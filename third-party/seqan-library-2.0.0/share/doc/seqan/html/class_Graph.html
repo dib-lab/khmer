@@ -1,0 +1,3529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_graph" data-page="Graph">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Graph - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Graph<div><div>Graph class.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>, 
+    <a href="specialization_Automaton.html" data-lang-entity="specialization">Automaton</a>, 
+    <a href="specialization_DirectedGraph.html" data-lang-entity="specialization">DirectedGraph</a>, 
+    <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a>, 
+    <a href="specialization_Tree.html" data-lang-entity="specialization">Tree</a>, 
+    <a href="specialization_UndirectedGraph.html" data-lang-entity="specialization">UndirectedGraph</a>, 
+    <a href="specialization_WordGraph.html" data-lang-entity="specialization">WordGraph</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_types.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TSpec]&gt;
+class Graph;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: Directed&lt;&gt;.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23addEdge" title="#Graph#addEdge (interface function)" data-lang-entity="interface_function">TEdgeDescriptor addEdge(g, source, target, label[, cargo]);, TEdgeDescriptor addEdge(g, source, target, cargo);</a></code></span>
+    <span class="summary_desc"><div>Adds a new edge to a graph, either with or without cargo.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23addEdges" title="#Graph#addEdges (interface function)" data-lang-entity="interface_function">void addEdges(graph, edges, size);</a></code></span>
+    <span class="summary_desc"><div>Shortcut to add multiple edges at once; vertices are created implicitely.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23addVertex" title="#Graph#addVertex (interface function)" data-lang-entity="interface_function">TVertexDescriptor addVertex(g);</a></code></span>
+    <span class="summary_desc"><div>Add a vertex to a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23assignEdgeMap" title="#Graph#assignEdgeMap (interface function)" data-lang-entity="interface_function">void assignEdgeMap(g, pm, prop);</a></code></span>
+    <span class="summary_desc"><div>Initializes a vertex map with values of an array.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23assignVertexMap" title="#Graph#assignVertexMap (interface function)" data-lang-entity="interface_function">void assignVertexMap(g, pm, prop);</a></code></span>
+    <span class="summary_desc"><div>Initializes a vertex map with values of an array.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23clear" title="#Graph#clear (interface function)" data-lang-entity="interface_function">void clear(g);</a></code></span>
+    <span class="summary_desc"><div>Remove all edges and vertices from a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23clearEdges" title="#Graph#clearEdges (interface function)" data-lang-entity="interface_function">void clearEdges(g);</a></code></span>
+    <span class="summary_desc"><div>Removes all edges from a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23clearVertices" title="#Graph#clearVertices (interface function)" data-lang-entity="interface_function">void clearVertices(g);</a></code></span>
+    <span class="summary_desc"><div>Removes all vertices from a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23degree" title="#Graph#degree (interface function)" data-lang-entity="interface_function">TSize degree(g, v);</a></code></span>
+    <span class="summary_desc"><div>Return degree of a vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23empty" title="#Graph#empty (interface function)" data-lang-entity="interface_function">bool empty(g);</a></code></span>
+    <span class="summary_desc"><div>Returns whether there are no vertices and edges in the graph or not.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23findEdge" title="#Graph#findEdge (interface function)" data-lang-entity="interface_function">TEdgeDescriptor findEdge(g, v, c);, TEdgeDescriptor findEdge(g, v, w);</a></code></span>
+    <span class="summary_desc"><div>Finds an edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23getAdjacencyMatrix" title="#Graph#getAdjacencyMatrix (interface function)" data-lang-entity="interface_function">void getAdjacencyMatrix(g, matrix);</a></code></span>
+    <span class="summary_desc"><div>Build an adjacency matrix representation of the graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23getNil" title="#Graph#getNil (interface function)" data-lang-entity="interface_function">T getNil(ptr);, T getNil&lt;T&gt;();</a></code></span>
+    <span class="summary_desc"><div>Returning a "nil" value for graphs.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23inDegree" title="#Graph#inDegree (interface function)" data-lang-entity="interface_function">TSize inDegree(g, v);</a></code></span>
+    <span class="summary_desc"><div>Return in degree of a vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23numEdges" title="#Graph#numEdges (interface function)" data-lang-entity="interface_function">TSize numEdges(g);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of edges in a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23numVertices" title="#Graph#numVertices (interface function)" data-lang-entity="interface_function">TSize numVertices(g);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of vertices in a graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23outDegree" title="#Graph#outDegree (interface function)" data-lang-entity="interface_function">TSize outDegree(g, v);</a></code></span>
+    <span class="summary_desc"><div>Return out degree of a vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23removeEdge" title="#Graph#removeEdge (interface function)" data-lang-entity="interface_function">void removeEdge(g, source, target[, label]);, void removeEdge(g, e);</a></code></span>
+    <span class="summary_desc"><div>Removes an edge from the graph. For automatons, a label is required.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23removeInEdges" title="#Graph#removeInEdges (interface function)" data-lang-entity="interface_function">void removeOutEdges(g, v);</a></code></span>
+    <span class="summary_desc"><div>Removes the incoming edges of a given vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23removeOutEdges" title="#Graph#removeOutEdges (interface function)" data-lang-entity="interface_function">void removeOutEdges(g, v);</a></code></span>
+    <span class="summary_desc"><div>Removes the outgoing edges of a given vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23removeVertex" title="#Graph#removeVertex (interface function)" data-lang-entity="interface_function">void removeVertex(g, v);</a></code></span>
+    <span class="summary_desc"><div>Remove a vertex from a Graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23resizeEdgeMap" title="#Graph#resizeEdgeMap (interface function)" data-lang-entity="interface_function">void resizeEdgeMap(pm, g[, prototype]);;</a></code></span>
+    <span class="summary_desc"><div>Initializes an edge map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23resizeVertexMap" title="#Graph#resizeVertexMap (interface function)" data-lang-entity="interface_function">void resizeVertexMap(pm, g[, prototype]);</a></code></span>
+    <span class="summary_desc"><div>Initializes a vertex map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23sourceVertex" title="#Graph#sourceVertex (interface function)" data-lang-entity="interface_function">TVertexDescriptor sourceVertex(g, e);, TVertexDescriptor sourceVertex(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the source vertex of an edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23targetVertex" title="#Graph#targetVertex (interface function)" data-lang-entity="interface_function">TVertexDescriptor targetVertex(g, e);, TVertexDescriptor targetVertex(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the target vertex of an edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23transpose" title="#Graph#transpose (interface function)" data-lang-entity="interface_function">void transpose(source, dest);, void transpose(g);</a></code></span>
+    <span class="summary_desc"><div>Transposes a graph, either in place or from source to dest.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23write" title="#Graph#write (interface function)" data-lang-entity="interface_function">void write(file, graph[, nodeMap[, edgeMap]], tag);</a></code></span>
+    <span class="summary_desc"><div>The graph to write out.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23Cargo" title="#Graph#Cargo (interface function)" data-lang-entity="interface_metafunction">Cargo&lt;T&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Type for the graph's cargo.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23EdgeDescriptor" title="#Graph#EdgeDescriptor (interface function)" data-lang-entity="interface_metafunction">EdgeDescriptor&lt;T&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Type of an object that represents an edge descriptor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23EdgeIdHandler" title="#Graph#EdgeIdHandler (interface function)" data-lang-entity="interface_metafunction">EdgeIdHandler&lt;T&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Type of an object that represents an IdManager.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23EdgeType" title="#Graph#EdgeType (interface function)" data-lang-entity="interface_metafunction">EdgeType&lt;T&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Edge type of a graph class.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23Size" title="#Graph#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TGraph&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Size type of the Graph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Graph%23VertexIdHandler" title="#Graph#VertexIdHandler (interface function)" data-lang-entity="interface_metafunction">VertexIdHandler&lt;T&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Type of an object that repreestns an IdManager.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Examples</h3><p>This is an example for Dijktra's algorithm on a directed graph with an external property map. The property map
+labels the edges with weights. The xample only outputs distances, not th edetails of the paths.</p><div data-src-path="demos/graph/graph_algo_dijkstra.cpp"><div class="highlight"><pre><span class="c1">// A tutorial about the dijkstra&#39;s algorithm, once using an external map and once using an internal map.</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/graph_algorithms.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Graph</span><span class="o">&lt;</span><span class="n">Directed</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="n">TGraph</span><span class="p">;</span>
+
+    <span class="c1">// Graph creation: 10 directed edges (0,1), (0,3), ...</span>
+    <span class="n">TGraph</span> <span class="n">g</span><span class="p">;</span>
+    <span class="n">Size</span><span class="o">&lt;</span><span class="n">TGraph</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">numEdges</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">VertexDescriptor</span><span class="o">&lt;</span><span class="n">TGraph</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">edges</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+    <span class="n">addEdges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">numEdges</span><span class="p">);</span>
+
+    <span class="c1">// One external property map: Weight map</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">weights</span><span class="p">[]</span> <span class="o">=</span>    <span class="p">{</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">weightMap</span><span class="p">;</span>
+    <span class="n">assignEdgeMap</span><span class="p">(</span><span class="n">weightMap</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">weights</span><span class="p">);</span>
+
+    <span class="c1">// Out-parameters: Predecessor and distance map</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">predMap</span><span class="p">;</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">distMap</span><span class="p">;</span>
+
+    <span class="c1">// Dijkstra from vertex 0 (single source shortest paths)</span>
+    <span class="n">dijkstra</span><span class="p">(</span><span class="n">predMap</span><span class="p">,</span> <span class="n">distMap</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">weightMap</span><span class="p">);</span>
+
+    <span class="c1">// Output distances of shortest paths</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TGraph</span><span class="p">,</span> <span class="n">VertexIterator</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Distance from 0 to &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">getValue</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">getProperty</span><span class="p">(</span><span class="n">distMap</span><span class="p">,</span> <span class="n">getValue</span><span class="p">(</span><span class="n">it</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="n">goNext</span><span class="p">(</span><span class="n">it</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/graph/graph_algo_dijkstra.cpp" target="_top">demos/graph/graph_algo_dijkstra.cpp</a></div></div><p>The output of the distances is as follows:</p><pre class="console" data-src-path="demos/graph/graph_algo_dijkstra.cpp.stdout">Distance from 0 to 0: 0
+Distance from 0 to 1: 8
+Distance from 0 to 2: 9
+Distance from 0 to 3: 5
+Distance from 0 to 4: 7
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Graph#addEdge" class="signature first" data-lang-entity="interface_function">
+      <code>TEdgeDescriptor addEdge(g, source, target, label[, cargo]);
+TEdgeDescriptor addEdge(g, source, target, cargo);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds a new edge to a graph, either with or without cargo.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The Graph to add the edge to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>Descriptor of the source vertex.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>Descriptor of the target vertex.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">label</code>
+            
+        
+      </th>
+      <td>Label of the edge, of alphabet type of the Automaton.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cargo</code>
+            
+        
+      </th>
+      <td>Cargo object for the edge.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TEdgeDescriptor</code></th>
+        <td>Descriptor of the added edge.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>For Automaton objects, a label is required but the label can only be given for Automatons.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#addEdges" class="signature" data-lang-entity="interface_function">
+      <code>void addEdges(graph, edges, size);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut to add multiple edges at once; vertices are created implicitely.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">graph</code>
+            
+        
+      </th>
+      <td>The Graph to add the edges to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">edges</code>
+            
+        
+      </th>
+      <td>An array of vertex descriptions.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>Size of the array. Must be a even.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>It is assumed that the edges in <tt>edges</tt> are stored as an array of vertex ids: <tt>source1, target1, source2,
+target2, ...</tt>. For a tree, the root must be the first vertex in this array and the enumeration is <tt>parent,
+child, parent, child</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#addVertex" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor addVertex(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a vertex to a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The Graph to add a vertex to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The descriptor of the added vertex.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#assignEdgeMap" class="signature" data-lang-entity="interface_function">
+      <code>void assignEdgeMap(g, pm, prop);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initializes a vertex map with values of an array.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pm</code>
+            
+        
+      </th>
+      <td>An <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">property map</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">prop</code>
+            
+        
+      </th>
+      <td>An array with properties that are to be assigned to the items in the property map.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>A Graph.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>For every edge id there must be an entry in the array.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#assignVertexMap" class="signature" data-lang-entity="interface_function">
+      <code>void assignVertexMap(g, pm, prop);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initializes a vertex map with values of an array.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">pm</code>
+            
+        
+      </th>
+      <td>A <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">property map</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>A Graph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">prop</code>
+            
+        
+      </th>
+      <td>An array with properties that are to be assigned to the items in the property map.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>For every vertex descriptor there must be an entry in the array.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove all edges and vertices from a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The graph to remove edges and vertices from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#clearEdges" class="signature" data-lang-entity="interface_function">
+      <code>void clearEdges(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes all edges from a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The graph to remove the edges from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#clearVertices" class="signature" data-lang-entity="interface_function">
+      <code>void clearVertices(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes all vertices from a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The graph to remove the vertices from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#degree" class="signature" data-lang-entity="interface_function">
+      <code>TSize degree(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return degree of a vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to query for its degree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of edges adjacent to vertex v.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether there are no vertices and edges in the graph or not.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if g is empty and <tt>false</tt> if not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#findEdge" class="signature" data-lang-entity="interface_function">
+      <code>TEdgeDescriptor findEdge(g, v, c);
+TEdgeDescriptor findEdge(g, v, w);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Finds an edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the source vertex.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>An edge label.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">w</code>
+            
+        
+      </th>
+      <td>The descriptor of the target descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TEdgeDescriptor</code></th>
+        <td>Edge descriptor of the found edge. 0 if not present. NB: in automatons, there is
+always a valid edge descriptor but the target may be nil.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>In an automaton, an edge is uniquely defined by a vertex and a label. In all other graphs, two adjacent vertices
+uniquely define an edge. If tehre are multiple edges between two vertices then the behaviour is undefined.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#getAdjacencyMatrix" class="signature" data-lang-entity="interface_function">
+      <code>void getAdjacencyMatrix(g, matrix);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Build an adjacency matrix representation of the graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to compute ajacency matrix for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">matrix</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> filled with <tt>n * n</tt> elements of <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>
+where <tt>matrix[i + n * j]</tt> gives the edge count between vertices <tt>i</tt> and
+<tt>j</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#getNil" class="signature" data-lang-entity="interface_function">
+      <code>T getNil(ptr);
+T getNil&lt;T&gt;();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returning a "nil" value for graphs.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ptr</code>
+            
+        
+      </th>
+      <td>Pointer to T to select the type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T</code></th>
+        <td>Pseudo nil value for type T.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Usefulf or various graph algorithms, e.g. missing predecessors or vertices that have not been visited.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#inDegree" class="signature" data-lang-entity="interface_function">
+      <code>TSize inDegree(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return in degree of a vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to query for its in degree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of in edges to vertex v.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#numEdges" class="signature" data-lang-entity="interface_function">
+      <code>TSize numEdges(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of edges in a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> to query for its number of edges.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of edges. TSize is the size type of g.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#numVertices" class="signature" data-lang-entity="interface_function">
+      <code>TSize numVertices(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of vertices in a graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> to query for its number of vertices.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of vertices. TSize is the size type of g.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#outDegree" class="signature" data-lang-entity="interface_function">
+      <code>TSize outDegree(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return out degree of a vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to query for its out degree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of out edges from vertex v.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#removeEdge" class="signature" data-lang-entity="interface_function">
+      <code>void removeEdge(g, source, target[, label]);
+void removeEdge(g, e);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes an edge from the graph. For automatons, a label is required.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The Graph to remove the edge from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>Descriptor of the source vertex.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">target</code>
+            
+        
+      </th>
+      <td>Descriptor of the target vertex.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>Descriptor of the edge to remove.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#removeInEdges" class="signature" data-lang-entity="interface_function">
+      <code>void removeOutEdges(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes the incoming edges of a given vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to remove the edges from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to remove incoming edges from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#removeOutEdges" class="signature" data-lang-entity="interface_function">
+      <code>void removeOutEdges(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes the outgoing edges of a given vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph to remove the edges from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to remove outgoing edges from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#removeVertex" class="signature" data-lang-entity="interface_function">
+      <code>void removeVertex(g, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove a vertex from a Graph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The Graph to remove the vertex from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to remove.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#resizeEdgeMap" class="signature" data-lang-entity="interface_function">
+      <code>void resizeEdgeMap(pm, g[, prototype]);;</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initializes an edge map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>A <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">property map</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>A Graph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">prototype</code>
+            
+        
+      </th>
+      <td>An optional prototype that is used for initializing the property map.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#resizeVertexMap" class="signature" data-lang-entity="interface_function">
+      <code>void resizeVertexMap(pm, g[, prototype]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initializes a vertex map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>A <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">property map</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>A Graph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">prototype</code>
+            
+        
+      </th>
+      <td>An optional prototype that is used for initializing the property map.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#sourceVertex" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor sourceVertex(g, e);
+TVertexDescriptor sourceVertex(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the source vertex of an edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph the edge is in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>The descriptor of the edge to remove.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>An edge iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>In a tree, the source vertex is always the child. In an undirected graph, the larger vertex descriptor of the two
+end points i the source. For an out-edge iterator, the source is always the OutEdgeIterator has been initialized
+with.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#targetVertex" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor targetVertex(g, e);
+TVertexDescriptor targetVertex(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the target vertex of an edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The Graph the edge is in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>The descriptor of the edge to remove.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>An edge iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>In a tree, the target vertex is always the child. In an undirected graph, the larger vertex descriptor of the two
+end points i the target. For an out-edge iterator, the target is always the OutEdgeIterator has <b>not</b> been
+initialized with.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#transpose" class="signature" data-lang-entity="interface_function">
+      <code>void transpose(source, dest);
+void transpose(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Transposes a graph, either in place or from source to dest.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>The input <a href="class_Graph.html" data-lang-entity="class">Graph</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dest</code>
+            
+        
+      </th>
+      <td>The output <a href="class_Graph.html" data-lang-entity="class">Graph</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> to transpose.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Graph#write" class="signature" data-lang-entity="interface_function">
+      <code>void write(file, graph[, nodeMap[, edgeMap]], tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The graph to write out.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">graph</code>
+            
+        
+      </th>
+      <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> to write out.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">nodeMap</code>
+            
+        
+      </th>
+      <td>Vertex labels for each vertex; optional.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">edgeMap</code>
+            
+        
+      </th>
+      <td>Edge label for each edge; optional.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>Format tag to use for writing. Types: DotDrawing.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Graph#Cargo" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Cargo&lt;T&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type for the graph's cargo.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting cargo type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Graph#EdgeDescriptor" class="signature" data-lang-entity="interface_metafunction">
+    <code>EdgeDescriptor&lt;T&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type of an object that represents an edge descriptor.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting edge descriptor type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The edge descriptor is a unique handle to a given edge in a graph. It is used in various graph functions, e.g. to
+remove edges, to assign cargo to an edge or to get the end points of an edge. It is also used to attache properties
+to edges via property maps.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">EdgeDescriptor</span><span class="o">&lt;</span><span class="n">Graph</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">ed</span><span class="p">;</span>  <span class="c1">// eD is an edge descriptor</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Graph#EdgeIdHandler" class="signature" data-lang-entity="interface_metafunction">
+    <code>EdgeIdHandler&lt;T&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type of an object that represents an IdManager.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>The Graph to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The IdManager type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The exact IdManager type depends on the edge stump type. If the edge stump has no ids then the IdManager simply
+counts edge ids and otherwise it manages a list of free and used ids.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Graph#EdgeType" class="signature" data-lang-entity="interface_metafunction">
+    <code>EdgeType&lt;T&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Edge type of a graph class.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>The <a href="class_Graph.html" data-lang-entity="class">Graph</a> type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting edge stump type that is used in the graph.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">EdgeType</span><span class="o">&lt;</span><span class="n">TGraph</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">e</span><span class="p">;</span>  <span class="c1">// e is an edge in a TGraph</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Graph#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TGraph&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Size type of the Graph.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TGraph</code></th>
+            <td>The graph type to query for its size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Graph#VertexIdHandler" class="signature" data-lang-entity="interface_metafunction">
+    <code>VertexIdHandler&lt;T&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type of an object that repreestns an IdManager.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>The Graph to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The IdManager type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Graph
+ * 
+ * @implements ContainerConcept
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief Graph class.
+ * 
+ * @signature template &lt;[typename TSpec]&gt; class Graph;
+ * 
+ * @tparam TSpec The specializing type. Default: Directed&amp;lt;&amp;gt;.
+ * 
+ * @section Examples
+ * 
+ * This is an example for Dijktra&#39;s algorithm on a directed graph with an
+ * external property map. The property map labels the edges with weights. The
+ * xample only outputs distances, not th edetails of the paths.
+ * 
+ * @include demos/graph/graph_algo_dijkstra.cpp
+ * 
+ * The output of the distances is as follows:
+ * 
+ * @include demos/graph/graph_algo_dijkstra.cpp.stdout
+ * 
+ * 
+ * 
+ * @mfn Graph#EdgeDescriptor
+ * 
+ * @brief Type of an object that represents an edge descriptor.
+ * 
+ * @signature EdgeDescriptor&lt;T&gt;::Type;
+ * 
+ * @tparam T The @link Graph @endlink type to query.
+ * 
+ * @return Type The resulting edge descriptor type.
+ * 
+ * The edge descriptor is a unique handle to a given edge in a graph. It is used
+ * in various graph functions, e.g. to remove edges, to assign cargo to an edge
+ * or to get the end points of an edge. It is also used to attache properties to
+ * edges via property maps.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * EdgeDescriptor&lt;Graph&lt;&gt; &gt;::Type ed;  // eD is an edge descriptor
+ * @endcode
+ * 
+ * 
+ * @mfn Graph#Cargo
+ * 
+ * @brief Type for the graph&#39;s cargo.
+ * 
+ * @signature Cargo&lt;T&gt;::Type;
+ * 
+ * @tparam T The @link Graph @endlink type to query.
+ * 
+ * @return Type The resulting cargo type.
+ * 
+ * @mfn Graph#EdgeType
+ * 
+ * @brief Edge type of a graph class.
+ * 
+ * @signature EdgeType&lt;T&gt;::Type;
+ * 
+ * @tparam T The @link Graph @endlink type to query.
+ * 
+ * @return Type The resulting edge stump type that is used in the graph.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * EdgeType&lt;TGraph&gt;::Type e;  // e is an edge in a TGraph
+ * @endcode
+ * 
+ * 
+ * @mfn Graph#EdgeIdHandler
+ * 
+ * @brief Type of an object that represents an IdManager.
+ * 
+ * @signature EdgeIdHandler&lt;T&gt;::Type;
+ * 
+ * @tparam T The Graph to query.
+ * 
+ * @return Type The IdManager type.
+ * 
+ * The exact IdManager type depends on the edge stump type. If the edge stump
+ * has no ids then the IdManager simply counts edge ids and otherwise it manages
+ * a list of free and used ids.
+ * 
+ * @mfn Graph#VertexIdHandler
+ * 
+ * @brief Type of an object that repreestns an IdManager.
+ * 
+ * @signature VertexIdHandler&lt;T&gt;::Type;
+ * 
+ * @tparam T The Graph to query.
+ * 
+ * @return Type The IdManager type.
+ * 
+ * @mfn Graph#Size
+ * 
+ * @brief Size type of the Graph.
+ * 
+ * @signature Size&lt;TGraph&gt;::Type;
+ * 
+ * @tparam TGraph The graph type to query for its size type.
+ * 
+ * @return Type The size type.
+ * 
+ * @fn Graph#write
+ * 
+ * @brief The graph to write out.
+ * 
+ * @signature void write(file, graph[, nodeMap[, edgeMap]], tag);
+ * 
+ * @param[in,out] file The @link StreamConcept @endlink to write to.
+ * @param[in] graph The @link Graph @endlink to write out.
+ * @param[in] nodeMap Vertex labels for each vertex; optional.
+ * @param[in] edgeMap Edge label for each edge; optional.
+ * @param[in] tag Format tag to use for writing. Types: DotDrawing.
+ * 
+ * @fn Graph#transpose
+ * 
+ * @brief Transposes a graph, either in place or from source to dest.
+ * 
+ * @signature void transpose(source, dest);
+ * @signature void transpose(g);
+ * 
+ * @param[in] source The input @link Graph @endlink.
+ * @param[in] dest The output @link Graph @endlink.
+ * @param[in,out] g The @link Graph @endlink to transpose.
+ * 
+ * @fn Graph#numEdges
+ * 
+ * @brief Returns the number of edges in a graph.
+ * 
+ * @signature TSize numEdges(g);
+ * 
+ * @param[in] g The @link Graph @endlink to query for its number of edges.
+ * 
+ * @return TSize The number of edges. TSize is the size type of g.
+ * 
+ * @fn Graph#numVertices
+ * 
+ * @brief Returns the number of vertices in a graph.
+ * 
+ * @signature TSize numVertices(g);
+ * 
+ * @param[in] g The @link Graph @endlink to query for its number of vertices.
+ * 
+ * @return TSize The number of vertices. TSize is the size type of g.
+ * 
+ * @fn Graph#empty
+ * 
+ * @brief Returns whether there are no vertices and edges in the graph or not.
+ * 
+ * @signature bool empty(g);
+ * 
+ * @param[in] g The Graph to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if g is empty and &lt;tt&gt;false&lt;/tt&gt; if not.
+ * 
+ * @fn Graph#clearEdges
+ * 
+ * @brief Removes all edges from a graph.
+ * 
+ * @signature void clearEdges(g);
+ * 
+ * @param[in,out] g The graph to remove the edges from.
+ * 
+ * @fn Graph#clear
+ * 
+ * @brief Remove all edges and vertices from a graph.
+ * 
+ * @signature void clear(g);
+ * 
+ * @param[in,out] g The graph to remove edges and vertices from.
+ * 
+ * @fn Graph#outDegree
+ * 
+ * @brief Return out degree of a vertex.
+ * 
+ * @signature TSize outDegree(g, v);
+ * 
+ * @param[in] g The Graph to query.
+ * @param[in] v The descriptor of the vertex to query for its out degree.
+ * 
+ * @return TSize The number of out edges from vertex v.
+ * 
+ * @fn Graph#inDegree
+ * 
+ * @brief Return in degree of a vertex.
+ * 
+ * @signature TSize inDegree(g, v);
+ * 
+ * @param[in] g The Graph to query.
+ * @param[in] v The descriptor of the vertex to query for its in degree.
+ * 
+ * @return TSize The number of in edges to vertex v.
+ * 
+ * @fn Graph#degree
+ * 
+ * @brief Return degree of a vertex.
+ * 
+ * @signature TSize degree(g, v);
+ * 
+ * @param[in] g The Graph to query.
+ * @param[in] v The descriptor of the vertex to query for its degree.
+ * 
+ * @return TSize The number of edges adjacent to vertex v.
+ * 
+ * @fn Graph#addVertex
+ * 
+ * @brief Add a vertex to a graph.
+ * 
+ * @signature TVertexDescriptor addVertex(g);
+ * 
+ * @param[in,out] g The Graph to add a vertex to.
+ * 
+ * @return TVertexDescriptor The descriptor of the added vertex.
+ * 
+ * @fn Graph#removeVertex
+ * 
+ * @brief Remove a vertex from a Graph.
+ * 
+ * @signature void removeVertex(g, v);
+ * 
+ * @param[in,out] g The Graph to remove the vertex from.
+ * @param[in] v The descriptor of the vertex to remove.
+ * 
+ * @fn Graph#addEdge
+ * 
+ * @brief Adds a new edge to a graph, either with or without cargo.
+ * 
+ * @signature TEdgeDescriptor addEdge(g, source, target, label[, cargo]);
+ * @signature TEdgeDescriptor addEdge(g, source, target, cargo);
+ * 
+ * @param[in,out] g The Graph to add the edge to.
+ * @param[in] source Descriptor of the source vertex.
+ * @param[in] source Descriptor of the target vertex.
+ * @param[in] label Label of the edge, of alphabet type of the Automaton.
+ * @param[in] cargo Cargo object for the edge.
+ * 
+ * @return TEdgeDescriptor Descriptor of the added edge.
+ * 
+ * @section Remarks
+ * 
+ * For Automaton objects, a label is required but the label can only be given
+ * for Automatons.
+ * 
+ * @fn Graph#removeEdge
+ * 
+ * @brief Removes an edge from the graph. For automatons, a label is required.
+ * 
+ * @signature void removeEdge(g, source, target[, label]);
+ * @signature void removeEdge(g, e);
+ * 
+ * @param[in,out] g The Graph to remove the edge from.
+ * @param[in] source Descriptor of the source vertex.
+ * @param[in] target Descriptor of the target vertex.
+ * @param[in] e Descriptor of the edge to remove.
+ * 
+ * @fn Graph#removeInEdges
+ * 
+ * @brief Removes the incoming edges of a given vertex.
+ * 
+ * @signature void removeOutEdges(g, v);
+ * 
+ * @param[in] g The Graph to remove the edges from.
+ * @param[in] v The descriptor of the vertex to remove incoming edges from.
+ * 
+ * @fn Graph#removeOutEdges
+ * 
+ * @brief Removes the outgoing edges of a given vertex.
+ * 
+ * @signature void removeOutEdges(g, v);
+ * 
+ * @param[in] g The Graph to remove the edges from.
+ * @param[in] v The descriptor of the vertex to remove outgoing edges from.
+ * 
+ * @fn Graph#targetVertex
+ * 
+ * @brief Returns the target vertex of an edge.
+ * 
+ * @signature TVertexDescriptor targetVertex(g, e);
+ * @signature TVertexDescriptor targetVertex(it);
+ * 
+ * @param[in] g The Graph the edge is in.
+ * @param[in] e The descriptor of the edge to remove.
+ * @param[in] it An edge iterator.
+ * 
+ * @section Remarks
+ * 
+ * In a tree, the target vertex is always the child. In an undirected graph, the
+ * larger vertex descriptor of the two end points i the target. For an out-edge
+ * iterator, the target is always the OutEdgeIterator has &lt;b&gt;not&lt;/b&gt; been
+ * initialized with.
+ * 
+ * @fn Graph#sourceVertex
+ * 
+ * @brief Returns the source vertex of an edge.
+ * 
+ * @signature TVertexDescriptor sourceVertex(g, e);
+ * @signature TVertexDescriptor sourceVertex(it);
+ * 
+ * @param[in] g The Graph the edge is in.
+ * @param[in] e The descriptor of the edge to remove.
+ * @param[in] it An edge iterator.
+ * 
+ * @section Remarks
+ * 
+ * In a tree, the source vertex is always the child. In an undirected graph, the
+ * larger vertex descriptor of the two end points i the source. For an out-edge
+ * iterator, the source is always the OutEdgeIterator has been initialized with.
+ * 
+ * @fn Graph#getAdjacencyMatrix
+ * 
+ * @brief Build an adjacency matrix representation of the graph.
+ * 
+ * @signature void getAdjacencyMatrix(g, matrix);
+ * 
+ * @param[in] g The Graph to compute ajacency matrix for.
+ * @param[out] matrix A @link String @endlink filled with &lt;tt&gt;n * n&lt;/tt&gt;
+ *                    elements of @link IntegerConcept @endlink where
+ *                    &lt;tt&gt;matrix[i + n * j]&lt;/tt&gt; gives the edge count between
+ *                    vertices &lt;tt&gt;i&lt;/tt&gt; and &lt;tt&gt;j&lt;/tt&gt;.
+ * 
+ * @fn Graph#findEdge
+ * 
+ * @brief Finds an edge.
+ * 
+ * @signature TEdgeDescriptor findEdge(g, v, c);
+ * @signature TEdgeDescriptor findEdge(g, v, w);
+ * 
+ * @param[in] g The Graph to query.
+ * @param[in] v The descriptor of the source vertex.
+ * @param[in] c An edge label.
+ * @param[in] w The descriptor of the target descriptor.
+ * 
+ * @return TEdgeDescriptor Edge descriptor of the found edge. 0 if not present.
+ *                         NB: in automatons, there is always a valid edge
+ *                         descriptor but the target may be nil.
+ * 
+ * @section Remarks
+ * 
+ * In an automaton, an edge is uniquely defined by a vertex and a label. In all
+ * other graphs, two adjacent vertices uniquely define an edge. If tehre are
+ * multiple edges between two vertices then the behaviour is undefined.
+ * 
+ * @fn Graph#clearVertices
+ * 
+ * @brief Removes all vertices from a graph.
+ * 
+ * @signature void clearVertices(g);
+ * 
+ * @param[in,out] g The graph to remove the vertices from.
+ * 
+ * @fn Graph#getNil
+ * 
+ * @brief Returning a &#34;nil&#34; value for graphs.
+ * 
+ * @signature T getNil(ptr);
+ * @signature T getNil&lt;T&gt;();
+ * 
+ * @param[in] ptr Pointer to T to select the type.
+ * 
+ * @return T Pseudo nil value for type T.
+ * 
+ * Usefulf or various graph algorithms, e.g. missing predecessors or vertices
+ * that have not been visited.
+ * 
+ * @fn Graph#addEdges
+ * 
+ * @brief Shortcut to add multiple edges at once; vertices are created
+ *        implicitely.
+ * 
+ * @signature void addEdges(graph, edges, size);
+ * 
+ * @param[in,out] graph The Graph to add the edges to.
+ * @param[in] edges An array of vertex descriptions.
+ * @param[in] size Size of the array. Must be a even.
+ * 
+ * It is assumed that the edges in &lt;tt&gt;edges&lt;/tt&gt; are stored as an array of
+ * vertex ids: &lt;tt&gt;source1, target1, source2, target2, ...&lt;/tt&gt;. For a tree, the
+ * root must be the first vertex in this array and the enumeration is
+ * &lt;tt&gt;parent, child, parent, child&lt;/tt&gt;.
+ * 
+ * @fn Graph#resizeVertexMap
+ * 
+ * @brief Initializes a vertex map.
+ * 
+ * @signature void resizeVertexMap(pm, g[, prototype]);
+ * 
+ * @param[in,out] pm A @link PropertyMapConcept property map @endlink.
+ * @param[in] g A Graph.
+ * @param[in] prototype An optional prototype that is used for initializing the
+ *                      property map.
+ * 
+ * @fn Graph#resizeEdgeMap
+ * 
+ * @brief Initializes an edge map.
+ * 
+ * @signature void resizeEdgeMap(pm, g[, prototype]);;
+ * 
+ * @param[in,out] pm A @link PropertyMapConcept property map @endlink.
+ * @param[in] g A Graph.
+ * @param[in] prototype An optional prototype that is used for initializing the
+ *                      property map.
+ * 
+ * @fn Graph#assignVertexMap
+ * 
+ * @brief Initializes a vertex map with values of an array.
+ * 
+ * @signature void assignVertexMap(g, pm, prop);
+ * 
+ * @param[out] pm A @link PropertyMapConcept property map @endlink.
+ * @param[in] g A Graph.
+ * @param[in] prop An array with properties that are to be assigned to the items
+ *                 in the property map.
+ * 
+ * For every vertex descriptor there must be an entry in the array.
+ * 
+ * @fn Graph#assignEdgeMap
+ * 
+ * @brief Initializes a vertex map with values of an array.
+ * 
+ * @signature void assignEdgeMap(g, pm, prop);
+ * 
+ * @param[in] pm An @link PropertyMapConcept property map @endlink.
+ * @param[out] prop An array with properties that are to be assigned to the
+ *                  items in the property map.
+ * @param[in] g A Graph.
+ * 
+ * For every edge id there must be an entry in the array.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

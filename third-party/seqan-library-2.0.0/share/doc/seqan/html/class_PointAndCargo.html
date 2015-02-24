@@ -1,0 +1,1038 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_pointandcargo" data-page="PointAndCargo">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>PointAndCargo - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>PointAndCargo<div><div>Simple record class storing a point (one-value) interval and cargo.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/misc/interval_tree.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TValue[, typename TCargo]]&gt;
+class PointAndCargo;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The value type.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The cargo type.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%3A%3APointAndCargo" title="#PointAndCargo::PointAndCargo (interface function)" data-lang-entity="member_function">PointAndCargo::PointAndCargo();, PointAndCargo::PointAndCargo(point, cargo);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23cargo" title="#PointAndCargo#cargo (interface function)" data-lang-entity="interface_function">TCargo cargo(point);</a></code></span>
+    <span class="summary_desc"><div>Access to the cargo.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23getCargo" title="#PointAndCargo#getCargo (interface function)" data-lang-entity="interface_function">TCargo getCargo(point);</a></code></span>
+    <span class="summary_desc"><div>Access to the cargo.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23getLeftBoundary" title="#PointAndCargo#getLeftBoundary (interface function)" data-lang-entity="interface_function">TBoundary getLeftBoundary(point);</a></code></span>
+    <span class="summary_desc"><div>Access to getLeft boundary.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23leftBoundary" title="#PointAndCargo#leftBoundary (interface function)" data-lang-entity="interface_function">TBoundary leftBoundary(point);</a></code></span>
+    <span class="summary_desc"><div>Access to left boundary.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23rightBoundary" title="#PointAndCargo#rightBoundary (interface function)" data-lang-entity="interface_function">TBoundary rightBoundary(point);</a></code></span>
+    <span class="summary_desc"><div>Access to right boundary.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23Cargo" title="#PointAndCargo#Cargo (interface function)" data-lang-entity="interface_metafunction">Cargo&lt;TPointAndCargo&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the cargo type.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PointAndCargo%23Value" title="#PointAndCargo#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TPointAndCargo&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the value type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#PointAndCargo%3A%3Acargo" title="#PointAndCargo::cargo (interface function)" data-lang-entity="member_variable">
+        TCargo PointAndCargo::cargo
+    </a></code></span>
+    <span class="summary_desc"><div>The cargo to store.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#PointAndCargo%3A%3Apoint" title="#PointAndCargo::point (interface function)" data-lang-entity="member_variable">
+        TValue PointAndCargo::point
+    </a></code></span>
+    <span class="summary_desc"><div>The point to store.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PointAndCargo::PointAndCargo" class="signature first" data-lang-entity="member_function">
+      <code>PointAndCargo::PointAndCargo();
+PointAndCargo::PointAndCargo(point, cargo);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The point to store.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cargo</code>
+            
+        
+      </th>
+      <td>The cargo to store.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PointAndCargo#cargo" class="signature first" data-lang-entity="interface_function">
+      <code>TCargo cargo(point);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to the cargo.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The PointAndCargo to query for its cargo.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Reference to the cargo member.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PointAndCargo#getCargo" class="signature" data-lang-entity="interface_function">
+      <code>TCargo getCargo(point);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to the cargo.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The PointAndCargo to query for its cargo.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Copy of the cargo member.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PointAndCargo#getLeftBoundary" class="signature" data-lang-entity="interface_function">
+      <code>TBoundary getLeftBoundary(point);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to getLeft boundary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The PointAndCargo to query for its left boundary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TBoundary</code></th>
+        <td>Copy of the left boundary value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PointAndCargo#leftBoundary" class="signature" data-lang-entity="interface_function">
+      <code>TBoundary leftBoundary(point);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to left boundary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The PointAndCargo to query for its left boundary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TBoundary</code></th>
+        <td>Reference to the left boundary value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PointAndCargo#rightBoundary" class="signature" data-lang-entity="interface_function">
+      <code>TBoundary rightBoundary(point);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to right boundary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">point</code>
+            
+        
+      </th>
+      <td>The PointAndCargo to query for its right boundary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TBoundary</code></th>
+        <td>Reference to the right boundary value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="PointAndCargo#Cargo" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Cargo&lt;TPointAndCargo&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the cargo type.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="PointAndCargo#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TPointAndCargo&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the value type.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="PointAndCargo::cargo" class="signature first" data-lang-entity="member_variable">
+      <code>TCargo PointAndCargo::cargo</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The cargo to store.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="PointAndCargo::point" class="signature" data-lang-entity="member_variable">
+      <code>TValue PointAndCargo::point</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The point to store.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class PointAndCargo
+ * 
+ * @headerfile &lt;seqan/misc/interval_tree.h&gt;
+ * 
+ * @brief Simple record class storing a point (one-value) interval and cargo.
+ * 
+ * @signature template &lt;[typename TValue[, typename TCargo]]&gt; class
+ *            PointAndCargo;
+ * 
+ * @tparam TValue The value type.
+ * @tparam TCargo The cargo type.
+ * 
+ * @mfn PointAndCargo#Value
+ * 
+ * @brief Return the value type.
+ * 
+ * @signature Value&lt;TPointAndCargo&gt;::Type;
+ * 
+ * @mfn PointAndCargo#Cargo
+ * 
+ * @brief Return the cargo type.
+ * 
+ * @signature Cargo&lt;TPointAndCargo&gt;::Type;
+ * 
+ * @fn PointAndCargo::PointAndCargo
+ * 
+ * @brief Constructor
+ * 
+ * @signature PointAndCargo::PointAndCargo();
+ * @signature PointAndCargo::PointAndCargo(point, cargo);
+ * 
+ * @param[in] point The point to store.
+ * @param[in] cargo The cargo to store.
+ * 
+ * @var TValue PointAndCargo::point;
+ * 
+ * @brief The point to store.
+ * 
+ * @var TCargo PointAndCargo::cargo;
+ * 
+ * @brief The cargo to store.
+ * 
+ * @fn PointAndCargo#leftBoundary
+ * 
+ * @brief Access to left boundary.
+ * 
+ * @signature TBoundary leftBoundary(point);
+ * 
+ * @param[in] point The PointAndCargo to query for its left boundary.
+ * 
+ * @return TBoundary Reference to the left boundary value.
+ * 
+ * @fn PointAndCargo#rightBoundary
+ * 
+ * @brief Access to right boundary.
+ * 
+ * @signature TBoundary rightBoundary(point);
+ * 
+ * @param[in] point The PointAndCargo to query for its right boundary.
+ * 
+ * @return TBoundary Reference to the right boundary value.
+ * 
+ * @fn PointAndCargo#getLeftBoundary
+ * 
+ * @brief Access to getLeft boundary.
+ * 
+ * @signature TBoundary getLeftBoundary(point);
+ * 
+ * @param[in] point The PointAndCargo to query for its left boundary.
+ * 
+ * @return TBoundary Copy of the left boundary value.
+ * 
+ * @fn PointAndCargo#cargo
+ * 
+ * @brief Access to the cargo.
+ * 
+ * @signature TCargo cargo(point);
+ * 
+ * @param[in] point The PointAndCargo to query for its cargo.
+ * 
+ * @return TCargo Reference to the cargo member.
+ * 
+ * @fn PointAndCargo#getCargo
+ * 
+ * @brief Access to the cargo.
+ * 
+ * @signature TCargo getCargo(point);
+ * 
+ * @param[in] point The PointAndCargo to query for its cargo.
+ * 
+ * @return TCargo Copy of the cargo member.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

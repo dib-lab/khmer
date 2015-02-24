@@ -1,0 +1,2478 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_bamalignmentrecord" data-page="BamAlignmentRecord">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>BamAlignmentRecord - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>BamAlignmentRecord<div><div>Represent a record from a BAM or SAM file.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_CopyConstructibleConcept.html" data-lang-entity="concept">CopyConstructibleConcept</a>, 
+    <a href="concept_DefaultConstructibleConcept.html" data-lang-entity="concept">DefaultConstructibleConcept</a>, 
+    <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/bam_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class BamAlignmentRecord;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23bamRecordToAlignment" title="#BamAlignmentRecord#bamRecordToAlignment (interface function)" data-lang-entity="interface_function">void bamRecordToAlignment(align, reference, record);</a></code></span>
+    <span class="summary_desc"><div>Construct an <a href="class_Align.html" data-lang-entity="class">Align</a> object from a BamAlignmentRecord object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23clear" title="#BamAlignmentRecord#clear (interface function)" data-lang-entity="interface_function">void clear(record);</a></code></span>
+    <span class="summary_desc"><div>Clear BamAlignmentRecord.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23getAlignmentLengthInRef" title="#BamAlignmentRecord#getAlignmentLengthInRef (interface function)" data-lang-entity="interface_function">unsigned getAlignmentLengthInRef(record);</a></code></span>
+    <span class="summary_desc"><div>Return the alignment length in the record's projection in the reference.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23getContigLength" title="#BamAlignmentRecord#getContigLength (interface function)" data-lang-entity="interface_function">TLength getContigLength(record, file);</a></code></span>
+    <span class="summary_desc"><div>Return the length of the reference contig of a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23getContigName" title="#BamAlignmentRecord#getContigName (interface function)" data-lang-entity="interface_function">TNameString getContigName(record, file);</a></code></span>
+    <span class="summary_desc"><div>Return the name of the reference contig of a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagAllProper" title="#BamAlignmentRecord#hasFlagAllProper (interface function)" data-lang-entity="interface_function">bool hasFlagAllProper(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "all properly aligned" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagDuplicate" title="#BamAlignmentRecord#hasFlagDuplicate (interface function)" data-lang-entity="interface_function">bool hasFlagDuplicate(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "duplicate" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagFirst" title="#BamAlignmentRecord#hasFlagFirst (interface function)" data-lang-entity="interface_function">bool hasFlagFirst(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "first in template" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagLast" title="#BamAlignmentRecord#hasFlagLast (interface function)" data-lang-entity="interface_function">bool hasFlagLast(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "last in template" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagMultiple" title="#BamAlignmentRecord#hasFlagMultiple (interface function)" data-lang-entity="interface_function">bool hasFlagMultiple(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "multiple" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagNextRC" title="#BamAlignmentRecord#hasFlagNextRC (interface function)" data-lang-entity="interface_function">bool hasFlagNextRC(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "next reverse-complemented" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagNextUnmapped" title="#BamAlignmentRecord#hasFlagNextUnmapped (interface function)" data-lang-entity="interface_function">bool hasFlagNextUnmapped(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "next unmapped" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagQCNoPass" title="#BamAlignmentRecord#hasFlagQCNoPass (interface function)" data-lang-entity="interface_function">bool hasFlagQCNoPass(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "did not pass QC" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagRC" title="#BamAlignmentRecord#hasFlagRC (interface function)" data-lang-entity="interface_function">bool hasFlagRC(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "reverse-complemented" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagSecondary" title="#BamAlignmentRecord#hasFlagSecondary (interface function)" data-lang-entity="interface_function">bool hasFlagSecondary(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "secondary" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagSupplementary" title="#BamAlignmentRecord#hasFlagSupplementary (interface function)" data-lang-entity="interface_function">bool hasFlagSupplementary(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "supplementary" flag set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%23hasFlagUnmapped" title="#BamAlignmentRecord#hasFlagUnmapped (interface function)" data-lang-entity="interface_function">bool hasFlagUnmapped(record);</a></code></span>
+    <span class="summary_desc"><div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "unmapped" flag set.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AbeginPos" title="#BamAlignmentRecord::beginPos (interface function)" data-lang-entity="member_variable">
+        __int32 BamAlignmentRecord::beginPos
+    </a></code></span>
+    <span class="summary_desc"><div>Begin position of the alignment (0-based, <tt>INVALID_POS</tt> for '0' in SAM).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Abin" title="#BamAlignmentRecord::bin (interface function)" data-lang-entity="member_variable">
+        __uint16 BamAlignmentRecord::bin
+    </a></code></span>
+    <span class="summary_desc"><div>The bin of the alignment, automatically computed when writing BAM.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Acigar" title="#BamAlignmentRecord::cigar (interface function)" data-lang-entity="member_variable">
+        TCigarString BamAlignmentRecord::cigar
+    </a></code></span>
+    <span class="summary_desc"><div>The CIGAR string for the BAM alignment (of type String&lt;CigarElement&lt;&gt; &gt;).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Aflag" title="#BamAlignmentRecord::flag (interface function)" data-lang-entity="member_variable">
+        __uint16 BamAlignmentRecord::flag
+    </a></code></span>
+    <span class="summary_desc"><div>The flag of this mapping.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AINVALID_LEN" title="#BamAlignmentRecord::INVALID_LEN (interface function)" data-lang-entity="member_variable">
+        __uint32 BamAlignmentRecord::INVALID_LEN
+    </a></code></span>
+    <span class="summary_desc"><div>Static member with invalid/sentinel reference ids (0 as in BAM/SAM).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AINVALID_POS" title="#BamAlignmentRecord::INVALID_POS (interface function)" data-lang-entity="member_variable">
+        __uint32 BamAlignmentRecord::INVALID_POS
+    </a></code></span>
+    <span class="summary_desc"><div>Static member with invalid sentinel/position value (-1).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AINVALID_REFID" title="#BamAlignmentRecord::INVALID_REFID (interface function)" data-lang-entity="member_variable">
+        __uint32 BamAlignmentRecord::INVALID_REFID
+    </a></code></span>
+    <span class="summary_desc"><div>Static member with invalid sentinel/position value (-1).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AmapQ" title="#BamAlignmentRecord::mapQ (interface function)" data-lang-entity="member_variable">
+        __uint8 BamAlignmentRecord::mapQ
+    </a></code></span>
+    <span class="summary_desc"><div>Mapping quality (255 for '*').</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3ApNext" title="#BamAlignmentRecord::pNext (interface function)" data-lang-entity="member_variable">
+        __int32 BamAlignmentRecord::pNext
+    </a></code></span>
+    <span class="summary_desc"><div>Position on the reference where the next fragment in this template aligns.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AqName" title="#BamAlignmentRecord::qName (interface function)" data-lang-entity="member_variable">
+        CharString BamAlignmentRecord::qName
+    </a></code></span>
+    <span class="summary_desc"><div>The query/read name.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Aqual" title="#BamAlignmentRecord::qual (interface function)" data-lang-entity="member_variable">
+        CharString BamAlignmentRecord::qual
+    </a></code></span>
+    <span class="summary_desc"><div>The PHRED quality values of the sequence (as in SAM), empty for '*'.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3ArID" title="#BamAlignmentRecord::rID (interface function)" data-lang-entity="member_variable">
+        __int32 BamAlignmentRecord::rID
+    </a></code></span>
+    <span class="summary_desc"><div>ID of reference for this fragment mapping (0-based, <tt>INVALID_REFID</tt> for '*' in SAM).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3ArNextId" title="#BamAlignmentRecord::rNextId (interface function)" data-lang-entity="member_variable">
+        __int32 BamAlignmentRecord::rNextId
+    </a></code></span>
+    <span class="summary_desc"><div>The ID of the reference where the next fragment in this template aligns.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Aseq" title="#BamAlignmentRecord::seq (interface function)" data-lang-entity="member_variable">
+        CharString BamAlignmentRecord::seq
+    </a></code></span>
+    <span class="summary_desc"><div>The fragment sequence.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3Atags" title="#BamAlignmentRecord::tags (interface function)" data-lang-entity="member_variable">
+        CharString BamAlignmentRecord::tags
+    </a></code></span>
+    <span class="summary_desc"><div>Raw BAM tag string, use <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> for comfortable access.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamAlignmentRecord%3A%3AtLen" title="#BamAlignmentRecord::tLen (interface function)" data-lang-entity="member_variable">
+        __int32 BamAlignmentRecord::tLen
+    </a></code></span>
+    <span class="summary_desc"><div>The inferred template size.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>While also used to represent SAM records, the type is called <tt>BamAlignmentRecord</tt> since the data directly
+reflects a BAM records (0-based positions, identify references by id, and tags are stored in BAM format.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a></li>
+  
+  <li><a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#bamRecordToAlignment" class="signature first" data-lang-entity="interface_function">
+      <code>void bamRecordToAlignment(align, reference, record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Construct an <a href="class_Align.html" data-lang-entity="class">Align</a> object from a BamAlignmentRecord object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">align</code>
+            
+        
+      </th>
+      <td>The <a href="class_Align.html" data-lang-entity="class">Align</a> object to create the alignment object in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">reference</code>
+            
+        
+      </th>
+      <td>The string with the reference that <tt>record</tt> lies on.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> to construct alignment from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The function will resize <tt>align</tt> to have two rows. The part of the reference that the read from
+<tt>record</tt> aligns to will be copied to the first row and the sequence from record will be copied to the second
+row (and reverse-complemented if appropriate). Then, the gaps from the CIGAR string in <tt>record</tt> will be
+copied to <tt>align</tt>.</p><h4>Example</h4><p>Here is an example:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">StringSet</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="o">&gt;</span> <span class="n">references</span><span class="p">;</span>
+<span class="n">BamAlignment</span> <span class="n">record</span><span class="p">;</span>
+<span class="c1">// Read references and record.</span>
+<span class="n">Align</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">record</span><span class="p">.</span><span class="n">rID</span> <span class="o">!=</span> <span class="n">BamAlignmentRecord</span><span class="o">::</span><span class="n">INVALID_REFID</span><span class="p">)</span>
+    <span class="n">bamRecordToAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">references</span><span class="p">[</span><span class="n">record</span><span class="p">.</span><span class="n">refId</span><span class="p">],</span> <span class="n">record</span><span class="p">);</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear BamAlignmentRecord.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Clears all strings and resets it to default initialization state.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#getAlignmentLengthInRef" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getAlignmentLengthInRef(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the alignment length in the record's projection in the reference.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to compute length for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The alignment length.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#getContigLength" class="signature" data-lang-entity="interface_function">
+      <code>TLength getContigLength(record, file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the length of the reference contig of a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a> or <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a> where the record belongs to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TLength</code></th>
+        <td>The length of the reference contig. <tt>TLength</tt> is the <a href="global_metafunction_Value.html" data-lang-entity="global_metafunction">Value</a> type of the LengthStore.
+The LengthStore type can be determined using the <a href="global_metafunction_Member.html" data-lang-entity="global_metafunction">Member</a> metafunction
+for the <a href="class_BamIOContext.html" data-lang-entity="class">BamIOContext</a> in conjunction with the <a href="group_BamIOContextMemberTag.html#BamIOContextMemberTag#LengthStoreMember" data-lang-entity="grouped_tag">LengthStoreMember</a> tag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#getContigName" class="signature" data-lang-entity="interface_function">
+      <code>TNameString getContigName(record, file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the name of the reference contig of a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a> or <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a> where the record belongs to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TNameString</code></th>
+        <td>The name of the reference contig. <tt>TNameString</tt> is the <a href="global_metafunction_Value.html" data-lang-entity="global_metafunction">Value</a> type of the NameStore.
+The NameStore type can be determined using the <a href="global_metafunction_Member.html" data-lang-entity="global_metafunction">Member</a> metafunction
+for the <a href="class_BamIOContext.html" data-lang-entity="class">BamIOContext</a> in conjunction with the <a href="group_BamIOContextMemberTag.html#BamIOContextMemberTag#NameStoreMember" data-lang-entity="grouped_tag">NameStoreMember</a> tag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagAllProper" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagAllProper(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "all properly aligned" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagDuplicate" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagDuplicate(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "duplicate" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagFirst" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagFirst(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "first in template" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagLast" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagLast(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "last in template" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagMultiple" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagMultiple(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "multiple" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagNextRC" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagNextRC(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "next reverse-complemented" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagNextUnmapped" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagNextUnmapped(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "next unmapped" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagQCNoPass" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagQCNoPass(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "did not pass QC" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagRC" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagRC(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "reverse-complemented" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagSecondary" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagSecondary(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "secondary" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagSupplementary" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagSupplementary(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "supplementary" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>record</code>
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord#hasFlagUnmapped" class="signature" data-lang-entity="interface_function">
+      <code>bool hasFlagUnmapped(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return true if a <a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a> has the "unmapped" flag set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The BamAlignmentRecord to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the flag is set, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::beginPos" class="signature first" data-lang-entity="member_variable">
+      <code>__int32 BamAlignmentRecord::beginPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Begin position of the alignment (0-based, <tt>INVALID_POS</tt> for '0' in SAM).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::bin" class="signature" data-lang-entity="member_variable">
+      <code>__uint16 BamAlignmentRecord::bin</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The bin of the alignment, automatically computed when writing BAM.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::cigar" class="signature" data-lang-entity="member_variable">
+      <code>TCigarString BamAlignmentRecord::cigar</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The CIGAR string for the BAM alignment (of type String&lt;CigarElement&lt;&gt; &gt;).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::flag" class="signature" data-lang-entity="member_variable">
+      <code>__uint16 BamAlignmentRecord::flag</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The flag of this mapping.</div>
+        
+<div><p>See <a href="enum_BamFlags.html" data-lang-entity="enum">BamFlags</a> for flag constants and also see the <tt>hasFlag*()</tt> functions.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::INVALID_LEN" class="signature" data-lang-entity="member_variable">
+      <code>__uint32 BamAlignmentRecord::INVALID_LEN</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member with invalid/sentinel reference ids (0 as in BAM/SAM).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::INVALID_POS" class="signature" data-lang-entity="member_variable">
+      <code>__uint32 BamAlignmentRecord::INVALID_POS</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member with invalid sentinel/position value (-1).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::INVALID_REFID" class="signature" data-lang-entity="member_variable">
+      <code>__uint32 BamAlignmentRecord::INVALID_REFID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member with invalid sentinel/position value (-1).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::mapQ" class="signature" data-lang-entity="member_variable">
+      <code>__uint8 BamAlignmentRecord::mapQ</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Mapping quality (255 for '*').</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::pNext" class="signature" data-lang-entity="member_variable">
+      <code>__int32 BamAlignmentRecord::pNext</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Position on the reference where the next fragment in this template aligns.</div>
+        
+<div><p><tt>INVALID_POS</tt> for '*'.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::qName" class="signature" data-lang-entity="member_variable">
+      <code>CharString BamAlignmentRecord::qName</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The query/read name.</div>
+        
+<div><p>Note that the reads of a template all of the same query name and are differentiated by their position
+and the <tt>BAM_FLAG_FIRST</tt>/<tt>BAM_FLAG_LAST</tt> flag values.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::qual" class="signature" data-lang-entity="member_variable">
+      <code>CharString BamAlignmentRecord::qual</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The PHRED quality values of the sequence (as in SAM), empty for '*'.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::rID" class="signature" data-lang-entity="member_variable">
+      <code>__int32 BamAlignmentRecord::rID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>ID of reference for this fragment mapping (0-based, <tt>INVALID_REFID</tt> for '*' in SAM).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::rNextId" class="signature" data-lang-entity="member_variable">
+      <code>__int32 BamAlignmentRecord::rNextId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The ID of the reference where the next fragment in this template aligns.</div>
+        
+<div><p><tt>INVALID_REFID</tt> for '*'.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::seq" class="signature" data-lang-entity="member_variable">
+      <code>CharString BamAlignmentRecord::seq</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The fragment sequence.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::tags" class="signature" data-lang-entity="member_variable">
+      <code>CharString BamAlignmentRecord::tags</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Raw BAM tag string, use <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> for comfortable access.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamAlignmentRecord::tLen" class="signature" data-lang-entity="member_variable">
+      <code>__int32 BamAlignmentRecord::tLen</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The inferred template size.</div>
+        
+<div><p><tt>INVALID_LEN</tt> for '*'.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class BamAlignmentRecord
+ * 
+ * @implements FormattedFileRecordConcept
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Represent a record from a BAM or SAM file.
+ * 
+ * @signature class BamAlignmentRecord;
+ * 
+ * @section Remarks
+ * 
+ * While also used to represent SAM records, the type is called
+ * &lt;tt&gt;BamAlignmentRecord&lt;/tt&gt; since the data directly reflects a BAM records
+ * (0-based positions, identify references by id, and tags are stored in BAM
+ * format.
+ * 
+ * @see BamFileIn
+ * @see BamFileOut
+ * 
+ * @var __uint32 BamAlignmentRecord::INVALID_POS;
+ * 
+ * @brief Static member with invalid sentinel/position value (-1).
+ * 
+ * @var __uint32 BamAlignmentRecord::INVALID_REFID;
+ * 
+ * @brief Static member with invalid sentinel/position value (-1).
+ * 
+ * @var __uint32 BamAlignmentRecord::INVALID_LEN;
+ * 
+ * @brief Static member with invalid/sentinel reference ids (0 as in BAM/SAM).
+ * 
+ * @var CharString BamAlignmentRecord::qName;
+ * 
+ * @brief The query/read name.
+ * 
+ * Note that the reads of a template all of the same query name and are
+ * differentiated by their position and the
+ * &lt;tt&gt;BAM_FLAG_FIRST&lt;/tt&gt;/&lt;tt&gt;BAM_FLAG_LAST&lt;/tt&gt; flag values.
+ * 
+ * @var __uint16 BamAlignmentRecord::flag;
+ * 
+ * @brief The flag of this mapping.
+ * 
+ * See @link BamFlags @endlink for flag constants and also see the
+ * &lt;tt&gt;hasFlag*()&lt;/tt&gt; functions.
+ * 
+ * @var __int32 BamAlignmentRecord::rID;
+ * 
+ * @brief ID of reference for this fragment mapping (0-based,
+ *        &lt;tt&gt;INVALID_REFID&lt;/tt&gt; for &#39;*&#39; in SAM).
+ * 
+ * @var __int32 BamAlignmentRecord::beginPos;
+ * 
+ * @brief Begin position of the alignment (0-based, &lt;tt&gt;INVALID_POS&lt;/tt&gt; for &#39;0&#39;
+ *        in SAM).
+ * 
+ * @var __uint8 BamAlignmentRecord::mapQ;
+ * 
+ * @brief Mapping quality (255 for &#39;*&#39;).
+ * 
+ * @var __uint16 BamAlignmentRecord::bin;
+ * 
+ * @brief The bin of the alignment, automatically computed when writing BAM.
+ * 
+ * @var TCigarString BamAlignmentRecord::cigar;
+ * 
+ * @brief The CIGAR string for the BAM alignment (of type String&lt;CigarElement&lt;&gt;
+ *        &gt;).
+ * 
+ * @var __int32 BamAlignmentRecord::rNextId;
+ * 
+ * @brief The ID of the reference where the next fragment in this template
+ *        aligns.
+ * 
+ * &lt;tt&gt;INVALID_REFID&lt;/tt&gt; for &#39;*&#39;.
+ * 
+ * @var __int32 BamAlignmentRecord::pNext;
+ * 
+ * @brief Position on the reference where the next fragment in this template
+ *        aligns.
+ * 
+ * &lt;tt&gt;INVALID_POS&lt;/tt&gt; for &#39;*&#39;.
+ * 
+ * @var __int32 BamAlignmentRecord::tLen;
+ * 
+ * @brief The inferred template size.
+ * 
+ * &lt;tt&gt;INVALID_LEN&lt;/tt&gt; for &#39;*&#39;.
+ * 
+ * @var CharString BamAlignmentRecord::seq;
+ * 
+ * @brief The fragment sequence.
+ * 
+ * @var CharString BamAlignmentRecord::qual;
+ * 
+ * @brief The PHRED quality values of the sequence (as in SAM), empty for &#39;*&#39;.
+ * 
+ * @var CharString BamAlignmentRecord::tags;
+ * 
+ * @brief Raw BAM tag string, use @link BamTagsDict @endlink for comfortable
+ *        access.
+ * 
+ * @fn BamAlignmentRecord#clear
+ * 
+ * @brief Clear BamAlignmentRecord.
+ * 
+ * @signature void clear(record);
+ * 
+ * @param[in,out] record The BamAlignmentRecord to clear.
+ * 
+ * Clears all strings and resets it to default initialization state.
+ * 
+ * @fn BamAlignmentRecord#hasFlagMultiple
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;multiple&#34;
+ *        flag set.
+ * 
+ * @signature bool hasFlagMultiple(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagAllProper
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;all
+ *        properly aligned&#34; flag set.
+ * 
+ * @signature bool hasFlagAllProper(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagUnmapped
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;unmapped&#34;
+ *        flag set.
+ * 
+ * @signature bool hasFlagUnmapped(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagNextUnmapped
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;next
+ *        unmapped&#34; flag set.
+ * 
+ * @signature bool hasFlagNextUnmapped(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagRC
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;reverse-
+ *        complemented&#34; flag set.
+ * 
+ * @signature bool hasFlagRC(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagNextRC
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;next
+ *        reverse-complemented&#34; flag set.
+ * 
+ * @signature bool hasFlagNextRC(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagFirst
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;first in
+ *        template&#34; flag set.
+ * 
+ * @signature bool hasFlagFirst(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagLast
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;last in
+ *        template&#34; flag set.
+ * 
+ * @signature bool hasFlagLast(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagSecondary
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;secondary&#34;
+ *        flag set.
+ * 
+ * @signature bool hasFlagSecondary(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagQCNoPass
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;did not
+ *        pass QC&#34; flag set.
+ * 
+ * @signature bool hasFlagQCNoPass(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagDuplicate
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the &#34;duplicate&#34;
+ *        flag set.
+ * 
+ * @signature bool hasFlagDuplicate(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#hasFlagSupplementary
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return true if a @link BamAlignmentRecord @endlink has the
+ *        &#34;supplementary&#34; flag set.
+ * 
+ * @signature bool hasFlagSupplementary(record);
+ * 
+ * @param record The BamAlignmentRecord to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the flag is set, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn BamAlignmentRecord#getAlignmentLengthInRef
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Return the alignment length in the record&#39;s projection in the
+ *        reference.
+ * 
+ * @signature unsigned getAlignmentLengthInRef(record);
+ * 
+ * @param[in] record The BamAlignmentRecord to compute length for.
+ * 
+ * @return unsigned The alignment length.
+ * 
+ * @see BamFlags
+ * 
+ * @fn BamAlignmentRecord#getContigName
+ * 
+ * @brief Return the name of the reference contig of a @link BamAlignmentRecord
+ *        @endlink.
+ * 
+ * @signature TNameString getContigName(record, file);
+ * 
+ * @param[in] record The @link BamAlignmentRecord @endlink to query.
+ * @param[in] file The @link BamFileIn @endlink or @link BamFileOut @endlink
+ *                 where the record belongs to.
+ * 
+ * @return TNameString The name of the reference contig. &lt;tt&gt;TNameString&lt;/tt&gt; is
+ *                     the @link Value @endlink type of the NameStore. The
+ *                     NameStore type can be determined using the @link Member
+ *                     @endlink metafunction for the @link BamIOContext @endlink
+ *                     in conjunction with the @link
+ *                     BamIOContextMemberTag#NameStoreMember @endlink tag.
+ * 
+ * @fn BamAlignmentRecord#getContigLength
+ * 
+ * @brief Return the length of the reference contig of a @link
+ *        BamAlignmentRecord @endlink.
+ * 
+ * @signature TLength getContigLength(record, file);
+ * 
+ * @param[in] record The @link BamAlignmentRecord @endlink to query.
+ * @param[in] file The @link BamFileIn @endlink or @link BamFileOut @endlink
+ *                 where the record belongs to.
+ * 
+ * @return TLength The length of the reference contig. &lt;tt&gt;TLength&lt;/tt&gt; is the
+ *                 @link Value @endlink type of the LengthStore. The LengthStore
+ *                 type can be determined using the @link Member @endlink
+ *                 metafunction for the @link BamIOContext @endlink in
+ *                 conjunction with the @link
+ *                 BamIOContextMemberTag#LengthStoreMember @endlink tag.
+ * 
+ * @fn BamAlignmentRecord#bamRecordToAlignment
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Construct an @link Align @endlink object from a BamAlignmentRecord
+ *        object.
+ * 
+ * @signature void bamRecordToAlignment(align, reference, record);
+ * 
+ * @param[out] align The @link Align @endlink object to create the alignment
+ *                   object in.
+ * @param[in] reference The string with the reference that &lt;tt&gt;record&lt;/tt&gt; lies
+ *                      on.
+ * @param[in] record The @link BamAlignmentRecord @endlink to construct
+ *                   alignment from.
+ * 
+ * The function will resize &lt;tt&gt;align&lt;/tt&gt; to have two rows. The part of the
+ * reference that the read from &lt;tt&gt;record&lt;/tt&gt; aligns to will be copied to the
+ * first row and the sequence from record will be copied to the second row (and
+ * reverse-complemented if appropriate). Then, the gaps from the CIGAR string in
+ * &lt;tt&gt;record&lt;/tt&gt; will be copied to &lt;tt&gt;align&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * Here is an example:
+ * 
+ * @code{.cpp}
+ * StringSet&lt;Dna5String&gt; references;
+ * BamAlignment record;
+ * // Read references and record.
+ * Align&lt;Dna5String&gt; align;
+ * if (record.rID != BamAlignmentRecord::INVALID_REFID)
+ *     bamRecordToAlignment(align, references[record.refId], record);
+ * @endcode
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_prioritytype" data-page="PriorityType">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>PriorityType - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>PriorityType<div><div>STores items in such a way that the item with the highest priority is at the top.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_PriorityHeap.html" data-lang-entity="specialization">PriorityHeap</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/misc/priority_type_base.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TValue[, typename TLess[, typename TSpec]]]&gt;
+class PriorityType;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The value type. Default: <tt>int</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TLess</a></code></th>
+        <td>The less-than comparator. Default: <tt>std::less&lt;TValue&gt;</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialization. Default: <tt>PriorityHeap</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23adjustTop" title="#PriorityType#adjustTop (interface function)" data-lang-entity="interface_function">void adjustTop(pq);</a></code></span>
+    <span class="summary_desc"><div>Adjusts the priority of the first item.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23clear" title="#PriorityType#clear (interface function)" data-lang-entity="interface_function">void clear(pq);</a></code></span>
+    <span class="summary_desc"><div>Remove all elements from the PriorityType.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23empty" title="#PriorityType#empty (interface function)" data-lang-entity="interface_function">bool empty(pq);</a></code></span>
+    <span class="summary_desc"><div>Query priority queue for beging empty.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23length" title="#PriorityType#length (interface function)" data-lang-entity="interface_function">TSize length(pq);</a></code></span>
+    <span class="summary_desc"><div>Return number of elements in priority queue.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23pop" title="#PriorityType#pop (interface function)" data-lang-entity="interface_function">void push(pq);</a></code></span>
+    <span class="summary_desc"><div>Deletes item with the highest priority and adjusts the priority queue.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23push" title="#PriorityType#push (interface function)" data-lang-entity="interface_function">void push(pq, element);</a></code></span>
+    <span class="summary_desc"><div>Inserts a new item and adjusts the priority queue if necessary.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PriorityType%23top" title="#PriorityType#top (interface function)" data-lang-entity="interface_function">TReference top(pq);</a></code></span>
+    <span class="summary_desc"><div>Reference to the item with the highest priority.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PriorityType#adjustTop" class="signature first" data-lang-entity="interface_function">
+      <code>void adjustTop(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adjusts the priority of the first item.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pq</code>
+            
+        
+      </th>
+      <td>The PriorityType to adjust.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove all elements from the PriorityType.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pq</code>
+            
+        
+      </th>
+      <td>PriorityType to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query priority queue for beging empty.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pq</code>
+            
+        
+      </th>
+      <td>The <a href="class_PriorityType.html" data-lang-entity="class">PriorityType</a> to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>pq</tt> queue is empty.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return number of elements in priority queue.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pq</code>
+            
+        
+      </th>
+      <td>The PriorityType to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>Number of elements in priority queue.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#pop" class="signature" data-lang-entity="interface_function">
+      <code>void push(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Deletes item with the highest priority and adjusts the priority queue.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pq</code>
+            
+        
+      </th>
+      <td>The PriorityType to pop from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#push" class="signature" data-lang-entity="interface_function">
+      <code>void push(pq, element);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Inserts a new item and adjusts the priority queue if necessary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pq</code>
+            
+        
+      </th>
+      <td>The PriorityType to push to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">element</code>
+            
+        
+      </th>
+      <td>The element to push.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PriorityType#top" class="signature" data-lang-entity="interface_function">
+      <code>TReference top(pq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reference to the item with the highest priority.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pq</code>
+            
+        
+      </th>
+      <td>The PriorityType to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>The result, reference to Value type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class PriorityType
+ * 
+ * @headerfile &lt;seqan/misc/priority_type_base.h&gt;
+ * 
+ * @brief STores items in such a way that the item with the highest priority is
+ *        at the top.
+ * 
+ * @signature template &lt;[typename TValue[, typename TLess[, typename TSpec]]]&gt;
+ *            class PriorityType;
+ * 
+ * @tparam TValue The value type. Default: &lt;tt&gt;int&lt;/tt&gt;.
+ * @tparam TLess The less-than comparator. Default:
+ *               &lt;tt&gt;std::less&amp;lt;TValue&amp;gt;&lt;/tt&gt;.
+ * @tparam TSpec The specialization. Default: &lt;tt&gt;PriorityHeap&lt;/tt&gt;.
+ * 
+ * @fn PriorityType#clear
+ * 
+ * @brief Remove all elements from the PriorityType.
+ * 
+ * @signature void clear(pq);
+ * 
+ * @param[in,out] pq PriorityType to clear.
+ * 
+ * @fn PriorityType#empty
+ * 
+ * @headerfile &lt;seqan/misc/priority_type_heap.h&gt;
+ * 
+ * @brief Query priority queue for beging empty.
+ * 
+ * @signature bool empty(pq);
+ * 
+ * @param[in] pq The @link PriorityType @endlink to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;pq&lt;/tt&gt; queue is empty.
+ * 
+ * @fn PriorityType#length
+ * 
+ * @headerfile &lt;seqan/misc/priority_type_heap.h&gt;
+ * 
+ * @brief Return number of elements in priority queue.
+ * 
+ * @signature TSize length(pq);
+ * 
+ * @param[in] pq The PriorityType to query.
+ * 
+ * @return TSize Number of elements in priority queue.
+ * 
+ * @fn PriorityType#top
+ * 
+ * @brief Reference to the item with the highest priority.
+ * 
+ * @signature TReference top(pq);
+ * 
+ * @param[in] pq The PriorityType to query.
+ * 
+ * @return TReference The result, reference to Value type.
+ * 
+ * @fn PriorityType#adjustTop
+ * 
+ * @brief Adjusts the priority of the first item.
+ * 
+ * @signature void adjustTop(pq);
+ * 
+ * @param[in,out] pq The PriorityType to adjust.
+ * 
+ * @fn PriorityType#push
+ * 
+ * @brief Inserts a new item and adjusts the priority queue if necessary.
+ * 
+ * @signature void push(pq, element);
+ * 
+ * @param[in,out] pq The PriorityType to push to.
+ * @param[in] element The element to push.
+ * 
+ * @fn PriorityType#pop
+ * 
+ * @brief Deletes item with the highest priority and adjusts the priority queue.
+ * 
+ * @signature void push(pq);
+ * 
+ * @param[in,out] pq The PriorityType to pop from.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,4412 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_fragmentstore" data-page="FragmentStore">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>FragmentStore - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>FragmentStore<div><div>Multi-container to store contigs, reads, multiple read alignments and genome annotations.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/store.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TSpec[, typename TConfig]]&gt;
+class FragmentStore;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialializing type. Default: <tt>void</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TConfig</a></code></th>
+        <td>The configuration struct. Default: <tt>FragmentStoreConfig&lt;TSpec&gt;</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AclearReads" title="#FragmentStore::clearReads (interface function)" data-lang-entity="member_function">void clearReads(store);</a></code></span>
+    <span class="summary_desc"><div>Removes all reds from a FragmentStore.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23appendAlignedRead" title="#FragmentStore#appendAlignedRead (interface function)" data-lang-entity="interface_function">TSize appendAlignedRead(store, readId, contigId, beginPos, endPos[, pairMatchId]);</a></code></span>
+    <span class="summary_desc"><div>Appends an aligned read entyr to a fragment store.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23appendMatePair" title="#FragmentStore#appendMatePair (interface function)" data-lang-entity="interface_function">TSize appendMatePair(store, readSeq1, readSeq2[, name1, name2]);</a></code></span>
+    <span class="summary_desc"><div>Appends the two reads of a mate pair to a FragmentStore.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23appendRead" title="#FragmentStore#appendRead (interface function)" data-lang-entity="interface_function">TSize appendRead(store, read[, matePairId]);, TSize appendRead(store, read, name[, matePairId]);</a></code></span>
+    <span class="summary_desc"><div>Append a read to a FragmentStore.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23calculateInsertSizes" title="#FragmentStore#calculateInsertSizes (interface function)" data-lang-entity="interface_function">void calculateInsertSizes(insertSizes, store);</a></code></span>
+    <span class="summary_desc"><div>Calcualtes a string wtih insert sizes for each pair match.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23calculateMateIndices" title="#FragmentStore#calculateMateIndices (interface function)" data-lang-entity="interface_function">void calculateMateIndices(mateIndices, store);</a></code></span>
+    <span class="summary_desc"><div>Calculates a string that maps the readId of a read to the index of its mate in the alignedReadStore.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23clearContigs" title="#FragmentStore#clearContigs (interface function)" data-lang-entity="interface_function">void clearContigs(store);</a></code></span>
+    <span class="summary_desc"><div>REvmoes all contigs from a FragmentStore.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23compactAlignedReads" title="#FragmentStore#compactAlignedReads (interface function)" data-lang-entity="interface_function">TSize compactAlignedReads(store);</a></code></span>
+    <span class="summary_desc"><div>Remove invalid aligned reads and rename the alignId's sequentially beginning with 0.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23compactPairMatchIds" title="#FragmentStore#compactPairMatchIds (interface function)" data-lang-entity="interface_function">TSize compactPairMatchIds(store);</a></code></span>
+    <span class="summary_desc"><div>Renames pairMatchId sequentially beginning with 0.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23convertMatchesToGlobalAlignment" title="#FragmentStore#convertMatchesToGlobalAlignment (interface function)" data-lang-entity="interface_function">void convertMatchesToGlobalAlignment(store, score, shrinkMatches);</a></code></span>
+    <span class="summary_desc"><div>Converts all matches to a multiple global alignment in gap-space.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23convertPairWiseToGlobalAlignment" title="#FragmentStore#convertPairWiseToGlobalAlignment (interface function)" data-lang-entity="interface_function">void convertPairWiseToGlobalAlignment(store, pairwiseContigGaps);</a></code></span>
+    <span class="summary_desc"><div>Converts pairwise alignments to a multiple global alignment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23getClrRange" title="#FragmentStore#getClrRange (interface function)" data-lang-entity="interface_function">void getClrRange(store, alignEl, begClr, endClr);</a></code></span>
+    <span class="summary_desc"><div>Get the "clear" range of a read alignment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23getMateNo" title="#FragmentStore#getMateNo (interface function)" data-lang-entity="interface_function">int getMateNo(store, readId);</a></code></span>
+    <span class="summary_desc"><div>Returns the mate number for a read given a readId.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23getRead" title="#FragmentStore#getRead (interface function)" data-lang-entity="interface_function">TRead getRead(store, id);</a></code></span>
+    <span class="summary_desc"><div>Returns the read with the given readId.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23loadContig" title="#FragmentStore#loadContig (interface function)" data-lang-entity="interface_function">bool loadContig(store, contigId);</a></code></span>
+    <span class="summary_desc"><div>Manually load a contig sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23loadContigs" title="#FragmentStore#loadContigs (interface function)" data-lang-entity="interface_function">bool loadContigs(store, fileName[, loadSeqs]);, bool loadContigs(store, fileNameList[, loadSeqs]);</a></code></span>
+    <span class="summary_desc"><div>Load contigs into a FragmentStore.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23loadReads" title="#FragmentStore#loadReads (interface function)" data-lang-entity="interface_function">bool loadReads(store, fileName);, bool loadReads(store, fileNameL, fileNameR);</a></code></span>
+    <span class="summary_desc"><div>Loads reads into FragmentStore</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23lockContig" title="#FragmentStore#lockContig (interface function)" data-lang-entity="interface_function">bool lockContig(store, contigId);</a></code></span>
+    <span class="summary_desc"><div>Locks a contig sequence from being removed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23lockContigs" title="#FragmentStore#lockContigs (interface function)" data-lang-entity="interface_function">bool lockContigs(store);</a></code></span>
+    <span class="summary_desc"><div>Locks all contig sequences from being remove.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23read" title="#FragmentStore#read (interface function)" data-lang-entity="interface_function">int read(file, store, tag);</a></code></span>
+    <span class="summary_desc"><div>Read the contents of a FragmentStore from a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23readRecords" title="#FragmentStore#readRecords (interface function)" data-lang-entity="interface_function">void readRecords(store, bamFileIn, importFlags);</a></code></span>
+    <span class="summary_desc"><div>Read all records from one <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23unlockAndFreeContig" title="#FragmentStore#unlockAndFreeContig (interface function)" data-lang-entity="interface_function">bool unlockContig(store, contigId);</a></code></span>
+    <span class="summary_desc"><div>Removes a previous contig lock and clears the sequence if no further lock exists.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23unlockAndFreeContigs" title="#FragmentStore#unlockAndFreeContigs (interface function)" data-lang-entity="interface_function">bool unlockAndFreeContigs(store);</a></code></span>
+    <span class="summary_desc"><div>Unlocks all contig sequences and clears sequences without lock.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23unlockContig" title="#FragmentStore#unlockContig (interface function)" data-lang-entity="interface_function">bool unlockContig(store, contigId);</a></code></span>
+    <span class="summary_desc"><div>Removes a previous contig lock.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23unlockContigs" title="#FragmentStore#unlockContigs (interface function)" data-lang-entity="interface_function">bool unlockContigs(store);</a></code></span>
+    <span class="summary_desc"><div>Unlocks all contig sequences.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23write" title="#FragmentStore#write (interface function)" data-lang-entity="interface_function">int write(file, store, tag);</a></code></span>
+    <span class="summary_desc"><div>Write the contents of a FragmentStore to a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23writeContigs" title="#FragmentStore#writeContigs (interface function)" data-lang-entity="interface_function">bool writeContigs(file, store, tag);</a></code></span>
+    <span class="summary_desc"><div>Write contigs from FragmentStore into a <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%23writeRecords" title="#FragmentStore#writeRecords (interface function)" data-lang-entity="interface_function">void readRecords(bamFileOut, store);</a></code></span>
+    <span class="summary_desc"><div>Write all records to one <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+
+
+<div data-lang-entity-container="member_typedef">
+<h2 data-lang-entity="member_typedef">Member Typedef Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAlignedReadStore" title="#FragmentStore::TAlignedReadStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAlignedReadStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAlignedReadTagStore" title="#FragmentStore::TAlignedReadTagStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAlignedReadTagStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignedReadTagStore" data-lang-entity="member_variable">alignedReadTagStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAlignQualityStore" title="#FragmentStore::TAlignQualityStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAlignQualityStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAnnotationKeyStore" title="#FragmentStore::TAnnotationKeyStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAnnotationKeyStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationKeyStore" data-lang-entity="member_variable">annotationKeyStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAnnotationNameStore" title="#FragmentStore::TAnnotationNameStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAnnotationNameStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationNameStore" data-lang-entity="member_variable">annotationNameStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAnnotationStore" title="#FragmentStore::TAnnotationStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAnnotationStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationStore" data-lang-entity="member_variable">annotationStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATAnnotationTypeStore" title="#FragmentStore::TAnnotationTypeStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TAnnotationTypeStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationTypeStore" data-lang-entity="member_variable">annotationTypeStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATContigFileStore" title="#FragmentStore::TContigFileStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TContigFileStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigFileStore" data-lang-entity="member_variable">contigFileStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATContigNameStore" title="#FragmentStore::TContigNameStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TContigNameStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigNameStore" data-lang-entity="member_variable">contigNameStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATContigStore" title="#FragmentStore::TContigStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TContigStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATLibraryNameStore" title="#FragmentStore::TLibraryNameStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TLibraryNameStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::libraryNameStore" data-lang-entity="member_variable">libraryNameStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATMatePairNameStore" title="#FragmentStore::TMatePairNameStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TMatePairNameStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::matePairNameStore" data-lang-entity="member_variable">matePairNameStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATMatePairStore" title="#FragmentStore::TMatePairStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TMatePairStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::matePairStore" data-lang-entity="member_variable">matePairStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATReadNameStore" title="#FragmentStore::TReadNameStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TReadNameStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::readNameStore" data-lang-entity="member_variable">readNameStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATReadSeqStore" title="#FragmentStore::TReadSeqStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TReadSeqStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3ATReadStore" title="#FragmentStore::TReadStore (member typedef)" data-lang-entity="member_typedef">typedef (..) TFragmentStore::TReadStore;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a> member.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AalignedReadStore" title="#FragmentStore::alignedReadStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAlignedReadStore FragmentStore::alignedReadStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that stores (alignId, readId, contigId, pairMatchId, beginPos, endPos, gapAnchors).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AalignedReadTagStore" title="#FragmentStore::alignedReadTagStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAlignedReadTagStore FragmentStore::alignedReadTagStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from alignId to alignTag.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AalignQualityStore" title="#FragmentStore::alignQualityStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAlignQualityStore FragmentStore::alignQualityStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that maps from alignId to (pairScore, score, errors).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AannotationKeyStore" title="#FragmentStore::annotationKeyStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAnnotationKeyStore FragmentStore::annotationKeyStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from keyId to the name of a key. The keyId is used to address <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::values" data-lang-entity="member_variable">values</a> of an annotation.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AannotationNameStore" title="#FragmentStore::annotationNameStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAnnotationNameStore FragmentStore::annotationNameStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from annoId to annoName;</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AannotationStore" title="#FragmentStore::annotationStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAnnotationStore FragmentStore::annotationStore
+    </a></code></span>
+    <span class="summary_desc"><div>String that maps from annoId to (contigId, typeId, beginPos, endPos, parentId, lastChildId, nextSiblingId, values).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AannotationTypeStore" title="#FragmentStore::annotationTypeStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TAnnotationTypeStore FragmentStore::annotationTypeStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from typeId to the type name of an annotation, e.g. "gene" or "exon".
+typeId is a member of the <a href="class_AnnotationStoreElement.html" data-lang-entity="class">AnnotationStoreElement</a>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AcontigFileStore" title="#FragmentStore::contigFileStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TContigFileStore FragmentStore::contigFileStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that maps from contigId to (contigSeq, contigGaps, contigFileId).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AcontigNameStore" title="#FragmentStore::contigNameStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TContigNameStore FragmentStore::contigNameStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from contigId to contigName.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AcontigStore" title="#FragmentStore::contigStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TContigStore FragmentStore::contigStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that maps from contigId to (contigSeq, contigGaps, contigFileId).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AlibraryNameStore" title="#FragmentStore::libraryNameStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TLibraryNameStore FragmentStore::libraryNameStore
+    </a></code></span>
+    <span class="summary_desc"><div>A <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from libId to libName.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AlibraryStore" title="#FragmentStore::libraryStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TLibraryStore FragmentStore::libraryStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that maps from libId to (mean, std).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AmatePairNameStore" title="#FragmentStore::matePairNameStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TContigNameStore FragmentStore::matePairNameStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from contigId to matePairName.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AmatePairStore" title="#FragmentStore::matePairStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TMatePairStore FragmentStore::matePairStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_String.html" data-lang-entity="class">String</a> that maps from matePairId to (readId[2], libId).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AreadNameStore" title="#FragmentStore::readNameStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TReadNameStore FragmentStore::readNameStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from readId to readName.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AreadSeqStore" title="#FragmentStore::readSeqStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TReadSeqStore FragmentStore::readSeqStore
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from readId to readSeq.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FragmentStore%3A%3AreadStore" title="#FragmentStore::readStore (interface function)" data-lang-entity="member_variable">
+        FragmentStore::TReadStore FragmentStore::readStore
+    </a></code></span>
+    <span class="summary_desc"><div>A <a href="class_String.html" data-lang-entity="class">String</a> that maps from readId to matePairId.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The FragmentStore is a data structure specifically designed for read mapping, genome assembly or gene
+annotation. These tasks typically require lots of data structures that are related to each other like: reads,
+mate-pairs, reference genome; pairwise alignments; genome annotation.</p><p>The FragmentStore subsumes all these data structures in an easy to use interface. It represents a multiple alignment
+of millions of reads or mate-pairs against a reference genome consisting of multiple contigs. Additionally, regions
+of the reference genome can be annotated with features like 'gene', 'mRNA', 'exon', 'intro' or custom features. The
+FragmentStore supports I/O functions to read/write a read alignment in Sam or Amos format and to read/write
+annotations in Gff/Gtf format.</p><p>The FragmentStore can be compared with a database where each table (called "store") is implemented as a String member
+of the FragmentStore class. The rows of each table (implemented as structs) are referred by their ids which are
+their positions in the string and not stored explicitly. The only exception is the alignedReadStore whose elements
+of type AlignedReadStoreElement contain an id-member as they may be rearranged in arbitrary order, e.g. by increasing
+genomic positions or by readId. Many stores have an associated name store to store element names. Each name store
+is a StringSet that stores the element name at the position of its id. All stores are present in the FragmentStore
+and empty if unused. The concrete types, e.g. the position types or read/contig alphabet, can be easily changed by
+defining a custom config struct which is a template parameter of the FragmentStore class.</p><h3>Examples</h3><p>Load read alignments and a reference genome and display the multiple alignment in a genomic range:</p><div data-src-path="demos/store/store_example.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/store.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// instantiate emtpy FragmentStore and set file paths</span>
+    <span class="n">FragmentStore</span><span class="o">&lt;&gt;</span> <span class="n">store</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">pathGenome</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;/demos/tutorial/store/ex1.fa&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">pathSAM</span>    <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">(</span><span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;/demos/tutorial/store/ex1.sam&quot;</span><span class="p">;</span>
+
+    <span class="c1">// load example genome and example reads and alignments</span>
+    <span class="n">loadContigs</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">pathGenome</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="n">BamFileIn</span> <span class="n">bamFile</span><span class="p">(</span><span class="n">pathSAM</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="n">readRecords</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">bamFile</span><span class="p">);</span>
+
+    <span class="c1">// compute staircase read layout and print from position 30..129</span>
+    <span class="n">AlignedReadLayout</span> <span class="n">layout</span><span class="p">;</span>
+    <span class="n">layoutAlignment</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">);</span>
+    <span class="n">printAlignment</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">36</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/store/store_example.cpp" target="_top">demos/store/store_example.cpp</a></div></div><pre class="console" data-src-path="None">ATTTAAGAAATTACAAAATATAGTTGAAAGCTCTAACAATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ATTTAA  AATTACAAAATATAGTTGAAAGCTCTAACAATAGA   AACCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGA  AGTCTCTTATGAATTAA
+ATTTA GAAATTACAAAATATAGTTGAAAGCTCTAACAATA ACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTTG AGACAAGTCTCTTATGAATTAA
+attta GAAATTACAAAATATAGTTGAAAGCTCTAACAATAG    AACCAAGCAGAAGAAAGAGGCTCAGAACTTGAAGA  AGTCTCTTATGAATTAA
+ATTTAA   ATTACAAAATATAGTTGAAAGATCTAACAATAGAC    CCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAA     TTATGAATTAA
+ATTTAAGAA TTACAAAATATAGTTGAAAGCTCTAACAATAGACT     AAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAAG     TATGAATTAA
+ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA     GCAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTC    ATGAATTAA
+ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA      CAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTCT    TGAATTAA
+ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA      CAGAAGAAAGAGGTTCANANNNTGANGACAAGTCT    TGAATTAA
+ATTTAAGAAATT CAAAATATAGTTGAAAGCTCTAACAATAGACTAAA       GAAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCT   GAATTAA
+ATTTAAGAAAT   AAAATATAGTTGAAAGCTCTAACAATAGACTAAAC       AAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCGT  GAATTAA
+ATTTAAGAAAT   AAAATATAGTTGAAAGCTCTAACAATAGACTAAAC       AAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCTT   AATTAA
+ATTTAAGAAAT    AAATATAGTTGAAAGCTCTAACAATAGACTAAACC        GAAAGAGGTTCAGAACTTGAAGACAAGTCTCTTATG
+ATTTAAGAAATT   AAATATAGTTGAAAGCTCTAACAATAGACTAAACC          AAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGA
+ATTTAAGAAATT    AATATAGTTGAAAGCTCTAACAATAGACTAAACCAA        AAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGA
+ATTTAAGAAATTACA  ATATAGTTGAAAGCTCTAACAATAGACTAAACCAA          GAGGTTCAGAACTTGAAGACAAGTCTCTTATGAAT
+ATTTAAGAAATTACAA   ATAGTTGAAAGCTCTAACAATAGACTAAACCAAGC        GAGGTTCAGAACTTGAAGACAAGTCTCTTATGAAT
+ATTTAAGAAATTACAAAATA AGTTGAAAGCTCTAACAATAGACTAAACCAAGCAG       AGGTTCAGAACTTGAAGACAAGTCTCTTATGAATT
+ATTTAAGAAATTACAAAATAT  TTGAAAGCTCTAACAATAGACTAAACCAAGCAGAA      GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+ATTTAAGAAATTACAAAATATA   GAAAGCTCTAACAATAGACTAAACCAAGCAGAAGAAAGAG TTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ATTTAAGAAATTACAAAATATAGTTGAA    CTAACAATAGACTAAACCAAGCAGAAGAAAGAGTT      CTTGAAGACAAGTCTCTTATGAATTAA
+ATTTAAGAAATTACAAAATATAGTTGAAA   CTAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT      TTGAAGACAAGTCTCTTATGAATTAA
+ATTTAAGAAATTACAAAATATAGTTGAAAG   TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT       TGAAGACAAGTCTCTTATGAATTAA
+ATTTAAGAAATTACAAAATATAGTTGAAAGCTCT ACAATAGACTAAACCAAGCAGAAGAAAGAGGTTCA     TGAAGACAAGTCTCTTATGAATTAA
+  TTAAGAAATTACAAAATATAGTTGAAAGCTCTAAC    GACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTT AAGACAAGTCTCTTATGAATTAA
+   TAAGAAATTACAAAATATAGTTGAAAGCTCTAACAATAGA                     GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+          TTACAAAATATAGTTGAAAGCTCTAACAATAGACT                   GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+                   ATAGTTGAAAGCTCTAACAATAGACTAAACCAAGC           GTTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+                          AAAGCTCTAACAATAGACTAAACCAAGCAGAAGAA      TCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+                          AAAGCTCTAACAATAGACTAAACCAAGCAGAAGAA               NAAGACAAGTCTCTTATGAATTAA
+                           AAGCTCTAACAATAGACTAAACCAAGCAGAAGAAA              GAAGACAAGTCTCTTATGAATTAA
+                                 TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT               AGTCTCTTATGAATTAA
+                                 TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT                GTCTCTTATGAATTAA
+                                  AACAATAGACTAAACCAAGCAGAAGAAAGAGGTTC
+                                  AACAATAGACTAAACCAAGCAGAAGAAAGAGGTTC
+                                     AATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGA
+                                     AATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGA</pre><h3>Remarks</h3><p>The following figures visualize the relations between the different stores:</p><p><img height="363" width="597" title="Stores that are involved in the representation of a multiple read alignment." src="img/FragmentStore.png"></img></p><p><img height="363" width="597" title="Stores that are involved in the representation of a genome alignment." src="img/AnnotationStore.png"></img></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FragmentStore::clearReads" class="signature first" data-lang-entity="member_function">
+      <code>void clearReads(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes all reds from a FragmentStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to remove all reads from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Clears the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>, <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a>, and <a href="class_FragmentStore.html#FragmentStore::readNameStore" data-lang-entity="member_variable">readNameStore</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FragmentStore#appendAlignedRead" class="signature first" data-lang-entity="interface_function">
+      <code>TSize appendAlignedRead(store, readId, contigId, beginPos, endPos[, pairMatchId]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends an aligned read entyr to a fragment store.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">readId</code>
+            
+        
+      </th>
+      <td>The id of the read to append an alignment for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigId</code>
+            
+        
+      </th>
+      <td>The id of the contig of the alignment.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPos</code>
+            
+        
+      </th>
+      <td>The begin position of the alignment.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">endPos</code>
+            
+        
+      </th>
+      <td>The end position of the alignment.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pairMatchId</code>
+            
+        
+      </th>
+      <td>The id of the alignedRead pair. Default:
+<tt>FragmentStore::INVALID_ID</tt> which corresponds to an unmated read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The alignedReadId of the alignment.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function appends a single read alignment to the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>. Note that this
+really only adds a match. To generate a global alignment out of all these matches, use <a href="class_FragmentStore.html#FragmentStore#convertMatchesToGlobalAlignment" data-lang-entity="interface_function">convertMatchesToGlobalAlignment</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">appendRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#appendMatePair" class="signature" data-lang-entity="interface_function">
+      <code>TSize appendMatePair(store, readSeq1, readSeq2[, name1, name2]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends the two reads of a mate pair to a FragmentStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append the mate pair to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">readSeq1</code>
+            
+        
+      </th>
+      <td>The read sequence of the first read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">readSeq2</code>
+            
+        
+      </th>
+      <td>The read sequence of the second read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name1</code>
+            
+        
+      </th>
+      <td>The read name of the first read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name2</code>
+            
+        
+      </th>
+      <td>The read name of the first read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The matePairId of the newly appended mate pair. TSize is the size type of the <a href="class_FragmentStore.html#FragmentStore::matePairStore" data-lang-entity="member_variable">matePairStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function appends two reads to the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a> and <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a> and a mate pair entry for both them to the <a href="class_FragmentStore.html#FragmentStore::matePairStore" data-lang-entity="member_variable">matePairStore</a>. If names are given,
+they are appended to <a href="class_FragmentStore.html#FragmentStore::readNameStore" data-lang-entity="member_variable">readNameStore</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#appendRead" class="signature" data-lang-entity="interface_function">
+      <code>TSize appendRead(store, read[, matePairId]);
+TSize appendRead(store, read, name[, matePairId]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a read to a FragmentStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append the read to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">read</code>
+            
+        
+      </th>
+      <td>The read sequence. Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the read. Type: <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">matePairId</code>
+            
+        
+      </th>
+      <td>ID of the mate-pair that this read is part of. Default:
+<tt>FragmentStore::INVALID_ID</tt> which corresponds to an unmated read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The readId of the newly appended read. TSize is the size type of the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This funciton appends a single read to the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a> and <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#calculateInsertSizes" class="signature" data-lang-entity="interface_function">
+      <code>void calculateInsertSizes(insertSizes, store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Calcualtes a string wtih insert sizes for each pair match.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">insertSizes</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> of insert sizes. This string is accordingly resized and can be
+addressed by the pairMatchId.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> to compute the insert sizes for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function calls <a href="class_FragmentStore.html#FragmentStore#compactPairMatchIds" data-lang-entity="interface_function">compactPairMatchIds</a> first and calcualte the insert size for every
+pair match. The insert size of a pair match is the outer distance between the two matches.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#calculateMateIndices" class="signature" data-lang-entity="interface_function">
+      <code>void calculateMateIndices(mateIndices, store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Calculates a string that maps the readId of a read to the index of its mate in the alignedReadStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">mateIndices</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> with the resulting mate indices. This string is accordingly resized
+and can be addressed by the readId.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Entries of reads without a mate contain <tt>INVALID_ID</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#clearContigs" class="signature" data-lang-entity="interface_function">
+      <code>void clearContigs(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>REvmoes all contigs from a FragmentStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to remove all contigs from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function clears the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> and <a href="class_FragmentStore.html#FragmentStore::contigNameStore" data-lang-entity="member_variable">contigNameStore</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#compactAlignedReads" class="signature" data-lang-entity="interface_function">
+      <code>TSize compactAlignedReads(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove invalid aligned reads and rename the alignId's sequentially beginning with 0.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to compact the aligned reads of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>s</code></th>
+        <td>TSize The new size of the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>. TSize is the size type of the
+<a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function removes all entries from the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> whose alignId is equal to
+<tt>INVALID_ID</tt> as well as orphan entries in <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a>. Afterwards, the
+alignIds are renamed sequentially beginning with 0. This function can be used to remove alignments which are flagged
+by previously setting their id to INVALID_ID.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#compactPairMatchIds" class="signature" data-lang-entity="interface_function">
+      <code>TSize compactPairMatchIds(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Renames pairMatchId sequentially beginning with 0.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to compact pair match ids of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of pair matches. TSize is the size type of <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function renames the pairMatchId in the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> sequentially beginning
+with 0. Two read alignments can be identified to be pair match if they have the same pairMatchId. Please note that
+paired reads not necessarily have to map as a pair match, e.g. if they are on different ocntigs or have the same
+orientation or a wrong insert size.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#convertMatchesToGlobalAlignment" class="signature" data-lang-entity="interface_function">
+      <code>void convertMatchesToGlobalAlignment(store, score, shrinkMatches);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts all matches to a multiple global alignment in gap-space.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The fragment store. Types: FragmentStore</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>A score object used by <a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a> in this function.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shrinkMatches</code>
+            
+        
+      </th>
+      <td>States whether the matches should be shrinked. Types: True, False</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Before calling this function all <tt>gaps</tt> structures in <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> and <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> must be empty, i.e. there are no gaps in the alignments. This function iterates
+over entries in the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> and semi-global aligns each read to its contig
+segments given by begin and end position. Gaps introduced by these pair-wise alignments are then inserted to the
+affected contig and reads correspondingly.</p><p>The invariant that positions in the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> are in gap-space holds before
+(there were no gaps in alignments) and after calling this functions.</p><p>If the <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> of the <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> is empty when
+<tt>convertMatchesToGlobalAlignment()</tt> is called then the <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> is
+filled with the edit distance scores.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#convertPairWiseToGlobalAlignment" class="signature" data-lang-entity="interface_function">
+      <code>void convertPairWiseToGlobalAlignment(store, pairwiseContigGaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts pairwise alignments to a multiple global alignment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The fragment store. Types: FragmentStore</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pairwiseContigGaps</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> of anchored contig gaps for every pairwise alignment.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Before calling this function the <tt>gaps</tt> structures in the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> must be
+empty, i.e. there are no gaps in the contig. The pairwise alignment gaps of the reads are stored in the <tt>gaps</tt>
+structure in the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>, whereas the pairwise alignment gaps of the contig
+are stored in the <tt>pairwiseContigGaps</tt> string.</p><p>After calling this functions all positions in the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> are in gap-space.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#getClrRange" class="signature" data-lang-entity="interface_function">
+      <code>void getClrRange(store, alignEl, begClr, endClr);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the "clear" range of a read alignment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to work on.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">alignEl</code>
+            
+        
+      </th>
+      <td>The <a href="class_AlignedReadStoreElement.html" data-lang-entity="class">AlignedReadStoreElement</a> to work on.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">begClr</code>
+            
+        
+      </th>
+      <td>Begin of the clear range.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">endClr</code>
+            
+        
+      </th>
+      <td>End of the clear range.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The clear range of a read alignment is the range of the part of the alignmetn that is not clipped.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#getMateNo" class="signature" data-lang-entity="interface_function">
+      <code>int getMateNo(store, readId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the mate number for a read given a readId.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore with the read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">readId</code>
+            
+        
+      </th>
+      <td>The readId.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>int</code></th>
+        <td>The mate number (0 for the first mate, 1 for the second mate) of the read in its mate pair or -1 if the
+read is not paired.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#getRead" class="signature" data-lang-entity="interface_function">
+      <code>TRead getRead(store, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the read with the given readId.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to query for the read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TRead</code></th>
+        <td>The entry from the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>. TRead is the value type of the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#loadContig" class="signature" data-lang-entity="interface_function">
+      <code>bool loadContig(store, contigId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Manually load a contig sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to load the contig for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigId</code>
+            
+        
+      </th>
+      <td>The id of the contig that was created earlier by <a href="class_FragmentStore.html#FragmentStore#loadContigs" data-lang-entity="interface_function">loadContigs</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#loadContigs" class="signature" data-lang-entity="interface_function">
+      <code>bool loadContigs(store, fileName[, loadSeqs]);
+bool loadContigs(store, fileNameList[, loadSeqs]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Load contigs into a FragmentStore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append the contigs to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>A <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> with the name of the file to load.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileNameList</code>
+            
+        
+      </th>
+      <td>A <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> of <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> with a list of file names to
+load.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">loadSeqs</code>
+            
+        
+      </th>
+      <td>A <tt>bool</tt> indicating whether to load lazily. If <tt>true</tt> then sequences are
+loaded immediately. If <tt>false</tt>, an emptycontig with a reference to the file is
+created. Its sequence can be loaded on demand by <a href="class_FragmentStore.html#FragmentStore#lockContig" data-lang-entity="interface_function">lockContig</a> and <a href="class_FragmentStore.html#FragmentStore#loadContig" data-lang-entity="interface_function">loadContig</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of success and false in case of error.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#loadReads" class="signature" data-lang-entity="interface_function">
+      <code>bool loadReads(store, fileName);
+bool loadReads(store, fileNameL, fileNameR);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Loads reads into FragmentStore</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append the reads to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>Path to single-end read file.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileNameL</code>
+            
+        
+      </th>
+      <td>Path to left read file in case of paired reads.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileNameR</code>
+            
+        
+      </th>
+      <td>Path to right read file in case of paired reads.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of success, false in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>When two file names are given thent he files are expected to containt he same number of reads and reads with the same
+index are assumed to be mate pairs. Mate pairs are stored internally in an "interleaved mode": a read is read from
+each file before reading the next one.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#lockContig" class="signature" data-lang-entity="interface_function">
+      <code>bool lockContig(store, contigId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Locks a contig sequence from being removed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to lock the contig for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigId</code>
+            
+        
+      </th>
+      <td>The id of the contig that was created earlier by <a href="class_FragmentStore.html#FragmentStore#loadContigs" data-lang-entity="interface_function">loadContigs</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function increases the contig usage counter by 1 and ensures that the contig sequence is loaded.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#lockContigs" class="signature" data-lang-entity="interface_function">
+      <code>bool lockContigs(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Locks all contig sequences from being remove.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to lock the contigs for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of success, false in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#read" class="signature" data-lang-entity="interface_function">
+      <code>int read(file, store, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read the contents of a FragmentStore from a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a> to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to append to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The format to read from. Can be Amos or Sam.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>int</code></th>
+        <td>0 in the case of success, non-0 value in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#readRecords" class="signature" data-lang-entity="interface_function">
+      <code>void readRecords(store, bamFileIn, importFlags);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read all records from one <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> object to store the records into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bamFileIn</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a> object to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">importFlags</code>
+            
+        
+      </th>
+      <td>The import flags.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+  <h4>Thrown Exceptions</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>IOError</code></th>
+        <td>On low-level I/O errors.</td>
+    </tr>
+    
+    <tr>
+        <th><code>ParseError</code></th>
+        <td>On high-level file format errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#unlockAndFreeContig" class="signature" data-lang-entity="interface_function">
+      <code>bool unlockContig(store, contigId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes a previous contig lock and clears the sequence if no further lock exists.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to unlock the contig for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigId</code>
+            
+        
+      </th>
+      <td>The id of the contig that was created earlier by <a href="class_FragmentStore.html#FragmentStore#loadContigs" data-lang-entity="interface_function">loadContigs</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function decreases the contig usage counter by 1 and frees the sequences' memory if the counter equals 0.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#unlockAndFreeContigs" class="signature" data-lang-entity="interface_function">
+      <code>bool unlockAndFreeContigs(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Unlocks all contig sequences and clears sequences without lock.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to unlock the contigs for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of success, false in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#unlockContig" class="signature" data-lang-entity="interface_function">
+      <code>bool unlockContig(store, contigId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes a previous contig lock.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to unlock the contig for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigId</code>
+            
+        
+      </th>
+      <td>The id of the contig that was created earlier by <a href="class_FragmentStore.html#FragmentStore#loadContigs" data-lang-entity="interface_function">loadContigs</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function decreases the contig usage counter by 1.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#unlockContigs" class="signature" data-lang-entity="interface_function">
+      <code>bool unlockContigs(store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Unlocks all contig sequences.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to unlock the contigs for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of success, false in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#write" class="signature" data-lang-entity="interface_function">
+      <code>int write(file, store, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write the contents of a FragmentStore to a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to write to the file.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The format to write out. Types: Sam or Amos.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>int</code></th>
+        <td>0 in case of success, 1 in case of errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#writeContigs" class="signature" data-lang-entity="interface_function">
+      <code>bool writeContigs(file, store, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write contigs from FragmentStore into a <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StreamConcept.html" data-lang-entity="concept">StreamConcept</a> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore to write contigs of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>A tag for the sequence format.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FragmentStore#writeRecords" class="signature" data-lang-entity="interface_function">
+      <code>void readRecords(bamFileOut, store);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write all records to one <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bamFileOut</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a> object to write into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+  <h4>Thrown Exceptions</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>IOError</code></th>
+        <td>On low-level I/O errors.</td>
+    </tr>
+    
+    <tr>
+        <th><code>ParseError</code></th>
+        <td>On high-level file format errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+<div class="member_typedef_defails" data-lang-entity-container="member_typedef">
+  <h2 data-lang-entity="member_typedef">Member Typedef Detail</h2>
+
+  
+      <div class="method_details first">
+        <h3 data-toc="hidden" id="FragmentStore::TAlignedReadStore" class="signature first" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAlignedReadStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAlignedReadTagStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAlignedReadTagStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignedReadTagStore" data-lang-entity="member_variable">alignedReadTagStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAlignQualityStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAlignQualityStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAnnotationKeyStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAnnotationKeyStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationKeyStore" data-lang-entity="member_variable">annotationKeyStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAnnotationNameStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAnnotationNameStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationNameStore" data-lang-entity="member_variable">annotationNameStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAnnotationStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAnnotationStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationStore" data-lang-entity="member_variable">annotationStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TAnnotationTypeStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TAnnotationTypeStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::annotationTypeStore" data-lang-entity="member_variable">annotationTypeStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TContigFileStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TContigFileStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigFileStore" data-lang-entity="member_variable">contigFileStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TContigNameStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TContigNameStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigNameStore" data-lang-entity="member_variable">contigNameStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TContigStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TContigStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TLibraryNameStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TLibraryNameStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::libraryNameStore" data-lang-entity="member_variable">libraryNameStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TMatePairNameStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TMatePairNameStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::matePairNameStore" data-lang-entity="member_variable">matePairNameStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TMatePairStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TMatePairStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::matePairStore" data-lang-entity="member_variable">matePairStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TReadNameStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TReadNameStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::readNameStore" data-lang-entity="member_variable">readNameStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TReadSeqStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TReadSeqStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="FragmentStore::TReadStore" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TFragmentStore::TReadStore;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+  
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="FragmentStore::alignedReadStore" class="signature first" data-lang-entity="member_variable">
+      <code>FragmentStore::TAlignedReadStore FragmentStore::alignedReadStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that stores (alignId, readId, contigId, pairMatchId, beginPos, endPos, gapAnchors).</div>
+        
+<div><p>The value type is <a href="class_AlignedReadStoreElement.html" data-lang-entity="class">AlignedReadStoreElement</a>.</p><h4>Remarks</h4><p>You can sort <tt>alignedReadStore</tt> using <a href="global_function_sortAlignedReads.html" data-lang-entity="global_function">sortAlignedReads</a>. After sorting, you can use the
+functions <a href="global_function_lowerBoundAlignedReads.html" data-lang-entity="global_function">lowerBoundAlignedReads</a> and <a href="global_function_upperBoundAlignedReads.html" data-lang-entity="global_function">upperBoundAlignedReads</a> to perform a binary search,
+e.g. for accessing only a subrange.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::alignedReadTagStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAlignedReadTagStore FragmentStore::alignedReadTagStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from alignId to alignTag.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::alignQualityStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAlignQualityStore FragmentStore::alignQualityStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that maps from alignId to (pairScore, score, errors).</div>
+        
+<div><p>The value type is <a href="class_AlignQualityStoreElement.html" data-lang-entity="class">AlignQualityStoreElement</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::annotationKeyStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAnnotationKeyStore FragmentStore::annotationKeyStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from keyId to the name of a key. The keyId is used to address <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::values" data-lang-entity="member_variable">values</a> of an annotation.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::annotationNameStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAnnotationNameStore FragmentStore::annotationNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from annoId to annoName;</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::annotationStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAnnotationStore FragmentStore::annotationStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>String that maps from annoId to (contigId, typeId, beginPos, endPos, parentId, lastChildId, nextSiblingId, values).</div>
+        
+<div><p>The value type is <a href="class_AnnotationStoreElement.html" data-lang-entity="class">AnnotationStoreElement</a>.</p><p>Instead of accessing this store directly, consider to use the high-level interface provided by <a href="specialization_AnnotationTreeIterator.html" data-lang-entity="specialization">AnnotationTreeIterator</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::annotationTypeStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TAnnotationTypeStore FragmentStore::annotationTypeStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from typeId to the type name of an annotation, e.g. "gene" or "exon".
+typeId is a member of the <a href="class_AnnotationStoreElement.html" data-lang-entity="class">AnnotationStoreElement</a>.</div>
+        
+<div><h4>Remarks</h4><p>There are <a href="enum_FragmentStore_58_58PredefinedAnnotationTypes.html" data-lang-entity="enum">predefined type ids</a> for commonly used types
+e.g. <tt>ANNO_GENE</tt> or <tt>ANNO_EXON</tt> which can be used to set the <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::typeId" data-lang-entity="member_variable">typeId</a> directly as a fast alternative to <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#getType" data-lang-entity="interface_function">getType</a> and <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#setType" data-lang-entity="interface_function">setType</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::contigFileStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TContigFileStore FragmentStore::contigFileStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that maps from contigId to (contigSeq, contigGaps, contigFileId).</div>
+        
+<div><p>Value type is <a href="class_ContigFile.html" data-lang-entity="class">ContigFile</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::contigNameStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TContigNameStore FragmentStore::contigNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from contigId to contigName.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::contigStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TContigStore FragmentStore::contigStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that maps from contigId to (contigSeq, contigGaps, contigFileId).</div>
+        
+<div><p>Value type is <a href="class_ContigStoreElement.html" data-lang-entity="class">ContigStoreElement</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::libraryNameStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TLibraryNameStore FragmentStore::libraryNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>A <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from libId to libName.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::libraryStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TLibraryStore FragmentStore::libraryStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that maps from libId to (mean, std).</div>
+        
+<div><p>Value type is <a href="class_LibraryStoreElement.html" data-lang-entity="class">LibraryStoreElement</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::matePairNameStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TContigNameStore FragmentStore::matePairNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from contigId to matePairName.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::matePairStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TMatePairStore FragmentStore::matePairStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_String.html" data-lang-entity="class">String</a> that maps from matePairId to (readId[2], libId).</div>
+        
+<div><p>The value type is <a href="class_MatePairStoreElement.html" data-lang-entity="class">MatePairStoreElement</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::readNameStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TReadNameStore FragmentStore::readNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from readId to readName.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::readSeqStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TReadSeqStore FragmentStore::readSeqStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that maps from readId to readSeq.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="FragmentStore::readStore" class="signature" data-lang-entity="member_variable">
+      <code>FragmentStore::TReadStore FragmentStore::readStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>A <a href="class_String.html" data-lang-entity="class">String</a> that maps from readId to matePairId.</div>
+        
+<div><p>The value type is <a href="class_ReadStoreElement.html" data-lang-entity="class">ReadStoreElement</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FragmentStore
+ * 
+ * @headerfile &lt;seqan/store.h&gt;
+ * 
+ * @brief Multi-container to store contigs, reads, multiple read alignments and
+ *        genome annotations.
+ * 
+ * @signature template &lt;[typename TSpec[, typename TConfig]]&gt; class
+ *            FragmentStore;
+ * 
+ * @tparam TSpec The specialializing type. Default: &lt;tt&gt;void&lt;/tt&gt;.
+ * @tparam TConfig The configuration struct. Default:
+ *                 &lt;tt&gt;FragmentStoreConfig&amp;lt;TSpec&amp;gt;&lt;/tt&gt;.
+ * 
+ * The FragmentStore is a data structure specifically designed for read mapping,
+ * genome assembly or gene annotation. These tasks typically require lots of
+ * data structures that are related to each other like: reads, mate-pairs,
+ * reference genome; pairwise alignments; genome annotation.
+ * 
+ * The FragmentStore subsumes all these data structures in an easy to use
+ * interface. It represents a multiple alignment of millions of reads or mate-
+ * pairs against a reference genome consisting of multiple contigs.
+ * Additionally, regions of the reference genome can be annotated with features
+ * like &#39;gene&#39;, &#39;mRNA&#39;, &#39;exon&#39;, &#39;intro&#39; or custom features. The FragmentStore
+ * supports I/O functions to read/write a read alignment in Sam or Amos format
+ * and to read/write annotations in Gff/Gtf format.
+ * 
+ * The FragmentStore can be compared with a database where each table (called
+ * &#34;store&#34;) is implemented as a String member of the FragmentStore class. The
+ * rows of each table (implemented as structs) are referred by their ids which
+ * are their positions in the string and not stored explicitly. The only
+ * exception is the alignedReadStore whose elements of type
+ * AlignedReadStoreElement contain an id-member as they may be rearranged in
+ * arbitrary order, e.g. by increasing genomic positions or by readId. Many
+ * stores have an associated name store to store element names. Each name store
+ * is a StringSet that stores the element name at the position of its id. All
+ * stores are present in the FragmentStore and empty if unused. The concrete
+ * types, e.g. the position types or read/contig alphabet, can be easily changed
+ * by defining a custom config struct which is a template parameter of the
+ * FragmentStore class.
+ * 
+ * @section Examples
+ * 
+ * Load read alignments and a reference genome and display the multiple
+ * alignment in a genomic range:
+ * 
+ * @include demos/store/store_example.cpp
+ * 
+ * @code{.console}
+ * ATTTAAGAAATTACAAAATATAGTTGAAAGCTCTAACAATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ * ATTTAA  AATTACAAAATATAGTTGAAAGCTCTAACAATAGA   AACCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGA  AGTCTCTTATGAATTAA
+ * ATTTA GAAATTACAAAATATAGTTGAAAGCTCTAACAATA ACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTTG AGACAAGTCTCTTATGAATTAA
+ * attta GAAATTACAAAATATAGTTGAAAGCTCTAACAATAG    AACCAAGCAGAAGAAAGAGGCTCAGAACTTGAAGA  AGTCTCTTATGAATTAA
+ * ATTTAA   ATTACAAAATATAGTTGAAAGATCTAACAATAGAC    CCAAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAA     TTATGAATTAA
+ * ATTTAAGAA TTACAAAATATAGTTGAAAGCTCTAACAATAGACT     AAGCAGAAGAAAGAGGTTCAGAACTTGAAGACAAG     TATGAATTAA
+ * ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA     GCAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTC    ATGAATTAA
+ * ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA      CAGAAGAAAGAGGTTCAGAACTTGAAGACAAGTCT    TGAATTAA
+ * ATTTAAGAAA  ACAAAATATAGTTGAAAGCTCTAACAATAGACTAA      CAGAAGAAAGAGGTTCANANNNTGANGACAAGTCT    TGAATTAA
+ * ATTTAAGAAATT CAAAATATAGTTGAAAGCTCTAACAATAGACTAAA       GAAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCT   GAATTAA
+ * ATTTAAGAAAT   AAAATATAGTTGAAAGCTCTAACAATAGACTAAAC       AAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCGT  GAATTAA
+ * ATTTAAGAAAT   AAAATATAGTTGAAAGCTCTAACAATAGACTAAAC       AAGAAAGAGGTTCAGAACTTGAAGACAAGTCTCTT   AATTAA
+ * ATTTAAGAAAT    AAATATAGTTGAAAGCTCTAACAATAGACTAAACC        GAAAGAGGTTCAGAACTTGAAGACAAGTCTCTTATG
+ * ATTTAAGAAATT   AAATATAGTTGAAAGCTCTAACAATAGACTAAACC          AAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGA
+ * ATTTAAGAAATT    AATATAGTTGAAAGCTCTAACAATAGACTAAACCAA        AAGAGGTTCAGAACTTGAAGACAAGTCTCTTATGA
+ * ATTTAAGAAATTACA  ATATAGTTGAAAGCTCTAACAATAGACTAAACCAA          GAGGTTCAGAACTTGAAGACAAGTCTCTTATGAAT
+ * ATTTAAGAAATTACAA   ATAGTTGAAAGCTCTAACAATAGACTAAACCAAGC        GAGGTTCAGAACTTGAAGACAAGTCTCTTATGAAT
+ * ATTTAAGAAATTACAAAATA AGTTGAAAGCTCTAACAATAGACTAAACCAAGCAG       AGGTTCAGAACTTGAAGACAAGTCTCTTATGAATT
+ * ATTTAAGAAATTACAAAATAT  TTGAAAGCTCTAACAATAGACTAAACCAAGCAGAA      GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+ * ATTTAAGAAATTACAAAATATA   GAAAGCTCTAACAATAGACTAAACCAAGCAGAAGAAAGAG TTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ * ATTTAAGAAATTACAAAATATAGTTGAA    CTAACAATAGACTAAACCAAGCAGAAGAAAGAGTT      CTTGAAGACAAGTCTCTTATGAATTAA
+ * ATTTAAGAAATTACAAAATATAGTTGAAA   CTAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT      TTGAAGACAAGTCTCTTATGAATTAA
+ * ATTTAAGAAATTACAAAATATAGTTGAAAG   TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT       TGAAGACAAGTCTCTTATGAATTAA
+ * ATTTAAGAAATTACAAAATATAGTTGAAAGCTCT ACAATAGACTAAACCAAGCAGAAGAAAGAGGTTCA     TGAAGACAAGTCTCTTATGAATTAA
+ *   TTAAGAAATTACAAAATATAGTTGAAAGCTCTAAC    GACTAAACCAAGCAGAAGAAAGAGGTTCAGAACTT AAGACAAGTCTCTTATGAATTAA
+ *    TAAGAAATTACAAAATATAGTTGAAAGCTCTAACAATAGA                     GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+ *           TTACAAAATATAGTTGAAAGCTCTAACAATAGACT                   GGTTCAGAACTTGAAGACAAGTCTCTTATGAATTA
+ *                    ATAGTTGAAAGCTCTAACAATAGACTAAACCAAGC           GTTCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ *                           AAAGCTCTAACAATAGACTAAACCAAGCAGAAGAA      TCAGAACTTGAAGACAAGTCTCTTATGAATTAA
+ *                           AAAGCTCTAACAATAGACTAAACCAAGCAGAAGAA               NAAGACAAGTCTCTTATGAATTAA
+ *                            AAGCTCTAACAATAGACTAAACCAAGCAGAAGAAA              GAAGACAAGTCTCTTATGAATTAA
+ *                                  TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT               AGTCTCTTATGAATTAA
+ *                                  TAACAATAGACTAAACCAAGCAGAAGAAAGAGGTT                GTCTCTTATGAATTAA
+ *                                   AACAATAGACTAAACCAAGCAGAAGAAAGAGGTTC
+ *                                   AACAATAGACTAAACCAAGCAGAAGAAAGAGGTTC
+ *                                      AATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGA
+ *                                      AATAGACTAAACCAAGCAGAAGAAAGAGGTTCAGA
+ * @endcode
+ * 
+ * 
+ * @section Remarks
+ * 
+ * The following figures visualize the relations between the different stores:
+ * 
+ * &lt;img width=&#34;597&#34; height=&#34;363&#34; src=&#34;FragmentStore.png&#34; title=&#34;Stores that are
+ * involved in the representation of a multiple read alignment.&#34; /&gt;
+ * 
+ * &lt;img width=&#34;597&#34; height=&#34;363&#34; src=&#34;AnnotationStore.png&#34; title=&#34;Stores that
+ * are involved in the representation of a genome alignment.&#34; /&gt;
+ * 
+ * @fn FragmentStore::clearReads
+ * 
+ * @brief Removes all reds from a FragmentStore.
+ * 
+ * @signature void clearReads(store);
+ * 
+ * @param[in,out] store The FragmentStore to remove all reads from.
+ * 
+ * Clears the @link FragmentStore::readStore @endlink, @link
+ * FragmentStore::readSeqStore @endlink, and @link FragmentStore::readNameStore
+ * @endlink.
+ * 
+ * @typedef FragmentStore::TReadStore
+ * 
+ * @brief Type of the @link FragmentStore::readStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TReadStore;
+ * 
+ * @typedef FragmentStore::TReadSeqStore
+ * 
+ * @brief Type of the @link FragmentStore::readSeqStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TReadSeqStore;
+ * 
+ * @typedef FragmentStore::TMatePairStore
+ * 
+ * @brief Type of the @link FragmentStore::matePairStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TMatePairStore;
+ * 
+ * @typedef FragmentStore::TContigFileStore
+ * 
+ * @brief Type of the @link FragmentStore::contigFileStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TContigFileStore;
+ * 
+ * @typedef FragmentStore::TContigStore
+ * 
+ * @brief Type of the @link FragmentStore::contigStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TContigStore;
+ * 
+ * @typedef FragmentStore::TAlignedReadStore
+ * 
+ * @brief Type of the @link FragmentStore::alignedReadStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAlignedReadStore;
+ * 
+ * @typedef FragmentStore::TAnnotationStore
+ * 
+ * @brief Type of the @link FragmentStore::annotationStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAnnotationStore;
+ * 
+ * @typedef FragmentStore::TAlignQualityStore
+ * 
+ * @brief Type of the @link FragmentStore::alignQualityStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAlignQualityStore;
+ * 
+ * @typedef FragmentStore::TAlignedReadTagStore
+ * 
+ * @brief Type of the @link FragmentStore::alignedReadTagStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAlignedReadTagStore;
+ * 
+ * @typedef FragmentStore::TReadNameStore
+ * 
+ * @brief Type of the @link FragmentStore::readNameStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TReadNameStore;
+ * 
+ * @typedef FragmentStore::TMatePairNameStore
+ * 
+ * @brief Type of the @link FragmentStore::matePairNameStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TMatePairNameStore;
+ * 
+ * @typedef FragmentStore::TLibraryNameStore
+ * 
+ * @brief Type of the @link FragmentStore::libraryNameStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TLibraryNameStore;
+ * 
+ * @typedef FragmentStore::TContigNameStore
+ * 
+ * @brief Type of the @link FragmentStore::contigNameStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TContigNameStore;
+ * 
+ * @typedef FragmentStore::TAnnotationNameStore
+ * 
+ * @brief Type of the @link FragmentStore::annotationNameStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAnnotationNameStore;
+ * 
+ * @typedef FragmentStore::TAnnotationTypeStore
+ * 
+ * @brief Type of the @link FragmentStore::annotationTypeStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAnnotationTypeStore;
+ * 
+ * @typedef FragmentStore::TAnnotationKeyStore
+ * 
+ * @brief Type of the @link FragmentStore::annotationKeyStore @endlink member.
+ * 
+ * @signature typedef (..) TFragmentStore::TAnnotationKeyStore;
+ * 
+ * @var FragmentStore::TReadStore FragmentStore::readStore;
+ * 
+ * @brief A @link String @endlink that maps from readId to matePairId.
+ * 
+ * The value type is @link ReadStoreElement @endlink.
+ * 
+ * @var FragmentStore::TReadSeqStore FragmentStore::readSeqStore;
+ * 
+ * @brief @link StringSet @endlink that maps from readId to readSeq.
+ * 
+ * @var FragmentStore::TMatePairStore FragmentStore::matePairStore;
+ * 
+ * @brief @link String @endlink that maps from matePairId to (readId[2], libId).
+ * 
+ * The value type is @link MatePairStoreElement @endlink.
+ * 
+ * @var FragmentStore::TLibraryStore FragmentStore::libraryStore;
+ * 
+ * @brief @link String @endlink that maps from libId to (mean, std).
+ * 
+ * Value type is @link LibraryStoreElement @endlink.
+ * 
+ * @var FragmentStore::TContigFileStore FragmentStore::contigFileStore;
+ * 
+ * @brief @link String @endlink that maps from contigId to (contigSeq,
+ *        contigGaps, contigFileId).
+ * 
+ * Value type is @link ContigFile @endlink.
+ * 
+ * @var FragmentStore::TContigStore FragmentStore::contigStore;
+ * 
+ * @brief @link String @endlink that maps from contigId to (contigSeq,
+ *        contigGaps, contigFileId).
+ * 
+ * Value type is @link ContigStoreElement @endlink.
+ * 
+ * @var FragmentStore::TAlignedReadStore FragmentStore::alignedReadStore;
+ * 
+ * @brief @link String @endlink that stores (alignId, readId, contigId,
+ *        pairMatchId, beginPos, endPos, gapAnchors).
+ * 
+ * The value type is @link AlignedReadStoreElement @endlink.
+ * 
+ * @section Remarks
+ * 
+ * You can sort &lt;tt&gt;alignedReadStore&lt;/tt&gt; using @link sortAlignedReads @endlink.
+ * After sorting, you can use the functions @link lowerBoundAlignedReads
+ * @endlink and @link upperBoundAlignedReads @endlink to perform a binary
+ * search, e.g. for accessing only a subrange.
+ * 
+ * @see lowerBoundAlignedReads
+ * @see upperBoundAlignedReads
+ * @see sortAlignedReads
+ * 
+ * @var FragmentStore::TAnnotationStore FragmentStore::annotationStore;
+ * 
+ * @brief String that maps from annoId to (contigId, typeId, beginPos, endPos,
+ *        parentId, lastChildId, nextSiblingId, values).
+ * 
+ * The value type is @link AnnotationStoreElement @endlink.
+ * 
+ * Instead of accessing this store directly, consider to use the high-level
+ * interface provided by @link AnnotationTreeIterator @endlink.
+ * 
+ * @var FragmentStore::TAlignQualityStore FragmentStore::alignQualityStore;
+ * 
+ * @brief @link String @endlink that maps from alignId to (pairScore, score,
+ *        errors).
+ * 
+ * The value type is @link AlignQualityStoreElement @endlink.
+ * 
+ * @var FragmentStore::TAlignedReadTagStore FragmentStore::alignedReadTagStore;
+ * 
+ * @brief @link StringSet @endlink that maps from alignId to alignTag.
+ * 
+ * @var FragmentStore::TReadNameStore FragmentStore::readNameStore;
+ * 
+ * @brief @link StringSet @endlink that maps from readId to readName.
+ * 
+ * @var FragmentStore::TContigNameStore FragmentStore::matePairNameStore;
+ * 
+ * @brief @link StringSet @endlink that maps from contigId to matePairName.
+ * 
+ * @var FragmentStore::TLibraryNameStore FragmentStore::libraryNameStore;
+ * 
+ * @brief A @link StringSet @endlink that maps from libId to libName.
+ * 
+ * @var FragmentStore::TContigNameStore FragmentStore::contigNameStore;
+ * 
+ * @brief @link StringSet @endlink that maps from contigId to contigName.
+ * 
+ * @var FragmentStore::TAnnotationNameStore FragmentStore::annotationNameStore;
+ * 
+ * @brief @link StringSet @endlink that maps from annoId to annoName;
+ * 
+ * @var FragmentStore::TAnnotationTypeStore FragmentStore::annotationTypeStore;
+ * 
+ * @brief @link StringSet @endlink that maps from typeId to the type name of an
+ *        annotation, e.g. &#34;gene&#34; or &#34;exon&#34;. typeId is a member of the @link
+ *        AnnotationStoreElement @endlink.
+ * 
+ * @section Remarks
+ * 
+ * There are @link FragmentStore::PredefinedAnnotationTypes predefined type ids
+ * @endlink for commonly used types e.g. &lt;tt&gt;ANNO_GENE&lt;/tt&gt; or
+ * &lt;tt&gt;ANNO_EXON&lt;/tt&gt; which can be used to set the @link
+ * AnnotationStoreElement::typeId @endlink directly as a fast alternative to
+ * @link AnnotationTreeIterator#getType @endlink and @link
+ * AnnotationTreeIterator#setType @endlink.
+ * 
+ * @var FragmentStore::TAnnotationKeyStore FragmentStore::annotationKeyStore;
+ * 
+ * @brief @link StringSet @endlink that maps from keyId to the name of a key.
+ *        The keyId is used to address @link AnnotationStoreElement::values
+ *        @endlink of an annotation.
+ * 
+ * @fn FragmentStore#clearContigs
+ * 
+ * @brief REvmoes all contigs from a FragmentStore.
+ * 
+ * @signature void clearContigs(store);
+ * 
+ * @param[in,out] store The FragmentStore to remove all contigs from.
+ * 
+ * This function clears the @link FragmentStore::contigStore @endlink and @link
+ * FragmentStore::contigNameStore @endlink.
+ * 
+ * @fn FragmentStore#appendRead
+ * 
+ * @brief Append a read to a FragmentStore.
+ * 
+ * @signature TSize appendRead(store, read[, matePairId]);
+ * @signature TSize appendRead(store, read, name[, matePairId]);
+ * 
+ * @param[in,out] store The FragmentStore to append the read to.
+ * @param[in] read The read sequence. Type: @link ContainerConcept @endlink.
+ * @param[in] name The name of the read. Type: @link CharString @endlink.
+ * @param[in] matePairId ID of the mate-pair that this read is part of. Default:
+ *                       &lt;tt&gt;FragmentStore::INVALID_ID&lt;/tt&gt; which corresponds to
+ *                       an unmated read.
+ * 
+ * @return TSize The readId of the newly appended read. TSize is the size type
+ *               of the @link FragmentStore::readStore @endlink.
+ * 
+ * This funciton appends a single read to the @link FragmentStore::readStore
+ * @endlink and @link FragmentStore::readSeqStore @endlink.
+ * 
+ * @see FragmentStore#getRead
+ * 
+ * @fn FragmentStore#getRead
+ * 
+ * @brief Returns the read with the given readId.
+ * 
+ * @signature TRead getRead(store, id);
+ * 
+ * @param[in] store The FragmentStore to query for the read.
+ * @param[in] id The id of the read.
+ * 
+ * @return TRead The entry from the @link FragmentStore::readStore @endlink.
+ *               TRead is the value type of the @link FragmentStore::readStore
+ *               @endlink.
+ * 
+ * @fn FragmentStore#appendAlignedRead
+ * 
+ * @brief Appends an aligned read entyr to a fragment store.
+ * 
+ * @signature TSize appendAlignedRead(store, readId, contigId, beginPos,
+ *            endPos[, pairMatchId]);
+ * 
+ * @param[in,out] store The FragmentStore to append to.
+ * @param[in] readId The id of the read to append an alignment for.
+ * @param[in] contigId The id of the contig of the alignment.
+ * @param[in] beginPos The begin position of the alignment.
+ * @param[in] endPos The end position of the alignment.
+ * @param[in] pairMatchId The id of the alignedRead pair. Default:
+ *                        &lt;tt&gt;FragmentStore::INVALID_ID&lt;/tt&gt; which corresponds
+ *                        to an unmated read.
+ * 
+ * @return TSize The alignedReadId of the alignment.
+ * 
+ * @section Remarks
+ * 
+ * This function appends a single read alignment to the @link
+ * FragmentStore::alignedReadStore @endlink. Note that this really only adds a
+ * match. To generate a global alignment out of all these matches, use @link
+ * FragmentStore#convertMatchesToGlobalAlignment @endlink.
+ * 
+ * @see FragmentStore#appendRead
+ * 
+ * @fn FragmentStore#appendMatePair
+ * 
+ * @brief Appends the two reads of a mate pair to a FragmentStore.
+ * 
+ * @signature TSize appendMatePair(store, readSeq1, readSeq2[, name1, name2]);
+ * 
+ * @param[in,out] store The FragmentStore to append the mate pair to.
+ * @param[in] readSeq1 The read sequence of the first read.
+ * @param[in] readSeq2 The read sequence of the second read.
+ * @param[in] name1 The read name of the first read.
+ * @param[in] name2 The read name of the first read.
+ * 
+ * @return TSize The matePairId of the newly appended mate pair. TSize is the
+ *               size type of the @link FragmentStore::matePairStore @endlink.
+ * 
+ * @section Remarks
+ * 
+ * This function appends two reads to the @link FragmentStore::readStore
+ * @endlink and @link FragmentStore::readSeqStore @endlink and a mate pair entry
+ * for both them to the @link FragmentStore::matePairStore @endlink. If names
+ * are given, they are appended to @link FragmentStore::readNameStore @endlink.
+ * 
+ * @fn FragmentStore#compactAlignedReads
+ * 
+ * @brief Remove invalid aligned reads and rename the alignId&#39;s sequentially
+ *        beginning with 0.
+ * 
+ * @signature TSize compactAlignedReads(store);
+ * 
+ * @param[in,out] store The FragmentStore to compact the aligned reads of.
+ * 
+ * @return s TSize The new size of the @link FragmentStore::alignedReadStore
+ *           @endlink. TSize is the size type of the @link
+ *           FragmentStore::alignedReadStore @endlink.
+ * 
+ * @section Remarks
+ * 
+ * This function removes all entries from the @link
+ * FragmentStore::alignedReadStore @endlink whose alignId is equal to
+ * &lt;tt&gt;INVALID_ID&lt;/tt&gt; as well as orphan entries in @link
+ * FragmentStore::alignQualityStore @endlink. Afterwards, the alignIds are
+ * renamed sequentially beginning with 0. This function can be used to remove
+ * alignments which are flagged by previously setting their id to INVALID_ID.
+ * 
+ * @fn FragmentStore#compactPairMatchIds
+ * 
+ * @brief Renames pairMatchId sequentially beginning with 0.
+ * 
+ * @signature TSize compactPairMatchIds(store);
+ * 
+ * @param[in,out] store The FragmentStore to compact pair match ids of.
+ * 
+ * @return TSize The number of pair matches. TSize is the size type of @link
+ *               FragmentStore::alignedReadStore @endlink.
+ * 
+ * @section Remarks
+ * 
+ * This function renames the pairMatchId in the @link
+ * FragmentStore::alignedReadStore @endlink sequentially beginning with 0. Two
+ * read alignments can be identified to be pair match if they have the same
+ * pairMatchId. Please note that paired reads not necessarily have to map as a
+ * pair match, e.g. if they are on different ocntigs or have the same
+ * orientation or a wrong insert size.
+ * 
+ * @fn FragmentStore#calculateInsertSizes
+ * 
+ * @brief Calcualtes a string wtih insert sizes for each pair match.
+ * 
+ * @signature void calculateInsertSizes(insertSizes, store);
+ * 
+ * @param[out] insertSizes A @link String @endlink of insert sizes. This string
+ *                         is accordingly resized and can be addressed by the
+ *                         pairMatchId.
+ * @param[in] store The @link FragmentStore @endlink to compute the insert sizes
+ *                  for.
+ * 
+ * @section Remarks
+ * 
+ * This function calls @link FragmentStore#compactPairMatchIds @endlink first
+ * and calcualte the insert size for every pair match. The insert size of a pair
+ * match is the outer distance between the two matches.
+ * 
+ * @fn FragmentStore#getMateNo
+ * 
+ * @brief Returns the mate number for a read given a readId.
+ * 
+ * @signature int getMateNo(store, readId);
+ * 
+ * @param[in] store The FragmentStore with the read.
+ * @param[in] readId The readId.
+ * 
+ * @return int The mate number (0 for the first mate, 1 for the second mate) of
+ *             the read in its mate pair or -1 if the read is not paired.
+ * 
+ * @fn FragmentStore#calculateMateIndices
+ * 
+ * @brief Calculates a string that maps the readId of a read to the index of its
+ *        mate in the alignedReadStore.
+ * 
+ * @signature void calculateMateIndices(mateIndices, store);
+ * 
+ * @param[out] mateIndices A @link String @endlink with the resulting mate
+ *                         indices. This string is accordingly resized and can
+ *                         be addressed by the readId.
+ * @param[in] store The @link FragmentStore @endlink.
+ * 
+ * Entries of reads without a mate contain &lt;tt&gt;INVALID_ID&lt;/tt&gt;.
+ * 
+ * @fn FragmentStore#convertMatchesToGlobalAlignment
+ * 
+ * @brief Converts all matches to a multiple global alignment in gap-space.
+ * 
+ * @signature void convertMatchesToGlobalAlignment(store, score, shrinkMatches);
+ * 
+ * @param[in,out] store The fragment store. Types: FragmentStore
+ * @param[in] score A score object used by @link globalAlignment @endlink in
+ *                  this function.
+ * @param[in] shrinkMatches States whether the matches should be shrinked.
+ *                          Types: True, False
+ * 
+ * @section Remarks
+ * 
+ * Before calling this function all &lt;tt&gt;gaps&lt;/tt&gt; structures in @link
+ * FragmentStore::alignedReadStore @endlink and @link FragmentStore::contigStore
+ * @endlink must be empty, i.e. there are no gaps in the alignments. This
+ * function iterates over entries in the @link FragmentStore::alignedReadStore
+ * @endlink and semi-global aligns each read to its contig segments given by
+ * begin and end position. Gaps introduced by these pair-wise alignments are
+ * then inserted to the affected contig and reads correspondingly.
+ * 
+ * The invariant that positions in the @link FragmentStore::alignedReadStore
+ * @endlink are in gap-space holds before (there were no gaps in alignments) and
+ * after calling this functions.
+ * 
+ * If the @link FragmentStore::alignQualityStore @endlink of the @link
+ * FragmentStore @endlink is empty when
+ * &lt;tt&gt;convertMatchesToGlobalAlignment()&lt;/tt&gt; is called then the @link
+ * FragmentStore::alignQualityStore @endlink is filled with the edit distance
+ * scores.
+ * 
+ * @fn FragmentStore#convertPairWiseToGlobalAlignment
+ * 
+ * @brief Converts pairwise alignments to a multiple global alignment.
+ * 
+ * @signature void convertPairWiseToGlobalAlignment(store, pairwiseContigGaps);
+ * 
+ * @param[in,out] store The fragment store. Types: FragmentStore
+ * @param[in,out] pairwiseContigGaps  A @link String @endlink of anchored contig
+ *                                   gaps for every pairwise alignment.
+ * 
+ * @section Remarks
+ * 
+ * Before calling this function the &lt;tt&gt;gaps&lt;/tt&gt; structures in the @link
+ * FragmentStore::contigStore @endlink must be empty, i.e. there are no gaps in
+ * the contig. The pairwise alignment gaps of the reads are stored in the
+ * &lt;tt&gt;gaps&lt;/tt&gt; structure in the @link FragmentStore::alignedReadStore
+ * @endlink, whereas the pairwise alignment gaps of the contig are stored in the
+ * &lt;tt&gt;pairwiseContigGaps&lt;/tt&gt; string.
+ * 
+ * After calling this functions all positions in the @link
+ * FragmentStore::alignedReadStore @endlink are in gap-space.
+ * 
+ * @fn FragmentStore#getClrRange
+ * 
+ * @brief Get the &#34;clear&#34; range of a read alignment.
+ * 
+ * @signature void getClrRange(store, alignEl, begClr, endClr);
+ * 
+ * @param[in] store The FragmentStore to work on.
+ * @param[in] alignEl The @link AlignedReadStoreElement @endlink to work on.
+ * @param[out] begClr Begin of the clear range.
+ * @param[out] endClr End of the clear range.
+ * 
+ * The clear range of a read alignment is the range of the part of the alignmetn
+ * that is not clipped.
+ * 
+ * @fn FragmentStore#read
+ * 
+ * @brief Read the contents of a FragmentStore from a file.
+ * 
+ * @signature int read(file, store, tag);
+ * 
+ * @param[in,out] file The @link StreamConcept @endlink to read from.
+ * @param[in,out] store The FragmentStore to append to.
+ * @param[in] tag The format to read from. Can be Amos or Sam.
+ * 
+ * @return int 0 in the case of success, non-0 value in case of errors.
+ * 
+ * @fn FragmentStore#write
+ * 
+ * @brief Write the contents of a FragmentStore to a file.
+ * 
+ * @signature int write(file, store, tag);
+ * 
+ * @param[in,out] file The @link StreamConcept @endlink to write to.
+ * @param[in] store The FragmentStore to write to the file.
+ * @param[in] tag The format to write out. Types: Sam or Amos.
+ * 
+ * @return int 0 in case of success, 1 in case of errors.
+ * 
+ * @fn FragmentStore#writeContigs
+ * 
+ * @brief Write contigs from FragmentStore into a @link StreamConcept @endlink.
+ * 
+ * @signature bool writeContigs(file, store, tag);
+ * 
+ * @param[in,out] file The @link StreamConcept @endlink to write to.
+ * @param[in] store The FragmentStore to write contigs of.
+ * @param[in] tag A tag for the sequence format.
+ * 
+ * @return bool true on success, false on errors.
+ * 
+ * @fn FragmentStore#loadContigs
+ * 
+ * @brief Load contigs into a FragmentStore.
+ * 
+ * @signature bool loadContigs(store, fileName[, loadSeqs]);
+ * @signature bool loadContigs(store, fileNameList[, loadSeqs]);
+ * 
+ * @param[in,out] store The FragmentStore to append the contigs to.
+ * @param[in] fileName A @link CharString @endlink with the name of the file to
+ *                     load.
+ * @param[in] fileNameList A @link StringSet @endlink of @link CharString
+ *                         @endlink with a list of file names to load.
+ * @param[in] loadSeqs A &lt;tt&gt;bool&lt;/tt&gt; indicating whether to load lazily. If
+ *                     &lt;tt&gt;true&lt;/tt&gt; then sequences are loaded immediately. If
+ *                     &lt;tt&gt;false&lt;/tt&gt;, an emptycontig with a reference to the
+ *                     file is created. Its sequence can be loaded on demand by
+ *                     @link FragmentStore#lockContig @endlink and @link
+ *                     FragmentStore#loadContig @endlink.
+ * 
+ * @return bool true in case of success and false in case of error.
+ * 
+ * @fn FragmentStore#loadContig
+ * 
+ * @brief Manually load a contig sequence.
+ * 
+ * @signature bool loadContig(store, contigId);
+ * 
+ * @param[in,out] store The FragmentStore to load the contig for.
+ * @param[in] contigId The id of the contig that was created earlier by @link
+ *                     FragmentStore#loadContigs @endlink.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * @fn FragmentStore#lockContig
+ * 
+ * @brief Locks a contig sequence from being removed.
+ * 
+ * @signature bool lockContig(store, contigId);
+ * 
+ * @param[in,out] store The FragmentStore to lock the contig for.
+ * @param[in] contigId The id of the contig that was created earlier by @link
+ *                     FragmentStore#loadContigs @endlink.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * This function increases the contig usage counter by 1 and ensures that the
+ * contig sequence is loaded.
+ * 
+ * @fn FragmentStore#unlockContig
+ * 
+ * @brief Removes a previous contig lock.
+ * 
+ * @signature bool unlockContig(store, contigId);
+ * 
+ * @param[in,out] store The FragmentStore to unlock the contig for.
+ * @param[in] contigId The id of the contig that was created earlier by @link
+ *                     FragmentStore#loadContigs @endlink.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * This function decreases the contig usage counter by 1.
+ * 
+ * @fn FragmentStore#unlockAndFreeContig
+ * 
+ * @brief Removes a previous contig lock and clears the sequence if no further
+ *        lock exists.
+ * 
+ * @signature bool unlockContig(store, contigId);
+ * 
+ * @param[in,out] store The FragmentStore to unlock the contig for.
+ * @param[in] contigId The id of the contig that was created earlier by @link
+ *                     FragmentStore#loadContigs @endlink.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * This function decreases the contig usage counter by 1 and frees the
+ * sequences&#39; memory if the counter equals 0.
+ * 
+ * @fn FragmentStore#lockContigs
+ * 
+ * @brief Locks all contig sequences from being remove.
+ * 
+ * @signature bool lockContigs(store);
+ * 
+ * @param[in,out] store The FragmentStore to lock the contigs for.
+ * 
+ * @return bool true in case of success, false in case of errors.
+ * 
+ * @fn FragmentStore#unlockContigs
+ * 
+ * @brief Unlocks all contig sequences.
+ * 
+ * @signature bool unlockContigs(store);
+ * 
+ * @param[in,out] store The FragmentStore to unlock the contigs for.
+ * 
+ * @return bool true in case of success, false in case of errors.
+ * 
+ * @fn FragmentStore#unlockAndFreeContigs
+ * 
+ * @brief Unlocks all contig sequences and clears sequences without lock.
+ * 
+ * @signature bool unlockAndFreeContigs(store);
+ * 
+ * @param[in,out] store The FragmentStore to unlock the contigs for.
+ * 
+ * @return bool true in case of success, false in case of errors.
+ * 
+ * @fn FragmentStore#loadReads
+ * 
+ * @brief Loads reads into FragmentStore
+ * 
+ * @signature bool loadReads(store, fileName);
+ * @signature bool loadReads(store, fileNameL, fileNameR);
+ * 
+ * @param[in,out] store The FragmentStore to append the reads to.
+ * @param[in] fileName Path to single-end read file.
+ * @param[in] fileNameL Path to left read file in case of paired reads.
+ * @param[in] fileNameR Path to right read file in case of paired reads.
+ * 
+ * @return bool true in case of success, false in case of errors.
+ * 
+ * When two file names are given thent he files are expected to containt he same
+ * number of reads and reads with the same index are assumed to be mate pairs.
+ * Mate pairs are stored internally in an &#34;interleaved mode&#34;: a read is read
+ * from each file before reading the next one.
+ * 
+ * @fn FragmentStore#readRecords
+ * 
+ * @brief Read all records from one @link BamFileIn @endlink.
+ * 
+ * @signature void readRecords(store, bamFileIn, importFlags);
+ * 
+ * @param[in,out] store The @link FragmentStore @endlink object to store the
+ *                      records into.
+ * @param[in,out] bamFileIn The @link BamFileIn @endlink object to read from.
+ * @param[in] importFlags The import flags.
+ * 
+ * @throw IOError On low-level I/O errors.
+ * @throw ParseError On high-level file format errors.
+ * 
+ * @fn FragmentStore#writeRecords
+ * 
+ * @brief Write all records to one @link BamFileOut @endlink.
+ * 
+ * @signature void readRecords(bamFileOut, store);
+ * 
+ * @param[in,out] bamFileOut The @link BamFileOut @endlink object to write into.
+ * @param[in] store The @link FragmentStore @endlink object.
+ * 
+ * @throw IOError On low-level I/O errors.
+ * @throw ParseError On high-level file format errors.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

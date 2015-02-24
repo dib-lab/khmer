@@ -1,0 +1,1133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="concept_textconcept" data-page="TextConcept">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>TextConcept - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="concept" data-pimped="true">
+  <a href="page_LanguageEntities.html#concept">Concept</a> <span>TextConcept<div><div>Concept for a type that can be as text of an index.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>concept TextConcept;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Certain algorithms and data structures can work for both strings and string sets but need to treat these two
+types slightly different. Examples are index data structures and algorithms that build the indices and use
+the indices for lookup.</p><p>To facilitate writing of generic algorithms, the TextConcept concept gives a common interface to both for this
+kind of algorithms.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_String.html" data-lang-entity="class">String</a></li>
+  
+  <li><a href="class_StringSet.html" data-lang-entity="class">StringSet</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23getSeqNo" title="#TextConcept#getSeqNo (interface function)" data-lang-entity="interface_function">TSeqNo getSeqNo(pos[, limits]);</a></code></span>
+    <span class="summary_desc"><div>Returns the sequence number of a position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23getSeqOffset" title="#TextConcept#getSeqOffset (interface function)" data-lang-entity="interface_function">TOffset getSeqOffset(pos[, limits]);</a></code></span>
+    <span class="summary_desc"><div>Returns the local sequence offset of a position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23posGlobalize" title="#TextConcept#posGlobalize (interface function)" data-lang-entity="interface_function">TPos posGlobalize(pos, limits)</a></code></span>
+    <span class="summary_desc"><div>Converts a local/global to a global position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23posLocalize" title="#TextConcept#posLocalize (interface function)" data-lang-entity="interface_function">void posLocalize(result, pos, limits)</a></code></span>
+    <span class="summary_desc"><div>Converts a local/global to a local position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23posLocalToX" title="#TextConcept#posLocalToX (interface function)" data-lang-entity="interface_function">void posLocalToX(dst, localPos, limits);</a></code></span>
+    <span class="summary_desc"><div>Converts a local to a local/global position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23stringSetLimits" title="#TextConcept#stringSetLimits (interface function)" data-lang-entity="interface_function">TStringSetLimits stringSetLimits(text);</a></code></span>
+    <span class="summary_desc"><div>Return string delimiter positions for TextConcept types.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23SAValue" title="#TextConcept#SAValue (interface function)" data-lang-entity="interface_metafunction">SAValue&lt;TText&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>The default alphabet type of a suffix array, i.e. the type to store a
+position of a string or string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#TextConcept%23StringSetLimits" title="#TextConcept#StringSetLimits (interface function)" data-lang-entity="interface_metafunction">StringSetLimits&lt;TText&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return type of string set limits for TextConcept types.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="TextConcept#getSeqNo" class="signature first" data-lang-entity="interface_function">
+      <code>TSeqNo getSeqNo(pos[, limits]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the sequence number of a position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position. Types: Pair</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limits</code>
+            
+        
+      </th>
+      <td>The limits string returned by <a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSeqNo</code></th>
+        <td>A single integer value that identifies the string within the stringset <tt>pos</tt> points at. If
+<tt>limits</tt> is omitted or <a href="tag_Nothing.html" data-lang-entity="tag">Nothing</a> <tt>getSeqNo</tt> returns 0.If <tt>pos</tt> is a
+local position (of class <a href="class_Pair.html" data-lang-entity="class">Pair</a>) then <tt>i1</tt> is returned.If <tt>pos</tt> is a global
+position (integer type and <tt>limits</tt> is a <a href="class_String.html" data-lang-entity="class">String</a>) then <tt>pos</tt> is converted
+to a local position and <tt>i1</tt> is returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="TextConcept#getSeqOffset" class="signature" data-lang-entity="interface_function">
+      <code>TOffset getSeqOffset(pos[, limits]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the local sequence offset of a position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position. Types: Pair</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limits</code>
+            
+        
+      </th>
+      <td>The limits string returned by <a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TOffset</code></th>
+        <td>A single integer value that identifies the position within the string <tt>pos</tt> points at.If
+<tt>limits</tt> is omitted or <a href="tag_Nothing.html" data-lang-entity="tag">Nothing</a> <tt>getSeqNo</tt> returns <tt>pos</tt>. If
+<tt>pos</tt> is a local position (of class <a href="class_Pair.html" data-lang-entity="class">Pair</a>) then <tt>i2</tt> is returned.If
+<tt>pos</tt> is a global position (integer type and <tt>limits</tt> is a <a href="class_String.html" data-lang-entity="class">String</a>) then
+<tt>pos</tt> is converted to a local position and <tt>i2</tt> is returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="TextConcept#posGlobalize" class="signature" data-lang-entity="interface_function">
+      <code>TPos posGlobalize(pos, limits)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts a local/global to a global position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A local or global position (pair or integer value). Types: Pair</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limits</code>
+            
+        
+      </th>
+      <td>The limits string returned by <a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The corresponding global position of <tt>pos</tt>. If
+<tt>pos</tt> is an integral type <tt>pos</tt> is returned. If
+not, <tt>limits[getSeqNo(pos, limits)] + getSeqOffset(pos,
+limits)</tt> is returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="TextConcept#posLocalize" class="signature" data-lang-entity="interface_function">
+      <code>void posLocalize(result, pos, limits)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts a local/global to a local position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A local or global position (pair or integer value).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limits</code>
+            
+        
+      </th>
+      <td>The limits string returned by <a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">result</code>
+            
+        
+      </th>
+      <td>Reference to the resulting corresponding local position of
+<tt>pos</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="TextConcept#posLocalToX" class="signature" data-lang-entity="interface_function">
+      <code>void posLocalToX(dst, localPos, limits);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts a local to a local/global position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dst</code>
+            
+        
+      </th>
+      <td>The local or global position (pair or integer value) is written here.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">localPos</code>
+            
+        
+      </th>
+      <td>The local position.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limits</code>
+            
+        
+      </th>
+      <td>The string limits as returned by <a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="TextConcept#stringSetLimits" class="signature" data-lang-entity="interface_function">
+      <code>TStringSetLimits stringSetLimits(text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return string delimiter positions for TextConcept types.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The text to query for its string set limits.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TStringSetLimits</code></th>
+        <td>The string set limits (of type <a href="concept_TextConcept.html#TextConcept#StringSetLimits" data-lang-entity="interface_metafunction">StringSetLimits</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="TextConcept#SAValue" class="signature first" data-lang-entity="interface_metafunction">
+    <code>SAValue&lt;TText&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The default alphabet type of a suffix array, i.e. the type to store a
+position of a string or string set.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TText</code></th>
+            <td>The text type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TReturn</code></th>
+            <td>A type to store a position in a <tt>TText</tt>. This could be an integer for strings or a
+pair of integers for string sets.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Usage</h4><p>This type should be removed for functions returning positions in texts such as online or index-based search.
+Thus, always use this metafunction for declaring position variables.</p><p>Use the functions <a href="concept_TextConcept.html#TextConcept#posLocalize" data-lang-entity="interface_function">posLocalize</a>, <a href="concept_TextConcept.html#TextConcept#posGlobalize" data-lang-entity="interface_function">posGlobalize</a>, <a href="concept_TextConcept.html#TextConcept#getSeqNo" data-lang-entity="interface_function">getSeqNo</a>, and <a href="concept_TextConcept.html#TextConcept#getSeqOffset" data-lang-entity="interface_function">getSeqOffset</a> for conversion between local
+and global positions in texts.</p><h4>Examples</h4><p>The following shows the original definition of the SAValue metafunction in SeqAn.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TString</span><span class="p">,</span> <span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">SAValue</span><span class="o">&lt;</span><span class="n">StringSet</span><span class="o">&lt;</span><span class="n">TString</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Pair</span><span class="o">&lt;</span>
+            <span class="k">typename</span> <span class="n">Size</span><span class="o">&lt;</span><span class="n">StringSet</span><span class="o">&lt;</span><span class="n">TString</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span><span class="p">,</span>
+            <span class="k">typename</span> <span class="n">SAValue</span><span class="o">&lt;</span><span class="n">TString</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">,</span>
+            <span class="n">Pack</span>
+        <span class="o">&gt;</span> <span class="n">Type</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="TextConcept#StringSetLimits" class="signature" data-lang-entity="interface_metafunction">
+    <code>StringSetLimits&lt;TText&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return type of string set limits for TextConcept types.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TText</code></th>
+            <td>The type of the text.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The type of string set limits objects.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @concept TextConcept
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Concept for a type that can be as text of an index.
+ * 
+ * @signature concept TextConcept;
+ * 
+ * Certain algorithms and data structures can work for both strings and string
+ * sets but need to treat these two types slightly different. Examples are index
+ * data structures and algorithms that build the indices and use the indices for
+ * lookup.
+ * 
+ * To facilitate writing of generic algorithms, the TextConcept concept gives a
+ * common interface to both for this kind of algorithms.
+ * 
+ * @see String
+ * @see StringSet
+ * 
+ * @mfn TextConcept#StringSetLimits
+ * 
+ * @brief Return type of string set limits for TextConcept types.
+ * 
+ * @signature StringSetLimits&lt;TText&gt;::Type;
+ * 
+ * @tparam TText The type of the text.
+ * 
+ * @return Type The type of string set limits objects.
+ * 
+ * @mfn TextConcept#SAValue
+ * 
+ * @brief The default alphabet type of a suffix array, i.e. the type to store a
+ *        position of a string or string set.
+ * 
+ * @signature SAValue&lt;TText&gt;::Type
+ * 
+ * @tparam TText The text type to query.
+ * 
+ * @return TReturn A type to store a position in a &lt;tt&gt;TText&lt;/tt&gt;. This could be
+ *                 an integer for strings or a pair of integers for string sets.
+ * 
+ * @section Usage
+ * 
+ * This type should be removed for functions returning positions in texts such
+ * as online or index-based search. Thus, always use this metafunction for
+ * declaring position variables.
+ * 
+ * Use the functions @link TextConcept#posLocalize @endlink, @link
+ * TextConcept#posGlobalize @endlink, @link TextConcept#getSeqNo @endlink, and
+ * @link TextConcept#getSeqOffset @endlink for conversion between local and
+ * global positions in texts.
+ * 
+ * @section Examples
+ * 
+ * The following shows the original definition of the SAValue metafunction in
+ * SeqAn.
+ * 
+ * @code{.cpp}
+ * template &lt;typename TString, typename TSpec&gt;
+ * struct SAValue&lt;StringSet&lt;TString, TSpec&gt; &gt;
+ * {
+ *     typedef Pair&lt;
+ *             typename Size&lt;StringSet&lt;TString, TSpec&gt; &gt;::Type,
+ *             typename SAValue&lt;TString&gt;::Type,
+ *             Pack
+ *         &gt; Type;
+ * };
+ * @endcode
+ * 
+ * 
+ * @fn TextConcept#stringSetLimits
+ * 
+ * @brief Return string delimiter positions for TextConcept types.
+ * 
+ * @signature TStringSetLimits stringSetLimits(text);
+ * 
+ * @param[in] text The text to query for its string set limits.
+ * 
+ * @return TStringSetLimits The string set limits (of type @link
+ *                          TextConcept#StringSetLimits @endlink).
+ * 
+ * @fn TextConcept#posLocalToX
+ * 
+ * @brief Converts a local to a local/global position.
+ * 
+ * @signature void posLocalToX(dst, localPos, limits);
+ * 
+ * @param[in] dst The local or global position (pair or integer value) is
+ *                written here.
+ * @param[in] localPos The local position.
+ * @param[in] limits The string limits as returned by @link
+ *                   TextConcept#stringSetLimits @endlink.
+ * 
+ * @fn TextConcept#posLocalize
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Converts a local/global to a local position.
+ * 
+ * @signature void posLocalize(result, pos, limits)
+ * 
+ * @param[in] pos A local or global position (pair or integer value).
+ * @param[in] limits The limits string returned by @link
+ *                   TextConcept#stringSetLimits @endlink.
+ * @param[in] result Reference to the resulting corresponding local position of
+ *                   &lt;tt&gt;pos&lt;/tt&gt;.
+ * 
+ * @fn TextConcept#posGlobalize
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Converts a local/global to a global position.
+ * 
+ * @signature TPos posGlobalize(pos, limits)
+ * 
+ * @param[in] pos A local or global position (pair or integer value). Types:
+ *                Pair
+ * @param[in] limits The limits string returned by @link
+ *                   TextConcept#stringSetLimits @endlink.
+ * 
+ * @return TPos The corresponding global position of &lt;tt&gt;pos&lt;/tt&gt;. If
+ *              &lt;tt&gt;pos&lt;/tt&gt; is an integral type &lt;tt&gt;pos&lt;/tt&gt; is returned. If
+ *              not, &lt;tt&gt;limits[getSeqNo(pos, limits)] + getSeqOffset(pos,
+ *              limits)&lt;/tt&gt; is returned.
+ * 
+ * @fn TextConcept#getSeqNo
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns the sequence number of a position.
+ * 
+ * @signature TSeqNo getSeqNo(pos[, limits]);
+ * 
+ * @param[in] pos A position. Types: Pair
+ * @param[in] limits The limits string returned by @link
+ *                   TextConcept#stringSetLimits @endlink.
+ * 
+ * @return TSeqNo A single integer value that identifies the string within the
+ *                stringset &lt;tt&gt;pos&lt;/tt&gt; points at. If &lt;tt&gt;limits&lt;/tt&gt; is
+ *                omitted or @link Nothing @endlink &lt;tt&gt;getSeqNo&lt;/tt&gt; returns
+ *                0.If &lt;tt&gt;pos&lt;/tt&gt; is a local position (of class @link Pair
+ *                @endlink) then &lt;tt&gt;i1&lt;/tt&gt; is returned.If &lt;tt&gt;pos&lt;/tt&gt; is a
+ *                global position (integer type and &lt;tt&gt;limits&lt;/tt&gt; is a @link
+ *                String @endlink) then &lt;tt&gt;pos&lt;/tt&gt; is converted to a local
+ *                position and &lt;tt&gt;i1&lt;/tt&gt; is returned.
+ * 
+ * @fn TextConcept#getSeqOffset
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns the local sequence offset of a position.
+ * 
+ * @signature TOffset getSeqOffset(pos[, limits]);
+ * 
+ * @param[in] pos A position. Types: Pair
+ * @param[in] limits The limits string returned by @link
+ *                   TextConcept#stringSetLimits @endlink.
+ * 
+ * @return TOffset A single integer value that identifies the position within
+ *                 the string &lt;tt&gt;pos&lt;/tt&gt; points at.If &lt;tt&gt;limits&lt;/tt&gt; is
+ *                 omitted or @link Nothing @endlink &lt;tt&gt;getSeqNo&lt;/tt&gt; returns
+ *                 &lt;tt&gt;pos&lt;/tt&gt;. If &lt;tt&gt;pos&lt;/tt&gt; is a local position (of class
+ *                 @link Pair @endlink) then &lt;tt&gt;i2&lt;/tt&gt; is returned.If
+ *                 &lt;tt&gt;pos&lt;/tt&gt; is a global position (integer type and
+ *                 &lt;tt&gt;limits&lt;/tt&gt; is a @link String @endlink) then &lt;tt&gt;pos&lt;/tt&gt;
+ *                 is converted to a local position and &lt;tt&gt;i2&lt;/tt&gt; is returned.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1460 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_map" data-page="Map">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Map - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Map<div><div>Set/dictionary container.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_Skiplist.html" data-lang-entity="specialization">Skiplist</a>, 
+    <a href="specialization_VectorSet.html" data-lang-entity="specialization">VectorSet</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/map.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue, typename TSpec&gt;
+class Map;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <a href="specialization_Skiplist.html" data-lang-entity="specialization">Skiplist</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>Type of values that are stored in the map. Use a Pair&lt;Key, Cargo&gt; to implement a dictionary
+mapping from <tt>Key</tt> to <tt>Cargo</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23add" title="#Map#add (interface function)" data-lang-entity="interface_function">void add(map, value);, void add(map, key, cargo);</a></code></span>
+    <span class="summary_desc"><div>Insert another value into a multi map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23cargo" title="#Map#cargo (interface function)" data-lang-entity="interface_function">TCargo find(map, key);</a></code></span>
+    <span class="summary_desc"><div>Returns a cargo given a key.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23erase" title="#Map#erase (interface function)" data-lang-entity="interface_function">void erase(map, key);, void erase(map, iterator);</a></code></span>
+    <span class="summary_desc"><div>Removes a value from a map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23eraseAll" title="#Map#eraseAll (interface function)" data-lang-entity="interface_function">void eraseAll(map, key);</a></code></span>
+    <span class="summary_desc"><div>Removes a value from a map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23find" title="#Map#find (interface function)" data-lang-entity="interface_function">TIterator find(map, key);</a></code></span>
+    <span class="summary_desc"><div>Find a value in a map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23hasKey" title="#Map#hasKey (interface function)" data-lang-entity="interface_function">bool hasKey(map, key);</a></code></span>
+    <span class="summary_desc"><div>Determines whether a map contains a value given key.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23insert" title="#Map#insert (interface function)" data-lang-entity="interface_function">void insert(map, value);, void insert(map, key, cargo);</a></code></span>
+    <span class="summary_desc"><div>Insert new value into map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23length" title="#Map#length (interface function)" data-lang-entity="interface_function">TSize length(map);</a></code></span>
+    <span class="summary_desc"><div>Return number of elements in map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23mapValue" title="#Map#mapValue (interface function)" data-lang-entity="interface_function">TMapValue mapValue(map, key);</a></code></span>
+    <span class="summary_desc"><div>Subscript <tt>operator[]</tt> of maps.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23value" title="#Map#value (interface function)" data-lang-entity="interface_function">TReference value(map, key);</a></code></span>
+    <span class="summary_desc"><div>Returns a value given a key.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Map%23MapValue" title="#Map#MapValue (interface function)" data-lang-entity="interface_metafunction">MapValue&lt;T&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Type of the map value type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Map#add" class="signature first" data-lang-entity="interface_function">
+      <code>void add(map, value);
+void add(map, key, cargo);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Insert another value into a multi map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Skiplist</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">value</code>
+            
+        
+      </th>
+      <td>A value that is added to <tt>map</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cargo</code>
+            
+        
+      </th>
+      <td>A cargo.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>If <tt>key</tt> and <tt>cargo</tt> are specified, a new value of that key and value is added.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#cargo" class="signature" data-lang-entity="interface_function">
+      <code>TCargo find(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a cargo given a key.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">map</code>
+            
+        
+      </th>
+      <td>A map.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>The cargo of the first value in <tt>map</tt> of the given key, if there is any. Otherwise, the
+cargo of a new value that is inserted to <tt>map</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#erase" class="signature" data-lang-entity="interface_function">
+      <code>void erase(map, key);
+void erase(map, iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes a value from a map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Map</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key of a value in <tt>map</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator to a value in <tt>map</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Removes the first value in <tt>map</tt> of the given key, if there is any.</p><p>Use <a href="class_Map.html#Map#eraseAll" data-lang-entity="interface_function">eraseAll</a> to remove all values of the given key in a multi map.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#eraseAll" class="signature" data-lang-entity="interface_function">
+      <code>void eraseAll(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes a value from a map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Skiplist</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key of a value in <tt>map</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Removes all values in <tt>map</tt> of the given key, if there is any.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#find" class="signature" data-lang-entity="interface_function">
+      <code>TIterator find(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Find a value in a map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Map</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>An iterator to the first value in <tt>map</tt> of the given key, if there is any. An iterator
+to the fist value in <tt>map</tt> with key &gt; <tt>key</tt>, otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">cargo</a></li>
+    
+    <li><a class="error">value</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#hasKey" class="signature" data-lang-entity="interface_function">
+      <code>bool hasKey(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Determines whether a map contains a value given key.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Map</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt>, if there is a value in <tt>map</tt> of that key, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#insert" class="signature" data-lang-entity="interface_function">
+      <code>void insert(map, value);
+void insert(map, key, cargo);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Insert new value into map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">map</code>
+            
+        
+      </th>
+      <td>A map.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">value</code>
+            
+        
+      </th>
+      <td>A value that is added to <tt>map</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cargo</code>
+            
+        
+      </th>
+      <td>A cargo.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>If <tt>key</tt> and <tt>cargo</tt> are specified, a new value of that key and value is added. If there is already a
+value of that key in <tt>map</tt>, the value of this element is changed to <tt>cargo</tt>.</p><p>If <tt>value</tt> is specified, and there is already a value in map of that key, than the cargo of this value is
+changed to cargo.cargo(value).</p><p>Use Map#add instead to insert multiple values of the same key.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(map);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return number of elements in map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">map</code>
+            
+        
+      </th>
+      <td>The Map to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the map.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#mapValue" class="signature" data-lang-entity="interface_function">
+      <code>TMapValue mapValue(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Subscript <tt>operator[]</tt> of maps.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">map</code>
+            
+        
+      </th>
+      <td>A map. Types: Map</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TMapValue</code></th>
+        <td>If <tt>map</tt> is a set: The same as Map#hasKey. If <tt>map</tt> is a dictionary: The same as
+Map#value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Usually, Map#value implements the subscript operator <tt>[ ]</tt>, but for maps, this operator is implemented in
+<tt>mapValue</tt>. The semantic of this operator depends on the kind of map: If the map has a Cargo.cargo, than
+<tt>mapValue(map, key)</tt> returns the cargo of the (first) value in the map of the given key. If the map has no
+Cargo.cargo, than the function returns a <tt>true</tt>, if <tt>key</tt> is in <tt>map</tt>, or <tt>false</tt>
+otherwise.</p><h4>Remarks</h4><p>There is no way to create a set of Pair, since it is always interpreted as a key/value pair. If you need a key type
+that holds two members, define your own key type.</p><p>You may overload Key and Cargo for your own value type in order to define, what part of your value type is used as
+key and what as cargo.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Map#value" class="signature" data-lang-entity="interface_function">
+      <code>TReference value(map, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+  <div class="note note">Note. <div class='inline'>
+      
+      <p>Do not change the key of a value in the map.</p>
+      
+  </div></div>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a value given a key.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">map</code>
+            
+        
+      </th>
+      <td>A map.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A key.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>The first value in <tt>map</tt> of the given key, if there is any. Otherwise, a new value
+that is inserted to <tt>map</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Map#MapValue" class="signature first" data-lang-entity="interface_metafunction">
+    <code>MapValue&lt;T&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type of the map value type.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>A map type. Types: Map</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>the map value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Map
+ * 
+ * @headerfile &lt;seqan/map.h&gt;
+ * 
+ * @brief Set/dictionary container.
+ * 
+ * @signature template &lt;typename TValue, typename TSpec&gt; class Map;
+ * 
+ * @tparam TSpec The specializing type. Default: @link Skiplist @endlink
+ * @tparam TValue Type of values that are stored in the map. Use a Pair&lt;Key,
+ *                Cargo&gt; to implement a dictionary mapping from &lt;tt&gt;Key&lt;/tt&gt; to
+ *                &lt;tt&gt;Cargo&lt;/tt&gt;.
+ * 
+ * @mfn Map#MapValue
+ * 
+ * @brief Type of the map value type.
+ * 
+ * @signature MapValue&lt;T&gt;::Type
+ * 
+ * @tparam T A map type. Types: Map
+ * 
+ * @return Type the map value type.
+ * 
+ * @fn Map#length
+ * 
+ * @headerfile &lt;seqan/map.h&gt;
+ * 
+ * @brief Return number of elements in map.
+ * 
+ * @signature TSize length(map);
+ * 
+ * @param[in] map The Map to query for its size.
+ * 
+ * @return TSize The number of elements in the map.
+ * 
+ * @fn Map#mapValue
+ * 
+ * @brief Subscript &lt;tt&gt;operator[]&lt;/tt&gt; of maps.
+ * 
+ * @signature TMapValue mapValue(map, key);
+ * 
+ * @param[in,out] map A map. Types: Map
+ * @param[in] key A key.
+ * 
+ * @return TMapValue If &lt;tt&gt;map&lt;/tt&gt; is a set: The same as Map#hasKey. If
+ *                   &lt;tt&gt;map&lt;/tt&gt; is a dictionary: The same as Map#value.
+ * 
+ * @section Remarks
+ * 
+ * Usually, Map#value implements the subscript operator &lt;tt&gt;[ ]&lt;/tt&gt;, but for
+ * maps, this operator is implemented in &lt;tt&gt;mapValue&lt;/tt&gt;. The semantic of this
+ * operator depends on the kind of map: If the map has a Cargo.cargo, than
+ * &lt;tt&gt;mapValue(map, key)&lt;/tt&gt; returns the cargo of the (first) value in the map
+ * of the given key. If the map has no Cargo.cargo, than the function returns a
+ * &lt;tt&gt;true&lt;/tt&gt;, if &lt;tt&gt;key&lt;/tt&gt; is in &lt;tt&gt;map&lt;/tt&gt;, or &lt;tt&gt;false&lt;/tt&gt;
+ * otherwise.
+ * 
+ * @section Remarks
+ * 
+ * There is no way to create a set of Pair, since it is always interpreted as a
+ * key/value pair. If you need a key type that holds two members, define your
+ * own key type.
+ * 
+ * You may overload Key and Cargo for your own value type in order to define,
+ * what part of your value type is used as key and what as cargo.
+ * 
+ * @fn Map#find
+ * 
+ * @headerfile &lt;seqan/map.h&gt;
+ * 
+ * @brief Find a value in a map.
+ * 
+ * @signature TIterator find(map, key);
+ * 
+ * @param[in] map A map. Types: Map
+ * @param[in] key A key.
+ * 
+ * @return TIterator An iterator to the first value in &lt;tt&gt;map&lt;/tt&gt; of the given
+ *                   key, if there is any. An iterator to the fist value in
+ *                   &lt;tt&gt;map&lt;/tt&gt; with key &amp;gt; &lt;tt&gt;key&lt;/tt&gt;, otherwise.
+ * 
+ * @see Map#value
+ * @see Map#cargo
+ * 
+ * @fn Map#value
+ * 
+ * @brief Returns a value given a key.
+ * 
+ * @note Do not change the key of a value in the map.
+ * 
+ * @signature TReference value(map, key);
+ * 
+ * @param[in] map A map.
+ * @param[in] key A key.
+ * 
+ * @return TReference The first value in &lt;tt&gt;map&lt;/tt&gt; of the given key, if there
+ *                    is any. Otherwise, a new value that is inserted to
+ *                    &lt;tt&gt;map&lt;/tt&gt;.
+ * 
+ * @fn Map#cargo
+ * 
+ * @brief Returns a cargo given a key.
+ * 
+ * @signature TCargo find(map, key);
+ * 
+ * @param[in,out] map A map.
+ * @param[in] key A key.
+ * 
+ * @return TReturn The cargo of the first value in &lt;tt&gt;map&lt;/tt&gt; of the given
+ *                 key, if there is any. Otherwise, the cargo of a new value
+ *                 that is inserted to &lt;tt&gt;map&lt;/tt&gt;.
+ * 
+ * @fn Map#insert
+ * 
+ * @brief Insert new value into map.
+ * 
+ * @signature void insert(map, value);
+ * @signature void insert(map, key, cargo);
+ * 
+ * @param[in,out] map A map.
+ * @param[in] value A value that is added to &lt;tt&gt;map&lt;/tt&gt;.
+ * @param[in] key A key.
+ * @param[in] cargo A cargo.
+ * 
+ * If &lt;tt&gt;key&lt;/tt&gt; and &lt;tt&gt;cargo&lt;/tt&gt; are specified, a new value of that key and
+ * value is added. If there is already a value of that key in &lt;tt&gt;map&lt;/tt&gt;, the
+ * value of this element is changed to &lt;tt&gt;cargo&lt;/tt&gt;.
+ * 
+ * If &lt;tt&gt;value&lt;/tt&gt; is specified, and there is already a value in map of that
+ * key, than the cargo of this value is changed to cargo.cargo(value).
+ * 
+ * Use Map#add instead to insert multiple values of the same key.
+ * 
+ * @fn Map#add
+ * 
+ * @brief Insert another value into a multi map.
+ * 
+ * @signature void add(map, value);
+ * @signature void add(map, key, cargo);
+ * 
+ * @param[in,out] map A map. Types: Skiplist
+ * @param[in] value A value that is added to &lt;tt&gt;map&lt;/tt&gt;.
+ * @param[in] cargo A cargo.
+ * @param[in] key A key.
+ * 
+ * If &lt;tt&gt;key&lt;/tt&gt; and &lt;tt&gt;cargo&lt;/tt&gt; are specified, a new value of that key and
+ * value is added.
+ * 
+ * @fn Map#erase
+ * 
+ * @brief Removes a value from a map.
+ * 
+ * @signature void erase(map, key);
+ * @signature void erase(map, iterator);
+ * 
+ * @param[in] map A map. Types: Map
+ * @param[in] key The key of a value in &lt;tt&gt;map&lt;/tt&gt;.
+ * @param[in] iterator An iterator to a value in &lt;tt&gt;map&lt;/tt&gt;.
+ * 
+ * Removes the first value in &lt;tt&gt;map&lt;/tt&gt; of the given key, if there is any.
+ * 
+ * Use @link Map#eraseAll @endlink to remove all values of the given key in a
+ * multi map.
+ * 
+ * @fn Map#eraseAll
+ * 
+ * @brief Removes a value from a map.
+ * 
+ * @signature void eraseAll(map, key);
+ * 
+ * @param[in,out] map A map. Types: Skiplist
+ * @param[in] key The key of a value in &lt;tt&gt;map&lt;/tt&gt;.
+ * 
+ * Removes all values in &lt;tt&gt;map&lt;/tt&gt; of the given key, if there is any.
+ * 
+ * @fn Map#hasKey
+ * 
+ * @brief Determines whether a map contains a value given key.
+ * 
+ * @signature bool hasKey(map, key);
+ * 
+ * @param[in] map A map. Types: Map
+ * @param[in] key A key.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt;, if there is a value in &lt;tt&gt;map&lt;/tt&gt; of that key,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

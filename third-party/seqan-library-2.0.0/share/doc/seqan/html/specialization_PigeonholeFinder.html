@@ -1,0 +1,987 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_pigeonholefinder" data-page="PigeonholeFinder">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>PigeonholeFinder - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>PigeonholeFinder<div><div>Pigeonhole-based finder. Must be used together with <a href="specialization_PigeonholePattern.html" data-lang-entity="specialization">PigeonholePattern</a>.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Finder.html" data-lang-entity="class">Finder</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Finder.html" data-lang-entity="class">Finder</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index/find_pigeonhole.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename THaystack, typename TSpec&gt;
+class Finder&lt;THaystack, Pigeonhole&lt;TSpec&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specifies the type of pigeonhole filter.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">THaystack</a></code></th>
+        <td>The type of the sequence that should be searched.
+Types: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_Finder.html" data-lang-entity="class">Finder</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder::Finder" data-lang-entity="member_function">Finder</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PigeonholeFinder%23getWindowFindHits" title="#PigeonholeFinder#getWindowFindHits (interface function)" data-lang-entity="interface_function">THitString getWindowFindHits(finder);</a></code></span>
+    <span class="summary_desc"><div>Returns the string of hits from the finder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PigeonholeFinder%23windowFindBegin" title="#PigeonholeFinder#windowFindBegin (interface function)" data-lang-entity="interface_function">windowFindBegin(finder, pattern, errorRate)</a></code></span>
+    <span class="summary_desc"><div>Initializes the pattern. Sets the finder on the begin position. Gets the first non-repeat range and sets it
+in the finder. Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindEnd" data-lang-entity="interface_function">windowFindEnd</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PigeonholeFinder%23windowFindEnd" title="#PigeonholeFinder#windowFindEnd (interface function)" data-lang-entity="interface_function">void windowFindEnd(finder, pattern);</a></code></span>
+    <span class="summary_desc"><div>Flushes the pattern. Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindBegin" data-lang-entity="interface_function">windowFindBegin</a> and <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindNext" data-lang-entity="interface_function">windowFindNext</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PigeonholeFinder%23windowFindNext" title="#PigeonholeFinder#windowFindNext (interface function)" data-lang-entity="interface_function">bool windowFindNext(finder, pattern, finderWindowLength)</a></code></span>
+    <span class="summary_desc"><div>Searches over the next window with the finder. The found hits can be retrieved with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#getWindowFindHits" data-lang-entity="interface_function">getWindowFindHits</a> Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindBegin" data-lang-entity="interface_function">windowFindBegin</a>
+and <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindEnd" data-lang-entity="interface_function">windowFindEnd</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Finder.html" data-lang-entity="class">Finder</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#beginPosition" data-lang-entity="interface_function">beginPosition</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#endPosition" data-lang-entity="interface_function">endPosition</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#find" data-lang-entity="interface_function">find</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#findBegin" data-lang-entity="interface_function">findBegin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#goBegin" data-lang-entity="interface_function">goBegin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#goEnd" data-lang-entity="interface_function">goEnd</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#haystack" data-lang-entity="interface_function">haystack</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#infix" data-lang-entity="interface_function">infix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#position" data-lang-entity="interface_function">position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#setHaystack" data-lang-entity="interface_function">setHaystack</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#setPosition" data-lang-entity="interface_function">setPosition</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+
+
+<div data-lang-entity-container="member_typedef">
+<h2 data-lang-entity="member_typedef">Member Typedef Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PigeonholeFinder%3A%3ATHitString" title="#PigeonholeFinder::THitString (member typedef)" data-lang-entity="member_typedef">typedef (...) PigeonholeFinder::THitString;</a></code></span>
+    <span class="summary_desc"><div>The type to use for the hit string returned in <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#getWindowFindHits" data-lang-entity="interface_function">getWindowFindHits</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Finder.html" data-lang-entity="class">Finder</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Finder.html#Finder#Haystack" data-lang-entity="interface_metafunction">Haystack</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Provides a fast filter algorithm that uses the pigeonhole lemma, i.e. if a pattern matches with k errors in the text,
+every partition into k+1 parts contains one part that matches without error.</p><p>The <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> must be a q-gram index over multiple patterns. The tolerated error rate must be given
+when <a href="class_Finder.html#Finder#find" data-lang-entity="interface_function">find</a> or <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindBegin" data-lang-entity="interface_function">windowFindBegin</a> is called. In these functions the
+length of the index <a href="class_Shape.html" data-lang-entity="class">Shape</a> is set automatically thus it must be modifiable at runtime, e.g. <a href="specialization_OneGappedShape.html" data-lang-entity="specialization">OneGappedShape</a>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="specialization_PigeonholePattern.html" data-lang-entity="specialization">PigeonholePattern</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PigeonholeFinder#getWindowFindHits" class="signature first" data-lang-entity="interface_function">
+      <code>THitString getWindowFindHits(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the string of hits from the finder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>A PigeonFinder.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THitString</code></th>
+        <td><a href="class_String.html" data-lang-entity="class">String</a> of Hits, see <a href="specialization_PigeonholeFinder.html#PigeonholeFinder::THitString" data-lang-entity="member_typedef">THitString</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">windowFindNext</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PigeonholeFinder#windowFindBegin" class="signature" data-lang-entity="interface_function">
+      <code>windowFindBegin(finder, pattern, errorRate)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initializes the pattern. Sets the finder on the begin position. Gets the first non-repeat range and sets it
+in the finder. Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindEnd" data-lang-entity="interface_function">windowFindEnd</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The PigeonholeFinder to use.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The PigeonholePattern to use.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">errorRate</code>
+            
+        
+      </th>
+      <td>Error rate that is allowed between reads and reference. Should be the same in as in <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindNext" data-lang-entity="interface_function">windowFindNext</a>. Types: <tt>double</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">windowFindEnd</a></li>
+    
+    <li><a class="error">windowFindNext</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PigeonholeFinder#windowFindEnd" class="signature" data-lang-entity="interface_function">
+      <code>void windowFindEnd(finder, pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Flushes the pattern. Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindBegin" data-lang-entity="interface_function">windowFindBegin</a> and <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindNext" data-lang-entity="interface_function">windowFindNext</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>A pattern with window interface.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>A finder with window interface. Types: <a href="specialization_PigeonholeFinder.html" data-lang-entity="specialization">PigeonholeFinder</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">windowFindBegin</a></li>
+    
+    <li><a class="error">windowFindNext</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PigeonholeFinder#windowFindNext" class="signature" data-lang-entity="interface_function">
+      <code>bool windowFindNext(finder, pattern, finderWindowLength)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Searches over the next window with the finder. The found hits can be retrieved with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#getWindowFindHits" data-lang-entity="interface_function">getWindowFindHits</a> Used together with <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindBegin" data-lang-entity="interface_function">windowFindBegin</a>
+and <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#windowFindEnd" data-lang-entity="interface_function">windowFindEnd</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The PigeonholeFinder to use.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The PigeonholePattern to use.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finderWindowLength</code>
+            
+        
+      </th>
+      <td>Number of bases that are scanned beginning from the position the finder is at.
+Including bases that are marked as repeats and that are skipped. Types: <tt>unsigned</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt>, if there are bases that can be scanned, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getWindowFindHits</a></li>
+    
+    <li><a class="error">windowFindBegin</a></li>
+    
+    <li><a class="error">windowFindEnd</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+<div class="member_typedef_defails" data-lang-entity-container="member_typedef">
+  <h2 data-lang-entity="member_typedef">Member Typedef Detail</h2>
+
+  
+      <div class="method_details first">
+        <h3 data-toc="hidden" id="PigeonholeFinder::THitString" class="signature first" data-lang-entity="member_typedef">
+          <code>typedef (...) PigeonholeFinder::THitString;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>The type to use for the hit string returned in <a href="specialization_PigeonholeFinder.html#PigeonholeFinder#getWindowFindHits" data-lang-entity="interface_function">getWindowFindHits</a>.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+  
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class PigeonholeFinder
+ * 
+ * @extends Finder
+ * 
+ * @headerfile &lt;seqan/index/find_pigeonhole.h&gt;
+ * 
+ * @brief Pigeonhole-based finder. Must be used together with @link
+ *        PigeonholePattern @endlink.
+ * 
+ * @signature template &lt;typename THaystack, typename TSpec&gt; class
+ *            Finder&lt;THaystack, Pigeonhole&lt;TSpec&gt; &gt;;
+ * 
+ * @tparam TSpec Specifies the type of pigeonhole filter.
+ * @tparam THaystack The type of the sequence that should be searched. Types:
+ *                   @link ContainerConcept @endlink
+ * 
+ * Provides a fast filter algorithm that uses the pigeonhole lemma, i.e. if a
+ * pattern matches with k errors in the text, every partition into k+1 parts
+ * contains one part that matches without error.
+ * 
+ * The @link Pattern @endlink must be a q-gram index over multiple patterns. The
+ * tolerated error rate must be given when @link Finder#find @endlink or @link
+ * PigeonholeFinder#windowFindBegin @endlink is called. In these functions the
+ * length of the index @link Shape @endlink is set automatically thus it must be
+ * modifiable at runtime, e.g. @link OneGappedShape @endlink.
+ * 
+ * @see PigeonholePattern
+ * 
+ * @typedef PigeonholeFinder::THitString
+ * 
+ * @brief The type to use for the hit string returned in @link
+ *        PigeonholeFinder#getWindowFindHits @endlink.
+ * 
+ * @signature typedef (...) PigeonholeFinder::THitString;
+ * 
+ * @fn PigeonholeFinder#windowFindBegin
+ * 
+ * @headerfile &lt;seqan/index/find_pigeonhole.h&gt;
+ * 
+ * @brief Initializes the pattern. Sets the finder on the begin position. Gets
+ *        the first non-repeat range and sets it in the finder. Used together
+ *        with @link PigeonholeFinder#windowFindEnd @endlink.
+ * 
+ * @signature windowFindBegin(finder, pattern, errorRate)
+ * 
+ * @param[in,out] finder The PigeonholeFinder to use.
+ * @param[in,out] pattern The PigeonholePattern to use.
+ * @param[in] errorRate Error rate that is allowed between reads and reference.
+ *                      Should be the same in as in @link
+ *                      PigeonholeFinder#windowFindNext @endlink. Types:
+ *                      &lt;tt&gt;double&lt;/tt&gt;
+ * 
+ * @see PigeonholeFinder#windowFindNext
+ * @see PigeonholeFinder#windowFindEnd
+ * 
+ * @fn PigeonholeFinder#windowFindNext
+ * 
+ * @headerfile &lt;seqan/index/find_pigeonhol.h&gt;
+ * 
+ * @brief Searches over the next window with the finder. The found hits can be
+ *        retrieved with @link PigeonholeFinder#getWindowFindHits @endlink Used
+ *        together with @link PigeonholeFinder#windowFindBegin @endlink and
+ *        @link PigeonholeFinder#windowFindEnd @endlink.
+ * 
+ * @signature bool windowFindNext(finder, pattern, finderWindowLength)
+ * 
+ * @param[in,out] finder The PigeonholeFinder to use.
+ * @param[in,out] pattern The PigeonholePattern to use.
+ * @param[in] finderWindowLength Number of bases that are scanned beginning from
+ *                               the position the finder is at. Including bases
+ *                               that are marked as repeats and that are
+ *                               skipped. Types: &lt;tt&gt;unsigned&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt;, if there are bases that can be scanned,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @see PigeonholeFinder#windowFindBegin
+ * @see PigeonholeFinder#windowFindEnd
+ * @see PigeonholeFinder#getWindowFindHits
+ * 
+ * @fn PigeonholeFinder#windowFindEnd
+ * 
+ * @headerfile &lt;seqan/index/find_pigeonhole.h&gt;
+ * 
+ * @brief Flushes the pattern. Used together with @link
+ *        PigeonholeFinder#windowFindBegin @endlink and @link
+ *        PigeonholeFinder#windowFindNext @endlink.
+ * 
+ * @signature void windowFindEnd(finder, pattern);
+ * 
+ * @param[in,out] pattern A pattern with window interface.
+ * @param[in,out] finder A finder with window interface. Types: @link
+ *                       PigeonholeFinder @endlink
+ * 
+ * @see PigeonholeFinder#windowFindBegin
+ * @see PigeonholeFinder#windowFindNext
+ * 
+ * @fn PigeonholeFinder#getWindowFindHits
+ * 
+ * @headerfile &lt;seqan/index/find_pigeonhole.h&gt;
+ * 
+ * @brief Returns the string of hits from the finder.
+ * 
+ * @signature THitString getWindowFindHits(finder);
+ * 
+ * @param[in] finder A PigeonFinder.
+ * 
+ * @return THitString @link String @endlink of Hits, see @link
+ *                    PigeonholeFinder::THitString @endlink.
+ * 
+ * @see PigeonholeFinder#windowFindNext
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_bandedchainalignment" data-page="bandedChainAlignment">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>bandedChainAlignment - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>bandedChainAlignment<div><div>Computes the best global pairwise alignment between two sequences given a non-empty seed chain.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seeds.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>TValue bandedChainAlignment(align, seedChain, scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+TValue bandedChainAlignment(gapsH, gapsV, seedChain, scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+TValue bandedChainAlignment(frags, strings, seedChain, scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+TValue bandedChainAlignment(alignmentGraph, seedChain, scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align</code>
+            
+        
+        </th>
+        <td>An <a href="class_Align.html" data-lang-entity="class">Align</a> object that stores the alignment. The number of rows must be 2 and the
+sequences must have already been set. <tt>row(align, 0)</tt> is the horizontal sequence in the
+alignment matrix, <tt>row(align, 1)</tt> is the vertical sequence.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gapsH</code>
+            
+        
+        </th>
+        <td>Horizontal gapped sequence in alignment matrix. Type: <a href="class_Gaps.html" data-lang-entity="class">Gaps</a>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gapsV</code>
+            
+        
+        </th>
+        <td>Vertical gapped sequence in alignment matrix. Type: <a href="class_Gaps.html" data-lang-entity="class">Gaps</a>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">frags</code>
+            
+        
+        </th>
+        <td><a href="class_String.html" data-lang-entity="class">String</a> of <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> objects. The sequence with id <tt>0</tt>
+is the horizontal one, the sequence with id <tt>1</tt> is the vertical one.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">strings</code>
+            
+        
+        </th>
+        <td>A <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> containing two sequences.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">alignmentGraph</code>
+            
+        
+        </th>
+        <td><a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a> object to store the alignment in. The underlying <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> must be an <a href="specialization_DependentStringSet.html" data-lang-entity="specialization">DependentStringSet</a>. Types: AlignmentGraph.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seedChain</code>
+            
+        
+        </th>
+        <td>The container holding the <a href="class_Seed.html" data-lang-entity="class">seeds</a>. Note that the <a href="class_Seed.html" data-lang-entity="class">seeds</a>
+have to be in montonic non-decreasing order and the container has to implement a forward-iterator.
+Type: <a href="class_SeedSet.html" data-lang-entity="class">SeedSet</a>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme1</code>
+            
+        
+        </th>
+        <td>The scoring scheme used for the alignment. If <tt>scoringScheme2</tt> is specified, then
+<tt>scoringScheme1</tt> is used for the regions around the seeds and <tt>scoringScheme2</tt>
+for the gap regions between two consecutive seeds. Types: Score</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme2</code>
+            
+        
+        </th>
+        <td>The optional scoring scheme for the gap regions between two anchors. Types: Score</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">k</code>
+            
+        
+        </th>
+        <td>Optional extension of the band around the seeds. At the moment only band extensions greater
+or equal <tt>1</tt> are allowed. Type: nolink:<tt>int</tt>. Default: 15.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">alignConfig</code>
+            
+        
+        </th>
+        <td>The <a href="class_AlignConfig.html" data-lang-entity="class">AlignConfig</a> to use for the alignment.</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+<h2>Return Values</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>TValue</code></th>
+        <td>An integer with the alignment score, as given by the <a href="class_Score.html#Score#Value" data-lang-entity="interface_metafunction">Value</a> metafunction of the
+<a href="class_Score.html" data-lang-entity="class">Score</a> type. If the seed chain is empty then the <a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#MinValue" data-lang-entity="interface_metafunction">smallest value of the score type</a> is used to return the minimal value of the selected score
+type and no alignment is computed.</td>
+    </tr>
+
+</table>
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>There exist multiple overloads for this function with four configuration dimensions.</p><p>First, you can select whether begin and end gaps are free in either sequence using <tt>alignConfig</tt>.</p><p>Second, you can select the type of the target storing the alignment. This can be either an <a href="class_Align.html" data-lang-entity="class">Align</a>
+object, two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects, a <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>, or a string of <a href="class_Fragment.html" data-lang-entity="class">Fragment</a>
+objects. <a href="class_Align.html" data-lang-entity="class">Align</a> objects provide an interface to tabular alignments with the restriction of all rows
+having the same type. Using two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects has the advantage that you can align sequences with
+different types, for example <a href="global_typedef_DnaString.html" data-lang-entity="global_typedef">DnaString</a> and <a href="global_typedef_Dna5String.html" data-lang-entity="global_typedef">Dna5String</a>. <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">Alignment
+Graphs</a> provide a graph-based representation of segment-based colinear alignments. Using <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> strings is useful for collecting many pairwise alignments, for example in the construction of <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">Alignment Graphs</a> for multiple-sequence alignments (MSA).</p><p>Third, you can optionally give a second scoring scheme to fill the gaps between two consecutive seeds. Note that
+based on the specified scores either an affine or linear gap cost function is used. This only depends on whether for
+one of the scoring schemes the scores for gap opening and gap extension differ or not. If only one scoring scheme is
+defined the complete region is computed with the same scoring scheme.</p><p>Fourth, you can optinally select a proper band extension for the bands around the seeds. At the moment only band
+extensions of at least <tt>1</tt> are allowed. The default value is <tt>15</tt> and is based on the default values
+for the LAGAN-algorithm described by Brudno et al., 2003.</p><p>The examples below show some common use cases.</p><h3>Examples</h3><p>Banded chain alignment of two sequences using an <a href="class_Align.html" data-lang-entity="class">Align</a> object and using only one scoring scheme and no
+free end-gaps.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Dna5String</span> <span class="n">seqH</span> <span class="o">=</span> <span class="s">&quot;CGAATCCATCCCACACA&quot;</span><span class="p">;</span>
+<span class="n">Dna5String</span> <span class="n">seqV</span> <span class="o">=</span> <span class="s">&quot;GGCGATNNNCATGGCACA&quot;</span><span class="p">;</span>
+
+<span class="n">String</span><span class="o">&lt;</span><span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">seedChain</span><span class="p">;</span>
+<span class="n">appendValue</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">));</span>
+<span class="n">appendValue</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">9</span><span class="p">));</span>
+<span class="n">appendValue</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">));</span>
+
+<span class="n">Align</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="p">,</span> <span class="n">ArrayGaps</span><span class="o">&gt;</span> <span class="n">alignment</span><span class="p">;</span>
+<span class="n">resize</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">alignment</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+<span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">alignment</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">seqH</span><span class="p">);</span>
+<span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">alignment</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">seqV</span><span class="p">);</span>
+
+<span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoringScheme</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">bandedChainAlignment</span><span class="p">(</span><span class="n">alignment</span><span class="p">,</span> <span class="n">seedChain</span><span class="p">,</span> <span class="n">scoringScheme</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div><p>Banded chain alignment of two sequences using two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects, an unordered seed set to hold the
+seeds, two different scoring schemes for the gaps between the seeds and the seeds and free end-gaps.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">DnaString</span> <span class="n">seqH</span> <span class="o">=</span> <span class="s">&quot;CGAATCCATCCCACACA&quot;</span><span class="p">;</span>
+<span class="n">Dna5String</span> <span class="n">seqV</span> <span class="o">=</span> <span class="s">&quot;GGCGATNNNCATGGCACA&quot;</span><span class="p">;</span>
+
+<span class="n">SeedSet</span><span class="o">&lt;</span><span class="n">Simple</span><span class="p">,</span> <span class="n">Unordered</span><span class="o">&gt;</span> <span class="n">seedChain</span><span class="p">;</span>
+<span class="n">addSeed</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+<span class="n">addSeed</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+<span class="n">addSeed</span><span class="p">(</span><span class="n">seedChain</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+
+<span class="n">Gaps</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="p">,</span> <span class="n">ArrayGaps</span><span class="o">&gt;</span> <span class="n">gapsH</span><span class="p">(</span><span class="n">seqH</span><span class="p">);</span>
+<span class="n">Gaps</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="p">,</span> <span class="n">AnchorGaps</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="n">gapsV</span><span class="p">(</span><span class="n">seqV</span><span class="p">);</span>
+
+<span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoringSchemeSeed</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoringSchemeGap</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">AlignConfig</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="o">&gt;</span> <span class="n">alignConfig</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">gapsH</span><span class="p">,</span> <span class="n">gapsV</span><span class="p">,</span> <span class="n">scoringSchemeSeed</span><span class="p">,</span> <span class="n">scoringSchemeGap</span><span class="p">,</span> <span class="n">alignConfig</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div><h3>Tutorial</h3><p>Also see the <a href="http://seqan.readthedocs.org/en/develop/Tutorial/SeedAndExtend.html">Seed-and-Extend Tutorial</a></p><h3>Reference</h3><p><ul>
+<li>Brudno M, Do CB, Cooper GM, et al.: LAGAN and Multi-LAGAN: Efficient Tools for Large-Scale Multiple Alignment
+of Genomic DNA. Genome Research 2003, 13: 721-731.</li>
+</ul></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn bandedChainAlignment
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Computes the best global pairwise alignment between two sequences
+ *        given a non-empty seed chain.
+ * 
+ * @signature TValue bandedChainAlignment(align, seedChain, scoringScheme1[,
+ *            scoringScheme2] [, alignConfig] [, k]);
+ * @signature TValue bandedChainAlignment(gapsH, gapsV, seedChain,
+ *            scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+ * @signature TValue bandedChainAlignment(frags, strings, seedChain,
+ *            scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+ * @signature TValue bandedChainAlignment(alignmentGraph, seedChain,
+ *            scoringScheme1[, scoringScheme2] [, alignConfig] [, k]);
+ * 
+ * @param[in,out] align An @link Align @endlink object that stores the
+ *                      alignment. The number of rows must be 2 and the
+ *                      sequences must have already been set. &lt;tt&gt;row(align,
+ *                      0)&lt;/tt&gt; is the horizontal sequence in the alignment
+ *                      matrix, &lt;tt&gt;row(align, 1)&lt;/tt&gt; is the vertical sequence.
+ * @param[in,out] gapsH Horizontal gapped sequence in alignment matrix. Type:
+ *                      @link Gaps @endlink.
+ * @param[in,out] gapsV Vertical gapped sequence in alignment matrix. Type:
+ *                      @link Gaps @endlink.
+ * @param[out] frags @link String @endlink of @link Fragment @endlink objects.
+ *                   The sequence with id &lt;tt&gt;0&lt;/tt&gt; is the horizontal one, the
+ *                   sequence with id &lt;tt&gt;1&lt;/tt&gt; is the vertical one.
+ * @param[in] strings A @link StringSet @endlink containing two sequences.
+ * @param[in,out] alignmentGraph  @link AlignmentGraph @endlink object to store
+ *                               the alignment in. The underlying @link
+ *                               StringSet @endlink must be an @link
+ *                               DependentStringSet @endlink. Types:
+ *                               AlignmentGraph.
+ * @param[in] seedChain The container holding the @link Seed seeds @endlink.
+ *                      Note that the @link Seed seeds @endlink have to be in
+ *                      montonic non-decreasing order and the container has to
+ *                      implement a forward-iterator. Type: @link SeedSet
+ *                      @endlink.
+ * @param[in] scoringScheme1  The scoring scheme used for the alignment. If
+ *                           &lt;tt&gt;scoringScheme2&lt;/tt&gt; is specified, then
+ *                           &lt;tt&gt;scoringScheme1&lt;/tt&gt; is used for the regions
+ *                           around the seeds and &lt;tt&gt;scoringScheme2&lt;/tt&gt; for
+ *                           the gap regions between two consecutive seeds.
+ *                           Types: Score
+ * @param[in] scoringScheme2  The optional scoring scheme for the gap regions
+ *                           between two anchors. Types: Score
+ * @param[in] k Optional extension of the band around the seeds. At the moment
+ *              only band extensions greater or equal &lt;tt&gt;1&lt;/tt&gt; are allowed.
+ *              Type: nolink:&lt;tt&gt;int&lt;/tt&gt;. Default: 15.
+ * @param[in] alignConfig  The @link AlignConfig @endlink to use for the
+ *                        alignment.
+ * 
+ * @return TValue An integer with the alignment score, as given by the @link
+ *                Score#Value @endlink metafunction of the @link Score @endlink
+ *                type. If the seed chain is empty then the @link
+ *                OrderedAlphabetConcept#MinValue smallest value of the score
+ *                type @endlink is used to return the minimal value of the
+ *                selected score type and no alignment is computed.
+ * 
+ * There exist multiple overloads for this function with four configuration
+ * dimensions.
+ * 
+ * First, you can select whether begin and end gaps are free in either sequence
+ * using &lt;tt&gt;alignConfig&lt;/tt&gt;.
+ * 
+ * Second, you can select the type of the target storing the alignment. This can
+ * be either an @link Align @endlink object, two @link Gaps @endlink objects, a
+ * @link AlignmentGraph @endlink, or a string of @link Fragment @endlink
+ * objects. @link Align @endlink objects provide an interface to tabular
+ * alignments with the restriction of all rows having the same type. Using two
+ * @link Gaps @endlink objects has the advantage that you can align sequences
+ * with different types, for example @link DnaString @endlink and @link
+ * Dna5String @endlink. @link AlignmentGraph Alignment Graphs @endlink provide a
+ * graph-based representation of segment-based colinear alignments. Using @link
+ * Fragment @endlink strings is useful for collecting many pairwise alignments,
+ * for example in the construction of @link AlignmentGraph Alignment Graphs
+ * @endlink for multiple-sequence alignments (MSA).
+ * 
+ * Third, you can optionally give a second scoring scheme to fill the gaps
+ * between two consecutive seeds. Note that based on the specified scores either
+ * an affine or linear gap cost function is used. This only depends on whether
+ * for one of the scoring schemes the scores for gap opening and gap extension
+ * differ or not. If only one scoring scheme is defined the complete region is
+ * computed with the same scoring scheme.
+ * 
+ * Fourth, you can optinally select a proper band extension for the bands around
+ * the seeds. At the moment only band extensions of at least &lt;tt&gt;1&lt;/tt&gt; are
+ * allowed. The default value is &lt;tt&gt;15&lt;/tt&gt; and is based on the default values
+ * for the LAGAN-algorithm described by Brudno et al., 2003.
+ * 
+ * The examples below show some common use cases.
+ * 
+ * @section Examples
+ * 
+ * Banded chain alignment of two sequences using an @link Align @endlink object
+ * and using only one scoring scheme and no free end-gaps.
+ * 
+ * @code{.cpp}
+ * Dna5String seqH = &#34;CGAATCCATCCCACACA&#34;;
+ * Dna5String seqV = &#34;GGCGATNNNCATGGCACA&#34;;
+ * 
+ * String&lt;Seed&lt;Simple&gt; &gt; seedChain;
+ * appendValue(seedChain, Seed&lt;Simple&gt;(2, 0, 6, 5));
+ * appendValue(seedChain, Seed&lt;Simple&gt;(9, 6, 12, 9));
+ * appendValue(seedChain, Seed&lt;Simple&gt;(14, 11, 16, 17));
+ * 
+ * Align&lt;Dna5String, ArrayGaps&gt; alignment;
+ * resize(rows(alignment), 2);
+ * assignSource(row(alignment, 0), seqH);
+ * assignSource(row(alignment, 1), seqV);
+ * 
+ * Score&lt;int, Simple&gt; scoringScheme(2, -1, -2);
+ * 
+ * int result = bandedChainAlignment(alignment, seedChain, scoringScheme, 2);
+ * @endcode
+ * 
+ * 
+ * Banded chain alignment of two sequences using two @link Gaps @endlink
+ * objects, an unordered seed set to hold the seeds, two different scoring
+ * schemes for the gaps between the seeds and the seeds and free end-gaps.
+ * 
+ * @code{.cpp}
+ * DnaString seqH = &#34;CGAATCCATCCCACACA&#34;;
+ * Dna5String seqV = &#34;GGCGATNNNCATGGCACA&#34;;
+ * 
+ * SeedSet&lt;Simple, Unordered&gt; seedChain;
+ * addSeed(seedChain, Seed&lt;Simple&gt;(2, 0, 6, 5), Single());
+ * addSeed(seedChain, Seed&lt;Simple&gt;(9, 6, 12, 9), Single());
+ * addSeed(seedChain, Seed&lt;Simple&gt;(14, 11, 16, 17), Single());
+ * 
+ * Gaps&lt;DnaString, ArrayGaps&gt; gapsH(seqH);
+ * Gaps&lt;Dna5String, AnchorGaps&lt;&gt; &gt; gapsV(seqV);
+ * 
+ * Score&lt;int, Simple&gt; scoringSchemeSeed(2, -1, -2);
+ * Score&lt;int, Simple&gt; scoringSchemeGap(5, -3, -1, -5);
+ * AlignConfig&lt;true, true, true, true&gt; alignConfig;
+ * 
+ * int result = globalAlignment(gapsH, gapsV, scoringSchemeSeed, scoringSchemeGap, alignConfig, 2);
+ * @endcode
+ * 
+ * 
+ * @section Tutorial
+ * 
+ * Also see the &lt;a
+ * href=&#34;http://seqan.readthedocs.org/en/develop/Tutorial/SeedAndExtend.html
+ * &#34;&gt;Seed-and-Extend Tutorial&lt;/a&gt;
+ * 
+ * @section Reference
+ * 
+ * &lt;ul&gt; &lt;li&gt;Brudno M, Do CB, Cooper GM, et al.: LAGAN and Multi-LAGAN: Efficient
+ * Tools for Large-Scale Multiple Alignment of Genomic DNA. Genome Research
+ * 2003, 13: 721-731.&lt;/li&gt; &lt;/ul&gt;
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

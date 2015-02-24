@@ -1,0 +1,1599 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_score" data-page="Score">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Score - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Score<div><div>Scoring scheme.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_EditDistanceScore.html" data-lang-entity="specialization">EditDistanceScore</a>, 
+    <a href="specialization_MatrixScore.html" data-lang-entity="specialization">MatrixScore</a>, 
+    <a href="specialization_ProfileSeqFracScore.html" data-lang-entity="specialization">ProfileSeqFracScore</a>, 
+    <a href="specialization_ProfileSeqScore.html" data-lang-entity="specialization">ProfileSeqScore</a>, 
+    <a href="specialization_SimpleScore.html" data-lang-entity="specialization">SimpleScore</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/score.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TValue[, typename TSpec]]&gt;
+class Score;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The scoring value, defaults to <tt>int</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialization type, defaults to <tt>Simple</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23loadScoreMatrix" title="#Score#loadScoreMatrix (interface function)" data-lang-entity="interface_function">void loadScoreMatrix(score, fileName[, meta]);</a></code></span>
+    <span class="summary_desc"><div>Load a score matrix from a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23score" title="#Score#score (interface function)" data-lang-entity="interface_function">TValue score(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns similarity score for two sequence entries.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapExtendHorizontal" title="#Score#scoreGapExtendHorizontal (interface function)" data-lang-entity="interface_function">TValue scoreGapExtendHorizontal(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for extending a gap in horizontal direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapExtendVertical" title="#Score#scoreGapExtendVertical (interface function)" data-lang-entity="interface_function">TValue scoreGapExtendVertical(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for extending a gap in vertical direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapHorizontal" title="#Score#scoreGapHorizontal (interface function)" data-lang-entity="interface_function">TValue scoreGapHorizontal(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for a gap in horizontal direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapOpenHorizontal" title="#Score#scoreGapOpenHorizontal (interface function)" data-lang-entity="interface_function">TValue scoreGapOpenHorizontal(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for opening a gap in horizontal direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapOpenVertical" title="#Score#scoreGapOpenVertical (interface function)" data-lang-entity="interface_function">TValue scoreGapOpenVertical(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for opening a gap in vertical direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23scoreGapVertical" title="#Score#scoreGapVertical (interface function)" data-lang-entity="interface_function">TValue scoreGapVertical(score, entryH, entryV);</a></code></span>
+    <span class="summary_desc"><div>Returns the score for a gap in vertical direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23sequenceEntryForScore" title="#Score#sequenceEntryForScore (interface function)" data-lang-entity="interface_function">TAlphabet sequenceEntryForScore(scoringScheme, seq, pos);</a></code></span>
+    <span class="summary_desc"><div>Helper function for element access, depending on score type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23SequenceEntryForScore" title="#Score#SequenceEntryForScore (interface function)" data-lang-entity="interface_metafunction">SequenceEntryForScore&lt;TScore, TSequence&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns representation type for a character of a position in a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Score%23Value" title="#Score#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TScore&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the value type of the scoring scheme.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The Score class uses <b>similarity</b> scores, i.e. the greater the score value, the greater the similarity.
+Depending on the exact score, the scores can also be negative for dissimilarity. This choice blends in naturally
+with the BLOSUM and PAM matrices, for examples. For the edit distance common in computer science, this corresponds
+to match scores of 0, mismatch and gap scores of -1.</p><h3>Examples</h3><div data-src-path="demos/score/score.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;  </span><span class="c1">// for I/O</span>
+<span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/score.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">stringSet</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="s">&quot;ACGTGGATCGGTGACTTACGGACTG&quot;</span><span class="p">);</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="s">&quot;ACGTGTTGAGTGATTACGGACTG&quot;</span><span class="p">);</span>
+
+    <span class="n">Align</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">(</span><span class="n">stringSet</span><span class="p">);</span>                <span class="c1">// Initialize the Align object using a StringSet.</span>
+
+    <span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">scoreScheme</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">);</span>           <span class="c1">// Initialize Score object with affine gap costs.</span>
+    <span class="kt">int</span> <span class="n">score</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">scoreScheme</span><span class="p">);</span>  <span class="c1">// Computes a global alignment usign the defined scoring scheme.</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Score = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">score</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Alignment:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">align</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/score/score.cpp" target="_top">demos/score/score.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/score/score.cpp.stdout">Score = 66
+Alignment:
+      0     .    :    .    :    .   
+        ACGTG--GATCGGTGACTTACGGACTG
+        |||||  ||   |||| ||||||||||
+        ACGTGTTGA---GTGA-TTACGGACTG
+
+
+
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Score#loadScoreMatrix" class="signature first" data-lang-entity="interface_function">
+      <code>void loadScoreMatrix(score, fileName[, meta]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Load a score matrix from a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">score</code>
+            
+        
+      </th>
+      <td>The MatrixScore to load.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>The path to the file to load, CharString.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">meta</code>
+            
+        
+      </th>
+      <td>Meta information is stored here, CharString.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#score" class="signature" data-lang-entity="interface_function">
+      <code>TValue score(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns similarity score for two sequence entries.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to use for comparing the two sequence entries.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>The entry in the first/horizontal sequence.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>The entry in the second/vertical sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score similarity cost for gaps at the given position/entry. TValue is the value type of
+score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapExtendHorizontal" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapExtendHorizontal(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for extending a gap in horizontal direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score extension cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence two and an insertion event in sequence one, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapExtendVertical" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapExtendVertical(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for extending a gap in vertical direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score extension cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence one and an insertion event in sequence two, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapHorizontal" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapHorizontal(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for a gap in horizontal direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score gap cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence two and an insertion event in sequence one, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapOpenHorizontal" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapOpenHorizontal(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for opening a gap in horizontal direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score open cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence two and an insertion event in sequence one, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapOpenVertical" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapOpenVertical(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for opening a gap in vertical direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score open cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence two and an insertion event in sequence one, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#scoreGapVertical" class="signature" data-lang-entity="interface_function">
+      <code>TValue scoreGapVertical(score, entryH, entryV);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score for a gap in vertical direction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The Score to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryH</code>
+            
+        
+      </th>
+      <td>Entry in sequence one (horizontal), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">entryV</code>
+            
+        
+      </th>
+      <td>Entry in sequence two (vertical), type from Score#SequenceEntryForScore.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The score gap cost for gaps at the given position/entry. TValue is the value type of score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Corresponds to a deletion event in sequence two and an insertion event in sequence one, respectively.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Score#sequenceEntryForScore" class="signature" data-lang-entity="interface_function">
+      <code>TAlphabet sequenceEntryForScore(scoringScheme, seq, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Helper function for element access, depending on score type.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme</code>
+            
+        
+      </th>
+      <td>The Score to get the representation for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the character.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The sequence to get the representation for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TAlphabet</code></th>
+        <td>The value of <tt>seq</tt> at <tt>pos</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Score#SequenceEntryForScore" class="signature first" data-lang-entity="interface_metafunction">
+    <code>SequenceEntryForScore&lt;TScore, TSequence&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+  <div class="note note">Note. <div class='inline'>
+      
+      <p>This is used for unified interfaces for position dependent and independent scores.</p>
+      
+  </div></div>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns representation type for a character of a position in a sequence.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TScore</code></th>
+            <td>The score type to use. Types: Score</td>
+        </tr>
+    
+        <tr>
+            <th><code>TSequence</code></th>
+            <td>The underlying sequence of the alignments or gaps. Types: ContainerConcept</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The type to use for representing a character in a sequence over its position.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Score#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TScore&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the value type of the scoring scheme.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TScore</code></th>
+            <td>The Score specialization.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The score value type of the scoring scheme.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Score
+ * 
+ * @headerfile &lt;seqan/score.h&gt;
+ * 
+ * @brief Scoring scheme.
+ * 
+ * @signature template &lt;[typename TValue[, typename TSpec]]&gt; class Score;
+ * 
+ * @tparam TValue The scoring value, defaults to &lt;tt&gt;int&lt;/tt&gt;.
+ * @tparam TSpec The specialization type, defaults to &lt;tt&gt;Simple&lt;/tt&gt;.
+ * 
+ * The Score class uses &lt;b&gt;similarity&lt;/b&gt; scores, i.e. the greater the score
+ * value, the greater the similarity. Depending on the exact score, the scores
+ * can also be negative for dissimilarity. This choice blends in naturally with
+ * the BLOSUM and PAM matrices, for examples. For the edit distance common in
+ * computer science, this corresponds to match scores of 0, mismatch and gap
+ * scores of -1.
+ * 
+ * @section Examples
+ * 
+ * @include demos/score/score.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/score/score.cpp.stdout
+ * 
+ * 
+ * 
+ * @mfn Score#Value
+ * 
+ * @brief Return the value type of the scoring scheme.
+ * 
+ * @signature Value&lt;TScore&gt;::Type;
+ * 
+ * @tparam TScore The Score specialization.
+ * 
+ * @return Type The score value type of the scoring scheme.
+ * 
+ * @mfn Score#SequenceEntryForScore
+ * 
+ * @headerfile &lt;seqan/score.h&gt;
+ * 
+ * @brief Returns representation type for a character of a position in a
+ *        sequence.
+ * 
+ * @note This is used for unified interfaces for position dependent and
+ *       independent scores.
+ * 
+ * @signature SequenceEntryForScore&lt;TScore, TSequence&gt;::Type;
+ * 
+ * @tparam TScore The score type to use. Types: Score
+ * @tparam TSequence The underlying sequence of the alignments or gaps. Types:
+ *                   ContainerConcept
+ * 
+ * @return Type The type to use for representing a character in a sequence over
+ *              its position.
+ * 
+ * @see Score#SequenceEntryForScore
+ * @see Score#sequenceEntryForScore
+ * @see ConsensusScoreSequenceEntry
+ * 
+ * @fn Score#sequenceEntryForScore
+ * 
+ * @brief Helper function for element access, depending on score type.
+ * 
+ * @signature TAlphabet sequenceEntryForScore(scoringScheme, seq, pos);
+ * 
+ * @param[in] scoringScheme The Score to get the representation for.
+ * @param[in] pos The position of the character.
+ * @param[in] seq The sequence to get the representation for.
+ * 
+ * @return TAlphabet The value of &lt;tt&gt;seq&lt;/tt&gt; at &lt;tt&gt;pos&lt;/tt&gt;.
+ * 
+ * @fn Score#scoreGapOpenHorizontal
+ * 
+ * @brief Returns the score for opening a gap in horizontal direction.
+ * 
+ * @signature TValue scoreGapOpenHorizontal(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score open cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence two and an insertion event in
+ * sequence one, respectively.
+ * 
+ * @fn Score#scoreGapOpenVertical
+ * 
+ * @brief Returns the score for opening a gap in vertical direction.
+ * 
+ * @signature TValue scoreGapOpenVertical(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score open cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence two and an insertion event in
+ * sequence one, respectively.
+ * 
+ * @fn Score#scoreGapExtendHorizontal
+ * 
+ * @brief Returns the score for extending a gap in horizontal direction.
+ * 
+ * @signature TValue scoreGapExtendHorizontal(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score extension cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence two and an insertion event in
+ * sequence one, respectively.
+ * 
+ * @fn Score#scoreGapExtendVertical
+ * 
+ * @brief Returns the score for extending a gap in vertical direction.
+ * 
+ * @signature TValue scoreGapExtendVertical(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score extension cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence one and an insertion event in
+ * sequence two, respectively.
+ * 
+ * @fn Score#scoreGapHorizontal
+ * 
+ * @brief Returns the score for a gap in horizontal direction.
+ * 
+ * @signature TValue scoreGapHorizontal(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score gap cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence two and an insertion event in
+ * sequence one, respectively.
+ * 
+ * @fn Score#scoreGapVertical
+ * 
+ * @brief Returns the score for a gap in vertical direction.
+ * 
+ * @signature TValue scoreGapVertical(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to query.
+ * @param[in] entryH Entry in sequence one (horizontal), type from
+ *                   Score#SequenceEntryForScore.
+ * @param[in] entryV Entry in sequence two (vertical), type from
+ *                   Score#SequenceEntryForScore.
+ * 
+ * @return TValue The score gap cost for gaps at the given position/entry.
+ *                TValue is the value type of score.
+ * 
+ * @section Remarks
+ * 
+ * Corresponds to a deletion event in sequence two and an insertion event in
+ * sequence one, respectively.
+ * 
+ * @fn Score#score
+ * 
+ * @brief Returns similarity score for two sequence entries.
+ * 
+ * @signature TValue score(score, entryH, entryV);
+ * 
+ * @param[in] score The Score to use for comparing the two sequence entries.
+ * @param[in] entryH The entry in the first/horizontal sequence.
+ * @param[in] entryV The entry in the second/vertical sequence.
+ * 
+ * @return TValue The score similarity cost for gaps at the given
+ *                position/entry. TValue is the value type of score.
+ * 
+ * @fn Score#loadScoreMatrix
+ * 
+ * @brief Load a score matrix from a file.
+ * 
+ * @signature void loadScoreMatrix(score, fileName[, meta]);
+ * 
+ * @param[in,out] score The MatrixScore to load.
+ * @param[in] fileName The path to the file to load, CharString.
+ * @param[out] meta Meta information is stored here, CharString.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

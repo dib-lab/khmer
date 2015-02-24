@@ -1,0 +1,769 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_bamfilein" data-page="BamFileIn">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>BamFileIn - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>BamFileIn<div><div>Class for reading SAM and BAM files.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a>, 
+    <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/bam_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>typedef FormattedFile&lt;Bam, Input&gt; BamFileIn;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile::getFileExtensions" data-lang-entity="member_function">getFileExtensions</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile::operatorTDependentContext" data-lang-entity="member_function">operatorTDependentContext</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamFileIn%23jumpToOrphans" title="#BamFileIn#jumpToOrphans (interface function)" data-lang-entity="interface_function">bool jumpToOrphans(bamFileIn, hasAlignments, index);</a></code></span>
+    <span class="summary_desc"><div>Seek to orphans block in BamFileIn using an index.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamFileIn%23jumpToRegion" title="#BamFileIn#jumpToRegion (interface function)" data-lang-entity="interface_function">bool jumpToRegion(bamFileIn, hasAlignments, refID, pos, posEnd, index);</a></code></span>
+    <span class="summary_desc"><div>Seek in BamFileIn using an index.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#atEnd" data-lang-entity="interface_function">atEnd</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#close" data-lang-entity="interface_function">close</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#context" data-lang-entity="interface_function">context</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#format" data-lang-entity="interface_function">format</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FormattedFile" data-lang-entity="interface_function">FormattedFile</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#getFileExtensions" data-lang-entity="interface_function">getFileExtensions</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#guessFormat" data-lang-entity="interface_function">guessFormat</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#open" data-lang-entity="interface_function">open</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#setFormat" data-lang-entity="interface_function">setFormat</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_FormattedFileIn.html#FormattedFileIn#readHeader" data-lang-entity="interface_function">readHeader</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_FormattedFileIn.html#FormattedFileIn#readRecord" data-lang-entity="interface_function">readRecord</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FileFormat" data-lang-entity="interface_metafunction">FileFormat</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FormattedFileContext" data-lang-entity="interface_metafunction">FormattedFileContext</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Example</h3><p>Access SAM or BAM files.</p><div data-src-path="demos/tutorial/bam_io/solution1.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/bam_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Open input file, BamFileIn can read SAM and BAM files.</span>
+    <span class="n">BamFileIn</span> <span class="n">bamFileIn</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">open</span><span class="p">(</span><span class="n">bamFileIn</span><span class="p">,</span> <span class="s">&quot;example.sam&quot;</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: Could not open example.sam!&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Open output file, BamFileOut accepts also an ostream and a format tag.</span>
+    <span class="n">BamFileOut</span> <span class="n">bamFileOut</span><span class="p">(</span><span class="n">context</span><span class="p">(</span><span class="n">bamFileIn</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">Sam</span><span class="p">());</span>
+
+    <span class="n">try</span>
+    <span class="p">{</span>
+        <span class="c1">// Copy header.</span>
+        <span class="n">BamHeader</span> <span class="n">header</span><span class="p">;</span>
+        <span class="n">readHeader</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">bamFileIn</span><span class="p">);</span>
+        <span class="n">writeHeader</span><span class="p">(</span><span class="n">bamFileOut</span><span class="p">,</span> <span class="n">header</span><span class="p">);</span>
+
+        <span class="c1">// Copy records.</span>
+        <span class="n">BamAlignmentRecord</span> <span class="n">record</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">bamFileIn</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">readRecord</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">bamFileIn</span><span class="p">);</span>
+            <span class="n">writeRecord</span><span class="p">(</span><span class="n">bamFileOut</span><span class="p">,</span> <span class="n">record</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/tutorial/bam_io/solution1.cpp" target="_top">demos/tutorial/bam_io/solution1.cpp</a></div></div><p>The output is as follows:</p><pre class="code" data-src-path="demos/tutorial/bam_io/example.sam">@HD	VN:1.3	SO:coordinate
+@SQ	SN:ref	LN:45
+@SQ	SN:ref2	LN:40
+r001	163	ref	7	30	8M4I4M1D3M	=	37	39	TTAGATAAAGAGGATACTG	*	XX:B:S,12561,2,20,112
+r002	0	ref	9	30	1S2I6M1P1I1P1I4M2I	*	0	0	AAAAGATAAGGGATAAA	*
+r003	0	ref	9	30	5H6M	*	0	0	AGCTAA	*
+r004	0	ref	16	30	6M14N1I5M	*	0	0	ATAGCTCTCAGC	*
+r003	16	ref	29	30	6H5M	*	0	0	TAGGC	*
+r001	83	ref	37	30	9M	=	7	-39	CAGCGCCAT	*</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_BamAlignmentRecord.html" data-lang-entity="class">BamAlignmentRecord</a></li>
+  
+  <li><a href="class_BamHeader.html" data-lang-entity="class">BamHeader</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="BamFileIn#jumpToOrphans" class="signature first" data-lang-entity="interface_function">
+      <code>bool jumpToOrphans(bamFileIn, hasAlignments, index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Seek to orphans block in BamFileIn using an index.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bamFileIn</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a> object to jump with.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">hasAlignments</code>
+            
+        
+      </th>
+      <td>A <tt>bool</tt> that is set to true if there are any orphans.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamIndex.html" data-lang-entity="class">BamIndex</a> to use for jumping.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamFileIn#jumpToRegion" class="signature" data-lang-entity="interface_function">
+      <code>bool jumpToRegion(bamFileIn, hasAlignments, refID, pos, posEnd, index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Seek in BamFileIn using an index.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bamFileIn</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a> to jump with.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">hasAlignments</code>
+            
+        
+      </th>
+      <td>A <tt>bool</tt> that is set true if the region <tt>[pos, posEnd)</tt> has any
+alignments.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">refID</code>
+            
+        
+      </th>
+      <td>The reference id to jump to (<tt>__int32</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The begin of the region to jump to (<tt>__int32</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">posEnd</code>
+            
+        
+      </th>
+      <td>The end of the region to jump to (<tt>__int32</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamIndex.html" data-lang-entity="class">BamIndex</a> to use for the jumping.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true if seeking was successful, false if not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>You provide a region <tt>[pos, posEnd)</tt> on the reference <tt>refID</tt> that you want to jump to and the function
+jumps to the first alignment in this region, if any.</p><h4>Remarks</h4><p>This function fails if <tt>refID</tt>/<tt>pos</tt> are invalid.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class BamFileIn
+ * 
+ * @extends FormattedFileIn
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Class for reading SAM and BAM files.
+ * 
+ * @signature typedef FormattedFile&lt;Bam, Input&gt; BamFileIn;
+ * 
+ * @section Example
+ * 
+ * Access SAM or BAM files.
+ * 
+ * @include demos/tutorial/bam_io/solution1.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/tutorial/bam_io/example.sam
+ * 
+ * 
+ * 
+ * @see BamHeader
+ * @see BamAlignmentRecord
+ * 
+ * @fn BamFileIn#jumpToRegion
+ * 
+ * @brief Seek in BamFileIn using an index.
+ * 
+ * @signature bool jumpToRegion(bamFileIn, hasAlignments, refID, pos, posEnd,
+ *            index);
+ * 
+ * @param[in,out] bamFileIn The @link BamFileIn @endlink to jump with.
+ * @param[out] hasAlignments A &lt;tt&gt;bool&lt;/tt&gt; that is set true if the region
+ *                           &lt;tt&gt;[pos, posEnd)&lt;/tt&gt; has any alignments.
+ * @param[in] refID The reference id to jump to (&lt;tt&gt;__int32&lt;/tt&gt;).
+ * @param[in] pos The begin of the region to jump to (&lt;tt&gt;__int32&lt;/tt&gt;).
+ * @param[in] posEnd The end of the region to jump to (&lt;tt&gt;__int32&lt;/tt&gt;).
+ * @param[in] index The @link BamIndex @endlink to use for the jumping.
+ * 
+ * @return bool true if seeking was successful, false if not.
+ * 
+ * You provide a region &lt;tt&gt;[pos, posEnd)&lt;/tt&gt; on the reference &lt;tt&gt;refID&lt;/tt&gt;
+ * that you want to jump to and the function jumps to the first alignment in
+ * this region, if any.
+ * 
+ * @section Remarks
+ * 
+ * This function fails if &lt;tt&gt;refID&lt;/tt&gt;/&lt;tt&gt;pos&lt;/tt&gt; are invalid.
+ * 
+ * @fn BamFileIn#jumpToOrphans
+ * 
+ * @brief Seek to orphans block in BamFileIn using an index.
+ * 
+ * @signature bool jumpToOrphans(bamFileIn, hasAlignments, index);
+ * 
+ * @param[in,out] bamFileIn The @link BamFileIn @endlink object to jump with.
+ * @param[out] hasAlignments A &lt;tt&gt;bool&lt;/tt&gt; that is set to true if there are
+ *                           any orphans.
+ * @param[in] index The @link BamIndex @endlink to use for jumping.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

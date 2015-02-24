@@ -1,0 +1,21 @@
+subject: CPISRTWSIFRCWALLKAMEAALL
+query:   SRTWASFRCWA
+
+subject infix: SRTWSI
+query infix:   SRTWAS
+
+infix alignment
+      0     .   
+        SRTW-SI
+        |||| | 
+        SRTWAS-
+
+
+clipping row(align, 0) to source range (3, 14).  This is the view range (3, 15)
+align with clipping
+      0     .    :   
+        SRTW-SIFRCWA
+        |||| | |||||
+        SRTWAS-FRCWA
+
+

@@ -1,0 +1,2042 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_hmmgraph" data-page="HmmGraph">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>HmmGraph - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>HmmGraph<div><div>A grap representing a Hidden Markov Model (HMM).</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_types.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TAlphabet[, typename TCargo[, typename TSpec]]]&gt;
+class Graph&lt;Hmm&lt;TAlphabet, TCargo, TSpec&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TAlphabet</a></code></th>
+        <td>The alphabet of the HMM. Default: <a href="specialization_Dna.html" data-lang-entity="specialization">Dna</a>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The edge cargos. Default: <tt>void</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialization type. Default: <tt>Default</tt>. Use <tt>WithoutEdgeIds</tt> here to omit
+edge ids. NB: if edges do not store ids then external property maps do not work.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23assignBeginState" title="#HmmGraph#assignBeginState (interface function)" data-lang-entity="interface_function">void assignBeginState(hmm, v);</a></code></span>
+    <span class="summary_desc"><div>Assigns a begin state.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23assignEmissionsProbability" title="#HmmGraph#assignEmissionsProbability (interface function)" data-lang-entity="interface_function">void assignEmissionProbability(hmm, state, symbol, eProb);</a></code></span>
+    <span class="summary_desc"><div>Assigns a new emission probability.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23assignEndState" title="#HmmGraph#assignEndState (interface function)" data-lang-entity="interface_function">void assignEndState(hmm, v);</a></code></span>
+    <span class="summary_desc"><div>Assigns a end state.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23assignSilentStatus" title="#HmmGraph#assignSilentStatus (interface function)" data-lang-entity="interface_function">void assignSilentStatus(hmm, v, silent);</a></code></span>
+    <span class="summary_desc"><div>Assigns a silent status to a state.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23assignTransitionProbability" title="#HmmGraph#assignTransitionProbability (interface function)" data-lang-entity="interface_function">void assignTransitionProbability(hmm, state1, state2, prob);, void assignTransitionProbability(hmm, e, prob);</a></code></span>
+    <span class="summary_desc"><div>Assigns a new transition probability to an existing edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23beginState" title="#HmmGraph#beginState (interface function)" data-lang-entity="interface_function">TVertexDescriptor beginState(hmm);</a></code></span>
+    <span class="summary_desc"><div>Return a reference to the begin state vertex descriptor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23emissionProbability" title="#HmmGraph#emissionProbability (interface function)" data-lang-entity="interface_function">TCargo emissionProbability(hmm, state, symbol);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to the emissions probability.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23endState" title="#HmmGraph#endState (interface function)" data-lang-entity="interface_function">TVertexDescriptor endState(hmm);</a></code></span>
+    <span class="summary_desc"><div>Return a reference to the end state vertex descriptor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23getBeginState" title="#HmmGraph#getBeginState (interface function)" data-lang-entity="interface_function">TVertexDescriptor getBeginState(hmm);</a></code></span>
+    <span class="summary_desc"><div>Return the begin state vertex descriptor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23getEmissionsProbability" title="#HmmGraph#getEmissionsProbability (interface function)" data-lang-entity="interface_function">TCargo getEmissionProbability(hmm, state, symbol);</a></code></span>
+    <span class="summary_desc"><div>Returns the emissions probability.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23getEndState" title="#HmmGraph#getEndState (interface function)" data-lang-entity="interface_function">TVertexDescriptor getEndState(hmm);</a></code></span>
+    <span class="summary_desc"><div>Return the end state vertex descriptor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23getTransitionProbability" title="#HmmGraph#getTransitionProbability (interface function)" data-lang-entity="interface_function">TCargo getTransitionProbability(hmm, state1, state2);, TCargo getTransitionProbability(hmm, e);</a></code></span>
+    <span class="summary_desc"><div>Returns the transition probability, stored as the cargo.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23isSilent" title="#HmmGraph#isSilent (interface function)" data-lang-entity="interface_function">bool isSilent(hmm, v);</a></code></span>
+    <span class="summary_desc"><div>Indicates whether a state is silent or not.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23silentStatus" title="#HmmGraph#silentStatus (interface function)" data-lang-entity="interface_function">TBoolRef silentStatus(hmm, v);</a></code></span>
+    <span class="summary_desc"><div>Return reference to silent status flag.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#HmmGraph%23transitionProbability" title="#HmmGraph#transitionProbability (interface function)" data-lang-entity="interface_function">TCargo getTransitionProbability(hmm, state1, state2);, TCargo getTransitionProbability(hmm, e);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to transition probability, stored as the cargo.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdge" data-lang-entity="interface_function">addEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdges" data-lang-entity="interface_function">addEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addVertex" data-lang-entity="interface_function">addVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignEdgeMap" data-lang-entity="interface_function">assignEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignVertexMap" data-lang-entity="interface_function">assignVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearEdges" data-lang-entity="interface_function">clearEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearVertices" data-lang-entity="interface_function">clearVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#degree" data-lang-entity="interface_function">degree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#findEdge" data-lang-entity="interface_function">findEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getAdjacencyMatrix" data-lang-entity="interface_function">getAdjacencyMatrix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getNil" data-lang-entity="interface_function">getNil</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#inDegree" data-lang-entity="interface_function">inDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numEdges" data-lang-entity="interface_function">numEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numVertices" data-lang-entity="interface_function">numVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#outDegree" data-lang-entity="interface_function">outDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeEdge" data-lang-entity="interface_function">removeEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeInEdges" data-lang-entity="interface_function">removeInEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeOutEdges" data-lang-entity="interface_function">removeOutEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeVertex" data-lang-entity="interface_function">removeVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeEdgeMap" data-lang-entity="interface_function">resizeEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeVertexMap" data-lang-entity="interface_function">resizeVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#sourceVertex" data-lang-entity="interface_function">sourceVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#targetVertex" data-lang-entity="interface_function">targetVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#transpose" data-lang-entity="interface_function">transpose</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Cargo" data-lang-entity="interface_metafunction">Cargo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeDescriptor" data-lang-entity="interface_metafunction">EdgeDescriptor</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeIdHandler" data-lang-entity="interface_metafunction">EdgeIdHandler</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeType" data-lang-entity="interface_metafunction">EdgeType</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#VertexIdHandler" data-lang-entity="interface_metafunction">VertexIdHandler</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>An HMM is a directed graph with edges labeled with transition probabilities and emission profiles for each vertex.
+Vertices correspond to states in an HMM.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="HmmGraph#assignBeginState" class="signature first" data-lang-entity="interface_function">
+      <code>void assignBeginState(hmm, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a begin state.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to assign the begin state of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to assign as begin state.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#assignEmissionsProbability" class="signature" data-lang-entity="interface_function">
+      <code>void assignEmissionProbability(hmm, state, symbol, eProb);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a new emission probability.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state</code>
+            
+        
+      </th>
+      <td>A vertex descriptor with the source state.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">symbol</code>
+            
+        
+      </th>
+      <td>The symbol. Type: <tt>TAlphabet</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">eProb</code>
+            
+        
+      </th>
+      <td>Emission probability to assign.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#assignEndState" class="signature" data-lang-entity="interface_function">
+      <code>void assignEndState(hmm, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a end state.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to assign the end state of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to assign as end state.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#assignSilentStatus" class="signature" data-lang-entity="interface_function">
+      <code>void assignSilentStatus(hmm, v, silent);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a silent status to a state.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The HmmGraph to assign the silent status in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>Vertex descriptor of the state to assign silent status.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">silent</code>
+            
+        
+      </th>
+      <td>A bool with the silent status.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#assignTransitionProbability" class="signature" data-lang-entity="interface_function">
+      <code>void assignTransitionProbability(hmm, state1, state2, prob);
+void assignTransitionProbability(hmm, e, prob);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a new transition probability to an existing edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get transition probability for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state1</code>
+            
+        
+      </th>
+      <td>Assign transition probability from start state1.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state2</code>
+            
+        
+      </th>
+      <td>Assign probability to target state2.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>Assign probability to edge with this edge descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#beginState" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor beginState(hmm);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return a reference to the begin state vertex descriptor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get the vertex descriptor of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>A reference to the begin state vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#emissionProbability" class="signature" data-lang-entity="interface_function">
+      <code>TCargo emissionProbability(hmm, state, symbol);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to the emissions probability.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state</code>
+            
+        
+      </th>
+      <td>A vertex descriptor with the source state.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">symbol</code>
+            
+        
+      </th>
+      <td>The symbol. Type: <tt>TAlphabet</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Reference to the emission probability.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#endState" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor endState(hmm);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return a reference to the end state vertex descriptor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get the vertex descriptor of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>A reference to the end state vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#getBeginState" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getBeginState(hmm);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the begin state vertex descriptor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get the vertex descriptor of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The begin state vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#getEmissionsProbability" class="signature" data-lang-entity="interface_function">
+      <code>TCargo getEmissionProbability(hmm, state, symbol);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the emissions probability.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state</code>
+            
+        
+      </th>
+      <td>A vertex descriptor with the source state.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">symbol</code>
+            
+        
+      </th>
+      <td>The symbol. Type: <tt>TAlphabet</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>The emission probability.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#getEndState" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getEndState(hmm);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the end state vertex descriptor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get the vertex descriptor of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The end state vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#getTransitionProbability" class="signature" data-lang-entity="interface_function">
+      <code>TCargo getTransitionProbability(hmm, state1, state2);
+TCargo getTransitionProbability(hmm, e);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the transition probability, stored as the cargo.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get transition probability for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state1</code>
+            
+        
+      </th>
+      <td>Return transition probability from start state1.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state2</code>
+            
+        
+      </th>
+      <td>Return transition probability to target state2.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>An edge descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Return the transition probability.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#isSilent" class="signature" data-lang-entity="interface_function">
+      <code>bool isSilent(hmm, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Indicates whether a state is silent or not.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The HmmGraph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>Vertex descriptor of the state to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true if the state is silent and false if not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#silentStatus" class="signature" data-lang-entity="interface_function">
+      <code>TBoolRef silentStatus(hmm, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference to silent status flag.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The HmmGraph to assign the silent status in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>Vertex descriptor of the state to assign silent status.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TBoolRef</code></th>
+        <td>Reference to bool silent status flag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="HmmGraph#transitionProbability" class="signature" data-lang-entity="interface_function">
+      <code>TCargo getTransitionProbability(hmm, state1, state2);
+TCargo getTransitionProbability(hmm, e);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to transition probability, stored as the cargo.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hmm</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a> to get transition probability for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state1</code>
+            
+        
+      </th>
+      <td>Return transition probability from start state1.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">state2</code>
+            
+        
+      </th>
+      <td>Return transition probability to target state2.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">e</code>
+            
+        
+      </th>
+      <td>An edge descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Returns a reference to the transition probability.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class HmmGraph
+ * 
+ * @extends Graph
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief A grap representing a Hidden Markov Model (HMM).
+ * 
+ * @signature template &lt;[typename TAlphabet[, typename TCargo[, typename
+ *            TSpec]]]&gt; class Graph&lt;Hmm&lt;TAlphabet, TCargo, TSpec&gt; &gt;;
+ * 
+ * @tparam TAlphabet The alphabet of the HMM. Default: @link Dna @endlink.
+ * @tparam TCargo The edge cargos. Default: &lt;tt&gt;void&lt;/tt&gt;.
+ * @tparam TSpec The specialization type. Default: &lt;tt&gt;Default&lt;/tt&gt;. Use
+ *               &lt;tt&gt;WithoutEdgeIds&lt;/tt&gt; here to omit edge ids. NB: if edges do
+ *               not store ids then external property maps do not work.
+ * 
+ * An HMM is a directed graph with edges labeled with transition probabilities
+ * and emission profiles for each vertex. Vertices correspond to states in an
+ * HMM.
+ * 
+ * @fn HmmGraph#assignBeginState
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief Assigns a begin state.
+ * 
+ * @signature void assignBeginState(hmm, v);
+ * 
+ * @param[in,out] hmm The @link HmmGraph @endlink to assign the begin state of.
+ * @param[in] v The descriptor of the vertex to assign as begin state.
+ * 
+ * @fn HmmGraph#assignEndState
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief Assigns a end state.
+ * 
+ * @signature void assignEndState(hmm, v);
+ * 
+ * @param[in,out] hmm The @link HmmGraph @endlink to assign the end state of.
+ * @param[in] v The descriptor of the vertex to assign as end state.
+ * 
+ * @fn HmmGraph#beginState
+ * 
+ * @brief Return a reference to the begin state vertex descriptor.
+ * 
+ * @signature TVertexDescriptor beginState(hmm);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get the vertex descriptor of.
+ * 
+ * @return TVertexDescriptor A reference to the begin state vertex descriptor.
+ * 
+ * @fn HmmGraph#endState
+ * 
+ * @brief Return a reference to the end state vertex descriptor.
+ * 
+ * @signature TVertexDescriptor endState(hmm);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get the vertex descriptor of.
+ * 
+ * @return TVertexDescriptor A reference to the end state vertex descriptor.
+ * 
+ * @fn HmmGraph#getBeginState
+ * 
+ * @brief Return the begin state vertex descriptor.
+ * 
+ * @signature TVertexDescriptor getBeginState(hmm);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get the vertex descriptor of.
+ * 
+ * @return TVertexDescriptor The begin state vertex descriptor.
+ * 
+ * @fn HmmGraph#getEndState
+ * 
+ * @brief Return the end state vertex descriptor.
+ * 
+ * @signature TVertexDescriptor getEndState(hmm);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get the vertex descriptor of.
+ * 
+ * @return TVertexDescriptor The end state vertex descriptor.
+ * 
+ * @fn HmmGraph#getTransitionProbability
+ * 
+ * @brief Returns the transition probability, stored as the cargo.
+ * 
+ * @signature TCargo getTransitionProbability(hmm, state1, state2);
+ * @signature TCargo getTransitionProbability(hmm, e);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get transition probability for.
+ * @param[in] state1 Return transition probability from start state1.
+ * @param[in] state2 Return transition probability to target state2.
+ * @param[in] e An edge descriptor.
+ * 
+ * @return TCargo Return the transition probability.
+ * 
+ * @fn HmmGraph#transitionProbability
+ * 
+ * @brief Returns a reference to transition probability, stored as the cargo.
+ * 
+ * @signature TCargo getTransitionProbability(hmm, state1, state2);
+ * @signature TCargo getTransitionProbability(hmm, e);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get transition probability for.
+ * @param[in] state1 Return transition probability from start state1.
+ * @param[in] state2 Return transition probability to target state2.
+ * @param[in] e An edge descriptor.
+ * 
+ * @return TCargo Returns a reference to the transition probability.
+ * 
+ * @fn HmmGraph#assignTransitionProbability
+ * 
+ * @brief Assigns a new transition probability to an existing edge.
+ * 
+ * @signature void assignTransitionProbability(hmm, state1, state2, prob);
+ * @signature void assignTransitionProbability(hmm, e, prob);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to get transition probability for.
+ * @param[in] state1 Assign transition probability from start state1.
+ * @param[in] state2 Assign probability to target state2.
+ * @param[in] e Assign probability to edge with this edge descriptor.
+ * 
+ * @fn HmmGraph#getEmissionsProbability
+ * 
+ * @brief Returns the emissions probability.
+ * 
+ * @signature TCargo getEmissionProbability(hmm, state, symbol);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to query.
+ * @param[in] state A vertex descriptor with the source state.
+ * @param[in] symbol The symbol. Type: &lt;tt&gt;TAlphabet&lt;/tt&gt;.
+ * 
+ * @return TCargo The emission probability.
+ * 
+ * @fn HmmGraph#emissionProbability
+ * 
+ * @brief Returns a reference to the emissions probability.
+ * 
+ * @signature TCargo emissionProbability(hmm, state, symbol);
+ * 
+ * @param[in] hmm The @link HmmGraph @endlink to query.
+ * @param[in] state A vertex descriptor with the source state.
+ * @param[in] symbol The symbol. Type: &lt;tt&gt;TAlphabet&lt;/tt&gt;.
+ * 
+ * @return TCargo Reference to the emission probability.
+ * 
+ * @fn HmmGraph#assignEmissionsProbability
+ * 
+ * @brief Assigns a new emission probability.
+ * 
+ * @signature void assignEmissionProbability(hmm, state, symbol, eProb);
+ * 
+ * @param[in,out] hmm The @link HmmGraph @endlink to query.
+ * @param[in] state A vertex descriptor with the source state.
+ * @param[in] symbol The symbol. Type: &lt;tt&gt;TAlphabet&lt;/tt&gt;.
+ * @param[in] eProb Emission probability to assign.
+ * 
+ * @fn HmmGraph#assignSilentStatus
+ * 
+ * @brief Assigns a silent status to a state.
+ * 
+ * @signature void assignSilentStatus(hmm, v, silent);
+ * 
+ * @param[in] hmm The HmmGraph to assign the silent status in.
+ * @param[in] v Vertex descriptor of the state to assign silent status.
+ * @param[in] silent A bool with the silent status.
+ * 
+ * @fn HmmGraph#silentStatus
+ * 
+ * @brief Return reference to silent status flag.
+ * 
+ * @signature TBoolRef silentStatus(hmm, v);
+ * 
+ * @param[in] hmm The HmmGraph to assign the silent status in.
+ * @param[in] v Vertex descriptor of the state to assign silent status.
+ * 
+ * @return TBoolRef Reference to bool silent status flag.
+ * 
+ * @fn HmmGraph#isSilent
+ * 
+ * @brief Indicates whether a state is silent or not.
+ * 
+ * @signature bool isSilent(hmm, v);
+ * 
+ * @param[in] hmm The HmmGraph to query.
+ * @param[in] v Vertex descriptor of the state to query.
+ * 
+ * @return bool true if the state is silent and false if not.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_seedset" data-page="SeedSet">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SeedSet - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>SeedSet<div><div>Handles a set of seeds with local chaining on adding seeds.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seeds.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSeed[, typename TSpec]&gt;
+class SeedSet;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSeed</a></code></th>
+        <td>Type of the <a href="class_Seed.html" data-lang-entity="class">Seed</a> objects stored in the seed set.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Optional tag for seed set specialization. Defaults to <tt>Unordered</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeedSet%23addSeed" title="#SeedSet#addSeed (interface function)" data-lang-entity="interface_function">bool addSeed(seedSet, seed, distance, bandwidth, score, seqH, seqV, tag);, bool addSeed(seedSet, seed, distance, score, SimpleChain);, bool addSeed(seedSet, seed, distance, Merge);, bool addSeed(seedSet, seed, Single);</a></code></span>
+    <span class="summary_desc"><div>Adds a seed to an existing <a href="class_SeedSet.html" data-lang-entity="class">SeedSet</a> using different
+algorithms for local chaining.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeedSet%23clear" title="#SeedSet#clear (interface function)" data-lang-entity="interface_function">void clear(seedSet);</a></code></span>
+    <span class="summary_desc"><div>Clear the SeedSet.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeedSet%23minScore" title="#SeedSet#minScore (interface function)" data-lang-entity="interface_function">TSeedScore minScore(seedSet);</a></code></span>
+    <span class="summary_desc"><div>Returns the threshold to distinguish between high-scoring and low-scoring seeds.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeedSet%23setMinScore" title="#SeedSet#setMinScore (interface function)" data-lang-entity="interface_function">void setMinScore(seedSet, scoreValue);</a></code></span>
+    <span class="summary_desc"><div>Sets the threshold at which seeds are considered high-scoring.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+        
+        <div class="note info"><strong>Note:</strong> <div class='inline'>
+            <p>At the moment only <tt>Unordered SeedSets</tt> are supported.</p>
+         </div></div>
+        
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="SeedSet#addSeed" class="signature first" data-lang-entity="interface_function">
+      <code>bool addSeed(seedSet, seed, distance, bandwidth, score, seqH, seqV, tag);
+bool addSeed(seedSet, seed, distance, score, SimpleChain);
+bool addSeed(seedSet, seed, distance, Merge);
+bool addSeed(seedSet, seed, Single);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds a seed to an existing <a href="class_SeedSet.html" data-lang-entity="class">SeedSet</a> using different
+algorithms for local chaining.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seedSet</code>
+            
+        
+      </th>
+      <td>The SeedSet to add the seed to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to be added.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">distance</code>
+            
+        
+      </th>
+      <td>The maximal distance between the end point of the upper left and the begin point of the
+lower right <a href="class_Seed.html" data-lang-entity="class">Seed</a> allowed for local chaining. NB: only Chaos, SimpleChain
+and Merge require the distance information.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">bandwidth</code>
+            
+        
+      </th>
+      <td>The window size to search for a chainable <a href="class_Seed.html" data-lang-entity="class">Seed</a>. Note, only <tt>Chaos</tt>
+requires the bandwidth information.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The scoring scheme.Note, only Chaos and SimpleChain require the score.
+Type: <a href="specialization_SimpleScore.html" data-lang-entity="specialization">SimpleScore</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqH</code>
+            
+        
+      </th>
+      <td>Database sequence (horizontal). Only required for Chaos Chaining. Types: ContainerConcept.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqV</code>
+            
+        
+      </th>
+      <td>Query sequence (vertical). Only required for Chaos Chaining. Types: ContainerConcept.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>Select the algorithm that is used to add the new seed. Note that not every algorithm can
+be used with each type of <a href="class_Seed.html" data-lang-entity="class">Seed</a>. See special signatures above. The seed is
+copied and then added.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if successful. Adding can fail if no appropriate seed is there for chaining or merging.
+Adding using <tt>Single</tt> ever fails.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><div data-src-path="demos/seeds/seeds_add_seed.cpp"><div class="highlight"><pre>    <span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">iostream</span><span class="o">&gt;</span>
+<span class="cp">#include &lt;seqan/seeds.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">TSeed</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">SeedSet</span><span class="o">&lt;</span><span class="n">TSeed</span><span class="o">&gt;</span> <span class="n">TSeedSet</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TSeedSet</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">TIterator</span><span class="p">;</span>
+
+    <span class="n">DnaString</span> <span class="n">seqH</span> <span class="o">=</span> <span class="s">&quot;ggatACGTccTTCGAtACccTGGTg&quot;</span><span class="p">;</span>
+    <span class="n">DnaString</span> <span class="n">seqV</span> <span class="o">=</span> <span class="s">&quot;ttccgACGTgTTCGAgACtgaGGTca&quot;</span><span class="p">;</span>
+
+    <span class="n">TSeed</span> <span class="n">seed0</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="n">TSeed</span> <span class="n">seed1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+    <span class="n">TSeed</span> <span class="n">seed2</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="n">TSeed</span> <span class="n">seed3</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">TSeedSet</span> <span class="n">seedSet</span><span class="p">;</span>
+
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed0</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed3</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Single Method:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">TIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Seed: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">clear</span><span class="p">(</span><span class="n">seedSet</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Merge</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed0</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Merge</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Merge</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Merge</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed3</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Merge Method:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">TIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Seed: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">clear</span><span class="p">(</span><span class="n">seedSet</span><span class="p">);</span>
+    <span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoreScheme</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scoreScheme</span><span class="p">,</span> <span class="n">seqH</span><span class="p">,</span> <span class="n">seqV</span><span class="p">,</span> <span class="n">Chaos</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed0</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scoreScheme</span><span class="p">,</span> <span class="n">seqH</span><span class="p">,</span> <span class="n">seqV</span><span class="p">,</span> <span class="n">Chaos</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scoreScheme</span><span class="p">,</span> <span class="n">seqH</span><span class="p">,</span> <span class="n">seqV</span><span class="p">,</span> <span class="n">Chaos</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scoreScheme</span><span class="p">,</span> <span class="n">seqH</span><span class="p">,</span> <span class="n">seqV</span><span class="p">,</span> <span class="n">Chaos</span><span class="p">()))</span>
+        <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">seed3</span><span class="p">,</span> <span class="n">Single</span><span class="p">());</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Chaos Method:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">TIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Seed: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/seeds/seeds_add_seed.cpp" target="_top">demos/seeds/seeds_add_seed.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="None">Single Method:
+Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 8, 9, lower diag = -1, upper diag = -1)
+Seed: Seed&lt;Simple, TConfig&gt;(10, 10, 15, 15, lower diag = 0, upper diag = 0)
+Seed: Seed&lt;Simple, TConfig&gt;(14, 14, 18, 18, lower diag = 0, upper diag = 0)
+Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)
+
+
+Merge Method:
+Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 8, 9, lower diag = -1, upper diag = -1)
+Seed: Seed&lt;Simple, TConfig&gt;(10, 10, 18, 18, lower diag = 0, upper diag = 0)
+Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)
+
+
+Chaos Method:
+Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 15, 15, lower diag = -1, upper diag = 0)
+Seed: Seed&lt;Simple, TConfig&gt;(14, 14, 18, 18, lower diag = 0, upper diag = 0)
+Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SeedSet#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(seedSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear the SeedSet.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seedSet</code>
+            
+        
+      </th>
+      <td>The SeedSet to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SeedSet#minScore" class="signature" data-lang-entity="interface_function">
+      <code>TSeedScore minScore(seedSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the threshold to distinguish between high-scoring and low-scoring seeds.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seedSet</code>
+            
+        
+      </th>
+      <td>The SeedSet for which the threshold is set. If the score of a seed is higher than the given
+threshold, then it is virtually put into a container storing the high-scoring seeds which can
+be iterated separately.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSeedScore</code></th>
+        <td>The score threshold. TSeedScore is the <a href="class_Seed.html#Seed#SeedScore" data-lang-entity="interface_metafunction">SeedScore</a> of the contained seeds.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">setMinScore</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SeedSet#setMinScore" class="signature" data-lang-entity="interface_function">
+      <code>void setMinScore(seedSet, scoreValue);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the threshold at which seeds are considered high-scoring.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seedSet</code>
+            
+        
+      </th>
+      <td>The SeedSet for which the threshold is to be set.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoreValue</code>
+            
+        
+      </th>
+      <td>The new threshold to set. If the score of a seed is higher than the given threshold, then
+it is virtually put into a container storing the high-scoring seeds which can be iterated
+separately (<a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">minScore</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class SeedSet
+ * 
+ * @implements ContainerConcept
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Handles a set of seeds with local chaining on adding seeds.
+ * 
+ * @note At the moment only &lt;tt&gt;Unordered SeedSets&lt;/tt&gt; are supported.
+ * 
+ * @signature template &lt;typename TSeed[, typename TSpec]&gt; class SeedSet;
+ * 
+ * @tparam TSeed Type of the @link Seed @endlink objects stored in the seed set.
+ * @tparam TSpec Optional tag for seed set specialization. Defaults to
+ *               &lt;tt&gt;Unordered&lt;/tt&gt;.
+ * 
+ * @fn SeedSet#addSeed
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Adds a seed to an existing @link SeedSet @endlink using different
+ *        algorithms for local chaining.
+ * 
+ * @signature bool addSeed(seedSet, seed, distance, bandwidth, score, seqH,
+ *            seqV, tag);
+ * @signature bool addSeed(seedSet, seed, distance, score, SimpleChain);
+ * @signature bool addSeed(seedSet, seed, distance, Merge);
+ * @signature bool addSeed(seedSet, seed, Single);
+ * 
+ * @param[in,out] seedSet The SeedSet to add the seed to.
+ * @param[in] seed The seed to be added.
+ * @param[in] distance The maximal distance between the end point of the upper
+ *                     left and the begin point of the lower right @link Seed
+ *                     @endlink allowed for local chaining. NB: only Chaos,
+ *                     SimpleChain and Merge require the distance information.
+ * @param[in] bandwidth The window size to search for a chainable @link Seed
+ *                      @endlink. Note, only &lt;tt&gt;Chaos&lt;/tt&gt; requires the
+ *                      bandwidth information.
+ * @param[in] score The scoring scheme.Note, only Chaos and SimpleChain require
+ *                  the score. Type: @link SimpleScore @endlink.
+ * @param[in] seqH Database sequence (horizontal). Only required for Chaos
+ *                 Chaining. Types: ContainerConcept.
+ * @param[in] seqV Query sequence (vertical). Only required for Chaos Chaining.
+ *                 Types: ContainerConcept.
+ * @param[in] tag Select the algorithm that is used to add the new seed. Note
+ *                that not every algorithm can be used with each type of @link
+ *                Seed @endlink. See special signatures above. The seed is
+ *                copied and then added.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if successful. Adding can fail if no appropriate
+ *              seed is there for chaining or merging. Adding using
+ *              &lt;tt&gt;Single&lt;/tt&gt; ever fails.
+ * 
+ * @section Examples
+ * 
+ * @include demos/seeds/seeds_add_seed.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @code{.console}
+ * Single Method:
+ * Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 8, 9, lower diag = -1, upper diag = -1)
+ * Seed: Seed&lt;Simple, TConfig&gt;(10, 10, 15, 15, lower diag = 0, upper diag = 0)
+ * Seed: Seed&lt;Simple, TConfig&gt;(14, 14, 18, 18, lower diag = 0, upper diag = 0)
+ * Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)
+ * 
+ * 
+ * Merge Method:
+ * Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 8, 9, lower diag = -1, upper diag = -1)
+ * Seed: Seed&lt;Simple, TConfig&gt;(10, 10, 18, 18, lower diag = 0, upper diag = 0)
+ * Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)
+ * 
+ * 
+ * Chaos Method:
+ * Seed: Seed&lt;Simple, TConfig&gt;(4, 5, 15, 15, lower diag = -1, upper diag = 0)
+ * Seed: Seed&lt;Simple, TConfig&gt;(14, 14, 18, 18, lower diag = 0, upper diag = 0)
+ * Seed: Seed&lt;Simple, TConfig&gt;(21, 21, 24, 24, lower diag = 0, upper diag = 0)
+ * @endcode
+ * 
+ * 
+ * @fn SeedSet#minScore
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Returns the threshold to distinguish between high-scoring and low-
+ *        scoring seeds.
+ * 
+ * @signature TSeedScore minScore(seedSet);
+ * 
+ * @param[in] seedSet The SeedSet for which the threshold is set. If the score
+ *                    of a seed is higher than the given threshold, then it is
+ *                    virtually put into a container storing the high-scoring
+ *                    seeds which can be iterated separately.
+ * 
+ * @return TSeedScore The score threshold. TSeedScore is the @link
+ *                    Seed#SeedScore @endlink of the contained seeds.
+ * 
+ * @see SeedSet#setMinScore
+ * 
+ * @fn SeedSet#setMinScore
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Sets the threshold at which seeds are considered high-scoring.
+ * 
+ * @signature void setMinScore(seedSet, scoreValue);
+ * 
+ * @param[in,out] seedSet The SeedSet for which the threshold is to be set.
+ * @param[in] scoreValue The new threshold to set. If the score of a seed is
+ *                       higher than the given threshold, then it is virtually
+ *                       put into a container storing the high-scoring seeds
+ *                       which can be iterated separately (@link IntegerConcept
+ *                       @endlink).
+ * 
+ * @see SeedSet#minScore
+ * 
+ * @fn SeedSet#clear
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Clear the SeedSet.
+ * 
+ * @signature void clear(seedSet);
+ * 
+ * @param[in,out] seedSet The SeedSet to clear.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

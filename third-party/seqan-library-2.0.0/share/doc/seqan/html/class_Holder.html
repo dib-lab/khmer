@@ -1,0 +1,1490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_holder" data-page="Holder">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Holder - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Holder<div><div>Manages relationship to another object.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_SimpleHolder.html" data-lang-entity="specialization">SimpleHolder</a>, 
+    <a href="specialization_TristateHolder.html" data-lang-entity="specialization">TristateHolder</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue[, typename TSpec&gt;
+class Holder;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <tt>Tristate</tt></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>Type of the managed object.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23assignValue" title="#Holder#assignValue (interface function)" data-lang-entity="interface_function">void assignValue(object, value);</a></code></span>
+    <span class="summary_desc"><div>Assigns value to item.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23clear" title="#Holder#clear (interface function)" data-lang-entity="interface_function">void clear(holder);</a></code></span>
+    <span class="summary_desc"><div>Clear/destruct the Holder's value.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23create" title="#Holder#create (interface function)" data-lang-entity="interface_function">void create(holder[, object]);</a></code></span>
+    <span class="summary_desc"><div>Makes an object to owner of its content.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23detach" title="#Holder#detach (interface function)" data-lang-entity="interface_function">void detach(holder);</a></code></span>
+    <span class="summary_desc"><div>Makes an object independent from other objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23empty" title="#Holder#empty (interface function)" data-lang-entity="interface_function">bool empty(holder);</a></code></span>
+    <span class="summary_desc"><div>Test a Holder for being empty.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23getValue" title="#Holder#getValue (interface function)" data-lang-entity="interface_function">TGetValue getValue(holder);</a></code></span>
+    <span class="summary_desc"><div>Return the get-value of the holder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23moveValue" title="#Holder#moveValue (interface function)" data-lang-entity="interface_function">void moveValue(holder, value);</a></code></span>
+    <span class="summary_desc"><div>Move a value of into a holder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23setValue" title="#Holder#setValue (interface function)" data-lang-entity="interface_function">void setValue(holder, object);</a></code></span>
+    <span class="summary_desc"><div>Makes holder dependent.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23value" title="#Holder#value (interface function)" data-lang-entity="interface_function">TReference value(holder);</a></code></span>
+    <span class="summary_desc"><div>Return a reference to the value of the holder.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23GetValue" title="#Holder#GetValue (interface function)" data-lang-entity="interface_metafunction">GetValue&lt;THolder&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return get-value type of Holder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23Reference" title="#Holder#Reference (interface function)" data-lang-entity="interface_metafunction">Reference&lt;THolder&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the reference type of a Holder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23Spec" title="#Holder#Spec (interface function)" data-lang-entity="interface_metafunction">Spec&lt;THolder&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the specialization tag for a Holder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Holder%23Value" title="#Holder#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;THolder&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return value type of Holder.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>The main purpose of this class is to facilitate the handling of member objects. If we want class <tt>A</tt> to be
+dependent on or the owner of another object of class <tt>B</tt>, then we add a data member of type <tt>Holder&lt;B&gt;</tt>
+to <tt>A</tt>. <tt>Holder</tt> offers some useful access functions and stores the kind of relationship between
+<tt>A</tt> and <tt>B</tt>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_Holder.html#Holder#create" data-lang-entity="interface_function">create</a></li>
+  
+  <li><a href="class_Holder.html#Holder#setValue" data-lang-entity="interface_function">setValue</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Holder#assignValue" class="signature first" data-lang-entity="interface_function">
+      <code>void assignValue(object, value);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns value to item.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">object</code>
+            
+        
+      </th>
+      <td>An object that holds a value or points to a value. Types:
+Holder, Iter Concepts: Concept.BasicOutputIteratorConcept</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">value</code>
+            
+        
+      </th>
+      <td>A value that is assigned to the item <tt>object</tt> holds or points to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function is similar to <a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a>. The difference is, that
+<tt>assignValue</tt> just changes a value stored in <tt>object</tt> or the
+value <tt>object</tt> points to, while <a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a> changes the
+whole object.</p><p>If <tt>object</tt> is a container (that is <tt>pos</tt> is not specified),
+the whole content of <tt>object</tt> is replaced by <tt>value</tt>.</p><p>If <tt>value</tt> is not used again after calling this function, then
+consider to use <a href="class_Holder.html#Holder#moveValue" data-lang-entity="interface_function">moveValue</a> that could be faster in some cases
+instead.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">assign</a></li>
+    
+    <li><a class="error">moveValue</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(holder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear/destruct the Holder's value.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">holder</code>
+            
+        
+      </th>
+      <td>The Holder to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#create" class="signature" data-lang-entity="interface_function">
+      <code>void create(holder[, object]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Makes an object to owner of its content.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">holder</code>
+            
+        
+      </th>
+      <td>The Holder to create the object of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">object</code>
+            
+        
+      </th>
+      <td>Object from which a copy is made and stored in <tt>holder</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>After this operation, <tt>holder</tt> will be in state 'owner'. If <tt>object</tt> is specified, <tt>holder</tt>
+will hold a copy of <tt>object</tt> at the end of this function. If <tt>object</tt> is not specified, the action
+depends on the former state of <tt>holder</tt>:</p><p><ul>
+<li>If the state of <tt>holder</tt> was 'empty', a new object is default constructed and stored into
+<tt>holder</tt>.</li>
+<li>If the state of <tt>holder</tt> was 'dependent', a copy of the former object is made and stored into
+<tt>holder</tt>.</li>
+<li>If the state of <tt>holder</tt> was already 'owner', nothing happens.</li>
+</ul></p><p>It is guaranteed, that after calling this function <tt>source</tt> and <tt>target</tt> can be used independently.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#detach" class="signature" data-lang-entity="interface_function">
+      <code>void detach(holder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Makes an object independent from other objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">holder</code>
+            
+        
+      </th>
+      <td>The Holder to detach.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>After this function, <tt>holder</tt> does not depends from any other entity outside of <tt>holder</tt>, like a source
+or a host, and dependent(holer) returns <tt>false</tt></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(holder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test a Holder for being empty.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">holder</code>
+            
+        
+      </th>
+      <td>A Holder.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>holder</tt> contains no elements, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p><tt>empty(x)</tt> is guaranteed to be at least as fast as <tt>length(me) == 0</tt>, but can be significantly faster
+in some cases.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">emptyHost</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#getValue" class="signature" data-lang-entity="interface_function">
+      <code>TGetValue getValue(holder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the get-value of the holder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">holder</code>
+            
+        
+      </th>
+      <td>The Holder to query for its get-value type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TGetValue</code></th>
+        <td>The get-value of the Holder.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#moveValue" class="signature" data-lang-entity="interface_function">
+      <code>void moveValue(holder, value);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move a value of into a holder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">holder</code>
+            
+        
+      </th>
+      <td>The Holder to manipulate.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">value</code>
+            
+        
+      </th>
+      <td>The value to move into <tt>holder</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#setValue" class="signature" data-lang-entity="interface_function">
+      <code>void setValue(holder, object);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Makes holder dependent.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">holder</code>
+            
+        
+      </th>
+      <td>A holder object. Types: Holder</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">object</code>
+            
+        
+      </th>
+      <td>Object from which <tt>holder</tt> will be dependent.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>After this operation, <tt>holder</tt> will be dependent in state 'dependent'.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Holder#value" class="signature" data-lang-entity="interface_function">
+      <code>TReference value(holder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return a reference to the value of the holder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">holder</code>
+            
+        
+      </th>
+      <td>The Holder to query for its reference.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>The reference of the Holder's value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Holder#GetValue" class="signature first" data-lang-entity="interface_metafunction">
+    <code>GetValue&lt;THolder&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return get-value type of Holder.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>THolder</code></th>
+            <td>The Holder to query for its value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The get-value type for its holder.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Holder#Reference" class="signature" data-lang-entity="interface_metafunction">
+    <code>Reference&lt;THolder&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the reference type of a Holder.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>THolder</code></th>
+            <td>The holder to query for its reference type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting reference type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Holder#Spec" class="signature" data-lang-entity="interface_metafunction">
+    <code>Spec&lt;THolder&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the specialization tag for a Holder.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>THolder</code></th>
+            <td>The Holder to query for its value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting specialization tag.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Holder#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;THolder&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return value type of Holder.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>THolder</code></th>
+            <td>The Holder to query for its value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The value type for its holder.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Holder
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Manages relationship to another object.
+ * 
+ * @signature template &lt;typename TValue[, typename TSpec&gt; class Holder;
+ * 
+ * @tparam TSpec The specializing type. Default: &lt;tt&gt;Tristate&lt;/tt&gt;
+ * @tparam TValue Type of the managed object.
+ * 
+ * @section Remarks
+ * 
+ * The main purpose of this class is to facilitate the handling of member
+ * objects. If we want class &lt;tt&gt;A&lt;/tt&gt; to be dependent on or the owner of
+ * another object of class &lt;tt&gt;B&lt;/tt&gt;, then we add a data member of type
+ * &lt;tt&gt;Holder&amp;lt;B&amp;gt;&lt;/tt&gt; to &lt;tt&gt;A&lt;/tt&gt;. &lt;tt&gt;Holder&lt;/tt&gt; offers some useful
+ * access functions and stores the kind of relationship between &lt;tt&gt;A&lt;/tt&gt; and
+ * &lt;tt&gt;B&lt;/tt&gt;.
+ * 
+ * @see Holder#create
+ * @see Holder#setValue
+ * 
+ * @mfn Holder#GetValue
+ * 
+ * @brief Return get-value type of Holder.
+ * 
+ * @signature GetValue&lt;THolder&gt;::Type;
+ * 
+ * @tparam THolder The Holder to query for its value type.
+ * 
+ * @return Type The get-value type for its holder.
+ * 
+ * @mfn Holder#Value
+ * 
+ * @brief Return value type of Holder.
+ * 
+ * @signature Value&lt;THolder&gt;::Type;
+ * 
+ * @tparam THolder The Holder to query for its value type.
+ * 
+ * @return Type The value type for its holder.
+ * 
+ * @mfn Holder#Spec
+ * 
+ * @brief Return the specialization tag for a Holder.
+ * 
+ * @signature Spec&lt;THolder&gt;::Type;
+ * 
+ * @tparam THolder The Holder to query for its value type.
+ * 
+ * @return Type The resulting specialization tag.
+ * 
+ * @mfn Holder#Reference
+ * 
+ * @brief Return the reference type of a Holder.
+ * 
+ * @signature Reference&lt;THolder&gt;::Type;
+ * 
+ * @tparam THolder The holder to query for its reference type.
+ * 
+ * @return Type The resulting reference type.
+ * 
+ * @fn Holder#create
+ * 
+ * @brief Makes an object to owner of its content.
+ * 
+ * @signature void create(holder[, object]);
+ * 
+ * @param[in,out] holder The Holder to create the object of.
+ * @param[in] object Object from which a copy is made and stored in
+ *                   &lt;tt&gt;holder&lt;/tt&gt;.
+ * 
+ * After this operation, &lt;tt&gt;holder&lt;/tt&gt; will be in state &#39;owner&#39;. If
+ * &lt;tt&gt;object&lt;/tt&gt; is specified, &lt;tt&gt;holder&lt;/tt&gt; will hold a copy of
+ * &lt;tt&gt;object&lt;/tt&gt; at the end of this function. If &lt;tt&gt;object&lt;/tt&gt; is not
+ * specified, the action depends on the former state of &lt;tt&gt;holder&lt;/tt&gt;:
+ * 
+ * &lt;ul&gt; &lt;li&gt;If the state of &lt;tt&gt;holder&lt;/tt&gt; was &#39;empty&#39;, a new object is default
+ * constructed and stored into &lt;tt&gt;holder&lt;/tt&gt;.&lt;/li&gt; &lt;li&gt;If the state of
+ * &lt;tt&gt;holder&lt;/tt&gt; was &#39;dependent&#39;, a copy of the former object is made and
+ * stored into &lt;tt&gt;holder&lt;/tt&gt;.&lt;/li&gt; &lt;li&gt;If the state of &lt;tt&gt;holder&lt;/tt&gt; was
+ * already &#39;owner&#39;, nothing happens.&lt;/li&gt; &lt;/ul&gt;
+ * 
+ * It is guaranteed, that after calling this function &lt;tt&gt;source&lt;/tt&gt; and
+ * &lt;tt&gt;target&lt;/tt&gt; can be used independently.
+ * 
+ * @fn Holder#detach
+ * 
+ * @brief Makes an object independent from other objects.
+ * 
+ * @signature void detach(holder);
+ * 
+ * @param[in,out] holder The Holder to detach.
+ * 
+ * @section Remarks
+ * 
+ * After this function, &lt;tt&gt;holder&lt;/tt&gt; does not depends from any other entity
+ * outside of &lt;tt&gt;holder&lt;/tt&gt;, like a source or a host, and dependent(holer)
+ * returns &lt;tt&gt;false&lt;/tt&gt;
+ * 
+ * @fn Holder#setValue
+ * 
+ * @brief Makes holder dependent.
+ * 
+ * @signature void setValue(holder, object);
+ * 
+ * @param[in,out] holder A holder object. Types: Holder
+ * @param[in] object Object from which &lt;tt&gt;holder&lt;/tt&gt; will be dependent.
+ * 
+ * After this operation, &lt;tt&gt;holder&lt;/tt&gt; will be dependent in state &#39;dependent&#39;.
+ * 
+ * @fn Holder#empty
+ * 
+ * @brief Test a Holder for being empty.
+ * 
+ * @signature bool empty(holder);
+ * 
+ * @param[in] holder A Holder.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;holder&lt;/tt&gt; contains no elements, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @section Remarks
+ * 
+ * &lt;tt&gt;empty(x)&lt;/tt&gt; is guaranteed to be at least as fast as &lt;tt&gt;length(me) ==
+ * 0&lt;/tt&gt;, but can be significantly faster in some cases.
+ * 
+ * @see HostedConcept#emptyHost
+ * 
+ * @fn Holder#assignValue
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Assigns value to item.
+ * 
+ * @signature void assignValue(object, value);
+ * 
+ * @param[in,out] object An object that holds a value or points to a value.
+ *                       Types: Holder, Iter Concepts:
+ *                       Concept.BasicOutputIteratorConcept
+ * @param[in] value A value that is assigned to the item &lt;tt&gt;object&lt;/tt&gt; holds
+ *                  or points to.
+ * 
+ * This function is similar to @link AssignableConcept#assign @endlink. The
+ * difference is, that &lt;tt&gt;assignValue&lt;/tt&gt; just changes a value stored in
+ * &lt;tt&gt;object&lt;/tt&gt; or the value &lt;tt&gt;object&lt;/tt&gt; points to, while @link
+ * AssignableConcept#assign @endlink changes the whole object.
+ * 
+ * If &lt;tt&gt;object&lt;/tt&gt; is a container (that is &lt;tt&gt;pos&lt;/tt&gt; is not specified),
+ * the whole content of &lt;tt&gt;object&lt;/tt&gt; is replaced by &lt;tt&gt;value&lt;/tt&gt;.
+ * 
+ * If &lt;tt&gt;value&lt;/tt&gt; is not used again after calling this function, then
+ * consider to use @link Holder#moveValue @endlink that could be faster in some
+ * cases instead.
+ * 
+ * @see AssignableConcept#assign
+ * @see Holder#moveValue
+ * 
+ * @fn Holder#clear
+ * 
+ * @brief Clear/destruct the Holder&#39;s value.
+ * 
+ * @signature void clear(holder);
+ * 
+ * @param[in,out] holder The Holder to clear.
+ * 
+ * @fn Holder#value
+ * 
+ * @brief Return a reference to the value of the holder.
+ * 
+ * @signature TReference value(holder);
+ * 
+ * @param[in] holder The Holder to query for its reference.
+ * 
+ * @return TReference The reference of the Holder&#39;s value.
+ * 
+ * @fn Holder#moveValue
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Move a value of into a holder.
+ * 
+ * @signature void moveValue(holder, value);
+ * 
+ * @param[in,out] holder The Holder to manipulate.
+ * @param[in,out] value The value to move into &lt;tt&gt;holder&lt;/tt&gt;.
+ * 
+ * @fn Holder#getValue
+ * 
+ * @brief Return the get-value of the holder.
+ * 
+ * @signature TGetValue getValue(holder);
+ * 
+ * @param[in] holder The Holder to query for its get-value type.
+ * 
+ * @return TGetValue The get-value of the Holder.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

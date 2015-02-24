@@ -1,0 +1,30 @@
+Adjacency list:
+0 -> 4,1,
+1 -> 5,0,
+2 -> 3,6,5,
+3 -> 7,6,2,
+4 -> 0,
+5 -> 6,2,1,
+6 -> 7,5,3,2,
+7 -> 6,3,
+Edge list:
+Source: 0,Target: 4 (Id: 1)
+Source: 0,Target: 1 (Id: 0)
+Source: 1,Target: 5 (Id: 2)
+Source: 2,Target: 3 (Id: 5)
+Source: 2,Target: 6 (Id: 4)
+Source: 2,Target: 5 (Id: 3)
+Source: 3,Target: 7 (Id: 7)
+Source: 3,Target: 6 (Id: 6)
+Source: 5,Target: 6 (Id: 8)
+Source: 6,Target: 7 (Id: 9)
+
+Breadth-First search: 
+Vertex r: Level = 1, Predecessor = s
+Vertex s: Level = 0, Predecessor = nil
+Vertex t: Level = 2, Predecessor = w
+Vertex u: Level = 3, Predecessor = x
+Vertex v: Level = 2, Predecessor = r
+Vertex w: Level = 1, Predecessor = s
+Vertex x: Level = 2, Predecessor = w
+Vertex y: Level = 3, Predecessor = x

@@ -1,0 +1,3290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_gaps" data-page="Gaps">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Gaps - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Gaps<div><div>Store the gapped version of a sequence.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_AnchorGaps.html" data-lang-entity="specialization">AnchorGaps</a>, 
+    <a href="specialization_ArrayGaps.html" data-lang-entity="specialization">ArrayGaps</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSequence, typename TSpec&gt;
+class Gaps;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSequence</a></code></th>
+        <td>The type of the underlying sequence.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Tag for specialization.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23assignSource" title="#Gaps#assignSource (interface function)" data-lang-entity="interface_function">void assignSource(gaps, seq);</a></code></span>
+    <span class="summary_desc"><div>Assign the source of a gaps object, copying data.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23beginPosition" title="#Gaps#beginPosition (interface function)" data-lang-entity="interface_function">TPos beginPosition(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return the clipping begin position as a source position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23clearClipping" title="#Gaps#clearClipping (interface function)" data-lang-entity="interface_function">void clearClipping(gaps);</a></code></span>
+    <span class="summary_desc"><div>Clear clipping from Gaps objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23clearGaps" title="#Gaps#clearGaps (interface function)" data-lang-entity="interface_function">void clearGaps(gaps);</a></code></span>
+    <span class="summary_desc"><div>Clear gaps from Gaps objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23clippedBeginPosition" title="#Gaps#clippedBeginPosition (interface function)" data-lang-entity="interface_function">TPos clippedBeginPosition(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return begin position of the clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23clippedEndPosition" title="#Gaps#clippedEndPosition (interface function)" data-lang-entity="interface_function">TPos clippedEndPosition(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return end position of the clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23clipSemiGlobal" title="#Gaps#clipSemiGlobal (interface function)" data-lang-entity="interface_function">void clipSemiGlobal(global, local);</a></code></span>
+    <span class="summary_desc"><div>Clip the Gaps objects to reflect a semi-global alignment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23copyClipping" title="#Gaps#copyClipping (interface function)" data-lang-entity="interface_function">void copyClipping(dest, source);</a></code></span>
+    <span class="summary_desc"><div>Copy clipping information from one Gaps object to another.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23copyGaps" title="#Gaps#copyGaps (interface function)" data-lang-entity="interface_function">void copyGaps(dest, source);</a></code></span>
+    <span class="summary_desc"><div>Copy gaps from one Gaps object to another (in the clipped view of both argumetns).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23countCharacters" title="#Gaps#countCharacters (interface function)" data-lang-entity="interface_function">TSize countCharacters(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>The number of characters following a position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23countGaps" title="#Gaps#countGaps (interface function)" data-lang-entity="interface_function">TSize countGaps(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>The number of gaps following a position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23countLeadingGaps" title="#Gaps#countLeadingGaps (interface function)" data-lang-entity="interface_function">TSize countLeadingGaps(gaps);</a></code></span>
+    <span class="summary_desc"><div>The number of leading gaps.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23countTrailingGaps" title="#Gaps#countTrailingGaps (interface function)" data-lang-entity="interface_function">TSize countTrailingGaps(gaps);</a></code></span>
+    <span class="summary_desc"><div>The number of trailing gaps.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23endPosition" title="#Gaps#endPosition (interface function)" data-lang-entity="interface_function">TPos endPosition(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return the clipping end position as a source position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23insertGap" title="#Gaps#insertGap (interface function)" data-lang-entity="interface_function">void insertGap(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>Insert one gap character.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23insertGaps" title="#Gaps#insertGaps (interface function)" data-lang-entity="interface_function">void insertGaps(gaps, viewPos, count);</a></code></span>
+    <span class="summary_desc"><div>Insert gap characters.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23isCharacer" title="#Gaps#isCharacer (interface function)" data-lang-entity="interface_function">bool isGap(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>Query positions in a Gaps object for being a character.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23isGap" title="#Gaps#isGap (interface function)" data-lang-entity="interface_function">bool isGap(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>Query positions in a Gaps object for being a gap.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23iter" title="#Gaps#iter (interface function)" data-lang-entity="interface_function">TIterator iter(gaps, viewPos[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Return an iterator to a specific position in the current clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23length" title="#Gaps#length (interface function)" data-lang-entity="interface_function">TSize length(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return number of gap and characters between the beginning and the end of the clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23removeGap" title="#Gaps#removeGap (interface function)" data-lang-entity="interface_function">TSize removeGap(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>Remove one gap from a Gaps object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23removeGaps" title="#Gaps#removeGaps (interface function)" data-lang-entity="interface_function">TSize removeGaps(gaps, viewPos, count);</a></code></span>
+    <span class="summary_desc"><div>Remove gaps from a Gaps object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23setBeginPosition" title="#Gaps#setBeginPosition (interface function)" data-lang-entity="interface_function">void setBeginPosition(gaps, sourcePos);</a></code></span>
+    <span class="summary_desc"><div>Set the begin position of the clipped gapped sequence, given a source position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23setClippedBeginPosition" title="#Gaps#setClippedBeginPosition (interface function)" data-lang-entity="interface_function">void setClippedBeginPosition(gaps, unclippedViewPos);</a></code></span>
+    <span class="summary_desc"><div>Set the begin position of the clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23setClippedEndPosition" title="#Gaps#setClippedEndPosition (interface function)" data-lang-entity="interface_function">void setClippedEndPosition(gaps, unclippedViewPos);</a></code></span>
+    <span class="summary_desc"><div>Set the end position of the clipping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23setEndPosition" title="#Gaps#setEndPosition (interface function)" data-lang-entity="interface_function">void setEndPosition(gaps, sourcePos);</a></code></span>
+    <span class="summary_desc"><div>Set the end position of the clipped gapped sequence, given a source position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23source" title="#Gaps#source (interface function)" data-lang-entity="interface_function">TSource source(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return underlying object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23toSourcePosition" title="#Gaps#toSourcePosition (interface function)" data-lang-entity="interface_function">TPos toSourcePosition(gaps, viewPos);</a></code></span>
+    <span class="summary_desc"><div>Conversion from view position (including gaps and clipping) to source (without gaps or clipping).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23toViewPosition" title="#Gaps#toViewPosition (interface function)" data-lang-entity="interface_function">TPos toViewPosition(gaps, sourcePos);</a></code></span>
+    <span class="summary_desc"><div>Conversion from source (without gaps or clipping) to view position (including gaps and clipping).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Gaps%23unclippedLength" title="#Gaps#unclippedLength (interface function)" data-lang-entity="interface_function">TSize unclippedLength(gaps);</a></code></span>
+    <span class="summary_desc"><div>Return length of the gapped sequence without clipping.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Gaps wrap a <a href="concept_ContainerConcept.html" data-lang-entity="concept">Sequence</a> and allows to (1) insert gaps into the sequence and (2) select
+an infix of the gapped sequence (clipping). The gaps are not inserted into the underlying sequence (source) but
+stored separately. Using the clipping is optional and meant for selecting parts of the alignment as a part of the
+result of a local alignment algorithm.</p><p><img src="img/gaps_illustration.png" title="Illustration of Gaps object and positions with clipping."></img></p><p>In the figure above, the source sequence has seven characters, the gapped sequence has four gaps and thus consists
+of eleven characters. The gapped sequence is clipped to start at position 0 in the gapped sequence and to end at
+position 8 in the gapped sequence (the positions given as half-open intervals <tt>[begin, end)</tt>).</p><p>The figure shows the three coordinate systems that are used with Gaps objects. The source position is the position
+in the underlying sequence. The unclipped view position is the position in the gapped sequence without gaps. The
+view position is the position in the gapped sequence but including the clipping: All (clipped) view positions have
+the clipping begin position subtracted from them.</p><h3>Examples</h3><p>The following example shows the construction of the gaps object from the image above together with some calls to
+<tt>toViewPosition</tt> and <tt>toSourcePosition</tt>.</p><div data-src-path="demos/align/gaps_example.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;  </span><span class="c1">// for printing Seqan strings</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Dna5String</span> <span class="n">seq</span> <span class="o">=</span> <span class="s">&quot;CGGTATC&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Construct the gaps object.</span>
+    <span class="n">Gaps</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="o">&gt;</span> <span class="n">gaps</span><span class="p">(</span><span class="n">seq</span><span class="p">);</span>
+
+    <span class="c1">// Insert gaps (view position, unclipped as of yet).  Note that inserting</span>
+    <span class="c1">// the gaps changes the coordinates.</span>
+    <span class="n">insertGap</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+    <span class="n">insertGap</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+    <span class="n">insertGaps</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="c1">// Clip the gaps object.  Note that the coordinates are in unclipped view position.</span>
+    <span class="n">setClippedBeginPosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">setClippedEndPosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+
+    <span class="c1">// Print the resulting gaps object and some coordinate transformation.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Resulting gaps: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">gaps</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;toSourcePosition(gaps, 0) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">toSourcePosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;toSourcePosition(gaps, 4) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">toSourcePosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;toViewPosition(gaps, 0) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">toViewPosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;toViewPosition(gaps, 5) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">toViewPosition</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/align/gaps_example.cpp" target="_top">demos/align/gaps_example.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/align/gaps_example.cpp.stdout">Distance from 0 to 0: 0
+Distance from 0 to 1: 8
+Distance from 0 to 2: 9
+Distance from 0 to 3: 5
+Distance from 0 to 4: 7
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Gaps#assignSource" class="signature first" data-lang-entity="interface_function">
+      <code>void assignSource(gaps, seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assign the source of a gaps object, copying data.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to assign the source of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The <a href="concept_ContainerConcept.html" data-lang-entity="concept">sequence</a> to assign to the underlying string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#beginPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos beginPosition(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the clipping begin position as a source position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The clipping begin position in the source (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>In the following gaps configuration, the result of <tt>beginPosition(gaps)</tt> is $1$. The clipping starts in a
+gap and the source position of the first non-gap character right of the clipping begin has source position 1.</p><pre class="code" data-src-path="None">clipping                   [     )
+  (half-open interval)
+
+gapped sequence:          X--XXX-XX-
+
+source position:          0111234456
+unclipped view position:  0123456789
+clipped view position:     0123456</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#clearClipping" class="signature" data-lang-entity="interface_function">
+      <code>void clearClipping(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear clipping from Gaps objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>Object to clear clipping from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#clearGaps" class="signature" data-lang-entity="interface_function">
+      <code>void clearGaps(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear gaps from Gaps objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>Object to clear gaps from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#clippedBeginPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos clippedBeginPosition(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return begin position of the clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The begin position of the unclipped view (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>In the following gaps configuration, the result of <tt>clippedBeginPosition(gaps)</tt> is 1.</p><pre class="code" data-src-path="None">clipping                   [     )
+  (half-open interval)
+
+gapped sequence:          X--XXX-XX-
+
+source position:          0111234456
+unclipped view position:  0123456789
+clipped view position:     0123456</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#clippedEndPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos clippedEndPosition(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return end position of the clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The end position of the unclipped view (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>In the following gaps configuration, the result of <tt>clippedEndPosition(gaps)</tt> is 7.</p><pre class="code" data-src-path="None">clipping                   [     )
+  (half-open interval)
+
+gapped sequence:          X--XXX-XX-
+
+source position:          0111234456
+unclipped view position:  0123456789
+clipped view position:     0123456</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#clipSemiGlobal" class="signature" data-lang-entity="interface_function">
+      <code>void clipSemiGlobal(global, local);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clip the Gaps objects to reflect a semi-global alignment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">global</code>
+            
+        
+      </th>
+      <td>The global Gaps object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">local</code>
+            
+        
+      </th>
+      <td>The local Gaps object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Leading and trailing gaps are clipped in the local Gaps object. The global Gaps object is updated accordingly.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#copyClipping" class="signature" data-lang-entity="interface_function">
+      <code>void copyClipping(dest, source);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Copy clipping information from one Gaps object to another.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">dest</code>
+            
+        
+      </th>
+      <td>The destination Gaps object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>The source Gaps object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#copyGaps" class="signature" data-lang-entity="interface_function">
+      <code>void copyGaps(dest, source);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Copy gaps from one Gaps object to another (in the clipped view of both argumetns).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">dest</code>
+            
+        
+      </th>
+      <td>The destination Gaps object (appropriate clipping, no gaps).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>The source Gaps object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The user is resposible for ensuring that the gaps are over sequences of same length and appropriate clipping.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#countCharacters" class="signature" data-lang-entity="interface_function">
+      <code>TSize countCharacters(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The number of characters following a position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>View position (including clipping and gaps) to query at.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of non-gaps characters characters at <tt>viewPos</tt> (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#countGaps" class="signature" data-lang-entity="interface_function">
+      <code>TSize countGaps(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The number of gaps following a position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>View position (including clipping and gaps) to query at.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of gap characters at <tt>viewPos</tt> (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#countLeadingGaps" class="signature" data-lang-entity="interface_function">
+      <code>TSize countLeadingGaps(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The number of leading gaps.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of leading gap characters (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#countTrailingGaps" class="signature" data-lang-entity="interface_function">
+      <code>TSize countTrailingGaps(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The number of trailing gaps.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of trailing gap characters (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#endPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos endPosition(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the clipping end position as a source position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query for the end position as a source position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The end position as a source position (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>In the following gaps configuration, the result of <tt>endPositioN(gaps)</tt> is 4.</p><pre class="code" data-src-path="None">clipping                   [     )
+  (half-open interval)
+
+gapped sequence:          X--XXX-XX-
+
+source position:          0111234456
+unclipped view position:  0123456789
+clipped view position:     0123456</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#insertGap" class="signature" data-lang-entity="interface_function">
+      <code>void insertGap(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Insert one gap character.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to insert gap into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view position (including clipping and gaps) to insert the gap at.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#insertGaps" class="signature" data-lang-entity="interface_function">
+      <code>void insertGaps(gaps, viewPos, count);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Insert gap characters.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to insert gaps into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view position (including clipping and gaps) to insert gaps at.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The number of gaps to insert.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#isCharacer" class="signature" data-lang-entity="interface_function">
+      <code>bool isGap(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query positions in a Gaps object for being a character.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view position (including clipping and gaps).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>The query result.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#isGap" class="signature" data-lang-entity="interface_function">
+      <code>bool isGap(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query positions in a Gaps object for being a gap.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view position (including clipping and gaps).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>The query result.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#iter" class="signature" data-lang-entity="interface_function">
+      <code>TIterator iter(gaps, viewPos[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return an iterator to a specific position in the current clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to get an iterator into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>View position to get an iterator to (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>An optional tag for selecting the iterator type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>The resulting iterator. The type is <tt>Iterator&lt;TGaps, TTag&gt;::Type</tt> where <tt>TTag</tt> is
+the type of <tt>tag</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return number of gap and characters between the beginning and the end of the clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> object to query for its length.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of gaps and characters between the beginning and the end of the clipping (Metafunction:
+<a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#removeGap" class="signature" data-lang-entity="interface_function">
+      <code>TSize removeGap(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove one gap from a Gaps object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The gaps object to remove one gap character from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view positions to remove one gap character from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of gap characters removed (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#removeGaps" class="signature" data-lang-entity="interface_function">
+      <code>TSize removeGaps(gaps, viewPos, count);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove gaps from a Gaps object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The gaps object to remove gap characters from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">viewPos</code>
+            
+        
+      </th>
+      <td>The view positions to remove gap characters from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The number of gap characters to remove.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of gap characters removed (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#setBeginPosition" class="signature" data-lang-entity="interface_function">
+      <code>void setBeginPosition(gaps, sourcePos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the begin position of the clipped gapped sequence, given a source position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to set the begin position in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sourcePos</code>
+            
+        
+      </th>
+      <td>Position in the underlying sequence to set clipping to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#setClippedBeginPosition" class="signature" data-lang-entity="interface_function">
+      <code>void setClippedBeginPosition(gaps, unclippedViewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the begin position of the clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to set the clipping begin position of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">unclippedViewPos</code>
+            
+        
+      </th>
+      <td>View position (including gaps but excluding clipping) to set the clipping begin to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#setClippedEndPosition" class="signature" data-lang-entity="interface_function">
+      <code>void setClippedEndPosition(gaps, unclippedViewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the end position of the clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to set the clipping end position of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">unclippedViewPos</code>
+            
+        
+      </th>
+      <td>View position (including gaps but excluding clipping) to set the clipping end to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#setEndPosition" class="signature" data-lang-entity="interface_function">
+      <code>void setEndPosition(gaps, sourcePos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the end position of the clipped gapped sequence, given a source position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to set the end position in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sourcePos</code>
+            
+        
+      </th>
+      <td>Position in the underlying sequence to set clipping to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#source" class="signature" data-lang-entity="interface_function">
+      <code>TSource source(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return underlying object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to return the underling sequence for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSource</code></th>
+        <td>Reference to the source of the Gaps.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#toSourcePosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos toSourcePosition(gaps, viewPos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Conversion from view position (including gaps and clipping) to source (without gaps or clipping).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The gaps object to use for translation.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sourcePos</code>
+            
+        
+      </th>
+      <td>The view position (including gaps and clipping) to translate.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The resulting position in the underlying sequence (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#toViewPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos toViewPosition(gaps, sourcePos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Conversion from source (without gaps or clipping) to view position (including gaps and clipping).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The gaps object to use for translation.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sourcePos</code>
+            
+        
+      </th>
+      <td>The source position (in the underlying sequence) to translate.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The resulting position in the view (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Gaps#unclippedLength" class="signature" data-lang-entity="interface_function">
+      <code>TSize unclippedLength(gaps);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return length of the gapped sequence without clipping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>The Gaps object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The result (Metafunction: <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Gaps
+ * 
+ * @implements ContainerConcept
+ * 
+ * @headerfile &lt;seqan/align.h&gt;
+ * 
+ * @brief Store the gapped version of a sequence.
+ * 
+ * @signature template &lt;typename TSequence, typename TSpec&gt; class Gaps;
+ * 
+ * @tparam TSequence The type of the underlying sequence.
+ * @tparam TSpec Tag for specialization.
+ * 
+ * Gaps wrap a @link ContainerConcept Sequence @endlink and allows to (1) insert
+ * gaps into the sequence and (2) select an infix of the gapped sequence
+ * (clipping). The gaps are not inserted into the underlying sequence (source)
+ * but stored separately. Using the clipping is optional and meant for selecting
+ * parts of the alignment as a part of the result of a local alignment
+ * algorithm.
+ * 
+ * &lt;img src=&#34;gaps_illustration.png&#34; title=&#34;Illustration of Gaps object and
+ * positions with clipping.&#34; /&gt;
+ * 
+ * In the figure above, the source sequence has seven characters, the gapped
+ * sequence has four gaps and thus consists of eleven characters. The gapped
+ * sequence is clipped to start at position 0 in the gapped sequence and to end
+ * at position 8 in the gapped sequence (the positions given as half-open
+ * intervals &lt;tt&gt;[begin, end)&lt;/tt&gt;).
+ * 
+ * The figure shows the three coordinate systems that are used with Gaps
+ * objects. The source position is the position in the underlying sequence. The
+ * unclipped view position is the position in the gapped sequence without gaps.
+ * The view position is the position in the gapped sequence but including the
+ * clipping: All (clipped) view positions have the clipping begin position
+ * subtracted from them.
+ * 
+ * @section Examples
+ * 
+ * The following example shows the construction of the gaps object from the
+ * image above together with some calls to &lt;tt&gt;toViewPosition&lt;/tt&gt; and
+ * &lt;tt&gt;toSourcePosition&lt;/tt&gt;.
+ * 
+ * @include demos/align/gaps_example.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/align/gaps_example.cpp.stdout
+ * 
+ * 
+ * 
+ * @fn Gaps#iter
+ * 
+ * @brief Return an iterator to a specific position in the current clipping.
+ * 
+ * @signature TIterator iter(gaps, viewPos[, tag]);
+ * 
+ * @param[in] gaps The Gaps object to get an iterator into.
+ * @param[in] viewPos View position to get an iterator to (Metafunction: @link
+ *                    ContainerConcept#Position @endlink).
+ * @param[in] tag An optional tag for selecting the iterator type.
+ * 
+ * @return TIterator The resulting iterator. The type is &lt;tt&gt;Iterator&lt;TGaps,
+ *                   TTag&gt;::Type&lt;/tt&gt; where &lt;tt&gt;TTag&lt;/tt&gt; is the type of
+ *                   &lt;tt&gt;tag&lt;/tt&gt;.
+ * 
+ * @fn Gaps#clearClipping
+ * 
+ * @brief Clear clipping from Gaps objects.
+ * 
+ * @signature void clearClipping(gaps);
+ * 
+ * @param[in,out] gaps Object to clear clipping from.
+ * 
+ * @fn Gaps#clearGaps
+ * 
+ * @brief Clear gaps from Gaps objects.
+ * 
+ * @signature void clearGaps(gaps);
+ * 
+ * @param[in,out] gaps Object to clear gaps from.
+ * 
+ * @fn Gaps#length
+ * 
+ * @brief Return number of gap and characters between the beginning and the end
+ *        of the clipping.
+ * 
+ * @signature TSize length(gaps);
+ * 
+ * @param[in] gaps The @link Gaps @endlink object to query for its length.
+ * 
+ * @return TSize The number of gaps and characters between the beginning and the
+ *               end of the clipping (Metafunction: @link ContainerConcept#Size
+ *               @endlink).
+ * 
+ * @fn Gaps#unclippedLength
+ * 
+ * @brief Return length of the gapped sequence without clipping.
+ * 
+ * @signature TSize unclippedLength(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TSize The result (Metafunction: @link ContainerConcept#Size
+ *               @endlink).
+ * 
+ * @fn Gaps#toViewPosition
+ * 
+ * @brief Conversion from source (without gaps or clipping) to view position
+ *        (including gaps and clipping).
+ * 
+ * @signature TPos toViewPosition(gaps, sourcePos);
+ * 
+ * @param[in] gaps The gaps object to use for translation.
+ * @param[in] sourcePos The source position (in the underlying sequence) to
+ *                      translate.
+ * 
+ * @return TPos The resulting position in the view (Metafunction: @link
+ *              ContainerConcept#Position @endlink).
+ * 
+ * @fn Gaps#toSourcePosition
+ * 
+ * @brief Conversion from view position (including gaps and clipping) to source
+ *        (without gaps or clipping).
+ * 
+ * @signature TPos toSourcePosition(gaps, viewPos);
+ * 
+ * @param[in] gaps The gaps object to use for translation.
+ * @param[in] sourcePos The view position (including gaps and clipping) to
+ *                      translate.
+ * 
+ * @return TPos The resulting position in the underlying sequence (Metafunction:
+ *              @link ContainerConcept#Position @endlink).
+ * 
+ * @fn Gaps#isGap
+ * 
+ * @brief Query positions in a Gaps object for being a gap.
+ * 
+ * @signature bool isGap(gaps, viewPos);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * @param[in] viewPos The view position (including clipping and gaps).
+ * 
+ * @return bool The query result.
+ * 
+ * @fn Gaps#isCharacer
+ * 
+ * @brief Query positions in a Gaps object for being a character.
+ * 
+ * @signature bool isGap(gaps, viewPos);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * @param[in] viewPos The view position (including clipping and gaps).
+ * 
+ * @return bool The query result.
+ * 
+ * @fn Gaps#insertGaps
+ * 
+ * @brief Insert gap characters.
+ * 
+ * @signature void insertGaps(gaps, viewPos, count);
+ * 
+ * @param[in,out] gaps The Gaps object to insert gaps into.
+ * @param[in] viewPos The view position (including clipping and gaps) to insert
+ *                    gaps at.
+ * @param[in] count The number of gaps to insert.
+ * 
+ * @fn Gaps#insertGap
+ * 
+ * @brief Insert one gap character.
+ * 
+ * @signature void insertGap(gaps, viewPos);
+ * 
+ * @param[in,out] gaps The Gaps object to insert gap into.
+ * @param[in] viewPos The view position (including clipping and gaps) to insert
+ *                    the gap at.
+ * 
+ * @fn Gaps#removeGaps
+ * 
+ * @brief Remove gaps from a Gaps object.
+ * 
+ * @signature TSize removeGaps(gaps, viewPos, count);
+ * 
+ * @param[in,out] gaps The gaps object to remove gap characters from.
+ * @param[in] viewPos The view positions to remove gap characters from.
+ * @param[in] count The number of gap characters to remove.
+ * 
+ * @return TSize The number of gap characters removed (Metafunction: @link
+ *               ContainerConcept#Size @endlink).
+ * 
+ * @fn Gaps#removeGap
+ * 
+ * @brief Remove one gap from a Gaps object.
+ * 
+ * @signature TSize removeGap(gaps, viewPos);
+ * 
+ * @param[in,out] gaps The gaps object to remove one gap character from.
+ * @param[in] viewPos The view positions to remove one gap character from.
+ * 
+ * @return TSize The number of gap characters removed (Metafunction: @link
+ *               ContainerConcept#Size @endlink).
+ * 
+ * @fn Gaps#countGaps
+ * 
+ * @brief The number of gaps following a position.
+ * 
+ * @signature TSize countGaps(gaps, viewPos);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * @param[in] viewPos View position (including clipping and gaps) to query at.
+ * 
+ * @return TSize The number of gap characters at &lt;tt&gt;viewPos&lt;/tt&gt; (Metafunction:
+ *               @link ContainerConcept#Size @endlink).
+ * 
+ * @fn Gaps#countLeadingGaps
+ * 
+ * @brief The number of leading gaps.
+ * 
+ * @signature TSize countLeadingGaps(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TSize The number of leading gap characters (Metafunction: @link
+ *               ContainerConcept#Size @endlink).
+ * 
+ * @fn Gaps#countTrailingGaps
+ * 
+ * @brief The number of trailing gaps.
+ * 
+ * @signature TSize countTrailingGaps(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TSize The number of trailing gap characters (Metafunction: @link
+ *               ContainerConcept#Size @endlink).
+ * 
+ * @fn Gaps#countCharacters
+ * 
+ * @brief The number of characters following a position.
+ * 
+ * @signature TSize countCharacters(gaps, viewPos);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * @param[in] viewPos View position (including clipping and gaps) to query at.
+ * 
+ * @return TSize The number of non-gaps characters characters at
+ *               &lt;tt&gt;viewPos&lt;/tt&gt; (Metafunction: @link ContainerConcept#Size
+ *               @endlink).
+ * 
+ * @fn Gaps#setClippedBeginPosition
+ * 
+ * @brief Set the begin position of the clipping.
+ * 
+ * @signature void setClippedBeginPosition(gaps, unclippedViewPos);
+ * 
+ * @param[in,out] gaps The Gaps object to set the clipping begin position of.
+ * @param[in] unclippedViewPos View position (including gaps but excluding
+ *                             clipping) to set the clipping begin to.
+ * 
+ * @fn Gaps#setClippedEndPosition
+ * 
+ * @brief Set the end position of the clipping.
+ * 
+ * @signature void setClippedEndPosition(gaps, unclippedViewPos);
+ * 
+ * @param[in,out] gaps The Gaps object to set the clipping end position of.
+ * @param[in] unclippedViewPos View position (including gaps but excluding
+ *                             clipping) to set the clipping end to.
+ * 
+ * @fn Gaps#clippedBeginPosition
+ * 
+ * @brief Return begin position of the clipping.
+ * 
+ * @signature TPos clippedBeginPosition(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TPos The begin position of the unclipped view (Metafunction: @link
+ *              ContainerConcept#Position @endlink).
+ * 
+ * @section Example
+ * 
+ * In the following gaps configuration, the result of
+ * &lt;tt&gt;clippedBeginPosition(gaps)&lt;/tt&gt; is 1.
+ * 
+ * @code{.txt}
+ * clipping                   [     )
+ *   (half-open interval)
+ * 
+ * gapped sequence:          X--XXX-XX-
+ * 
+ * source position:          0111234456
+ * unclipped view position:  0123456789
+ * clipped view position:     0123456
+ * @endcode
+ * 
+ * 
+ * @fn Gaps#clippedEndPosition
+ * 
+ * @brief Return end position of the clipping.
+ * 
+ * @signature TPos clippedEndPosition(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TPos The end position of the unclipped view (Metafunction: @link
+ *              ContainerConcept#Position @endlink).
+ * 
+ * @section Example
+ * 
+ * In the following gaps configuration, the result of
+ * &lt;tt&gt;clippedEndPosition(gaps)&lt;/tt&gt; is 7.
+ * 
+ * @code{.txt}
+ * clipping                   [     )
+ *   (half-open interval)
+ * 
+ * gapped sequence:          X--XXX-XX-
+ * 
+ * source position:          0111234456
+ * unclipped view position:  0123456789
+ * clipped view position:     0123456
+ * @endcode
+ * 
+ * 
+ * @fn Gaps#setBeginPosition
+ * 
+ * @brief Set the begin position of the clipped gapped sequence, given a source
+ *        position.
+ * 
+ * @signature void setBeginPosition(gaps, sourcePos);
+ * 
+ * @param[in,out] gaps The Gaps object to set the begin position in.
+ * @param[in] sourcePos Position in the underlying sequence to set clipping to.
+ * 
+ * @fn Gaps#setEndPosition
+ * 
+ * @brief Set the end position of the clipped gapped sequence, given a source
+ *        position.
+ * 
+ * @signature void setEndPosition(gaps, sourcePos);
+ * 
+ * @param[in,out] gaps The Gaps object to set the end position in.
+ * @param[in] sourcePos Position in the underlying sequence to set clipping to.
+ * 
+ * @fn Gaps#beginPosition
+ * 
+ * @brief Return the clipping begin position as a source position.
+ * 
+ * @signature TPos beginPosition(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query.
+ * 
+ * @return TPos The clipping begin position in the source (Metafunction: @link
+ *              ContainerConcept#Position @endlink).
+ * 
+ * @section Example
+ * 
+ * In the following gaps configuration, the result of
+ * &lt;tt&gt;beginPosition(gaps)&lt;/tt&gt; is $1$. The clipping starts in a gap and the
+ * source position of the first non-gap character right of the clipping begin
+ * has source position 1.
+ * 
+ * @code{.txt}
+ * clipping                   [     )
+ *   (half-open interval)
+ * 
+ * gapped sequence:          X--XXX-XX-
+ * 
+ * source position:          0111234456
+ * unclipped view position:  0123456789
+ * clipped view position:     0123456
+ * @endcode
+ * 
+ * 
+ * @fn Gaps#endPosition
+ * 
+ * @brief Return the clipping end position as a source position.
+ * 
+ * @signature TPos endPosition(gaps);
+ * 
+ * @param[in] gaps The Gaps object to query for the end position as a source
+ *                 position.
+ * 
+ * @return TPos The end position as a source position (Metafunction: @link
+ *              ContainerConcept#Position @endlink).
+ * 
+ * @section Example
+ * 
+ * In the following gaps configuration, the result of &lt;tt&gt;endPositioN(gaps)&lt;/tt&gt;
+ * is 4.
+ * 
+ * @code{.txt}
+ * clipping                   [     )
+ *   (half-open interval)
+ * 
+ * gapped sequence:          X--XXX-XX-
+ * 
+ * source position:          0111234456
+ * unclipped view position:  0123456789
+ * clipped view position:     0123456
+ * @endcode
+ * 
+ * 
+ * @fn Gaps#source
+ * 
+ * @brief Return underlying object.
+ * 
+ * @signature TSource source(gaps);
+ * 
+ * @param[in] gaps The Gaps object to return the underling sequence for.
+ * 
+ * @return TSource Reference to the source of the Gaps.
+ * 
+ * @fn Gaps#assignSource
+ * 
+ * @brief Assign the source of a gaps object, copying data.
+ * 
+ * @signature void assignSource(gaps, seq);
+ * 
+ * @param[in,out] gaps The Gaps object to assign the source of.
+ * @param[in] seq The @link ContainerConcept sequence @endlink to assign to the
+ *                underlying string.
+ * 
+ * @fn Gaps#copyGaps
+ * 
+ * @brief Copy gaps from one Gaps object to another (in the clipped view of both
+ *        argumetns).
+ * 
+ * @signature void copyGaps(dest, source);
+ * 
+ * @param[in,out] dest The destination Gaps object (appropriate clipping, no
+ *                     gaps).
+ * @param[in] source The source Gaps object.
+ * 
+ * The user is resposible for ensuring that the gaps are over sequences of same
+ * length and appropriate clipping.
+ * 
+ * @fn Gaps#copyClipping
+ * 
+ * @brief Copy clipping information from one Gaps object to another.
+ * 
+ * @signature void copyClipping(dest, source);
+ * 
+ * @param[in,out] dest The destination Gaps object.
+ * @param[in] source The source Gaps object.
+ * 
+ * @fn Gaps#clipSemiGlobal
+ * 
+ * @brief Clip the Gaps objects to reflect a semi-global alignment.
+ * 
+ * @signature void clipSemiGlobal(global, local);
+ * 
+ * @param[in,out] global The global Gaps object.
+ * @param[in,out] local The local Gaps object.
+ * 
+ * Leading and trailing gaps are clipped in the local Gaps object. The global
+ * Gaps object is updated accordingly.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

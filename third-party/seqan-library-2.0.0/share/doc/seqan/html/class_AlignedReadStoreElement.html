@@ -1,0 +1,903 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_alignedreadstoreelement" data-page="AlignedReadStoreElement">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>AlignedReadStoreElement - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>AlignedReadStoreElement<div><div>Represents an alignment of a read to a contig.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/store.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TPos, typename TGapAnchors[, typename TSpec]&gt;
+struct AlignedReadStoreElement;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TPos</a></code></th>
+        <td>The position type to use.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TGapAnchors</a></code></th>
+        <td>Type of a read <a href="class_GapAnchor.html" data-lang-entity="class">GapAnchor</a>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <tt>void</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AAlignedReadStoreElement" title="#AlignedReadStoreElement::AlignedReadStoreElement (interface function)" data-lang-entity="member_function">AlignedReadStoreElement::AlignedReadStoreElement();, AlignedReadStoreElement::AlignedReadStoreElement(id, readId, contigId, beginPos, endPos[, gaps]);</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+
+
+<div data-lang-entity-container="member_typedef">
+<h2 data-lang-entity="member_typedef">Member Typedef Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3ATGapAnchors" title="#AlignedReadStoreElement::TGapAnchors (member typedef)" data-lang-entity="member_typedef">typedef (..) TAlignedReadStoreElement::TGapAnchors;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::gaps" data-lang-entity="member_variable">gaps</a> member.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3ATId" title="#AlignedReadStoreElement::TId (member typedef)" data-lang-entity="member_typedef">typedef (..) TAlignedReadStoreElement::TId;</a></code></span>
+    <span class="summary_desc"><div>Type of all store ids.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3ATPos" title="#AlignedReadStoreElement::TPos (member typedef)" data-lang-entity="member_typedef">typedef (..) TAlignedReadStoreElement::TPos;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::beginPos" data-lang-entity="member_variable">beginPos</a> and <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::endPos" data-lang-entity="member_variable">endPos</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3ATSpec" title="#AlignedReadStoreElement::TSpec (member typedef)" data-lang-entity="member_typedef">typedef (..) TAlignedReadStoreElement::TSpec;</a></code></span>
+    <span class="summary_desc"><div>The specializing type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AbeginPos" title="#AlignedReadStoreElement::beginPos (interface function)" data-lang-entity="member_variable">
+        TPos AlignedReadStoreElement::beginPos
+    </a></code></span>
+    <span class="summary_desc"><div>Begin position in gap-space.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AcontigId" title="#AlignedReadStoreElement::contigId (interface function)" data-lang-entity="member_variable">
+        TId AlignedReadStoreElement::contigId
+    </a></code></span>
+    <span class="summary_desc"><div>Refers to the contig in the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> that the read is aligned with.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AendPos" title="#AlignedReadStoreElement::endPos (interface function)" data-lang-entity="member_variable">
+        TPos AlignedReadStoreElement::endPos
+    </a></code></span>
+    <span class="summary_desc"><div>End position in gap-space.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3Agaps" title="#AlignedReadStoreElement::gaps (interface function)" data-lang-entity="member_variable">
+        TGaps AlignedReadStoreElement::gaps
+    </a></code></span>
+    <span class="summary_desc"><div>String of read <a href="class_GapAnchor.html" data-lang-entity="class">GapAnchor</a> objects. Can be used to create a <a href="specialization_AnchorGaps.html" data-lang-entity="specialization">AnchorGaps</a>
+alignment row.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3Aid" title="#AlignedReadStoreElement::id (interface function)" data-lang-entity="member_variable">
+        TId AlignedReadStoreElement::id
+    </a></code></span>
+    <span class="summary_desc"><div>The alignment id refers to associated alignment information in <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> or <a href="class_FragmentStore.html#FragmentStore::alignedReadTagStore" data-lang-entity="member_variable">alignedReadTagStore</a>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AINVALID_ID" title="#AlignedReadStoreElement::INVALID_ID (interface function)" data-lang-entity="member_variable">
+        TId AlignedReadStoreElement::INVALID_ID
+    </a></code></span>
+    <span class="summary_desc"><div>Constant expression that is the value of an invalid id.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3ApairMatchId" title="#AlignedReadStoreElement::pairMatchId (interface function)" data-lang-entity="member_variable">
+        TId AlignedReadStoreElement::pairMatchId
+    </a></code></span>
+    <span class="summary_desc"><div>Two read alignments having the same pairMatchId form a valid pair match. If it equals <tt>INVALID_ID</tt>
+then the read is either not paired or could not be aligned as part of a pair.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AlignedReadStoreElement%3A%3AreadId" title="#AlignedReadStoreElement::readId (interface function)" data-lang-entity="member_variable">
+        TId AlignedReadStoreElement::readId
+    </a></code></span>
+    <span class="summary_desc"><div>Refers to the aligned read in <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Value type of the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>. In contrast to all other <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> stores, the <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::id" data-lang-entity="member_variable">id</a> of an aligned read is explicitely stored as a member
+to allow for reordering the <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a> and still recover the id.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::AlignedReadStoreElement" class="signature first" data-lang-entity="member_function">
+      <code>AlignedReadStoreElement::AlignedReadStoreElement();
+AlignedReadStoreElement::AlignedReadStoreElement(id, readId, contigId, beginPos, endPos[, gaps]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The alignment id refers to associated alignment information in <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> or <a href="class_FragmentStore.html#FragmentStore::alignedReadTagStore" data-lang-entity="member_variable">alignedReadTagStore</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">readId</code>
+            
+        
+      </th>
+      <td>Refers to the aligned read in the <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigID</code>
+            
+        
+      </th>
+      <td>Refers to the contig in the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> the read is aligned to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPos</code>
+            
+        
+      </th>
+      <td>Begin position of the alignment in gap-space.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">endPos</code>
+            
+        
+      </th>
+      <td>End position of the alignment in gap-space.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">gaps</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> of <a href="class_GapAnchor.html" data-lang-entity="class">GapAnchor</a> objects.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The default constructors sets all ids to <tt>AlignedReadStoreElement::INVALID_ID</tt> and <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::beginPos" data-lang-entity="member_variable">beginPos</a> and <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::endPos" data-lang-entity="member_variable">endPos</a> to 0.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+<div class="member_typedef_defails" data-lang-entity-container="member_typedef">
+  <h2 data-lang-entity="member_typedef">Member Typedef Detail</h2>
+
+  
+      <div class="method_details first">
+        <h3 data-toc="hidden" id="AlignedReadStoreElement::TGapAnchors" class="signature first" data-lang-entity="member_typedef">
+          <code>typedef (..) TAlignedReadStoreElement::TGapAnchors;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::gaps" data-lang-entity="member_variable">gaps</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="AlignedReadStoreElement::TId" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TAlignedReadStoreElement::TId;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of all store ids.</div>
+          
+<div><p><tt>TId</tt> is the result of <tt>Id&lg;AlignedReadStoreElement&lgt;&gt; &gt;::Type</tt>, see <a href="global_metafunction_Id.html" data-lang-entity="global_metafunction">Id</a>.</p></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="AlignedReadStoreElement::TPos" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TAlignedReadStoreElement::TPos;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::beginPos" data-lang-entity="member_variable">beginPos</a> and <a href="class_AlignedReadStoreElement.html#AlignedReadStoreElement::endPos" data-lang-entity="member_variable">endPos</a>.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="AlignedReadStoreElement::TSpec" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (..) TAlignedReadStoreElement::TSpec;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>The specializing type.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+  
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::beginPos" class="signature first" data-lang-entity="member_variable">
+      <code>TPos AlignedReadStoreElement::beginPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Begin position in gap-space.</div>
+        
+<div><p>If beginPos &lt; endPos then the read is aligned to the reverse strand where beginPos and endPos are the
+corresponding positions on the forward strand.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::contigId" class="signature" data-lang-entity="member_variable">
+      <code>TId AlignedReadStoreElement::contigId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Refers to the contig in the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> that the read is aligned with.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::endPos" class="signature" data-lang-entity="member_variable">
+      <code>TPos AlignedReadStoreElement::endPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>End position in gap-space.</div>
+        
+<div><p>If beginPos &lt; endPos then the read is aligned to the reverse strand where beginPos and endPos are the
+corresponding positions on the forward strand.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::gaps" class="signature" data-lang-entity="member_variable">
+      <code>TGaps AlignedReadStoreElement::gaps</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>String of read <a href="class_GapAnchor.html" data-lang-entity="class">GapAnchor</a> objects. Can be used to create a <a href="specialization_AnchorGaps.html" data-lang-entity="specialization">AnchorGaps</a>
+alignment row.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::id" class="signature" data-lang-entity="member_variable">
+      <code>TId AlignedReadStoreElement::id</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The alignment id refers to associated alignment information in <a href="class_FragmentStore.html#FragmentStore::alignQualityStore" data-lang-entity="member_variable">alignQualityStore</a> or <a href="class_FragmentStore.html#FragmentStore::alignedReadTagStore" data-lang-entity="member_variable">alignedReadTagStore</a>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::INVALID_ID" class="signature" data-lang-entity="member_variable">
+      <code>TId AlignedReadStoreElement::INVALID_ID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Constant expression that is the value of an invalid id.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::pairMatchId" class="signature" data-lang-entity="member_variable">
+      <code>TId AlignedReadStoreElement::pairMatchId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Two read alignments having the same pairMatchId form a valid pair match. If it equals <tt>INVALID_ID</tt>
+then the read is either not paired or could not be aligned as part of a pair.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AlignedReadStoreElement::readId" class="signature" data-lang-entity="member_variable">
+      <code>TId AlignedReadStoreElement::readId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Refers to the aligned read in <a href="class_FragmentStore.html#FragmentStore::readStore" data-lang-entity="member_variable">readStore</a>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class AlignedReadStoreElement
+ * 
+ * @headerfile &lt;seqan/store.h&gt;
+ * 
+ * @brief Represents an alignment of a read to a contig.
+ * 
+ * @signature template &lt;typename TPos, typename TGapAnchors[, typename TSpec]&gt;
+ *            struct AlignedReadStoreElement;
+ * 
+ * @tparam TPos The position type to use.
+ * @tparam TGapAnchors Type of a read @link GapAnchor @endlink.
+ * @tparam TSpec The specializing type. Default: &lt;tt&gt;void&lt;/tt&gt;.
+ * 
+ * Value type of the @link FragmentStore::alignedReadStore @endlink. In contrast
+ * to all other @link FragmentStore @endlink stores, the @link
+ * AlignedReadStoreElement::id @endlink of an aligned read is explicitely stored
+ * as a member to allow for reordering the @link FragmentStore::alignedReadStore
+ * @endlink and still recover the id.
+ * 
+ * @fn AlignedReadStoreElement::AlignedReadStoreElement
+ * 
+ * @brief Constructor.
+ * 
+ * @signature AlignedReadStoreElement::AlignedReadStoreElement();
+ * @signature AlignedReadStoreElement::AlignedReadStoreElement(id, readId,
+ *            contigId, beginPos, endPos[, gaps]);
+ * 
+ * @param[in] id The alignment id refers to associated alignment information in
+ *               @link FragmentStore::alignQualityStore @endlink or @link
+ *               FragmentStore::alignedReadTagStore @endlink.
+ * @param[in] readId Refers to the aligned read in the @link
+ *                   FragmentStore::readStore @endlink.
+ * @param[in] contigID Refers to the contig in the @link
+ *                     FragmentStore::contigStore @endlink the read is aligned
+ *                     to.
+ * @param[in] beginPos Begin position of the alignment in gap-space.
+ * @param[in] endPos End position of the alignment in gap-space.
+ * @param[in] gaps A @link String @endlink of @link GapAnchor @endlink objects.
+ * 
+ * The default constructors sets all ids to
+ * &lt;tt&gt;AlignedReadStoreElement::INVALID_ID&lt;/tt&gt; and @link
+ * AlignedReadStoreElement::beginPos @endlink and @link
+ * AlignedReadStoreElement::endPos @endlink to 0.
+ * 
+ * @typedef AlignedReadStoreElement::TId
+ * 
+ * @brief Type of all store ids.
+ * 
+ * @signature typedef (..) TAlignedReadStoreElement::TId;
+ * 
+ * &lt;tt&gt;TId&lt;/tt&gt; is the result of &lt;tt&gt;Id&amp;lg;AlignedReadStoreElement&amp;lgt;&amp;gt;
+ * &amp;gt;::Type&lt;/tt&gt;, see @link Id @endlink.
+ * 
+ * @typedef AlignedReadStoreElement::TPos
+ * 
+ * @brief Type of the @link AlignedReadStoreElement::beginPos @endlink and @link
+ *        AlignedReadStoreElement::endPos @endlink.
+ * 
+ * @signature typedef (..) TAlignedReadStoreElement::TPos;
+ * 
+ * @typedef AlignedReadStoreElement::TGapAnchors
+ * 
+ * @brief Type of the @link AlignedReadStoreElement::gaps @endlink member.
+ * 
+ * @signature typedef (..) TAlignedReadStoreElement::TGapAnchors;
+ * 
+ * @typedef AlignedReadStoreElement::TSpec
+ * 
+ * @brief The specializing type.
+ * 
+ * @signature typedef (..) TAlignedReadStoreElement::TSpec;
+ * 
+ * @var TId AlignedReadStoreElement::INVALID_ID;
+ * 
+ * @brief Constant expression that is the value of an invalid id.
+ * 
+ * @var TId AlignedReadStoreElement::id;
+ * 
+ * @brief The alignment id refers to associated alignment information in @link
+ *        FragmentStore::alignQualityStore @endlink or @link
+ *        FragmentStore::alignedReadTagStore @endlink.
+ * 
+ * @var TId AlignedReadStoreElement::readId;
+ * 
+ * @brief Refers to the aligned read in @link FragmentStore::readStore @endlink.
+ * 
+ * @var TId AlignedReadStoreElement::contigId;
+ * 
+ * @brief Refers to the contig in the @link FragmentStore::contigStore @endlink
+ *        that the read is aligned with.
+ * 
+ * @var TId AlignedReadStoreElement::pairMatchId;
+ * 
+ * @brief Two read alignments having the same pairMatchId form a valid pair
+ *        match. If it equals &lt;tt&gt;INVALID_ID&lt;/tt&gt; then the read is either not
+ *        paired or could not be aligned as part of a pair.
+ * 
+ * @var TPos AlignedReadStoreElement::beginPos;
+ * 
+ * @brief Begin position in gap-space.
+ * 
+ * If beginPos &amp;lt; endPos then the read is aligned to the reverse strand where
+ * beginPos and endPos are the corresponding positions on the forward strand.
+ * 
+ * @var TPos AlignedReadStoreElement::endPos;
+ * 
+ * @brief End position in gap-space.
+ * 
+ * If beginPos &amp;lt; endPos then the read is aligned to the reverse strand where
+ * beginPos and endPos are the corresponding positions on the forward strand.
+ * 
+ * @var TGaps AlignedReadStoreElement::gaps;
+ * 
+ * @brief String of read @link GapAnchor @endlink objects. Can be used to create
+ *        a @link AnchorGaps @endlink alignment row.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,556 @@
+/* ===========================================================================
+ * Main Page Structure
+ * ===========================================================================
+ */
+
+body
+{
+    background: #F6F6F1;
+    font: 13px/1.428 "Lucida Grande", "Lucida Sans Unicode", Lucida, Arial, Helvetica, sans-serif;
+    color: #333;
+    padding: 20px 10px 14px 10px;
+}
+
+div.banner div.cat_type
+{
+    margin-left: 17px;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+div.banner
+{
+    background: url(../i/seqan_logo.png) no-repeat right top;
+    padding-bottom: 20px;
+    margin-right: 5px;
+    margin-top: -10px;
+    padding-top: 10px;
+}
+
+div.banner h1.first
+{
+    margin: -3px 0px 0px 16px;
+    font-weight: bold;
+}
+
+div.content
+{
+    background: white;
+}
+
+div.boxed
+{
+    padding: 18px;
+    margin: 0px 4px 26px 0px;
+    border: 1px solid #ECECE7;
+    -moz-box-shadow: 2px 2px 0 rgba(170,160,130,.5), 4px 4px 0 rgba(200,190,165,.5);
+    -webkit-box-shadow: 2px 2px 0 rgba(170,160,130,.5), 4px 4px 0 rgba(200,190,165,.5);
+    box-shadow: 2px 2px 0 rgba(170,160,130,.5), 4px 4px 0 rgba(200,190,165,.5);
+}
+
+#footer {
+    text-align: right;
+    font-size: .8em;
+    color: #aaa;
+}
+
+/* ===========================================================================
+ * Overview Section
+ * ===========================================================================
+ */
+
+
+/* Overview Box */
+.overview {
+    border-spacing: 2px;
+    margin: 1em 0px;
+}
+
+/* Overview Caption */
+.overview h2 {
+    background: #CCCCFF;
+    padding: 2px;
+    border: 2px solid gray;
+    border-bottom: 0px;
+    margin: 0px;
+}
+
+/* Overview Content */
+.overview table, .inherited table
+{
+    border: 0px;
+    width: 100%;
+    boder-collapse: collapse;
+    border: 2px solid gray;
+}
+
+.overview td
+{
+    padding: 2px;
+    border: 2px solid gray;
+}
+
+table .return_type
+{
+    width: 80px;
+}
+
+.signature, .highlight
+{
+    background: #EDF3FE;
+    padding-left: 5px;
+    margin: 1em 0px;
+    /*border-top: 1px solid #999;
+    border-bottom: 1px solid #999;*/
+}
+
+.inherited h3
+{
+    font-size: 1.2em;
+    background: #EEEEFF;
+    padding: 2px;
+    border: 2px solid gray;
+    border-bottom: 0px;
+    margin: 0px;
+}
+
+.inherited td
+{
+    padding: 2px;
+}
+
+/* ===========================================================================
+ * Detail Boxes
+ * ===========================================================================
+ */
+
+.details h2
+{
+    background: #CCCCFF;
+    padding: 2px;
+    border: 2px solid gray;
+    margin: 1em 0px;
+}
+
+.details .brief
+{
+}
+
+.tparams table, .params table, .returns table,
+.tparams table td, .params table td, .returns table td
+{
+    border: 2px solid gray;
+}
+
+.tparams table td, .params table td, .returns table td
+{
+    padding: 2px;
+}
+
+.details > dl > dt, .inheritance > dl > dt
+{
+    font-weight: bolder;
+}
+
+.details > dl > dd, .inheritance > dl > dd
+{
+    margin-left: 2em;
+}
+
+/* ===========================================================================
+ * Page Elements
+ * ===========================================================================
+ */
+
+div.contents
+{
+    float: right;
+    border: 5px solid white;
+    background: #F0F0F0;
+    padding: 5px;
+}
+
+div.contents_heading
+{
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+div.section table,
+div.section div.list,
+div.section p
+{
+    margin-bottom: 18px;
+}
+
+div.remark,
+div.values,
+div.metafunctions,
+div.types,
+div.inherited,
+div.default
+{
+    margin-top: 2px;
+}
+
+pre.console
+{
+    background-color: rgba(0, 0, 0, 0.85);
+    font-weight: 600;
+    color: lightgray;
+    margin-left: 6%;
+    margin-right: 6%;
+}
+
+/* ===========================================================================
+ * Standard HTML Elements
+ * ===========================================================================
+ */
+
+h2, h3
+{
+    /*font-family: Georgia, Times, 'Times New Roman', serif;*/
+    font: 14px/1.428 "Lucida Grande", "Lucida Sans Unicode", Lucida, Arial, Helvetica, sans-serif;
+    border-bottom: 1px solid gray;
+}
+
+sup
+{
+    font-size: .7em;
+    vertical-align: top;
+}
+
+sup a
+{
+    vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 { font-weight: bold; margin: 0 0 .8em; }
+h1, .page-title h1 { font-size: 1.857em; }
+h2 { font-size: 1.600em; }
+h3 { font-size: 1.428em; }
+h4 { font-size: 1.142em; }
+h5, h6 { font-size: 1em; }
+
+a.error
+{
+    color: red;
+}
+
+a, a:visited, a:active
+{
+    color: #blue;
+    text-decoration: underline;
+}
+
+div.contents a,
+div.contents a:visited,
+div.contents a:active
+{
+    color: #551A8B;
+}
+
+a:hover
+{
+    text-decoration: underline;
+}
+
+.hierarchy_section
+{
+    text-align:center;
+}
+
+.section table td
+{
+    padding: 3px;
+}
+
+.section table th
+{
+    font-weight: bolder;
+    padding: 3px;
+    background: #EEE;
+    border: 1px solid #999;
+}
+
+.section table td.signature
+{
+    width: 15em;
+}
+/*
+.section table tr.even td {
+    background-color: #ccc;
+}
+*/
+
+.cat_type {
+    font-size: .75em;
+}
+
+a.dead {
+    font-weight: boldest;
+    color: darkred;
+}
+
+ul, ol {
+    margin-left: 2em;
+}
+
+ul li {
+    list-style-type: disc;
+}
+
+ol li {
+    list-style-type: decimal;
+}
+
+/* Nifty paragraph effect, taken from Trac. */
+a.anchor:link, a.anchor:visited { color: #eee; }
+h1 a.anchor, h2 a.anchor, h3 a.anchor { visibility: hidden; }
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor { visibility: visible; }
+a.anchor { font-size: .8em; vertical-align: text-top; }
+
+.abstract { font-weight: bolder; }
+
+/* ===========================================================================
+ * Permalink
+ * ===========================================================================
+ */
+
+#footer a,
+#footer a:active,
+#footer a:hover,
+#footer a:visited
+{
+    padding-top: 0px;
+    padding-left: 20px;
+    padding-right: 10px;
+    background: url(../i/link.png) no-repeat left center;
+
+    color: #999;
+    text-decoration: none;
+}
+
+div#permalink-div
+{
+    display:block;
+    position: absolute;
+    right: 0px;
+    top: 20px;
+    width: 258px;
+    display: none;
+    padding: 4px;
+    border: 1px solid black;
+    background: #EDF3FE;
+}
+
+div#permalink-div input
+{
+    width: 250px;
+}
+
+/* ===========================================================================
+ * Tables
+ * ===========================================================================
+ */
+
+div.section table
+{
+    width: 100%;
+}
+
+div.section table td
+{
+    padding: 5px;
+    border: 1px solid #999;
+}
+
+div.section table td p
+{
+    margin: 0px;
+}
+
+/* ===========================================================================
+ * File Sections
+ * ===========================================================================
+ *
+ * The source code is wrapped into tables.  We treat <p> in these sections
+ * differently because file_sections do not have the CSS class section.
+ */
+
+table.highlighttable,
+div.file_section p
+{
+    margin-bottom: 10px;
+}
+
+.file_section pre
+{
+    padding: 5px;
+}
+
+.file_section .highlight pre
+{
+    background: #EDF3FE;
+    padding-left: 5px;
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+}
+
+/* ===========================================================================
+ * Text Formatting
+ * ===========================================================================
+ */
+
+div.image
+{
+    text-align: center;
+    margin: 10px 0px;
+}
+
+/* ===========================================================================
+ * Examples
+ * ===========================================================================
+ */
+
+div.example table td
+{
+    padding: 0px !important;
+    border: none !important;
+}
+
+div.example p
+{
+    margin-bottom: 10px;
+}
+
+.example pre
+{
+    padding: 5px;
+}
+
+.example .highlight pre
+{
+    background: #EDF3FE;
+    padding-left: 5px;
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+}
+
+.signature_section pre/*,
+.example pre*/
+{
+  padding: 6px 11px 7px 11px;
+  /*background-color: #EDF3FE;*/
+  margin-bottom: 18px;
+  /*margin: 0 12px 10px 12px;*/
+}
+
+.signature_section pre
+{
+  border: 1px solid #999;
+}
+
+/*
+.example pre
+{
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999;
+}
+*/
+
+/* ===========================================================================
+ * Nicer Integration Of pygments Output In Page
+ * ===========================================================================
+ */
+
+table.highlighttable
+{
+    width:100%;
+}
+
+td.linenos
+{
+    width: 5.5%;
+    padding-right: .5%;
+}
+
+div.linenodiv
+{
+    text-align: right;
+}
+
+div.highlight
+{
+    padding-left: 1%;
+    width: 93%;
+}
+
+/* ===========================================================================
+ * Source Code Highlighting
+ * ===========================================================================
+ */
+
+/*.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #EDF3FE; }*/
+.highlight .c { color: #0099FF; font-style: italic } /* Comment */
+.highlight .err { color: #AA0000; background-color: #FFAAAA } /* Error */
+.highlight .k { color: #006699; font-weight: bold } /* Keyword */
+.highlight .o { color: #555555 } /* Operator */
+.highlight .cm { color: #0099FF; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #009999 } /* Comment.Preproc */
+.highlight .c1 { color: #0099FF; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #0099FF; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { background-color: #FFCCCC; border: 1px solid #CC0000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #003300; font-weight: bold } /* Generic.Heading */
+.highlight .gi { background-color: #CCFFCC; border: 1px solid #00CC00 } /* Generic.Inserted */
+.highlight .go { color: #AAAAAA } /* Generic.Output */
+.highlight .gp { color: #000099; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #003300; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #99CC66 } /* Generic.Traceback */
+.highlight .kc { color: #006699; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #006699; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #006699; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #006699 } /* Keyword.Pseudo */
+.highlight .kr { color: #006699; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #007788; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #FF6600 } /* Literal.Number */
+.highlight .s { color: #CC3300 } /* Literal.String */
+.highlight .na { color: #330099 } /* Name.Attribute */
+.highlight .nb { color: #336666 } /* Name.Builtin */
+.highlight .nc { color: #00AA88; font-weight: bold } /* Name.Class */
+.highlight .no { color: #336600 } /* Name.Constant */
+.highlight .nd { color: #9999FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CC0000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #CC00FF } /* Name.Function */
+.highlight .nl { color: #9999FF } /* Name.Label */
+.highlight .nn { color: #00CCFF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #330099; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #003333 } /* Name.Variable */
+.highlight .ow { color: #000000; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #FF6600 } /* Literal.Number.Float */
+.highlight .mh { color: #FF6600 } /* Literal.Number.Hex */
+.highlight .mi { color: #FF6600 } /* Literal.Number.Integer */
+.highlight .mo { color: #FF6600 } /* Literal.Number.Oct */
+.highlight .sb { color: #CC3300 } /* Literal.String.Backtick */
+.highlight .sc { color: #CC3300 } /* Literal.String.Char */
+.highlight .sd { color: #CC3300; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #CC3300 } /* Literal.String.Double */
+.highlight .se { color: #CC3300; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #CC3300 } /* Literal.String.Heredoc */
+.highlight .si { color: #AA0000 } /* Literal.String.Interpol */
+.highlight .sx { color: #CC3300 } /* Literal.String.Other */
+.highlight .sr { color: #33AAAA } /* Literal.String.Regex */
+.highlight .s1 { color: #CC3300 } /* Literal.String.Single */
+.highlight .ss { color: #FFCC33 } /* Literal.String.Symbol */
+.highlight .bp { color: #336666 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #003333 } /* Name.Variable.Class */
+.highlight .vg { color: #003333 } /* Name.Variable.Global */
+.highlight .vi { color: #003333 } /* Name.Variable.Instance */
+.highlight .il { color: #FF6600 } /* Literal.Number.Integer.Long */

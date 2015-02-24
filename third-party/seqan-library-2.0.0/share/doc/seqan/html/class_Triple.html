@@ -1,0 +1,1638 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_triple" data-page="Triple">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Triple - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Triple<div><div>Store three arbitrary object.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a>, 
+    <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_PackedTriple.html" data-lang-entity="specialization">PackedTriple</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a>, 
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>, 
+    <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename T1, typename T3, typename T3[, typename TSpec]&gt;
+class Triple;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T1</a></code></th>
+        <td>Type of first object.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T2</a></code></th>
+        <td>Type of second object.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T3</a></code></th>
+        <td>Type of third object.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Tag for specialization (Default: <tt>void</tt>).</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%3A%3ATriple" title="#Triple::Triple (interface function)" data-lang-entity="member_function">Triple::Triple(), Triple::Triple(other), Triple::Triple(x1, x2, x3)</a></code></span>
+    <span class="summary_desc"><div>Default and copy construction and construction with three objects.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept::operator>" data-lang-entity="member_function">operator&gt;</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator!=" data-lang-entity="member_function">operator!=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator==" data-lang-entity="member_function">operator==</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_LessThanComparableConcept.html#LessThanComparableConcept::operator<" data-lang-entity="member_function">operator&lt;</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23assignValueI1" title="#Triple#assignValueI1 (interface function)" data-lang-entity="interface_function">void assignValueI1(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set first entry of a triple.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23assignValueI2" title="#Triple#assignValueI2 (interface function)" data-lang-entity="interface_function">void assignValueI2(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set second entry of a triple.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23assignValueI3" title="#Triple#assignValueI3 (interface function)" data-lang-entity="interface_function">void assignValueI3(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set third entry of a triple.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23getValueI1" title="#Triple#getValueI1 (interface function)" data-lang-entity="interface_function">T1 getValue(triple);</a></code></span>
+    <span class="summary_desc"><div>The get-value of the Triple's first entry.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23getValueI2" title="#Triple#getValueI2 (interface function)" data-lang-entity="interface_function">T2 getValue(triple);</a></code></span>
+    <span class="summary_desc"><div>The get-value of the Triple's second entry.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23getValueI3" title="#Triple#getValueI3 (interface function)" data-lang-entity="interface_function">T3 getValue(triple);</a></code></span>
+    <span class="summary_desc"><div>The get-value of the Triple's third entry.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23setValueI1" title="#Triple#setValueI1 (interface function)" data-lang-entity="interface_function">void setValueI1(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set first entry of a triple.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23setValueI2" title="#Triple#setValueI2 (interface function)" data-lang-entity="interface_function">void setValueI2(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set second entry of a triple.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23setValueI3" title="#Triple#setValueI3 (interface function)" data-lang-entity="interface_function">void setValueI3(triple, val);</a></code></span>
+    <span class="summary_desc"><div>Set third entry of a triple.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator<=" data-lang-entity="interface_function">operator&lt;=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator>=" data-lang-entity="interface_function">operator&gt;=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23LENGTH" title="#Triple#LENGTH (interface function)" data-lang-entity="interface_metafunction">LENGTH&lt;TTriple&gt;::VALUE</a></code></span>
+    <span class="summary_desc"><div>Return (only type-depending) length of a triple: 3.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23Spec" title="#Triple#Spec (interface function)" data-lang-entity="interface_metafunction">Spec&lt;TTriple&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return specialization tag.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Triple%23Value" title="#Triple#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TTriple, I&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return i<sup>th</sup> type of the triple.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#Triple%3A%3Ai1" title="#Triple::i1 (interface function)" data-lang-entity="member_variable">
+        T1 Triple::i1
+    </a></code></span>
+    <span class="summary_desc"><div>First value of triple.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#Triple%3A%3Ai2" title="#Triple::i2 (interface function)" data-lang-entity="member_variable">
+        T2 Triple::i2
+    </a></code></span>
+    <span class="summary_desc"><div>Second value of triple.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#Triple%3A%3Ai3" title="#Triple::i3 (interface function)" data-lang-entity="member_variable">
+        T3 Triple::i3
+    </a></code></span>
+    <span class="summary_desc"><div>Third value of triple.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Triple::Triple" class="signature first" data-lang-entity="member_function">
+      <code>Triple::Triple()
+Triple::Triple(other)
+Triple::Triple(x1, x2, x3)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Default and copy construction and construction with three objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>Other Triple object to copy from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x1</code>
+            
+        
+      </th>
+      <td>First object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x2</code>
+            
+        
+      </th>
+      <td>Second object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x3</code>
+            
+        
+      </th>
+      <td>Third object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>x1</tt> must be convertible to T1, <tt>x2</tt> to T2, <tt>x3</tt> to T3. For example, a Triple of three
+<tt>int</tt> values can be constructed with three <tt>double</tt> values.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Triple#assignValueI1" class="signature first" data-lang-entity="interface_function">
+      <code>void assignValueI1(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set first entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's first entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#assignValueI2" class="signature" data-lang-entity="interface_function">
+      <code>void assignValueI2(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set second entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's second entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#assignValueI3" class="signature" data-lang-entity="interface_function">
+      <code>void assignValueI3(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set third entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's third entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#getValueI1" class="signature" data-lang-entity="interface_function">
+      <code>T1 getValue(triple);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The get-value of the Triple's first entry.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T1</code></th>
+        <td>The first entry of the Triple.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#getValueI2" class="signature" data-lang-entity="interface_function">
+      <code>T2 getValue(triple);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The get-value of the Triple's second entry.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T2</code></th>
+        <td>The second entry of the Triple.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#getValueI3" class="signature" data-lang-entity="interface_function">
+      <code>T3 getValue(triple);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The get-value of the Triple's third entry.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T3</code></th>
+        <td>The third entry of the Triple.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#setValueI1" class="signature" data-lang-entity="interface_function">
+      <code>void setValueI1(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set first entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's first entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#setValueI2" class="signature" data-lang-entity="interface_function">
+      <code>void setValueI2(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set second entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's second entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Triple#setValueI3" class="signature" data-lang-entity="interface_function">
+      <code>void setValueI3(triple, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set third entry of a triple.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">triple</code>
+            
+        
+      </th>
+      <td>The triple to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Triple's third entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Triple#LENGTH" class="signature first" data-lang-entity="interface_metafunction">
+    <code>LENGTH&lt;TTriple&gt;::VALUE</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return (only type-depending) length of a triple: 3.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TTriple</code></th>
+            <td>The Triple specialization to get the length of.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Length of the triple (always 3).</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Triple#Spec" class="signature" data-lang-entity="interface_metafunction">
+    <code>Spec&lt;TTriple&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return specialization tag.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TTriple</code></th>
+            <td>The Triple specialization to query for the specialization tag.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The specialization type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Triple#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TTriple, I&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return i<sup>th</sup> type of the triple.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TTriple</code></th>
+            <td>The Triple to return the <tt>I</tt>-th value of.</td>
+        </tr>
+    
+        <tr>
+            <th><code>I</code></th>
+            <td>The index of the value to return, one of 1, 2, or 3.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="Triple::i1" class="signature first" data-lang-entity="member_variable">
+      <code>T1 Triple::i1</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>First value of triple.</div>
+        
+<div><p>signature T1 Triple::i1;</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="Triple::i2" class="signature" data-lang-entity="member_variable">
+      <code>T2 Triple::i2</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Second value of triple.</div>
+        
+<div><p>signature T2 Triple::i2;</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="Triple::i3" class="signature" data-lang-entity="member_variable">
+      <code>T3 Triple::i3</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Third value of triple.</div>
+        
+<div><p>signature T3 Triple::i3;</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Triple
+ * 
+ * @implements ComparableConcept
+ * @implements LessThanComparableConcept
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Store three arbitrary object.
+ * 
+ * @signature template &lt;typename T1, typename T3, typename T3[, typename TSpec]&gt;
+ *            class Triple;
+ * 
+ * @tparam T1 Type of first object.
+ * @tparam T2 Type of second object.
+ * @tparam T3 Type of third object.
+ * @tparam TSpec Tag for specialization (Default: &lt;tt&gt;void&lt;/tt&gt;).
+ * 
+ * @mfn Triple#LENGTH
+ * 
+ * @brief Return (only type-depending) length of a triple: 3.
+ * 
+ * @signature LENGTH&lt;TTriple&gt;::VALUE
+ * 
+ * @tparam TTriple The Triple specialization to get the length of.
+ * 
+ * @return VALUE Length of the triple (always 3).
+ * 
+ * @mfn Triple#Value
+ * 
+ * @brief Return i&lt;sup&gt;th&lt;/sup&gt; type of the triple.
+ * 
+ * @signature Value&lt;TTriple, I&gt;::Type;
+ * 
+ * @tparam TTriple The Triple to return the &lt;tt&gt;I&lt;/tt&gt;-th value of.
+ * @tparam I The index of the value to return, one of 1, 2, or 3.
+ * 
+ * @mfn Triple#Spec
+ * 
+ * @brief Return specialization tag.
+ * 
+ * @signature Spec&lt;TTriple&gt;::Type;
+ * 
+ * @tparam TTriple The Triple specialization to query for the specialization
+ *                 tag.
+ * 
+ * @return Type The specialization type.
+ * 
+ * @fn Triple::Triple
+ * 
+ * @brief Default and copy construction and construction with three objects.
+ * 
+ * @signature Triple::Triple()
+ * @signature Triple::Triple(other)
+ * @signature Triple::Triple(x1, x2, x3)
+ * 
+ * @param[in] other Other Triple object to copy from.
+ * @param[in] x1 First object.
+ * @param[in] x2 Second object.
+ * @param[in] x3 Third object.
+ * 
+ * &lt;tt&gt;x1&lt;/tt&gt; must be convertible to T1, &lt;tt&gt;x2&lt;/tt&gt; to T2, &lt;tt&gt;x3&lt;/tt&gt; to T3.
+ * For example, a Triple of three &lt;tt&gt;int&lt;/tt&gt; values can be constructed with
+ * three &lt;tt&gt;double&lt;/tt&gt; values.
+ * 
+ * @var T1 Triple::i1;
+ * 
+ * @brief First value of triple.
+ * 
+ * signature T1 Triple::i1;
+ * 
+ * @var T2 Triple::i2;
+ * 
+ * @brief Second value of triple.
+ * 
+ * signature T2 Triple::i2;
+ * 
+ * @var T3 Triple::i3;
+ * 
+ * @brief Third value of triple.
+ * 
+ * signature T3 Triple::i3;
+ * 
+ * @fn Triple#getValueI1
+ * 
+ * @brief The get-value of the Triple&#39;s first entry.
+ * 
+ * @signature T1 getValue(triple);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * 
+ * @return T1 The first entry of the Triple.
+ * 
+ * @fn Triple#getValueI2
+ * 
+ * @brief The get-value of the Triple&#39;s second entry.
+ * 
+ * @signature T2 getValue(triple);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * 
+ * @return T2 The second entry of the Triple.
+ * 
+ * @fn Triple#getValueI3
+ * 
+ * @brief The get-value of the Triple&#39;s third entry.
+ * 
+ * @signature T3 getValue(triple);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * 
+ * @return T3 The third entry of the Triple.
+ * 
+ * @fn Triple#assignValueI1
+ * 
+ * @brief Set first entry of a triple.
+ * 
+ * @signature void assignValueI1(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s first entry.
+ * 
+ * @fn Triple#assignValueI2
+ * 
+ * @brief Set second entry of a triple.
+ * 
+ * @signature void assignValueI2(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s second entry.
+ * 
+ * @fn Triple#assignValueI3
+ * 
+ * @brief Set third entry of a triple.
+ * 
+ * @signature void assignValueI3(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s third entry.
+ * 
+ * @fn Triple#setValueI1
+ * 
+ * @brief Set first entry of a triple.
+ * 
+ * @signature void setValueI1(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s first entry.
+ * 
+ * @fn Triple#setValueI2
+ * 
+ * @brief Set second entry of a triple.
+ * 
+ * @signature void setValueI2(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s second entry.
+ * 
+ * @fn Triple#setValueI3
+ * 
+ * @brief Set third entry of a triple.
+ * 
+ * @signature void setValueI3(triple, val);
+ * 
+ * @param[in] triple The triple to get entry from.
+ * @param[in] val Set the value of the Triple&#39;s third entry.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

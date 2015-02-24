@@ -22,19 +22,17 @@ namespace read_parsers
 {
 
 struct SeqAnParser::Handle {
-    seqan::SequenceStream stream;
+    seqan::SeqFileIn file;
     uint32_t seqan_spin_lock;
 };
 
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
-    _private = new SeqAnParser::Handle();
-    seqan::open(_private->stream, filename);
-    if (!seqan::isGood(_private->stream)) {
-        std::string message = "Could not open ";
+    if (!seqan::open(_private->file, filename)) {
+	std::string message = "Could not open ";
         message = message + filename + " for reading.";
         throw InvalidStreamHandle(message.c_str());
-    } else if (seqan::atEnd(_private->stream)) {
+    } else if (seqan::atEnd(_private->file)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
         throw InvalidStreamHandle(message.c_str());
@@ -45,57 +43,27 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 
 bool SeqAnParser::is_complete()
 {
-    return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
+    return seqan::atEnd(_private->file);
 }
 
 void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
-    int ret = -1;
-    const char *invalid_read_exc = NULL;
-    while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
-    bool atEnd = seqan::atEnd(_private->stream);
-    if (!atEnd) {
-        ret = seqan::readRecord(the_read.name, the_read.sequence,
-                                the_read.quality, _private->stream);
-        if (ret == 0) {
-            // Detect if we're parsing something w/ qualities on the first read
-            // only
-            if (_num_reads == 0 && the_read.quality.length() != 0) {
-                _have_qualities = true;
-            }
-
-            // Handle error cases, or increment number of reads on success
-            if (the_read.sequence.length() == 0) {
-                invalid_read_exc = "Sequence is empty";
-            } else if (_have_qualities && (the_read.sequence.length() != \
-                                           the_read.quality.length())) {
-                invalid_read_exc = "Sequence and quality lengths differ";
-            } else {
-                _num_reads++;
-            }
-        }
-    }
-    __asm__ __volatile__ ("" ::: "memory");
-    _private->seqan_spin_lock = 0;
-    // Throw any error in the read, even if we're at the end
-    if (invalid_read_exc != NULL) {
-        throw InvalidRead(invalid_read_exc);
-    }
-    // Throw NoMoreReadsAvailable if none of the above errors were raised, even
-    // if ret == 0
-    if (atEnd) {
+    if (seqan::atEnd(_private->file)) {
         throw NoMoreReadsAvailable();
     }
-    // Catch-all error in readRecord that isn't one of the above
-    if (ret != 0) {
-        throw StreamReadError();
+    else {
+        while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
+	seqan::readRecord(the_read.name, the_read.sequence, the_read.quality,
+		_private->file);
+        __asm__ __volatile__ ("" ::: "memory");
+        _private->seqan_spin_lock = 0;
     }
 }
 
 SeqAnParser::~SeqAnParser()
 {
-    seqan::close(_private->stream);
+    seqan::close(_private->file);
     delete _private;
 }
 

@@ -1,0 +1,1341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_pair" data-page="Pair">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Pair - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Pair<div><div>Store two arbitrary objects.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_BitPackedPair.html" data-lang-entity="specialization">BitPackedPair</a>, 
+    <a href="specialization_PackedPair.html" data-lang-entity="specialization">PackedPair</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a>, 
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>, 
+    <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename T1, typename T2, typename TSpec&gt;
+class Pair;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T1</a></code></th>
+        <td>The type of the first member.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T2</a></code></th>
+        <td>The type of the second member.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Tag used for the specialization.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept::operator>" data-lang-entity="member_function">operator&gt;</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator!=" data-lang-entity="member_function">operator!=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator==" data-lang-entity="member_function">operator==</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_LessThanComparableConcept.html#LessThanComparableConcept::operator<" data-lang-entity="member_function">operator&lt;</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23assignValueI1" title="#Pair#assignValueI1 (interface function)" data-lang-entity="interface_function">void assignValueI1(pair, val);</a></code></span>
+    <span class="summary_desc"><div>Set first entry of a pair.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23assignValueI2" title="#Pair#assignValueI2 (interface function)" data-lang-entity="interface_function">void assignValueI2(pair, val);</a></code></span>
+    <span class="summary_desc"><div>Set second entry of a pair.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23getValueI1" title="#Pair#getValueI1 (interface function)" data-lang-entity="interface_function">T1 getValueI1(pair);</a></code></span>
+    <span class="summary_desc"><div>The get-value of the Pair's first entry.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23getValueI2" title="#Pair#getValueI2 (interface function)" data-lang-entity="interface_function">T2 getValueI2(pair);</a></code></span>
+    <span class="summary_desc"><div>The get-value of the Pair's second entry.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23Pair" title="#Pair#Pair (interface function)" data-lang-entity="interface_function">Pair::Pair();, Pair::Pair(other);, Pair::Pair(x1, x2);</a></code></span>
+    <span class="summary_desc"><div>Default and copy construction and construction for two values.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23setValueI1" title="#Pair#setValueI1 (interface function)" data-lang-entity="interface_function">void setValueI1(pair, val);</a></code></span>
+    <span class="summary_desc"><div>Set first entry of a pair.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23setValueI2" title="#Pair#setValueI2 (interface function)" data-lang-entity="interface_function">void setValueI2(pair, val);</a></code></span>
+    <span class="summary_desc"><div>Set second entry of a pair.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator<=" data-lang-entity="interface_function">operator&lt;=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator>=" data-lang-entity="interface_function">operator&gt;=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23LENGTH" title="#Pair#LENGTH (interface function)" data-lang-entity="interface_metafunction">LENGTH&lt;TPair&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Return number of members in a Pair (2).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23Spec" title="#Pair#Spec (interface function)" data-lang-entity="interface_metafunction">Spec&lt;TPair&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return specialization tag.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pair%23Value" title="#Pair#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TTuple, I&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return type of the i-th value.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#Pair%3A%3Ai1" title="#Pair::i1 (interface function)" data-lang-entity="member_variable">
+        T1 Pair::i1
+    </a></code></span>
+    <span class="summary_desc"><div>First member</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#Pair%3A%3Ai2" title="#Pair::i2 (interface function)" data-lang-entity="member_variable">
+        T2 Pair::i2
+    </a></code></span>
+    <span class="summary_desc"><div>Second member</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Pair#assignValueI1" class="signature first" data-lang-entity="interface_function">
+      <code>void assignValueI1(pair, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set first entry of a pair.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Pair's first entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#assignValueI2" class="signature" data-lang-entity="interface_function">
+      <code>void assignValueI2(pair, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set second entry of a pair.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Pair's second entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#getValueI1" class="signature" data-lang-entity="interface_function">
+      <code>T1 getValueI1(pair);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The get-value of the Pair's first entry.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T1</code></th>
+        <td>The first entry of the Pair.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#getValueI2" class="signature" data-lang-entity="interface_function">
+      <code>T2 getValueI2(pair);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The get-value of the Pair's second entry.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>T2</code></th>
+        <td>The second entry of the Pair.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#Pair" class="signature" data-lang-entity="interface_function">
+      <code>Pair::Pair();
+Pair::Pair(other);
+Pair::Pair(x1, x2);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Default and copy construction and construction for two values.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>The other Pair object to copy from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x1</code>
+            
+        
+      </th>
+      <td>Copied to first member.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x2</code>
+            
+        
+      </th>
+      <td>Copied to second member</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#setValueI1" class="signature" data-lang-entity="interface_function">
+      <code>void setValueI1(pair, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set first entry of a pair.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Pair's first entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pair#setValueI2" class="signature" data-lang-entity="interface_function">
+      <code>void setValueI2(pair, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set second entry of a pair.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pair</code>
+            
+        
+      </th>
+      <td>The pair to get entry from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Set the value of the Pair's second entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Pair#LENGTH" class="signature first" data-lang-entity="interface_metafunction">
+    <code>LENGTH&lt;TPair&gt;::VALUE;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return number of members in a Pair (2).</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPair</code></th>
+            <td>The Pair specialization.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>The number of element in a Pair (2).</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pair#Spec" class="signature" data-lang-entity="interface_metafunction">
+    <code>Spec&lt;TPair&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return specialization tag.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPair</code></th>
+            <td>The Pair specialization.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pair#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TTuple, I&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return type of the i-th value.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TTuple</code></th>
+            <td>Tuple specialization to get the type of.</td>
+        </tr>
+    
+        <tr>
+            <th><code>I</code></th>
+            <td>The index of the member to get (1 or 2).</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Result type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="Pair::i1" class="signature first" data-lang-entity="member_variable">
+      <code>T1 Pair::i1</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>First member</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="Pair::i2" class="signature" data-lang-entity="member_variable">
+      <code>T2 Pair::i2</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Second member</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Pair
+ * 
+ * @implements ComparableConcept
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Store two arbitrary objects.
+ * 
+ * @signature template &lt;typename T1, typename T2, typename TSpec&gt; class Pair;
+ * 
+ * @tparam T1 The type of the first member.
+ * @tparam T2 The type of the second member.
+ * @tparam TSpec Tag used for the specialization.
+ * 
+ * @mfn Pair#LENGTH
+ * 
+ * @brief Return number of members in a Pair (2).
+ * 
+ * @signature LENGTH&lt;TPair&gt;::VALUE;
+ * 
+ * @tparam TPair The Pair specialization.
+ * 
+ * @return VALUE The number of element in a Pair (2).
+ * 
+ * @mfn Pair#Value
+ * 
+ * @brief Return type of the i-th value.
+ * 
+ * @signature Value&lt;TTuple, I&gt;::Type;
+ * 
+ * @tparam TTuple Tuple specialization to get the type of.
+ * @tparam I The index of the member to get (1 or 2).
+ * 
+ * @return Type Result type.
+ * 
+ * @mfn Pair#Spec
+ * 
+ * @brief Return specialization tag.
+ * 
+ * @signature Spec&lt;TPair&gt;::Type;
+ * 
+ * @tparam TPair The Pair specialization.
+ * 
+ * @return Type The resulting type.
+ * 
+ * @var T1 Pair::i1;
+ * 
+ * @brief First member
+ * 
+ * @var T2 Pair::i2;
+ * 
+ * @brief Second member
+ * 
+ * @fn Pair#Pair
+ * 
+ * @brief Default and copy construction and construction for two values.
+ * 
+ * @signature Pair::Pair();
+ * @signature Pair::Pair(other);
+ * @signature Pair::Pair(x1, x2);
+ * 
+ * @param[in] other The other Pair object to copy from.
+ * @param[in] x1 Copied to first member.
+ * @param[in] x2 Copied to second member
+ * 
+ * @fn Pair#getValueI1
+ * 
+ * @brief The get-value of the Pair&#39;s first entry.
+ * 
+ * @signature T1 getValueI1(pair);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * 
+ * @return T1 The first entry of the Pair.
+ * 
+ * @fn Pair#getValueI2
+ * 
+ * @brief The get-value of the Pair&#39;s second entry.
+ * 
+ * @signature T2 getValueI2(pair);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * 
+ * @return T2 The second entry of the Pair.
+ * 
+ * @fn Pair#assignValueI1
+ * 
+ * @brief Set first entry of a pair.
+ * 
+ * @signature void assignValueI1(pair, val);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * @param[in] val Set the value of the Pair&#39;s first entry.
+ * 
+ * @fn Pair#assignValueI2
+ * 
+ * @brief Set second entry of a pair.
+ * 
+ * @signature void assignValueI2(pair, val);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * @param[in] val Set the value of the Pair&#39;s second entry.
+ * 
+ * @fn Pair#setValueI1
+ * 
+ * @brief Set first entry of a pair.
+ * 
+ * @signature void setValueI1(pair, val);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * @param[in] val Set the value of the Pair&#39;s first entry.
+ * 
+ * @fn Pair#setValueI2
+ * 
+ * @brief Set second entry of a pair.
+ * 
+ * @signature void setValueI2(pair, val);
+ * 
+ * @param[in] pair The pair to get entry from.
+ * @param[in] val Set the value of the Pair&#39;s second entry.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

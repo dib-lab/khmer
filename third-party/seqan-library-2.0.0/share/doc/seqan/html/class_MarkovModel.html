@@ -1,0 +1,1050 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_markovmodel" data-page="MarkovModel">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>MarkovModel - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>MarkovModel<div><div>Gives a suitable representation of a Marcov Chain.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/statistics.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TAlphabet[, typename TFloat[, typename TSpec]]&gt;
+class MarkovModel;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TAlphabet</a></code></th>
+        <td>The type of the underlying alphabet.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TFloat</a></code></th>
+        <td>The type for storing counts, default is <tt>double</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Tag for specialization.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Abuild" title="#MarkovModel::build (interface function)" data-lang-entity="member_function">void MarkovModel::build(stringSet);</a></code></span>
+    <span class="summary_desc"><div>Compute the transition matrix from a training set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3AemittedProbability" title="#MarkovModel::emittedProbability (interface function)" data-lang-entity="member_function">TFloat MarkovModel::emittedProbability(s);, TFloat MarkovModel::emittedProbability(ss);</a></code></span>
+    <span class="summary_desc"><div>Computes the probability that a string or a set of strings is emitted by the MarkovModel.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3AMarkovModel" title="#MarkovModel::MarkovModel (interface function)" data-lang-entity="member_function">MarkovModel::MarkovModel(order);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Aread" title="#MarkovModel::read (interface function)" data-lang-entity="member_function">void MarkovModel::read(file);</a></code></span>
+    <span class="summary_desc"><div>Load an instance of MarkovModel from a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Aset" title="#MarkovModel::set (interface function)" data-lang-entity="member_function">void MarkovModel(transition[, stationaryDistribution]);</a></code></span>
+    <span class="summary_desc"><div>Set transition matrix.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Awrite" title="#MarkovModel::write (interface function)" data-lang-entity="member_function">void MarkovModel::write(file);</a></code></span>
+    <span class="summary_desc"><div>Stores an instance of a markovModel in a file.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Aorder" title="#MarkovModel::order (interface function)" data-lang-entity="member_variable">
+        unsigned MarkovModel::order
+    </a></code></span>
+    <span class="summary_desc"><div>The order of the MarkovModel.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3AstationaryDistribution" title="#MarkovModel::stationaryDistribution (interface function)" data-lang-entity="member_variable">
+        TVector MarkovModel::stationaryDistribution
+    </a></code></span>
+    <span class="summary_desc"><div>The vector of characgter distribution (String of TFloat).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MarkovModel%3A%3Atransition" title="#MarkovModel::transition (interface function)" data-lang-entity="member_variable">
+        TMatrix MarkovModel::transition
+    </a></code></span>
+    <span class="summary_desc"><div>The transition matirx.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Examples</h3><h4>Build a MarkovModel from Background</h4><div data-src-path="demos/statistics/build_markov_model.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+<span class="cp">#include &lt;seqan/statistics.h&gt;</span>
+<span class="cp">#include &lt;seqan/seq_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Build path to background FASTA file.</span>
+    <span class="n">CharString</span> <span class="n">bgPath</span> <span class="o">=</span> <span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">();</span>
+    <span class="n">append</span><span class="p">(</span><span class="n">bgPath</span><span class="p">,</span> <span class="s">&quot;/demos/statistics/background.fa&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Read the background from a file into X.</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">X</span><span class="p">;</span>
+    <span class="n">SeqFileIn</span> <span class="n">seqFile</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">open</span><span class="p">(</span><span class="n">seqFile</span><span class="p">,</span> <span class="n">toCString</span><span class="p">(</span><span class="n">bgPath</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: Could not open &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">bgPath</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">ids</span><span class="p">;</span>  <span class="c1">// will be ignored</span>
+    <span class="n">readRecords</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">seqFile</span><span class="p">);</span>
+
+    <span class="c1">// Create MarkovModel of order 3 from the background.</span>
+    <span class="n">MarkovModel</span><span class="o">&lt;</span><span class="n">Dna</span><span class="o">&gt;</span> <span class="n">mm</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+    <span class="n">buildMarkovModel</span><span class="p">(</span><span class="n">mm</span><span class="p">,</span> <span class="n">X</span><span class="p">);</span>
+
+    <span class="c1">// Build set of words that we want to compute the zscore of.</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">W</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="s">&quot;CCCAAAGC&quot;</span><span class="p">);</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="s">&quot;CCCAAAGTAAATT&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Compute and print zscore.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;zscore: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">zscore</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">mm</span><span class="p">,</span> <span class="n">AhoCorasick</span><span class="p">())</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+<span class="c1">// //TODO his path has to be set explicitely when calling the demo</span>
+<span class="c1">//  FILE *fd = fopen(&quot;projects/library/demos/zscore_human_mm.3&quot;,&quot;r&quot;);</span>
+<span class="c1">//  read(fd, mm);</span>
+<span class="c1">//  fclose(fd);</span>
+
+    <span class="c1">//std::cout &lt;&lt; zscore(W, X, mm, WuManber()) &lt;&lt; std::endl;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/statistics/build_markov_model.cpp" target="_top">demos/statistics/build_markov_model.cpp</a></div></div><p>The following example shows how to build a MarkovModel over a Dna alphabet from a set of background sequence. After
+build the model, we compute the zscore.</p><pre class="console" data-src-path="None">zscore: 11.8323</pre><h4>Load a MarkovModel from File</h4><p>We can also load the MarkovModel from a file (previously saved using <a href="class_MarkovModel.html#MarkovModel::write" data-lang-entity="member_function">write</a>). Since we do
+not have the background word set here but only the model, we compute the variance of a word using the function
+calculateVariance from the alignment_free module.</p><div data-src-path="demos/statistics/load_markov_model.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+<span class="cp">#include &lt;seqan/alignment_free.h&gt;</span>
+<span class="cp">#include &lt;seqan/statistics.h&gt;</span>
+<span class="cp">#include &lt;seqan/seq_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Build path to serialized MarkovModel.</span>
+    <span class="n">CharString</span> <span class="n">mmPath</span> <span class="o">=</span> <span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">();</span>
+    <span class="n">append</span><span class="p">(</span><span class="n">mmPath</span><span class="p">,</span> <span class="s">&quot;/demos/statistics/zscore_example_mm.3&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Open the file.</span>
+    <span class="kt">FILE</span> <span class="o">*</span> <span class="n">mmFile</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">toCString</span><span class="p">(</span><span class="n">mmPath</span><span class="p">),</span> <span class="s">&quot;rb&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">mmFile</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: Could not open &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">mmPath</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Create MarkovModel of order 3 and load it from the file.</span>
+    <span class="n">MarkovModel</span><span class="o">&lt;</span><span class="n">Dna</span><span class="o">&gt;</span> <span class="n">mm</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+    <span class="n">read</span><span class="p">(</span><span class="n">mmFile</span><span class="p">,</span> <span class="n">mm</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">mmFile</span><span class="p">);</span>  <span class="c1">// close file again</span>
+
+    <span class="c1">// Build set of words that we want to compute the zscore of.</span>
+    <span class="n">DnaString</span> <span class="n">word</span> <span class="o">=</span> <span class="s">&quot;CCCAAAGC&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Compute variance.</span>
+    <span class="kt">double</span> <span class="n">variance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">;</span>  <span class="c1">// assumed text length</span>
+    <span class="n">calculateVariance</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">mm</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;variance: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">variance</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/statistics/load_markov_model.cpp" target="_top">demos/statistics/load_markov_model.cpp</a></div></div><pre class="console" data-src-path="None">variance: 0.267919</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="MarkovModel::build" class="signature first" data-lang-entity="member_function">
+      <code>void MarkovModel::build(stringSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Compute the transition matrix from a training set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stringSet</code>
+            
+        
+      </th>
+      <td>The StringSet to build the model for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The character statitionary distribution and the auxiliary information that give raise to an instance of a
+Markov Model are also computed.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="MarkovModel::emittedProbability" class="signature" data-lang-entity="member_function">
+      <code>TFloat MarkovModel::emittedProbability(s);
+TFloat MarkovModel::emittedProbability(ss);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes the probability that a string or a set of strings is emitted by the MarkovModel.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">s</code>
+            
+        
+      </th>
+      <td>The String to compute the emission probability for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ss</code>
+            
+        
+      </th>
+      <td>The StringSet to compute the emission probability for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFloat</code></th>
+        <td>The emission probability, TFloat is the TFloat from the MarkovModel.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="MarkovModel::MarkovModel" class="signature" data-lang-entity="member_function">
+      <code>MarkovModel::MarkovModel(order);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">order</code>
+            
+        
+      </th>
+      <td>The order of the model (<tt>unsigned</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="MarkovModel::read" class="signature" data-lang-entity="member_function">
+      <code>void MarkovModel::read(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Load an instance of MarkovModel from a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The file to read the model from (type <tt>FILE *</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="MarkovModel::set" class="signature" data-lang-entity="member_function">
+      <code>void MarkovModel(transition[, stationaryDistribution]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set transition matrix.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">transition</code>
+            
+        
+      </th>
+      <td>The transition matrix.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stationaryDistribution</code>
+            
+        
+      </th>
+      <td>The vector of character distributions.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Given e transition matrix, sets it as transition matrix of the MarkovModel and computes (if it is not available) the
+vector of character distributions and the auxiliary information.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="MarkovModel::write" class="signature" data-lang-entity="member_function">
+      <code>void MarkovModel::write(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Stores an instance of a markovModel in a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The file to write the model to (type <tt>FILE *</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="MarkovModel::order" class="signature first" data-lang-entity="member_variable">
+      <code>unsigned MarkovModel::order</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The order of the MarkovModel.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MarkovModel::stationaryDistribution" class="signature" data-lang-entity="member_variable">
+      <code>TVector MarkovModel::stationaryDistribution</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The vector of characgter distribution (String of TFloat).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MarkovModel::transition" class="signature" data-lang-entity="member_variable">
+      <code>TMatrix MarkovModel::transition</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The transition matirx.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class MarkovModel
+ * 
+ * @headerfile &lt;seqan/statistics.h&gt;
+ * 
+ * @brief Gives a suitable representation of a Marcov Chain.
+ * 
+ * @signature template &lt;typename TAlphabet[, typename TFloat[, typename TSpec]]&gt;
+ *            class MarkovModel;
+ * 
+ * @tparam TAlphabet The type of the underlying alphabet.
+ * @tparam TFloat The type for storing counts, default is &lt;tt&gt;double&lt;/tt&gt;.
+ * @tparam TSpec Tag for specialization.
+ * 
+ * @section Examples
+ * 
+ * @subsection Build a MarkovModel from Background
+ * 
+ * @include demos/statistics/build_markov_model.cpp
+ * 
+ * The following example shows how to build a MarkovModel over a Dna alphabet
+ * from a set of background sequence. After build the model, we compute the
+ * zscore.
+ * 
+ * @code{.console}
+ * zscore: 11.8323
+ * @endcode
+ * 
+ * 
+ * @subsection Load a MarkovModel from File
+ * 
+ * We can also load the MarkovModel from a file (previously saved using @link
+ * MarkovModel::write @endlink). Since we do not have the background word set
+ * here but only the model, we compute the variance of a word using the function
+ * calculateVariance from the alignment_free module.
+ * 
+ * @include demos/statistics/load_markov_model.cpp
+ * 
+ * @code{.console}
+ * variance: 0.267919
+ * @endcode
+ * 
+ * 
+ * @fn MarkovModel::MarkovModel
+ * 
+ * @brief Constructor
+ * 
+ * @signature MarkovModel::MarkovModel(order);
+ * 
+ * @param[in] order The order of the model (&lt;tt&gt;unsigned&lt;/tt&gt;).
+ * 
+ * @fn MarkovModel::build
+ * 
+ * @brief Compute the transition matrix from a training set.
+ * 
+ * @signature void MarkovModel::build(stringSet);
+ * 
+ * @param[in] stringSet The StringSet to build the model for.
+ * 
+ * The character statitionary distribution and the auxiliary information that
+ * give raise to an instance of a Markov Model are also computed.
+ * 
+ * @fn MarkovModel::set
+ * 
+ * @brief Set transition matrix.
+ * 
+ * @signature void MarkovModel(transition[, stationaryDistribution]);
+ * 
+ * @param[in,out] transition The transition matrix.
+ * @param[in] stationaryDistribution The vector of character distributions.
+ * 
+ * Given e transition matrix, sets it as transition matrix of the MarkovModel
+ * and computes (if it is not available) the vector of character distributions
+ * and the auxiliary information.
+ * 
+ * @fn MarkovModel::emittedProbability
+ * 
+ * @brief Computes the probability that a string or a set of strings is emitted
+ *        by the MarkovModel.
+ * 
+ * @signature TFloat MarkovModel::emittedProbability(s);
+ * @signature TFloat MarkovModel::emittedProbability(ss);
+ * 
+ * @param[in] s The String to compute the emission probability for.
+ * @param[in] ss The StringSet to compute the emission probability for.
+ * 
+ * @return TFloat The emission probability, TFloat is the TFloat from the
+ *                MarkovModel.
+ * 
+ * @fn MarkovModel::write
+ * 
+ * @brief Stores an instance of a markovModel in a file.
+ * 
+ * @signature void MarkovModel::write(file);
+ * 
+ * @param[in,out] file The file to write the model to (type &lt;tt&gt;FILE *&lt;/tt&gt;).
+ * 
+ * @fn MarkovModel::read
+ * 
+ * @brief Load an instance of MarkovModel from a file.
+ * 
+ * @signature void MarkovModel::read(file);
+ * 
+ * @param[in,out] file The file to read the model from (type &lt;tt&gt;FILE *&lt;/tt&gt;).
+ * 
+ * @var unsigned MarkovModel::order;
+ * 
+ * @brief The order of the MarkovModel.
+ * 
+ * @var TMatrix MarkovModel::transition;
+ * 
+ * @brief The transition matirx.
+ * 
+ * @var TVector MarkovModel::stationaryDistribution;
+ * 
+ * @brief The vector of characgter distribution (String of TFloat).
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

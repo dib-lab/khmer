@@ -1,0 +1,894 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_bamheaderrecord" data-page="BamHeaderRecord">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>BamHeaderRecord - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>BamHeaderRecord<div><div>Represents a header entry in a SAM file or the header section of the BAM header.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/bam_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class BamHeaderRecord;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3ABamHeaderRecord" title="#BamHeaderRecord::BamHeaderRecord (interface function)" data-lang-entity="member_function">BamHeaderRecord::BamRecord();</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3Aclear" title="#BamHeaderRecord::clear (interface function)" data-lang-entity="member_function">void clear(record);</a></code></span>
+    <span class="summary_desc"><div>Clear BamHeaderRecord object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3AgetTagValue" title="#BamHeaderRecord::getTagValue (interface function)" data-lang-entity="member_function">bool getTagValue(tagValue, idx, record);, bool getTagValue(tagValue, key, record);</a></code></span>
+    <span class="summary_desc"><div>Return tag value from a <a href="class_BamHeaderRecord.html" data-lang-entity="class">BamHeaderRecord</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3AsetTagValue" title="#BamHeaderRecord::setTagValue (interface function)" data-lang-entity="member_function">void setTagValue(idx, value, record);, void setTagValue(key, value, record);</a></code></span>
+    <span class="summary_desc"><div>Sets the value of a tag in a BamHeaderRecord.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+
+
+<div data-lang-entity-container="member_typedef">
+<h2 data-lang-entity="member_typedef">Member Typedef Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3ATTag" title="#BamHeaderRecord::TTag (member typedef)" data-lang-entity="member_typedef">BamHeaderRecord::TTag;</a></code></span>
+    <span class="summary_desc"><div>Type of the tag keys (<a href="class_Pair.html" data-lang-entity="class">Pair</a> of <tt>TTagName</tt> and <tt>TTagValue</tt>).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3ATTagName" title="#BamHeaderRecord::TTagName (member typedef)" data-lang-entity="member_typedef">BamHeaderRecord::TTagName;</a></code></span>
+    <span class="summary_desc"><div>Type of the tag keys (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3ATTags" title="#BamHeaderRecord::TTags (member typedef)" data-lang-entity="member_typedef">BamHeaderRecord::TTags;</a></code></span>
+    <span class="summary_desc"><div>Type of the tags string (<a href="specialization_AllocString.html" data-lang-entity="specialization">AllocString</a> of <tt>TTag</tt>).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3ATTagValue" title="#BamHeaderRecord::TTagValue (member typedef)" data-lang-entity="member_typedef">BamHeaderRecord::TTagValue;</a></code></span>
+    <span class="summary_desc"><div>Type of the tag values (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3Atags" title="#BamHeaderRecord::tags (interface function)" data-lang-entity="member_variable">
+        TRecordString BamHeaderRecord::tags
+    </a></code></span>
+    <span class="summary_desc"><div>The header record's tags, of type <a href="class_BamHeaderRecord.html#BamHeaderRecord::TTags" data-lang-entity="member_typedef">TTags</a>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#BamHeaderRecord%3A%3Atype" title="#BamHeaderRecord::type (interface function)" data-lang-entity="member_variable">
+        BamHeaderRecordType BamHeaderRecord::type
+    </a></code></span>
+    <span class="summary_desc"><div>Type of the record.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>Comment records are stored with one tag where the key is empty and the value is the comment.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="BamHeaderRecord::BamHeaderRecord" class="signature first" data-lang-entity="member_function">
+      <code>BamHeaderRecord::BamRecord();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Only the default constructor is provided.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamHeaderRecord::clear" class="signature" data-lang-entity="member_function">
+      <code>void clear(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear BamHeaderRecord object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">record</code>
+            
+        
+      </th>
+      <td>The record to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamHeaderRecord::getTagValue" class="signature" data-lang-entity="member_function">
+      <code>bool getTagValue(tagValue, idx, record);
+bool getTagValue(tagValue, key, record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return tag value from a <a href="class_BamHeaderRecord.html" data-lang-entity="class">BamHeaderRecord</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">tagValue</code>
+            
+        
+      </th>
+      <td>The <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> to write the tag value to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">idx</code>
+            
+        
+      </th>
+      <td>An integer with the index of the tag in the header record.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>A two-letter sequence with the key of the tag in the header record.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case the value could be retrieved, false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">CharString</span> <span class="n">tagValue</span><span class="p">;</span>
+<span class="kt">bool</span> <span class="n">keyFound</span> <span class="o">=</span> <span class="n">getTagValue</span><span class="p">(</span><span class="n">tagValue</span><span class="p">,</span> <span class="s">&quot;SN&quot;</span><span class="p">,</span> <span class="n">record</span><span class="p">);</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamHeaderRecord::setTagValue" class="signature" data-lang-entity="member_function">
+      <code>void setTagValue(idx, value, record);
+void setTagValue(key, value, record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the value of a tag in a BamHeaderRecord.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">idx</code>
+            
+        
+      </th>
+      <td>The index of the tag in the header record to set the value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The name of the tag (two-letter sequence) to set.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">record</code>
+            
+        
+      </th>
+      <td>The header record to set the value for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+<div class="member_typedef_defails" data-lang-entity-container="member_typedef">
+  <h2 data-lang-entity="member_typedef">Member Typedef Detail</h2>
+
+  
+      <div class="method_details first">
+        <h3 data-toc="hidden" id="BamHeaderRecord::TTag" class="signature first" data-lang-entity="member_typedef">
+          <code>BamHeaderRecord::TTag;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the tag keys (<a href="class_Pair.html" data-lang-entity="class">Pair</a> of <tt>TTagName</tt> and <tt>TTagValue</tt>).</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="BamHeaderRecord::TTagName" class="signature" data-lang-entity="member_typedef">
+          <code>BamHeaderRecord::TTagName;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the tag keys (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="BamHeaderRecord::TTags" class="signature" data-lang-entity="member_typedef">
+          <code>BamHeaderRecord::TTags;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the tags string (<a href="specialization_AllocString.html" data-lang-entity="specialization">AllocString</a> of <tt>TTag</tt>).</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="BamHeaderRecord::TTagValue" class="signature" data-lang-entity="member_typedef">
+          <code>BamHeaderRecord::TTagValue;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the tag values (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+  
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="BamHeaderRecord::tags" class="signature first" data-lang-entity="member_variable">
+      <code>TRecordString BamHeaderRecord::tags</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The header record's tags, of type <a href="class_BamHeaderRecord.html#BamHeaderRecord::TTags" data-lang-entity="member_typedef">TTags</a>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="BamHeaderRecord::type" class="signature" data-lang-entity="member_variable">
+      <code>BamHeaderRecordType BamHeaderRecord::type</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Type of the record.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class BamHeaderRecord
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Represents a header entry in a SAM file or the header section of the
+ *        BAM header.
+ * 
+ * @signature class BamHeaderRecord;
+ * 
+ * @section Remarks
+ * 
+ * Comment records are stored with one tag where the key is empty and the value
+ * is the comment.
+ * 
+ * @fn BamHeaderRecord::BamHeaderRecord
+ * 
+ * @brief Constructor.
+ * 
+ * @signature BamHeaderRecord::BamRecord();
+ * 
+ * Only the default constructor is provided.
+ * 
+ * @fn BamHeaderRecord::clear
+ * 
+ * @brief Clear BamHeaderRecord object.
+ * 
+ * @signature void clear(record);
+ * 
+ * @param[in,out] record The record to clear.
+ * 
+ * @fn BamHeaderRecord::getTagValue
+ * 
+ * @brief Return tag value from a @link BamHeaderRecord @endlink.
+ * 
+ * @signature bool getTagValue(tagValue, idx, record);
+ * @signature bool getTagValue(tagValue, key, record);
+ * 
+ * @param[out] tagValue The @link CharString @endlink to write the tag value to.
+ * @param[in] idx An integer with the index of the tag in the header record.
+ * @param[in] key A two-letter sequence with the key of the tag in the header
+ *                record.
+ * 
+ * @return bool true in case the value could be retrieved, false otherwise.
+ * 
+ * @section Example
+ * 
+ * @code{.cpp}
+ * CharString tagValue;
+ * bool keyFound = getTagValue(tagValue, &#34;SN&#34;, record);
+ * @endcode
+ * 
+ * 
+ * @fn BamHeaderRecord::setTagValue
+ * 
+ * @brief Sets the value of a tag in a BamHeaderRecord.
+ * 
+ * @signature void setTagValue(idx, value, record);
+ * @signature void setTagValue(key, value, record);
+ * 
+ * @param[in,out] idx The index of the tag in the header record to set the value
+ *                    for.
+ * @param[in] key The name of the tag (two-letter sequence) to set.
+ * @param[in] record The header record to set the value for.
+ * 
+ * @typedef BamHeaderRecord::TTagName
+ * 
+ * @brief Type of the tag keys (@link CharString @endlink).
+ * 
+ * @signature BamHeaderRecord::TTagName;
+ * 
+ * @typedef BamHeaderRecord::TTagValue
+ * 
+ * @brief Type of the tag values (@link CharString @endlink).
+ * 
+ * @signature BamHeaderRecord::TTagValue;
+ * 
+ * @typedef BamHeaderRecord::TTag
+ * 
+ * @brief Type of the tag keys (@link Pair @endlink of &lt;tt&gt;TTagName&lt;/tt&gt; and
+ *        &lt;tt&gt;TTagValue&lt;/tt&gt;).
+ * 
+ * @signature BamHeaderRecord::TTag;
+ * 
+ * @typedef BamHeaderRecord::TTags
+ * 
+ * @brief Type of the tags string (@link AllocString @endlink of &lt;tt&gt;TTag&lt;/tt&gt;).
+ * 
+ * @signature BamHeaderRecord::TTags;
+ * 
+ * @var BamHeaderRecordType BamHeaderRecord::type;
+ * 
+ * @brief Type of the record.
+ * 
+ * @var TRecordString BamHeaderRecord::tags;
+ * 
+ * @brief The header record&#39;s tags, of type @link BamHeaderRecord::TTags
+ *        @endlink.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

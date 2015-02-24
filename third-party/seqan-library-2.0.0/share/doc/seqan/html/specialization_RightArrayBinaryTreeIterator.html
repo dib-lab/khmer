@@ -1,0 +1,1639 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_rightarraybinarytreeiterator" data-page="RightArrayBinaryTreeIterator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>RightArrayBinaryTree Iterator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>RightArrayBinaryTree Iterator<div><div>An iterator for <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSpec&gt;
+class Iter&lt;TRightArrayBinaryTree, TSpec &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specialisation Tag. Types: TopDownIterator</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TRightArrayBinaryTree</a></code></th>
+        <td>The <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter::Iter" data-lang-entity="member_function">Iter</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23container" title="#RightArrayBinaryTreeIterator#container (interface function)" data-lang-entity="interface_function">TContainer container(iterator)</a></code></span>
+    <span class="summary_desc"><div>Container of an iterator.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23getCharacter" title="#RightArrayBinaryTreeIterator#getCharacter (interface function)" data-lang-entity="interface_function">TChar getCharacter(iterator);</a></code></span>
+    <span class="summary_desc"><div>This function returns the pivot character of the node the iterator currently points to.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23getLeftChildPos" title="#RightArrayBinaryTreeIterator#getLeftChildPos (interface function)" data-lang-entity="interface_function">unsigned getLeftChildPos(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the position in <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a> of the left child node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23getPosition" title="#RightArrayBinaryTreeIterator#getPosition (interface function)" data-lang-entity="interface_function">unsigned getPosition(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the position of the iterator in the host.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23getRightChildPos" title="#RightArrayBinaryTreeIterator#getRightChildPos (interface function)" data-lang-entity="interface_function">unsigned getLeftChildPos(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the position in <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a> of the right child node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23getSubTreeSize" title="#RightArrayBinaryTreeIterator#getSubTreeSize (interface function)" data-lang-entity="interface_function">unsigned getSubTreeSize(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of vertices in the subtree starting at the position
+an iterator points to.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23goDown" title="#RightArrayBinaryTreeIterator#goDown (interface function)" data-lang-entity="interface_function">bool goDown(iterator);</a></code></span>
+    <span class="summary_desc"><div>Iterates down the leftmost edge in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23goLeftChild" title="#RightArrayBinaryTreeIterator#goLeftChild (interface function)" data-lang-entity="interface_function">bool goLeftChild(iterator);</a></code></span>
+    <span class="summary_desc"><div>Sets the iterator to the left child of the current node if it exists and returns true, otherwise the
+iterator does not change position and the function returns false.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23goRight" title="#RightArrayBinaryTreeIterator#goRight (interface function)" data-lang-entity="interface_function">bool goRight(iterator);</a></code></span>
+    <span class="summary_desc"><div>Iterates to the next sibling in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23goRightChild" title="#RightArrayBinaryTreeIterator#goRightChild (interface function)" data-lang-entity="interface_function">bool goRightChild(iterator);</a></code></span>
+    <span class="summary_desc"><div>Sets the iterator to the right child of the current node if it exists and returns true, otherwise the
+iterator does not change position and the function returns false.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23goUp" title="#RightArrayBinaryTreeIterator#goUp (interface function)" data-lang-entity="interface_function">bool goUp(iterator);</a></code></span>
+    <span class="summary_desc"><div>Iterates up one edge to the parent in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23isLeaf" title="#RightArrayBinaryTreeIterator#isLeaf (interface function)" data-lang-entity="interface_function">bool isLeaf(iterator);</a></code></span>
+    <span class="summary_desc"><div>Tests whether a given node is a leaf or not.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23isRoot" title="#RightArrayBinaryTreeIterator#isRoot (interface function)" data-lang-entity="interface_function">bool isRoot(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether a iterator points to the root node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RightArrayBinaryTreeIterator%23setCharacter" title="#RightArrayBinaryTreeIterator#setCharacter (interface function)" data-lang-entity="interface_function">void setCharacter(iterator, character);</a></code></span>
+    <span class="summary_desc"><div>The function sets the character of the node the iterator points to to character.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#operator*" data-lang-entity="interface_function">operator*</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Container" data-lang-entity="interface_metafunction">Container</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterComplementConst" data-lang-entity="interface_metafunction">IterComplementConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterMakeConst" data-lang-entity="interface_metafunction">IterMakeConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Spec" data-lang-entity="interface_metafunction">Spec</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Pointer" data-lang-entity="interface_metafunction">Pointer</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#container" class="signature first" data-lang-entity="interface_function">
+      <code>TContainer container(iterator)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Container of an iterator.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TContainer</code></th>
+        <td>The container that <tt>iterator</tt> traverses.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#getCharacter" class="signature" data-lang-entity="interface_function">
+      <code>TChar getCharacter(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This function returns the pivot character of the node the iterator currently points to.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TChar</code></th>
+        <td>The resulting character.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#getLeftChildPos" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getLeftChildPos(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the position in <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a> of the left child node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The left child position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#getPosition" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getPosition(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the position of the iterator in the host.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#getRightChildPos" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getLeftChildPos(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the position in <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a> of the right child node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The left child position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#getSubTreeSize" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getSubTreeSize(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of vertices in the subtree starting at the position
+an iterator points to.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The subtree size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#goDown" class="signature" data-lang-entity="interface_function">
+      <code>bool goDown(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Iterates down the leftmost edge in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if an edge to go down exists, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#goLeftChild" class="signature" data-lang-entity="interface_function">
+      <code>bool goLeftChild(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the iterator to the left child of the current node if it exists and returns true, otherwise the
+iterator does not change position and the function returns false.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the edge to go down exists, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#goRight" class="signature" data-lang-entity="interface_function">
+      <code>bool goRight(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Iterates to the next sibling in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the iterator could be moved, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#goRightChild" class="signature" data-lang-entity="interface_function">
+      <code>bool goRightChild(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the iterator to the right child of the current node if it exists and returns true, otherwise the
+iterator does not change position and the function returns false.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the edge to go down exists, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#goUp" class="signature" data-lang-entity="interface_function">
+      <code>bool goUp(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Iterates up one edge to the parent in a <a href="class_RightArrayBinaryTree.html" data-lang-entity="class">RightArrayBinaryTree</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the iterator could be moved, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#isLeaf" class="signature" data-lang-entity="interface_function">
+      <code>bool isLeaf(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Tests whether a given node is a leaf or not.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the node is a leaf.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#isRoot" class="signature" data-lang-entity="interface_function">
+      <code>bool isRoot(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether a iterator points to the root node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points to the root of the tree, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RightArrayBinaryTreeIterator#setCharacter" class="signature" data-lang-entity="interface_function">
+      <code>void setCharacter(iterator, character);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The function sets the character of the node the iterator points to to character.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">iterator</code>
+            
+        
+      </th>
+      <td>The iterator.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">character</code>
+            
+        
+      </th>
+      <td>The character to be assigned to a node.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class RightArrayBinaryTreeIterator RightArrayBinaryTree Iterator
+ * 
+ * @extends Iter
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief An iterator for @link RightArrayBinaryTree @endlink.
+ * 
+ * @signature template &lt;typename TSpec&gt; class Iter&lt;TRightArrayBinaryTree, TSpec
+ *            &gt;;
+ * 
+ * @tparam TSpec Specialisation Tag. Types: TopDownIterator
+ * @tparam TRightArrayBinaryTree The @link RightArrayBinaryTree @endlink.
+ * 
+ * @fn RightArrayBinaryTreeIterator#container
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Container of an iterator.
+ * 
+ * @signature TContainer container(iterator)
+ * 
+ * @param[in] iterator An iterator.
+ * 
+ * @return TContainer The container that &lt;tt&gt;iterator&lt;/tt&gt; traverses.
+ * 
+ * @fn RightArrayBinaryTreeIterator#getCharacter
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This function returns the pivot character of the node the iterator
+ *        currently points to.
+ * 
+ * @signature TChar getCharacter(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return TChar The resulting character.
+ * 
+ * @fn RightArrayBinaryTreeIterator#getLeftChildPos
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the position in @link RightArrayBinaryTree @endlink of the
+ *        left child node.
+ * 
+ * @signature unsigned getLeftChildPos(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return unsigned The left child position.
+ * 
+ * @fn RightArrayBinaryTreeIterator#getSubTreeSize
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of vertices in the subtree starting at the position
+ *        an iterator points to.
+ * 
+ * @signature unsigned getSubTreeSize(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return unsigned The subtree size.
+ * 
+ * @fn RightArrayBinaryTreeIterator#getPosition
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the position of the iterator in the host.
+ * 
+ * @signature unsigned getPosition(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return unsigned The position.
+ * 
+ * @fn RightArrayBinaryTreeIterator#getRightChildPos
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the position in @link RightArrayBinaryTree @endlink of the
+ *        right child node.
+ * 
+ * @signature unsigned getLeftChildPos(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return unsigned The left child position.
+ * 
+ * @fn RightArrayBinaryTreeIterator#goDown
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Iterates down the leftmost edge in a @link RightArrayBinaryTree
+ *        @endlink.
+ * 
+ * @signature bool goDown(iterator);
+ * 
+ * @param[in] iterator The iterator
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if an edge to go down exists, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn RightArrayBinaryTreeIterator#goLeftChild
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Sets the iterator to the left child of the current node if it exists
+ *        and returns true, otherwise the iterator does not change position and
+ *        the function returns false.
+ * 
+ * @signature bool goLeftChild(iterator);
+ * 
+ * @param[in] iterator The iterator
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the edge to go down exists, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn RightArrayBinaryTreeIterator#goRight
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Iterates to the next sibling in a @link RightArrayBinaryTree @endlink.
+ * 
+ * @signature bool goRight(iterator);
+ * 
+ * @param[in] iterator The iterator
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the iterator could be moved, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn RightArrayBinaryTreeIterator#goRightChild
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Sets the iterator to the right child of the current node if it exists
+ *        and returns true, otherwise the iterator does not change position and
+ *        the function returns false.
+ * 
+ * @signature bool goRightChild(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the edge to go down exists, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn RightArrayBinaryTreeIterator#goUp
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Iterates up one edge to the parent in a @link RightArrayBinaryTree
+ *        @endlink.
+ * 
+ * @signature bool goUp(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the iterator could be moved, otherwise
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn RightArrayBinaryTreeIterator#isLeaf
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Tests whether a given node is a leaf or not.
+ * 
+ * @signature bool isLeaf(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the node is a leaf.
+ * 
+ * @fn RightArrayBinaryTreeIterator#setCharacter
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief The function sets the character of the node the iterator points to to
+ *        character.
+ * 
+ * @signature void setCharacter(iterator, character);
+ * 
+ * @param[in,out] iterator The iterator.
+ * @param[in] character The character to be assigned to a node.
+ * 
+ * @fn RightArrayBinaryTreeIterator#isRoot
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether a iterator points to the root node.
+ * 
+ * @signature bool isRoot(iterator);
+ * 
+ * @param[in] iterator The iterator.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points to the root of the
+ *              tree, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

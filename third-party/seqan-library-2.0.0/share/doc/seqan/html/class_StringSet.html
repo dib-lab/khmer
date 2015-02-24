@@ -1,0 +1,2108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_stringset" data-page="StringSet">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>StringSet - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>StringSet<div><div>A container class for a set of strings.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a>, 
+    <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a>, 
+    <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_ConcatDirectStringSet.html" data-lang-entity="specialization">ConcatDirectStringSet</a>, 
+    <a href="specialization_DependentStringSet.html" data-lang-entity="specialization">DependentStringSet</a>, 
+    <a href="specialization_GenerousDependentStringSet.html" data-lang-entity="specialization">GenerousDependentStringSet</a>, 
+    <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>, 
+    <a href="specialization_OwnerStringSet.html" data-lang-entity="specialization">OwnerStringSet</a>, 
+    <a href="specialization_TightDependentStringSet.html" data-lang-entity="specialization">TightDependentStringSet</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>, 
+    <a href="concept_ForwardContainerConcept.html" data-lang-entity="concept">ForwardContainerConcept</a>, 
+    <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a>, 
+    <a href="concept_ReversibleContainerConcept.html" data-lang-entity="concept">ReversibleContainerConcept</a>, 
+    <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a>, 
+    <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a>, 
+    <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TString, typename TSpec&gt;
+class StringSet;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TString</a></code></th>
+        <td>The type of the string to store in the string set.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>A tag for selecting the specialization of the string set. Default: <tt>Owner&lt;Generous&gt;</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept::operator[]" data-lang-entity="member_function">operator[]</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23assignValueById" title="#StringSet#assignValueById (interface function)" data-lang-entity="interface_function">TId getValueById(set, s[, id]);</a></code></span>
+    <span class="summary_desc"><div>Set the member of a string set by its id.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23clear" title="#StringSet#clear (interface function)" data-lang-entity="interface_function">void clear(stringSet);</a></code></span>
+    <span class="summary_desc"><div>Clear the StringSet.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23concat" title="#StringSet#concat (interface function)" data-lang-entity="interface_function">TConcat concat(set);</a></code></span>
+    <span class="summary_desc"><div>Returns the concatenation sequence of all sequences in a string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23getValueById" title="#StringSet#getValueById (interface function)" data-lang-entity="interface_function">TString getValueById(s, id);</a></code></span>
+    <span class="summary_desc"><div>Get the value from a string set by its id.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23idToPosition" title="#StringSet#idToPosition (interface function)" data-lang-entity="interface_function">TPos idToPosition(set, id);</a></code></span>
+    <span class="summary_desc"><div>Convert a string id to a position/index in the string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23lengthSum" title="#StringSet#lengthSum (interface function)" data-lang-entity="interface_function">TSize lengthSum(s);</a></code></span>
+    <span class="summary_desc"><div>Returns total length of all strings in the string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23positionToId" title="#StringSet#positionToId (interface function)" data-lang-entity="interface_function">Id positionToId(set, pos);</a></code></span>
+    <span class="summary_desc"><div>Convert a position/index in the string set to a string id.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23removeValueById" title="#StringSet#removeValueById (interface function)" data-lang-entity="interface_function">void removeValueById(set, id);</a></code></span>
+    <span class="summary_desc"><div>Remove a value from a string set by its id.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23reserve" title="#StringSet#reserve (interface function)" data-lang-entity="interface_function">TSize reserve(s, newCapacity, tag);</a></code></span>
+    <span class="summary_desc"><div>Reserve memory for string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23strSplit" title="#StringSet#strSplit (interface function)" data-lang-entity="interface_function">void strSplit(result, sequence[, sep[, allowEmptyStrings[, maxSplit]]]);</a></code></span>
+    <span class="summary_desc"><div>Append a list of the words in the string, using sep as the delimiter string <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23valueById" title="#StringSet#valueById (interface function)" data-lang-entity="interface_function">TString valueById(s, id);</a></code></span>
+    <span class="summary_desc"><div>Get the value from a string set by its id.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#assignValue" data-lang-entity="interface_function">assignValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#prefix" data-lang-entity="interface_function">prefix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#infixWithLength" data-lang-entity="interface_function">infixWithLength</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#infix" data-lang-entity="interface_function">infix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#suffix" data-lang-entity="interface_function">suffix</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#iter" data-lang-entity="interface_function">iter</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#front" data-lang-entity="interface_function">front</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#back" data-lang-entity="interface_function">back</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#resize" data-lang-entity="interface_function">resize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#erase" data-lang-entity="interface_function">erase</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#eraseFront" data-lang-entity="interface_function">eraseFront</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#eraseBack" data-lang-entity="interface_function">eraseBack</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#capacity" data-lang-entity="interface_function">capacity</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#computeGenerousCapacity" data-lang-entity="interface_function">computeGenerousCapacity</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#insert" data-lang-entity="interface_function">insert</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#insertValue" data-lang-entity="interface_function">insertValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#replace" data-lang-entity="interface_function">replace</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posLocalToX" data-lang-entity="interface_function">posLocalToX</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posLocalize" data-lang-entity="interface_function">posLocalize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posGlobalize" data-lang-entity="interface_function">posGlobalize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#getSeqNo" data-lang-entity="interface_function">getSeqNo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#getSeqOffset" data-lang-entity="interface_function">getSeqOffset</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23Concatenator" title="#StringSet#Concatenator (interface function)" data-lang-entity="interface_metafunction">Concatenator&lt;TStringSet&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the type of the concatenated sequence of all sequences in a StringSet.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23GetSequenceByNo" title="#StringSet#GetSequenceByNo (interface function)" data-lang-entity="interface_metafunction">GetSequenceByNo&lt;TStringSet&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Type for getting sequence by number.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23Id" title="#StringSet#Id (interface function)" data-lang-entity="interface_metafunction">Id&lt;TStringSet&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the id type for the string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23LengthSum" title="#StringSet#LengthSum (interface function)" data-lang-entity="interface_metafunction">LengthSum&lt;TStringSet&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Length sum type type in string set.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringSet%23StringSetPosition" title="#StringSet#StringSetPosition (interface function)" data-lang-entity="interface_metafunction">StringSetPosition&lt;TStringSet&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns position type in string set.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Infix" data-lang-entity="interface_metafunction">Infix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Prefix" data-lang-entity="interface_metafunction">Prefix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Suffix" data-lang-entity="interface_metafunction">Suffix</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#SAValue" data-lang-entity="interface_metafunction">SAValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#StringSetLimits" data-lang-entity="interface_metafunction">StringSetLimits</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>String sets are containers for strings. They have two advantages over a string of strings:</p><p>First, they allow to express the common intent in Bioinformatics to have a list of strings, e.g. for the
+chromosomes of a genome. This facilitates writing generic data structures and algorithms to operate on single
+strings and genomes which is captured by the <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>.</p><p>Second, the <a href="specialization_DependentStringSet.html" data-lang-entity="specialization">DependentStringSet</a> specialization allows to create subsets of string sets without
+storing copies of strings and identifying strings by a common id.</p><h3>Examples</h3><div data-src-path="demos/sequence/stringset.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">stringSet</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="s">&quot;Hello World!&quot;</span><span class="p">);</span>                    <span class="c1">// Append string to the end of the string set.</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Number of elements: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">stringSet</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">resize</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">Exact</span><span class="p">());</span>                             <span class="c1">// Adapt the size of the container, while keeping existing values.</span>
+
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">seq</span> <span class="o">=</span> <span class="s">&quot;To be or not to be!&quot;</span><span class="p">;</span>
+    <span class="n">stringSet</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span><span class="p">;</span>                                        <span class="c1">// Use subscript operator to assign a new value.</span>
+    <span class="n">stringSet</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;A man, a plan, a canal - Panama!&quot;</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Number of elements: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">stringSet</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">typedef</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">StringSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">,</span> <span class="n">Standard</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">TIterator</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">TIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Element &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">position</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">stringSet</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">clear</span><span class="p">(</span><span class="n">stringSet</span><span class="p">);</span>                                           <span class="c1">// Clear the contents of the StringSet.</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Number of elements: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">stringSet</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/sequence/stringset.cpp" target="_top">demos/sequence/stringset.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/sequence/stringset.cpp.stdout">Number of elements: 1
+Number of elements: 3
+Element 0: Hello World!
+Element 1: To be or not to be!
+Element 2: A man, a plan, a canal - Panama!
+Number of elements: 0
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="StringSet#assignValueById" class="signature first" data-lang-entity="interface_function">
+      <code>TId getValueById(set, s[, id]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the member of a string set by its id.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">set</code>
+            
+        
+      </th>
+      <td>The string to assign value in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">s</code>
+            
+        
+      </th>
+      <td>The string set to assign.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the string to set. If omitted, <tt>s</tt> will be appended to <tt>set</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TId</code></th>
+        <td>The id of the new string in the string set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(stringSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear the StringSet.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seedSet</code>
+            
+        
+      </th>
+      <td>The StringSet to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#concat" class="signature" data-lang-entity="interface_function">
+      <code>TConcat concat(set);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the concatenation sequence of all sequences in a string set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">set</code>
+            
+        
+      </th>
+      <td>The string set to get the concatenation sequence for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TConcat</code></th>
+        <td>The concatenation sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#getValueById" class="signature" data-lang-entity="interface_function">
+      <code>TString getValueById(s, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the value from a string set by its id.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">s</code>
+            
+        
+      </th>
+      <td>The string set to get string from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the string to get.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TString</code></th>
+        <td>Reference to the string with the given id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#idToPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos idToPosition(set, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Convert a string id to a position/index in the string set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">set</code>
+            
+        
+      </th>
+      <td>The string to convert positions for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id to convert.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The resulting position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#lengthSum" class="signature" data-lang-entity="interface_function">
+      <code>TSize lengthSum(s);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns total length of all strings in the string set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">s</code>
+            
+        
+      </th>
+      <td>The string set to get length sum of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The sum of the lengths of all strings in the string set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#positionToId" class="signature" data-lang-entity="interface_function">
+      <code>Id positionToId(set, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Convert a position/index in the string set to a string id.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">set</code>
+            
+        
+      </th>
+      <td>The string to convert positions for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to convert.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TId</code></th>
+        <td>The resulting id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#removeValueById" class="signature" data-lang-entity="interface_function">
+      <code>void removeValueById(set, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove a value from a string set by its id.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">set</code>
+            
+        
+      </th>
+      <td>The string to remove value in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the string to remove.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#reserve" class="signature" data-lang-entity="interface_function">
+      <code>TSize reserve(s, newCapacity, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reserve memory for string set.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">s</code>
+            
+        
+      </th>
+      <td>The string set to reserve memory for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newCapacity</code>
+            
+        
+      </th>
+      <td>The target capacity.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>A tag to select the reservation strategy.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#strSplit" class="signature" data-lang-entity="interface_function">
+      <code>void strSplit(result, sequence[, sep[, allowEmptyStrings[, maxSplit]]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a list of the words in the string, using sep as the delimiter string <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">result</code>
+            
+        
+      </th>
+      <td>The resulting string set.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sequence</code>
+            
+        
+      </th>
+      <td>The sequence to split.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sep</code>
+            
+        
+      </th>
+      <td>The splitter to use (default <tt>' '</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">allowEmptyString</code>
+            
+        
+      </th>
+      <td>Whether or not to allow empty strings (<tt>bool</tt>, defaults to <tt>true</tt> iff
+<tt>sep</tt> is given).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">maxSplit</code>
+            
+        
+      </th>
+      <td>The maximal number of split operations to do if given.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringSet#valueById" class="signature" data-lang-entity="interface_function">
+      <code>TString valueById(s, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the value from a string set by its id.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">s</code>
+            
+        
+      </th>
+      <td>The string set to get string from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the string to get.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TString</code></th>
+        <td>Reference to the string with the given id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="StringSet#Concatenator" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Concatenator&lt;TStringSet&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the type of the concatenated sequence of all sequences in a StringSet.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TStringSet</code></th>
+            <td>The type of the string set.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting concatenator type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="StringSet#GetSequenceByNo" class="signature" data-lang-entity="interface_metafunction">
+    <code>GetSequenceByNo&lt;TStringSet&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type for getting sequence by number.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TStringSet</code></th>
+            <td>The StringSet to query for its sequence-by-number type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The given sequence-by-number type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="StringSet#Id" class="signature" data-lang-entity="interface_metafunction">
+    <code>Id&lt;TStringSet&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the id type for the string set.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TStringSet</code></th>
+            <td>The string set type to query for its id type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting ID type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="StringSet#LengthSum" class="signature" data-lang-entity="interface_metafunction">
+    <code>LengthSum&lt;TStringSet&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Length sum type type in string set.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TStringSet</code></th>
+            <td>The <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> to query for its length sum type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting length sum type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="StringSet#StringSetPosition" class="signature" data-lang-entity="interface_metafunction">
+    <code>StringSetPosition&lt;TStringSet&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns position type in string set.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TStringSet</code></th>
+            <td>The <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> to query for its position type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The position type of TStringSet.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class StringSet
+ * 
+ * @implements StringConcept
+ * @implements TextConcept
+ * @implements SegmentableConcept
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief A container class for a set of strings.
+ * 
+ * @signature template &lt;typename TString, typename TSpec&gt; class StringSet;
+ * 
+ * @tparam TString The type of the string to store in the string set.
+ * @tparam TSpec A tag for selecting the specialization of the string set.
+ *               Default: &lt;tt&gt;Owner&amp;lt;Generous&amp;gt;&lt;/tt&gt;.
+ * 
+ * String sets are containers for strings. They have two advantages over a
+ * string of strings:
+ * 
+ * First, they allow to express the common intent in Bioinformatics to have a
+ * list of strings, e.g. for the chromosomes of a genome. This facilitates
+ * writing generic data structures and algorithms to operate on single strings
+ * and genomes which is captured by the @link TextConcept @endlink.
+ * 
+ * Second, the @link DependentStringSet @endlink specialization allows to create
+ * subsets of string sets without storing copies of strings and identifying
+ * strings by a common id.
+ * 
+ * @section Examples
+ * 
+ * @include demos/sequence/stringset.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/sequence/stringset.cpp.stdout
+ * 
+ * 
+ * 
+ * @mfn StringSet#Concatenator
+ * 
+ * @brief Return the type of the concatenated sequence of all sequences in a
+ *        StringSet.
+ * 
+ * @signature Concatenator&lt;TStringSet&gt;::Type
+ * 
+ * @tparam TStringSet The type of the string set.
+ * 
+ * @return Type The resulting concatenator type.
+ * 
+ * @mfn StringSet#LengthSum
+ * 
+ * @brief Length sum type type in string set.
+ * 
+ * @signature LengthSum&lt;TStringSet&gt;::Type
+ * 
+ * @tparam TStringSet The @link StringSet @endlink to query for its length sum
+ *                    type.
+ * 
+ * @return Type The resulting length sum type.
+ * 
+ * @mfn StringSet#StringSetPosition
+ * 
+ * @brief Returns position type in string set.
+ * 
+ * @signature StringSetPosition&lt;TStringSet&gt;::Type
+ * 
+ * @tparam TStringSet The @link StringSet @endlink to query for its position
+ *                    type.
+ * 
+ * @return Type The position type of TStringSet.
+ * 
+ * @mfn StringSet#GetSequenceByNo
+ * 
+ * @brief Type for getting sequence by number.
+ * 
+ * @signature GetSequenceByNo&lt;TStringSet&gt;::Type
+ * 
+ * @tparam TStringSet The StringSet to query for its sequence-by-number type.
+ * 
+ * @return Type The given sequence-by-number type.
+ * 
+ * @mfn StringSet#Id
+ * 
+ * @brief Return the id type for the string set.
+ * 
+ * @signature Id&lt;TStringSet&gt;::Type
+ * 
+ * @tparam TStringSet The string set type to query for its id type.
+ * 
+ * @return Type The resulting ID type.
+ * 
+ * @fn StringSet#lengthSum
+ * 
+ * @brief Returns total length of all strings in the string set.
+ * 
+ * @signature TSize lengthSum(s);
+ * 
+ * @param[in] s The string set to get length sum of.
+ * 
+ * @return TSize The sum of the lengths of all strings in the string set.
+ * 
+ * @fn StringSet#clear
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Clear the StringSet.
+ * 
+ * @signature void clear(stringSet);
+ * 
+ * @param[in,out] seedSet The StringSet to clear.
+ * 
+ * @fn StringSet#reserve
+ * 
+ * @brief Reserve memory for string set.
+ * 
+ * @signature TSize reserve(s, newCapacity, tag);
+ * 
+ * @param[in,out] s The string set to reserve memory for.
+ * @param[in] newCapacity The target capacity.
+ * @param[in] tag A tag to select the reservation strategy.
+ * 
+ * @fn StringSet#getValueById
+ * 
+ * @brief Get the value from a string set by its id.
+ * 
+ * @signature TString getValueById(s, id);
+ * 
+ * @param[in] s The string set to get string from.
+ * @param[in] id The id of the string to get.
+ * 
+ * @return TString Reference to the string with the given id.
+ * 
+ * @fn StringSet#valueById
+ * 
+ * @brief Get the value from a string set by its id.
+ * 
+ * @signature TString valueById(s, id);
+ * 
+ * @param[in] s The string set to get string from.
+ * @param[in] id The id of the string to get.
+ * 
+ * @return TString Reference to the string with the given id.
+ * 
+ * @fn StringSet#assignValueById
+ * 
+ * @brief Set the member of a string set by its id.
+ * 
+ * @signature TId getValueById(set, s[, id]);
+ * 
+ * @param[in] set The string to assign value in.
+ * @param[in] s The string set to assign.
+ * @param[in] id The id of the string to set. If omitted, &lt;tt&gt;s&lt;/tt&gt; will be
+ *               appended to &lt;tt&gt;set&lt;/tt&gt;.
+ * 
+ * @return TId The id of the new string in the string set.
+ * 
+ * @fn StringSet#removeValueById
+ * 
+ * @brief Remove a value from a string set by its id.
+ * 
+ * @signature void removeValueById(set, id);
+ * 
+ * @param[in,out] set The string to remove value in.
+ * @param[in] id The id of the string to remove.
+ * 
+ * @fn StringSet#positionToId
+ * 
+ * @brief Convert a position/index in the string set to a string id.
+ * 
+ * @signature Id positionToId(set, pos);
+ * 
+ * @param[in] set The string to convert positions for.
+ * @param[in] pos The position to convert.
+ * 
+ * @return TId The resulting id.
+ * 
+ * @fn StringSet#concat
+ * 
+ * @brief Returns the concatenation sequence of all sequences in a string set.
+ * 
+ * @signature TConcat concat(set);
+ * 
+ * @param[in] set The string set to get the concatenation sequence for.
+ * 
+ * @return TConcat The concatenation sequence.
+ * 
+ * @fn StringSet#idToPosition
+ * 
+ * @brief Convert a string id to a position/index in the string set.
+ * 
+ * @signature TPos idToPosition(set, id);
+ * 
+ * @param[in] set The string to convert positions for.
+ * @param[in] id The id to convert.
+ * 
+ * @return TPos The resulting position.
+ * 
+ * @fn StringSet#strSplit
+ * 
+ * @brief Append a list of the words in the string, using sep as the delimiter
+ *        string @link StringSet @endlink.
+ * 
+ * @signature void strSplit(result, sequence[, sep[, allowEmptyStrings[,
+ *            maxSplit]]]);
+ * 
+ * @param[out] result The resulting string set.
+ * @param[in] sequence The sequence to split.
+ * @param[in] sep The splitter to use (default &lt;tt&gt;&#39; &#39;&lt;/tt&gt;).
+ * @param[in] allowEmptyString Whether or not to allow empty strings
+ *                             (&lt;tt&gt;bool&lt;/tt&gt;, defaults to &lt;tt&gt;true&lt;/tt&gt; iff
+ *                             &lt;tt&gt;sep&lt;/tt&gt; is given).
+ * @param[in] maxSplit The maximal number of split operations to do if given.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

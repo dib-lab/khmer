@@ -1,9 +1,0 @@
-Name: seqan-system
-Author: David Weese <david.weese@fu-berlin.de>
-Maintainer: David Weese <david.weese@fu-berlin.de>
-License: BSD 3-clause
-Copyright: 2006-2013, FU Berlin
-Status: mature
-Description: Wrapper of operating system functionality.
- This module contains wrappers around threads and files for synchronous and
- asynchronous I/O.

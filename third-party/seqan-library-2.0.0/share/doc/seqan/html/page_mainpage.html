@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="page_mainpage" data-page="mainpage">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Home - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<div id="filecontents">
+<h1 data-lang-entity="page" data-pimped="true">
+  <a href="page_LanguageEntities.html#page">Page</a> <span>Home</span>
+</h1>
+
+<div class="docstring">
+  <div class="discussion">
+    <!-- @brief -->
+    
+    
+    <!-- paragraphs -->
+    
+<div><p>SeqAn is an open source C++ library of efficient algorithms and data structures for the analysis of sequences with the focus on biological data. Our library applies a unique generic design that guarantees high performance, generality, extensibility, and integration with other libraries. SeqAn is easy to use and simplifies the development of new software tools with a minimal loss of performance.</p><h2>Getting Started</h2><p><ol>
+<li><b>Install SeqAn.</b> It's as easy as following the <a href="http://seqan.readthedocs.org/en/master/Tutorial/GettingStarted.html" target="_top">installation instructions</a>.</li>
+<li><b>Learn SeqAn.</b> The <a href="http://seqan.readthedocs.org/en/master/Tutorial.html" target="_top">SeqAn Tutorials</a> in the <a href="http://seqan.readthedocs.org/en/master/" target="_top">SeqAn Manual</a> will introduce you into SeqAn's basic concepts and show you how to use its data structures and functions.</li>
+<li><b>Think SeqAn.</b> Since our library uses advanced C++ template programming techniques, we recommend you to read our glossary of <a href="page_LanguageEntities.html">language entity types</a> for a quick introduction.</li>
+<li><b>Use SeqAn.</b> Search the library for classes, functions, etc. using the search bar to the left. Need some orientation? Check the <a href="#typical_tasks">typical tasks</a> below.</li>
+</ol></p><p><h2 name="typical_tasks">Typical Tasks</h2></p><p>If you know what you want to do but not how to achieve this with SeqAn, this sections gives you a nice overview of the components that might help you.</p><p>Alternatively you might want to check the <a href="http://seqan.readthedocs.org/en/master/Tutorial.html" target="_top">SeqAn Tutorials</a>.</p><p><ul class="overview">
+<li>
+<h3>Read Mapping</h3>
+<p>Most modern read mappers first identify candidate regions in the reference sequence approximately or using heuristics. Then, they verify the found locations. SeqAn can help with both and also provides facilities for making I/O easier.</p>
+<table>
+<tr><td><ul><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/SimpleReadMapping.html" target="_top" data-lang-entity="tutorial">Read Mapping</a></li></ul></td><td>instructive introductions</td></tr>
+<tr><td><ul><li><a href="class_Index.html" data-lang-entity="class">Index</a></li></ul></td><td>class and subclasses can be used for index-based search</td></tr>
+<tr><td><ul><li><a href="class_Finder.html" data-lang-entity="class">Finder</a></li><li><a href="class_Pattern.html" data-lang-entity="class">Pattern</a></li></ul></td><td>can be used to implement online string search</td></tr>
+<tr><td><ul><li><a href="class_Align.html" data-lang-entity="class">Align</a></li><li><a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a></li></ul></td><td>alignments can be used for the verification</td></tr>
+<tr><td><ul><li><a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a></li></ul></td><td>used to read FASTA and FASTQ files</td></tr>
+<tr><td><ul><li><a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a></li></ul></td><td>used to write SAM and BAM files</td></tr>
+<tr><td><ul><li><a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a></li></ul></td><td>allows for managing read alignments and reading/writing from/to SAM</td></tr>
+</table>
+</li>
+<li>
+<h3>File I/O</h3>
+<p>SeqAn has support for most common file formats in Bioinformatics. The following lists the most convenient access methods.</p>
+<table>
+<tr><td><ul><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/InputOutputOverview.html" target="_top" data-lang-entity="tutorial">I/O Overview</a></li></ul></td><td>instructive introductions</td></tr>
+<tr><td><ul><li><a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a></li><li><a href="specialization_SeqFileOut.html" data-lang-entity="specialization">SeqFileOut</a></li><li><a href="class_FaiIndex.html" data-lang-entity="class">FaiIndex</a></li></ul></td><td>FASTA, FASTQ</td></tr>
+<tr><td><ul><li><a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a></li><li><a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a></li></ul></td><td>SAM, BAM</td></tr>
+<tr><td><ul><li><a href="specialization_VcfFileIn.html" data-lang-entity="specialization">VcfFileIn</a></li><li><a href="specialization_VcfFileOut.html" data-lang-entity="specialization">VcfFileOut</a></li></ul></td><td>VCF</td></tr>
+<tr><td><ul><li><a href="specialization_BedFileIn.html" data-lang-entity="specialization">BedFileIn</a></li><li><a href="specialization_BedFileOut.html" data-lang-entity="specialization">BedFileOut</a></li></ul></td><td>BED</td></tr>
+<tr><td><ul><li><a href="specialization_GffFileIn.html" data-lang-entity="specialization">GffFileIn</a></li><li><a href="specialization_GffFileOut.html" data-lang-entity="specialization">GffFileOut</a></li></ul></td><td>GFF, GTF</td></tr>
+</table>
+</li>
+<li>
+<h3>Sequence Alignment <small>and Multiple Sequence Alignment</small></h3>
+<p>Sequence alignment and multiple sequence alignment are classic problems in Bioinformatics.</p>
+<table>
+<tr><td><ul><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/AlignmentRepresentation.html" target="_top" data-lang-entity="tutorial">Alignment Representation</a></li><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/PairwiseSequenceAlignment.html" target="_top" data-lang-entity="tutorial">Pairwise Sequence Alignment</a></li><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/MultipleSequenceAlignment.html" target="_top" data-lang-entity="tutorial">Multiple Sequence Alignment</a></li></ul></td><td>instructive introductions</td></tr>
+<tr><td><ul><li><a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a></li></ul></td><td>provides dynamic programming algorithms for global sequence alignment with various parameters</td></tr>
+<tr><td><ul><li><a href="global_function_localAlignment.html" data-lang-entity="global_function">localAlignment</a></li></ul></td><td></td></tr>
+<tr><td><ul><li><a href="class_LocalAlignmentEnumerator.html" data-lang-entity="class">LocalAlignmentEnumerator</a></li></ul></td><td>offers the Waterman-Eggert algorithm for enumerating suboptimal local alignments</td></tr>
+<tr><td><ul><li><a href="class_Align.html" data-lang-entity="class">Align</a></li></ul></td><td>provides a data structure for tabular alignment of sequences with the same type</td></tr>
+<tr><td><ul><li><a href="class_Gaps.html" data-lang-entity="class">Gaps</a></li></ul></td><td>allows to store gaps independent of the underlying sequence</td></tr>
+</table>
+</li>
+<li>
+<h3>Graph <small>Data Structures and Algorithms</small></h3>
+<p>Often, graphs come in handy to model subproblems in sequence analysis. SeqAn provides basic support for graphs and graph algorithms.</p>
+<table>
+<tr><td><ul><li><a href="http://seqan.readthedocs.org/en/master/Tutorial/Graphs.html" target="_top" data-lang-entity="tutorial">Graphs</a></li></ul></td><td>instructive introductions</td></tr>
+<tr><td><ul><li><a href="class_Graph.html" data-lang-entity="class">Graph</a></li></ul></td><td>central class (including subclasses)</td></tr>
+<tr><td><ul><li><a href="specialization_DirectedGraph.html" data-lang-entity="specialization">DirectedGraph</a></li><li><a href="specialization_UndirectedGraph.html" data-lang-entity="specialization">UndirectedGraph</a>.</li></ul></td><td>simple directed and undirected graphs structures</td></tr>
+<tr><td><ul><li><a href="specialization_Automaton.html" data-lang-entity="specialization">Automaton</a></li><li><a href="specialization_WordGraph.html" data-lang-entity="specialization">WordGraph</a></li><li><a href="specialization_HmmGraph.html" data-lang-entity="specialization">HmmGraph</a></li></ul></td><td>special subclasses for sequence analysis</td></tr>
+<tr><td><ul><li><a href="global_function_dijkstra.html" data-lang-entity="global_function">Dijkstra's algorithm</a></li><li><a href="global_function_bellmanFordAlgorithm.html" data-lang-entity="global_function">Bellman-Ford algorithm</a></li><li><a href="global_function_topologicalSort.html" data-lang-entity="global_function">topological sorting</a></li><li><a href="global_function_dagShortestPath.html" data-lang-entity="global_function">shortest paths in DAGs</a></li></ul></td><td>standard graph algorithms</td></tr>
+<tr><td colspan="2">For more advanced usage and algorithms, we recommend using the <a href="http://lemon.cs.elte.hu/trac/lemon" target="_top">LEMON Graph Library</a>.</td></tr>
+</table>
+</li>
+</ul></p></div>
+
+  </div>
+</div>
+
+<!-- @see -->
+
+</div>
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>@mainpage Home
+
+SeqAn is an open source C++ library of efficient algorithms and data
+structures for the analysis of sequences with the focus on biological data.
+Our library applies a unique generic design that guarantees high performance,
+generality, extensibility, and integration with other libraries. SeqAn is
+easy to use and simplifies the development of new software tools with a
+minimal loss of performance.
+
+@section Getting Started
+
+&lt;ol&gt; &lt;li&gt;&lt;b&gt;Install SeqAn.&lt;/b&gt; It&#39;s as easy as following the &lt;a
+href=&#34;http://seqan.readthedocs.org/en/master/Tutorial/GettingStarted.html&#34;
+target=&#34;_top&#34;&gt;installation instructions&lt;/a&gt;.&lt;/li&gt; &lt;li&gt;&lt;b&gt;Learn SeqAn.&lt;/b&gt; The
+&lt;a href=&#34;http://seqan.readthedocs.org/en/master/Tutorial.html&#34;
+target=&#34;_top&#34;&gt;SeqAn Tutorials&lt;/a&gt; in the &lt;a
+href=&#34;http://seqan.readthedocs.org/en/master/&#34; target=&#34;_top&#34;&gt;SeqAn Manual&lt;/a&gt;
+will introduce you into SeqAn&#39;s basic concepts and show you how to use its
+data structures and functions.&lt;/li&gt; &lt;li&gt;&lt;b&gt;Think SeqAn.&lt;/b&gt; Since our library
+uses advanced C++ template programming techniques, we recommend you to read
+our glossary of &lt;a href=&#34;page_LanguageEntities.html&#34;&gt;language entity
+types&lt;/a&gt; for a quick introduction.&lt;/li&gt; &lt;li&gt;&lt;b&gt;Use SeqAn.&lt;/b&gt; Search the
+library for classes, functions, etc. using the search bar to the left. Need
+some orientation? Check the &lt;a href=&#34;#typical_tasks&#34;&gt;typical tasks&lt;/a&gt;
+below.&lt;/li&gt; &lt;/ol&gt;
+
+&lt;h2 name=&#34;typical_tasks&#34;&gt;Typical Tasks&lt;/h2&gt;
+
+If you know what you want to do but not how to achieve this with SeqAn, this
+sections gives you a nice overview of the components that might help you.
+
+Alternatively you might want to check the &lt;a
+href=&#34;http://seqan.readthedocs.org/en/master/Tutorial.html&#34;
+target=&#34;_top&#34;&gt;SeqAn Tutorials&lt;/a&gt;.
+
+&lt;ul class=&#34;overview&#34;&gt; &lt;li&gt; &lt;h3&gt;Read Mapping&lt;/h3&gt; &lt;p&gt;Most modern read mappers
+first identify candidate regions in the reference sequence approximately or
+using heuristics. Then, they verify the found locations. SeqAn can help with
+both and also provides facilities for making I/O easier.&lt;/p&gt; &lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;&lt;a
+href=&#34;http://seqan.readthedocs.org/en/master/Tutorial/SimpleReadMapping.html&#34;
+target=&#34;_top&#34; data-lang-entity=&#34;tutorial&#34;&gt;Read
+Mapping&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;instructive introductions&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Index @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;class and subclasses
+can be used for index-based search&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Finder
+@endlink&lt;/li&gt;&lt;li&gt;@link Pattern @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;can be used to
+implement online string search&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Align
+@endlink&lt;/li&gt;&lt;li&gt;@link globalAlignment @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;alignments
+can be used for the verification&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link SeqFileIn
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;used to read FASTA and FASTQ files&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link BamFileOut @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;used to write SAM
+and BAM files&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link FragmentStore
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;allows for managing read alignments and
+reading/writing from/to SAM&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; &lt;/li&gt; &lt;li&gt; &lt;h3&gt;File I/O&lt;/h3&gt;
+&lt;p&gt;SeqAn has support for most common file formats in Bioinformatics. The
+following lists the most convenient access methods.&lt;/p&gt; &lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;http://seqan.readthedocs.org/en/master/Tutorial/Inpu
+tOutputOverview.html&#34; target=&#34;_top&#34; data-lang-entity=&#34;tutorial&#34;&gt;I/O
+Overview&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;instructive introductions&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link SeqFileIn @endlink&lt;/li&gt;&lt;li&gt;@link SeqFileOut
+@endlink&lt;/li&gt;&lt;li&gt;@link FaiIndex @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;FASTA,
+FASTQ&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link BamFileIn @endlink&lt;/li&gt;&lt;li&gt;@link
+BamFileOut @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;SAM, BAM&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link VcfFileIn @endlink&lt;/li&gt;&lt;li&gt;@link VcfFileOut
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;VCF&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link BedFileIn
+@endlink&lt;/li&gt;&lt;li&gt;@link BedFileOut @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;BED&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link GffFileIn @endlink&lt;/li&gt;&lt;li&gt;@link GffFileOut
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;GFF, GTF&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; &lt;/li&gt; &lt;li&gt;
+&lt;h3&gt;Sequence Alignment &lt;small&gt;and Multiple Sequence Alignment&lt;/small&gt;&lt;/h3&gt;
+&lt;p&gt;Sequence alignment and multiple sequence alignment are classic problems in
+Bioinformatics.&lt;/p&gt; &lt;table&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;http://seqan.readthedocs
+.org/en/master/Tutorial/AlignmentRepresentation.html&#34; target=&#34;_top&#34; data-
+lang-entity=&#34;tutorial&#34;&gt;Alignment Representation&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;http://s
+eqan.readthedocs.org/en/master/Tutorial/PairwiseSequenceAlignment.html&#34;
+target=&#34;_top&#34; data-lang-entity=&#34;tutorial&#34;&gt;Pairwise Sequence
+Alignment&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;http://seqan.readthedocs.org/en/master/Tutoria
+l/MultipleSequenceAlignment.html&#34; target=&#34;_top&#34; data-lang-
+entity=&#34;tutorial&#34;&gt;Multiple Sequence
+Alignment&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;instructive introductions&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link globalAlignment @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;provides
+dynamic programming algorithms for global sequence alignment with various
+parameters&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link localAlignment
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link
+LocalAlignmentEnumerator @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;offers the Waterman-
+Eggert algorithm for enumerating suboptimal local alignments&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Align @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;provides a data
+structure for tabular alignment of sequences with the same type&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Gaps @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;allows to store gaps
+independent of the underlying sequence&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; &lt;/li&gt; &lt;li&gt;
+&lt;h3&gt;Graph &lt;small&gt;Data Structures and Algorithms&lt;/small&gt;&lt;/h3&gt; &lt;p&gt;Often, graphs
+come in handy to model subproblems in sequence analysis. SeqAn provides basic
+support for graphs and graph algorithms.&lt;/p&gt; &lt;table&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;&lt;a
+href=&#34;http://seqan.readthedocs.org/en/master/Tutorial/Graphs.html&#34;
+target=&#34;_top&#34; data-lang-
+entity=&#34;tutorial&#34;&gt;Graphs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;instructive
+introductions&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Graph
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;central class (including subclasses)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link DirectedGraph @endlink&lt;/li&gt;&lt;li&gt;@link UndirectedGraph
+@endlink.&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;simple directed and undirected graphs
+structures&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link Automaton @endlink&lt;/li&gt;&lt;li&gt;@link
+WordGraph @endlink&lt;/li&gt;&lt;li&gt;@link HmmGraph @endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;special
+subclasses for sequence analysis&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;&lt;ul&gt;&lt;li&gt;@link dijkstra
+Dijkstra&#39;s algorithm @endlink&lt;/li&gt;&lt;li&gt;@link bellmanFordAlgorithm Bellman-Ford
+algorithm @endlink&lt;/li&gt;&lt;li&gt;@link topologicalSort topological sorting
+@endlink&lt;/li&gt;&lt;li&gt;@link dagShortestPath shortest paths in DAGs
+@endlink&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;&lt;td&gt;standard graph algorithms&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td
+colspan=&#34;2&#34;&gt;For more advanced usage and algorithms, we recommend using the &lt;a
+href=&#34;http://lemon.cs.elte.hu/trac/lemon&#34; target=&#34;_top&#34;&gt;LEMON Graph
+Library&lt;/a&gt;.&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; &lt;/li&gt; &lt;/ul&gt;
+
+
+
+</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

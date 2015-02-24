@@ -1,0 +1,4973 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_argumentparser" data-page="ArgumentParser">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ArgumentParser - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>ArgumentParser<div><div>Parse the command line.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/arg_parse.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class ArgumentParser;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%3A%3AArgumentParser" title="#ArgumentParser::ArgumentParser (interface function)" data-lang-entity="member_function">ArgumentParser::ArgumentParser([appName]);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addArgument" title="#ArgumentParser#addArgument (interface function)" data-lang-entity="interface_function">void addArgument(parser, arg);</a></code></span>
+    <span class="summary_desc"><div>Adds an <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a> to an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addDefaultValue" title="#ArgumentParser#addDefaultValue (interface function)" data-lang-entity="interface_function">void addDefaultValue(parser, name, v);</a></code></span>
+    <span class="summary_desc"><div>Add/append a value to the default values for an option in an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addDescription" title="#ArgumentParser#addDescription (interface function)" data-lang-entity="interface_function">void addDescription(parser, description);</a></code></span>
+    <span class="summary_desc"><div>Appends a description paragraph to the ArgumentParser documentation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addLine" title="#ArgumentParser#addLine (interface function)" data-lang-entity="interface_function">void addLine(parser, line);</a></code></span>
+    <span class="summary_desc"><div>Adds a line of text to the help output of the ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addListItem" title="#ArgumentParser#addListItem (interface function)" data-lang-entity="interface_function">void addListItem(parser, item, description);</a></code></span>
+    <span class="summary_desc"><div>Appends a list item to the ArgumentParser</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addOption" title="#ArgumentParser#addOption (interface function)" data-lang-entity="interface_function">void addOption(parser, option);</a></code></span>
+    <span class="summary_desc"><div>Adds an <a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a> to an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addSection" title="#ArgumentParser#addSection (interface function)" data-lang-entity="interface_function">void addSection(parser, title);</a></code></span>
+    <span class="summary_desc"><div>Begins a new section of the option block of the ArgumentParser help output.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addText" title="#ArgumentParser#addText (interface function)" data-lang-entity="interface_function">void addText(parser, text);</a></code></span>
+    <span class="summary_desc"><div>Add text to an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addTextSection" title="#ArgumentParser#addTextSection (interface function)" data-lang-entity="interface_function">void addTextSection(parser, title);</a></code></span>
+    <span class="summary_desc"><div>Add a text section to the ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addTextSubSection" title="#ArgumentParser#addTextSubSection (interface function)" data-lang-entity="interface_function">void addTextSubSection(parser, title);</a></code></span>
+    <span class="summary_desc"><div>Add a text sub section to the ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23addUseLine" title="#ArgumentParser#addUseLine (interface function)" data-lang-entity="interface_function">void addUsageLine(parser, line);</a></code></span>
+    <span class="summary_desc"><div>Adds a line of text to the usage output of the ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getAppName" title="#ArgumentParser#getAppName (interface function)" data-lang-entity="interface_function">TCharStringRef getAppName(parser);</a></code></span>
+    <span class="summary_desc"><div>Return program name of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getArgument" title="#ArgumentParser#getArgument (interface function)" data-lang-entity="interface_function">TArgument getArgument(parser, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to the given positional argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getArgumentFileExtension" title="#ArgumentParser#getArgumentFileExtension (interface function)" data-lang-entity="interface_function">std::string argumentFileExtension(parser, pos[, argNo]);</a></code></span>
+    <span class="summary_desc"><div>Retrieve the file extension of a file argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getArgumentValue" title="#ArgumentParser#getArgumentValue (interface function)" data-lang-entity="interface_function">bool getArgumentValue(dest, parser, pos[, no]);</a></code></span>
+    <span class="summary_desc"><div>Retrieves the value of an argument given by its position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getArgumentValueCount" title="#ArgumentParser#getArgumentValueCount (interface function)" data-lang-entity="interface_function">unsigned getArgumentValueCount(parser, pos);</a></code></span>
+    <span class="summary_desc"><div>Query number of values stored for the specified argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getArgumentValues" title="#ArgumentParser#getArgumentValues (interface function)" data-lang-entity="interface_function">TVector getArgumentValues(parser, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns all values of an argument given on the command line.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getCategory" title="#ArgumentParser#getCategory (interface function)" data-lang-entity="interface_function">TCharStringRef getCategory(parser);</a></code></span>
+    <span class="summary_desc"><div>Returns the category.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getFileExtensions" title="#ArgumentParser#getFileExtensions (interface function)" data-lang-entity="interface_function">TVector getFormatExtension(tag);, TVector getFormatExtension(tagList);, TVector getFormatExtension(tagSelector);</a></code></span>
+    <span class="summary_desc"><div>Returns file format extension given a format tag.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getOption" title="#ArgumentParser#getOption (interface function)" data-lang-entity="interface_function">TOption getOption(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to the specified option.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getOptionFileExtension" title="#ArgumentParser#getOptionFileExtension (interface function)" data-lang-entity="interface_function">std::string getOptionFileExtension(parser, name[, pos]);</a></code></span>
+    <span class="summary_desc"><div>Retrieve the file extension of a file option.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getOptionValue" title="#ArgumentParser#getOptionValue (interface function)" data-lang-entity="interface_function">bool getOptionValue(dest, parser, name[, pos]);</a></code></span>
+    <span class="summary_desc"><div>Retrieve the value of an option.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getOptionValueCount" title="#ArgumentParser#getOptionValueCount (interface function)" data-lang-entity="interface_function">unsigned getOptionValueCount(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Query number of values stored for the specified option.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getOptionValues" title="#ArgumentParser#getOptionValues (interface function)" data-lang-entity="interface_function">TVector getOptionValues(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Returns all values of an option given on the command line.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getShortDescription" title="#ArgumentParser#getShortDescription (interface function)" data-lang-entity="interface_function">CharString getShortDescription(parser);</a></code></span>
+    <span class="summary_desc"><div>Returns the short description.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23getVersion" title="#ArgumentParser#getVersion (interface function)" data-lang-entity="interface_function">TCharStringRef getVersion(parser);</a></code></span>
+    <span class="summary_desc"><div>Returns the version string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23hasDefault" title="#ArgumentParser#hasDefault (interface function)" data-lang-entity="interface_function">bool hasDefault(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Query whether an option has a default value.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23hasOption" title="#ArgumentParser#hasOption (interface function)" data-lang-entity="interface_function">bool hasOption(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Query whether a certain option is registered in the parser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23hideOption" title="#ArgumentParser#hideOption (interface function)" data-lang-entity="interface_function">void hideOption(parser, name[, hide]).</a></code></span>
+    <span class="summary_desc"><div>Hides the ArgParseOption with the given name.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23isSet" title="#ArgumentParser#isSet (interface function)" data-lang-entity="interface_function">bool isSet(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Query whether an option was set on the command line.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23parse" title="#ArgumentParser#parse (interface function)" data-lang-entity="interface_function">TResult parse(parser, argc, argv[, outStream[, errStream]]);</a></code></span>
+    <span class="summary_desc"><div>Parse command line parameters.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23printHelp" title="#ArgumentParser#printHelp (interface function)" data-lang-entity="interface_function">void printHelp(parser, out, format);</a></code></span>
+    <span class="summary_desc"><div>Prints the complete help message for the parser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23printShortHelp" title="#ArgumentParser#printShortHelp (interface function)" data-lang-entity="interface_function">void printShortHelp(parser, out);</a></code></span>
+    <span class="summary_desc"><div>Prints a short help message for the parser to a stream.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23printVersion" title="#ArgumentParser#printVersion (interface function)" data-lang-entity="interface_function">void printVersion(parser, stream);</a></code></span>
+    <span class="summary_desc"><div>Prints the version information of the parser to a stream.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setAppName" title="#ArgumentParser#setAppName (interface function)" data-lang-entity="interface_function">void setAppName(parser, name);</a></code></span>
+    <span class="summary_desc"><div>Sets application name of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setCategory" title="#ArgumentParser#setCategory (interface function)" data-lang-entity="interface_function">void setCategory(parser, category);</a></code></span>
+    <span class="summary_desc"><div>Sets category of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setDate" title="#ArgumentParser#setDate (interface function)" data-lang-entity="interface_function">void setDate(parser, date);</a></code></span>
+    <span class="summary_desc"><div>Sets date string of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setDefaultValue" title="#ArgumentParser#setDefaultValue (interface function)" data-lang-entity="interface_function">void setDefaultValue(parser, name, v);</a></code></span>
+    <span class="summary_desc"><div>Set the default value of an option of an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setHelpText" title="#ArgumentParser#setHelpText (interface function)" data-lang-entity="interface_function">void setHelpText(parser, name, text);, void setHelpText(parser, pos, text);</a></code></span>
+    <span class="summary_desc"><div>Set the help text of an option or argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setMaxValue" title="#ArgumentParser#setMaxValue (interface function)" data-lang-entity="interface_function">void setMaxValue(parser, name, v);, void setMaxValue(parser, pos, v);</a></code></span>
+    <span class="summary_desc"><div>Set largest allowed value for an option or argument of an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setMinValue" title="#ArgumentParser#setMinValue (interface function)" data-lang-entity="interface_function">void setMinValue(parser, name, v);, void setMinValue(parser, pos, v);</a></code></span>
+    <span class="summary_desc"><div>Set smallest allowed value for an option or argument of an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setRequired" title="#ArgumentParser#setRequired (interface function)" data-lang-entity="interface_function">void setRequired(parser, name[, required]).</a></code></span>
+    <span class="summary_desc"><div>Sets whether or not the option with the givne name is mandatory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setShortDescription" title="#ArgumentParser#setShortDescription (interface function)" data-lang-entity="interface_function">void setShortDescription(parser, desc);</a></code></span>
+    <span class="summary_desc"><div>Sets shortDescription of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setValidValues" title="#ArgumentParser#setValidValues (interface function)" data-lang-entity="interface_function">void setValidValues(parser, name, values);, void setValidValues(parser, pos, values);</a></code></span>
+    <span class="summary_desc"><div>Set valid values for an argumetn or option of an ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23setVersion" title="#ArgumentParser#setVersion (interface function)" data-lang-entity="interface_function">void setVersion(parser, version);</a></code></span>
+    <span class="summary_desc"><div>Sets version of ArgumentParser.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgumentParser%23writeCTD" title="#ArgumentParser#writeCTD (interface function)" data-lang-entity="interface_function">bool writeCTD(parser[, stream]);</a></code></span>
+    <span class="summary_desc"><div>Export the app's interface description to a .ctd file.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Options are stored as <a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a> and <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a> objects.</p><h3>Remarks</h3><p>See the documentation of <a href="class_ToolDoc.html" data-lang-entity="class">ToolDoc</a> on how to format text. Wherever possible, formatting is added
+automatically for you. You have to use formatting in the following places: (1) usage lines, (2) option help texts,
+(3) description and additional text sections.</p><h3>Examples</h3><p>The following gives a simple example of how to use the ArgumentParser class.</p><div data-src-path="demos/arg_parse/argument_parser.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+
+<span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;      </span><span class="c1">// For printing SeqAn Strings.</span>
+
+<span class="cp">#include &lt;seqan/arg_parse.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">**</span> <span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Initialize ArgumentParser.</span>
+    <span class="n">ArgumentParser</span> <span class="n">parser</span><span class="p">(</span><span class="s">&quot;arg_parse_demo&quot;</span><span class="p">);</span>
+    <span class="n">setCategory</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Demo&quot;</span><span class="p">);</span>
+    <span class="n">setShortDescription</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Just a demo of the new ArgumentParser!&quot;</span><span class="p">);</span>
+    <span class="n">setVersion</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;0.1&quot;</span><span class="p">);</span>
+    <span class="n">setDate</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Mar 2012&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Add use and description lines.</span>
+    <span class="n">addUsageLine</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;[</span><span class="se">\\</span><span class="s">fIOPTIONS</span><span class="se">\\</span><span class="s">fP] </span><span class="se">\\</span><span class="s">fIIN</span><span class="se">\\</span><span class="s">fP </span><span class="se">\\</span><span class="s">fIOUT</span><span class="se">\\</span><span class="s">fP &quot;</span><span class="p">);</span>
+
+    <span class="n">addDescription</span><span class="p">(</span>
+        <span class="n">parser</span><span class="p">,</span>
+        <span class="s">&quot;This is just a little demo to show what ArgumentParser is &quot;</span>
+        <span class="s">&quot;able to do.  </span><span class="se">\\</span><span class="s">fIIN</span><span class="se">\\</span><span class="s">fP is a multi-FASTA input file.  </span><span class="se">\\</span><span class="s">fIOUT</span><span class="se">\\</span><span class="s">fP is a &quot;</span>
+        <span class="s">&quot;txt output file.&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Add positional arguments and set their valid file types.</span>
+    <span class="n">addArgument</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">ArgParseArgument</span><span class="p">(</span><span class="n">ArgParseArgument</span><span class="o">::</span><span class="n">INPUT_FILE</span><span class="p">,</span> <span class="s">&quot;IN&quot;</span><span class="p">));</span>
+    <span class="n">addArgument</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">ArgParseArgument</span><span class="p">(</span><span class="n">ArgParseArgument</span><span class="o">::</span><span class="n">OUTPUT_FILE</span><span class="p">,</span> <span class="s">&quot;OUT&quot;</span><span class="p">));</span>
+    <span class="n">setValidValues</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;FASTA fa&quot;</span><span class="p">);</span>
+    <span class="n">setValidValues</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;txt&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Add a section with some options.</span>
+    <span class="n">addSection</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Important Tool Parameters&quot;</span><span class="p">);</span>
+    <span class="n">addOption</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">ArgParseOption</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;Sequence identity between [0.0:1.0]&quot;</span><span class="p">,</span>
+                                     <span class="n">ArgParseArgument</span><span class="o">::</span><span class="n">DOUBLE</span><span class="p">,</span> <span class="s">&quot;ID&quot;</span><span class="p">));</span>
+    <span class="n">setRequired</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+    <span class="n">setMinValue</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;0.0&quot;</span><span class="p">);</span>
+    <span class="n">setMaxValue</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;1.0&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Adding a verbose and a hidden option.</span>
+    <span class="n">addSection</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Miscellaneous&quot;</span><span class="p">);</span>
+    <span class="n">addOption</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">ArgParseOption</span><span class="p">(</span><span class="s">&quot;v&quot;</span><span class="p">,</span> <span class="s">&quot;verbose&quot;</span><span class="p">,</span> <span class="s">&quot;Turn on verbose output.&quot;</span><span class="p">));</span>
+    <span class="n">addOption</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">ArgParseOption</span><span class="p">(</span><span class="s">&quot;H&quot;</span><span class="p">,</span> <span class="s">&quot;hidden&quot;</span><span class="p">,</span> <span class="s">&quot;Super mysterious flag that will not be shown in &quot;</span>
+                                                    <span class="s">&quot;the help screen or man page.&quot;</span><span class="p">));</span>
+    <span class="n">hideOption</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;H&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Add a Reference section.</span>
+    <span class="n">addTextSection</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;References&quot;</span><span class="p">);</span>
+    <span class="n">addText</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;http://www.seqan.de&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Parse the arguments.</span>
+    <span class="n">ArgumentParser</span><span class="o">::</span><span class="n">ParseResult</span> <span class="n">res</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+    <span class="c1">// Return if there was an error or a built-in command was triggered (e.g. help).</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="o">!=</span> <span class="n">ArgumentParser</span><span class="o">::</span><span class="n">PARSE_OK</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span> <span class="o">==</span> <span class="n">ArgumentParser</span><span class="o">::</span><span class="n">PARSE_ERROR</span><span class="p">;</span>  <span class="c1">// 1 on errors, 0 otherwise</span>
+
+    <span class="c1">// Extract and print the options.</span>
+    <span class="kt">bool</span> <span class="n">verbose</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="n">getOptionValue</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="s">&quot;verbose&quot;</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Verbose:     &quot;</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">verbose</span> <span class="o">?</span> <span class="s">&quot;on&quot;</span> <span class="o">:</span> <span class="s">&quot;off&quot;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="kt">double</span> <span class="n">identity</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">;</span>
+    <span class="n">getOptionValue</span><span class="p">(</span><span class="n">identity</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Identity:    &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">identity</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">CharString</span> <span class="n">inputFile</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">;</span>
+    <span class="n">getArgumentValue</span><span class="p">(</span><span class="n">inputFile</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="n">getArgumentValue</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Input-File:  &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">inputFile</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Output-File: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">outputFile</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/arg_parse/argument_parser.cpp" target="_top">demos/arg_parse/argument_parser.cpp</a></div></div><pre class="console" data-src-path="None">$ demo_arg_parse_argument_parser in.fa out.txt --id 0
+Built target seqan_core
+Built target demo_arg_parse
+Verbose:     off
+Identity:    0
+Input-File:  in.fa
+Output-File: out.txt</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a></li>
+  
+  <li><a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a></li>
+  
+  <li><a href="class_ToolDoc.html" data-lang-entity="class">ToolDoc</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgumentParser::ArgumentParser" class="signature first" data-lang-entity="member_function">
+      <code>ArgumentParser::ArgumentParser([appName]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">appName</code>
+            
+        
+      </th>
+      <td>The name of the application (<tt>std::string</tt>), defaults to <tt>argv[0]</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgumentParser#addArgument" class="signature first" data-lang-entity="interface_function">
+      <code>void addArgument(parser, arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds an <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a> to an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the argument to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to add to <tt>parser</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addDefaultValue" class="signature" data-lang-entity="interface_function">
+      <code>void addDefaultValue(parser, name, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add/append a value to the default values for an option in an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to append the default value to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the argument (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The value to append (template parameter, must be streamable into a <tt>std::stringstream</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addDescription" class="signature" data-lang-entity="interface_function">
+      <code>void addDescription(parser, description);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends a description paragraph to the ArgumentParser documentation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the line to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">description</code>
+            
+        
+      </th>
+      <td>The description text, a <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addLine" class="signature" data-lang-entity="interface_function">
+      <code>void addLine(parser, line);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds a line of text to the help output of the ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the line to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">line</code>
+            
+        
+      </th>
+      <td>The line of text to add, <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> of <tt>char</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The line of text will be added to the block of the options.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addListItem" class="signature" data-lang-entity="interface_function">
+      <code>void addListItem(parser, item, description);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends a list item to the ArgumentParser</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the list item to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">item</code>
+            
+        
+      </th>
+      <td>The item to add, <tt>std::string</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">description</code>
+            
+        
+      </th>
+      <td>The item to add, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addOption" class="signature" data-lang-entity="interface_function">
+      <code>void addOption(parser, option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds an <a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a> to an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the option to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption to add to <tt>parser</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addSection" class="signature" data-lang-entity="interface_function">
+      <code>void addSection(parser, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Begins a new section of the option block of the ArgumentParser help output.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the line to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The title to add, <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> of <tt>char</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><div data-src-path="None"><div class="highlight"><pre><span class="n">ArgumentParser</span> <span class="n">parser</span><span class="p">;</span>
+
+<span class="p">[...]</span> <span class="c1">// init parser</span>
+
+<span class="n">addSection</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;In-/Output-Options&quot;</span><span class="p">);</span>
+<span class="n">addOption</span><span class="p">(</span><span class="s">&quot;i&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">);</span>
+<span class="n">addOption</span><span class="p">(</span><span class="s">&quot;o&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">);</span>
+
+<span class="n">addSection</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="s">&quot;Other Options&quot;</span><span class="p">);</span>
+<span class="n">addOption</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="p">...</span> <span class="p">);</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addText" class="signature" data-lang-entity="interface_function">
+      <code>void addText(parser, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add text to an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>ArgumentParser to add text to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The <tt>std::string</tt> to add to the parser.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addTextSection" class="signature" data-lang-entity="interface_function">
+      <code>void addTextSection(parser, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a text section to the ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the text section title to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The section title to add, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addTextSubSection" class="signature" data-lang-entity="interface_function">
+      <code>void addTextSubSection(parser, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a text sub section to the ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser add the subsection title to of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The sub section title to add, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#addUseLine" class="signature" data-lang-entity="interface_function">
+      <code>void addUsageLine(parser, line);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds a line of text to the usage output of the ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to add the line to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">line</code>
+            
+        
+      </th>
+      <td>The line to add, a <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getAppName" class="signature" data-lang-entity="interface_function">
+      <code>TCharStringRef getAppName(parser);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return program name of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the app name for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCharStringRef</code></th>
+        <td>The app name, const-ref to <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getArgument" class="signature" data-lang-entity="interface_function">
+      <code>TArgument getArgument(parser, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to the given positional argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to return (<tt>unsigned</tt>, starting at 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TArgument</code></th>
+        <td>Reference to the <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a> with the given position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getArgumentFileExtension" class="signature" data-lang-entity="interface_function">
+      <code>std::string argumentFileExtension(parser, pos[, argNo]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Retrieve the file extension of a file argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the value from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to query (<tt>unsigned</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argNo</code>
+            
+        
+      </th>
+      <td>Optional position for multi-value options (<tt>unsigned</tt>, defaults to 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The extension of the argument if any.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Overriding File Extensions on the Command Line</h4><p>For each argument with type <tt>INPUT_FILE</tt> and <tt>OUTPUT_FILE</tt>, an option with the index
+<tt>arg-${idx}-file-ext</tt> is automatically added to the ArgumentParser (where <tt>${idx}</tt> is the index
+of the original option). The extension can be overridden by specifying the argument. Thus, the user of
+the program could give the value "file.ext" to the parameter "0" and override the extension on the
+command line to "ext2" as follows:</p><pre class="console" data-src-path="None"># program_name file.ext --arg-0-file-ext ext2</pre></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getOptionFileExtension</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getArgumentValue" class="signature" data-lang-entity="interface_function">
+      <code>bool getArgumentValue(dest, parser, pos[, no]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Retrieves the value of an argument given by its position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dest</code>
+            
+        
+      </th>
+      <td>The variable to write the result to (the type is a template parameter and the value type of the
+argument must be convertible in the type of <tt>dest</tt> for the retrieval to work, also see
+result value).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the value from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to get the value of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">no</code>
+            
+        
+      </th>
+      <td>Optional position for multi-value arguments (<tt>unsigned</tt>, defaults to 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the retrieval was successful, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getArgumentValueCount" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getArgumentValueCount(parser, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query number of values stored for the specified argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The position of the argument (<tt>unsigned</tt>, 0-based).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The number of values for the argument with the given position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getArgumentValues" class="signature" data-lang-entity="interface_function">
+      <code>TVector getArgumentValues(parser, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns all values of an argument given on the command line.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument (<tt>unsigned</tt>, 0-based).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVector</code></th>
+        <td>The resulting values (<tt>std::vector&lt;std::string&gt;</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getCategory" class="signature" data-lang-entity="interface_function">
+      <code>TCharStringRef getCategory(parser);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the category.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the category from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCharString</code></th>
+        <td>A const-ref to a <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> with the category.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getFileExtensions" class="signature" data-lang-entity="interface_function">
+      <code>TVector getFormatExtension(tag);
+TVector getFormatExtension(tagList);
+TVector getFormatExtension(tagSelector);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns file format extension given a format tag.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>A single file foramt, e.g. <tt>Fastq()</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tagList</code>
+            
+        
+      </th>
+      <td>A list of file format (<a href="class_TagList.html" data-lang-entity="class">TagList</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tagSelector</code>
+            
+        
+      </th>
+      <td>A file format selector (<a href="class_TagSelector.html" data-lang-entity="class">TagSelector</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVector</code></th>
+        <td>A <tt>std::vector&lt;std::string&gt;</tt> with the allowed file format extensions.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getOption" class="signature" data-lang-entity="interface_function">
+      <code>TOption getOption(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to the specified option.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The parser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TOption</code></th>
+        <td>Reference to the <a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a> with the given short or long name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getOptionFileExtension" class="signature" data-lang-entity="interface_function">
+      <code>std::string getOptionFileExtension(parser, name[, pos]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Retrieve the file extension of a file option.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the value from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>Optional position for multi-value options (<tt>unsigned</tt>, defaults to 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The extension of the option. Empty if not set or no extension.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Overriding File Extension on the Command Line</h4><p>For each option with type <tt>INPUT_FILE</tt> and <tt>OUTPUT_FILE</tt>, an option with the name
+<tt>${name}-file-ext</tt> is automatically added to the ArgumentParser (where <tt>${name}</tt> is the name
+of the original option). The extension can be overridden by specifying the argument. Thus, the user of
+the program could give the value "file.ext" to the parameter "fname" and override the extension on the
+command line to "ext2" as follows:</p><pre class="console" data-src-path="None"># program_name --fname file.ext --fname-file-ext ext2</pre></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getArgumentFileExtension</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getOptionValue" class="signature" data-lang-entity="interface_function">
+      <code>bool getOptionValue(dest, parser, name[, pos]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Retrieve the value of an option.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dest</code>
+            
+        
+      </th>
+      <td>The variable to write the result to (the type is a template parameter and the value type of the
+option must be convertible in the type of <tt>dest</tt> for the retrieval to work, also see
+result value).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the value from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>Optional position for multi-value options (<tt>unsigned</tt>, defaults to 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the requested option was given on the command line and could be coverted to the type of
+<tt>dest</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getOptionValueCount" class="signature" data-lang-entity="interface_function">
+      <code>unsigned getOptionValueCount(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query number of values stored for the specified option.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The number of values for the option with the given name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getOptionValues" class="signature" data-lang-entity="interface_function">
+      <code>TVector getOptionValues(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns all values of an option given on the command line.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option to get (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVector</code></th>
+        <td>The resulting values (<tt>std::vector&lt;std::string&gt;</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getShortDescription" class="signature" data-lang-entity="interface_function">
+      <code>CharString getShortDescription(parser);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the short description.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get short description for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>A <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> with the short description.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#getVersion" class="signature" data-lang-entity="interface_function">
+      <code>TCharStringRef getVersion(parser);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the version string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to get the version string from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCharString</code></th>
+        <td>A const-ref to a <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> with the version string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#hasDefault" class="signature" data-lang-entity="interface_function">
+      <code>bool hasDefault(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query whether an option has a default value.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Whether or not the option has a default value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#hasOption" class="signature" data-lang-entity="interface_function">
+      <code>bool hasOption(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query whether a certain option is registered in the parser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name to query for (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if there is such an option, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#hideOption" class="signature" data-lang-entity="interface_function">
+      <code>void hideOption(parser, name[, hide]).</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Hides the ArgParseOption with the given name.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgParseOption to the the hidden flag of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hide</code>
+            
+        
+      </th>
+      <td>Whether or not to hide the flag (<tt>bool</tt>, defaults to <tt>true</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#isSet" class="signature" data-lang-entity="interface_function">
+      <code>bool isSet(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query whether an option was set on the command line.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Whether or not the option was set on the command line or not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#parse" class="signature" data-lang-entity="interface_function">
+      <code>TResult parse(parser, argc, argv[, outStream[, errStream]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Parse command line parameters.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to use for parsing and for storing parse results.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argc</code>
+            
+        
+      </th>
+      <td>The number of arguments (<tt>int</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argv</code>
+            
+        
+      </th>
+      <td>The arguments (<tt>const char * argv[]</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">outStream</code>
+            
+        
+      </th>
+      <td>The <tt>std::ostream</tt> to use for output.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">errStream</code>
+            
+        
+      </th>
+      <td>The <tt>std::ostream</tt> to use for error output.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TResult</code></th>
+        <td>The parse result, of type <a href="enum_ArgumentParser_58_58ParseResult.html" data-lang-entity="enum">ArgumentParser::ParseResult</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function must be called before retrieving any options or arguments from the parser.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#printHelp" class="signature" data-lang-entity="interface_function">
+      <code>void printHelp(parser, out, format);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Prints the complete help message for the parser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser print the help for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">out</code>
+            
+        
+      </th>
+      <td>The output stream to print to (<tt>std::ostream</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">format</code>
+            
+        
+      </th>
+      <td>The format to print, one of "html", "man", and "txt".</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#printShortHelp" class="signature" data-lang-entity="interface_function">
+      <code>void printShortHelp(parser, out);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Prints a short help message for the parser to a stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to print help for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">out</code>
+            
+        
+      </th>
+      <td>The <tt>std::ostream</tt> to print help to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#printVersion" class="signature" data-lang-entity="interface_function">
+      <code>void printVersion(parser, stream);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Prints the version information of the parser to a stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumenParser to print for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td>The <tt>std::ostream</tt> to print to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setAppName" class="signature" data-lang-entity="interface_function">
+      <code>void setAppName(parser, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets application name of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the name of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The application name, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setCategory" class="signature" data-lang-entity="interface_function">
+      <code>void setCategory(parser, category);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets category of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the category of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">category</code>
+            
+        
+      </th>
+      <td>The category to set, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setDate" class="signature" data-lang-entity="interface_function">
+      <code>void setDate(parser, date);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets date string of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the date string of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">date</code>
+            
+        
+      </th>
+      <td>The date string to set, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setDefaultValue" class="signature" data-lang-entity="interface_function">
+      <code>void setDefaultValue(parser, name, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the default value of an option of an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the default value to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the argument (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The value to set (template parameter, must be streamable into a <tt>std::stringstream</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setHelpText" class="signature" data-lang-entity="interface_function">
+      <code>void setHelpText(parser, name, text);
+void setHelpText(parser, pos, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the help text of an option or argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the option to set the help text for (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to set the help text for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The string to use for the help text (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setMaxValue" class="signature" data-lang-entity="interface_function">
+      <code>void setMaxValue(parser, name, v);
+void setMaxValue(parser, pos, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set largest allowed value for an option or argument of an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the maximal value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the option to set the maximal value for (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to set the maximal value for (<tt>unsigned</tt>, 0-based).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The maximal value to set (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The option/argument must have an integer or double type.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setMinValue" class="signature" data-lang-entity="interface_function">
+      <code>void setMinValue(parser, name, v);
+void setMinValue(parser, pos, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set smallest allowed value for an option or argument of an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the minimal value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the option to set the minimal value for (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument to set the minimal value for (<tt>unsigned</tt>, 0-based).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The minimal value to set (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The option/argument must have an integer or double type.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setRequired" class="signature" data-lang-entity="interface_function">
+      <code>void setRequired(parser, name[, required]).</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets whether or not the option with the givne name is mandatory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the flag of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The short or long name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">required</code>
+            
+        
+      </th>
+      <td>Whether or not the option is required (<tt>bool</tt>, default to <tt>true</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setShortDescription" class="signature" data-lang-entity="interface_function">
+      <code>void setShortDescription(parser, desc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets shortDescription of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the short description of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">desc</code>
+            
+        
+      </th>
+      <td>The short description, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setValidValues" class="signature" data-lang-entity="interface_function">
+      <code>void setValidValues(parser, name, values);
+void setValidValues(parser, pos, values);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set valid values for an argumetn or option of an ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the default values to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the option (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument (<tt>unsigned</tt>, 0-based).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">values</code>
+            
+        
+      </th>
+      <td>The values to set. Either a <tt>std::string</tt> with the values as space-separated list
+or a <tt>std::vector&lt;std::string&gt;</tt> with the values.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#setVersion" class="signature" data-lang-entity="interface_function">
+      <code>void setVersion(parser, version);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets version of ArgumentParser.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to set the version of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">version</code>
+            
+        
+      </th>
+      <td>The version string to set, <tt>std::string</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgumentParser#writeCTD" class="signature" data-lang-entity="interface_function">
+      <code>bool writeCTD(parser[, stream]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Export the app's interface description to a .ctd file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">parser</code>
+            
+        
+      </th>
+      <td>The ArgumentParser to write the CTD file for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">stream</code>
+            
+        
+      </th>
+      <td>A <tt>std::ostream</tt> to write to. If omitted an output file with the name form the
+"write-ctd" parameter of the parser is used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ArgumentParser
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Parse the command line.
+ * 
+ * @signature class ArgumentParser;
+ * 
+ * Options are stored as @link ArgParseOption @endlink and @link
+ * ArgParseArgument @endlink objects.
+ * 
+ * @section Remarks
+ * 
+ * See the documentation of @link ToolDoc @endlink on how to format text.
+ * Wherever possible, formatting is added automatically for you. You have to use
+ * formatting in the following places: (1) usage lines, (2) option help texts,
+ * (3) description and additional text sections.
+ * 
+ * @section Examples
+ * 
+ * The following gives a simple example of how to use the ArgumentParser class.
+ * 
+ * @include demos/arg_parse/argument_parser.cpp
+ * 
+ * @code{.console}
+ * $ demo_arg_parse_argument_parser in.fa out.txt --id 0
+ * Built target seqan_core
+ * Built target demo_arg_parse
+ * Verbose:     off
+ * Identity:    0
+ * Input-File:  in.fa
+ * Output-File: out.txt
+ * @endcode
+ * 
+ * 
+ * @see ArgParseArgument
+ * @see ArgParseOption
+ * @see ToolDoc
+ * 
+ * @fn ArgumentParser::ArgumentParser
+ * 
+ * @brief Constructor
+ * 
+ * @signature ArgumentParser::ArgumentParser([appName]);
+ * 
+ * @param[in] appName The name of the application (&lt;tt&gt;std::string&lt;/tt&gt;),
+ *                    defaults to &lt;tt&gt;argv[0]&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#writeCTD
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;\
+ * 
+ * @brief Export the app&#39;s interface description to a .ctd file.
+ * 
+ * @signature bool writeCTD(parser[, stream]);
+ * 
+ * @param[in] parser The ArgumentParser to write the CTD file for.
+ * @param[out] stream A &lt;tt&gt;std::ostream&lt;/tt&gt; to write to. If omitted an output
+ *                    file with the name form the &#34;write-ctd&#34; parameter of the
+ *                    parser is used.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn ArgumentParser#getAppName
+ * 
+ * @brief Return program name of ArgumentParser.
+ * 
+ * @signature TCharStringRef getAppName(parser);
+ * 
+ * @param[in] parser The ArgumentParser to get the app name for.
+ * 
+ * @return TCharStringRef The app name, const-ref to @link CharString @endlink.
+ * 
+ * @fn ArgumentParser#addLine
+ * 
+ * @brief Adds a line of text to the help output of the ArgumentParser.
+ * 
+ * @signature void addLine(parser, line);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the line to.
+ * @param[in] line The line of text to add, @link StringConcept @endlink of
+ *                 &lt;tt&gt;char&lt;/tt&gt;.
+ * 
+ * The line of text will be added to the block of the options.
+ * 
+ * @fn ArgumentParser#addSection
+ * 
+ * @brief Begins a new section of the option block of the ArgumentParser help
+ *        output.
+ * 
+ * @signature void addSection(parser, title);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the line to.
+ * @param[in] title The title to add, @link StringConcept @endlink of
+ *                  &lt;tt&gt;char&lt;/tt&gt;.
+ * 
+ * @code{.cpp}
+ * ArgumentParser parser;
+ * 
+ * [...] // init parser
+ * 
+ * addSection(parser, &#34;In-/Output-Options&#34;);
+ * addOption(&#34;i&#34;, ... );
+ * addOption(&#34;o&#34;, ... );
+ * 
+ * addSection(parser, &#34;Other Options&#34;);
+ * addOption(&#34;x&#34;, ... );
+ * @endcode
+ * 
+ * 
+ * @fn ArgumentParser#addUseLine
+ * 
+ * @brief Adds a line of text to the usage output of the ArgumentParser.
+ * 
+ * @signature void addUsageLine(parser, line);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the line to.
+ * @param[in] line The line to add, a &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#addDescription
+ * 
+ * @brief Appends a description paragraph to the ArgumentParser documentation.
+ * 
+ * @signature void addDescription(parser, description);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the line to.
+ * @param[in] description The description text, a &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#setAppName
+ * 
+ * @brief Sets application name of ArgumentParser.
+ * 
+ * @signature void setAppName(parser, name);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the name of.
+ * @param[in] name The application name, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#setShortDescription
+ * 
+ * @brief Sets shortDescription of ArgumentParser.
+ * 
+ * @signature void setShortDescription(parser, desc);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the short description of.
+ * @param[in] desc The short description, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#getShortDescription
+ * 
+ * @brief Returns the short description.
+ * 
+ * @signature CharString getShortDescription(parser);
+ * 
+ * @param[in,out] parser The ArgumentParser to get short description for.
+ * 
+ * @return CharString A @link CharString @endlink with the short description.
+ * 
+ * @fn ArgumentParser#setVersion
+ * 
+ * @brief Sets version of ArgumentParser.
+ * 
+ * @signature void setVersion(parser, version);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the version of.
+ * @param[in] version The version string to set, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#getVersion
+ * 
+ * @brief Returns the version string.
+ * 
+ * @signature TCharStringRef getVersion(parser);
+ * 
+ * @param[in,out] parser The ArgumentParser to get the version string from.
+ * 
+ * @return TCharString A const-ref to a @link CharString @endlink with the
+ *                     version string.
+ * 
+ * @fn ArgumentParser#setCategory
+ * 
+ * @brief Sets category of ArgumentParser.
+ * 
+ * @signature void setCategory(parser, category);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the category of.
+ * @param[in] category The category to set, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#getCategory
+ * 
+ * @brief Returns the category.
+ * 
+ * @signature TCharStringRef getCategory(parser);
+ * 
+ * @param[in,out] parser The ArgumentParser to get the category from.
+ * 
+ * @return TCharString A const-ref to a @link CharString @endlink with the
+ *                     category.
+ * 
+ * @fn ArgumentParser#setDate
+ * 
+ * @brief Sets date string of ArgumentParser.
+ * 
+ * @signature void setDate(parser, date);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the date string of.
+ * @param[in] date The date string to set, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#addTextSection
+ * 
+ * @brief Add a text section to the ArgumentParser.
+ * 
+ * @signature void addTextSection(parser, title);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the text section title to.
+ * @param[in] title The section title to add, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#addTextSubSection
+ * 
+ * @brief Add a text sub section to the ArgumentParser.
+ * 
+ * @signature void addTextSubSection(parser, title);
+ * 
+ * @param[in,out] parser The ArgumentParser add the subsection title to of.
+ * @param[in] title The sub section title to add, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#addText
+ * 
+ * @brief Add text to an ArgumentParser.
+ * 
+ * @signature void addText(parser, text);
+ * 
+ * @param[in,out] parser ArgumentParser to add text to.
+ * @param[in] text The &lt;tt&gt;std::string&lt;/tt&gt; to add to the parser.
+ * 
+ * @fn ArgumentParser#addListItem
+ * 
+ * @brief Appends a list item to the ArgumentParser
+ * 
+ * @signature void addListItem(parser, item, description);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the list item to.
+ * @param[in] item The item to add, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * @param[in] description The item to add, &lt;tt&gt;std::string&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#printShortHelp
+ * 
+ * @brief Prints a short help message for the parser to a stream.
+ * 
+ * @signature void printShortHelp(parser, out);
+ * 
+ * @param[in,out] parser The ArgumentParser to print help for.
+ * @param[in,out] out The &lt;tt&gt;std::ostream&lt;/tt&gt; to print help to.
+ * 
+ * @fn ArgumentParser#printVersion
+ * 
+ * @brief Prints the version information of the parser to a stream.
+ * 
+ * @signature void printVersion(parser, stream);
+ * 
+ * @param[in,out] parser The ArgumenParser to print for.
+ * @param[in,out] stream The &lt;tt&gt;std::ostream&lt;/tt&gt; to print to.
+ * 
+ * @fn ArgumentParser#printHelp
+ * 
+ * @brief Prints the complete help message for the parser.
+ * 
+ * @signature void printHelp(parser, out, format);
+ * 
+ * @param[in,out] parser The ArgumentParser print the help for.
+ * @param[out] out The output stream to print to (&lt;tt&gt;std::ostream&lt;/tt&gt;).
+ * @param[in] format The format to print, one of &#34;html&#34;, &#34;man&#34;, and &#34;txt&#34;.
+ * 
+ * @fn ArgumentParser#parse
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Parse command line parameters.
+ * 
+ * @signature TResult parse(parser, argc, argv[, outStream[, errStream]]);
+ * 
+ * @param[in,out] parser The ArgumentParser to use for parsing and for storing
+ *                       parse results.
+ * @param[in] argc The number of arguments (&lt;tt&gt;int&lt;/tt&gt;).
+ * @param[in] argv The arguments (&lt;tt&gt;const char * argv[]&lt;/tt&gt;).
+ * @param[in,out] outStream The &lt;tt&gt;std::ostream&lt;/tt&gt; to use for output.
+ * @param[in,out] errStream The &lt;tt&gt;std::ostream&lt;/tt&gt; to use for error output.
+ * 
+ * @return TResult The parse result, of type @link ArgumentParser::ParseResult
+ *                 @endlink.
+ * 
+ * This function must be called before retrieving any options or arguments from
+ * the parser.
+ * 
+ * @fn ArgumentParser#hasOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Query whether a certain option is registered in the parser.
+ * 
+ * @signature bool hasOption(parser, name);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The name to query for (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if there is such an option, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgumentParser#addOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Adds an @link ArgParseOption @endlink to an ArgumentParser.
+ * 
+ * @signature void addOption(parser, option);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the option to.
+ * @param[in] option The ArgParseOption to add to &lt;tt&gt;parser&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#addArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Adds an @link ArgParseArgument @endlink to an ArgumentParser.
+ * 
+ * @signature void addArgument(parser, arg);
+ * 
+ * @param[in,out] parser The ArgumentParser to add the argument to.
+ * @param[in] arg The ArgParseArgument to add to &lt;tt&gt;parser&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#getOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns a reference to the specified option.
+ * 
+ * @signature TOption getOption(parser, name);
+ * 
+ * @param[in] parser The parser to query.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @return TOption Reference to the @link ArgParseOption @endlink with the given
+ *                 short or long name.
+ * 
+ * @fn ArgumentParser#setRequired
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Sets whether or not the option with the givne name is mandatory.
+ * 
+ * @signature void setRequired(parser, name[, required]).
+ * 
+ * @param[in,out] parser The ArgumentParser to set the flag of.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] required Whether or not the option is required (&lt;tt&gt;bool&lt;/tt&gt;,
+ *                     default to &lt;tt&gt;true&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#hideOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Hides the ArgParseOption with the given name.
+ * 
+ * @signature void hideOption(parser, name[, hide]).
+ * 
+ * @param[in,out] parser The ArgParseOption to the the hidden flag of.
+ * @param[in] name The short or long name of the option to modify.
+ * @param[in] hide Whether or not to hide the flag (&lt;tt&gt;bool&lt;/tt&gt;, defaults to
+ *                 &lt;tt&gt;true&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#getArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns a reference to the given positional argument.
+ * 
+ * @signature TArgument getArgument(parser, pos);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] pos The position of the argument to return (&lt;tt&gt;unsigned&lt;/tt&gt;,
+ *                starting at 0).
+ * 
+ * @return TArgument Reference to the @link ArgParseArgument @endlink with the
+ *                   given position.
+ * 
+ * @fn ArgumentParser#isSet
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Query whether an option was set on the command line.
+ * 
+ * @signature bool isSet(parser, name);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @return bool Whether or not the option was set on the command line or not.
+ * 
+ * @fn ArgumentParser#hasDefault
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Query whether an option has a default value.
+ * 
+ * @signature bool hasDefault(parser, name);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @return bool Whether or not the option has a default value.
+ * 
+ * @fn ArgumentParser#getOptionValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Retrieve the value of an option.
+ * 
+ * @signature bool getOptionValue(dest, parser, name[, pos]);
+ * 
+ * @param[in] dest The variable to write the result to (the type is a template
+ *                 parameter and the value type of the option must be
+ *                 convertible in the type of &lt;tt&gt;dest&lt;/tt&gt; for the retrieval to
+ *                 work, also see result value).
+ * @param[in] parser The ArgumentParser to get the value from.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos Optional position for multi-value options (&lt;tt&gt;unsigned&lt;/tt&gt;,
+ *                defaults to 0).
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the requested option was given on the command
+ *              line and could be coverted to the type of &lt;tt&gt;dest&lt;/tt&gt;.
+ * 
+ * @fn ArgumentParser#getOptionFileExtension
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Retrieve the file extension of a file option.
+ * 
+ * @signature std::string getOptionFileExtension(parser, name[, pos]);
+ * 
+ * @param[in] parser The ArgumentParser to get the value from.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos Optional position for multi-value options (&lt;tt&gt;unsigned&lt;/tt&gt;,
+ *                defaults to 0).
+ * 
+ * @return std::string The extension of the option. Empty if not set or no
+ *                     extension.
+ * 
+ * @section Overriding File Extension on the Command Line
+ * 
+ * For each option with type &lt;tt&gt;INPUT_FILE&lt;/tt&gt; and &lt;tt&gt;OUTPUT_FILE&lt;/tt&gt;, an
+ * option with the name &lt;tt&gt;${name}-file-ext&lt;/tt&gt; is automatically added to the
+ * ArgumentParser (where &lt;tt&gt;${name}&lt;/tt&gt; is the name of the original option).
+ * The extension can be overridden by specifying the argument. Thus, the user of
+ * the program could give the value &#34;file.ext&#34; to the parameter &#34;fname&#34; and
+ * override the extension on the command line to &#34;ext2&#34; as follows:
+ * 
+ * @code{.console}
+ * # program_name --fname file.ext --fname-file-ext ext2
+ * @endcode
+ * 
+ * 
+ * @see ArgumentParser#getArgumentFileExtension
+ * 
+ * @fn ArgumentParser#getOptionValueCount
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Query number of values stored for the specified option.
+ * 
+ * @signature unsigned getOptionValueCount(parser, name);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The short or long name of the option (&lt;tt&gt;string&lt;/tt&gt;).
+ * 
+ * @return unsigned The number of values for the option with the given name.
+ * 
+ * @fn ArgumentParser#getArgumentValueCount
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Query number of values stored for the specified argument.
+ * 
+ * @signature unsigned getArgumentValueCount(parser, pos);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The position of the argument (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based).
+ * 
+ * @return unsigned The number of values for the argument with the given
+ *                  position.
+ * 
+ * @fn ArgumentParser#getArgumentValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Retrieves the value of an argument given by its position.
+ * 
+ * @signature bool getArgumentValue(dest, parser, pos[, no]);
+ * 
+ * @param[in] dest The variable to write the result to (the type is a template
+ *                 parameter and the value type of the argument must be
+ *                 convertible in the type of &lt;tt&gt;dest&lt;/tt&gt; for the retrieval to
+ *                 work, also see result value).
+ * @param[in] parser The ArgumentParser to get the value from.
+ * @param[in] pos The position of the argument to get the value of.
+ * @param[in] no Optional position for multi-value arguments (&lt;tt&gt;unsigned&lt;/tt&gt;,
+ *               defaults to 0).
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the retrieval was successful, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgumentParser#getArgumentFileExtension
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Retrieve the file extension of a file argument.
+ * 
+ * @signature std::string argumentFileExtension(parser, pos[, argNo]);
+ * 
+ * @param[in] parser The ArgumentParser to get the value from.
+ * @param[in] pos The position of the argument to query (&lt;tt&gt;unsigned&lt;/tt&gt;).
+ * @param[in] argNo Optional position for multi-value options
+ *                  (&lt;tt&gt;unsigned&lt;/tt&gt;, defaults to 0).
+ * 
+ * @return std::string The extension of the argument if any.
+ * 
+ * @section Overriding File Extensions on the Command Line
+ * 
+ * For each argument with type &lt;tt&gt;INPUT_FILE&lt;/tt&gt; and &lt;tt&gt;OUTPUT_FILE&lt;/tt&gt;, an
+ * option with the index &lt;tt&gt;arg-${idx}-file-ext&lt;/tt&gt; is automatically added to
+ * the ArgumentParser (where &lt;tt&gt;${idx}&lt;/tt&gt; is the index of the original
+ * option). The extension can be overridden by specifying the argument. Thus,
+ * the user of the program could give the value &#34;file.ext&#34; to the parameter &#34;0&#34;
+ * and override the extension on the command line to &#34;ext2&#34; as follows:
+ * 
+ * @code{.console}
+ * # program_name file.ext --arg-0-file-ext ext2
+ * @endcode
+ * 
+ * 
+ * @see ArgumentParser#getOptionFileExtension
+ * 
+ * @fn ArgumentParser#getOptionValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns all values of an option given on the command line.
+ * 
+ * @signature TVector getOptionValues(parser, name);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] name The short or long name of the option to get
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @return TVector The resulting values
+ *                 (&lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#getArgumentValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns all values of an argument given on the command line.
+ * 
+ * @signature TVector getArgumentValues(parser, pos);
+ * 
+ * @param[in] parser The ArgumentParser to query.
+ * @param[in] pos The position of the argument (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based).
+ * 
+ * @return TVector The resulting values
+ *                 (&lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#setDefaultValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the default value of an option of an ArgumentParser.
+ * 
+ * @signature void setDefaultValue(parser, name, v);
+ * 
+ * @param[in] parser The ArgumentParser to set the default value to.
+ * @param[in] name The short or long name of the argument
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] v The value to set (template parameter, must be streamable into a
+ *              &lt;tt&gt;std::stringstream&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#addDefaultValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Add/append a value to the default values for an option in an
+ *        ArgumentParser.
+ * 
+ * @signature void addDefaultValue(parser, name, v);
+ * 
+ * @param[in,out] parser The ArgumentParser to append the default value to.
+ * @param[in] name The short or long name of the argument
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] v The value to append (template parameter, must be streamable into
+ *              a &lt;tt&gt;std::stringstream&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#setMinValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set smallest allowed value for an option or argument of an
+ *        ArgumentParser.
+ * 
+ * @signature void setMinValue(parser, name, v);
+ * @signature void setMinValue(parser, pos, v);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the minimal value for.
+ * @param[in] name The name of the option to set the minimal value for
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos The position of the argument to set the minimal value for
+ *                (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based).
+ * @param[in] v The minimal value to set (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @section Remarks
+ * 
+ * The option/argument must have an integer or double type.
+ * 
+ * @fn ArgumentParser#setMaxValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set largest allowed value for an option or argument of an
+ *        ArgumentParser.
+ * 
+ * @signature void setMaxValue(parser, name, v);
+ * @signature void setMaxValue(parser, pos, v);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the maximal value for.
+ * @param[in] name The name of the option to set the maximal value for
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos The position of the argument to set the maximal value for
+ *                (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based).
+ * @param[in] v The maximal value to set (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @section Remarks
+ * 
+ * The option/argument must have an integer or double type.
+ * 
+ * @fn ArgumentParser#setValidValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set valid values for an argumetn or option of an ArgumentParser.
+ * 
+ * @signature void setValidValues(parser, name, values);
+ * @signature void setValidValues(parser, pos, values);
+ * 
+ * @param[in,out] parser The ArgumentParser to set the default values to.
+ * @param[in] name The name of the option (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos The position of the argument (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based).
+ * @param[in] values The values to set. Either a &lt;tt&gt;std::string&lt;/tt&gt; with the
+ *                   values as space-separated list or a
+ *                   &lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt; with the values.
+ * 
+ * @fn ArgumentParser#setHelpText
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the help text of an option or argument.
+ * 
+ * @signature void setHelpText(parser, name, text);
+ * @signature void setHelpText(parser, pos, text);
+ * 
+ * @param[in,out] parser The ArgumentParser object.
+ * @param[in] name The name of the option to set the help text for
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] pos The position of the argument to set the help text for.
+ * @param[in] text The string to use for the help text (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @fn ArgumentParser#getFileExtensions
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns file format extension given a format tag.
+ * 
+ * @signature TVector getFormatExtension(tag);
+ * @signature TVector getFormatExtension(tagList);
+ * @signature TVector getFormatExtension(tagSelector);
+ * 
+ * @param[in] tag A single file foramt, e.g. &lt;tt&gt;Fastq()&lt;/tt&gt;.
+ * @param[in] tagList A list of file format (@link TagList @endlink).
+ * @param[in] tagSelector A file format selector (@link TagSelector @endlink).
+ * 
+ * @return TVector A &lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt; with the allowed
+ *                 file format extensions.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

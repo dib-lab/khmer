@@ -1,0 +1,1117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_conceptchecking" data-page="ConceptChecking">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Concept Checking - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Concept Checking
+  <div><div>Macros for the concept checking system in SeqAn.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+<div class="overview grouped_macros" data-lang-entity-container="macro">
+<h2 data-lang-entity="macro">Grouped Macros Overview</h2>
+
+<table width="100%">
+  
+  <tr>
+    
+    <td><code><a href="#ConceptChecking%23SEQAN_CONCEPT"><div>SEQAN_CONCEPT(name, params)</div></a></code> <div>Defines a new concept.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#ConceptChecking%23SEQAN_CONCEPT_ASSERT"><div>SEQAN_CONCEPT_ASSERT((concept))</div></a></code> <div>Perform a concept check.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#ConceptChecking%23SEQAN_CONCEPT_IMPL"><div>template&lt;&gt; // required, even if name has no template arguments
+SEQAN_CONCEPT_IMPL((name), implementedConcepts)</div></a></code> <div>Defines which concepts a model fulfills.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#ConceptChecking%23SEQAN_CONCEPT_REFINE"><div>SEQAN_CONCEPT_REFINE(name, params, refinedConcepts)</div></a></code> <div>Defines a new concept as a refinement of existing concepts.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#ConceptChecking%23SEQAN_CONCEPT_USAGE"><div>SEQAN_CONCEPT_USAGE(name)</div></a></code> <div>Defines valid expressions.</div></td>
+    
+  </tr>
+  
+</table>
+</div>
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Grouped Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ConceptChecking%23requireBooleanExpr" title="#ConceptChecking#requireBooleanExpr (interface function)" data-lang-entity="interface_function">void requireBooleanExpr(x);</a></code></span>
+    <span class="summary_desc"><div>Tests for a boolean expression.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ConceptChecking%23sameType" title="#ConceptChecking#sameType (interface function)" data-lang-entity="interface_function">void sameType(x, y);</a></code></span>
+    <span class="summary_desc"><div>Tests for equality of types.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>SeqAn's concept checking system is copied from Boost. The license for the library is as follows:</p><div data-src-path="None"><div class="highlight"><pre><span class="c1">// Copyright David Abrahams 2006. Distributed under the Boost Software</span>
+<span class="c1">// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at</span>
+<span class="c1">// http://www.boost.org/LICENSE_1_0.txt).</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+
+
+
+<!-- Grouped macros Details -->
+
+<div class="details grouped_macros" data-lang-entity-container="grouped_macro">
+<h2 data-lang-entity="grouped_macro">Grouped Macros Detail</h2>
+
+
+<h3 data-toc="hidden" id="ConceptChecking#SEQAN_CONCEPT">
+  ConceptChecking#SEQAN_CONCEPT
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CONCEPT(name, params)
+</code>
+
+<div class="brief"><div>Defines a new concept.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>params</code>
+     -
+    Template paramter list in parantheses, e.g. (T) or (T1)(T2).
+Typically, template parameters are models, i.e. one or multiple
+classes that should be checked for fulfilling a concept.This is
+a sequence of the Boost Preprocessor Library, read <a href="http://www.boost.org/doc/libs/1_47_0/libs/preprocessor/doc/index.html">more</a>.
+  </dd>
+  
+  <dd>
+    <code>name</code>
+     -
+    Concept identifier. Non-trivial concepts should have an
+identifier with a Concept-suffix.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+  <dt>See Also</dt>
+  <dd>
+  
+  <dd><a class="error">SEQAN_CONCEPT_USAGE</a></dd>
+  
+  </dd>
+
+</dl>
+
+
+<div><p>A concept is implemented as a template struct with name <tt>name</tt> and
+arguments <tt>params</tt>. The concept checking should be part of the struct
+definition. Associated types should be checked via <a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT_ASSERT" data-lang-entity="grouped_macro">SEQAN_CONCEPT_ASSERT</a> and valid expressions in a function <a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT_USAGE" data-lang-entity="grouped_macro">SEQAN_CONCEPT_USAGE</a>, see below. Variables used in valid expressions should be (private)
+struct members instead of local variables in member functions (read <a href="http://www.boost.org/doc/libs/1_47_0/libs/concept_check/creating_concepts.htm">more</a>.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_CONCEPT</span><span class="p">(</span><span class="n">Assignable</span><span class="p">,(</span><span class="n">T</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="n">SEQAN_CONCEPT_USAGE</span><span class="p">(</span><span class="n">Assignable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>              <span class="c1">// require assignment operator</span>
+        <span class="n">constConstraints</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">private:</span>
+    <span class="kt">void</span> <span class="n">constConstraints</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">x</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>              <span class="c1">// const required for argument to assignment</span>
+        <span class="n">ignoreUnusedVariableWarning</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">private:</span>
+    <span class="n">T</span> <span class="n">a</span><span class="p">;</span>
+    <span class="n">T</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">SEQAN_CONCEPT</span><span class="p">(</span><span class="n">EqualityComparable</span><span class="p">,(</span><span class="n">T</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="n">SEQAN_CONCEPT_USAGE</span><span class="p">(</span><span class="n">EqualityComparable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">requireBooleanExpr</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">);</span>
+        <span class="n">requireBooleanExpr</span><span class="p">(</span><span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">private:</span>
+    <span class="n">T</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="ConceptChecking#SEQAN_CONCEPT_ASSERT">
+  ConceptChecking#SEQAN_CONCEPT_ASSERT
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CONCEPT_ASSERT((concept))
+</code>
+
+<div class="brief"><div>Perform a concept check.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>concept</code>
+     -
+    Concept specialized with a the type that should be checked.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+  <dt>See Also</dt>
+  <dd>
+  
+  <dd><a href="global_metafunction_Is.html" data-lang-entity="global_metafunction">Is</a></dd>
+  
+  </dd>
+
+</dl>
+
+
+<div><p>This macro is a compile-time assertion and requires the concept specialized
+with the tested types to compile. The check neither consumes memory nor
+running time. The macro can be used at the beginning of a function or within
+a struct/class definition. The checked concepts should be as restrictive and
+generic as possible to on the one hand cover all used functionality and on
+the other hand not limit the applicability of a function/class.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="k">typedef</span> <span class="k">typename</span> <span class="n">Value</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span>                <span class="n">TValue</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">typename</span> <span class="n">Position</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span>             <span class="n">TPosition</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">typename</span> <span class="n">Difference</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span>           <span class="n">TDifference</span><span class="p">;</span>
+
+<span class="n">SEQAN_CONCEPT_ASSERT</span><span class="p">((</span><span class="n">AlphabetConcept</span><span class="o">&lt;</span><span class="n">TValue</span><span class="o">&gt;</span><span class="p">));</span>
+<span class="n">SEQAN_CONCEPT_ASSERT</span><span class="p">((</span><span class="n">SignedIntegerConcept</span><span class="o">&lt;</span><span class="n">TDifference</span><span class="o">&gt;</span><span class="p">));</span>
+<span class="n">SEQAN_CONCEPT_ASSERT</span><span class="p">((</span><span class="n">UnsignedIntegerConcept</span><span class="o">&lt;</span><span class="n">TSize</span><span class="o">&gt;</span><span class="p">));</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="ConceptChecking#SEQAN_CONCEPT_IMPL">
+  ConceptChecking#SEQAN_CONCEPT_IMPL
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>template&lt;&gt; // required, even if name has no template arguments
+SEQAN_CONCEPT_IMPL((name), implementedConcepts)
+</code>
+
+<div class="brief"><div>Defines which concepts a model fulfills.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>implementedConcepts</code>
+     -
+    Identifiers of concepts that are fulfilled by the model. This is a sequence of the
+Boost Preprocessor Library, read <a href="http://www.boost.org/doc/libs/1_47_0/libs/preprocessor/doc/index.html">more</a>.
+  </dd>
+  
+  <dd>
+    <code>name</code>
+     -
+    Model type, i.e. an identifier or an identifier with template
+arguments.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>template&lt;typename T, int I&gt;
+SEQAN_CONCEPT_IMPL((name&lt;T,I&gt;), implementedConcepts)</p><p>The metafunction <a href="global_metafunction_Is.html" data-lang-entity="global_metafunction">Is</a> can be used to determine whether a class
+models (fulfills) a concepts. A model of a concept must pass the concept
+check via <a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT_ASSERT" data-lang-entity="grouped_macro">SEQAN_CONCEPT_ASSERT</a>.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TValue</span><span class="p">,</span> <span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="n">SEQAN_CONCEPT_IMPL</span><span class="p">((</span><span class="n">String</span><span class="o">&lt;</span><span class="n">TValue</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span><span class="p">),</span> <span class="p">(</span><span class="n">StringConcept</span><span class="p">));</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="ConceptChecking#SEQAN_CONCEPT_REFINE">
+  ConceptChecking#SEQAN_CONCEPT_REFINE
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CONCEPT_REFINE(name, params, refinedConcepts)
+</code>
+
+<div class="brief"><div>Defines a new concept as a refinement of existing concepts.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>params</code>
+     -
+    Template paramter list in parantheses, e.g. (T) or (T1)(T2).
+Typically, template parameters are models, i.e. one or multiple
+classes that should be checked for fulfilling a concept.This is
+a sequence of the Boost Preprocessor Library, read <a href="http://boost.org/doc/libs/1_47_0/libs/preprocessor/doc/index.html">more</a>.
+  </dd>
+  
+  <dd>
+    <code>name</code>
+     -
+    Concept identifier. Non-trivial concepts should have an
+identifier with a Concept-suffix.
+  </dd>
+  
+  <dd>
+    <code>refinedConcepts</code>
+     -
+    Identifiers of concepts that are refined by the new
+concept.Refined concepts are implicitly integrated
+into the requirements of the new concept.This is a
+sequence of the Boost Preprocessor Library, read
+<a href="http://boost.org/doc/libs/1_47_0/libs/preprocessor/doc/index.html">more</a>
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+  <dt>See Also</dt>
+  <dd>
+  
+  <dd><a class="error">SEQAN_CONCEPT_USAGE</a></dd>
+  
+  </dd>
+
+</dl>
+
+
+<div><p>A concept is implemented as a template struct with name <tt>name</tt> and
+arguments <tt>params</tt>. The struct inherits all refined concept structs.
+The concept checking should be part of the struct definition. For more
+information, see <a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT" data-lang-entity="grouped_macro">SEQAN_CONCEPT</a>.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_CONCEPT_REFINE</span><span class="p">(</span><span class="n">AlphabetConcept</span><span class="p">,</span> <span class="p">(</span><span class="n">TValue</span><span class="p">),</span> <span class="p">(</span><span class="n">Assignable</span><span class="p">)(</span><span class="n">DefaultConstructible</span><span class="p">)(</span><span class="n">CopyConstructible</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="n">TValue</span> <span class="n">val</span><span class="p">,</span> <span class="n">val2</span><span class="p">;</span>
+
+    <span class="n">SEQAN_CONCEPT_USAGE</span><span class="p">(</span><span class="n">AlphabetConcept</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">assign</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val2</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="ConceptChecking#SEQAN_CONCEPT_USAGE">
+  ConceptChecking#SEQAN_CONCEPT_USAGE
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CONCEPT_USAGE(name)
+</code>
+
+<div class="brief"><div>Defines valid expressions.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>name</code>
+    
+    (in)
+     -
+    Identifier of the concept defined with <a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT" data-lang-entity="grouped_macro">SEQAN_CONCEPT</a> or
+<a href="group_ConceptChecking.html#ConceptChecking#SEQAN_CONCEPT_REFINE" data-lang-entity="grouped_macro">SEQAN_CONCEPT_REFINE</a>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+  <dt>See Also</dt>
+  <dd>
+  
+  <dd><a class="error">SEQAN_CONCEPT</a></dd>
+  
+  <dd><a class="error">SEQAN_CONCEPT_REFINE</a></dd>
+  
+  <dd><a class="error">requireBooleanExpr</a></dd>
+  
+  </dd>
+
+</dl>
+
+
+<div><p>This macro should be used to introduce a block (enclosed with curly braces) of valid expressions within a newly
+defined concept. Valid expressions should test for available functions, operators and the correctness of return
+types. Use helper functions, e.g. <a href="global_function_ignoreUnusedVariableWarning.html" data-lang-entity="global_function">ignoreUnusedVariableWarning</a>,
+<a href="group_ConceptChecking.html#ConceptChecking#requireBooleanExpr" data-lang-entity="interface_function">requireBooleanExpr</a> and <a href="group_ConceptChecking.html#ConceptChecking#sameType" data-lang-entity="interface_function">sameType</a>.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_CONCEPT</span><span class="p">(</span><span class="n">EqualityComparable</span><span class="p">,(</span><span class="n">T</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="n">SEQAN_CONCEPT_USAGE</span><span class="p">(</span><span class="n">EqualityComparable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">requireBooleanExpr</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">);</span>
+        <span class="n">requireBooleanExpr</span><span class="p">(</span><span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">private:</span>
+    <span class="n">T</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div></div>
+
+
+
+
+</div>
+
+
+
+<!-- Grouped Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Grouped Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ConceptChecking#requireBooleanExpr" class="signature first" data-lang-entity="interface_function">
+      <code>void requireBooleanExpr(x);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Tests for a boolean expression.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x</code>
+            
+        
+      </th>
+      <td>Object that must be convertible to <tt>bool</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function can be used to test for functions returning bools, e.g. less operators.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">SEQAN_CONCEPT_USAGE</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ConceptChecking#sameType" class="signature" data-lang-entity="interface_function">
+      <code>void sameType(x, y);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Tests for equality of types.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">x</code>
+            
+        
+      </th>
+      <td>Object of a certain type.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">y</code>
+            
+        
+      </th>
+      <td>Object that must be of the same type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function can be used to test for the correctness of function return types or the type of an expression in
+concept tests.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">SEQAN_CONCEPT_USAGE</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup ConceptChecking Concept Checking
+ * 
+ * @brief Macros for the concept checking system in SeqAn.
+ * 
+ * SeqAn&#39;s concept checking system is copied from Boost. The license for the
+ * library is as follows:
+ * 
+ * @code{.cpp}
+ * // Copyright David Abrahams 2006. Distributed under the Boost Software
+ * // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+ * // http://www.boost.org/LICENSE_1_0.txt).
+ * @endcode
+ * 
+ * 
+ * @macro ConceptChecking#SEQAN_CONCEPT_ASSERT
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Perform a concept check.
+ * 
+ * @signature SEQAN_CONCEPT_ASSERT((concept))
+ * 
+ * @param concept Concept specialized with a the type that should be checked.
+ * 
+ * This macro is a compile-time assertion and requires the concept specialized
+ * with the tested types to compile. The check neither consumes memory nor
+ * running time. The macro can be used at the beginning of a function or within
+ * a struct/class definition. The checked concepts should be as restrictive and
+ * generic as possible to on the one hand cover all used functionality and on
+ * the other hand not limit the applicability of a function/class.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * typedef typename Value&lt;TContainer&gt;::Type                TValue;
+ * typedef typename Position&lt;TContainer&gt;::Type             TPosition;
+ * typedef typename Difference&lt;TContainer&gt;::Type           TDifference;
+ * 
+ * SEQAN_CONCEPT_ASSERT((AlphabetConcept&lt;TValue&gt;));
+ * SEQAN_CONCEPT_ASSERT((SignedIntegerConcept&lt;TDifference&gt;));
+ * SEQAN_CONCEPT_ASSERT((UnsignedIntegerConcept&lt;TSize&gt;));
+ * @endcode
+ * 
+ * 
+ * @see Is
+ * 
+ * @macro ConceptChecking#SEQAN_CONCEPT_USAGE
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Defines valid expressions.
+ * 
+ * @signature SEQAN_CONCEPT_USAGE(name)
+ * 
+ * @param[in] name Identifier of the concept defined with @link
+ *                 ConceptChecking#SEQAN_CONCEPT @endlink or @link
+ *                 ConceptChecking#SEQAN_CONCEPT_REFINE @endlink.
+ * 
+ * This macro should be used to introduce a block (enclosed with curly braces)
+ * of valid expressions within a newly defined concept. Valid expressions should
+ * test for available functions, operators and the correctness of return types.
+ * Use helper functions, e.g. @link ignoreUnusedVariableWarning @endlink, @link
+ * ConceptChecking#requireBooleanExpr @endlink and @link
+ * ConceptChecking#sameType @endlink.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_CONCEPT(EqualityComparable,(T))
+ * {
+ *     SEQAN_CONCEPT_USAGE(EqualityComparable)
+ *     {
+ *         requireBooleanExpr(a == b);
+ *         requireBooleanExpr(a != b);
+ *     }
+ * private:
+ *     T a, b;
+ * };
+ * @endcode
+ * 
+ * 
+ * @see ConceptChecking#requireBooleanExpr
+ * @see ConceptChecking#SEQAN_CONCEPT
+ * @see ConceptChecking#SEQAN_CONCEPT_REFINE
+ * 
+ * @macro ConceptChecking#SEQAN_CONCEPT
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Defines a new concept.
+ * 
+ * @signature SEQAN_CONCEPT(name, params)
+ * 
+ * @param params Template paramter list in parantheses, e.g. (T) or (T1)(T2).
+ *               Typically, template parameters are models, i.e. one or multiple
+ *               classes that should be checked for fulfilling a concept.This is
+ *               a sequence of the Boost Preprocessor Library, read &lt;a
+ *               href=&#34;http://www.boost.org/doc/libs/1_47_0/libs/preprocessor/do
+ *               c/index.html&#34;&gt;more&lt;/a&gt;.
+ * @param name Concept identifier. Non-trivial concepts should have an
+ *             identifier with a Concept-suffix.
+ * 
+ * A concept is implemented as a template struct with name &lt;tt&gt;name&lt;/tt&gt; and
+ * arguments &lt;tt&gt;params&lt;/tt&gt;. The concept checking should be part of the struct
+ * definition. Associated types should be checked via @link
+ * ConceptChecking#SEQAN_CONCEPT_ASSERT @endlink and valid expressions in a
+ * function @link ConceptChecking#SEQAN_CONCEPT_USAGE @endlink, see below.
+ * Variables used in valid expressions should be (private) struct members
+ * instead of local variables in member functions (read &lt;a href=&#34;http://www.boos
+ * t.org/doc/libs/1_47_0/libs/concept_check/creating_concepts.htm&#34;&gt;more&lt;/a&gt;.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_CONCEPT(Assignable,(T))
+ * {
+ *     SEQAN_CONCEPT_USAGE(Assignable)
+ *     {
+ *         a = b;              // require assignment operator
+ *         constConstraints(b);
+ *     }
+ * private:
+ *     void constConstraints(const T&amp; x)
+ *     {
+ *         a = x;              // const required for argument to assignment
+ *         ignoreUnusedVariableWarning(x);
+ *     }
+ * private:
+ *     T a;
+ *     T b;
+ * };
+ * 
+ * SEQAN_CONCEPT(EqualityComparable,(T))
+ * {
+ *     SEQAN_CONCEPT_USAGE(EqualityComparable)
+ *     {
+ *         requireBooleanExpr(a == b);
+ *         requireBooleanExpr(a != b);
+ *     }
+ * private:
+ *     T a, b;
+ * };
+ * @endcode
+ * 
+ * 
+ * @see ConceptChecking#SEQAN_CONCEPT_USAGE
+ * 
+ * @macro ConceptChecking#SEQAN_CONCEPT_REFINE
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Defines a new concept as a refinement of existing concepts.
+ * 
+ * @signature SEQAN_CONCEPT_REFINE(name, params, refinedConcepts)
+ * 
+ * @param params Template paramter list in parantheses, e.g. (T) or (T1)(T2).
+ *               Typically, template parameters are models, i.e. one or multiple
+ *               classes that should be checked for fulfilling a concept.This is
+ *               a sequence of the Boost Preprocessor Library, read &lt;a
+ *               href=&#34;http://boost.org/doc/libs/1_47_0/libs/preprocessor/doc/in
+ *               dex.html&#34;&gt;more&lt;/a&gt;.
+ * @param name Concept identifier. Non-trivial concepts should have an
+ *             identifier with a Concept-suffix.
+ * @param refinedConcepts Identifiers of concepts that are refined by the new
+ *                        concept.Refined concepts are implicitly integrated
+ *                        into the requirements of the new concept.This is a
+ *                        sequence of the Boost Preprocessor Library, read &lt;a hr
+ *                        ef=&#34;http://boost.org/doc/libs/1_47_0/libs/preprocessor
+ *                        /doc/index.html&#34;&gt;more&lt;/a&gt;
+ * 
+ * A concept is implemented as a template struct with name &lt;tt&gt;name&lt;/tt&gt; and
+ * arguments &lt;tt&gt;params&lt;/tt&gt;. The struct inherits all refined concept structs.
+ * The concept checking should be part of the struct definition. For more
+ * information, see @link ConceptChecking#SEQAN_CONCEPT @endlink.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_CONCEPT_REFINE(AlphabetConcept, (TValue), (Assignable)(DefaultConstructible)(CopyConstructible))
+ * {
+ *     TValue val, val2;
+ * 
+ *     SEQAN_CONCEPT_USAGE(AlphabetConcept)
+ *     {
+ *         assign(val, val2);
+ *     }
+ * };
+ * @endcode
+ * 
+ * 
+ * @see ConceptChecking#SEQAN_CONCEPT_USAGE
+ * 
+ * @macro ConceptChecking#SEQAN_CONCEPT_IMPL
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Defines which concepts a model fulfills.
+ * 
+ * @signature template&lt;&gt; // required, even if name has no template arguments
+ *            SEQAN_CONCEPT_IMPL((name), implementedConcepts)
+ * 
+ * @param implementedConcepts Identifiers of concepts that are fulfilled by the
+ *                            model. This is a sequence of the Boost
+ *                            Preprocessor Library, read &lt;a
+ *                            href=&#34;http://www.boost.org/doc/libs/1_47_0/libs/pr
+ *                            eprocessor/doc/index.html&#34;&gt;more&lt;/a&gt;.
+ * @param name Model type, i.e. an identifier or an identifier with template
+ *             arguments.
+ * 
+ * template&lt;typename T, int I&gt; SEQAN_CONCEPT_IMPL((name&lt;T,I&gt;),
+ * implementedConcepts)
+ * 
+ * The metafunction @link Is @endlink can be used to determine whether a class
+ * models (fulfills) a concepts. A model of a concept must pass the concept
+ * check via @link ConceptChecking#SEQAN_CONCEPT_ASSERT @endlink.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * template &lt;typename TValue, typename TSpec&gt;
+ * SEQAN_CONCEPT_IMPL((String&lt;TValue, TSpec&gt;), (StringConcept));
+ * @endcode
+ * 
+ * 
+ * @fn ConceptChecking#sameType
+ * 
+ * @brief Tests for equality of types.
+ * 
+ * @signature void sameType(x, y);
+ * 
+ * @param[in] x Object of a certain type.
+ * @param[in] y Object that must be of the same type.
+ * 
+ * This function can be used to test for the correctness of function return
+ * types or the type of an expression in concept tests.
+ * 
+ * @see ConceptChecking#SEQAN_CONCEPT_USAGE
+ * 
+ * @fn ConceptChecking#requireBooleanExpr
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Tests for a boolean expression.
+ * 
+ * @signature void requireBooleanExpr(x);
+ * 
+ * @param[in] x Object that must be convertible to &lt;tt&gt;bool&lt;/tt&gt;
+ * 
+ * This function can be used to test for functions returning bools, e.g. less
+ * operators.
+ * 
+ * @see ConceptChecking#SEQAN_CONCEPT_USAGE
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

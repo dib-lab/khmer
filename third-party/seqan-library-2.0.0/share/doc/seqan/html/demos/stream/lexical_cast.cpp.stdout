@@ -1,0 +1,9 @@
+success=1, x=123
+success=0, x=123
+success=1, x=234
+success=1, x=345
+success=1, x=2
+success=1, f=3.1
+success=1, d=4.2
+error: Unable to convert 'a' into int.
+error: Unable to convert 'b' into int.

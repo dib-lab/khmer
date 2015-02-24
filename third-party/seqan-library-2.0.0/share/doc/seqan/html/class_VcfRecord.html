@@ -1,0 +1,946 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_vcfrecord" data-page="VcfRecord">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>VcfRecord - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>VcfRecord<div><div>Information for one VCF record.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_CopyConstructibleConcept.html" data-lang-entity="concept">CopyConstructibleConcept</a>, 
+    <a href="concept_DefaultConstructibleConcept.html" data-lang-entity="concept">DefaultConstructibleConcept</a>, 
+    <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/vcf_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class VcfRecord;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AMISSING_QUAL" title="#VcfRecord::MISSING_QUAL (interface function)" data-lang-entity="member_function">float VcfRecord::MISSING_QUAL();</a></code></span>
+    <span class="summary_desc"><div>Return IEEE <tt>NaN</tt> float value.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AVcfRecord" title="#VcfRecord::VcfRecord (interface function)" data-lang-entity="member_function">VcfRecord::VcfRecord();</a></code></span>
+    <span class="summary_desc"><div>Default constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VcfRecord%23clear" title="#VcfRecord#clear (interface function)" data-lang-entity="interface_function">void clear(record);</a></code></span>
+    <span class="summary_desc"><div>Clear a VcfRecord.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Aalt" title="#VcfRecord::alt (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::alt
+    </a></code></span>
+    <span class="summary_desc"><div>Alternative bases in the variants, comma-separated if multiple (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AbeginPos" title="#VcfRecord::beginPos (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::beginPos
+    </a></code></span>
+    <span class="summary_desc"><div>Position of the VCF record (<tt>__int32</tt>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Afilter" title="#VcfRecord::filter (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::filter
+    </a></code></span>
+    <span class="summary_desc"><div>Value of FILTER field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Aformat" title="#VcfRecord::format (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::format
+    </a></code></span>
+    <span class="summary_desc"><div>Value of the VCF FORMAT field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AgenotypeInfos" title="#VcfRecord::genotypeInfos (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::genotypeInfos
+    </a></code></span>
+    <span class="summary_desc"><div>Genotype information, as in VCF file (<a href="class_StringSet.html" data-lang-entity="class">StringSet</a>&lt;<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>&gt;).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Aid" title="#VcfRecord::id (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::id
+    </a></code></span>
+    <span class="summary_desc"><div>Textual identifier of the variant (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Ainfo" title="#VcfRecord::info (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::info
+    </a></code></span>
+    <span class="summary_desc"><div>Value of the INFO field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AINVALID_POS" title="#VcfRecord::INVALID_POS (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::INVALID_POS
+    </a></code></span>
+    <span class="summary_desc"><div>Static member as marker for invalid position (<tt>__int32</tt>)</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3AINVALID_REFID" title="#VcfRecord::INVALID_REFID (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::INVALID_REFID
+    </a></code></span>
+    <span class="summary_desc"><div>Static member as marker for invalid reference (<tt>__int32</tt>)</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Aqual" title="#VcfRecord::qual (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::qual
+    </a></code></span>
+    <span class="summary_desc"><div>Quality, <tt>NaN</tt> if invalid (<tt>float</tt>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3Aref" title="#VcfRecord::ref (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::ref
+    </a></code></span>
+    <span class="summary_desc"><div>Bases in the reference (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#VcfRecord%3A%3ArID" title="#VcfRecord::rID (interface function)" data-lang-entity="member_variable">
+        VariableType VcfRecord::rID
+    </a></code></span>
+    <span class="summary_desc"><div>Static member as marker for invalid reference (<tt>__int32</tt>)</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>We store most information as strings and without structure since the VCF format's definition is quite loose. We plan
+to provide classes for structured access to these strings later.</p><h3>Remarks</h3><p>Although all positions in the VCF text format are 1-based, they are stored 0-based in the <a href="class_VcfRecord.html" data-lang-entity="class">VcfRecord</a>.
+Positions in string members are stored verbatim in the <a href="class_VcfRecord.html" data-lang-entity="class">VcfRecord</a>'s members, e.g. 1-based.</p><p>Invalid qualities are stored as a float <tt>NaN</tt> (not a number). To test a float quality <tt>q</tt> for being
+<tt>NaN</tt>, test for <tt>q != q</tt>. Only <tt>NaN</tt> has the property that <tt>NaN != NaN</tt>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="VcfRecord::MISSING_QUAL" class="signature first" data-lang-entity="member_function">
+      <code>float VcfRecord::MISSING_QUAL();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return IEEE <tt>NaN</tt> float value.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This cannot be implemented portably as a constant in a header-only library. In C++11, there is a function
+<tt>std::nanf()</tt> that could be used instead. For C++98, this is the best we can do.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VcfRecord::VcfRecord" class="signature" data-lang-entity="member_function">
+      <code>VcfRecord::VcfRecord();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Default constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="VcfRecord#clear" class="signature first" data-lang-entity="interface_function">
+      <code>void clear(record);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear a VcfRecord.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">record</code>
+            
+        
+      </th>
+      <td>The VcfRecord to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="VcfRecord::alt" class="signature first" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::alt</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Alternative bases in the variants, comma-separated if multiple (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::beginPos" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::beginPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Position of the VCF record (<tt>__int32</tt>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::filter" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::filter</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Value of FILTER field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::format" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::format</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Value of the VCF FORMAT field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::genotypeInfos" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::genotypeInfos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Genotype information, as in VCF file (<a href="class_StringSet.html" data-lang-entity="class">StringSet</a>&lt;<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>&gt;).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::id" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::id</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Textual identifier of the variant (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::info" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::info</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Value of the INFO field, empty if "." in VCF file (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::INVALID_POS" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::INVALID_POS</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member as marker for invalid position (<tt>__int32</tt>)</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::INVALID_REFID" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::INVALID_REFID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member as marker for invalid reference (<tt>__int32</tt>)</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::qual" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::qual</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Quality, <tt>NaN</tt> if invalid (<tt>float</tt>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::ref" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::ref</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Bases in the reference (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="VcfRecord::rID" class="signature" data-lang-entity="member_variable">
+      <code>VariableType VcfRecord::rID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Static member as marker for invalid reference (<tt>__int32</tt>)</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class VcfRecord
+ * 
+ * @implements FormattedFileRecordConcept
+ * 
+ * @headerfile &lt;seqan/vcf_io.h&gt;
+ * 
+ * @brief Information for one VCF record.
+ * 
+ * @signature class VcfRecord;
+ * 
+ * We store most information as strings and without structure since the VCF
+ * format&#39;s definition is quite loose. We plan to provide classes for structured
+ * access to these strings later.
+ * 
+ * @section Remarks
+ * 
+ * Although all positions in the VCF text format are 1-based, they are stored
+ * 0-based in the @link VcfRecord @endlink. Positions in string members are
+ * stored verbatim in the @link VcfRecord @endlink&#39;s members, e.g. 1-based.
+ * 
+ * Invalid qualities are stored as a float &lt;tt&gt;NaN&lt;/tt&gt; (not a number). To test
+ * a float quality &lt;tt&gt;q&lt;/tt&gt; for being &lt;tt&gt;NaN&lt;/tt&gt;, test for &lt;tt&gt;q != q&lt;/tt&gt;.
+ * Only &lt;tt&gt;NaN&lt;/tt&gt; has the property that &lt;tt&gt;NaN != NaN&lt;/tt&gt;.
+ * 
+ * @fn VcfRecord::MISSING_QUAL
+ * 
+ * @brief Return IEEE &lt;tt&gt;NaN&lt;/tt&gt; float value.
+ * 
+ * @signature float VcfRecord::MISSING_QUAL();
+ * 
+ * @section Remarks
+ * 
+ * This cannot be implemented portably as a constant in a header-only library.
+ * In C++11, there is a function &lt;tt&gt;std::nanf()&lt;/tt&gt; that could be used
+ * instead. For C++98, this is the best we can do.
+ * 
+ * @fn VcfRecord::VcfRecord
+ * 
+ * @brief Default constructor.
+ * 
+ * @signature VcfRecord::VcfRecord();
+ * 
+ * @var VariableType VcfRecord::ref;
+ * 
+ * @brief Bases in the reference (@link CharString @endlink).
+ * 
+ * @var VariableType VcfRecord::genotypeInfos;
+ * 
+ * @brief Genotype information, as in VCF file (@link StringSet @endlink&lt;@link
+ *        CharString @endlink&gt;).
+ * 
+ * @var VariableType VcfRecord::info;
+ * 
+ * @brief Value of the INFO field, empty if &#34;.&#34; in VCF file (@link CharString
+ *        @endlink).
+ * 
+ * @var VariableType VcfRecord::INVALID_REFID;
+ * 
+ * @brief Static member as marker for invalid reference (&lt;tt&gt;__int32&lt;/tt&gt;)
+ * 
+ * @var VariableType VcfRecord::format;
+ * 
+ * @brief Value of the VCF FORMAT field, empty if &#34;.&#34; in VCF file (@link
+ *        CharString @endlink).
+ * 
+ * @var VariableType VcfRecord::alt;
+ * 
+ * @brief Alternative bases in the variants, comma-separated if multiple (@link
+ *        CharString @endlink).
+ * 
+ * @var VariableType VcfRecord::qual;
+ * 
+ * @brief Quality, &lt;tt&gt;NaN&lt;/tt&gt; if invalid (&lt;tt&gt;float&lt;/tt&gt;).
+ * 
+ * @var VariableType VcfRecord::filter;
+ * 
+ * @brief Value of FILTER field, empty if &#34;.&#34; in VCF file (@link CharString
+ *        @endlink).
+ * 
+ * @var VariableType VcfRecord::rID;
+ * 
+ * @brief Static member as marker for invalid reference (&lt;tt&gt;__int32&lt;/tt&gt;)
+ * 
+ * @var VariableType VcfRecord::beginPos;
+ * 
+ * @brief Position of the VCF record (&lt;tt&gt;__int32&lt;/tt&gt;).
+ * 
+ * @var VariableType VcfRecord::INVALID_POS;
+ * 
+ * @brief Static member as marker for invalid position (&lt;tt&gt;__int32&lt;/tt&gt;)
+ * 
+ * @var VariableType VcfRecord::id;
+ * 
+ * @brief Textual identifier of the variant (@link CharString @endlink).
+ * 
+ * @fn VcfRecord#clear
+ * 
+ * @brief Clear a VcfRecord.
+ * 
+ * @signature void clear(record);
+ * 
+ * @param[in,out] record The VcfRecord to clear.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

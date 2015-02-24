@@ -1,0 +1,1641 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_pattern" data-page="Pattern">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Pattern - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Pattern<div><div>Holds the needle and preprocessing data (depends on algorithm).</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_AbndmAlgoPattern.html" data-lang-entity="specialization">AbndmAlgoPattern</a>, 
+    <a href="specialization_AhoCorasickPattern.html" data-lang-entity="specialization">AhoCorasickPattern</a>, 
+    <a href="specialization_BfamPattern.html" data-lang-entity="specialization">BfamPattern</a>, 
+    <a href="specialization_BndmAlgoPattern.html" data-lang-entity="specialization">BndmAlgoPattern</a>, 
+    <a href="specialization_DPSearchPattern.html" data-lang-entity="specialization">DPSearchPattern</a>, 
+    <a href="specialization_HammingSimplePattern.html" data-lang-entity="specialization">HammingSimplePattern</a>, 
+    <a href="specialization_HierarchicalPexPattern.html" data-lang-entity="specialization">HierarchicalPexPattern</a>, 
+    <a href="specialization_HorspoolPattern.html" data-lang-entity="specialization">HorspoolPattern</a>, 
+    <a href="specialization_MultiBfamPattern.html" data-lang-entity="specialization">MultiBfamPattern</a>, 
+    <a href="specialization_MultipleShiftAndPattern.html" data-lang-entity="specialization">MultipleShiftAndPattern</a>, 
+    <a href="specialization_MyersPattern.html" data-lang-entity="specialization">MyersPattern</a>, 
+    <a href="specialization_NonHierarchicalPexPattern.html" data-lang-entity="specialization">NonHierarchicalPexPattern</a>, 
+    <a href="specialization_OracleBfamPattern.html" data-lang-entity="specialization">OracleBfamPattern</a>, 
+    <a href="specialization_OracleMultiBfamPattern.html" data-lang-entity="specialization">OracleMultiBfamPattern</a>, 
+    <a href="specialization_PexPattern.html" data-lang-entity="specialization">PexPattern</a>, 
+    <a href="specialization_PigeonholePattern.html" data-lang-entity="specialization">PigeonholePattern</a>, 
+    <a href="specialization_SetHorspoolPattern.html" data-lang-entity="specialization">SetHorspoolPattern</a>, 
+    <a href="specialization_ShiftAndPattern.html" data-lang-entity="specialization">ShiftAndPattern</a>, 
+    <a href="specialization_ShiftOrPattern.html" data-lang-entity="specialization">ShiftOrPattern</a>, 
+    <a href="specialization_SimplePattern.html" data-lang-entity="specialization">SimplePattern</a>, 
+    <a href="specialization_SwiftLocalPattern.html" data-lang-entity="specialization">SwiftLocalPattern</a>, 
+    <a href="specialization_SwiftPattern.html" data-lang-entity="specialization">SwiftPattern</a>, 
+    <a href="specialization_SwiftSemiGlobalPattern.html" data-lang-entity="specialization">SwiftSemiGlobalPattern</a>, 
+    <a href="specialization_TrieBfamPattern.html" data-lang-entity="specialization">TrieBfamPattern</a>, 
+    <a href="specialization_WildShiftAndPattern.html" data-lang-entity="specialization">WildShiftAndPattern</a>, 
+    <a href="specialization_WuManberPattern.html" data-lang-entity="specialization">WuManberPattern</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/find.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TNeedle[, typename TSpec]&gt;
+class Pattern;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TNeedle</a></code></th>
+        <td>The needle type. Types: <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>A tag that specifies the online algorithm to use for the search. Defaults to the result of
+<a href="global_metafunction_DefaultPattern.html" data-lang-entity="global_metafunction">DefaultPattern</a>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23getBeginScore" title="#Pattern#getBeginScore (interface function)" data-lang-entity="interface_function">TScoreValue getBeginScore(pattern);</a></code></span>
+    <span class="summary_desc"><div>Score of the last match found by <a href="class_Finder.html#Finder#findBegin" data-lang-entity="interface_function">findBegin</a> during approximate searching.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23host" title="#Pattern#host (interface function)" data-lang-entity="interface_function">THost host(pattern);</a></code></span>
+    <span class="summary_desc"><div>Query a Pattern for its host.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23needle" title="#Pattern#needle (interface function)" data-lang-entity="interface_function">TNeedle needle(pattern);</a></code></span>
+    <span class="summary_desc"><div>Returns the needle of a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> object (not implemented for some online-algorithms).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23position" title="#Pattern#position (interface function)" data-lang-entity="interface_function">TPosition position(pattern);</a></code></span>
+    <span class="summary_desc"><div>Return the position of the last match in the pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23scoringScheme" title="#Pattern#scoringScheme (interface function)" data-lang-entity="interface_function">TScoringScheme scoringScheme(pattern);</a></code></span>
+    <span class="summary_desc"><div>The scoring scheme used for finding or aligning.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23setNeedle" title="#Pattern#setNeedle (interface function)" data-lang-entity="interface_function">void setNeedle(pattern, needle);</a></code></span>
+    <span class="summary_desc"><div>Sets the needle of a Pattern object and optionall induces preprocessing.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23setScoringScheme" title="#Pattern#setScoringScheme (interface function)" data-lang-entity="interface_function">void setScoringScheme(pattern, score);</a></code></span>
+    <span class="summary_desc"><div>Sets the scoring scheme used for finding or aligning.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Container" title="#Pattern#Container (interface function)" data-lang-entity="interface_metafunction">Container&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the needle type of the pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Difference" title="#Pattern#Difference (interface function)" data-lang-entity="interface_metafunction">Difference&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the difference type of the underlying pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Host" title="#Pattern#Host (interface function)" data-lang-entity="interface_metafunction">Host&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the host type of the pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Needle" title="#Pattern#Needle (interface function)" data-lang-entity="interface_metafunction">Needle&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the needle type of a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> type.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23PexMultiFinder" title="#Pattern#PexMultiFinder (interface function)" data-lang-entity="interface_metafunction">PexMultiFinder&lt;Pattern&lt;TNeedle,Pex&lt;TVerification, TMultiFinder&gt; &gt; &gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Determines the multiple exact string matching algorithm used by the Pex algorithm.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Position" title="#Pattern#Position (interface function)" data-lang-entity="interface_metafunction">Position&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the position type of the underlying pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23ScoringScheme" title="#Pattern#ScoringScheme (interface function)" data-lang-entity="interface_metafunction">ScoringScheme&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the scoring scheme type of an approximate search algorithm.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Size" title="#Pattern#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the size type of the underlying pattern.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pattern%23Value" title="#Pattern#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TPattern&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the value type of the underlying pattern.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>If <tt>Needle</tt> is a StringSet then <tt>position(pattern)</tt> returns a <a href="class_Pair.html" data-lang-entity="class">Pair</a> with the index of the currently
+matching needle and the position in the needle.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Pattern#getBeginScore" class="signature first" data-lang-entity="interface_function">
+      <code>TScoreValue getBeginScore(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Score of the last match found by <a href="class_Finder.html#Finder#findBegin" data-lang-entity="interface_function">findBegin</a> during approximate searching.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>A Pattern that can be used for approximate searching.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TScoreValue</code></th>
+        <td>The score of the lst match found using <tt>pattern</tt>. The value is set after successfully
+call of <a href="class_Finder.html#Finder#findBegin" data-lang-entity="interface_function">findBegin</a>. If no match was found, the value is undefined.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#host" class="signature" data-lang-entity="interface_function">
+      <code>THost host(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Query a Pattern for its host.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The Pattern to query for its host.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THost</code></th>
+        <td>Reference to the host.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#needle" class="signature" data-lang-entity="interface_function">
+      <code>TNeedle needle(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the needle of a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> object (not implemented for some online-algorithms).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The Pattern to query for its needle.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TNeedle</code></th>
+        <td>Reference of the needle object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>TNeedle is the result of the Needle metafunction of TPattern. This is an alias to the function <a href="class_Pattern.html#Pattern#host" data-lang-entity="interface_function">host</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#position" class="signature" data-lang-entity="interface_function">
+      <code>TPosition position(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the position of the last match in the pattern.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The Pattern to query for its position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The position of the last match in the pattern.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#scoringScheme" class="signature" data-lang-entity="interface_function">
+      <code>TScoringScheme scoringScheme(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The scoring scheme used for finding or aligning.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The Pattern to query for its scoring scheme.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TScoringScheme</code></th>
+        <td>The scoring scheme of the pattern.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#setNeedle" class="signature" data-lang-entity="interface_function">
+      <code>void setNeedle(pattern, needle);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the needle of a Pattern object and optionall induces preprocessing.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The pattern to set the needle for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">needle</code>
+            
+        
+      </th>
+      <td>The needle to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pattern#setScoringScheme" class="signature" data-lang-entity="interface_function">
+      <code>void setScoringScheme(pattern, score);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the scoring scheme used for finding or aligning.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The pattern to set the scoring scheme for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">score</code>
+            
+        
+      </th>
+      <td>The scoring scheme to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Pattern#Container" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Container&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the needle type of the pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The pattern to query for its needle type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The needle type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Difference" class="signature" data-lang-entity="interface_metafunction">
+    <code>Difference&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the difference type of the underlying pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The Pattern to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The difference type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Host" class="signature" data-lang-entity="interface_metafunction">
+    <code>Host&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the host type of the pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The pattern to query for its host type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The host type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Needle" class="signature" data-lang-entity="interface_metafunction">
+    <code>Needle&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the needle type of a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> type.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The pattern type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The needle type of <tt>TPattern&lt;/tt., i.e. <tt>TNeedle</tt> for <tt>Pattern&lt;TNeedle, TSpec&gt;</tt>.</tt></td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#PexMultiFinder" class="signature" data-lang-entity="interface_metafunction">
+    <code>PexMultiFinder&lt;Pattern&lt;TNeedle,Pex&lt;TVerification, TMultiFinder&gt; &gt; &gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Determines the multiple exact string matching algorithm used by the Pex algorithm.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TMultiFinder</code></th>
+            <td>The specification for the multiple exact string matching algorithm that should be used
+with the Pex algorithm.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Pattern type of the multiple exact string matching algorithm for the specified Pattern.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>For a description of Pattern usage, see <a href="class_Pattern.html" data-lang-entity="class">Pattern</a>.</p><p>Overload this metafunction if you want to use something else for verification then
+<tt>Pattern&lt;String&lt;Segment&l;tNeedle&gt; &gt;, TMultiFinder&gt;</tt>.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Position" class="signature" data-lang-entity="interface_metafunction">
+    <code>Position&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the position type of the underlying pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The Pattern to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The position type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#ScoringScheme" class="signature" data-lang-entity="interface_metafunction">
+    <code>ScoringScheme&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the scoring scheme type of an approximate search algorithm.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The Pattern to query for its scoring scheme type. Default: EditDistanceScore.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the size type of the underlying pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The Pattern to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pattern#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TPattern&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value type of the underlying pattern.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPattern</code></th>
+            <td>The Pattern to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Pattern
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Holds the needle and preprocessing data (depends on algorithm).
+ * 
+ * @signature template &lt;typename TNeedle[, typename TSpec]&gt; class Pattern;
+ * 
+ * @tparam TNeedle The needle type. Types: @link TextConcept @endlink.
+ * @tparam TSpec A tag that specifies the online algorithm to use for the
+ *               search. Defaults to the result of @link DefaultPattern
+ *               @endlink.
+ * 
+ * If &lt;tt&gt;Needle&lt;/tt&gt; is a StringSet then &lt;tt&gt;position(pattern)&lt;/tt&gt; returns a
+ * @link Pair @endlink with the index of the currently matching needle and the
+ * position in the needle.
+ * 
+ * @mfn Pattern#Needle
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Returns the needle type of a @link Pattern @endlink type.
+ * 
+ * @signature Needle&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The pattern type to query.
+ * 
+ * @return Type The needle type of &lt;tt&gt;TPattern&lt;/tt., i.e. &lt;tt&gt;TNeedle&lt;/tt&gt; for
+ *              &lt;tt&gt;Pattern&amp;lt;TNeedle, TSpec&amp;gt;&lt;/tt&gt;.
+ * 
+ * @mfn Pattern#Container
+ * 
+ * @brief Returns the needle type of the pattern.
+ * 
+ * @signature Container&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The pattern to query for its needle type.
+ * 
+ * @return Type The needle type.
+ * 
+ * @mfn Pattern#Host
+ * 
+ * @brief Returns the host type of the pattern.
+ * 
+ * @signature Host&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The pattern to query for its host type.
+ * 
+ * @return Type The host type.
+ * 
+ * @mfn Pattern#Value
+ * 
+ * @brief Returns the value type of the underlying pattern.
+ * 
+ * @signature Value&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The Pattern to query.
+ * 
+ * @return Type The value type.
+ * 
+ * @mfn Pattern#Position
+ * 
+ * @brief Returns the position type of the underlying pattern.
+ * 
+ * @signature Position&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The Pattern to query.
+ * 
+ * @return Type The position type.
+ * 
+ * @mfn Pattern#Difference
+ * 
+ * @brief Returns the difference type of the underlying pattern.
+ * 
+ * @signature Difference&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The Pattern to query.
+ * 
+ * @return Type The difference type.
+ * 
+ * @mfn Pattern#Size
+ * 
+ * @brief Returns the size type of the underlying pattern.
+ * 
+ * @signature Size&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The Pattern to query.
+ * 
+ * @return Type The size type.
+ * 
+ * @mfn Pattern#ScoringScheme
+ * 
+ * @brief Returns the scoring scheme type of an approximate search algorithm.
+ * 
+ * @signature ScoringScheme&lt;TPattern&gt;::Type;
+ * 
+ * @tparam TPattern The Pattern to query for its scoring scheme type. Default:
+ *                  EditDistanceScore.
+ * 
+ * @mfn Pattern#PexMultiFinder
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Determines the multiple exact string matching algorithm used by the
+ *        Pex algorithm.
+ * 
+ * @signature PexMultiFinder&lt;Pattern&lt;TNeedle,Pex&lt;TVerification, TMultiFinder&gt; &gt;
+ *            &gt;::Type;
+ * 
+ * @tparam TMultiFinder The specification for the multiple exact string matching
+ *                      algorithm that should be used with the Pex algorithm.
+ * 
+ * @return Type Pattern type of the multiple exact string matching algorithm for
+ *              the specified Pattern.
+ * 
+ * For a description of Pattern usage, see @link Pattern @endlink.
+ * 
+ * Overload this metafunction if you want to use something else for verification
+ * then &lt;tt&gt;Pattern&amp;lt;String&amp;lt;Segment&amp;l;tNeedle&amp;gt; &amp;gt;,
+ * TMultiFinder&amp;gt;&lt;/tt&gt;.
+ * 
+ * @fn Pattern#getBeginScore
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Score of the last match found by @link Finder#findBegin @endlink
+ *        during approximate searching.
+ * 
+ * @signature TScoreValue getBeginScore(pattern);
+ * 
+ * @param[in] pattern A Pattern that can be used for approximate searching.
+ * 
+ * @return TScoreValue The score of the lst match found using &lt;tt&gt;pattern&lt;/tt&gt;.
+ *                     The value is set after successfully call of @link
+ *                     Finder#findBegin @endlink. If no match was found, the
+ *                     value is undefined.
+ * 
+ * @fn Pattern#host
+ * 
+ * @brief Query a Pattern for its host.
+ * 
+ * @signature THost host(pattern);
+ * 
+ * @param[in] pattern The Pattern to query for its host.
+ * 
+ * @return THost Reference to the host.
+ * 
+ * @fn Pattern#needle
+ * 
+ * @brief Returns the needle of a @link Pattern @endlink object (not implemented
+ *        for some online-algorithms).
+ * 
+ * @signature TNeedle needle(pattern);
+ * 
+ * @param[in] pattern The Pattern to query for its needle.
+ * 
+ * @return TNeedle Reference of the needle object.
+ * 
+ * TNeedle is the result of the Needle metafunction of TPattern. This is an
+ * alias to the function @link Pattern#host @endlink.
+ * 
+ * @fn Pattern#position
+ * 
+ * @brief Return the position of the last match in the pattern.
+ * 
+ * @signature TPosition position(pattern);
+ * 
+ * @param[in] pattern The Pattern to query for its position.
+ * 
+ * @return TPosition The position of the last match in the pattern.
+ * 
+ * @fn Pattern#setNeedle
+ * 
+ * @brief Sets the needle of a Pattern object and optionall induces
+ *        preprocessing.
+ * 
+ * @signature void setNeedle(pattern, needle);
+ * 
+ * @param[in,out] pattern The pattern to set the needle for.
+ * @param[in] needle The needle to set.
+ * 
+ * @fn Pattern#scoringScheme
+ * 
+ * @brief The scoring scheme used for finding or aligning.
+ * 
+ * @signature TScoringScheme scoringScheme(pattern);
+ * 
+ * @param[in] pattern The Pattern to query for its scoring scheme.
+ * 
+ * @return TScoringScheme The scoring scheme of the pattern.
+ * 
+ * @fn Pattern#setScoringScheme
+ * 
+ * @brief Sets the scoring scheme used for finding or aligning.
+ * 
+ * @signature void setScoringScheme(pattern, score);
+ * 
+ * @param[in,out] pattern The pattern to set the scoring scheme for.
+ * @param[in] score The scoring scheme to set.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1746 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_filemapping" data-page="FileMapping">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>FileMapping - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>FileMapping<div><div>A structure to memory-map a file.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/file.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TSpec]&gt;
+struct FileMapping;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <tt>void</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23adviseFileSegment" title="#FileMapping#adviseFileSegment (interface function)" data-lang-entity="interface_function">bool adviseFileSegment(fileMapping, advise, addr, fileOfs, size);</a></code></span>
+    <span class="summary_desc"><div>Give advise about use of a memory-mapped file segment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23cancelFileSegment" title="#FileMapping#cancelFileSegment (interface function)" data-lang-entity="interface_function">bool cancelFileSegment(fileMapping, addr, beginPos, size);</a></code></span>
+    <span class="summary_desc"><div>Cancel all outstanding transactions of a memory-mapped file segment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23close" title="#FileMapping#close (interface function)" data-lang-entity="interface_function">bool close(fileMapping);</a></code></span>
+    <span class="summary_desc"><div>Close a file and its memory mapping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23closeAndResize" title="#FileMapping#closeAndResize (interface function)" data-lang-entity="interface_function">bool closeAndResize(fileMapping, newFileSize);</a></code></span>
+    <span class="summary_desc"><div>Close a memory mapping and resize and close the underlying file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23flushFileSegment" title="#FileMapping#flushFileSegment (interface function)" data-lang-entity="interface_function">bool flushFileSegment(fileMapping, addr, beginPos, size);</a></code></span>
+    <span class="summary_desc"><div>Wait for all outstanding transactions of a memory-mapped file segment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23length" title="#FileMapping#length (interface function)" data-lang-entity="interface_function">TSize length(fileMapping);</a></code></span>
+    <span class="summary_desc"><div>Return the file size of a memory mapping.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23mapFileSegment" title="#FileMapping#mapFileSegment (interface function)" data-lang-entity="interface_function">TPtr mapFileSegment(fileMapping, fileOfs[, size[, mode]]);</a></code></span>
+    <span class="summary_desc"><div>Map a segment of a file into memory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23open" title="#FileMapping#open (interface function)" data-lang-entity="interface_function">bool open(fileMapping, fileName[, openMode]);</a></code></span>
+    <span class="summary_desc"><div>Open a file to be mapped into memory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23openTemp" title="#FileMapping#openTemp (interface function)" data-lang-entity="interface_function">bool openTemp(fileMapping);</a></code></span>
+    <span class="summary_desc"><div>Open a temporary file to be mapped into memory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23remapFileSegment" title="#FileMapping#remapFileSegment (interface function)" data-lang-entity="interface_function">TPtr remapFileSegment(fileMapping, oldAddr, oldFileOfs, oldSize, newSize);</a></code></span>
+    <span class="summary_desc"><div>Change the size of a memory-mapped file segment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23resize" title="#FileMapping#resize (interface function)" data-lang-entity="interface_function">bool resize(fileMapping, newFileSize);</a></code></span>
+    <span class="summary_desc"><div>Resize the underlying file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23unmapFileSegment" title="#FileMapping#unmapFileSegment (interface function)" data-lang-entity="interface_function">bool unmappedFileSegment(fileMapping, addr, size);</a></code></span>
+    <span class="summary_desc"><div>Unmap a memory-mapped file segment.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FileMapping%23Size" title="#FileMapping#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TFileMapping&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the size type of the FileMapping.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This structure represents both a file and its memory mapping.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FileMapping#adviseFileSegment" class="signature first" data-lang-entity="interface_function">
+      <code>bool adviseFileSegment(fileMapping, advise, addr, fileOfs, size);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Give advise about use of a memory-mapped file segment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping object to adsive segment in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">advise</code>
+            
+        
+      </th>
+      <td>The advise type. Type: <a href="enum_FileMappingAdvise.html" data-lang-entity="enum">FileMappingAdvise</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">addr</code>
+            
+        
+      </th>
+      <td>A pointer t othe beginning of the memory-mapped segment in memory (returned by a
+prior call of <a href="class_FileMapping.html#FileMapping#mapFileSegment" data-lang-entity="interface_function">mapFileSegment</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute start address of the segment in bytes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The segment length in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function has no effect on Windows. On all other platforms it calls <tt>posix_madvise</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#cancelFileSegment" class="signature" data-lang-entity="interface_function">
+      <code>bool cancelFileSegment(fileMapping, addr, beginPos, size);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Cancel all outstanding transactions of a memory-mapped file segment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">addr</code>
+            
+        
+      </th>
+      <td>A pointer to the beginning of the memory-mapped segment in memory (returned by a prior
+call of FileMapping#mapFileSegment).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPos</code>
+            
+        
+      </th>
+      <td>the absolute start address of the segment in bytes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The segment length in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#close" class="signature" data-lang-entity="interface_function">
+      <code>bool close(fileMapping);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Close a file and its memory mapping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to close</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#closeAndResize" class="signature" data-lang-entity="interface_function">
+      <code>bool closeAndResize(fileMapping, newFileSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Close a memory mapping and resize and close the underlying file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to close.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newFileSize</code>
+            
+        
+      </th>
+      <td>The size the file should have after closing.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> indicating success, <tt>false</tt> failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#flushFileSegment" class="signature" data-lang-entity="interface_function">
+      <code>bool flushFileSegment(fileMapping, addr, beginPos, size);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Wait for all outstanding transactions of a memory-mapped file segment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>A FileMapping object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">addr</code>
+            
+        
+      </th>
+      <td>A pointer to the beginning of memory-mapped segment in memory (returned by a prior
+call of <a href="class_FileMapping.html#FileMapping#mapFileSegment" data-lang-entity="interface_function">mapFileSegment</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPos</code>
+            
+        
+      </th>
+      <td>The absolute start address of the segment in bytes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The segment length in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function has no effect under Windows. On all other platforms it calls <tt>msync</tt>. This function is only
+needed to synchronize file accesses in non-shared-memory environments.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(fileMapping);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the file size of a memory mapping.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to return the length for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The file size (Metafunction: <a href="class_FileMapping.html#FileMapping#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#mapFileSegment" class="signature" data-lang-entity="interface_function">
+      <code>TPtr mapFileSegment(fileMapping, fileOfs[, size[, mode]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Map a segment of a file into memory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>A FileMapping object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute start address of the segment in bytes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The segment length in bytes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">mode</code>
+            
+        
+      </th>
+      <td>The mapping access mode. Default rread/write open mode of the underlying file.
+Type: <a href="enum_FileMappingMode.html" data-lang-entity="enum">FileMappingMode</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPtr</code></th>
+        <td>A pointer to the beginning of the memory-mapped segment in memory or <tt>NULL</tt> on error. TPtr is
+<tt>void *</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#open" class="signature" data-lang-entity="interface_function">
+      <code>bool open(fileMapping, fileName[, openMode]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Open a file to be mapped into memory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to open.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>The path to the fie.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">openMode</code>
+            
+        
+      </th>
+      <td>The mode to open the file in, flags from <a href="enum_FileOpenMode.html" data-lang-entity="enum">FileOpenMode</a> to combine
+using OR. Write-only mode is not supported, use <tt>OPEN_RDWR</tt> if you need
+write access. If you omit the <tt>OPEN_APPEND</tt> flag in write mode, the file
+will be cleared when opened. Default: <tt>OPEN_RDWR | OPEN_CREATE | OPEN_APPEND</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the opening was successful, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#openTemp" class="signature" data-lang-entity="interface_function">
+      <code>bool openTemp(fileMapping);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Open a temporary file to be mapped into memory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to open using a temporary file.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#remapFileSegment" class="signature" data-lang-entity="interface_function">
+      <code>TPtr remapFileSegment(fileMapping, oldAddr, oldFileOfs, oldSize, newSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Change the size of a memory-mapped file segment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">oldAddr</code>
+            
+        
+      </th>
+      <td>The address returned by <a href="class_FileMapping.html#FileMapping#mapFileSegment" data-lang-entity="interface_function">mapFileSegment</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">oldFileOfs</code>
+            
+        
+      </th>
+      <td>The <tt>fileOfs</tt> parameter used in <a href="class_FileMapping.html#FileMapping#mapFileSegment" data-lang-entity="interface_function">mapFileSegment</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">oldSize</code>
+            
+        
+      </th>
+      <td>The <tt>size</tt> parameter used in <a href="class_FileMapping.html#FileMapping#mapFileSegment" data-lang-entity="interface_function">mapFileSegment</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newSize</code>
+            
+        
+      </th>
+      <td>the new segment length in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPtr</code></th>
+        <td>A pointer to the beginning of the memory-mapped segment in memory or <tt>NULL</tt> on error. Type:
+<tt>void*</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#resize" class="signature" data-lang-entity="interface_function">
+      <code>bool resize(fileMapping, newFileSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resize the underlying file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>The FileMapping to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newFileSize</code>
+            
+        
+      </th>
+      <td>The new file size to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>On Windows, all existing file mappings must be unmapped via <a href="class_FileMapping.html#FileMapping#unmapFileSegment" data-lang-entity="interface_function">unmapFileSegment</a> before
+claling this function.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FileMapping#unmapFileSegment" class="signature" data-lang-entity="interface_function">
+      <code>bool unmappedFileSegment(fileMapping, addr, size);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Unmap a memory-mapped file segment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileMapping</code>
+            
+        
+      </th>
+      <td>A FileMapping object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">addr</code>
+            
+        
+      </th>
+      <td>The pointer to the beginning of the memory-mapped segment in memory. Type: <tt>void*</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The segment length in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="FileMapping#Size" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TFileMapping&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the size type of the FileMapping.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TFileMapping</code></th>
+            <td>FileMapping to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The size type of the FileMapping.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FileMapping
+ * 
+ * @headerfile &lt;seqan/file.h&gt;
+ * 
+ * @brief A structure to memory-map a file.
+ * 
+ * @signature template &lt;[typename TSpec]&gt; struct FileMapping;
+ * 
+ * @tparam TSpec The specializing type. Default: &lt;tt&gt;void&lt;/tt&gt;.
+ * 
+ * This structure represents both a file and its memory mapping.
+ * 
+ * @mfn FileMapping#Size
+ * 
+ * @brief Return the size type of the FileMapping.
+ * 
+ * @signature Size&lt;TFileMapping&gt;::Type;
+ * 
+ * @tparam TFileMapping FileMapping to query.
+ * 
+ * @return Type The size type of the FileMapping.
+ * 
+ * @fn FileMapping#open
+ * 
+ * @brief Open a file to be mapped into memory.
+ * 
+ * @signature bool open(fileMapping, fileName[, openMode]);
+ * 
+ * @param[in,out] fileMapping The FileMapping to open.
+ * @param[in] fileName The path to the fie.
+ * @param[in] openMode The mode to open the file in, flags from @link
+ *                     FileOpenMode @endlink to combine using OR. Write-only
+ *                     mode is not supported, use &lt;tt&gt;OPEN_RDWR&lt;/tt&gt; if you need
+ *                     write access. If you omit the &lt;tt&gt;OPEN_APPEND&lt;/tt&gt; flag
+ *                     in write mode, the file will be cleared when opened.
+ *                     Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE | OPEN_APPEND&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the opening was successful, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn FileMapping#openTemp
+ * 
+ * @brief Open a temporary file to be mapped into memory.
+ * 
+ * @signature bool openTemp(fileMapping);
+ * 
+ * @param[in,out] fileMapping The FileMapping to open using a temporary file.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FileMapping#close
+ * 
+ * @brief Close a file and its memory mapping.
+ * 
+ * @signature bool close(fileMapping);
+ * 
+ * @param[in,out] fileMapping The FileMapping to close
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FileMapping#closeAndResize
+ * 
+ * @brief Close a memory mapping and resize and close the underlying file.
+ * 
+ * @signature bool closeAndResize(fileMapping, newFileSize);
+ * 
+ * @param[in,out] fileMapping The FileMapping to close.
+ * @param[in] newFileSize The size the file should have after closing.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; indicating success, &lt;tt&gt;false&lt;/tt&gt; failure.
+ * 
+ * @fn FileMapping#length
+ * 
+ * @brief Return the file size of a memory mapping.
+ * 
+ * @signature TSize length(fileMapping);
+ * 
+ * @param[in] fileMapping The FileMapping to return the length for.
+ * 
+ * @return TSize The file size (Metafunction: @link FileMapping#Size @endlink).
+ * 
+ * @fn FileMapping#resize
+ * 
+ * @brief Resize the underlying file.
+ * 
+ * @signature bool resize(fileMapping, newFileSize);
+ * 
+ * @param[in,out] fileMapping The FileMapping to resize.
+ * @param[in] newFileSize The new file size to set.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @section Remarks
+ * 
+ * On Windows, all existing file mappings must be unmapped via @link
+ * FileMapping#unmapFileSegment @endlink before claling this function.
+ * 
+ * @fn FileMapping#flushFileSegment
+ * 
+ * @brief Wait for all outstanding transactions of a memory-mapped file segment.
+ * 
+ * @signature bool flushFileSegment(fileMapping, addr, beginPos, size);
+ * 
+ * @param[in,out] fileMapping A FileMapping object.
+ * @param[in] addr A pointer to the beginning of memory-mapped segment in memory
+ *                 (returned by a prior call of @link FileMapping#mapFileSegment
+ *                 @endlink.
+ * @param[in] beginPos The absolute start address of the segment in bytes.
+ * @param[in] size The segment length in bytes.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @section Remarks
+ * 
+ * This function has no effect under Windows. On all other platforms it calls
+ * &lt;tt&gt;msync&lt;/tt&gt;. This function is only needed to synchronize file accesses in
+ * non-shared-memory environments.
+ * 
+ * @fn FileMapping#cancelFileSegment
+ * 
+ * @brief Cancel all outstanding transactions of a memory-mapped file segment.
+ * 
+ * @signature bool cancelFileSegment(fileMapping, addr, beginPos, size);
+ * 
+ * @param[in,out] fileMapping The FileMapping object.
+ * @param[in] addr A pointer to the beginning of the memory-mapped segment in
+ *                 memory (returned by a prior call of
+ *                 FileMapping#mapFileSegment).
+ * @param[in] beginPos the absolute start address of the segment in bytes.
+ * @param[in] size The segment length in bytes.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn FileMapping#adviseFileSegment
+ * 
+ * @brief Give advise about use of a memory-mapped file segment.
+ * 
+ * @signature bool adviseFileSegment(fileMapping, advise, addr, fileOfs, size);
+ * 
+ * @param[in,out] fileMapping The FileMapping object to adsive segment in.
+ * @param[in] advise The advise type. Type: @link FileMappingAdvise @endlink.
+ * @param[in] addr A pointer t othe beginning of the memory-mapped segment in
+ *                 memory (returned by a prior call of @link
+ *                 FileMapping#mapFileSegment @endlink).
+ * @param[in] fileOfs The absolute start address of the segment in bytes.
+ * @param[in] size The segment length in bytes.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @section Remarks
+ * 
+ * This function has no effect on Windows. On all other platforms it calls
+ * &lt;tt&gt;posix_madvise&lt;/tt&gt;.
+ * 
+ * @fn FileMapping#mapFileSegment
+ * 
+ * @brief Map a segment of a file into memory.
+ * 
+ * @signature TPtr mapFileSegment(fileMapping, fileOfs[, size[, mode]]);
+ * 
+ * @param[in,out] fileMapping A FileMapping object.
+ * @param[in] fileOfs The absolute start address of the segment in bytes.
+ * @param[in] size The segment length in bytes.
+ * @param[in] mode The mapping access mode. Default rread/write open mode of the
+ *                 underlying file. Type: @link FileMappingMode @endlink.
+ * 
+ * @return TPtr A pointer to the beginning of the memory-mapped segment in
+ *              memory or &lt;tt&gt;NULL&lt;/tt&gt; on error. TPtr is &lt;tt&gt;void *&lt;/tt&gt;.
+ * 
+ * @fn FileMapping#unmapFileSegment
+ * 
+ * @brief Unmap a memory-mapped file segment.
+ * 
+ * @signature bool unmappedFileSegment(fileMapping, addr, size);
+ * 
+ * @param[in,out] fileMapping A FileMapping object.
+ * @param[in] addr The pointer to the beginning of the memory-mapped segment in
+ *                 memory. Type: &lt;tt&gt;void*&lt;/tt&gt;.
+ * @param[in] size The segment length in bytes.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn FileMapping#remapFileSegment
+ * 
+ * @brief Change the size of a memory-mapped file segment.
+ * 
+ * @signature TPtr remapFileSegment(fileMapping, oldAddr, oldFileOfs, oldSize,
+ *            newSize);
+ * 
+ * @param[in,out] fileMapping The FileMapping object.
+ * @param[in] oldAddr The address returned by @link FileMapping#mapFileSegment
+ *                    @endlink.
+ * @param[in] oldFileOfs The &lt;tt&gt;fileOfs&lt;/tt&gt; parameter used in @link
+ *                       FileMapping#mapFileSegment @endlink.
+ * @param[in] oldSize The &lt;tt&gt;size&lt;/tt&gt; parameter used in @link
+ *                    FileMapping#mapFileSegment @endlink.
+ * @param[in] newSize the new segment length in bytes.
+ * 
+ * @return TPtr A pointer to the beginning of the memory-mapped segment in
+ *              memory or &lt;tt&gt;NULL&lt;/tt&gt; on error. Type: &lt;tt&gt;void*&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

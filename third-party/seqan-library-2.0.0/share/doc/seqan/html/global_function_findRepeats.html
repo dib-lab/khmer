@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_findrepeats" data-page="findRepeats">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>findRepeats - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>findRepeats<div><div>Search for repeats in a text.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>void findRepeats(repeatString, text, minRepeatLength[, maxPeriod]);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">repeatString</code>
+            
+        
+        </th>
+        <td>A <a href="class_String.html" data-lang-entity="class">String</a> of <a href="class_Repeat.html" data-lang-entity="class">Repeat</a> objects.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+        </th>
+        <td>The text to search repeats in. Types: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">minRepeatLength</code>
+            
+        
+        </th>
+        <td>The minimum length each reported repeat must have.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">maxPeriod</code>
+            
+        
+        </th>
+        <td>Optionally, the maximal period that reported repeats can have. Default: 1</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Subsequences of undefined values/<tt>N</tt>s will always be reported.</p><h3>Examples</h3><p>The following demonstrates finding repeats of period 3.</p><div data-src-path="demos/index/find_repeats.cpp"><div class="highlight"><pre><span class="cp">#include &lt;fstream&gt;</span>
+
+<span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+<span class="cp">#include &lt;seqan/seq_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Get path to file to search for repeats in.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">path</span> <span class="o">=</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">)</span><span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/demos/index/ref.fa&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Load first sequence from file.</span>
+    <span class="n">CharString</span> <span class="n">id</span><span class="p">;</span>
+    <span class="n">Dna5String</span> <span class="n">seq</span><span class="p">;</span>
+    <span class="n">SeqFileIn</span> <span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+    <span class="n">readRecord</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">file</span><span class="p">);</span>
+
+    <span class="c1">// Find repeats and print them.</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="n">Repeat</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="p">,</span> <span class="kt">unsigned</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">repeats</span><span class="p">;</span>
+    <span class="n">findRepeats</span><span class="p">(</span><span class="n">repeats</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;# of repeats: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">repeats</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">repeats</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;i == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, beginPosition = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">repeats</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">beginPosition</span>
+                  <span class="o">&lt;&lt;</span> <span class="s">&quot;, endPosition = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">repeats</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">endPosition</span>
+                  <span class="o">&lt;&lt;</span> <span class="s">&quot;, period = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">repeats</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">period</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/find_repeats.cpp" target="_top">demos/index/find_repeats.cpp</a></div></div><pre class="console" data-src-path="None"># of repeats: 15
+i == 0, beginPosition = 3, endPosition = 7, period = 1
+i == 1, beginPosition = 46, endPosition = 53, period = 1
+i == 2, beginPosition = 101, endPosition = 105, period = 1
+i == 3, beginPosition = 105, endPosition = 109, period = 1
+i == 4, beginPosition = 164, endPosition = 169, period = 1
+i == 5, beginPosition = 291, endPosition = 297, period = 1
+i == 6, beginPosition = 319, endPosition = 327, period = 1
+i == 7, beginPosition = 400, endPosition = 404, period = 1
+i == 8, beginPosition = 442, endPosition = 446, period = 1
+i == 9, beginPosition = 468, endPosition = 473, period = 1
+i == 10, beginPosition = 476, endPosition = 480, period = 1
+i == 11, beginPosition = 507, endPosition = 513, period = 1
+i == 12, beginPosition = 561, endPosition = 566, period = 1
+i == 13, beginPosition = 623, endPosition = 627, period = 1
+i == 14, beginPosition = 655, endPosition = 659, period = 1</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_Repeat.html" data-lang-entity="class">Repeat</a></li>
+  
+  <li><a href="concept_AlphabetWithUnknownValueConcept.html#AlphabetWithUnknownValueConcept#unknownValue" data-lang-entity="interface_function">unknownValue</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn findRepeats
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Search for repeats in a text.
+ * 
+ * @signature void findRepeats(repeatString, text, minRepeatLength[,
+ *            maxPeriod]);
+ * 
+ * @param[out] repeatString A @link String @endlink of @link Repeat @endlink
+ *                          objects.
+ * @param[in] text The text to search repeats in. Types: @link ContainerConcept
+ *                 @endlink
+ * @param[in] minRepeatLength The minimum length each reported repeat must have.
+ * @param[in] maxPeriod Optionally, the maximal period that reported repeats can
+ *                      have. Default: 1
+ * 
+ * Subsequences of undefined values/&lt;tt&gt;N&lt;/tt&gt;s will always be reported.
+ * 
+ * @section Examples
+ * 
+ * The following demonstrates finding repeats of period 3.
+ * 
+ * @include demos/index/find_repeats.cpp
+ * 
+ * @code{.console}
+ * # of repeats: 15
+ * i == 0, beginPosition = 3, endPosition = 7, period = 1
+ * i == 1, beginPosition = 46, endPosition = 53, period = 1
+ * i == 2, beginPosition = 101, endPosition = 105, period = 1
+ * i == 3, beginPosition = 105, endPosition = 109, period = 1
+ * i == 4, beginPosition = 164, endPosition = 169, period = 1
+ * i == 5, beginPosition = 291, endPosition = 297, period = 1
+ * i == 6, beginPosition = 319, endPosition = 327, period = 1
+ * i == 7, beginPosition = 400, endPosition = 404, period = 1
+ * i == 8, beginPosition = 442, endPosition = 446, period = 1
+ * i == 9, beginPosition = 468, endPosition = 473, period = 1
+ * i == 10, beginPosition = 476, endPosition = 480, period = 1
+ * i == 11, beginPosition = 507, endPosition = 513, period = 1
+ * i == 12, beginPosition = 561, endPosition = 566, period = 1
+ * i == 13, beginPosition = 623, endPosition = 627, period = 1
+ * i == 14, beginPosition = 655, endPosition = 659, period = 1
+ * @endcode
+ * 
+ * 
+ * @see AlphabetWithUnknownValueConcept#unknownValue
+ * @see Repeat
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

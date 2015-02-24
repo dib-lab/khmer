@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_extendalignment" data-page="extendAlignment">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>extendAlignment - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>extendAlignment<div><div>X-Drop extension for alignment objects.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align_extend.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>TScoreValue extendAlignment(align, [origScore,] hSeq, vSeq, positions, extensionDirection,
+[lowerDiag, upperDiag,] [xDrop,] scoreScheme);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align</code>
+            
+        
+        </th>
+        <td>The <a href="class_Align.html" data-lang-entity="class">Align</a> object to work on. Must be an alignment over the
+<a href="specialization_InfixSegment.html" data-lang-entity="specialization">infix</a> of the <i>const</i> type of <tt>hSeq</tt>
+and <tt>vSeq</tt>. Also see section "Returned Alignment".</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">origScore</code>
+            
+        
+        </th>
+        <td>Original score value of the alignment (optional; computed if not provided).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hSeq</code>
+            
+        
+        </th>
+        <td>Full horizontal sequence.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">vSeq</code>
+            
+        
+        </th>
+        <td>Full vertical sequence.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">positions</code>
+            
+        
+        </th>
+        <td>A <a href="class_Tuple.html" data-lang-entity="class">Tuple</a> of length 4 with the begin and end position of the
+infixes in align.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">extensionDirection</code>
+            
+        
+        </th>
+        <td>The extension direction (<a href="enum_ExtensionDirection.html" data-lang-entity="enum">ExtensionDirection</a>).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">lowerDiag</code>
+            
+        
+        </th>
+        <td>Lower alignment diagonal to use (<tt>int</tt>).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">upperDiag</code>
+            
+        
+        </th>
+        <td>Upper alignment diagonal to use (<tt>int</tt>).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">xDrop</code>
+            
+        
+        </th>
+        <td>The X-drop value to use (integral value). It only limits computation of new
+columns in the DP-Matrix and has no influence on the diagonals (but can be combined with them).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme</code>
+            
+        
+        </th>
+        <td>The <a href="class_Score.html" data-lang-entity="class">Score</a> to use.</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+<h2>Return Values</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>TScoreValue</code></th>
+        <td>The score of the new alignment. <tt>TScoreValue</tt> is the value type of
+<tt>scoringScheme</tt>.</td>
+    </tr>
+
+</table>
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Returned Alignment</h3><p>The resulting alignment has the infixes extended to the whole underlying sequence. The alignment
+is clipped to give the parts of the aligned sequences.</p><h3>Example</h3><div data-src-path="demos/align_extend/extend_alignment.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+
+<span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/align_extend.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">sc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+    <span class="n">Align</span><span class="o">&lt;</span><span class="n">Infix</span><span class="o">&lt;</span><span class="n">CharString</span> <span class="k">const</span><span class="o">&gt;::</span><span class="n">Type</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">;</span>
+    <span class="n">resize</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">align</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="c1">// We create the following initial situation with subject/query and the</span>
+    <span class="c1">// infixes thereof.</span>
+    <span class="c1">//</span>
+    <span class="c1">//                         infixes/seeds</span>
+    <span class="c1">//                             &lt;--&gt;</span>
+    <span class="c1">// subject  NNNNNNNNNNTTCCGGGACGGTACACACACGGGGGGGGGG</span>
+    <span class="c1">// query               CTCGGGACGGTACAGGCACGGTTTTTTTT</span>
+    <span class="n">CharString</span> <span class="n">subject</span> <span class="o">=</span> <span class="s">&quot;NNNNNNNNNNTTCCGGGACGGTACACACACGGGGGGGGGG&quot;</span><span class="p">;</span>
+    <span class="n">CharString</span> <span class="n">query</span>   <span class="o">=</span> <span class="s">&quot;CTCGGGACGGTACAGGCACGGTTTTTTTT&quot;</span><span class="p">;</span>
+    <span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">infix</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">23</span><span class="p">));</span>
+    <span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">infix</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">));</span>
+    <span class="kt">int</span> <span class="n">score</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">sc</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Initial alignment of infixes (score == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">score</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)</span><span class="se">\n\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">align</span><span class="p">;</span>
+
+    <span class="c1">// The alignment starts at diagonal (23 - 19) = 4.  A band of 4 in each direction has</span>
+    <span class="c1">// the following diagonals.</span>
+    <span class="kt">int</span> <span class="n">lDiag</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">uDiag</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="c1">// Set the x-Drop value to 5.</span>
+    <span class="kt">int</span> <span class="n">xDrop</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="n">Tuple</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="p">,</span> <span class="mi">4</span><span class="o">&gt;</span> <span class="n">positions</span> <span class="o">=</span> <span class="p">{</span> <span class="p">{</span><span class="mi">19u</span><span class="p">,</span> <span class="mi">8u</span><span class="p">,</span> <span class="mi">23u</span><span class="p">,</span> <span class="mi">12u</span><span class="p">}</span> <span class="p">};</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">extendAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">EXTEND_BOTH</span><span class="p">,</span>
+                            <span class="n">lDiag</span><span class="p">,</span> <span class="n">uDiag</span><span class="p">,</span> <span class="n">xDrop</span><span class="p">,</span> <span class="n">sc</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Resulting alignment (score == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">score</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)</span><span class="se">\n\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">align</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;source(row(align, 0)) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">source</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; (full sequence)</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;source(row(align, 1)) == &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">source</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; (full sequence)</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;clipping positions of row 0: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">clippedBeginPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">clippedEndPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;clipping positions of row 1: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">clippedBeginPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">clippedEndPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/align_extend/extend_alignment.cpp" target="_top">demos/align_extend/extend_alignment.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/align_extend/extend_alignment.cpp.stdout">Initial alignment of infixes (score == 8)
+
+      0      
+        GGTA
+        ||||
+        GGTA
+
+
+Resulting alignment (score == 32)
+
+      0     .    :    .     
+        CGGGACGGTACACACACGG
+        ||||||||||||  |||||
+        CGGGACGGTACAGGCACGG
+
+
+source(row(align, 0)) == NNNNNNNNNNTTCCGGGACGGTACACACACGGGGGGGGGG (full sequence)
+source(row(align, 1)) == CTCGGGACGGTACAGGCACGGTTTTTTTT (full sequence)
+
+clipping positions of row 0: 13, 32
+clipping positions of row 1: 2, 21
+</pre><h3>Remarks</h3><p>It is necessary to explicitly pass hSeq, vSeq and the positions, because the
+original hSeq and vSeq (that Align was created on), might have been infixes,
+(especially if they are members of a ConcatDirect set) in which cases their
+actual begin and end positions cannot be inferred from the Align object's
+rows' source().</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn extendAlignment
+ * 
+ * @headerfile &lt;seqan/align_extend.h&gt;
+ * 
+ * @brief X-Drop extension for alignment objects.
+ * 
+ * @signature TScoreValue extendAlignment(align, [origScore,] hSeq, vSeq,
+ *            positions, extensionDirection, [lowerDiag, upperDiag,] [xDrop,]
+ *            scoreScheme);
+ * 
+ * @param[in,out] align The @link Align @endlink object to work on. Must be an
+ *                      alignment over the @link InfixSegment infix @endlink of
+ *                      the &lt;i&gt;const&lt;/i&gt; type of &lt;tt&gt;hSeq&lt;/tt&gt; and
+ *                      &lt;tt&gt;vSeq&lt;/tt&gt;. Also see section &#34;Returned Alignment&#34;.
+ * @param[in] origScore Original score value of the alignment (optional;
+ *                      computed if not provided).
+ * @param[in] hSeq Full horizontal sequence.
+ * @param[in] vSeq Full vertical sequence.
+ * @param[in] positions A @link Tuple @endlink of length 4 with the begin and
+ *                      end position of the infixes in align.
+ * @param[in] extensionDirection  The extension direction (@link
+ *                               ExtensionDirection @endlink).
+ * @param[in] lowerDiag Lower alignment diagonal to use (&lt;tt&gt;int&lt;/tt&gt;).
+ * @param[in] upperDiag Upper alignment diagonal to use (&lt;tt&gt;int&lt;/tt&gt;).
+ * @param[in] xDrop The X-drop value to use (integral value). It only limits
+ *                  computation of new columns in the DP-Matrix and has no
+ *                  influence on the diagonals (but can be combined with them).
+ * @param[in] scoringScheme  The @link Score @endlink to use.
+ * 
+ * @return TScoreValue The score of the new alignment. &lt;tt&gt;TScoreValue&lt;/tt&gt; is
+ *                     the value type of &lt;tt&gt;scoringScheme&lt;/tt&gt;.
+ * 
+ * @section Returned Alignment
+ * 
+ * The resulting alignment has the infixes extended to the whole underlying
+ * sequence. The alignment is clipped to give the parts of the aligned
+ * sequences.
+ * 
+ * @section Example
+ * 
+ * @include demos/align_extend/extend_alignment.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/align_extend/extend_alignment.cpp.stdout
+ * 
+ * @section Remarks
+ * 
+ * It is necessary to explicitly pass hSeq, vSeq and the positions, because the
+ * original hSeq and vSeq (that Align was created on), might have been infixes,
+ * (especially if they are members of a ConcatDirect set) in which cases their
+ * actual begin and end positions cannot be inferred from the Align object&#39;s
+ * rows&#39; source().
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

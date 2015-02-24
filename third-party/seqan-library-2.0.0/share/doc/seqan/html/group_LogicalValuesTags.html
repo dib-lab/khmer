@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_logicalvaluestags" data-page="LogicalValuesTags">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Logical Values - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Logical Values
+  <div><div>Tags for representing true and false.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+<div data-lang-entity-container="grouped_tag">
+<h2 data-lang-entity="grouped_tag">Grouped Tags Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicalValuesTags%23False" title="#LogicalValuesTags#False (interface function)" data-lang-entity="grouped_tag">struct False;, False::Type;, bool False::VALUE = false;</a></code></span>
+    
+    <span class="summary_desc"><div>Representation for False.</div></span>
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicalValuesTags%23True" title="#LogicalValuesTags#True (interface function)" data-lang-entity="grouped_tag">struct True;, True::Type;, bool True::VALUE = true;</a></code></span>
+    
+    <span class="summary_desc"><div>Representation for True.</div></span>
+  </li>
+  
+</ul>
+</div>
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Examples</h3><p>Print the values of the tags/metafunctions <tt>True</tt> and <tt>False</tt>.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">False</span><span class="o">::</span><span class="n">VALUE</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>                                         <span class="c1">// =&gt; &quot;0&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">True</span><span class="o">::</span><span class="n">VALUE</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>                                          <span class="c1">// =&gt; &quot;1&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">IsSameType</span><span class="o">&lt;</span><span class="n">False</span><span class="p">,</span> <span class="n">False</span><span class="o">::</span><span class="n">Type</span><span class="o">&gt;::</span><span class="n">VALUE</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span> <span class="c1">// =&gt; &quot;1&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><h3>Inheriting from True and False</h3><p>The two tags True and False have the special property that they can also be used as metafunctions and both have a
+<tt>VALUE</tt> as well as a <tt>TYPE</tt>. This property makes it very convenient to define metafunctions by inheriting from the <tt>True</tt> or <tt>False</tt>.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">IsInt32</span> <span class="o">:</span>
+    <span class="n">False</span> <span class="p">{};</span>
+
+<span class="k">template</span> <span class="o">&lt;&gt;</span>
+<span class="k">struct</span> <span class="n">IsInt32</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;:</span>
+    <span class="n">True</span> <span class="p">{};</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>The metafunction <tt>IsInt32</tt> can now be used as follows.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">IsInt32</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;::</span><span class="n">VALUE</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>  <span class="c1">// =&gt; &quot;0&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">IsInt32</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">VALUE</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>  <span class="c1">// =&gt; &quot;1&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+  </div>
+</div>
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+<div class="grouped_tags_details" data-lang-entity-container="grouped_tag">
+  <h2 data-lang-entity="grouped_tag">Grouped Tags Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="LogicalValuesTags#False" class="signature first" data-lang-entity="grouped_tag">
+      <code>struct False;
+False::Type;
+bool False::VALUE = false;</code>
+    </h3>
+
+    
+    <dl>
+      <dt>Defined in</dt>
+      <dd>
+        &lt;seqan/basic.h&gt;
+        
+      </dd>
+    </dl>
+    
+
+    <div class="docstring">
+      <div class="discussion">
+        <div>Representation for False.</div>
+      </div>
+    </div>
+    
+    <dl>
+      
+
+      
+    </dl>
+
+    <div class="docstring">
+      <div class="discussion">
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="method_details">
+    <h3 data-toc="hidden" id="LogicalValuesTags#True" class="signature" data-lang-entity="grouped_tag">
+      <code>struct True;
+True::Type;
+bool True::VALUE = true;</code>
+    </h3>
+
+    
+    <dl>
+      <dt>Defined in</dt>
+      <dd>
+        &lt;seqan/basic.h&gt;
+        
+      </dd>
+    </dl>
+    
+
+    <div class="docstring">
+      <div class="discussion">
+        <div>Representation for True.</div>
+      </div>
+    </div>
+    
+    <dl>
+      
+
+      
+    </dl>
+
+    <div class="docstring">
+      <div class="discussion">
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+
+
+
+
+<!-- Grouped macros Details -->
+
+
+
+
+<!-- Grouped Functions Details -->
+
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup LogicalValuesTags Logical Values
+ * 
+ * @brief Tags for representing true and false.
+ * 
+ * @section Examples
+ * 
+ * Print the values of the tags/metafunctions &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp tags true false
+ * 
+ * @section Inheriting from True and False
+ * 
+ * The two tags True and False have the special property that they can also be
+ * used as metafunctions and both have a &lt;tt&gt;VALUE&lt;/tt&gt; as well as a
+ * &lt;tt&gt;TYPE&lt;/tt&gt;. This property makes it very convenient to define metafunctions
+ * by inheriting from the &lt;tt&gt;True&lt;/tt&gt; or &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp inheriting from true false
+ * 
+ * The metafunction &lt;tt&gt;IsInt32&lt;/tt&gt; can now be used as follows.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp using isint32
+ * 
+ * 
+ * 
+ * @tag LogicalValuesTags#True
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Representation for True.
+ * 
+ * @signature struct True;
+ * @signature True::Type;
+ * @signature bool True::VALUE = true;
+ * 
+ * @tag LogicalValuesTags#False
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Representation for False.
+ * 
+ * @signature struct False;
+ * @signature False::Type;
+ * @signature bool False::VALUE = false;
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_realignment" data-page="reAlignment">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>reAlignment - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>reAlignment<div><div>Perform realignment on a <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> object.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/realign.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>void reAlignment(store, contigID, realignmentMethod, bandwidth, includeReference[,
+windowBegin, windowEnd][, debug][, printTiming]);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+        </th>
+        <td>The <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> to perform realignment for.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">realignmentMethod</code>
+            
+        
+        </th>
+        <td>The realignment algorithm to use, <tt>1</tt> for affine gap costs, <tt>0</tt>
+for linear gap costs, affine gap costs are recommended, <tt>unsigned</tt>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">contigID</code>
+            
+        
+        </th>
+        <td>Identifier of the contig to realign, <tt>unsigned</tt></td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">bandwidth</code>
+            
+        
+        </th>
+        <td>Bandwidth to use in the pairwise DP alignment algorithms <tt>unsigned</tt>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">includeReference</code>
+            
+        
+        </th>
+        <td>A <tt>bool</tt>, if <tt>true</tt> then the reference will be included as a
+pseudo-read to increase stability in case of indels. See section "Including
+the Reference" for details.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">windowBegin</code>
+            
+        
+        </th>
+        <td>Optional <tt>unsigned</tt> window begin for windowed alignment,
+default: <tt>0</tt>, i.e. no windowing. Also see section "Windowed
+Realignment" below.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">windowEnd</code>
+            
+        
+        </th>
+        <td>Optional <tt>unsigned</tt> window end for windowed alignment, default: <tt>0</tt>,
+i.e. no windowing. Also see section "Windowed Realignment" below.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">debug</code>
+            
+        
+        </th>
+        <td>Optional <tt>bool</tt> to enable verbose logging, default: <tt>false</tt>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">printTiming</code>
+            
+        
+        </th>
+        <td>Optional <tt>bool</tt> to enable printing of times, default: <tt>false</tt>.</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This function implements a variant of the Anson-Myers algorithm to refine the multi-read alignments. The algorithm
+works in a round-robin fashion:</p><p>First, the profile sequence is created for the multi-read alignment. The algorithm then works in round.</p><p>In each round, each read alignment is selected, removed from the profile and then aligned against the profile using
+a DP algorithm. For this alignment, a region of <tt>bandwidth / 2</tt> positions around the previous alignment
+locus is chosen and aligned using a bandwidth of <tt>bandwidth</tt> in the DP alignment algorithm. The profile is
+then updated with the resulting pairwise alignment. This is iterated until the global alignment score does not
+improve.</p><p>In the end, the reference sequence of the given contig is replaced by the consensus of the multi-read alignment.</p><h3>Including the Reference</h3><p>You can choose to include the reference sequence of the selected contig as a pseudo-read. In this case, the
+reference sequence of the selected contig will be added as an additional read and also a read alignment will be
+created for it. The appended pseudo-read will have the highest read ID in the store.</p><h3>Windowed Realignment</h3><p>Sometimes, it is useful to just realign a part of the fragment store. This can be done by using the parameters
+<tt>windowBegin</tt> and <tt>windowEnd</tt>. This refers to view positions in the current multi-read alignment.
+Set both to <tt>0</tt> (also the default) to disalbe windowed realignment.</p><h3>References</h3><p><ul><li>Anson, Eric L., and Eugene W. Myers. "ReAligner: a program for refining DNA sequence multi-alignments."
+Journal of Computational Biology 4.3 (1997): 369-383.</li></ul></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn reAlignment
+ * 
+ * @headerfile &lt;seqan/realign.h&gt;
+ * 
+ * @brief Perform realignment on a @link FragmentStore @endlink object.
+ * 
+ * @signature void reAlignment(store, contigID, realignmentMethod, bandwidth,
+ *            includeReference[, windowBegin, windowEnd][, debug][,
+ *            printTiming]);
+ * 
+ * @param[in,out] store The @link FragmentStore @endlink to perform realignment
+ *                      for.
+ * @param[in] realignmentMethod The realignment algorithm to use, &lt;tt&gt;1&lt;/tt&gt; for
+ *                              affine gap costs, &lt;tt&gt;0&lt;/tt&gt; for linear gap
+ *                              costs, affine gap costs are recommended,
+ *                              &lt;tt&gt;unsigned&lt;/tt&gt;.
+ * @param[in] contigID Identifier of the contig to realign, &lt;tt&gt;unsigned&lt;/tt&gt;
+ * @param[in] bandwidth Bandwidth to use in the pairwise DP alignment algorithms
+ *                      &lt;tt&gt;unsigned&lt;/tt&gt;.
+ * @param[in] includeReference A &lt;tt&gt;bool&lt;/tt&gt;, if &lt;tt&gt;true&lt;/tt&gt; then the
+ *                             reference will be included as a pseudo-read to
+ *                             increase stability in case of indels. See section
+ *                             &#34;Including the Reference&#34; for details.
+ * @param[in] windowBegin Optional &lt;tt&gt;unsigned&lt;/tt&gt; window begin for windowed
+ *                        alignment, default: &lt;tt&gt;0&lt;/tt&gt;, i.e. no windowing.
+ *                        Also see section &#34;Windowed Realignment&#34; below.
+ * @param[in] windowEnd Optional &lt;tt&gt;unsigned&lt;/tt&gt; window end for windowed
+ *                      alignment, default: &lt;tt&gt;0&lt;/tt&gt;, i.e. no windowing. Also
+ *                      see section &#34;Windowed Realignment&#34; below.
+ * @param[in] debug Optional &lt;tt&gt;bool&lt;/tt&gt; to enable verbose logging, default:
+ *                  &lt;tt&gt;false&lt;/tt&gt;.
+ * @param[in] printTiming Optional &lt;tt&gt;bool&lt;/tt&gt; to enable printing of times,
+ *                        default: &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * This function implements a variant of the Anson-Myers algorithm to refine the
+ * multi-read alignments. The algorithm works in a round-robin fashion:
+ * 
+ * First, the profile sequence is created for the multi-read alignment. The
+ * algorithm then works in round.
+ * 
+ * In each round, each read alignment is selected, removed from the profile and
+ * then aligned against the profile using a DP algorithm. For this alignment, a
+ * region of &lt;tt&gt;bandwidth / 2&lt;/tt&gt; positions around the previous alignment
+ * locus is chosen and aligned using a bandwidth of &lt;tt&gt;bandwidth&lt;/tt&gt; in the DP
+ * alignment algorithm. The profile is then updated with the resulting pairwise
+ * alignment. This is iterated until the global alignment score does not
+ * improve.
+ * 
+ * In the end, the reference sequence of the given contig is replaced by the
+ * consensus of the multi-read alignment.
+ * 
+ * @section Including the Reference
+ * 
+ * You can choose to include the reference sequence of the selected contig as a
+ * pseudo-read. In this case, the reference sequence of the selected contig will
+ * be added as an additional read and also a read alignment will be created for
+ * it. The appended pseudo-read will have the highest read ID in the store.
+ * 
+ * @section Windowed Realignment
+ * 
+ * Sometimes, it is useful to just realign a part of the fragment store. This
+ * can be done by using the parameters &lt;tt&gt;windowBegin&lt;/tt&gt; and
+ * &lt;tt&gt;windowEnd&lt;/tt&gt;. This refers to view positions in the current multi-read
+ * alignment. Set both to &lt;tt&gt;0&lt;/tt&gt; (also the default) to disalbe windowed
+ * realignment.
+ * 
+ * @section References
+ * 
+ * &lt;ul&gt;&lt;li&gt;Anson, Eric L., and Eugene W. Myers. &#34;ReAligner: a program for
+ * refining DNA sequence multi-alignments.&#34; Journal of Computational Biology 4.3
+ * (1997): 369-383.&lt;/li&gt;&lt;/ul&gt;
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

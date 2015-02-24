@@ -1,0 +1,2112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_file" data-page="File">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>File - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>File<div><div>Represents a file.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_AsyncFile.html" data-lang-entity="specialization">AsyncFile</a>, 
+    <a href="specialization_SyncFile.html" data-lang-entity="specialization">SyncFile</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/file.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TSpec]&gt;
+class File&lt;TSpec&gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specializing type. Default: <tt>Async&lt;&gt;</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23asyncReadAt" title="#File#asyncReadAt (interface function)" data-lang-entity="interface_function">bool asyncReadAt(file, memPtr, count, fileOfs, request);</a></code></span>
+    <span class="summary_desc"><div>Asynchronously loads records from a specific position in a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23asyncWriteAt" title="#File#asyncWriteAt (interface function)" data-lang-entity="interface_function">bool asyncWriteAt(file, memPtr, count, fileOfs, request);</a></code></span>
+    <span class="summary_desc"><div>Asynchronously writes records to a specific position in a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23cancel" title="#File#cancel (interface function)" data-lang-entity="interface_function">bool cancel(file, request);</a></code></span>
+    <span class="summary_desc"><div>Cancels an asynchronous request.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23close" title="#File#close (interface function)" data-lang-entity="interface_function">bool close(file);</a></code></span>
+    <span class="summary_desc"><div>Close a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23flush" title="#File#flush (interface function)" data-lang-entity="interface_function">void flush(file);</a></code></span>
+    <span class="summary_desc"><div>Waits for all open requests to complete.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23length" title="#File#length (interface function)" data-lang-entity="interface_function">TSize length(file);</a></code></span>
+    <span class="summary_desc"><div>Return the file size.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23open" title="#File#open (interface function)" data-lang-entity="interface_function">bool open(file, fileName, openMode);</a></code></span>
+    <span class="summary_desc"><div>Opens a file, stream, or persistent string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23openTemp" title="#File#openTemp (interface function)" data-lang-entity="interface_function">bool openTemp(file);</a></code></span>
+    <span class="summary_desc"><div>Opens a temporary file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23read" title="#File#read (interface function)" data-lang-entity="interface_function">bool read(file, memPtr, count);</a></code></span>
+    <span class="summary_desc"><div>Loads record from a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23readAt" title="#File#readAt (interface function)" data-lang-entity="interface_function">bool readAt(file, memPtr, count, fileOfs);</a></code></span>
+    <span class="summary_desc"><div>Loads records from a specific position in a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23resize" title="#File#resize (interface function)" data-lang-entity="interface_function">void resize(file, newLength);</a></code></span>
+    <span class="summary_desc"><div>A file object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23rewind" title="#File#rewind (interface function)" data-lang-entity="interface_function">void rewind(file);</a></code></span>
+    <span class="summary_desc"><div>Sets the current file pointer to the beginning of a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23seek" title="#File#seek (interface function)" data-lang-entity="interface_function">TPosition seek(file, fileOfs[, origin]);</a></code></span>
+    <span class="summary_desc"><div>Changes the current file pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23setEof" title="#File#setEof (interface function)" data-lang-entity="interface_function">bool setEof(file);</a></code></span>
+    <span class="summary_desc"><div>Sets the file end to the current pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23tell" title="#File#tell (interface function)" data-lang-entity="interface_function">TPosition tell(file);</a></code></span>
+    <span class="summary_desc"><div>Gets the current file pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23waitFor" title="#File#waitFor (interface function)" data-lang-entity="interface_function">bool waitFor(request[, timeout]);</a></code></span>
+    <span class="summary_desc"><div>Waits for an asychronous request to complete.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23write" title="#File#write (interface function)" data-lang-entity="interface_function">bool write(file, memPtr, count);</a></code></span>
+    <span class="summary_desc"><div>Saves records to a file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#File%23writeAt" title="#File#writeAt (interface function)" data-lang-entity="interface_function">bool writeAt(file, memPtr, count, fileOfs);</a></code></span>
+    <span class="summary_desc"><div>Saves records to a specific position in a file.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="File#asyncReadAt" class="signature first" data-lang-entity="interface_function">
+      <code>bool asyncReadAt(file, memPtr, count, fileOfs, request);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Asynchronously loads records from a specific position in a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">memPtr</code>
+            
+        
+      </th>
+      <td>A pointer to the first destination record in memory.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The amount of records to be read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute file position in bytes measured from the beginning.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">request</code>
+            
+        
+      </th>
+      <td>Reference to a structure that will be associated with this asynchronous request. Type:
+<a href="class_AsyncRequest.html" data-lang-entity="class">AsyncRequest</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#asyncWriteAt" class="signature" data-lang-entity="interface_function">
+      <code>bool asyncWriteAt(file, memPtr, count, fileOfs, request);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Asynchronously writes records to a specific position in a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">memPtr</code>
+            
+        
+      </th>
+      <td>A pointer to the first source record in memory.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The amount of records to be written.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute file position in bytes measured form the beginning.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">request</code>
+            
+        
+      </th>
+      <td>Reference to a structure that will be associated with this asynchronous request.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on succcess, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#cancel" class="signature" data-lang-entity="interface_function">
+      <code>bool cancel(file, request);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Cancels an asynchronous request.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File to cancel the request for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">request</code>
+            
+        
+      </th>
+      <td>Reference to an AsyncRequest object. Type: <a href="class_AsyncRequest.html" data-lang-entity="class">AsyncRequest</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#close" class="signature" data-lang-entity="interface_function">
+      <code>bool close(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Close a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to close.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#flush" class="signature" data-lang-entity="interface_function">
+      <code>void flush(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Waits for all open requests to complete.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to flush.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the file size.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The File object to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The file size measured in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#open" class="signature" data-lang-entity="interface_function">
+      <code>bool open(file, fileName, openMode);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Opens a file, stream, or persistent string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File to open.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>A <tt>char const *</tt> string containing the file name.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">openMode</code>
+            
+        
+      </th>
+      <td>Combination of flags defining how the file should be opened. See <a href="enum_FileOpenMode.html" data-lang-entity="enum">FileOpenMode</a> for more details. Type: <tt>int</tt>. If you omit the <tt>OPEN_APPEND</tt> flag in
+write mode, the file will be cleared when opened. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#openTemp" class="signature" data-lang-entity="interface_function">
+      <code>bool openTemp(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Opens a temporary file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to open the temporary file.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>After closing this file will be deleted automatically. The openmode (see <a href="class_File.html#File#open" data-lang-entity="interface_function">open</a>) is <tt>OPEN_RDWR
+| OPEN_CREATE</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#read" class="signature" data-lang-entity="interface_function">
+      <code>bool read(file, memPtr, count);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Loads record from a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">memPtr</code>
+            
+        
+      </th>
+      <td>A pointer to the first destination record in memory.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The amount of records to be read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The records are read from the position pointed to by the current file pointer (see <a href="class_File.html#File#seek" data-lang-entity="interface_function">seek</a>).</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#readAt" class="signature" data-lang-entity="interface_function">
+      <code>bool readAt(file, memPtr, count, fileOfs);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Loads records from a specific position in a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">memPtr</code>
+            
+        
+      </th>
+      <td>A pointer to the first destination record in memory.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The amount of records to be read.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute file position in bytes measured from the beginning.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success and <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#resize" class="signature" data-lang-entity="interface_function">
+      <code>void resize(file, newLength);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>A file object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newLength</code>
+            
+        
+      </th>
+      <td>The file size in bytes to resize to in bytes.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#rewind" class="signature" data-lang-entity="interface_function">
+      <code>void rewind(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the current file pointer to the beginning of a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The file to reset the file pointer of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#seek" class="signature" data-lang-entity="interface_function">
+      <code>TPosition seek(file, fileOfs[, origin]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Changes the current file pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to seek in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>A file offset measured in bytes relative to <tt>origin</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">origin</code>
+            
+        
+      </th>
+      <td>Selects the origin from where to calculate the new position. One of <tt>SEEK_BEGIN</tt>,
+<tt>SEEK_CURRENT</tt>, and <tt>SEEK_END<tt> (origin is beginning, current pointer, end of
+the file). Default: <tt>SEEK_BEGIN</tt>.</tt></tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The new file position measured in bytes from the beginning.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#setEof" class="signature" data-lang-entity="interface_function">
+      <code>bool setEof(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the file end to the current pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to set the end of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#tell" class="signature" data-lang-entity="interface_function">
+      <code>TPosition tell(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the current file pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The File object to query for the current position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The current position in the file.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#waitFor" class="signature" data-lang-entity="interface_function">
+      <code>bool waitFor(request[, timeout]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Waits for an asychronous request to complete.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">request</code>
+            
+        
+      </th>
+      <td>Reference to an AsyncRequest.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">timeout</code>
+            
+        
+      </th>
+      <td>A timeout value in milliseconds. A value of 0 can be used to test for completion without
+waiting. Default: 0.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on completion, <tt>false</tt> on timeout.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p><tt>waitfor</tt> block sand suspends the calling thread process until <tt>request</tt> is completed or after
+<tt>timeout</tt> milliseconds.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#write" class="signature" data-lang-entity="interface_function">
+      <code>bool write(file, memPtr, count);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Saves records to a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">memPtr</code>
+            
+        
+      </th>
+      <td>Pointer to the source for the data to write.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The number of records to write.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The records are written at the position pointed to by th ecurrent file pointer (see <a href="class_File.html#File#seek" data-lang-entity="interface_function">seek</a>).</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="File#writeAt" class="signature" data-lang-entity="interface_function">
+      <code>bool writeAt(file, memPtr, count, fileOfs);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Saves records to a specific position in a file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The File object to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">memPtr</code>
+            
+        
+      </th>
+      <td>Pointer to the memory to write.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>The amount of records to be written.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileOfs</code>
+            
+        
+      </th>
+      <td>The absolute file position in bytes measured from the beginning.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class File
+ * 
+ * @headerfile &lt;seqan/file.h&gt;
+ * 
+ * @brief Represents a file.
+ * 
+ * @signature template &lt;[typename TSpec]&gt; class File&lt;TSpec&gt;;
+ * 
+ * @tparam TSpec Specializing type. Default: &lt;tt&gt;Async&amp;lt;&amp;gt;&lt;/tt&gt;.
+ * 
+ * @fn File#open
+ * 
+ * @brief Opens a file, stream, or persistent string.
+ * 
+ * @signature bool open(file, fileName, openMode);
+ * 
+ * @param[in,out] file The File to open.
+ * @param[in] fileName A &lt;tt&gt;char const *&lt;/tt&gt; string containing the file name.
+ * @param[in] openMode Combination of flags defining how the file should be
+ *                     opened. See @link FileOpenMode @endlink for more details.
+ *                     Type: &lt;tt&gt;int&lt;/tt&gt;. If you omit the &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;
+ *                     flag in write mode, the file will be cleared when opened.
+ *                     Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE | OPEN_APPEND&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#openTemp
+ * 
+ * @brief Opens a temporary file.
+ * 
+ * @signature bool openTemp(file);
+ * 
+ * @param[in,out] file The File object to open the temporary file.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @section Remarks
+ * 
+ * After closing this file will be deleted automatically. The openmode (see
+ * @link File#open @endlink) is &lt;tt&gt;OPEN_RDWR | OPEN_CREATE&lt;/tt&gt;.
+ * 
+ * @fn File#close
+ * 
+ * @brief Close a file.
+ * 
+ * @signature bool close(file);
+ * 
+ * @param[in,out] file The File object to close.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#read
+ * 
+ * @brief Loads record from a file.
+ * 
+ * @signature bool read(file, memPtr, count);
+ * 
+ * @param[in,out] file The File object.
+ * @param[out] memPtr A pointer to the first destination record in memory.
+ * @param[in] count The amount of records to be read.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @section Remarks
+ * 
+ * The records are read from the position pointed to by the current file pointer
+ * (see @link File#seek @endlink).
+ * 
+ * @fn File#write
+ * 
+ * @brief Saves records to a file.
+ * 
+ * @signature bool write(file, memPtr, count);
+ * 
+ * @param[in,out] file The File object.
+ * @param[in] memPtr Pointer to the source for the data to write.
+ * @param[in] count The number of records to write.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @section Remarks
+ * 
+ * The records are written at the position pointed to by th ecurrent file
+ * pointer (see @link File#seek @endlink).
+ * 
+ * @fn File#readAt
+ * 
+ * @brief Loads records from a specific position in a file.
+ * 
+ * @signature bool readAt(file, memPtr, count, fileOfs);
+ * 
+ * @param[in,out] file The File object to read from.
+ * @param[out] memPtr A pointer to the first destination record in memory.
+ * @param[in] count The amount of records to be read.
+ * @param[in] fileOfs The absolute file position in bytes measured from the
+ *                    beginning.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success and &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#writeAt
+ * 
+ * @brief Saves records to a specific position in a file.
+ * 
+ * @signature bool writeAt(file, memPtr, count, fileOfs);
+ * 
+ * @param[in,out] file The File object to write to.
+ * @param[in] memPtr Pointer to the memory to write.
+ * @param[in] count The amount of records to be written.
+ * @param[in] fileOfs The absolute file position in bytes measured from the
+ *                    beginning.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#seek
+ * 
+ * @brief Changes the current file pointer.
+ * 
+ * @signature TPosition seek(file, fileOfs[, origin]);
+ * 
+ * @param[in,out] file The File object to seek in.
+ * @param[in] fileOfs A file offset measured in bytes relative to
+ *                    &lt;tt&gt;origin&lt;/tt&gt;.
+ * @param[in] origin Selects the origin from where to calculate the new
+ *                   position. One of &lt;tt&gt;SEEK_BEGIN&lt;/tt&gt;,
+ *                   &lt;tt&gt;SEEK_CURRENT&lt;/tt&gt;, and &lt;tt&gt;SEEK_END&lt;tt&gt; (origin is
+ *                   beginning, current pointer, end of the file). Default:
+ *                   &lt;tt&gt;SEEK_BEGIN&lt;/tt&gt;.
+ * 
+ * @return TPosition The new file position measured in bytes from the beginning.
+ * 
+ * @fn File#tell
+ * 
+ * @brief Gets the current file pointer.
+ * 
+ * @signature TPosition tell(file);
+ * 
+ * @param[in] file The File object to query for the current position.
+ * 
+ * @return TPosition The current position in the file.
+ * 
+ * @fn File#rewind
+ * 
+ * @brief Sets the current file pointer to the beginning of a file.
+ * 
+ * @signature void rewind(file);
+ * 
+ * @param[in,out] file The file to reset the file pointer of.
+ * 
+ * @fn File#length
+ * 
+ * @brief Return the file size.
+ * 
+ * @signature TSize length(file);
+ * 
+ * @param[in] file The File object to query for its size.
+ * 
+ * @return TSize The file size measured in bytes.
+ * 
+ * @fn File#resize
+ * 
+ * @brief A file object.
+ * 
+ * @signature void resize(file, newLength);
+ * 
+ * @param[in,out] file The File object to resize.
+ * @param[in] newLength The file size in bytes to resize to in bytes.
+ * 
+ * @fn File#setEof
+ * 
+ * @brief Sets the file end to the current pointer.
+ * 
+ * @signature bool setEof(file);
+ * 
+ * @param[in,out] file The File object to set the end of.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#asyncReadAt
+ * 
+ * @brief Asynchronously loads records from a specific position in a file.
+ * 
+ * @signature bool asyncReadAt(file, memPtr, count, fileOfs, request);
+ * 
+ * @param[in,out] file The File object to read from.
+ * @param[out] memPtr A pointer to the first destination record in memory.
+ * @param[in] count The amount of records to be read.
+ * @param[in] fileOfs The absolute file position in bytes measured from the
+ *                    beginning.
+ * @param[in] request Reference to a structure that will be associated with this
+ *                    asynchronous request. Type: @link AsyncRequest @endlink.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#asyncWriteAt
+ * 
+ * @brief Asynchronously writes records to a specific position in a file.
+ * 
+ * @signature bool asyncWriteAt(file, memPtr, count, fileOfs, request);
+ * 
+ * @param[in,out] file The File object.
+ * @param[in] memPtr A pointer to the first source record in memory.
+ * @param[in] count The amount of records to be written.
+ * @param[in] fileOfs The absolute file position in bytes measured form the
+ *                    beginning.
+ * @param[in] request Reference to a structure that will be associated with this
+ *                    asynchronous request.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on succcess, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ * 
+ * @fn File#flush
+ * 
+ * @brief Waits for all open requests to complete.
+ * 
+ * @signature void flush(file);
+ * 
+ * @param[in,out] file The File object to flush.
+ * 
+ * @fn File#waitFor
+ * 
+ * @brief Waits for an asychronous request to complete.
+ * 
+ * @signature bool waitFor(request[, timeout]);
+ * 
+ * @param[in,out] request Reference to an AsyncRequest.
+ * @param[in] timeout A timeout value in milliseconds. A value of 0 can be used
+ *                    to test for completion without waiting. Default: 0.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on completion, &lt;tt&gt;false&lt;/tt&gt; on timeout.
+ * 
+ * @section Remarks
+ * 
+ * &lt;tt&gt;waitfor&lt;/tt&gt; block sand suspends the calling thread process until
+ * &lt;tt&gt;request&lt;/tt&gt; is completed or after &lt;tt&gt;timeout&lt;/tt&gt; milliseconds.
+ * 
+ * @fn File#cancel
+ * 
+ * @brief Cancels an asynchronous request.
+ * 
+ * @signature bool cancel(file, request);
+ * 
+ * @param[in,out] file The File to cancel the request for.
+ * @param[in] request Reference to an AsyncRequest object. Type: @link
+ *                    AsyncRequest @endlink.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

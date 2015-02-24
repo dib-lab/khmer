@@ -1,0 +1,25 @@
+Adjacency list:
+0 -> 3,1,
+1 -> 3,2,
+2 -> 4,
+3 -> 4,2,1,
+4 -> 2,0,
+Edge list:
+Source: 0,Target: 3 (Id: 1)
+Source: 0,Target: 1 (Id: 0)
+Source: 1,Target: 3 (Id: 3)
+Source: 1,Target: 2 (Id: 2)
+Source: 2,Target: 4 (Id: 4)
+Source: 3,Target: 4 (Id: 7)
+Source: 3,Target: 2 (Id: 6)
+Source: 3,Target: 1 (Id: 5)
+Source: 4,Target: 2 (Id: 9)
+Source: 4,Target: 0 (Id: 8)
+
+Single-Source Shortest Paths: 
+Graph without negative cycles? 1
+Path from 0 to 0: 0 (Distance: 0)
+Path from 0 to 1: 0,3,1 (Distance: 8)
+Path from 0 to 2: 0,3,1,2 (Distance: 9)
+Path from 0 to 3: 0,3 (Distance: 5)
+Path from 0 to 4: 0,3,4 (Distance: 7)

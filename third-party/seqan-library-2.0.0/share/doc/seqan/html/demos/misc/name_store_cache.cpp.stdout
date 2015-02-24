@@ -1,0 +1,4 @@
+lookup I   => success=1, idx=0
+lookup II  => success=1, idx=1
+lookup III => success=1, idx=2
+lookup IV  => idx=3, length(nameStore)=4

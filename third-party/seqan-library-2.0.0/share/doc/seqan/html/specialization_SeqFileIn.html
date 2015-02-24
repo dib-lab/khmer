@@ -1,0 +1,614 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_seqfilein" data-page="SeqFileIn">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SeqFileIn - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>SeqFileIn<div><div>Class for reading RAW, FASTA, FASTQ, EMBL and GENBANK files containing unaligned sequences.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a>, 
+    <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seq_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>typedef FormattedFile&lt;Fastq, Input&gt; SeqFileIn;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile::getFileExtensions" data-lang-entity="member_function">getFileExtensions</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile::operatorTDependentContext" data-lang-entity="member_function">operatorTDependentContext</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeqFileIn%23readRecord" title="#SeqFileIn#readRecord (interface function)" data-lang-entity="interface_function">void readRecord(meta, seq, qual, fileIn);</a></code></span>
+    <span class="summary_desc"><div>Read one <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a> from a <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a> object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SeqFileIn%23readRecords" title="#SeqFileIn#readRecords (interface function)" data-lang-entity="interface_function">void readRecords(metas, seqs, quals, fileIn, numRecord);</a></code></span>
+    <span class="summary_desc"><div>Read many <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a> from a <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a> object.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#atEnd" data-lang-entity="interface_function">atEnd</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#close" data-lang-entity="interface_function">close</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#context" data-lang-entity="interface_function">context</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#format" data-lang-entity="interface_function">format</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FormattedFile" data-lang-entity="interface_function">FormattedFile</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#getFileExtensions" data-lang-entity="interface_function">getFileExtensions</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#guessFormat" data-lang-entity="interface_function">guessFormat</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#open" data-lang-entity="interface_function">open</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#setFormat" data-lang-entity="interface_function">setFormat</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_FormattedFileIn.html#FormattedFileIn#readHeader" data-lang-entity="interface_function">readHeader</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_FormattedFileIn.html#FormattedFileIn#readRecord" data-lang-entity="interface_function">readRecord</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_FormattedFile.html" data-lang-entity="class">FormattedFile</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FileFormat" data-lang-entity="interface_metafunction">FileFormat</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_FormattedFile.html#FormattedFile#FormattedFileContext" data-lang-entity="interface_metafunction">FormattedFileContext</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="SeqFileIn#readRecord" class="signature first" data-lang-entity="interface_function">
+      <code>void readRecord(meta, seq, qual, fileIn);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read one <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a> from a <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a> object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">meta</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> object where to read the meta information into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">seq</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> object where to read the sequence information into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">qual</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> object where to read the quality information into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fileIn</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a> object to read from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+  <h4>Thrown Exceptions</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>IOError</code></th>
+        <td>On low-level I/O errors.</td>
+    </tr>
+    
+    <tr>
+        <th><code>ParseError</code></th>
+        <td>On high-level file format errors.</td>
+    </tr>
+    
+  </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SeqFileIn#readRecords" class="signature" data-lang-entity="interface_function">
+      <code>void readRecords(metas, seqs, quals, fileIn, numRecord);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read many <a href="concept_FormattedFileRecordConcept.html" data-lang-entity="concept">FormattedFileRecordConcept</a> from a <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a> object.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">readRecord</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class SeqFileIn
+ * 
+ * @extends FormattedFileIn
+ * 
+ * @headerfile &lt;seqan/seq_io.h&gt;
+ * 
+ * @brief Class for reading RAW, FASTA, FASTQ, EMBL and GENBANK files containing
+ *        unaligned sequences.
+ * 
+ * @signature typedef FormattedFile&lt;Fastq, Input&gt; SeqFileIn;
+ * 
+ * @fn SeqFileIn#readRecord
+ * 
+ * @brief Read one @link FormattedFileRecordConcept @endlink from a @link
+ *        SeqFileIn @endlink object.
+ * 
+ * @signature void readRecord(meta, seq, qual, fileIn);
+ * 
+ * @param[out] meta The @link StringConcept @endlink object where to read the
+ *                  meta information into.
+ * @param[out] seq The @link StringConcept @endlink object where to read the
+ *                 sequence information into.
+ * @param[out] qual The @link StringConcept @endlink object where to read the
+ *                  quality information into.
+ * @param[in,out] fileIn The @link SeqFileIn @endlink object to read from.
+ * 
+ * @throw IOError On low-level I/O errors.
+ * @throw ParseError On high-level file format errors.
+ * 
+ * @fn SeqFileIn#readRecords
+ * 
+ * @brief Read many @link FormattedFileRecordConcept @endlink from a @link
+ *        SeqFileIn @endlink object.
+ * 
+ * @signature void readRecords(metas, seqs, quals, fileIn, numRecord);
+ * 
+ * @see SeqFileIn#readRecord
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

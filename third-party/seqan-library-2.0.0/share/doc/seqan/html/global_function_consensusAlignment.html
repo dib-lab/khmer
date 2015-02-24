@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_consensusalignment" data-page="consensusAlignment">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>consensusAlignment - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>consensusAlignment<div><div>Compute consensus alignment.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/consensus.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>void consensusAlignment(store, options);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+        </th>
+        <td><a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a> to use for consensus alignment computation.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">options</code>
+            
+        
+        </th>
+        <td><a href="class_ConsensusAlignmentOptions.html" data-lang-entity="class">ConsensusAlignmentOptions</a> with configuration.</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+
+
+<!-- @throw -->
+
+
+<h2>Thrown Exceptions</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>s</code></th>
+        <td>ConsensusAlignerIllegalArgumentException in case of invalid arguments (e.g. two alignments for the same
+read).</td>
+    </tr>
+
+</table>
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This function computes a consensus alignment for a set of nucleic sequences that are stored in a <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a>. Often, consensus sequences are reads, but they could also be other sequences, such as RNA transcripts.
+However, in the following description we call them reads.</p><p>This function uses the <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a>, <a href="class_FragmentStore.html#FragmentStore::alignedReadStore" data-lang-entity="member_variable">alignedReadStore</a>,
+and <a href="class_FragmentStore.html#FragmentStore::readSeqStore" data-lang-entity="member_variable">readSeqStore</a> members of <tt>store</tt>.</p><p>Each read must have at most one entry in <tt>store.alignedReadStore</tt>.</p><h3>General Algorithm</h3><p>In the most common case, both contig ID information and position information is available. The algorithm considers
+all aligned reads on each contig. For each read, all overlapping reads (with begin/end position extended
+<tt>options.posDelta</tt> to the left/to the right) are considered and overlap alignments are computed. This
+pairwise alignment information is then used to compute a multiple sequence alignment (MSA).</p><p>The resulting MSA is then refined by <a href="global_function_reAlignment.html" data-lang-entity="global_function">reAlignment</a> (see <a href="class_ConsensusAlignmentOptions.html#ConsensusAlignmentOptions::runRealignment" data-lang-entity="member_variable">runRealignment</a>).</p><h3>Using position information</h3><p>When position information is to be used then this will be used to generate fewer overlap alignments by only
+considering possible overlaps in windows around each read alignment as described above. Note that there can only be
+at most one alignment for each read in the <tt>store.alignedReadStore</tt> and the end position must be greater than
+or equal to the begin position, i.e., the alignment must be on the forward strand.</p><p>Using position information also requires contig ID information.</p><h3>Using contigID information</h3><p>When contig ID information is to be used and position information is not to be used then the
+<tt>consensusAlignment()</tt> will compute pairwise alignments between all pairs of reads on the same contig.</p><p>When contigID information is to be used then only the reads with an entry in <tt>store.alignedReadStore</tt> are
+considered.</p><p>When contigID information is not used then an all-to-all pairwise alignment of all reads will be performed.</p><p><strong>Note</strong> that if reads having the same contig ID cannot be properly aligned and the MSA falls apart then
+the reads for one "connected alignment component" are kept on the original contig while the rest are added to new
+contigs that are appended to <tt>store.contigStore</tt>.</p><h3>Example</h3><p>The following example program takes a reference sequence and creates overlapping reads from it. These are then added
+to <tt>store</tt> with approximate positions (adding and subtracting a few positions). The function
+<tt>consensusAlignment()</tt> is then used to compute a MSA and the consensus sequence is stored in
+<tt>store.contigStore[0].seq</tt>.</p><div data-src-path="demos/consensus/consensus_alignment.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+
+<span class="cp">#include &lt;seqan/consensus.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/store.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Reference to simulate reads from.</span>
+    <span class="n">Dna5String</span> <span class="n">ref</span> <span class="o">=</span>
+        <span class="s">&quot;AATGGATGGCAAAATAGTTGTTCCATGAATACATCTCTAAAGAGCTTTGATGCTAATTTAGTCAAATTTT&quot;</span>
+        <span class="s">&quot;CAATACTGTACAATCTTCTCTAGAGCAGAGCAAAAGAATAAAAGCACTTCTAGCTAATATTATGTGGCAT&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Read length and step width for reads.</span>
+    <span class="kt">int</span> <span class="k">const</span> <span class="n">READ_LENGTH</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="k">const</span> <span class="n">STEP</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+
+    <span class="c1">// Compute reads and append to FragmentStore.</span>
+    <span class="n">FragmentStore</span><span class="o">&lt;&gt;</span> <span class="n">store</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">READ_LENGTH</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">ref</span><span class="p">);</span> <span class="n">pos</span> <span class="o">+=</span> <span class="n">STEP</span><span class="p">,</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Append a new read sequence.</span>
+        <span class="kt">unsigned</span> <span class="n">readID</span> <span class="o">=</span> <span class="n">appendRead</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">infix</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">READ_LENGTH</span><span class="p">));</span>
+        <span class="c1">// Create small perturbation of the position but not left of position 0.</span>
+        <span class="kt">int</span> <span class="n">pos2</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">pos</span> <span class="o">+</span> <span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">i</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">-</span> <span class="mi">3</span><span class="p">));</span>
+        <span class="c1">// Append a new read alignment for the just added read.</span>
+        <span class="n">appendAlignedRead</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">readID</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pos2</span><span class="p">,</span> <span class="n">pos2</span> <span class="o">+</span> <span class="n">READ_LENGTH</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Add contig and contig name for printing.</span>
+    <span class="n">resize</span><span class="p">(</span><span class="n">store</span><span class="p">.</span><span class="n">contigStore</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">store</span><span class="p">.</span><span class="n">contigStore</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">seq</span> <span class="o">=</span> <span class="n">ref</span><span class="p">;</span>
+    <span class="n">resize</span><span class="p">(</span><span class="n">store</span><span class="p">.</span><span class="n">contigNameStore</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="c1">// Print initial perturbated alignment.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Initial Alignment</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">AlignedReadLayout</span> <span class="n">layout</span><span class="p">;</span>
+    <span class="n">layoutAlignment</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">);</span>
+    <span class="n">printAlignment</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="cm">/*contigID=*/</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="cm">/*beginPos=*/</span> <span class="mi">0</span><span class="p">,</span> <span class="cm">/*endPos=*/</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">length</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">);</span>
+
+    <span class="c1">// Compute consensus alignment.</span>
+    <span class="n">ConsensusAlignmentOptions</span> <span class="n">options</span><span class="p">;</span>
+    <span class="n">consensusAlignment</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">options</span><span class="p">);</span>
+
+    <span class="c1">// Print final consensus alignment.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">Final Consensus Alignment</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">layoutAlignment</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">);</span>
+    <span class="n">printAlignment</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="cm">/*contigID=*/</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="cm">/*beginPos=*/</span> <span class="mi">0</span><span class="p">,</span> <span class="cm">/*endPos=*/</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">length</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/consensus/consensus_alignment.cpp" target="_top">demos/consensus/consensus_alignment.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/consensus/consensus_alignment.cpp.stdout">Initial Alignment
+
+AATGGATGGCAAAATAGTTGTTCCATGAATACATCTCTAAAGAGCTTTGATGCTAATTTAGTCAAATTTTCAATACTGTACAATCTTCTCTAGAGCAGAGCAAAAGAATAAAAGCACTTCTAGCTAATATTATGTGGCAT
+.................................................. TGCT.A..TAGTC..A...TC.ATACTGTAC.ATC.TCTCTAGAGCAGAG
+   ATGGCAA..T.GTTG.TCCATGAAT.C.TC...AA.G..CTT.GATGCTA    A.TTAGTC.AA..TTCA.TAC.GT.CAA.CT...CT..AGC..AGC..A.
+         A...TAGT.GT.C.ATGA.TACATCTCTA..GAGCT..GATGCTA.T..A    .TT..CAAT.CTG.AC.ATC.TC...AG..CAG..CAA..G.AT.A..GC
+               ..................................................    CA.TACTGTACA.TCT.CTCTAGAGCAGAGCA...GA.TA...GCACT.C
+                     .T.CATG.ATACATCTCT..AGAGC..TGATGCT.A..TAGTC..A...T    ..................................................
+                           TGA.T.CA...CT.A..AGC.TTGATGCTAA.TTAGTC.AA..TTCA.TA    C.ATC.TCTCTAGAGCAGAGC...AG.AT...AGCAC.TCTAGCT.ATA.
+                           .CAT.TCTAAAG.GCTTTGA..C.AA.TTAG.CAAATTT.CAAT.C.GTA          T...CT..AGC..AGC..A.GA.T..AAG.ACT.CTAGCTA..AT.A..T
+                                 ...AA.G..CTT.GATGCTAATT.AGTCAA.TT..CAAT.CTG.AC.ATC
+                                       .GAGCT..GATGCTA.T..AGTCA..T...CA.TACTGTACA.TCT.CTC
+                                             ..................................................
+                                                         G.CAAATTT.CAAT.C.GTACA.TCT...CTAGAGC..AGC.AA.G..T.
+
+
+Final Consensus Alignment
+
+AATGGATGGCAAAATAGTTGTTCCATGAATACATCTCTAAAGAGCTTTGATGCTAATTTAGTCAAATTTTCAATACTGTACAATCTTCTCTAGAGCAGAGCAAAAGAATAAAAGCACTTCTAGCTAATATTATGT-----
+..................................................     ..................................................
+     ..................................................     ..................................................
+          ..................................................     ..................................................
+               ..................................................     ..................................................
+                    ..................................................     ..................................................
+                         ..................................................     ..................................................
+                              ..................................................     ..................................................
+                                   ..................................................
+                                        ..................................................
+                                             ..................................................
+                                                  ..................................................
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn consensusAlignment
+ * 
+ * @headerfile &lt;seqan/consensus.h&gt;
+ * 
+ * @brief Compute consensus alignment.
+ * 
+ * @signature void consensusAlignment(store, options);
+ * 
+ * @param[in,out] store @link FragmentStore @endlink to use for consensus
+ *                      alignment computation.
+ * @param[in] options @link ConsensusAlignmentOptions @endlink with
+ *                    configuration.
+ * 
+ * @throw s ConsensusAlignerIllegalArgumentException in case of invalid
+ *          arguments (e.g. two alignments for the same read).
+ * 
+ * This function computes a consensus alignment for a set of nucleic sequences
+ * that are stored in a @link FragmentStore @endlink. Often, consensus sequences
+ * are reads, but they could also be other sequences, such as RNA transcripts.
+ * However, in the following description we call them reads.
+ * 
+ * This function uses the @link FragmentStore::contigStore @endlink, @link
+ * FragmentStore::alignedReadStore @endlink, and @link
+ * FragmentStore::readSeqStore @endlink members of &lt;tt&gt;store&lt;/tt&gt;.
+ * 
+ * Each read must have at most one entry in &lt;tt&gt;store.alignedReadStore&lt;/tt&gt;.
+ * 
+ * @section General Algorithm
+ * 
+ * In the most common case, both contig ID information and position information
+ * is available. The algorithm considers all aligned reads on each contig. For
+ * each read, all overlapping reads (with begin/end position extended
+ * &lt;tt&gt;options.posDelta&lt;/tt&gt; to the left/to the right) are considered and
+ * overlap alignments are computed. This pairwise alignment information is then
+ * used to compute a multiple sequence alignment (MSA).
+ * 
+ * The resulting MSA is then refined by @link reAlignment @endlink (see @link
+ * ConsensusAlignmentOptions::runRealignment @endlink).
+ * 
+ * @section Using position information
+ * 
+ * When position information is to be used then this will be used to generate
+ * fewer overlap alignments by only considering possible overlaps in windows
+ * around each read alignment as described above. Note that there can only be at
+ * most one alignment for each read in the &lt;tt&gt;store.alignedReadStore&lt;/tt&gt; and
+ * the end position must be greater than or equal to the begin position, i.e.,
+ * the alignment must be on the forward strand.
+ * 
+ * Using position information also requires contig ID information.
+ * 
+ * @section Using contigID information
+ * 
+ * When contig ID information is to be used and position information is not to
+ * be used then the &lt;tt&gt;consensusAlignment()&lt;/tt&gt; will compute pairwise
+ * alignments between all pairs of reads on the same contig.
+ * 
+ * When contigID information is to be used then only the reads with an entry in
+ * &lt;tt&gt;store.alignedReadStore&lt;/tt&gt; are considered.
+ * 
+ * When contigID information is not used then an all-to-all pairwise alignment
+ * of all reads will be performed.
+ * 
+ * &lt;strong&gt;Note&lt;/strong&gt; that if reads having the same contig ID cannot be
+ * properly aligned and the MSA falls apart then the reads for one &#34;connected
+ * alignment component&#34; are kept on the original contig while the rest are added
+ * to new contigs that are appended to &lt;tt&gt;store.contigStore&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * The following example program takes a reference sequence and creates
+ * overlapping reads from it. These are then added to &lt;tt&gt;store&lt;/tt&gt; with
+ * approximate positions (adding and subtracting a few positions). The function
+ * &lt;tt&gt;consensusAlignment()&lt;/tt&gt; is then used to compute a MSA and the consensus
+ * sequence is stored in &lt;tt&gt;store.contigStore[0].seq&lt;/tt&gt;.
+ * 
+ * @include demos/consensus/consensus_alignment.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/consensus/consensus_alignment.cpp.stdout
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

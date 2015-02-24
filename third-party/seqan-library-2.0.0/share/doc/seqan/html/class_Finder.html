@@ -1,0 +1,2023 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_finder" data-page="Finder">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Finder - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Finder<div><div>Holds the haystack and a current search context.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_PigeonholeFinder.html" data-lang-entity="specialization">PigeonholeFinder</a>, 
+    <a href="specialization_SwiftFinder.html" data-lang-entity="specialization">SwiftFinder</a>, 
+    <a href="specialization_SwiftLocalFinder.html" data-lang-entity="specialization">SwiftLocalFinder</a>, 
+    <a href="specialization_SwiftSemiGlobalFinder.html" data-lang-entity="specialization">SwiftSemiGlobalFinder</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/find.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename THaystack[, typename TSpec]&gt;
+class Finder;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The index-algorithm to search with (Optional).Leave empty for
+online pattern matching (see <a href="class_Pattern.html" data-lang-entity="class">Pattern</a>).If
+<tt>THaystack</tt> is an <a href="class_Index.html" data-lang-entity="class">Index</a>, then
+<tt>TSpec</tt> specifies the index search algorithm. Types:
+Pigeonhole, Swift, Backtracking Default: The result of <a href="global_metafunction_DefaultFinder.html" data-lang-entity="global_metafunction">DefaultFinder</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">THaystack</a></code></th>
+        <td>The haystack type. Types: String, Index</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%3A%3AFinder" title="#Finder::Finder (interface function)" data-lang-entity="member_function">Finder::Finder();, Finder::Finder(other);, Finder::Finder(haystack);, Finder::Finder(iter);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23begin" title="#Finder#begin (interface function)" data-lang-entity="interface_function">TIter begin(finder[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Return begin iterator of the match in the haystack.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23beginPosition" title="#Finder#beginPosition (interface function)" data-lang-entity="interface_function">TPosition beginPosition(finder);</a></code></span>
+    <span class="summary_desc"><div>Return begin position of match.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23clear" title="#Finder#clear (interface function)" data-lang-entity="interface_function">void clear(finder);</a></code></span>
+    <span class="summary_desc"><div>Clear the Finder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23end" title="#Finder#end (interface function)" data-lang-entity="interface_function">TIter end(finder[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Return end iterator of the match in the haystack.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23endPosition" title="#Finder#endPosition (interface function)" data-lang-entity="interface_function">TPosition endPosition(finder);</a></code></span>
+    <span class="summary_desc"><div>Return end position of match.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23find" title="#Finder#find (interface function)" data-lang-entity="interface_function">bool find(finder, pattern[, k]);</a></code></span>
+    <span class="summary_desc"><div>Search for a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> in a <a href="class_Finder.html" data-lang-entity="class">Finder</a> object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23findBegin" title="#Finder#findBegin (interface function)" data-lang-entity="interface_function">bool findBegin(finder, pattern[, limit]);</a></code></span>
+    <span class="summary_desc"><div>Search the begin of an approximate match.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23goBegin" title="#Finder#goBegin (interface function)" data-lang-entity="interface_function">void goBegin(finder);</a></code></span>
+    <span class="summary_desc"><div>Go to the beginning of the text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23goEnd" title="#Finder#goEnd (interface function)" data-lang-entity="interface_function">void goEnd(finder);</a></code></span>
+    <span class="summary_desc"><div>Go to the end of the text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23haystack" title="#Finder#haystack (interface function)" data-lang-entity="interface_function">THaystack haystack(finder);</a></code></span>
+    <span class="summary_desc"><div>Returns the haystack of a Finder.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23infix" title="#Finder#infix (interface function)" data-lang-entity="interface_function">TInfix infix(finder);</a></code></span>
+    <span class="summary_desc"><div>Returns the segment of the last found match in the haystack.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23length" title="#Finder#length (interface function)" data-lang-entity="interface_function">TSize length(finder);</a></code></span>
+    <span class="summary_desc"><div>Return the length of the match.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23position" title="#Finder#position (interface function)" data-lang-entity="interface_function">TPosition position(finder);</a></code></span>
+    <span class="summary_desc"><div>Return current position of the finder in the haystack.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23setHaystack" title="#Finder#setHaystack (interface function)" data-lang-entity="interface_function">void setHaystack(finder, haystack);</a></code></span>
+    <span class="summary_desc"><div>Sets the haystack of a <a href="class_Finder.html" data-lang-entity="class">Finder</a> object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23setPosition" title="#Finder#setPosition (interface function)" data-lang-entity="interface_function">void setPosition(finder, pos);</a></code></span>
+    <span class="summary_desc"><div>Sets the position of a finder.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Finder%23Haystack" title="#Finder#Haystack (interface function)" data-lang-entity="interface_metafunction">Haystack&lt;TFinder&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the haystack type of a <a href="class_Finder.html" data-lang-entity="class">Finder</a> type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p><tt>position(finder)</tt> returns the position of the current hit in the haystack. If <tt>THaystack</tt> is a set of
+strings or an index of a set of strings, then <tt>position(finder)</tt> returns a <a href="class_Pair.html" data-lang-entity="class">Pair</a> <tt>(hayNo,
+pos)</tt>, in which <tt>hayNo</tt> is the haystack index and <tt>pos</tt> the local position of the hit.</p><p>To reset the finder object and use it on another text or different text position, use <tt>clear(finder)</tt> Note
+that <tt>clear(finder)</tt> doesn't move the text iterator. To start the search from the beginning or somewhere else
+in the text, use <a href="class_Finder.html#Finder#goBegin" data-lang-entity="interface_function">goBegin</a> or <a href="class_Finder.html#Finder#setPosition" data-lang-entity="interface_function">setPosition</a>.</p><h3>Examples</h3><p>The following example shows how to restart a search from the beginning of a
+text.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">CharString</span> <span class="n">hstck</span> <span class="o">=</span> <span class="s">&quot;I spy with my little eye something that is yellow&quot;</span><span class="p">;</span>
+<span class="n">Finder</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">finder</span><span class="p">(</span><span class="n">hstck</span><span class="p">);</span>
+
+<span class="n">Pattern</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">Horspool</span><span class="o">&gt;</span> <span class="n">p1</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">);</span>
+<span class="n">findAll</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="n">p1</span><span class="p">);</span>
+
+<span class="n">goBegin</span><span class="p">(</span><span class="n">finder</span><span class="p">);</span>    <span class="c1">// move Finder to the beginning of the text</span>
+<span class="n">clear</span><span class="p">(</span><span class="n">finder</span><span class="p">);</span>      <span class="c1">// reset Finder</span>
+
+<span class="n">Pattern</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">Horspool</span><span class="o">&gt;</span> <span class="n">p2</span><span class="p">(</span><span class="s">&quot;t&quot;</span><span class="p">);</span>
+<span class="n">findAll</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="n">p2</span><span class="p">);</span>
+</pre></div>
+</div><p>Demo: Demo.Index Finder StringSet</p><p>Demo: Demo.Index Finder</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Finder::Finder" class="signature first" data-lang-entity="member_function">
+      <code>Finder::Finder();
+Finder::Finder(other);
+Finder::Finder(haystack);
+Finder::Finder(iter);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>Other Finder of the same type (copy constructor).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">haystack</code>
+            
+        
+      </th>
+      <td>The haystack to work on, of type <tt>THaystack</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iter</code>
+            
+        
+      </th>
+      <td>The iter to work on on, either const or non-const.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Finder#begin" class="signature first" data-lang-entity="interface_function">
+      <code>TIter begin(finder[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return begin iterator of the match in the haystack.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag to select the iterator type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>The iterator to the begin of the match in the haystack. TIter is the same type as returned by
+<tt>begin(haystack[, tag])</tt> where <tt>haystack</tt> is the haystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#beginPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPosition beginPosition(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return begin position of match.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The begin position of the finder. TPosition is the position type of THaystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear the Finder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The Finder to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#end" class="signature" data-lang-entity="interface_function">
+      <code>TIter end(finder[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return end iterator of the match in the haystack.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag to select the iterator type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>The iterator to the end of the match in the haystack. TIter is the same type as returned by
+<tt>end(haystack[, tag])</tt> where <tt>haystack</tt> is the haystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#endPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPosition endPosition(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return end position of match.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The end position of the finder. TPosition is the position type of THaystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#find" class="signature" data-lang-entity="interface_function">
+      <code>bool find(finder, pattern[, k]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Search for a <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> in a <a href="class_Finder.html" data-lang-entity="class">Finder</a> object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The <a href="class_Finder.html" data-lang-entity="class">Finder</a> object to search through.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The <a href="class_Pattern.html" data-lang-entity="class">Pattern</a> to search for. For index finders, pattern can also be a text.
+Types: <a href="class_Pattern.html" data-lang-entity="class">Pattern</a>, <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">k</code>
+            
+        
+      </th>
+      <td>Desired minimal score (for approximate matching). <tt>k</tt> is a number <tt>&lt;= 0</tt>.
+Differences are deletions, insertions, and substitutions.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if an occurence was found and <tt>false</tt> if not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Repeated calls of this function iterate through all occurences of <tt>pattern</tt>.</p><h4>Examples</h4><p>The following example shows how one can search online for a pattern in a haystack. Note that it is neccessary to
+reset the finder befor searching for another pattern.</p><div data-src-path="demos/find/finder_online.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/find.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">CharString</span> <span class="n">hstck</span> <span class="o">=</span> <span class="s">&quot;I spy with my little eye something that is yellow&quot;</span><span class="p">;</span>
+    <span class="n">Finder</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">finder</span><span class="p">(</span><span class="n">hstck</span><span class="p">);</span>
+
+    <span class="n">Pattern</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">Horspool</span><span class="o">&gt;</span> <span class="n">p1</span><span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">);</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="n">p1</span><span class="p">))</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit at position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">position</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">goBegin</span><span class="p">(</span><span class="n">finder</span><span class="p">);</span>    <span class="c1">// move Finder to the beginning of the text</span>
+    <span class="n">clear</span><span class="p">(</span><span class="n">finder</span><span class="p">);</span>      <span class="c1">// reset Finder</span>
+
+    <span class="n">Pattern</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">Horspool</span><span class="o">&gt;</span> <span class="n">p2</span><span class="p">(</span><span class="s">&quot;t&quot;</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="n">p2</span><span class="p">))</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit at position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">position</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/find/finder_online.cpp" target="_top">demos/find/finder_online.cpp</a></div></div><p>The output is as follows.</p><pre class="console" data-src-path="demos/find/finder_online.cpp.stdout">Hit at position: 4
+Hit at position: 12
+Hit at position: 22
+Hit at position: 43
+Hit at position: 8
+Hit at position: 16
+Hit at position: 17
+Hit at position: 29
+Hit at position: 35
+Hit at position: 38
+</pre><p>In contrast to the example above the code below shows how one can use a Finder with an index as base. Again, note
+that it is neccessary to reset the finder befor searching for another pattern.</p><div data-src-path="demos/find/finder_index.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/find.h&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">CharString</span> <span class="n">hstck</span> <span class="o">=</span> <span class="s">&quot;I spy with my little eye something that is yellow&quot;</span><span class="p">;</span>
+    <span class="n">Index</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">FMIndex</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="n">index</span><span class="p">(</span><span class="n">hstck</span><span class="p">);</span>
+    <span class="n">Finder</span><span class="o">&lt;</span><span class="n">Index</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">FMIndex</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">finder</span><span class="p">(</span><span class="n">hstck</span><span class="p">);</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="s">&quot;y&quot;</span><span class="p">))</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit at position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">position</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">clear</span><span class="p">(</span><span class="n">finder</span><span class="p">);</span>      <span class="c1">// reset Finder</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="s">&quot;t&quot;</span><span class="p">))</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit at position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">position</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/find/finder_index.cpp" target="_top">demos/find/finder_index.cpp</a></div></div><p>The output is as follows.</p><pre class="console" data-src-path="demos/find/finder_index.cpp.stdout">Hit at position: 12
+Hit at position: 4
+Hit at position: 22
+Hit at position: 43
+Hit at position: 38
+Hit at position: 8
+Hit at position: 35
+Hit at position: 29
+Hit at position: 17
+Hit at position: 16
+</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#findBegin" class="signature" data-lang-entity="interface_function">
+      <code>bool findBegin(finder, pattern[, limit]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Search the begin of an approximate match.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The Finder object to search through.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The Pattern object to search for. This must be a pattern for approximate string matching.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limit</code>
+            
+        
+      </th>
+      <td>The score limit. The default is the limit used during the last <tt>find</tt> call, see
+<tt>getScore</tt>. All occurences that score at least <tt>limit</tt> are reported.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> indicates a match, <tt>false</tt> indicates no match.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The function <tt>find</tt> successfully called be called - that is an end position was found - before calling
+findBegin to find a begin position.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#goBegin" class="signature" data-lang-entity="interface_function">
+      <code>void goBegin(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Go to the beginning of the text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The finder to reset to the beginning of the text.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#goEnd" class="signature" data-lang-entity="interface_function">
+      <code>void goEnd(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Go to the end of the text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The finder to reset to the end of the text.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#haystack" class="signature" data-lang-entity="interface_function">
+      <code>THaystack haystack(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the haystack of a Finder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query for its haystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THaystack</code></th>
+        <td>The result type can be retrieved using <a href="class_Finder.html#Finder#Haystack" data-lang-entity="interface_metafunction">Haystack</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#infix" class="signature" data-lang-entity="interface_function">
+      <code>TInfix infix(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the segment of the last found match in the haystack.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TInfix</code></th>
+        <td>The <a href="concept_SegmentableConcept.html#SegmentableConcept#Infix" data-lang-entity="interface_metafunction">Infix</a> of the match in the haystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function works only correct if the begin position of the match was already found, see <a href="class_Finder.html#Finder#findBegin" data-lang-entity="interface_function">findBegin</a></p><p>For finders or patterns of filtering algorithms (e.g. @Spec.Swift@) the returned infix is a potential match.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the length of the match.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The finder to query for its match length.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#position" class="signature" data-lang-entity="interface_function">
+      <code>TPosition position(finder);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return current position of the finder in the haystack.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">finder</code>
+            
+        
+      </th>
+      <td>The Finder to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The current position. TPosition is the position type of the haystack.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#setHaystack" class="signature" data-lang-entity="interface_function">
+      <code>void setHaystack(finder, haystack);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the haystack of a <a href="class_Finder.html" data-lang-entity="class">Finder</a> object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The finder to set the haystack for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">haystack</code>
+            
+        
+      </th>
+      <td>The haystack to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Finder#setPosition" class="signature" data-lang-entity="interface_function">
+      <code>void setPosition(finder, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the position of a finder.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">finder</code>
+            
+        
+      </th>
+      <td>The Findre to set the position for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to set the finder to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Finder#Haystack" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Haystack&lt;TFinder&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the haystack type of a <a href="class_Finder.html" data-lang-entity="class">Finder</a> type.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TFinder</code></th>
+            <td>The finder to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The haystack type of <tt>TFinder</tt>, i.e. <tt>THaystack</tt> for <tt>Finder&lt;THaystack,
+TSpec&gt;</tt>. This is an alias to function <tt>host()</tt> of the pattern function.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Finder
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Holds the haystack and a current search context.
+ * 
+ * @signature template &lt;typename THaystack[, typename TSpec]&gt; class Finder;
+ * 
+ * @tparam TSpec The index-algorithm to search with (Optional).Leave empty for
+ *               online pattern matching (see @link Pattern @endlink).If
+ *               &lt;tt&gt;THaystack&lt;/tt&gt; is an @link Index @endlink, then
+ *               &lt;tt&gt;TSpec&lt;/tt&gt; specifies the index search algorithm. Types:
+ *               Pigeonhole, Swift, Backtracking Default: The result of @link
+ *               DefaultFinder @endlink
+ * @tparam THaystack The haystack type. Types: String, Index
+ * 
+ * &lt;tt&gt;position(finder)&lt;/tt&gt; returns the position of the current hit in the
+ * haystack. If &lt;tt&gt;THaystack&lt;/tt&gt; is a set of strings or an index of a set of
+ * strings, then &lt;tt&gt;position(finder)&lt;/tt&gt; returns a @link Pair @endlink
+ * &lt;tt&gt;(hayNo, pos)&lt;/tt&gt;, in which &lt;tt&gt;hayNo&lt;/tt&gt; is the haystack index and
+ * &lt;tt&gt;pos&lt;/tt&gt; the local position of the hit.
+ * 
+ * To reset the finder object and use it on another text or different text
+ * position, use &lt;tt&gt;clear(finder)&lt;/tt&gt; Note that &lt;tt&gt;clear(finder)&lt;/tt&gt; doesn&#39;t
+ * move the text iterator. To start the search from the beginning or somewhere
+ * else in the text, use @link Finder#goBegin @endlink or @link
+ * Finder#setPosition @endlink.
+ * 
+ * @section Examples
+ * 
+ * The following example shows how to restart a search from the beginning of a
+ * text.
+ * 
+ * @code{.cpp}
+ * CharString hstck = &#34;I spy with my little eye something that is yellow&#34;;
+ * Finder&lt;CharString&gt; finder(hstck);
+ * 
+ * Pattern&lt;CharString, Horspool&gt; p1(&#34;y&#34;);
+ * findAll(finder, p1);
+ * 
+ * goBegin(finder);    // move Finder to the beginning of the text
+ * clear(finder);      // reset Finder
+ * 
+ * Pattern&lt;CharString, Horspool&gt; p2(&#34;t&#34;);
+ * findAll(finder, p2);
+ * @endcode
+ *  Demo: Demo.Index Finder StringSet
+ * 
+ * Demo: Demo.Index Finder
+ * 
+ * @mfn Finder#Haystack
+ * 
+ * @headerfile &lt;seqan/file.h&gt;
+ * 
+ * @brief Returns the haystack type of a @link Finder @endlink type.
+ * 
+ * @signature Haystack&lt;TFinder&gt;::Type;
+ * 
+ * @tparam TFinder The finder to query.
+ * 
+ * @return Type The haystack type of &lt;tt&gt;TFinder&lt;/tt&gt;, i.e. &lt;tt&gt;THaystack&lt;/tt&gt;
+ *              for &lt;tt&gt;Finder&amp;lt;THaystack, TSpec&amp;gt;&lt;/tt&gt;. This is an alias to
+ *              function &lt;tt&gt;host()&lt;/tt&gt; of the pattern function.
+ * 
+ * @fn Finder::Finder
+ * 
+ * @brief Constructor
+ * 
+ * @signature Finder::Finder();
+ * @signature Finder::Finder(other);
+ * @signature Finder::Finder(haystack);
+ * @signature Finder::Finder(iter);
+ * 
+ * @param[in] other Other Finder of the same type (copy constructor).
+ * @param[in] haystack The haystack to work on, of type &lt;tt&gt;THaystack&lt;/tt&gt;.
+ * @param[in] iter The iter to work on on, either const or non-const.
+ * 
+ * @fn Finder#find
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Search for a @link Pattern @endlink in a @link Finder @endlink object.
+ * 
+ * @signature bool find(finder, pattern[, k]);
+ * 
+ * @param[in,out] finder The @link Finder @endlink object to search through.
+ * @param[in] pattern The @link Pattern @endlink to search for. For index
+ *                    finders, pattern can also be a text. Types: @link Pattern
+ *                    @endlink, @link TextConcept @endlink.
+ * @param[in] k Desired minimal score (for approximate matching). &lt;tt&gt;k&lt;/tt&gt; is
+ *              a number &lt;tt&gt;&amp;lt;= 0&lt;/tt&gt;. Differences are deletions,
+ *              insertions, and substitutions.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if an occurence was found and &lt;tt&gt;false&lt;/tt&gt; if
+ *              not.
+ * 
+ * Repeated calls of this function iterate through all occurences of
+ * &lt;tt&gt;pattern&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * The following example shows how one can search online for a pattern in a
+ * haystack. Note that it is neccessary to reset the finder befor searching for
+ * another pattern.
+ * 
+ * @include demos/find/finder_online.cpp
+ * 
+ * The output is as follows.
+ * 
+ * @include demos/find/finder_online.cpp.stdout
+ * 
+ * In contrast to the example above the code below shows how one can use a
+ * Finder with an index as base. Again, note that it is neccessary to reset the
+ * finder befor searching for another pattern.
+ * 
+ * @include demos/find/finder_index.cpp
+ * 
+ * The output is as follows.
+ * 
+ * @include demos/find/finder_index.cpp.stdout
+ * 
+ * 
+ * 
+ * @fn Finder#beginPosition
+ * 
+ * @brief Return begin position of match.
+ * 
+ * @signature TPosition beginPosition(finder);
+ * 
+ * @param[in] finder The Finder to query.
+ * 
+ * @return TPosition The begin position of the finder. TPosition is the position
+ *                   type of THaystack.
+ * 
+ * @fn Finder#begin
+ * 
+ * @brief Return begin iterator of the match in the haystack.
+ * 
+ * @signature TIter begin(finder[, tag]);
+ * 
+ * @param[in] finder The Finder to query.
+ * @param[in] tag The tag to select the iterator type.
+ * 
+ * @return TIter The iterator to the begin of the match in the haystack. TIter
+ *               is the same type as returned by &lt;tt&gt;begin(haystack[, tag])&lt;/tt&gt;
+ *               where &lt;tt&gt;haystack&lt;/tt&gt; is the haystack.
+ * 
+ * @fn Finder#endPosition
+ * 
+ * @brief Return end position of match.
+ * 
+ * @signature TPosition endPosition(finder);
+ * 
+ * @param[in] finder The Finder to query.
+ * 
+ * @return TPosition The end position of the finder. TPosition is the position
+ *                   type of THaystack.
+ * 
+ * @fn Finder#end
+ * 
+ * @brief Return end iterator of the match in the haystack.
+ * 
+ * @signature TIter end(finder[, tag]);
+ * 
+ * @param[in] finder The Finder to query.
+ * @param[in] tag The tag to select the iterator type.
+ * 
+ * @return TIter The iterator to the end of the match in the haystack. TIter is
+ *               the same type as returned by &lt;tt&gt;end(haystack[, tag])&lt;/tt&gt;
+ *               where &lt;tt&gt;haystack&lt;/tt&gt; is the haystack.
+ * 
+ * @fn Finder#length
+ * 
+ * @brief Return the length of the match.
+ * 
+ * @signature TSize length(finder);
+ * 
+ * @param[in] finder The finder to query for its match length.
+ * 
+ * @fn Finder#infix
+ * 
+ * @brief Returns the segment of the last found match in the haystack.
+ * 
+ * @signature TInfix infix(finder);
+ * 
+ * @param[in] finder The Finder to query.
+ * 
+ * @return TInfix The @link SegmentableConcept#Infix @endlink of the match in
+ *                the haystack.
+ * 
+ * This function works only correct if the begin position of the match was
+ * already found, see @link Finder#findBegin @endlink
+ * 
+ * For finders or patterns of filtering algorithms (e.g. @Spec.Swift@) the
+ * returned infix is a potential match.
+ * 
+ * @fn Finder#clear
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Clear the Finder.
+ * 
+ * @signature void clear(finder);
+ * 
+ * @param[in,out] finder The Finder to clear.
+ * 
+ * @fn Finder#goBegin
+ * 
+ * @brief Go to the beginning of the text.
+ * 
+ * @signature void goBegin(finder);
+ * 
+ * @param[in] finder The finder to reset to the beginning of the text.
+ * 
+ * @fn Finder#goEnd
+ * 
+ * @brief Go to the end of the text.
+ * 
+ * @signature void goEnd(finder);
+ * 
+ * @param[in] finder The finder to reset to the end of the text.
+ * 
+ * @fn Finder#position
+ * 
+ * @brief Return current position of the finder in the haystack.
+ * 
+ * @signature TPosition position(finder);
+ * 
+ * @param[in] finder The Finder to query.
+ * 
+ * @return TPosition The current position. TPosition is the position type of the
+ *                   haystack.
+ * 
+ * @fn Finder#setPosition
+ * 
+ * @brief Sets the position of a finder.
+ * 
+ * @signature void setPosition(finder, pos);
+ * 
+ * @param[in,out] finder The Findre to set the position for.
+ * @param[in] pos The position to set the finder to.
+ * 
+ * @fn Finder#setHaystack
+ * 
+ * @brief Sets the haystack of a @link Finder @endlink object.
+ * 
+ * @signature void setHaystack(finder, haystack);
+ * 
+ * @param[in,out] finder The finder to set the haystack for.
+ * @param[in] haystack The haystack to set.
+ * 
+ * @fn Finder#haystack
+ * 
+ * @brief Returns the haystack of a Finder.
+ * 
+ * @signature THaystack haystack(finder);
+ * 
+ * @param[in] finder The Finder to query for its haystack.
+ * 
+ * @return THaystack The result type can be retrieved using @link
+ *                   Finder#Haystack @endlink.
+ * 
+ * @fn Finder#findBegin
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Search the begin of an approximate match.
+ * 
+ * @signature bool findBegin(finder, pattern[, limit]);
+ * 
+ * @param[in,out] finder The Finder object to search through.
+ * @param[in,out] pattern The Pattern object to search for. This must be a
+ *                        pattern for approximate string matching.
+ * @param[in] limit The score limit. The default is the limit used during the
+ *                  last &lt;tt&gt;find&lt;/tt&gt; call, see &lt;tt&gt;getScore&lt;/tt&gt;. All
+ *                  occurences that score at least &lt;tt&gt;limit&lt;/tt&gt; are reported.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; indicates a match, &lt;tt&gt;false&lt;/tt&gt; indicates no
+ *              match.
+ * 
+ * The function &lt;tt&gt;find&lt;/tT&gt; successfully called be called - that is an end
+ * position was found - before calling findBegin to find a begin position.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

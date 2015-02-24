@@ -1,0 +1,21 @@
+Initial alignment of infixes (score == 8)
+
+      0      
+        GGTA
+        ||||
+        GGTA
+
+
+Resulting alignment (score == 32)
+
+      0     .    :    .     
+        CGGGACGGTACACACACGG
+        ||||||||||||  |||||
+        CGGGACGGTACAGGCACGG
+
+
+source(row(align, 0)) == NNNNNNNNNNTTCCGGGACGGTACACACACGGGGGGGGGG (full sequence)
+source(row(align, 1)) == CTCGGGACGGTACAGGCACGGTTTTTTTT (full sequence)
+
+clipping positions of row 0: 13, 32
+clipping positions of row 1: 2, 21

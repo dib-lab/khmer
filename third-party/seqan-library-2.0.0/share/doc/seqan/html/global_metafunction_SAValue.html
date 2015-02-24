@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_metafunction_savalue" data-page="SAValue">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SAValue - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="metafunction" data-pimped="true">
+  <a href="page_LanguageEntities.html#metafunction">Fn<></a> <span>SAValue<div><div>The default alphabet type of a suffix array, i.e. the type to store a
+position of a string or string set.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>SAValue&lt;TObject&gt;::Type;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+
+
+<!-- @tparam -->
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>TObject</code></th>
+        <td>A string, string set, or index type. Types: <a href="class_String.html" data-lang-entity="class">String</a>, <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>,
+<a href="class_Index.html" data-lang-entity="class">Index</a></td>
+    </tr>
+
+</table>
+
+</div>
+
+
+
+<!-- @returns -->
+
+
+<h2>Return Values</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A type to store a position.If <tt>TObject</tt> is a <a href="class_String.html" data-lang-entity="class">String</a>, it is a single integer
+value. By default this is the <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> type of <tt>TObject</tt>.If <tt>TObject</tt> is a
+<a href="class_StringSet.html" data-lang-entity="class">StringSet</a>, it could be a single integer too (called global position, see <a href="specialization_ConcatDirectStringSet.html" data-lang-entity="specialization">ConcatDirectStringSet</a>) or a <a href="class_Pair.html" data-lang-entity="class">Pair</a> (called local position, see
+<a href="specialization_OwnerStringSet.html" data-lang-entity="specialization">OwnerStringSet</a>). Currently SeqAn defaults to a local position for <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> classes (index_base.h).</td>
+    </tr>
+
+</table>
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+        
+        <div class="note info"><strong>Note:</strong> <div class='inline'>
+            <p>If <tt>TObject</tt> is an <a href="class_Index.html" data-lang-entity="class">Index</a>, <a href="global_metafunction_Position.html" data-lang-entity="global_metafunction">Position</a> returns the same value as <tt>SAValue</tt>.
+You can change the position type of an index by overloading <tt>SAValue</tt>, not <a href="global_metafunction_Position.html" data-lang-entity="global_metafunction">Position</a>.</p>
+         </div></div>
+        
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>SAValue is the return type of various functions, e.g. <a href="class_Finder.html#Finder#position" data-lang-entity="interface_function">position</a> for the Index <a href="class_Finder.html" data-lang-entity="class">Finder</a>
+class, <a href="specialization_VSTreeIterator.html#VSTreeIterator#getOccurrence" data-lang-entity="interface_function">getOccurrence</a>, <a href="specialization_VSTreeIterator.html#VSTreeIterator#getOccurrences" data-lang-entity="interface_function">getOccurrences</a>, <a href="specialization_IndexQGram.html#IndexQGram#getOccurrences" data-lang-entity="interface_function">getOccurrences</a> etc. You should always use the type of this meta-function to store the return values. If you want to write
+algorithms for both variants (local and global positions) you should use the functions <a href="concept_TextConcept.html#TextConcept#posLocalize" data-lang-entity="interface_function">posLocalize</a>,
+<a href="concept_TextConcept.html#TextConcept#posGlobalize" data-lang-entity="interface_function">posGlobalize</a>, <a href="concept_TextConcept.html#TextConcept#getSeqNo" data-lang-entity="interface_function">getSeqNo</a> and <a href="concept_TextConcept.html#TextConcept#getSeqOffset" data-lang-entity="interface_function">getSeqOffset</a>.</p><h3>Examples</h3><p>The following code snippet demonstrates the usage of <a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a>.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span> <span class="k">typename</span> <span class="n">TString</span><span class="p">,</span> <span class="k">typename</span> <span class="n">TSpec</span> <span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">SAValue</span><span class="o">&lt;</span> <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">TString</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Pair</span><span class="o">&lt;</span>
+        <span class="k">typename</span> <span class="n">Size</span><span class="o">&lt;</span> <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">TString</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span><span class="p">,</span>
+        <span class="k">typename</span> <span class="n">SAValue</span><span class="o">&lt;</span><span class="n">TString</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">,</span>
+        <span class="n">Pack</span>
+    <span class="o">&gt;</span> <span class="n">Type</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="global_function_orderOccurrences.html" data-lang-entity="global_function">orderOccurrences</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @mfn SAValue
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief The default alphabet type of a suffix array, i.e. the type to store a
+ *        position of a string or string set.
+ * 
+ * @note If &lt;tt&gt;TObject&lt;/tt&gt; is an @link Index @endlink, @link Position @endlink
+ *       returns the same value as &lt;tt&gt;SAValue&lt;/tt&gt;. You can change the position
+ *       type of an index by overloading &lt;tt&gt;SAValue&lt;/tt&gt;, not @link Position
+ *       @endlink.
+ * 
+ * @signature SAValue&lt;TObject&gt;::Type;
+ * 
+ * @tparam TObject A string, string set, or index type. Types: @link String
+ *                 @endlink, @link StringSet @endlink, @link Index @endlink
+ * 
+ * @return TReturn A type to store a position.If &lt;tt&gt;TObject&lt;/tt&gt; is a @link
+ *                 String @endlink, it is a single integer value. By default
+ *                 this is the @link Size @endlink type of &lt;tt&gt;TObject&lt;/tt&gt;.If
+ *                 &lt;tt&gt;TObject&lt;/tt&gt; is a @link StringSet @endlink, it could be a
+ *                 single integer too (called global position, see @link
+ *                 ConcatDirectStringSet @endlink) or a @link Pair @endlink
+ *                 (called local position, see @link OwnerStringSet @endlink).
+ *                 Currently SeqAn defaults to a local position for @link
+ *                 StringSet @endlink classes (index_base.h).
+ * 
+ * SAValue is the return type of various functions, e.g. @link Finder#position
+ * @endlink for the Index @link Finder @endlink class, @link
+ * VSTreeIterator#getOccurrence @endlink, @link VSTreeIterator#getOccurrences
+ * @endlink, @link IndexQGram#getOccurrences @endlink etc. You should always use
+ * the type of this meta-function to store the return values. If you want to
+ * write algorithms for both variants (local and global positions) you should
+ * use the functions @link TextConcept#posLocalize @endlink, @link
+ * TextConcept#posGlobalize @endlink, @link TextConcept#getSeqNo @endlink and
+ * @link TextConcept#getSeqOffset @endlink.
+ * 
+ * @section Examples
+ * 
+ * The following code snippet demonstrates the usage of @link SAValue @endlink.
+ * 
+ * @code{.cpp}
+ * template &lt; typename TString, typename TSpec &gt;
+ * struct SAValue&lt; StringSet&lt;TString, TSpec&gt; &gt; {
+ *     typedef Pair&lt;
+ *         typename Size&lt; StringSet&lt;TString, TSpec&gt; &gt;::Type,
+ *         typename SAValue&lt;TString&gt;::Type,
+ *         Pack
+ *     &gt; Type;
+ * };
+ * @endcode
+ * 
+ * 
+ * @see orderOccurrences
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

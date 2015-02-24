@@ -1,0 +1,2160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_tooldoc" data-page="ToolDoc">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ToolDoc - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>ToolDoc<div><div>Container for string documentation on a command line tool.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/arg_parse.&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class ToolDoc;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%3A%3AToolDoc" title="#ToolDoc::ToolDoc (interface function)" data-lang-entity="member_function">ToolDoc::ToolDoc()</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23addListItem" title="#ToolDoc#addListItem (interface function)" data-lang-entity="interface_function">void addListItem(toolDoc, key, value);</a></code></span>
+    <span class="summary_desc"><div>Add a list item to a ToolDoc.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23addSection" title="#ToolDoc#addSection (interface function)" data-lang-entity="interface_function">void addSection(toolDoc, title);</a></code></span>
+    <span class="summary_desc"><div>Add a section with the given title.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23addSubSection" title="#ToolDoc#addSubSection (interface function)" data-lang-entity="interface_function">void addSubSection(toolDoc, title);</a></code></span>
+    <span class="summary_desc"><div>Add a subsection with the given title.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23addText" title="#ToolDoc#addText (interface function)" data-lang-entity="interface_function">void addText(toolDoc, text[, isParagraph]);</a></code></span>
+    <span class="summary_desc"><div>Add a text line/paragraph to ToolDoc.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23append" title="#ToolDoc#append (interface function)" data-lang-entity="interface_function">void append(a, b);</a></code></span>
+    <span class="summary_desc"><div>Append two <a href="class_ToolDoc.html" data-lang-entity="class">ToolDoc</a> objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23clearEntries" title="#ToolDoc#clearEntries (interface function)" data-lang-entity="interface_function">void clearEntries(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Clear entries from ToolDoc.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getCategory" title="#ToolDoc#getCategory (interface function)" data-lang-entity="interface_function">CharString getCategory(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the tool category.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getDate" title="#ToolDoc#getDate (interface function)" data-lang-entity="interface_function">CharString getDate(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the date.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getManTitle" title="#ToolDoc#getManTitle (interface function)" data-lang-entity="interface_function">CharString getManTitle(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the tool man page title of.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getName" title="#ToolDoc#getName (interface function)" data-lang-entity="interface_function">CharString getName(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the tool name.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getShortDescription" title="#ToolDoc#getShortDescription (interface function)" data-lang-entity="interface_function">CharString getShortDescription(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the tool short description.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23getVersion" title="#ToolDoc#getVersion (interface function)" data-lang-entity="interface_function">CharString getVersion(toolDoc);</a></code></span>
+    <span class="summary_desc"><div>Get the tool version string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23print" title="#ToolDoc#print (interface function)" data-lang-entity="interface_function">void print(stream, toolDoc, format);</a></code></span>
+    <span class="summary_desc"><div>Print ToolDoc object in a given format.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setCategory" title="#ToolDoc#setCategory (interface function)" data-lang-entity="interface_function">void setName(toolDoc, name);</a></code></span>
+    <span class="summary_desc"><div>Set the tool name.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setDate" title="#ToolDoc#setDate (interface function)" data-lang-entity="interface_function">void setName(toolDoc, str);</a></code></span>
+    <span class="summary_desc"><div>Set the date string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setManTitle" title="#ToolDoc#setManTitle (interface function)" data-lang-entity="interface_function">void setTitle(toolDoc, title);</a></code></span>
+    <span class="summary_desc"><div>Set the man title.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setName" title="#ToolDoc#setName (interface function)" data-lang-entity="interface_function">void setName(toolDoc, name);</a></code></span>
+    <span class="summary_desc"><div>Set the tool name.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setShortDescription" title="#ToolDoc#setShortDescription (interface function)" data-lang-entity="interface_function">void setShortDescription(toolDoc, text);</a></code></span>
+    <span class="summary_desc"><div>Set the tool short description.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ToolDoc%23setVersion" title="#ToolDoc#setVersion (interface function)" data-lang-entity="interface_function">void setName(toolDoc, str);</a></code></span>
+    <span class="summary_desc"><div>Set the tool version string.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>This class is generally not used directly by the user but through <a href="class_ArgumentParser.html" data-lang-entity="class">ArgumentParser</a>. It allows to store
+and represent all information related to a command line tool that would normally go into a man page. It can be
+printed to STL streams in different formats, currently plain text, HTML and man pages are supported.</p><p>You can also use basic formatting in text. This formatting is tailored to the usage on the command line. Use
+<tt>\fB</tt> to start bold font, <tt>\fI</tt> to start italic font and <tt>\fP</tt> to use the previous font (of
+course, use correct escaping of the backslash in C strings, so use <tt>"\\fB"</tt>, <tt>"\\fI"</tt>, and
+<tt>"\\fP"</tt> in your code.</p><h3>Examples</h3><p>The following shows a brief example of how to use <a href="class_ToolDoc.html" data-lang-entity="class">ToolDoc</a>.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">ToolDoc</span> <span class="n">doc</span><span class="p">;</span>
+<span class="n">setName</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;RazerS&quot;</span><span class="p">);</span>
+<span class="n">setShortDescription</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Read mapping with controllable sensitivity.&quot;</span><span class="p">);</span>
+<span class="n">setDate</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;04 March 2012&quot;</span><span class="p">);</span>
+<span class="n">setVersion</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;1.0&quot;</span><span class="p">);</span>
+<span class="n">setCategory</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Read Mapping&quot;</span><span class="p">);</span>
+<span class="n">setManTitle</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;SeqAn Apps Reference Manual&quot;</span><span class="p">);</span>
+
+<span class="n">addSection</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Synopsis&quot;</span><span class="p">);</span>
+<span class="n">addText</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">fBrazers</span><span class="se">\\</span><span class="s">fP [</span><span class="se">\\</span><span class="s">fIOPTIONS</span><span class="se">\\</span><span class="s">fP] </span><span class="se">\\</span><span class="s">fIREFERENCE</span><span class="se">\\</span><span class="s">fP </span><span class="se">\\</span><span class="s">fIREADS</span><span class="se">\\</span><span class="s">fP&quot;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<span class="n">addText</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span>
+        <span class="s">&quot;</span><span class="se">\\</span><span class="s">fBrazers</span><span class="se">\\</span><span class="s">fP [</span><span class="se">\\</span><span class="s">fIOPTIONS</span><span class="se">\\</span><span class="s">fP] </span><span class="se">\\</span><span class="s">fIREFERENCE</span><span class="se">\\</span><span class="s">fP </span><span class="se">\\</span><span class="s">fILEFT_READS</span><span class="se">\\</span><span class="s">fP &quot;</span>
+        <span class="s">&quot;</span><span class="se">\\</span><span class="s">fIRIGHT_READS</span><span class="se">\\</span><span class="s">fP&quot;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+
+<span class="n">addSection</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Description&quot;</span><span class="p">);</span>
+<span class="n">addText</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span>
+        <span class="s">&quot;RazerS is a read mapper with controllable, sensitivity.  This &quot;</span>
+        <span class="s">&quot;means that you can find all read matches in the reference sequence &quot;</span>
+        <span class="s">&quot;and optionally, you can trade lower sensitivity for better &quot;</span>
+        <span class="s">&quot;performance.&quot;</span><span class="p">);</span>
+<span class="n">addText</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span>
+        <span class="s">&quot;What&#39;s special about RazerS is that you can control the sensitivity.&quot;</span><span class="p">);</span>
+
+<span class="n">addSection</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Options&quot;</span><span class="p">);</span>
+<span class="n">addSubSection</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;Main Options&quot;</span><span class="p">);</span>
+<span class="n">addListItem</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">fB-id</span><span class="se">\\</span><span class="s">fP, </span><span class="se">\\</span><span class="s">fB--indels</span><span class="se">\\</span><span class="s">fP&quot;</span><span class="p">,</span>
+            <span class="s">&quot;Enable mapping with indels enabled.&quot;</span><span class="p">);</span>
+<span class="n">addListItem</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">fB-i</span><span class="se">\\</span><span class="s">fP, </span><span class="se">\\</span><span class="s">fB--identity</span><span class="se">\\</span><span class="s">fP </span><span class="se">\\</span><span class="s">fIIDENTITY</span><span class="se">\\</span><span class="s">fP&quot;</span><span class="p">,</span>
+            <span class="s">&quot;Set minimal identity of matches to find.&quot;</span><span class="p">);</span>
+
+<span class="n">print</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="s">&quot;text&quot;</span><span class="p">);</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_ArgumentParser.html" data-lang-entity="class">ArgumentParser</a></li>
+  
+  <li><a href="class_ToolDoc.html#ToolDoc#addListItem" data-lang-entity="interface_function">addListItem</a></li>
+  
+  <li><a href="class_ToolDoc.html#ToolDoc#addText" data-lang-entity="interface_function">addText</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ToolDoc::ToolDoc" class="signature first" data-lang-entity="member_function">
+      <code>ToolDoc::ToolDoc()</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ToolDoc#addListItem" class="signature first" data-lang-entity="interface_function">
+      <code>void addListItem(toolDoc, key, value);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a list item to a ToolDoc.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to add the list item to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key for the list (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">value</code>
+            
+        
+      </th>
+      <td>The value for the list (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#addSection" class="signature" data-lang-entity="interface_function">
+      <code>void addSection(toolDoc, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a section with the given title.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to add a section for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The section title (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#addSubSection" class="signature" data-lang-entity="interface_function">
+      <code>void addSubSection(toolDoc, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a subsection with the given title.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to add a subsection for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The subsection title (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#addText" class="signature" data-lang-entity="interface_function">
+      <code>void addText(toolDoc, text[, isParagraph]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add a text line/paragraph to ToolDoc.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc to add the text to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The text to add (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">isParagraph</code>
+            
+        
+      </th>
+      <td>Whether to insert as paragraph or just a line (only one line break if not a paragraph).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#append" class="signature" data-lang-entity="interface_function">
+      <code>void append(a, b);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append two <a href="class_ToolDoc.html" data-lang-entity="class">ToolDoc</a> objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">a</code>
+            
+        
+      </th>
+      <td>This object is updated</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">b</code>
+            
+        
+      </th>
+      <td>This object is appended to <tt>b</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#clearEntries" class="signature" data-lang-entity="interface_function">
+      <code>void clearEntries(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear entries from ToolDoc.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to clear entries from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getCategory" class="signature" data-lang-entity="interface_function">
+      <code>CharString getCategory(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the tool category.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the category for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting category (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getDate" class="signature" data-lang-entity="interface_function">
+      <code>CharString getDate(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the date.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the date from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting date string (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getManTitle" class="signature" data-lang-entity="interface_function">
+      <code>CharString getManTitle(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the tool man page title of.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the man page title.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting man page title (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getName" class="signature" data-lang-entity="interface_function">
+      <code>CharString getName(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the tool name.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the name for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting name (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getShortDescription" class="signature" data-lang-entity="interface_function">
+      <code>CharString getShortDescription(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the tool short description.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the short description for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting short description (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#getVersion" class="signature" data-lang-entity="interface_function">
+      <code>CharString getVersion(toolDoc);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the tool version string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the get the version string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>Resulting version string (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#print" class="signature" data-lang-entity="interface_function">
+      <code>void print(stream, toolDoc, format);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Print ToolDoc object in a given format.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td>The <tt>std::ostream</tt> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc to print.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">format</code>
+            
+        
+      </th>
+      <td>The format, one of {"html", "man", "txt"}.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setCategory" class="signature" data-lang-entity="interface_function">
+      <code>void setName(toolDoc, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the tool name.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the name for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setDate" class="signature" data-lang-entity="interface_function">
+      <code>void setName(toolDoc, str);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the date string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the date string for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">str</code>
+            
+        
+      </th>
+      <td>The date string of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setManTitle" class="signature" data-lang-entity="interface_function">
+      <code>void setTitle(toolDoc, title);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the man title.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the title for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">title</code>
+            
+        
+      </th>
+      <td>The title of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setName" class="signature" data-lang-entity="interface_function">
+      <code>void setName(toolDoc, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the tool name.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the name for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setShortDescription" class="signature" data-lang-entity="interface_function">
+      <code>void setShortDescription(toolDoc, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the tool short description.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the short description for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The short description of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ToolDoc#setVersion" class="signature" data-lang-entity="interface_function">
+      <code>void setName(toolDoc, str);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the tool version string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">toolDoc</code>
+            
+        
+      </th>
+      <td>The ToolDoc object to the set the version string for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">str</code>
+            
+        
+      </th>
+      <td>The version string of the tool (<a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ToolDoc
+ * 
+ * @implements AssignableConcept
+ * 
+ * @headerfile &lt;seqan/arg_parse.&gt;
+ * 
+ * @brief Container for string documentation on a command line tool.
+ * 
+ * @signature class ToolDoc;
+ * 
+ * @section Remarks
+ * 
+ * This class is generally not used directly by the user but through @link
+ * ArgumentParser @endlink. It allows to store and represent all information
+ * related to a command line tool that would normally go into a man page. It can
+ * be printed to STL streams in different formats, currently plain text, HTML
+ * and man pages are supported.
+ * 
+ * You can also use basic formatting in text. This formatting is tailored to the
+ * usage on the command line. Use &lt;tt&gt;\fB&lt;/tt&gt; to start bold font, &lt;tt&gt;\fI&lt;/tt&gt;
+ * to start italic font and &lt;tt&gt;\fP&lt;/tt&gt; to use the previous font (of course,
+ * use correct escaping of the backslash in C strings, so use &lt;tt&gt;&#34;\\fB&#34;&lt;/tt&gt;,
+ * &lt;tt&gt;&#34;\\fI&#34;&lt;/tt&gt;, and &lt;tt&gt;&#34;\\fP&#34;&lt;/tt&gt; in your code.
+ * 
+ * @section Examples
+ * 
+ * The following shows a brief example of how to use @link ToolDoc @endlink.
+ * 
+ * @code{.cpp}
+ * ToolDoc doc;
+ * setName(doc, &#34;RazerS&#34;);
+ * setShortDescription(doc, &#34;Read mapping with controllable sensitivity.&#34;);
+ * setDate(doc, &#34;04 March 2012&#34;);
+ * setVersion(doc, &#34;1.0&#34;);
+ * setCategory(doc, &#34;Read Mapping&#34;);
+ * setManTitle(doc, &#34;SeqAn Apps Reference Manual&#34;);
+ * 
+ * addSection(doc, &#34;Synopsis&#34;);
+ * addText(doc, &#34;\\fBrazers\\fP [\\fIOPTIONS\\fP] \\fIREFERENCE\\fP \\fIREADS\\fP&#34;, false);
+ * addText(doc,
+ *         &#34;\\fBrazers\\fP [\\fIOPTIONS\\fP] \\fIREFERENCE\\fP \\fILEFT_READS\\fP &#34;
+ *         &#34;\\fIRIGHT_READS\\fP&#34;, false);
+ * 
+ * addSection(doc, &#34;Description&#34;);
+ * addText(doc,
+ *         &#34;RazerS is a read mapper with controllable, sensitivity.  This &#34;
+ *         &#34;means that you can find all read matches in the reference sequence &#34;
+ *         &#34;and optionally, you can trade lower sensitivity for better &#34;
+ *         &#34;performance.&#34;);
+ * addText(doc,
+ *         &#34;What&#39;s special about RazerS is that you can control the sensitivity.&#34;);
+ * 
+ * addSection(doc, &#34;Options&#34;);
+ * addSubSection(doc, &#34;Main Options&#34;);
+ * addListItem(doc, &#34;\\fB-id\\fP, \\fB--indels\\fP&#34;,
+ *             &#34;Enable mapping with indels enabled.&#34;);
+ * addListItem(doc, &#34;\\fB-i\\fP, \\fB--identity\\fP \\fIIDENTITY\\fP&#34;,
+ *             &#34;Set minimal identity of matches to find.&#34;);
+ * 
+ * print(std::cout, doc, &#34;text&#34;);
+ * @endcode
+ * 
+ * 
+ * @see ToolDoc#addText
+ * @see ToolDoc#addListItem
+ * @see ArgumentParser
+ * 
+ * @fn ToolDoc::ToolDoc
+ * 
+ * @brief Constructor
+ * 
+ * @signature ToolDoc::ToolDoc()
+ * 
+ * @fn ToolDoc#append
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Append two @link ToolDoc @endlink objects.
+ * 
+ * @signature void append(a, b);
+ * 
+ * @param[in,out] a This object is updated
+ * @param[in] b This object is appended to &lt;tt&gt;b&lt;/tt&gt;.
+ * 
+ * @fn ToolDoc#setName
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the tool name.
+ * 
+ * @signature void setName(toolDoc, name);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the name for.
+ * @param[in] name The name of the tool (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#getName
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the tool name.
+ * 
+ * @signature CharString getName(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the name for.
+ * 
+ * @return CharString Resulting name (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#setCategory
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the tool name.
+ * 
+ * @signature void setName(toolDoc, name);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the name for.
+ * @param[in] name The name of the tool (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#getCategory
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the tool category.
+ * 
+ * @signature CharString getCategory(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the category for.
+ * 
+ * @return CharString Resulting category (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#setShortDescription
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the tool short description.
+ * 
+ * @signature void setShortDescription(toolDoc, text);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the short description
+ *                        for.
+ * @param[in] text The short description of the tool (@link CharString
+ *                 @endlink).
+ * 
+ * @fn ToolDoc#getShortDescription
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the tool short description.
+ * 
+ * @signature CharString getShortDescription(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the short description for.
+ * 
+ * @return CharString Resulting short description (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#setDate
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the date string.
+ * 
+ * @signature void setName(toolDoc, str);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the date string for.
+ * @param[in] str The date string of the tool (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#getDate
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the date.
+ * 
+ * @signature CharString getDate(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the date from.
+ * 
+ * @return CharString Resulting date string (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#setVersion
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the tool version string.
+ * 
+ * @signature void setName(toolDoc, str);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the version string for.
+ * @param[in] str The version string of the tool (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#getVersion
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the tool version string.
+ * 
+ * @signature CharString getVersion(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the version string.
+ * 
+ * @return CharString Resulting version string (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#setManTitle
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the man title.
+ * 
+ * @signature void setTitle(toolDoc, title);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to the set the title for.
+ * @param[in] title The title of the tool (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#getManTitle
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Get the tool man page title of.
+ * 
+ * @signature CharString getManTitle(toolDoc);
+ * 
+ * @param[in] toolDoc The ToolDoc object to the get the man page title.
+ * 
+ * @return CharString Resulting man page title (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#addSection
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Add a section with the given title.
+ * 
+ * @signature void addSection(toolDoc, title);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to add a section for.
+ * @param[in] title The section title (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#addSubSection
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Add a subsection with the given title.
+ * 
+ * @signature void addSubSection(toolDoc, title);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to add a subsection for.
+ * @param[in] title The subsection title (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#addText
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Add a text line/paragraph to ToolDoc.
+ * 
+ * @signature void addText(toolDoc, text[, isParagraph]);
+ * 
+ * @param[in,out] toolDoc The ToolDoc to add the text to.
+ * @param[in] text The text to add (@link CharString @endlink).
+ * @param[in] isParagraph Whether to insert as paragraph or just a line (only
+ *                        one line break if not a paragraph).
+ * 
+ * @fn ToolDoc#addListItem
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Add a list item to a ToolDoc.
+ * 
+ * @signature void addListItem(toolDoc, key, value);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to add the list item to.
+ * @param[in] key The key for the list (@link CharString @endlink).
+ * @param[in] value The value for the list (@link CharString @endlink).
+ * 
+ * @fn ToolDoc#print
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Print ToolDoc object in a given format.
+ * 
+ * @signature void print(stream, toolDoc, format);
+ * 
+ * @param[in,out] stream The &lt;tt&gt;std::ostream&lt;/tt&gt; to write to.
+ * @param[in] toolDoc The ToolDoc to print.
+ * @param[in] format The format, one of {&#34;html&#34;, &#34;man&#34;, &#34;txt&#34;}.
+ * 
+ * @fn ToolDoc#clearEntries
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Clear entries from ToolDoc.
+ * 
+ * @signature void clearEntries(toolDoc);
+ * 
+ * @param[in,out] toolDoc The ToolDoc object to clear entries from.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

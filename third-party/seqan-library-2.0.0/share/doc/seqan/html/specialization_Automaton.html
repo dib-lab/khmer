@@ -1,0 +1,1895 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_automaton" data-page="Automaton">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Automaton - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>Automaton<div><div>Representation of a automaton graph.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_WordGraph.html" data-lang-entity="specialization">WordGraph</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_types.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TAlphabet[, typename TCargo[, typename TSpec]]]&gt;
+class Graph&lt;Automaton&lt;TAlphabet, TCargo, TSpec&gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TAlphabet</a></code></th>
+        <td>The alphabet type used for transition labels. Default: <tt>char</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The cargo type that can be attached to the edges. Default: <tt>void</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specializing type. Default: <tt>Default</tt>. Use <tt>WithoutEdgeId</tt> here to omit edge ids.
+NB: if edges to not store ids then external property maps do not work.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23assignRoot" title="#Automaton#assignRoot (interface function)" data-lang-entity="interface_function">void assignRoot(a, v);</a></code></span>
+    <span class="summary_desc"><div>Assign a new root vertex to the automaton.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23canParseString" title="#Automaton#canParseString (interface function)" data-lang-entity="interface_function">bool canParseString(a[, v], str);</a></code></span>
+    <span class="summary_desc"><div>Test whether an Automaton can parse a string completely.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createOracle" title="#Automaton#createOracle (interface function)" data-lang-entity="interface_function">void createOracle(g, text);</a></code></span>
+    <span class="summary_desc"><div>Creates a factor oracle into an Automaton object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createOracleOnReverse" title="#Automaton#createOracleOnReverse (interface function)" data-lang-entity="interface_function">void createOracleOnReverse(g, text);</a></code></span>
+    <span class="summary_desc"><div>Creates a factor oracle on the reversed string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createRoot" title="#Automaton#createRoot (interface function)" data-lang-entity="interface_function">void createRoot(g);</a></code></span>
+    <span class="summary_desc"><div>Creates the root for the automaton.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createSuffixTrie" title="#Automaton#createSuffixTrie (interface function)" data-lang-entity="interface_function">void createSuffixTrie(g, terminalStateMap, text);</a></code></span>
+    <span class="summary_desc"><div>Creates a trie of all suffixes of a text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createTrie" title="#Automaton#createTrie (interface function)" data-lang-entity="interface_function">createTrie(g, terminalStateMap, keywords);</a></code></span>
+    <span class="summary_desc"><div>Creates a trie in an Automaton.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23createTrieOnReverse" title="#Automaton#createTrieOnReverse (interface function)" data-lang-entity="interface_function">createTrie(g, terminalStateMap, keywords);</a></code></span>
+    <span class="summary_desc"><div>Creates a trie for all reversed keywords.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23getRoot" title="#Automaton#getRoot (interface function)" data-lang-entity="interface_function">TVertexDescriptor getRoot(a);</a></code></span>
+    <span class="summary_desc"><div>Gets the root of the automaton.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23getSuccessor" title="#Automaton#getSuccessor (interface function)" data-lang-entity="interface_function">TVertexDescriptor getSuccessor(a, v, c);</a></code></span>
+    <span class="summary_desc"><div>Gets the successor for a given vertex and an edge label.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23isRoot" title="#Automaton#isRoot (interface function)" data-lang-entity="interface_function">bool isRoot(a, v);</a></code></span>
+    <span class="summary_desc"><div>Tests whether a given vertex is the root or not.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23parseString" title="#Automaton#parseString (interface function)" data-lang-entity="interface_function">TVertexDescriptor parseString(a, v, beginIt, endIt);, TVertexDescriptor parseString(a, v, str);</a></code></span>
+    <span class="summary_desc"><div>Parses a string one character at a time and moves accordingly in the automaton.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Automaton%23root" title="#Automaton#root (interface function)" data-lang-entity="interface_function">TVertexDescriptor root(a);</a></code></span>
+    <span class="summary_desc"><div>Gets reference to the root of the automaton.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdge" data-lang-entity="interface_function">addEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdges" data-lang-entity="interface_function">addEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addVertex" data-lang-entity="interface_function">addVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignEdgeMap" data-lang-entity="interface_function">assignEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignVertexMap" data-lang-entity="interface_function">assignVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearEdges" data-lang-entity="interface_function">clearEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearVertices" data-lang-entity="interface_function">clearVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#degree" data-lang-entity="interface_function">degree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#findEdge" data-lang-entity="interface_function">findEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getAdjacencyMatrix" data-lang-entity="interface_function">getAdjacencyMatrix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getNil" data-lang-entity="interface_function">getNil</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#inDegree" data-lang-entity="interface_function">inDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numEdges" data-lang-entity="interface_function">numEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numVertices" data-lang-entity="interface_function">numVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#outDegree" data-lang-entity="interface_function">outDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeEdge" data-lang-entity="interface_function">removeEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeInEdges" data-lang-entity="interface_function">removeInEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeOutEdges" data-lang-entity="interface_function">removeOutEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeVertex" data-lang-entity="interface_function">removeVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeEdgeMap" data-lang-entity="interface_function">resizeEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeVertexMap" data-lang-entity="interface_function">resizeVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#sourceVertex" data-lang-entity="interface_function">sourceVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#targetVertex" data-lang-entity="interface_function">targetVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#transpose" data-lang-entity="interface_function">transpose</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Cargo" data-lang-entity="interface_metafunction">Cargo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeDescriptor" data-lang-entity="interface_metafunction">EdgeDescriptor</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeIdHandler" data-lang-entity="interface_metafunction">EdgeIdHandler</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeType" data-lang-entity="interface_metafunction">EdgeType</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#VertexIdHandler" data-lang-entity="interface_metafunction">VertexIdHandler</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>An Automaton has directed edges, labeled with input symbols, and a distinct start state, called root. The input
+symbols require the use of a third parameter: The alphabet of the input symbols.</p><p><img src="img/automatonGraph.png" title="An automaton where 0 is the start state"></img></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Automaton#assignRoot" class="signature first" data-lang-entity="interface_function">
+      <code>void assignRoot(a, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assign a new root vertex to the automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">a</code>
+            
+        
+      </th>
+      <td>The Automaton to assign the root for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>A vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#canParseString" class="signature" data-lang-entity="interface_function">
+      <code>bool canParseString(a[, v], str);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether an Automaton can parse a string completely.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>The Automaton to use for parsing.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>Optionally, the descriptor of the vertex to start at. Defaults to the root.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">str</code>
+            
+        
+      </th>
+      <td>The string to parse.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the Automaton parses <tt>str</tt> , starting at <tt>v</tt>, completely and
+<tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createOracle" class="signature" data-lang-entity="interface_function">
+      <code>void createOracle(g, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a factor oracle into an Automaton object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">g</code>
+            
+        
+      </th>
+      <td>The oracle to create.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> to create the oracle with.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createOracleOnReverse</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createOracleOnReverse" class="signature" data-lang-entity="interface_function">
+      <code>void createOracleOnReverse(g, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a factor oracle on the reversed string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">g</code>
+            
+        
+      </th>
+      <td>The oracle to create.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>A <a href="class_String.html" data-lang-entity="class">String</a> to create the oracle with.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createOracle</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createRoot" class="signature" data-lang-entity="interface_function">
+      <code>void createRoot(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates the root for the automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>The Automaton to create the root for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createSuffixTrie" class="signature" data-lang-entity="interface_function">
+      <code>void createSuffixTrie(g, terminalStateMap, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a trie of all suffixes of a text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">g</code>
+            
+        
+      </th>
+      <td>The Automaton to create the suffix trie in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">terminalStateMap</code>
+            
+        
+      </th>
+      <td>An external property map; of type <tt>String&lt;String&lt;unsigned&gt; &gt;</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>A <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createTrie" class="signature" data-lang-entity="interface_function">
+      <code>createTrie(g, terminalStateMap, keywords);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a trie in an Automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>Automaton object to create the trie in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">terminalStateMap</code>
+            
+        
+      </th>
+      <td>An external property map. The type must be <tt>String&lt;String&lt;unsigned&gt;&gt;</tt>
+since a number of keywords can end in each vertex of the trie. This is the case in the
+Aho-Corasick algorithm if one pattern is a suffix of another pattern. Hence, we must
+associate with every vertex a set of indices that correspond to keywords.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">keywords</code>
+            
+        
+      </th>
+      <td>A set of strings.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createTrieOnReverse</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#createTrieOnReverse" class="signature" data-lang-entity="interface_function">
+      <code>createTrie(g, terminalStateMap, keywords);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a trie for all reversed keywords.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>Automaton object to create the trie in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">terminalStateMap</code>
+            
+        
+      </th>
+      <td>An external property map. The type must be <tt>String&lt;String&lt;unsigned&gt;&gt;</tt>
+since a number of keywords can end in each vertex of the trie. This is the case in the
+Aho-Corasick algorithm if one pattern is a suffix of another pattern. Hence, we must
+associate with every vertex a set of indices that correspond to keywords.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">keywords</code>
+            
+        
+      </th>
+      <td>A set of strings.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createTrie</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#getRoot" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getRoot(a);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the root of the automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>The Automaton to query for its root.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The root's vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#getSuccessor" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getSuccessor(a, v, c);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the successor for a given vertex and an edge label.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>The Automaton to query for its successor.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor fo the vertex to get the successor for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>The character label.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>A vertex descriptor or nil if successor is not defined.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getNil</a></li>
+    
+    <li><a class="error">parseString</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#isRoot" class="signature" data-lang-entity="interface_function">
+      <code>bool isRoot(a, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Tests whether a given vertex is the root or not.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>The Automaton to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true if v is the root and false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#parseString" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor parseString(a, v, beginIt, endIt);
+TVertexDescriptor parseString(a, v, str);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Parses a string one character at a time and moves accordingly in the automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>An Automaton.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The descriptor of the vertex to start at.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">str</code>
+            
+        
+      </th>
+      <td>The <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a> to parse.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">beginIt</code>
+            
+        
+      </th>
+      <td>Begin iterator to sequence to parse. Set to the first character that could not be parsed
+or to the value of endIt if all of the string was parsed.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">endIt</code>
+            
+        
+      </th>
+      <td>End iterator to sequence to parse.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The vertex descriptor of the state that was reached after parsing.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The parsing stops before <a href="specialization_Automaton.html#Automaton#getSuccessor" data-lang-entity="interface_function">getSuccessor</a> reaches the nil state or if the complete sequence is
+read.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Automaton#root" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor root(a);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets reference to the root of the automaton.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">a</code>
+            
+        
+      </th>
+      <td>The Automaton to query for its root.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>Reference to the root's vertex descriptor.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Automaton
+ * 
+ * @extends Graph
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief Representation of a automaton graph.
+ * 
+ * @signature template &lt;[typename TAlphabet[, typename TCargo[, typename
+ *            TSpec]]]&gt; class Graph&lt;Automaton&lt;TAlphabet, TCargo, TSpec&gt;;
+ * 
+ * @tparam TAlphabet The alphabet type used for transition labels. Default:
+ *                   &lt;tt&gt;char&lt;/tt&gt;.
+ * @tparam TCargo The cargo type that can be attached to the edges. Default:
+ *                &lt;tt&gt;void&lt;/tt&gt;.
+ * @tparam TSpec Specializing type. Default: &lt;tt&gt;Default&lt;/tt&gt;. Use
+ *               &lt;tt&gt;WithoutEdgeId&lt;/tt&gt; here to omit edge ids. NB: if edges to
+ *               not store ids then external property maps do not work.
+ * 
+ * An Automaton has directed edges, labeled with input symbols, and a distinct
+ * start state, called root. The input symbols require the use of a third
+ * parameter: The alphabet of the input symbols.
+ * 
+ * &lt;img src=&#34;automatonGraph.png&#34; title=&#34;An automaton where 0 is the start state&#34;
+ * /&gt;
+ * 
+ * @fn Automaton#createRoot
+ * 
+ * @brief Creates the root for the automaton.
+ * 
+ * @signature void createRoot(g);
+ * 
+ * @param[in,out] g The Automaton to create the root for.
+ * 
+ * @fn Automaton#assignRoot
+ * 
+ * @brief Assign a new root vertex to the automaton.
+ * 
+ * @signature void assignRoot(a, v);
+ * 
+ * @param[in,out] a The Automaton to assign the root for.
+ * @param[in] v A vertex descriptor.
+ * 
+ * @fn Automaton#root
+ * 
+ * @brief Gets reference to the root of the automaton.
+ * 
+ * @signature TVertexDescriptor root(a);
+ * 
+ * @param[in] a The Automaton to query for its root.
+ * 
+ * @return TVertexDescriptor Reference to the root&#39;s vertex descriptor.
+ * 
+ * @fn Automaton#getRoot
+ * 
+ * @brief Gets the root of the automaton.
+ * 
+ * @signature TVertexDescriptor getRoot(a);
+ * 
+ * @param[in] a The Automaton to query for its root.
+ * 
+ * @return TVertexDescriptor The root&#39;s vertex descriptor.
+ * 
+ * @fn Automaton#isRoot
+ * 
+ * @brief Tests whether a given vertex is the root or not.
+ * 
+ * @signature bool isRoot(a, v);
+ * 
+ * @param[in] a The Automaton to query.
+ * @param[in] v The descriptor of the vertex to query.
+ * 
+ * @return bool true if v is the root and false otherwise.
+ * 
+ * @fn Automaton#getSuccessor
+ * 
+ * @brief Gets the successor for a given vertex and an edge label.
+ * 
+ * @signature TVertexDescriptor getSuccessor(a, v, c);
+ * 
+ * @param[in] a The Automaton to query for its successor.
+ * @param[in] v The descriptor fo the vertex to get the successor for.
+ * @param[in] c The character label.
+ * 
+ * @return TVertexDescriptor A vertex descriptor or nil if successor is not
+ *                           defined.
+ * 
+ * @see Automaton#parseString
+ * @see Graph#getNil
+ * 
+ * @fn Automaton#parseString
+ * 
+ * @brief Parses a string one character at a time and moves accordingly in the
+ *        automaton.
+ * 
+ * @signature TVertexDescriptor parseString(a, v, beginIt, endIt);
+ * @signature TVertexDescriptor parseString(a, v, str);
+ * 
+ * @param[in] a An Automaton.
+ * @param[in] v The descriptor of the vertex to start at.
+ * @param[in] str The @link ContainerConcept @endlink to parse.
+ * @param[in,out] beginIt Begin iterator to sequence to parse. Set to the first
+ *                        character that could not be parsed or to the value of
+ *                        endIt if all of the string was parsed.
+ * @param[in] endIt End iterator to sequence to parse.
+ * 
+ * @return TVertexDescriptor The vertex descriptor of the state that was reached
+ *                           after parsing.
+ * 
+ * The parsing stops before @link Automaton#getSuccessor @endlink reaches the
+ * nil state or if the complete sequence is read.
+ * 
+ * @fn Automaton#canParseString
+ * 
+ * @brief Test whether an Automaton can parse a string completely.
+ * 
+ * @signature bool canParseString(a[, v], str);
+ * 
+ * @param[in] a The Automaton to use for parsing.
+ * @param[in] v Optionally, the descriptor of the vertex to start at. Defaults
+ *              to the root.
+ * @param[in] str The string to parse.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the Automaton parses &lt;tt&gt;str&lt;/tt&gt; , starting at
+ *              &lt;tt&gt;v&lt;/tt&gt;, completely and &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Automaton#createOracle
+ * 
+ * @brief Creates a factor oracle into an Automaton object.
+ * 
+ * @signature void createOracle(g, text);
+ * 
+ * @param[out] g The oracle to create.
+ * @param[in] text A @link String @endlink to create the oracle with.
+ * 
+ * @see Automaton#createOracleOnReverse
+ * 
+ * @fn Automaton#createOracleOnReverse
+ * 
+ * @brief Creates a factor oracle on the reversed string.
+ * 
+ * @signature void createOracleOnReverse(g, text);
+ * 
+ * @param[out] g The oracle to create.
+ * @param[in] text A @link String @endlink to create the oracle with.
+ * 
+ * @see Automaton#createOracle
+ * 
+ * @fn Automaton#createTrie
+ * 
+ * @brief Creates a trie in an Automaton.
+ * 
+ * @signature createTrie(g, terminalStateMap, keywords);
+ * 
+ * @param[in,out] g Automaton object to create the trie in.
+ * @param[in] terminalStateMap  An external property map. The type must be
+ *                             &lt;tt&gt;String&amp;lt;String&amp;lt;unsigned&amp;gt;&amp;gt;&lt;/tt&gt;
+ *                             since a number of keywords can end in each vertex
+ *                             of the trie. This is the case in the Aho-Corasick
+ *                             algorithm if one pattern is a suffix of another
+ *                             pattern. Hence, we must associate with every
+ *                             vertex a set of indices that correspond to
+ *                             keywords.
+ * @param[in] keywords A set of strings.
+ * 
+ * @see Automaton#createTrieOnReverse
+ * 
+ * @fn Automaton#createTrieOnReverse
+ * 
+ * @brief Creates a trie for all reversed keywords.
+ * 
+ * @signature createTrie(g, terminalStateMap, keywords);
+ * 
+ * @param[in,out] g Automaton object to create the trie in.
+ * @param[in] terminalStateMap  An external property map. The type must be
+ *                             &lt;tt&gt;String&amp;lt;String&amp;lt;unsigned&amp;gt;&amp;gt;&lt;/tt&gt;
+ *                             since a number of keywords can end in each vertex
+ *                             of the trie. This is the case in the Aho-Corasick
+ *                             algorithm if one pattern is a suffix of another
+ *                             pattern. Hence, we must associate with every
+ *                             vertex a set of indices that correspond to
+ *                             keywords.
+ * @param[in] keywords A set of strings.
+ * 
+ * @see Automaton#createTrie
+ * 
+ * @fn Automaton#createSuffixTrie
+ * 
+ * @brief Creates a trie of all suffixes of a text.
+ * 
+ * @signature void createSuffixTrie(g, terminalStateMap, text);
+ * 
+ * @param[out] g The Automaton to create the suffix trie in.
+ * @param[out] terminalStateMap An external property map; of type
+ *                              &lt;tt&gt;String&amp;lt;String&amp;lt;unsigned&amp;gt; &amp;gt;&lt;/tt&gt;.
+ * @param[in] text A @link TextConcept @endlink object.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

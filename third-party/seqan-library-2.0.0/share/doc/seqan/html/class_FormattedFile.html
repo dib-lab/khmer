@@ -1,0 +1,1536 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_formattedfile" data-page="FormattedFile">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>FormattedFile - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>FormattedFile<div><div>Base class for formatted file I/O.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_BamFileIn.html" data-lang-entity="specialization">BamFileIn</a>, 
+    <a href="specialization_BamFileOut.html" data-lang-entity="specialization">BamFileOut</a>, 
+    <a href="specialization_BedFileIn.html" data-lang-entity="specialization">BedFileIn</a>, 
+    <a href="specialization_BedFileOut.html" data-lang-entity="specialization">BedFileOut</a>, 
+    <a href="specialization_FormattedFileIn.html" data-lang-entity="specialization">FormattedFileIn</a>, 
+    <a href="specialization_FormattedFileOut.html" data-lang-entity="specialization">FormattedFileOut</a>, 
+    <a href="specialization_GffFileIn.html" data-lang-entity="specialization">GffFileIn</a>, 
+    <a href="specialization_GffFileOut.html" data-lang-entity="specialization">GffFileOut</a>, 
+    <a href="specialization_RoiFileIn.html" data-lang-entity="specialization">RoiFileIn</a>, 
+    <a href="specialization_RoiFileOut.html" data-lang-entity="specialization">RoiFileOut</a>, 
+    <a href="specialization_SeqFileIn.html" data-lang-entity="specialization">SeqFileIn</a>, 
+    <a href="specialization_SeqFileOut.html" data-lang-entity="specialization">SeqFileOut</a>, 
+    <a href="specialization_SimpleIntervalsFileIn.html" data-lang-entity="specialization">SimpleIntervalsFileIn</a>, 
+    <a href="specialization_SimpleIntervalsFileInOut.html" data-lang-entity="specialization">SimpleIntervalsFileInOut</a>, 
+    <a href="specialization_UcscFileIn.html" data-lang-entity="specialization">UcscFileIn</a>, 
+    <a href="specialization_UcscFileInOut.html" data-lang-entity="specialization">UcscFileInOut</a>, 
+    <a href="specialization_VcfFileIn.html" data-lang-entity="specialization">VcfFileIn</a>, 
+    <a href="specialization_VcfFileOut.html" data-lang-entity="specialization">VcfFileOut</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/stream.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TFileFormat, typename TDirection[, typename TSpec]&gt;
+struct FormattedFile;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TFileFormat</a></code></th>
+        <td>A type specifying the file format.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TDirection</a></code></th>
+        <td>The direction of the file, one of <a href="group_DirectionTags.html#DirectionTags#Input" data-lang-entity="grouped_tag">Input</a> or <a href="group_DirectionTags.html#DirectionTags#Output" data-lang-entity="grouped_tag">Output</a>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>A tag for the specialization, defauls to <tt>void</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%3A%3AgetFileExtensions" title="#FormattedFile::getFileExtensions (interface function)" data-lang-entity="member_function">TExtensionVector getFileExtensions()</a></code></span>
+    <span class="summary_desc"><div>Static function that returns a list of allowed file format extension.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%3A%3AoperatorTDependentContext" title="#FormattedFile::operatorTDependentContext (interface function)" data-lang-entity="member_function">TDependentContext & FormattedFile::operator TDependentContext();</a></code></span>
+    <span class="summary_desc"><div>Allows conversion to a dependent context for the FormattedFile</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23atEnd" title="#FormattedFile#atEnd (interface function)" data-lang-entity="interface_function">bool atEnd(file);</a></code></span>
+    <span class="summary_desc"><div>Determines whether a FormattedFile is at the end.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23close" title="#FormattedFile#close (interface function)" data-lang-entity="interface_function">bool close(file);</a></code></span>
+    <span class="summary_desc"><div>Close a FormattedFile.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23context" title="#FormattedFile#context (interface function)" data-lang-entity="interface_function">TDependentContext & context(file);</a></code></span>
+    <span class="summary_desc"><div>Return the FormattedFile's dependent context object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23format" title="#FormattedFile#format (interface function)" data-lang-entity="interface_function">TFormat format(file);</a></code></span>
+    <span class="summary_desc"><div>Return the format of a FormattedFile.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23FormattedFile" title="#FormattedFile#FormattedFile (interface function)" data-lang-entity="interface_function">FormattedFile::FormattedFile();, FormattedFile::FormattedFile(fileName[, openMode]);, FormattedFile::FormattedFile(stream);, FormattedFile::FormattedFile(other);, FormattedFile::FormattedFile(otherContext);, FormattedFile::FormattedFile(otherContext, fileName[, openMode]);, FormattedFile::FormattedFile(otherContext, stream);</a></code></span>
+    <span class="summary_desc"><div>Provides default construction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23getFileExtensions" title="#FormattedFile#getFileExtensions (interface function)" data-lang-entity="interface_function">TExtensionVector getFileExtensions(file)</a></code></span>
+    <span class="summary_desc"><div>Static function that returns a list of allowed file format extension.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23guessFormat" title="#FormattedFile#guessFormat (interface function)" data-lang-entity="interface_function">bool guessFormat(file);</a></code></span>
+    <span class="summary_desc"><div>Guess the format of an open FormattedFile.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23open" title="#FormattedFile#open (interface function)" data-lang-entity="interface_function">bool open(file, fileName);</a></code></span>
+    <span class="summary_desc"><div>Open a FormattedFile.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23setFormat" title="#FormattedFile#setFormat (interface function)" data-lang-entity="interface_function">void setFormat(file, format);</a></code></span>
+    <span class="summary_desc"><div>Set the format of a FormattedFile.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23FileFormat" title="#FormattedFile#FileFormat (interface function)" data-lang-entity="interface_metafunction">FileFormat&lt;TFormattedFile&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Metafunction for retrieving the file format type of a formatted file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FormattedFile%23FormattedFileContext" title="#FormattedFile#FormattedFileContext (interface function)" data-lang-entity="interface_metafunction">FormattedFileContext&lt;TFormattedFile, TStorageSpec&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the context type for a FormattedFile.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>FormattedFile provides the following basic I/O operations on formatted files:</p><p><ul>
+<li>Open a file given its filename or attach to an existing stream like stdin/stdout.</li>
+<li>Guess the file format from the file content or filename extension.</li>
+<li>Set the file format manually.</li>
+<li>Access compressed or uncompressed files transparently.</li>
+</ul></p><p>FormattedFile encapsulates a VirtualStream and provides access to its <a href="concept_StreamConcept.html#StreamConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a>.
+Each instance of FormattedFile keeps a <a href="class_FormattedFile.html#FormattedFile#FormattedFileContext" data-lang-entity="interface_metafunction">FormattedFileContext</a> while reading or writing the formatted file.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FormattedFile::getFileExtensions" class="signature first" data-lang-entity="member_function">
+      <code>TExtensionVector getFileExtensions()</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Static function that returns a list of allowed file format extension.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TExtensionVector</code></th>
+        <td>A <tt>std::vector&lt;std::string&gt;</tt> with the allowed file extensions.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile::operatorTDependentContext" class="signature" data-lang-entity="member_function">
+      <code>TDependentContext & FormattedFile::operator TDependentContext();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Allows conversion to a dependent context for the FormattedFile</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDependentContext</code></th>
+        <td>The dependent context of this FormattedFile.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FormattedFile#atEnd" class="signature first" data-lang-entity="interface_function">
+      <code>bool atEnd(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Determines whether a FormattedFile is at the end.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to check.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> in the case of success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#close" class="signature" data-lang-entity="interface_function">
+      <code>bool close(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Close a FormattedFile.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to close.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> in the case of success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#context" class="signature" data-lang-entity="interface_function">
+      <code>TDependentContext & context(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the FormattedFile's dependent context object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to query for its context.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDependentContext</code></th>
+        <td>The dependent context, type as returned from <a href="class_FormattedFile.html#FormattedFile#FormattedFileContext" data-lang-entity="interface_metafunction">FormattedFileContext</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#format" class="signature" data-lang-entity="interface_function">
+      <code>TFormat format(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the format of a FormattedFile.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to check.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFormat</code></th>
+        <td>The type as returned from <a href="class_FormattedFile.html#FormattedFile#FileFormat" data-lang-entity="interface_metafunction">FileFormat</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#FormattedFile" class="signature" data-lang-entity="interface_function">
+      <code>FormattedFile::FormattedFile();
+FormattedFile::FormattedFile(fileName[, openMode]);
+FormattedFile::FormattedFile(stream);
+FormattedFile::FormattedFile(other);
+FormattedFile::FormattedFile(otherContext);
+FormattedFile::FormattedFile(otherContext, fileName[, openMode]);
+FormattedFile::FormattedFile(otherContext, stream);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Provides default construction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>Path to file to open, <tt>char const *</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">openMode</code>
+            
+        
+      </th>
+      <td>Optionally, the file open mode, default obtained from <tt>TDirection</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stream</code>
+            
+        
+      </th>
+      <td>A <tt>std::basic_istream&lt;&gt;</tt> to read from or <tt>std::basic_ostream&lt;&gt;</tt>
+to write to, depending on <tt>TDirection</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>A second FormattedFile, this FormattedFile's dependent context will depend on <tt>other</tt>'s
+dependent context.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">otherContext</code>
+            
+        
+      </th>
+      <td>The dependent context of another FormattedFile, this FormattedFile's dependent context will depend on <tt>otherContext</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+  <h4>Thrown Exceptions</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>IOError</code></th>
+        <td>The variants that accept the <tt>fileName</tt> parameter throw an exception of this
+type in case opening the file fails.</td>
+    </tr>
+    
+  </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#getFileExtensions" class="signature" data-lang-entity="interface_function">
+      <code>TExtensionVector getFileExtensions(file)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Static function that returns a list of allowed file format extension.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TExtensionVector</code></th>
+        <td>A <tt>std::vector&lt;std::string&gt;</tt> with the allowed file extensions.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This is a shortcut to <a href="class_FormattedFile.html#FormattedFile#getFileExtensions" data-lang-entity="interface_function">getFileExtensions</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#guessFormat" class="signature" data-lang-entity="interface_function">
+      <code>bool guessFormat(file);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Guess the format of an open FormattedFile.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The open FormattedFile for which the format is to be guessed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#open" class="signature" data-lang-entity="interface_function">
+      <code>bool open(file, fileName);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Open a FormattedFile.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to open.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>The name of the file open.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> in the case of success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FormattedFile#setFormat" class="signature" data-lang-entity="interface_function">
+      <code>void setFormat(file, format);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the format of a FormattedFile.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">file</code>
+            
+        
+      </th>
+      <td>The FormattedFile to change.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">format</code>
+            
+        
+      </th>
+      <td>The <a href="class_FormattedFile.html#FormattedFile#FileFormat" data-lang-entity="interface_metafunction">FileFormat</a> to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="FormattedFile#FileFormat" class="signature first" data-lang-entity="interface_metafunction">
+    <code>FileFormat&lt;TFormattedFile&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metafunction for retrieving the file format type of a formatted file.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TFormattedFile</code></th>
+            <td>The formatted file type to query for its file format type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting <a href="group_FileFormats.html" data-lang-entity="group">FileFormats</a> file formats type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="FormattedFile#FormattedFileContext" class="signature" data-lang-entity="interface_metafunction">
+    <code>FormattedFileContext&lt;TFormattedFile, TStorageSpec&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the context type for a FormattedFile.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TFormattedFile</code></th>
+            <td>The FormattedFile to query.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TStorageSpec</code></th>
+            <td>The storage specification, passed as specialization to any <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>
+contained in the context.</td>
+        </tr>
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting FormattedFile context type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FormattedFile
+ * 
+ * @headerfile &lt;seqan/stream.h&gt;
+ * 
+ * @brief Base class for formatted file I/O.
+ * 
+ * @signature template &lt;typename TFileFormat, typename TDirection[, typename
+ *            TSpec]&gt; struct FormattedFile;
+ * 
+ * @tparam TFileFormat A type specifying the file format.
+ * @tparam TDirection The direction of the file, one of @link
+ *                    DirectionTags#Input Input @endlink or @link
+ *                    DirectionTags#Output @endlink.
+ * @tparam TSpec A tag for the specialization, defauls to &lt;tt&gt;void&lt;/tt&gt;.
+ * 
+ * FormattedFile provides the following basic I/O operations on formatted files:
+ * 
+ * &lt;ul&gt; &lt;li&gt;Open a file given its filename or attach to an existing stream like
+ * stdin/stdout.&lt;/li&gt; &lt;li&gt;Guess the file format from the file content or
+ * filename extension.&lt;/li&gt; &lt;li&gt;Set the file format manually.&lt;/li&gt; &lt;li&gt;Access
+ * compressed or uncompressed files transparently.&lt;/li&gt; &lt;/ul&gt;
+ * 
+ * FormattedFile encapsulates a VirtualStream and provides access to its @link
+ * StreamConcept#DirectionIterator @endlink. Each instance of FormattedFile
+ * keeps a @link FormattedFile#FormattedFileContext @endlink while reading or
+ * writing the formatted file.
+ * 
+ * @mfn FormattedFile#FileFormat
+ * 
+ * @brief Metafunction for retrieving the file format type of a formatted file.
+ * 
+ * @signature FileFormat&lt;TFormattedFile&gt;::Type;
+ * 
+ * @tparam TFormattedFile The formatted file type to query for its file format
+ *                        type.
+ * 
+ * @return Type The resulting @link FileFormats @endlink file formats type.
+ * 
+ * @mfn FormattedFile#FormattedFileContext
+ * 
+ * @brief Returns the context type for a FormattedFile.
+ * 
+ * @signature FormattedFileContext&lt;TFormattedFile, TStorageSpec&gt;::Type
+ * 
+ * @tparam TFormattedFile The FormattedFile to query.
+ * @tparam TStorageSpec The storage specification, passed as specialization to
+ *                      any @link StringSet @endlink contained in the context.
+ * @tparam Type The resulting FormattedFile context type.
+ * 
+ * @fn FormattedFile::operatorTDependentContext
+ * 
+ * @brief Allows conversion to a dependent context for the FormattedFile
+ * 
+ * @signature TDependentContext &amp; FormattedFile::operator TDependentContext();
+ * 
+ * @return TDependentContext The dependent context of this FormattedFile.
+ * 
+ * @fn FormattedFile::getFileExtensions
+ * 
+ * @brief Static function that returns a list of allowed file format extension.
+ * 
+ * @signature TExtensionVector getFileExtensions()
+ * 
+ * @return TExtensionVector A &lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt; with the
+ *                          allowed file extensions.
+ * 
+ * @fn FormattedFile#FormattedFile
+ * 
+ * @brief Provides default construction.
+ * 
+ * @signature FormattedFile::FormattedFile();
+ * @signature FormattedFile::FormattedFile(fileName[, openMode]);
+ * @signature FormattedFile::FormattedFile(stream);
+ * @signature FormattedFile::FormattedFile(other);
+ * @signature FormattedFile::FormattedFile(otherContext);
+ * @signature FormattedFile::FormattedFile(otherContext, fileName[, openMode]);
+ * @signature FormattedFile::FormattedFile(otherContext, stream);
+ * 
+ * @param[in] fileName Path to file to open, &lt;tt&gt;char const *&lt;/tt&gt;.
+ * @param[in] openMode Optionally, the file open mode, default obtained from
+ *                     &lt;tt&gt;TDirection&lt;/tt&gt;.
+ * @param[in] stream A &lt;tt&gt;std::basic_istream&amp;lt;&amp;gt;&lt;/tt&gt; to read from or
+ *                   &lt;tt&gt;std::basic_ostream&amp;lt;&amp;gt;&lt;/tt&gt; to write to, depending
+ *                   on &lt;tt&gt;TDirection&lt;/tt&gt;.
+ * @param[in] other A second FormattedFile, this FormattedFile&#39;s dependent
+ *                  context will depend on &lt;tt&gt;other&lt;/tt&gt;&#39;s dependent context.
+ * @param[in] otherContext The dependent context of another FormattedFile, this
+ *                         FormattedFile&#39;s dependent context will depend on
+ *                         &lt;tt&gt;otherContext&lt;/tt&gt;.
+ * 
+ * @throw IOError The variants that accept the &lt;tt&gt;fileName&lt;/tt&gt; parameter throw
+ *                an exception of this type in case opening the file fails.
+ * 
+ * @fn FormattedFile#format
+ * 
+ * @brief Return the format of a FormattedFile.
+ * 
+ * @signature TFormat format(file);
+ * 
+ * @param[in] file The FormattedFile to check.
+ * 
+ * @return TFormat The type as returned from @link FormattedFile#FileFormat
+ *                 @endlink.
+ * 
+ * @fn FormattedFile#setFormat
+ * 
+ * @brief Set the format of a FormattedFile.
+ * 
+ * @signature void setFormat(file, format);
+ * 
+ * @param[in,out] file The FormattedFile to change.
+ * @param[in] format The @link FormattedFile#FileFormat @endlink to set.
+ * 
+ * @fn FormattedFile#guessFormat
+ * 
+ * @brief Guess the format of an open FormattedFile.
+ * 
+ * @signature bool guessFormat(file);
+ * 
+ * @param[in,out] file The open FormattedFile for which the format is to be
+ *                     guessed.
+ * 
+ * @fn FormattedFile#open
+ * 
+ * @brief Open a FormattedFile.
+ * 
+ * @signature bool open(file, fileName);
+ * 
+ * @param[in,out] file The FormattedFile to open.
+ * @param[in] fileName The name of the file open.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; in the case of success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FormattedFile#close
+ * 
+ * @brief Close a FormattedFile.
+ * 
+ * @signature bool close(file);
+ * 
+ * @param[in,out] file The FormattedFile to close.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; in the case of success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FormattedFile#atEnd
+ * 
+ * @brief Determines whether a FormattedFile is at the end.
+ * 
+ * @signature bool atEnd(file);
+ * 
+ * @param[in,out] file The FormattedFile to check.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; in the case of success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FormattedFile#context
+ * 
+ * @brief Return the FormattedFile&#39;s dependent context object.
+ * 
+ * @signature TDependentContext &amp; context(file);
+ * 
+ * @param[in,out] file The FormattedFile to query for its context.
+ * 
+ * @return TDependentContext The dependent context, type as returned from @link
+ *                           FormattedFile#FormattedFileContext @endlink.
+ * 
+ * @fn FormattedFile#getFileExtensions
+ * 
+ * @brief Static function that returns a list of allowed file format extension.
+ * 
+ * @signature TExtensionVector getFileExtensions(file)
+ * 
+ * @param[in] file The FormattedFile to query.
+ * 
+ * @return TExtensionVector A &lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt; with the
+ *                          allowed file extensions.
+ * 
+ * This is a shortcut to @link FormattedFile#getFileExtensions @endlink.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

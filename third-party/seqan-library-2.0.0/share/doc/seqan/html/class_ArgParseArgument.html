@@ -1,0 +1,2357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_argparseargument" data-page="ArgParseArgument">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ArgParseArgument - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>ArgParseArgument<div><div>Information for a specific command line argument.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_ArgParseOption.html" data-lang-entity="specialization">ArgParseOption</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/arg_parse.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class ArgParseArgument
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%3A%3AArgParseArgument" title="#ArgParseArgument::ArgParseArgument (interface function)" data-lang-entity="member_function">ArgParseArgument::ArgParseArgument(argumentType[, argumentLabel[, isListArgument[, numberOfArgument]]]);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23getArgumentLabel" title="#ArgParseArgument#getArgumentLabel (interface function)" data-lang-entity="interface_function">std::string getArgumentLabel(arg);</a></code></span>
+    <span class="summary_desc"><div>Return argument label.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23getArgumentValue" title="#ArgParseArgument#getArgumentValue (interface function)" data-lang-entity="interface_function">std::string getArgumentValue(arg[, argNo]);</a></code></span>
+    <span class="summary_desc"><div>Return the value of the argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23getArgumentValues" title="#ArgParseArgument#getArgumentValues (interface function)" data-lang-entity="interface_function">std::vector&lt;std::string&gt; getArgumentValue(arg);</a></code></span>
+    <span class="summary_desc"><div>Return all values of the argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23getFileExtension" title="#ArgParseArgument#getFileExtension (interface function)" data-lang-entity="interface_function">std::string getFileExtension(arg[, pos]);</a></code></span>
+    <span class="summary_desc"><div>Returns the file extension for the given file argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23hasArgumentValue" title="#ArgParseArgument#hasArgumentValue (interface function)" data-lang-entity="interface_function">bool hasValue(arg[, pos]);</a></code></span>
+    <span class="summary_desc"><div>Return whether a value is available.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23hasDefault" title="#ArgParseArgument#hasDefault (interface function)" data-lang-entity="interface_function">bool hasDefault(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument has a default value.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isDoubleArgument" title="#ArgParseArgument#isDoubleArgument (interface function)" data-lang-entity="interface_function">bool isDoubleArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is a double integer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isInputFileArgument" title="#ArgParseArgument#isInputFileArgument (interface function)" data-lang-entity="interface_function">bool isInputFileArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is a input file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isInputPrefixArgument" title="#ArgParseArgument#isInputPrefixArgument (interface function)" data-lang-entity="interface_function">bool isInputPrefixArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is an input prefix argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isInt64Argument" title="#ArgParseArgument#isInt64Argument (interface function)" data-lang-entity="interface_function">bool isInt64Argument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is a 64 bit integer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isIntegerArgument" title="#ArgParseArgument#isIntegerArgument (interface function)" data-lang-entity="interface_function">bool isIntegerArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is an integer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isListArgument" title="#ArgParseArgument#isListArgument (interface function)" data-lang-entity="interface_function">bool isListArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument can be given more than one time.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isOutputFileArgument" title="#ArgParseArgument#isOutputFileArgument (interface function)" data-lang-entity="interface_function">bool isOutputFileArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is a output file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isOutputPrefixArgument" title="#ArgParseArgument#isOutputPrefixArgument (interface function)" data-lang-entity="interface_function">bool isOutputPrefixArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is an output prefix.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isSet" title="#ArgParseArgument#isSet (interface function)" data-lang-entity="interface_function">bool isSet(arg):</a></code></span>
+    <span class="summary_desc"><div>Returns true if a value was assigned to the argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23isStringArgument" title="#ArgParseArgument#isStringArgument (interface function)" data-lang-entity="interface_function">bool isStringArgument(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the argument is a string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23numberOfAllowedValues" title="#ArgParseArgument#numberOfAllowedValues (interface function)" data-lang-entity="interface_function">unsigned numberOfAllowedValues(arg);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of allowed values for this ArgParseArgument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23setHelpText" title="#ArgParseArgument#setHelpText (interface function)" data-lang-entity="interface_function">void setHelpText(arg, text);</a></code></span>
+    <span class="summary_desc"><div>Set the help text for an ArgParseArgument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23setMaxValue" title="#ArgParseArgument#setMaxValue (interface function)" data-lang-entity="interface_function">void setMaxValue(arg, maxValue);</a></code></span>
+    <span class="summary_desc"><div>Set smallest allowed value for the argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23setMinValue" title="#ArgParseArgument#setMinValue (interface function)" data-lang-entity="interface_function">void setMinValue(arg, minValue);</a></code></span>
+    <span class="summary_desc"><div>Set smallest allowed value for the argument.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseArgument%23setValidValues" title="#ArgParseArgument#setValidValues (interface function)" data-lang-entity="interface_function">void setValidValues(arg, values);</a></code></span>
+    <span class="summary_desc"><div>Set list of valid values.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgParseArgument::ArgParseArgument" class="signature first" data-lang-entity="member_function">
+      <code>ArgParseArgument::ArgParseArgument(argumentType[, argumentLabel[, isListArgument[, numberOfArgument]]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argumentType</code>
+            
+        
+      </th>
+      <td>Type of the argument (<tt>ArgParseArgument::ArgumentType</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argumentLabel</code>
+            
+        
+      </th>
+      <td>Label for the argument (<tt>char const *</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">isListArgument</code>
+            
+        
+      </th>
+      <td>Whether or not this argument can be given multiple times (<tt>bool</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">numberOfArguments</code>
+            
+        
+      </th>
+      <td>Number of times the argument must be given. E.g. set to 2 for the parser to always
+expect two values (<tt>int</tt>, default is 1).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgParseArgument#getArgumentLabel" class="signature first" data-lang-entity="interface_function">
+      <code>std::string getArgumentLabel(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return argument label.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The argument label as a STL string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#getArgumentValue" class="signature" data-lang-entity="interface_function">
+      <code>std::string getArgumentValue(arg[, argNo]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the value of the argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argNo</code>
+            
+        
+      </th>
+      <td>In case that the ArgParseArgument allowed multiple values, give the index of the argument
+that you want to retrieve (<tt>unsigned</tt>, starts at 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>Const-reference to the argument value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#getArgumentValues" class="signature" data-lang-entity="interface_function">
+      <code>std::vector&lt;std::string&gt; getArgumentValue(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return all values of the argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::vector&lt;std::string&gt;</code></th>
+        <td>Const-reference to the argument values.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#getFileExtension" class="signature" data-lang-entity="interface_function">
+      <code>std::string getFileExtension(arg[, pos]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the file extension for the given file argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the value to retrieve if multiple values (<tt>unsigned</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The file extension, empty if no extension or not set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Only valid when argument is an INPUT_FILE or OUTPUT_FILE.</p><p>Halts the program if not an input or output file argument.</p><p>Can be overridden with special hidden options.
+For arguments, you can pass <tt>--arg-&lt;num&gt;-file-ext</tt> for argument <tt>num</tt>.
+For parameters, you can pass <tt>--&lt;param-name&gt;-file-ext</tt> for the option named <tt>param-name</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#hasArgumentValue" class="signature" data-lang-entity="interface_function">
+      <code>bool hasValue(arg[, pos]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return whether a value is available.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the argument in case of being a list (<tt>unsigned</tt>, 0-based, default is 0).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>pos</tt> is less than the size and the argument is non-empty.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#hasDefault" class="signature" data-lang-entity="interface_function">
+      <code>bool hasDefault(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument has a default value.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The argument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the argument has a default value and <tt>false</tt> if not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isDoubleArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isDoubleArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is a double integer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is a double argument, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isInputFileArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isInputFileArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is a input file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is a input file argument, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isInputPrefixArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isInputPrefixArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is an input prefix argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is an input prefix argument, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isInt64Argument" class="signature" data-lang-entity="interface_function">
+      <code>bool isInt64Argument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is a 64 bit integer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is a 64 bit integer, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isIntegerArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isIntegerArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is an integer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is an integer, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isListArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isListArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument can be given more than one time.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it can be given multiple times, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isOutputFileArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isOutputFileArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is a output file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is a output file argument, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isOutputPrefixArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isOutputPrefixArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is an output prefix.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is an output prefix argument, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isSet" class="signature" data-lang-entity="interface_function">
+      <code>bool isSet(arg):</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns true if a value was assigned to the argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if a value was assigned, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#isStringArgument" class="signature" data-lang-entity="interface_function">
+      <code>bool isStringArgument(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the argument is a string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is a string, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#numberOfAllowedValues" class="signature" data-lang-entity="interface_function">
+      <code>unsigned numberOfAllowedValues(arg);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of allowed values for this ArgParseArgument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>unsigned</code></th>
+        <td>The number of allowed values.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#setHelpText" class="signature" data-lang-entity="interface_function">
+      <code>void setHelpText(arg, text);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the help text for an ArgParseArgument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to set the help text for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The text to display as the description of the argument (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#setMaxValue" class="signature" data-lang-entity="interface_function">
+      <code>void setMaxValue(arg, maxValue);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set smallest allowed value for the argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to set the smallest value of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">maxValue</code>
+            
+        
+      </th>
+      <td>The largest value to set (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#setMinValue" class="signature" data-lang-entity="interface_function">
+      <code>void setMinValue(arg, minValue);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set smallest allowed value for the argument.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to set the smallest value of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">minValue</code>
+            
+        
+      </th>
+      <td>The smallest value to set (<tt>std::string</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseArgument#setValidValues" class="signature" data-lang-entity="interface_function">
+      <code>void setValidValues(arg, values);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set list of valid values.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">arg</code>
+            
+        
+      </th>
+      <td>The ArgParseArgument to set the valid values for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">values</code>
+            
+        
+      </th>
+      <td>Either a <tt>std::string</tt> containing all valid entries, separated by spaces or a
+<tt>std::vector&lt;std::string&gt;</tt> with the valid entries.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>If the argument is of type string then the list of valid values is the case-sensitive list of string values
+allowed for this argument. If it is an input or output file then the list of valid values is a list of
+case-insentive file extensions identifying the allowed types.</p><h4>Examples</h4><p>An example of setting allowed values for a string option.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">seqan</span><span class="o">::</span><span class="n">ArgParseArgument</span> <span class="n">stringArg</span><span class="p">(</span><span class="n">seqan</span><span class="o">::</span><span class="n">ArgParseArgument</span><span class="o">::</span><span class="n">STRING</span><span class="p">);</span>
+<span class="n">setValidValues</span><span class="p">(</span><span class="n">stringArg</span><span class="p">,</span> <span class="s">&quot;one two three&quot;</span><span class="p">);</span>  <span class="c1">// one of {&quot;one&quot;, &quot;two&quot;, &quot;three&quot;}</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">;</span>
+<span class="n">values</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">&quot;four&quot;</span><span class="p">);</span>
+<span class="n">values</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">&quot;five&quot;</span><span class="p">);</span>
+<span class="n">setValidValues</span><span class="p">(</span><span class="n">stringArg</span><span class="p">,</span> <span class="n">values</span><span class="p">);</span>  <span class="c1">// one of {&quot;four&quot;, &quot;five&quot;}</span>
+</pre></div>
+</div><p>An example for an input file option. Note that by changing <tt>INPUT_FILE</tt> to <tt>OUTPUT_FILE</tt> below,
+the example would be the same for output files.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">seqan</span><span class="o">::</span><span class="n">ArgParseArgument</span> <span class="n">fileArg</span><span class="p">(</span><span class="n">seqan</span><span class="o">::</span><span class="n">ArgParseArgument</span><span class="o">::</span><span class="n">INPUT_FILE</span><span class="p">);</span>
+<span class="n">setValidValues</span><span class="p">(</span><span class="n">fileArg</span><span class="p">,</span> <span class="s">&quot;fq fastq&quot;</span><span class="p">);</span>  <span class="c1">// file must end in &quot;.fq&quot; or &quot;.fastq&quot;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">;</span>
+<span class="n">values</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">&quot;sam&quot;</span><span class="p">);</span>
+<span class="n">values</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="s">&quot;bam&quot;</span><span class="p">);</span>
+<span class="n">setValidValues</span><span class="p">(</span><span class="n">fileArg</span><span class="p">,</span> <span class="n">values</span><span class="p">);</span>  <span class="c1">// file must end in &quot;.sam&quot; or &quot;.bam&quot;</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ArgParseArgument
+ * 
+ * @implements AssignableConcept
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Information for a specific command line argument.
+ * 
+ * @signature class ArgParseArgument
+ * 
+ * @fn ArgParseArgument::ArgParseArgument
+ * 
+ * @brief Constructor
+ * 
+ * @signature ArgParseArgument::ArgParseArgument(argumentType[, argumentLabel[,
+ *            isListArgument[, numberOfArgument]]]);
+ * 
+ * @param[in] argumentType Type of the argument
+ *                         (&lt;tt&gt;ArgParseArgument::ArgumentType&lt;/tt&gt;).
+ * @param[in] argumentLabel Label for the argument (&lt;tt&gt;char const *&lt;/tt&gt;).
+ * @param[in] isListArgument Whether or not this argument can be given multiple
+ *                           times (&lt;tt&gt;bool&lt;/tt&gt;).
+ * @param[in] numberOfArguments Number of times the argument must be given. E.g.
+ *                              set to 2 for the parser to always expect two
+ *                              values (&lt;tt&gt;int&lt;/tt&gt;, default is 1).
+ * 
+ * @fn ArgParseArgument#isListArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument can be given more than one time.
+ * 
+ * @signature bool isListArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it can be given multiple times, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isStringArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is a string.
+ * 
+ * @signature bool isStringArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is a string, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn ArgParseArgument#isIntegerArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is an integer.
+ * 
+ * @signature bool isIntegerArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is an integer, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn ArgParseArgument#isInt64Argument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is a 64 bit integer.
+ * 
+ * @signature bool isInt64Argument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is a 64 bit integer, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isDoubleArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is a double integer.
+ * 
+ * @signature bool isDoubleArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is a double argument, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isInputFileArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is a input file.
+ * 
+ * @signature bool isInputFileArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is a input file argument, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isOutputFileArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is a output file.
+ * 
+ * @signature bool isOutputFileArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is a output file argument, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isOutputPrefixArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is an output prefix.
+ * 
+ * @signature bool isOutputPrefixArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is an output prefix argument, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#isInputPrefixArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument is an input prefix argument.
+ * 
+ * @signature bool isInputPrefixArgument(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is an input prefix argument, &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn ArgParseArgument#getArgumentLabel
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Return argument label.
+ * 
+ * @signature std::string getArgumentLabel(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return std::string The argument label as a STL string.
+ * 
+ * @fn ArgParseArgument#setMinValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set smallest allowed value for the argument.
+ * 
+ * @signature void setMinValue(arg, minValue);
+ * 
+ * @param[in,out] arg The ArgParseArgument to set the smallest value of.
+ * @param[in] minValue The smallest value to set (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @fn ArgParseArgument#setMaxValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set smallest allowed value for the argument.
+ * 
+ * @signature void setMaxValue(arg, maxValue);
+ * 
+ * @param[in,out] arg The ArgParseArgument to set the smallest value of.
+ * @param[in] maxValue The largest value to set (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @fn ArgParseArgument#setValidValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set list of valid values.
+ * 
+ * @signature void setValidValues(arg, values);
+ * 
+ * @param[in,out] arg The ArgParseArgument to set the valid values for.
+ * @param[in] values Either a &lt;tt&gt;std::string&lt;/tt&gt; containing all valid entries,
+ *                   separated by spaces or a
+ *                   &lt;tt&gt;std::vector&amp;lt;std::string&amp;gt;&lt;/tt&gt; with the valid
+ *                   entries.
+ * 
+ * If the argument is of type string then the list of valid values is the case-
+ * sensitive list of string values allowed for this argument. If it is an input
+ * or output file then the list of valid values is a list of case-insentive file
+ * extensions identifying the allowed types.
+ * 
+ * @section Examples
+ * 
+ * An example of setting allowed values for a string option.
+ * 
+ * @code{.cpp}
+ * seqan::ArgParseArgument stringArg(seqan::ArgParseArgument::STRING);
+ * setValidValues(stringArg, &#34;one two three&#34;);  // one of {&#34;one&#34;, &#34;two&#34;, &#34;three&#34;}
+ * 
+ * std::vector&lt;std::string&gt; values;
+ * values.push_back(&#34;four&#34;);
+ * values.push_back(&#34;five&#34;);
+ * setValidValues(stringArg, values);  // one of {&#34;four&#34;, &#34;five&#34;}
+ * @endcode
+ * 
+ * 
+ * An example for an input file option. Note that by changing
+ * &lt;tt&gt;INPUT_FILE&lt;/tt&gt; to &lt;tt&gt;OUTPUT_FILE&lt;/tt&gt; below, the example would be the
+ * same for output files.
+ * 
+ * @code{.cpp}
+ * seqan::ArgParseArgument fileArg(seqan::ArgParseArgument::INPUT_FILE);
+ * setValidValues(fileArg, &#34;fq fastq&#34;);  // file must end in &#34;.fq&#34; or &#34;.fastq&#34;
+ * 
+ * std::vector&lt;std::string&gt; values;
+ * values.push_back(&#34;sam&#34;);
+ * values.push_back(&#34;bam&#34;);
+ * setValidValues(fileArg, values);  // file must end in &#34;.sam&#34; or &#34;.bam&#34;
+ * @endcode
+ * 
+ * 
+ * @fn ArgParseArgument#setHelpText
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the help text for an ArgParseArgument.
+ * 
+ * @signature void setHelpText(arg, text);
+ * 
+ * @param[in,out] arg The ArgParseArgument to set the help text for.
+ * @param[in] text The text to display as the description of the argument
+ *                 (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * 
+ * @fn ArgParseArgument#getArgumentValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Return the value of the argument.
+ * 
+ * @signature std::string getArgumentValue(arg[, argNo]);
+ * 
+ * @param[in,out] arg The ArgParseArgument to query.
+ * @param[in] argNo In case that the ArgParseArgument allowed multiple values,
+ *                  give the index of the argument that you want to retrieve
+ *                  (&lt;tt&gt;unsigned&lt;/tt&gt;, starts at 0).
+ * 
+ * @return std::string Const-reference to the argument value.
+ * 
+ * @fn ArgParseArgument#getArgumentValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Return all values of the argument.
+ * 
+ * @signature std::vector&lt;std::string&gt; getArgumentValue(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return std::vector&lt;std::string&gt; Const-reference to the argument values.
+ * 
+ * @fn ArgParseArgument#hasArgumentValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Return whether a value is available.
+ * 
+ * @signature bool hasValue(arg[, pos]);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * @param[in] pos The position of the argument in case of being a list
+ *                (&lt;tt&gt;unsigned&lt;/tt&gt;, 0-based, default is 0).
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;pos&lt;/tt&gt; is less than the size and the
+ *              argument is non-empty.
+ * 
+ * @fn ArgParseArgument#isSet
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns true if a value was assigned to the argument.
+ * 
+ * @signature bool isSet(arg):
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if a value was assigned, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn ArgParseArgument#hasDefault
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the argument has a default value.
+ * 
+ * @signature bool hasDefault(arg);
+ * 
+ * @param[in] arg The argument to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the argument has a default value and
+ *              &lt;tt&gt;false&lt;/tt&gt; if not.
+ * 
+ * @fn ArgParseArgument#numberOfAllowedValues
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns the number of allowed values for this ArgParseArgument.
+ * 
+ * @signature unsigned numberOfAllowedValues(arg);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * 
+ * @return unsigned The number of allowed values.
+ * 
+ * @fn ArgParseArgument#getFileExtension
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns the file extension for the given file argument.
+ * 
+ * @signature std::string getFileExtension(arg[, pos]);
+ * 
+ * @param[in] arg The ArgParseArgument to query.
+ * @param[in] pos The position of the value to retrieve if multiple values
+ *                (&lt;tt&gt;unsigned&lt;/tt&gt;).
+ * 
+ * @return std::string The file extension, empty if no extension or not set.
+ * 
+ * Only valid when argument is an INPUT_FILE or OUTPUT_FILE.
+ * 
+ * Halts the program if not an input or output file argument.
+ * 
+ * Can be overridden with special hidden options. For arguments, you can pass
+ * &lt;tt&gt;--arg-&amp;lt;num&amp;gt;-file-ext&lt;/tt&gt; for argument &lt;tt&gt;num&lt;/tt&gt;. For
+ * parameters, you can pass &lt;tt&gt;--&amp;lt;param-name&amp;gt;-file-ext&lt;/tt&gt; for the
+ * option named &lt;tt&gt;param-name&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

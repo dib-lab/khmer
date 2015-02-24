@@ -1,0 +1,1562 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_bamtagsdict" data-page="BamTagsDict">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>BamTagsDict - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>BamTagsDict<div><div>Indexes start positions of BAM tags in a <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a> and provides a dict-like API.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/bam_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class BamTagsDict;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%3A%3ABamTagsDict" title="#BamTagsDict::BamTagsDict (interface function)" data-lang-entity="member_function">BamTagsDict::BamTagsDict();</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23appendTagValue" title="#BamTagsDict#appendTagValue (interface function)" data-lang-entity="interface_function">bool appendTagValue(tags, key, val[, typeC]);</a></code></span>
+    <span class="summary_desc"><div>Append a tag/value pair to a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23buildIndex" title="#BamTagsDict#buildIndex (interface function)" data-lang-entity="interface_function">void buildIndex(bamTags);</a></code></span>
+    <span class="summary_desc"><div>Build index for a BamTagsDict object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23eraseTag" title="#BamTagsDict#eraseTag (interface function)" data-lang-entity="interface_function">bool eraseTag(tagsDict, key);</a></code></span>
+    <span class="summary_desc"><div>Erase a tag from BamTagsDict.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23extractTagValue" title="#BamTagsDict#extractTagValue (interface function)" data-lang-entity="interface_function">bool extractTagValue(dest, tags, id)</a></code></span>
+    <span class="summary_desc"><div>Extract and cast "atomic" value from tags string with index <tt>id</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23findTagKey" title="#BamTagsDict#findTagKey (interface function)" data-lang-entity="interface_function">bool findTagKey(id, tagsDict, key);</a></code></span>
+    <span class="summary_desc"><div>Find a tag by its key for a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23getTagKey" title="#BamTagsDict#getTagKey (interface function)" data-lang-entity="interface_function">TKey getTagKey(tagsDict, id);</a></code></span>
+    <span class="summary_desc"><div>Return key of a tag by index.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23getTagType" title="#BamTagsDict#getTagType (interface function)" data-lang-entity="interface_function">char getTagType(tags, id);</a></code></span>
+    <span class="summary_desc"><div>Returns the tag type char for an entry of a BamTagsDict.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23hasIndex" title="#BamTagsDict#hasIndex (interface function)" data-lang-entity="interface_function">bool hasIndex(dict);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the BamTagsDict has an index.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23length" title="#BamTagsDict#length (interface function)" data-lang-entity="interface_function">unsigned length(tagsDict);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of entries in a BamTagsDict.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#BamTagsDict%23setTagValue" title="#BamTagsDict#setTagValue (interface function)" data-lang-entity="interface_function">bool setTagValue(tags, key, val[, typeC]);</a></code></span>
+    <span class="summary_desc"><div>Set the value of a tag through a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Example</h3><div data-src-path="demos/bam_io/bam_tags_dict.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;</span>
+<span class="cp">#include &lt;seqan/bam_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">CharString</span> <span class="n">bamStr</span><span class="p">,</span> <span class="n">samStr</span> <span class="o">=</span> <span class="s">&quot;AA:Z:value1</span><span class="se">\t</span><span class="s">AB:Z:value2</span><span class="se">\t</span><span class="s">AC:i:30&quot;</span><span class="p">;</span>
+    <span class="n">assignTagsSamToBam</span><span class="p">(</span><span class="n">bamStr</span><span class="p">,</span> <span class="n">samStr</span><span class="p">);</span>
+    <span class="n">BamTagsDict</span> <span class="n">tags</span><span class="p">(</span><span class="n">bamStr</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>  <span class="c1">// #=&gt; &quot;3&quot;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">id</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">tags</span><span class="p">);</span> <span class="o">++</span><span class="n">id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">getTagKey</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">id</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; -&gt; &quot;</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">getTagType</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">id</span><span class="p">)</span> <span class="o">==</span> <span class="sc">&#39;i&#39;</span><span class="p">)</span>  <span class="c1">// is 32 bit integer</span>
+        <span class="p">{</span>
+            <span class="kr">__int32</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="kt">bool</span> <span class="n">res</span> <span class="o">=</span> <span class="n">extractTagValue</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">id</span><span class="p">);</span>
+            <span class="n">SEQAN_ASSERT_MSG</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s">&quot;Not a valid integer at pos %u!&quot;</span><span class="p">,</span> <span class="n">id</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">getTagType</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">id</span><span class="p">)</span> <span class="o">==</span> <span class="sc">&#39;Z&#39;</span><span class="p">)</span>  <span class="c1">// is string</span>
+        <span class="p">{</span>
+            <span class="n">CharString</span> <span class="n">str</span><span class="p">;</span>
+            <span class="kt">bool</span> <span class="n">res</span> <span class="o">=</span> <span class="n">extractTagValue</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">id</span><span class="p">);</span>
+            <span class="n">SEQAN_ASSERT_MSG</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s">&quot;Not a valid string at pos %u!&quot;</span><span class="p">,</span> <span class="n">id</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;&quot;&#39;</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;&quot;&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/bam_io/bam_tags_dict.cpp" target="_top">demos/bam_io/bam_tags_dict.cpp</a></div></div><p>Output is:</p><pre class="console" data-src-path="demos/bam_io/bam_tags_dict.cpp.stdout">3
+AA -&gt; "value1"
+AB -&gt; "value2"
+AC -&gt; 30
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="global_function_getBamTypeChar.html" data-lang-entity="global_function">getBamTypeChar</a></li>
+  
+  <li><a href="global_function_getBamTypeSize.html" data-lang-entity="global_function">getBamTypeSize</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="BamTagsDict::BamTagsDict" class="signature first" data-lang-entity="member_function">
+      <code>BamTagsDict::BamTagsDict();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="BamTagsDict#appendTagValue" class="signature first" data-lang-entity="interface_function">
+      <code>bool appendTagValue(tags, key, val[, typeC]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a tag/value pair to a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">tags</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key of the tag. Must be a sequence of length 2.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The value to set the tag to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">typeC</code>
+            
+        
+      </th>
+      <td>BAM type char to use. For portability (so the generated files are the same on all platforms), use
+a signed/unsigned qualified type for <tt>val</tt> or give <tt>typeC</tt>. Also see the remarks
+for <a href="global_function_getBamTypeChar.html" data-lang-entity="global_function">getBamTypeChar</a>. Types: getBamTypeChar@.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure. This function can fail if the key is not a valid tag id (e.g. does
+not have length 2) or if the type of <tt>val</tt> is not an atomic value or a string (anything but
+<tt>char *</tt>, <tt>char const *</tt>, a character, integer or float type is invalid).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p><a href="class_BamTagsDict.html#BamTagsDict#setTagValue" data-lang-entity="interface_function">setTagValue</a> behaves like <tt>appendTagValue</tt> if <tt>key</tt> was not part of <tt>tags</tt>
+before. However, in this case <tt>appendTagValue</tt> is faster.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#buildIndex" class="signature" data-lang-entity="interface_function">
+      <code>void buildIndex(bamTags);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Build index for a BamTagsDict object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bamTags</code>
+            
+        
+      </th>
+      <td>The BamTagsDict object to build the index for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#eraseTag" class="signature" data-lang-entity="interface_function">
+      <code>bool eraseTag(tagsDict, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Erase a tag from BamTagsDict.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">tagsDict</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to erase the tag from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key of the tag to erase.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the tag could be erased, <tt>false</tt> if the key wasn't present.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#extractTagValue" class="signature" data-lang-entity="interface_function">
+      <code>bool extractTagValue(dest, tags, id)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Extract and cast "atomic" value from tags string with index <tt>id</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">dest</code>
+            
+        
+      </th>
+      <td>The variable to write the value to.The value is first copied in a variable of the type indicated in
+the BAM file. Then it is cast into the type of <tt>dest</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tags</code>
+            
+        
+      </th>
+      <td>The BamTagsDict object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the tag to extract the value from. See <a href="class_BamTagsDict.html#BamTagsDict#findTagKey" data-lang-entity="interface_function">findTagKey</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the value could be extracted.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The function only works for atomic types such as <tt>int</tt>, not for <tt>char*</tt> or arrays.</p><p>See <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> for an example.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#findTagKey" class="signature" data-lang-entity="interface_function">
+      <code>bool findTagKey(id, tagsDict, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Find a tag by its key for a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">id</code>
+            
+        
+      </th>
+      <td>The id of the found tag.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tagsDict</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key to query for: <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the key could be found and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#getTagKey" class="signature" data-lang-entity="interface_function">
+      <code>TKey getTagKey(tagsDict, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return key of a tag by index.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tagsDict</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The index of the dict entry.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TKey</code></th>
+        <td>An infix of a <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>. Will be a two-character char sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#getTagType" class="signature" data-lang-entity="interface_function">
+      <code>char getTagType(tags, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the tag type char for an entry of a BamTagsDict.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tags</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The id of the tag for which to determine the type. See <a href="class_BamTagsDict.html#BamTagsDict#findTagKey" data-lang-entity="interface_function">findTagKey</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>char</code></th>
+        <td>A <tt>char</tt> that identifies the tag type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#hasIndex" class="signature" data-lang-entity="interface_function">
+      <code>bool hasIndex(dict);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the BamTagsDict has an index.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dict</code>
+            
+        
+      </th>
+      <td>The <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a> to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>dict</tt> has an index and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#length" class="signature" data-lang-entity="interface_function">
+      <code>unsigned length(tagsDict);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of entries in a BamTagsDict.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tagsDict</code>
+            
+        
+      </th>
+      <td>The BamTagsDict object to query for its length.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of entries in the BamTagsDict. <tt>TSize</tt> is the result of
+<tt>Size&lt;BamTagsDict&gt;::Type</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="BamTagsDict#setTagValue" class="signature" data-lang-entity="interface_function">
+      <code>bool setTagValue(tags, key, val[, typeC]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the value of a tag through a <a href="class_BamTagsDict.html" data-lang-entity="class">BamTagsDict</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">tags</code>
+            
+        
+      </th>
+      <td>The BamTagsDict to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key of the tag. Must be a sequence of length 2.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The value to set the tag to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">typeC</code>
+            
+        
+      </th>
+      <td>BAM type char to use. For portability (so the generated files are the same on all platforms), use
+a signed/unsigned qualified type for <tt>val</tt> or give <tt>typeC</tt>. Also see the remarks
+for <a href="global_function_getBamTypeChar.html" data-lang-entity="global_function">getBamTypeChar</a>. Types: getBamTypeChar@.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure. This function can fail if the key is not a valid tag id (e.g. does
+not have length 2) or if the type of <tt>val</tt> is not an atomic value or a string (anything but
+<tt>char *</tt>, <tt>char const *</tt>, a character, integer or float type is invalid).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Note that <tt>setTagValue</tt> does not cast the type, so <tt>typeC</tt> only influences the type character written
+out but <tt>val</tt> is written out in binary without modification.</p><h4>Examples</h4><p>An example setting some atomic tag values.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">CharString</span> <span class="n">rawTagsText</span><span class="p">;</span>
+<span class="n">BamTagsDict</span> <span class="nf">tags</span><span class="p">(</span><span class="n">rawTagsText</span><span class="p">);</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XA&quot;</span><span class="p">,</span> <span class="mi">9</span><span class="p">);</span>    <span class="c1">// int</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XB&quot;</span><span class="p">,</span> <span class="mi">9u</span><span class="p">);</span>   <span class="c1">// unsigned int</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XC&quot;</span><span class="p">,</span> <span class="sc">&#39;X&#39;</span><span class="p">);</span>  <span class="c1">// char</span>
+</pre></div>
+</div><p>If <tt>char</tt> is equal to <tt>__int8</tt> or <tt>__uint8</tt> then the last line produces an entry with type 'c'
+or 'C'. To make sure that the type char 'A' (for "printable character") is written to the file, give it explicitely:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XC&quot;</span><span class="p">,</span> <span class="sc">&#39;X&#39;</span><span class="p">,</span> <span class="sc">&#39;A&#39;</span><span class="p">);</span>  <span class="c1">// Overrwrite XC, enforce type &#39;printable character&#39;.</span>
+</pre></div>
+</div><p>Note that on most systems <tt>int</tt>s have a width of 32 bytes, but the C++ standard leaves this open. For all
+types but characters, you should not give an explicit type char but use one of the types with explicit width and
+signed/unsigned qualifier such as <tt>__int32</tt>, <tt>__uint32</tt> etc.</p><div data-src-path="None"><div class="highlight"><pre><span class="c1">// The following is not recommended since the type of &lt;tt&gt;x&lt;/tt&gt; is not &quot;unsigned 32 bit int.&quot;</span>
+<span class="kr">__int32</span> <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XB&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="sc">&#39;I&#39;</span><span class="p">);</span>
+<span class="c1">// Instead, explicitely use an unsigned type if you need one.  Note that your compiler</span>
+<span class="c1">// might warn you about assigning -1 to an unsigned variable so you know that you are</span>
+<span class="c1">// probably doing something unintended.</span>
+<span class="n">__uint32</span> <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XB&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+
+<span class="c1">// Do not do this!</span>
+<span class="n">setTagValue</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s">&quot;XA&quot;</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="sc">&#39;f&#39;</span><span class="p">);</span>    <span class="c1">// BOGUS since 9 is not a floating point number.</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="global_function_getBamTypeChar.html" data-lang-entity="global_function">getBamTypeChar</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class BamTagsDict
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Indexes start positions of BAM tags in a @link CharString @endlink and
+ *        provides a dict-like API.
+ * 
+ * @signature class BamTagsDict;
+ * 
+ * @section Example
+ * 
+ * @include demos/bam_io/bam_tags_dict.cpp
+ * 
+ * Output is:
+ * 
+ * @include demos/bam_io/bam_tags_dict.cpp.stdout
+ * 
+ * @see getBamTypeSize
+ * @see getBamTypeChar
+ * 
+ * @fn BamTagsDict::BamTagsDict
+ * 
+ * @brief Constructor
+ * 
+ * @signature BamTagsDict::BamTagsDict();
+ * 
+ * @fn BamTagsDict#hasIndex
+ * 
+ * @brief Returns whether the BamTagsDict has an index.
+ * 
+ * @signature bool hasIndex(dict);
+ * 
+ * @param[in] dict The @link BamTagsDict @endlink to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;dict&lt;/tt&gt; has an index and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn BamTagsDict#buildIndex
+ * 
+ * @brief Build index for a BamTagsDict object.
+ * 
+ * @signature void buildIndex(bamTags);
+ * 
+ * @param[in,out] bamTags The BamTagsDict object to build the index for.
+ * 
+ * @fn BamTagsDict#length
+ * 
+ * @brief Returns the number of entries in a BamTagsDict.
+ * 
+ * @signature unsigned length(tagsDict);
+ * 
+ * @param[in] tagsDict The BamTagsDict object to query for its length.
+ * 
+ * @return TSize The number of entries in the BamTagsDict. &lt;tt&gt;TSize&lt;/tt&gt; is the
+ *               result of &lt;tt&gt;Size&amp;lt;BamTagsDict&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * @fn BamTagsDict#getTagType
+ * 
+ * @brief Returns the tag type char for an entry of a BamTagsDict.
+ * 
+ * @signature char getTagType(tags, id);
+ * 
+ * @param[in] tags The BamTagsDict to query.
+ * @param[in] id The id of the tag for which to determine the type. See @link
+ *               BamTagsDict#findTagKey @endlink.
+ * 
+ * @return char A &lt;tt&gt;char&lt;/tt&gt; that identifies the tag type.
+ * 
+ * @fn BamTagsDict#getTagKey
+ * 
+ * @brief Return key of a tag by index.
+ * 
+ * @signature TKey getTagKey(tagsDict, id);
+ * 
+ * @param[in] tagsDict The BamTagsDict to query.
+ * @param[in] id The index of the dict entry.
+ * 
+ * @return TKey An infix of a @link CharString @endlink. Will be a two-character
+ *              char sequence.
+ * 
+ * @fn BamTagsDict#findTagKey
+ * 
+ * @brief Find a tag by its key for a @link BamTagsDict @endlink object.
+ * 
+ * @signature bool findTagKey(id, tagsDict, key);
+ * 
+ * @param[out] id The id of the found tag.
+ * @param[in] tagsDict The BamTagsDict to query.
+ * @param[in] key The key to query for: @link CharString @endlink.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the key could be found and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @fn BamTagsDict#extractTagValue
+ * 
+ * @brief Extract and cast &#34;atomic&#34; value from tags string with index
+ *        &lt;tt&gt;id&lt;/tt&gt;.
+ * 
+ * @signature bool extractTagValue(dest, tags, id)
+ * 
+ * @param[out] dest The variable to write the value to.The value is first copied
+ *                  in a variable of the type indicated in the BAM file. Then it
+ *                  is cast into the type of &lt;tt&gt;dest&lt;/tt&gt;.
+ * @param[in] tags The BamTagsDict object to query.
+ * @param[in] id The id of the tag to extract the value from. See @link
+ *               BamTagsDict#findTagKey @endlink.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the value could be extracted.
+ * 
+ * @section Remarks
+ * 
+ * The function only works for atomic types such as &lt;tt&gt;int&lt;/tt&gt;, not for
+ * &lt;tt&gt;char*&lt;/tt&gt; or arrays.
+ * 
+ * See @link BamTagsDict @endlink for an example.
+ * 
+ * @fn BamTagsDict#setTagValue
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Set the value of a tag through a @link BamTagsDict @endlink.
+ * 
+ * @signature bool setTagValue(tags, key, val[, typeC]);
+ * 
+ * @param[in,out] tags The BamTagsDict to modify.
+ * @param[in] key The key of the tag. Must be a sequence of length 2.
+ * @param[in] val The value to set the tag to.
+ * @param[in] typeC BAM type char to use. For portability (so the generated
+ *                  files are the same on all platforms), use a signed/unsigned
+ *                  qualified type for &lt;tt&gt;val&lt;/tt&gt; or give &lt;tt&gt;typeC&lt;/tt&gt;. Also
+ *                  see the remarks for @link getBamTypeChar @endlink. Types:
+ *                  getBamTypeChar@.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure. This
+ *              function can fail if the key is not a valid tag id (e.g. does
+ *              not have length 2) or if the type of &lt;tt&gt;val&lt;/tt&gt; is not an
+ *              atomic value or a string (anything but &lt;tt&gt;char *&lt;/tt&gt;, &lt;tt&gt;char
+ *              const *&lt;/tt&gt;, a character, integer or float type is invalid).
+ * 
+ * @section Remarks
+ * 
+ * Note that &lt;tt&gt;setTagValue&lt;/tt&gt; does not cast the type, so &lt;tt&gt;typeC&lt;/tt&gt; only
+ * influences the type character written out but &lt;tt&gt;val&lt;/tt&gt; is written out in
+ * binary without modification.
+ * 
+ * @section Examples
+ * 
+ * An example setting some atomic tag values.
+ * 
+ * @code{.cpp}
+ * CharString rawTagsText;
+ * BamTagsDict tags(rawTagsText);
+ * setTagValue(tags, &#34;XA&#34;, 9);    // int
+ * setTagValue(tags, &#34;XB&#34;, 9u);   // unsigned int
+ * setTagValue(tags, &#34;XC&#34;, &#39;X&#39;);  // char
+ * @endcode
+ * 
+ * 
+ * If &lt;tt&gt;char&lt;/tt&gt; is equal to &lt;tt&gt;__int8&lt;/tt&gt; or &lt;tt&gt;__uint8&lt;/tt&gt; then the
+ * last line produces an entry with type &#39;c&#39; or &#39;C&#39;. To make sure that the type
+ * char &#39;A&#39; (for &#34;printable character&#34;) is written to the file, give it
+ * explicitely:
+ * 
+ * @code{.cpp}
+ * setTagValue(tags, &#34;XC&#34;, &#39;X&#39;, &#39;A&#39;);  // Overrwrite XC, enforce type &#39;printable character&#39;.
+ * @endcode
+ * 
+ * 
+ * Note that on most systems &lt;tt&gt;int&lt;/tt&gt;s have a width of 32 bytes, but the C++
+ * standard leaves this open. For all types but characters, you should not give
+ * an explicit type char but use one of the types with explicit width and
+ * signed/unsigned qualifier such as &lt;tt&gt;__int32&lt;/tt&gt;, &lt;tt&gt;__uint32&lt;/tt&gt; etc.
+ * 
+ * @code{.cpp}
+ * // The following is not recommended since the type of &lt;tt&gt;x&lt;/tt&gt; is not &#34;unsigned 32 bit int.&#34;
+ * __int32 x = -1;
+ * setTagValue(tags, &#34;XB&#34;, x, &#39;I&#39;);
+ * // Instead, explicitely use an unsigned type if you need one.  Note that your compiler
+ * // might warn you about assigning -1 to an unsigned variable so you know that you are
+ * // probably doing something unintended.
+ * __uint32 y = -1;
+ * setTagValue(tags, &#34;XB&#34;, y);
+ * 
+ * // Do not do this!
+ * setTagValue(tags, &#34;XA&#34;, 9, &#39;f&#39;);    // BOGUS since 9 is not a floating point number.
+ * @endcode
+ * 
+ * 
+ * @see getBamTypeChar
+ * 
+ * @fn BamTagsDict#appendTagValue
+ * 
+ * @headerfile &lt;seqan/bam_io.h&gt;
+ * 
+ * @brief Append a tag/value pair to a @link BamTagsDict @endlink.
+ * 
+ * @signature bool appendTagValue(tags, key, val[, typeC]);
+ * 
+ * @param[in,out] tags The BamTagsDict to modify.
+ * @param[in] key The key of the tag. Must be a sequence of length 2.
+ * @param[in] val The value to set the tag to.
+ * @param[in] typeC BAM type char to use. For portability (so the generated
+ *                  files are the same on all platforms), use a signed/unsigned
+ *                  qualified type for &lt;tt&gt;val&lt;/tt&gt; or give &lt;tt&gt;typeC&lt;/tt&gt;. Also
+ *                  see the remarks for @link getBamTypeChar @endlink. Types:
+ *                  getBamTypeChar@.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure. This
+ *              function can fail if the key is not a valid tag id (e.g. does
+ *              not have length 2) or if the type of &lt;tt&gt;val&lt;/tt&gt; is not an
+ *              atomic value or a string (anything but &lt;tt&gt;char *&lt;/tt&gt;, &lt;tt&gt;char
+ *              const *&lt;/tt&gt;, a character, integer or float type is invalid).
+ * 
+ * @section Remarks
+ * 
+ * @link BamTagsDict#setTagValue @endlink behaves like &lt;tt&gt;appendTagValue&lt;/tt&gt;
+ * if &lt;tt&gt;key&lt;/tt&gt; was not part of &lt;tt&gt;tags&lt;/tt&gt; before. However, in this case
+ * &lt;tt&gt;appendTagValue&lt;/tt&gt; is faster.
+ * 
+ * @fn BamTagsDict#eraseTag
+ * 
+ * @brief Erase a tag from BamTagsDict.
+ * 
+ * @signature bool eraseTag(tagsDict, key);
+ * 
+ * @param[in,out] tagsDict The BamTagsDict to erase the tag from.
+ * @param[in] key The key of the tag to erase.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the tag could be erased, &lt;tt&gt;false&lt;/tt&gt; if the
+ *              key wasn&#39;t present.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

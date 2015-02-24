@@ -1,0 +1,844 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_maxrepeatsiterator" data-page="MaxRepeatsIterator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Max Repeats Iterator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>Max Repeats Iterator<div><div>Iterator to search for all maximal repeats.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="specialization_BottomUpIterator.html" data-lang-entity="specialization">BottomUpIterator</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="specialization_BottomUpIterator.html" data-lang-entity="specialization">BottomUpIterator</a>, 
+    <a href="class_Iter.html" data-lang-entity="class">Iter</a>, 
+    <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_CopyConstructibleConcept.html" data-lang-entity="concept">CopyConstructibleConcept</a>, 
+    <a href="concept_DefaultConstructibleConcept.html" data-lang-entity="concept">DefaultConstructibleConcept</a>, 
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>, 
+    <a href="concept_ForwardIteratorConcept.html" data-lang-entity="concept">ForwardIteratorConcept</a>, 
+    <a href="concept_InputIteratorConcept.html" data-lang-entity="concept">InputIteratorConcept</a>, 
+    <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>Iterator&lt;TContainer, MaxRepeats&gt;::Type;
+template &lt;typename TContainer&gt;
+class Iter&lt;TContainer, VSTree&lt; BottomUp&lt;MaxRepeats&gt; &gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TContainer</a></code></th>
+        <td>Type of an index that can be iterated with a bottom-up
+iterator. Types: IndexEsa</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MaxRepeatsIterator%3A%3AIter" title="#MaxRepeatsIterator::Iter (interface function)" data-lang-entity="member_function">Iter::Iter(index[, minLength]);, Iter::Iter(iterator);</a></code></span>
+    <span class="summary_desc"><div>The constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="specialization_BottomUpIterator.html" data-lang-entity="specialization">BottomUpIterator</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_BottomUpIterator.html#BottomUpIterator::Iter" data-lang-entity="member_function">Iter</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter::Iter" data-lang-entity="member_function">Iter</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator!=" data-lang-entity="member_function">operator!=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator==" data-lang-entity="member_function">operator==</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MaxRepeatsIterator%23length" title="#MaxRepeatsIterator#length (interface function)" data-lang-entity="interface_function">TSize length(it);</a></code></span>
+    <span class="summary_desc"><div>Return the number of repeats.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="specialization_BottomUpIterator.html" data-lang-entity="specialization">BottomUpIterator</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_BottomUpIterator.html#BottomUpIterator#goBegin" data-lang-entity="interface_function">goBegin</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#alignment" data-lang-entity="interface_function">alignment</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#assignProperty" data-lang-entity="interface_function">assignProperty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#atEnd" data-lang-entity="interface_function">atEnd</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#childrenAreLeaves" data-lang-entity="interface_function">childrenAreLeaves</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#countChildren" data-lang-entity="interface_function">countChildren</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#countOccurrences" data-lang-entity="interface_function">countOccurrences</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#getFrequency" data-lang-entity="interface_function">getFrequency</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#getOccurrence" data-lang-entity="interface_function">getOccurrence</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#getOccurrences" data-lang-entity="interface_function">getOccurrences</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#getOccurrencesBwt" data-lang-entity="interface_function">getOccurrencesBwt</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#getProperty" data-lang-entity="interface_function">getProperty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#goBegin" data-lang-entity="interface_function">goBegin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#goNext" data-lang-entity="interface_function">goNext</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#goRoot" data-lang-entity="interface_function">goRoot</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isLeaf" data-lang-entity="interface_function">isLeaf</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isLeftMaximal" data-lang-entity="interface_function">isLeftMaximal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isPartiallyLeftExtensible" data-lang-entity="interface_function">isPartiallyLeftExtensible</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isRightTerminal" data-lang-entity="interface_function">isRightTerminal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isRoot" data-lang-entity="interface_function">isRoot</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#isUnique" data-lang-entity="interface_function">isUnique</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#nodeHullPredicate" data-lang-entity="interface_function">nodeHullPredicate</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#nodePredicate" data-lang-entity="interface_function">nodePredicate</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#property" data-lang-entity="interface_function">property</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#range" data-lang-entity="interface_function">range</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#repLength" data-lang-entity="interface_function">repLength</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_InputIteratorConcept.html" data-lang-entity="concept">InputIteratorConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_InputIteratorConcept.html#InputIteratorConcept#operator++(suffix)" data-lang-entity="interface_function">operator++(suffix)</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_InputIteratorConcept.html#InputIteratorConcept#operator++(prefix)" data-lang-entity="interface_function">operator++(prefix)</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_InputIteratorConcept.html#InputIteratorConcept#operator->" data-lang-entity="interface_function">operator-&gt;</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_InputIteratorConcept.html#InputIteratorConcept#goNext" data-lang-entity="interface_function">goNext</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#operator*" data-lang-entity="interface_function">operator*</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Container" data-lang-entity="interface_metafunction">Container</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterComplementConst" data-lang-entity="interface_metafunction">IterComplementConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterMakeConst" data-lang-entity="interface_metafunction">IterMakeConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Spec" data-lang-entity="interface_metafunction">Spec</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="specialization_VSTreeIterator.html#VSTreeIterator#EdgeLabel" data-lang-entity="interface_metafunction">EdgeLabel</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Pointer" data-lang-entity="interface_metafunction">Pointer</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+        
+        <div class="note info"><strong>Note:</strong> <div class='inline'>
+            <p>Instead of using the class Iter directly we recommend to use the result of the metafunction
+Iterator&lt;TContainer, MaxRepeats&gt;::Type (which is Iter&lt;TContainer, VSTree&lt; BottomUp&lt;MaxRepeats&gt; &gt; &gt;).</p>
+         </div></div>
+        
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="page_DemoMaximalRepeats.html" data-lang-entity="page">DemoMaximalRepeats</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="MaxRepeatsIterator::Iter" class="signature first" data-lang-entity="member_function">
+      <code>Iter::Iter(index[, minLength]);
+Iter::Iter(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The index to be used for the iteration. Types: <a href="specialization_IndexEsa.html" data-lang-entity="specialization">IndexEsa</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">minLength</code>
+            
+        
+      </th>
+      <td>Minimum length of the supermaximal repeats, default value is 1.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>Another MaxRepeats iterator. Types: <a href="specialization_MaxRepeatsIterator.html" data-lang-entity="specialization">MaxRepeatsIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="MaxRepeatsIterator#length" class="signature first" data-lang-entity="interface_function">
+      <code>TSize length(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the number of repeats.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The MaxRepeatsIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of found repeats.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class MaxRepeatsIterator Max Repeats Iterator
+ * 
+ * @extends BottomUpIterator
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Iterator to search for all maximal repeats.
+ * 
+ * @note Instead of using the class Iter directly we recommend to use the result
+ *       of the metafunction Iterator&amp;lt;TContainer, MaxRepeats&amp;gt;::Type (which
+ *       is Iter&lt;TContainer, VSTree&lt; BottomUp&lt;MaxRepeats&amp;gt; &amp;gt; &amp;gt;).
+ * 
+ * @signature Iterator&lt;TContainer, MaxRepeats&gt;::Type;
+ * @signature template &lt;typename TContainer&gt; class Iter&lt;TContainer, VSTree&lt;
+ *            BottomUp&lt;MaxRepeats&gt; &gt; &gt;;
+ * 
+ * @tparam TContainer Type of an index that can be iterated with a bottom-up
+ *                    iterator. Types: IndexEsa
+ * 
+ * @see DemoMaximalRepeats
+ * 
+ * @fn MaxRepeatsIterator::Iter
+ * 
+ * @brief The constructor
+ * 
+ * @signature Iter::Iter(index[, minLength]);
+ * @signature Iter::Iter(iterator);
+ * 
+ * @param[in] index The index to be used for the iteration. Types: @link
+ *                  IndexEsa @endlink
+ * @param[in] minLength Minimum length of the supermaximal repeats, default
+ *                      value is 1.
+ * @param[in] iterator Another MaxRepeats iterator. Types: @link
+ *                     MaxRepeatsIterator @endlink
+ * 
+ * @fn MaxRepeatsIterator#length
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Return the number of repeats.
+ * 
+ * @signature TSize length(it);
+ * 
+ * @param[in] it The MaxRepeatsIterator to query.
+ * 
+ * @return TSize The number of found repeats.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>
