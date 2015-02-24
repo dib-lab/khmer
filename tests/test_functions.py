@@ -9,7 +9,8 @@ from nose.plugins.attrib import attr
 import os
 import khmer_tst_utils as utils
 import collections
-from khmer.utils import check_is_pair, broken_paired_reader
+from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
+                         check_is_right)
 
 
 def test_forward_hash():
@@ -139,6 +140,20 @@ def test_check_is_pair_3_fq():
     assert check_is_pair(read1, read2)
 
 
+def test_check_is_pair_3_broken_fq_1():
+    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
+
+    assert not check_is_pair(read1, read2)
+
+
+def test_check_is_pair_3_broken_fq_2():
+    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq', quality='###', sequence='AAA')
+
+    assert not check_is_pair(read1, read2)
+
+
 def test_check_is_pair_3_fa():
     read1 = FakeFastaRead(name='seq 1::', sequence='AAA')
     read2 = FakeFastaRead(name='seq 2::', sequence='AAA')
@@ -187,6 +202,29 @@ def test_check_is_pair_7():
     read2 = FakeFastaRead(name='seq/1', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
+
+
+def test_check_is_right():
+    assert not check_is_right('seq1/1')
+    assert not check_is_right('seq1 1::N')
+    assert check_is_right('seq1/2')
+    assert check_is_right('seq1 2::N')
+
+    assert not check_is_right('seq')
+    assert not check_is_right('seq 2')
+
+
+def test_check_is_left():
+    assert check_is_left('seq1/1')
+    assert check_is_left('seq1 1::N')
+    assert not check_is_left('seq1/2')
+    assert not check_is_left('seq1 2::N')
+
+    assert not check_is_left('seq')
+    assert not check_is_left('seq 1')
+
+    assert check_is_left(
+        '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
 
 
 class Test_BrokenPairedReader(object):

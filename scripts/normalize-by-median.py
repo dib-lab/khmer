@@ -26,7 +26,7 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
-from khmer.utils import write_record
+from khmer.utils import write_record, check_is_pair
 DEFAULT_DESIRED_COVERAGE = 10
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
@@ -41,12 +41,6 @@ def batchwise(coll, size):
     return izip(*[iter_coll] * size)
 
 # Returns true if the pair of records are properly pairs
-
-
-def validpair(read0, read1):
-    return read0.name[-1] == "1" and \
-        read1.name[-1] == "2" and \
-        read0.name[0:-1] == read1.name[0:-1]
 
 
 # pylint: disable=too-many-locals,too-many-branches
@@ -64,7 +58,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     total = 0
     discarded = 0
     for index, batch in enumerate(batchwise(screed.open(
-            input_filename), batch_size)):
+            input_filename, parse_description=False), batch_size)):
         if index > 0 and index % 100000 == 0:
             print >>sys.stderr, '... kept {kept} of {total} or'\
                 ' {perc:2}%'.format(kept=total - discarded, total=total,
@@ -82,7 +76,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         # If in paired mode, check that the reads are properly interleaved
 
         if args.paired:
-            if not validpair(batch[0], batch[1]):
+            if not check_is_pair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
                     {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
 

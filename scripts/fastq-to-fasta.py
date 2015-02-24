@@ -42,7 +42,8 @@ def main():
     print >> sys.stderr, ('fastq from ', args.input_sequence)
 
     n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence)):
+    for n, record in enumerate(screed.open(args.input_sequence,
+                                           parse_description=False)):
         if n % 10000 == 0:
             print>>sys.stderr, '...', n
 

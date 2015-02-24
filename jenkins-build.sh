@@ -64,3 +64,7 @@ if type sloccount >/dev/null 2>&1
 then
 	make sloccount.sc
 fi
+
+# takes too long to run on every build
+#bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
+ 

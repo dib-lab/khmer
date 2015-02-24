@@ -1,3 +1,90 @@
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Update extension to use recommended practices,
+   PyLong instead of PyInt, Type initialization, PyBytes instead of PyString.
+   Replace common initialization with explicit type structs, and all types
+   conform to the CPython checklist.
+
+2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
+   column headers.
+   * tests/test_scripts.py: add coverage for the new --csv option in
+   abundance-dist.py
+
+2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: remove examples/stamps/do.sh testing for now; takes too
+   long to run on every build. Related to #836
+
+2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/interleave-reads.py: Make the output file name print nicely.
+
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added 'check_is_left' and 'check_is_right' functions;
+   fixed bug in check_is_pair.
+   * tests/test_functions.py: added tests for now-fixed bug in check_is_pair,
+   as well as 'check_is_left' and 'check_is_right'.
+   * scripts/interleave-reads.py: updated to handle Casava 1.8 formatting.
+   * scripts/split-paired-reads.py: fixed bug where sequences with bad names
+   got dropped; updated to properly handle Casava 1.8 names in FASTQ files.
+   * scripts/count-median.py: added '--csv' output format; updated to properly
+   handle Casava 1.8 FASTQ format when '--csv' is specified.
+   * scripts/normalize-by-median.py: replaced pair checking with
+   utils.check_is_pair(), which properly handles Casava 1.8 FASTQ format.
+   * tests/test_scripts.py: updated script tests to check Casava 1.8
+   formatting; fixed extract-long-sequences.py test.
+   * scripts/{extract-long-sequences.py,extract-paired-reads.py,
+   fastq-to-fasta.py,readstats.py,sample-reads-randomly.py,trim-low-abund.py},
+   khmer/thread_utils.py: updated to handle Casava 1.8 FASTQ format by
+   setting parse_description=False in screed.open(...).
+   * tests/test-data/{paired-mixed.fq,paired-mixed.fq.pe,random-20-a.fq,
+   test-abund-read-2.fq,test-abund-read-2.paired2.fq,test-abund-read-paired.fa,
+   test-abund-read-paired.fq}: switched some sequences over to Casava 1.8
+   format, to test format handling.
+   * tests/test-data/{casava_18-pe.fq,test-reads.fq.gz}: new test file for
+   Casava 1.8 format handling.
+   * tests/test-data/{overlap.curve,paired-mixed.fq.1,paired-mixed.fq.2,
+   simple_1.fa,simple_2.fa,simple_3.fa,test-colors.fa,test-est.fa,
+   test-graph3.fa,test-graph4.fa,test-graph6.fa}: removed no-longer used
+   test files.
+
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: set !linux flag by default, to avoid running tests that
+   request too much memory when 'nosetests' is run.  (This is an OS difference
+   where Mac OS X attempts to allocate as much memory as requested, while
+   on Linux it just crashes).
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/{hashbits.cc,hashbits.hh,
+   hashtable,tests/test_{c_wrapper,read_parsers}.py: remove unused callback
+   functionality
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: point to the latest screed release candidate to work around
+   versioneer bug.
+
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * examples/stamps/do.sh: the argument --savehash was changed to --savetable
+   and change mode to u+x
+   * jenkins-build.sh: add a test to check for the do.sh file
+
+2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * khmer/load_pe.py: Remove unused/undocumented module. See #784
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/normalize-by-align.py: "copyright header 2013-2015 was added"
+   * sandbob/read_aligner.py: "copyright header 2013-2015 was added"
+   * sandbox/slice-reads-by-coverage.py: "copyright header 2014  was added"
+
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
    * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
