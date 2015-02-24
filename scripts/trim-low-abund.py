@@ -154,7 +154,7 @@ def main():
 
         pass2list.append((filename, pass2filename, trimfilename))
 
-        screed_iter = screed.open(filename)
+        screed_iter = screed.open(filename, parse_description=False)
         pass2fp = open(pass2filename, 'w')
         trimfp = open(trimfilename, 'w')
 
@@ -251,7 +251,8 @@ def main():
         # to the first loop.
 
         trimfp = open(trimfilename, 'a')
-        for n, read in enumerate(screed.open(pass2filename)):
+        for n, read in enumerate(screed.open(pass2filename,
+                                             parse_description=False)):
             if n % 10000 == 0:
                 print >>sys.stderr, '... x 2', n, pass2filename, \
                     written_reads, written_bp
