@@ -8,12 +8,12 @@
 import glob
 import sys
 
-filelist = glob.glob(*R1*.fastq.gz)
+filelist = glob.glob('*R1*.fastq.gz')
 
 for r1 in filelist:
-    r2 = r1.replace(R1, R2)
-    final_pe = r1[:-9] + .pe.fq.gz
-    final_se = r1[:-9] + .se.fq.gz
+    r2 = r1.replace('R1', 'R2')
+    final_pe = r1[:-9] + '.pe.fq.gz'
+    final_se = r1[:-9] + '.se.fq.gz'
     print """\
 mkdir trim
 cd trim
