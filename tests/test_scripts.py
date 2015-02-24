@@ -1,5 +1,4 @@
 #
-
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -2700,9 +2699,9 @@ def test_counting():
     shutil.copyfile(utils.get_test_data('count.ct.gz'), infile)
     assert os.path.exists(infile), infile
     try:
-        test_ct = khmer.load_counting_hash(infile)
-    except IOError:
-        assert 0, "Can't load a counting table with bigcount set"
+    	test_ct = khmer.load_counting_hash(infile)
+    except:
+    	assert 0, "Can't load a counting table with bigcount set"
 
 
 def test_roundtrip_casava_format_1():
