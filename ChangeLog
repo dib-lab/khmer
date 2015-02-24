@@ -3,6 +3,11 @@
    * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
    reference correct links and function arguments.
 
+2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: remove examples/stamps/do.sh testing for now; takes too
+   long to run on every build. Related to #836
+
 2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
 
    * scripts/interleave-reads.py: Make the output file name print nicely.
