@@ -2711,18 +2711,6 @@ def test_roundtrip_casava_format_1():
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
 
-def test_counting():
-    infile = utils.get_temp_filename('test.fa')
-    indir=os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('count.ct.gz'), infile)
-    assert os.path.exists(infile), infile
-    try:
-    	test_ct = khmer.load_counting_hash(infile)  
-    except IOError:
-        raise 
-	raise Exception("Can't load a counting table with bigcount set")
-
-
 
 def test_roundtrip_casava_format_2():
     # check that split-paired-reads -> interleave-reads produces a file
