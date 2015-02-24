@@ -1,3 +1,22 @@
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Update extension to use recommended practices,
+   PyLong instead of PyInt, Type initialization, PyBytes instead of PyString.
+   Replace common initialization with explicit type structs, and all types
+   conform to the CPython checklist.
+
+2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
+   column headers.
+   * tests/test_scripts.py: add coverage for the new --csv option in
+   abundance-dist.py
+
+2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: remove examples/stamps/do.sh testing for now; takes too
+   long to run on every build. Related to #836
+
 2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
 
    * scripts/interleave-reads.py: Make the output file name print nicely.
