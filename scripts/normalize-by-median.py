@@ -192,6 +192,9 @@ def get_parser():
                         dest='single_output_filename',
                         default='', help='only output a single'
                         ' file with the specified filename')
+    parser.add_argument('--append', default=False, action='store_true',
+                        help='append reads to the outputfile. '
+                        'Only with -o specified')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
@@ -233,11 +236,15 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     discarded = 0
     input_filename = None
 
-    for index, input_filename in enumerate(args.input_filenames):
-        if args.single_output_filename != '':
-            output_name = args.single_output_filename
+    if args.single_output_filename:
+        output_name = args.single_output_filename
+        if args.append:
             outfp = open(args.single_output_filename, 'a')
         else:
+            outfp = open(args.single_output_filename, 'w')
+
+    for index, input_filename in enumerate(args.input_filenames):
+        if not args.single_output_filename:
             output_name = os.path.basename(input_filename) + '.keep'
             outfp = open(output_name, 'w')
 
