@@ -13,6 +13,11 @@
    * tests/test_scripts.py: add a test for the --append option in
    normalize-by-median.py
 
+2015-02-25  Titus Brown  <titus@idyll.org>
+
+   * khmer/kfile.py: set 'force' flag for 'check_file_status' to default to
+   'False'.
+
 2015-02-25  Hussien Alameldin  <hussien@msu.edu>
 
    * khmer/khmer_args.py: add 'hll' citation entry "Irber and Brown,
