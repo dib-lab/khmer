@@ -178,7 +178,8 @@ _algorithms = {
     'counting': 'Q Zhang et al., '
     'http://dx.doi.org/10.1371/journal.pone.0101271',
     'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
-    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11'
+    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
+    'hll': 'Irber and Brown, unpublished'
 }
 
 

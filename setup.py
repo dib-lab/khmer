@@ -100,7 +100,7 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter"])
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
@@ -250,5 +250,5 @@ Distribution.reinitialize_command = reinitialize_command
 # remove dependency_link once screed is published to actual PyPi
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS, dependency_links=[
-    "https://testpypi.python.org/pypi/screed/0.8-rc3"],
+    "https://testpypi.python.org/pypi/screed/0.8-rc4"],
     **SETUP_METADATA)

@@ -1,9 +1,106 @@
-2015-02-23  Aditi Gupta  <agupta@msu.edu>
+2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
    * sandbox/{collect-reads.py, correct-errors.py, 
    normalize-by-median-pct.py, slice-reads-by-coverage.py, 
    sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}: 
    Replaced 'accuracy' with 'quality'. Fixes #787.
+
+2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/normalize-by-median.py: change to the default behavior to
+   overwrite the sequences output file. Also add a new argument --append to
+   append new reads to the output file.
+   * tests/test_scripts.py: add a test for the --append option in
+   normalize-by-median.py
+
+2015-02-25  Hussien Alameldin  <hussien@msu.edu>
+
+   * khmer/khmer_args.py: add 'hll' citation entry "Irber and Brown,
+     unpublished." to  _alg. dict.
+   * sandbox/unique-kmers.py: add call to 'info' with 'hll' in the
+     algorithms list.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+    * khmer/_khmermodule.cc: expose HLL internals as read-only attributes.
+    * lib/hllcounter.{cc,hh}: simplify error checking, add getters for HLL.
+    * tests/test_hll.py: add test cases for increasing coverage, also fix
+    some of the previous ones using the new HLL read-only attributes.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Fix coding style violations.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Update extension to use recommended practices,
+   PyLong instead of PyInt, Type initialization, PyBytes instead of PyString.
+   Replace common initialization with explicit type structs, and all types
+   conform to the CPython checklist.
+
+2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
+   column headers.
+   * tests/test_scripts.py: add coverage for the new --csv option in
+   abundance-dist.py
+
+2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: remove examples/stamps/do.sh testing for now; takes too
+   long to run on every build. Related to #836
+
+2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/interleave-reads.py: Make the output file name print nicely.
+
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added 'check_is_left' and 'check_is_right' functions;
+   fixed bug in check_is_pair.
+   * tests/test_functions.py: added tests for now-fixed bug in check_is_pair,
+   as well as 'check_is_left' and 'check_is_right'.
+   * scripts/interleave-reads.py: updated to handle Casava 1.8 formatting.
+   * scripts/split-paired-reads.py: fixed bug where sequences with bad names
+   got dropped; updated to properly handle Casava 1.8 names in FASTQ files.
+   * scripts/count-median.py: added '--csv' output format; updated to properly
+   handle Casava 1.8 FASTQ format when '--csv' is specified.
+   * scripts/normalize-by-median.py: replaced pair checking with
+   utils.check_is_pair(), which properly handles Casava 1.8 FASTQ format.
+   * tests/test_scripts.py: updated script tests to check Casava 1.8
+   formatting; fixed extract-long-sequences.py test.
+   * scripts/{extract-long-sequences.py,extract-paired-reads.py,
+   fastq-to-fasta.py,readstats.py,sample-reads-randomly.py,trim-low-abund.py},
+   khmer/thread_utils.py: updated to handle Casava 1.8 FASTQ format by
+   setting parse_description=False in screed.open(...).
+   * tests/test-data/{paired-mixed.fq,paired-mixed.fq.pe,random-20-a.fq,
+   test-abund-read-2.fq,test-abund-read-2.paired2.fq,test-abund-read-paired.fa,
+   test-abund-read-paired.fq}: switched some sequences over to Casava 1.8
+   format, to test format handling.
+   * tests/test-data/{casava_18-pe.fq,test-reads.fq.gz}: new test file for
+   Casava 1.8 format handling.
+   * tests/test-data/{overlap.curve,paired-mixed.fq.1,paired-mixed.fq.2,
+   simple_1.fa,simple_2.fa,simple_3.fa,test-colors.fa,test-est.fa,
+   test-graph3.fa,test-graph4.fa,test-graph6.fa}: removed no-longer used
+   test files.
+
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: set !linux flag by default, to avoid running tests that
+   request too much memory when 'nosetests' is run.  (This is an OS difference
+   where Mac OS X attempts to allocate as much memory as requested, while
+   on Linux it just crashes).
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/{hashbits.cc,hashbits.hh,
+   hashtable,tests/test_{c_wrapper,read_parsers}.py: remove unused callback
+   functionality
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: point to the latest screed release candidate to work around
+   versioneer bug.
 
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
@@ -14,6 +111,12 @@
 2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
 
    * khmer/load_pe.py: Remove unused/undocumented module. See #784
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/normalize-by-align.py: "copyright header 2013-2015 was added"
+   * sandbob/read_aligner.py: "copyright header 2013-2015 was added"
+   * sandbox/slice-reads-by-coverage.py: "copyright header 2014  was added"
 
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 

@@ -127,7 +127,7 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
-        for record in screed.open(filename):
+        for record in screed.open(filename, parse_description=False):
             total += 1
 
             if total % 10000 == 0:
