@@ -8,13 +8,19 @@
 import glob
 import sys
 
-filelist = glob.glob('*R1*.fastq.gz')
+def main():
+    """
+    Outputs commands for running the Debian version of Trimmomatic.
+    Put the path to the adapters to trim off as the first parameter
 
-for r1 in filelist:
-    r2 = r1.replace('R1', 'R2')
-    final_pe = r1[:-9] + '.pe.fq.gz'
-    final_se = r1[:-9] + '.se.fq.gz'
-    print """\
+    """
+    filelist = glob.glob('*R1*.fastq.gz')
+
+    for r1 in filelist:
+        r2 = r1.replace('R1', 'R2')
+        final_pe = r1[:-9] + '.pe.fq.gz'
+        final_se = r1[:-9] + '.se.fq.gz'
+        print """\
 mkdir trim
 cd trim
 TrimmomaticPE ../%s ../%s s1_pe s1_se s2_pe s2_se ILLUMINACLIP:%s:2:30:10
@@ -26,3 +32,6 @@ rm -r ./trim/
 
 chmod u-w %s %s
 """ % (r1, r2, sys.argv[1], final_pe, final_se, final_pe, final_se)
+
+if __name__ == '__main__':
+    main()
