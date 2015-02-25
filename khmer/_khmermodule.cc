@@ -4491,9 +4491,6 @@ hllcounter_set_ksize(khmer_KHLLCounter_Object * me, PyObject *value,
 
     try {
         me->hllcounter->set_ksize(ksize);
-    } catch (InvalidValue &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
-        return -1;
     } catch (ReadOnlyAttribute &e) {
         PyErr_SetString(PyExc_AttributeError, e.what());
         return -1;
