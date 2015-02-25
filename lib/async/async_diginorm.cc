@@ -14,7 +14,6 @@ void AsyncDiginorm::start(const std::string &filename,
                             unsigned int n_threads) {
     _cutoff = cutoff;
     _n_kept = 0;
-    _n_hashes_pushed = 0;
 
     AsyncSequenceProcessor::start(filename, paired, n_threads);
 }
@@ -40,12 +39,6 @@ unsigned int AsyncDiginorm::n_kept() {
 
 unsigned int AsyncDiginorm::output_queue_load() {
     return _n_kept - _n_popped;
-}
-
-bool AsyncDiginorm::iter_stop() {
-    if ((_STATE != STATE_RUNNING) && !aparser->has_output())
-        return true;
-    return false;
 }
 
 bool AsyncDiginorm::filter_single(ReadPtr read) {
@@ -76,11 +69,16 @@ void AsyncDiginorm::consume() {
     lock_stdout();
     std::thread::id tid = std::this_thread::get_id();
     std::cout << "Thread " << tid << " : " << std::endl 
-        << "\tCUTOFF: " << _cutoff << "\tK: " << _ht->ksize() << std::endl;
+        << "\tCUTOFF: " << _cutoff << "\tK: " << _ksize << std::endl;
     unlock_stdout();
     #endif
 
-    while(_STATE == STATE_RUNNING) {
+    print("spin on checking_running")
+    while(!check_running());
+
+    print("about to enter while loop in consume")
+    std::cout << "aparser state is " << aparser->get_state() << std::endl;
+    while(check_running()) {
         TSTART()
         if (aparser->pop(batch)) {
             TEND(reader_pop_wait)
@@ -105,7 +103,7 @@ void AsyncDiginorm::consume() {
                 }
 
                 TSTART()
-                while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
+                while(!(_out_queue->bounded_push(batch))) if (!check_running()) return;
                 TEND(output_push_wait)
 
             } else {
@@ -113,15 +111,20 @@ void AsyncDiginorm::consume() {
             }
             __sync_fetch_and_add(&_n_processed, _batchsize);
         } else {
-            if ((aparser->get_state() == STATE_WAIT) && !(aparser->has_output())) {
-                _STATE = STATE_WAIT;
+            if (((aparser->get_state() == STATE_WAIT) 
+                && !(aparser->has_output()))
+                || aparser->get_state() == STATE_DORMANT) {
+
+                set_global_state(STATE_WAIT);
             }
         }
     }
 
     #if(VERBOSITY)
     lock_stdout();
-    std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
+    std::cout << "\nReturning from AsyncDiginorm worker. STATE: " << 
+        _STATE << "; aparser STATE: " << aparser->get_state() << 
+        "n_processed: " << _n_processed << std::endl;
     unlock_stdout();
     #endif
 

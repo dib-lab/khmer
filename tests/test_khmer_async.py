@@ -32,10 +32,10 @@ def test_aync_processor_n_processed():
     asd.start(filename, False, 1)
     for r in asd:
         pass
-    asd.stop()
 
     print asd.n_processed()
     assert asd.n_processed() == 25000L
+    asd.stop()
 
 def test_async_processor_n_parsed():
     filename = utils.get_test_data('test-reads.fa')

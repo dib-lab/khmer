@@ -17,6 +17,8 @@ class AsyncSequenceParser: public AsyncProducer<ReadBatchPtr> {
 
     public:
 
+        const char * name = "AsyncSequenceParser";
+
         AsyncSequenceParser ():
             khmer::AsyncProducer<ReadBatchPtr>() {
         }
@@ -26,6 +28,15 @@ class AsyncSequenceParser: public AsyncProducer<ReadBatchPtr> {
         unsigned int queue_load();
         unsigned int get_batchsize() { return _batchsize; };
         unsigned int n_parsed();
+        
+        void set_global_state(int state) {
+            AsyncProducer<ReadBatchPtr>::set_global_state(state);
+            #if(VERBOSITY)
+            lock_stdout();
+            std::cout << name << " STATE=" << _STATE << std::endl;
+            unlock_stdout();
+            #endif 
+        }
 };
 
 } // namespace khmer

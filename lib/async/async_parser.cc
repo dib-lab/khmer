@@ -34,8 +34,6 @@ unsigned int AsyncSequenceParser::queue_load() {
 
 void AsyncSequenceParser::consume() {
     
-    set_global_state(STATE_RUNNING);
-
     IParser * parser = IParser::get_parser(_current_filename);
     // Use a function ptr to decide which imprint function to use
     // so as to avoid unnecssary branching
@@ -46,8 +44,10 @@ void AsyncSequenceParser::consume() {
         imprint = &imprint_single;
     }
 
+    while(!check_running());
+
     ReadBatchPtr batch;
-    while(!parser->is_complete() && (_STATE == STATE_RUNNING)) {
+    while(!parser->is_complete() && check_running()) {
         try {
             batch = imprint(parser);
         } catch (...) {
@@ -61,7 +61,7 @@ void AsyncSequenceParser::consume() {
 
         while(!(_out_queue->bounded_push(batch))) {
             // Somebody turned us off; flush the queue and return gracefully
-            if (_STATE != STATE_RUNNING) {
+            if (!check_running()) {
                 #if(VERBOSITY)
                 lock_stdout();
                 std::cout << "Flush readparser queue" << std::endl;

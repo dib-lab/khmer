@@ -209,8 +209,6 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    virtual void init_threadstuff() {};
-
     HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
     {
         // left-shift the previous hash over
@@ -248,6 +246,9 @@ public:
     {
         return _ksize;
     }
+
+    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {};
+    bool is_threadsafe() { return _threadsafe; };
 
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;

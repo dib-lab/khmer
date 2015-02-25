@@ -56,7 +56,6 @@ class Async {
         uint32_t _stdout_spin_lock; 
         unsigned int _n_workers;
         std::vector<std::thread> _worker_threads;
-        bool _workers_running;
         AsyncExceptionHandler * _exc_handler;
         unsigned int _batchsize;
 
@@ -65,30 +64,32 @@ class Async {
 
     public:
 
+        const char * name = "Async";
+
         Async() {
             //_exc_handler();
             _stdout_spin_lock = 0;
             _state_spin_lock = 0;
-            _STATE = STATE_DORMANT;
+            set_global_state(STATE_DORMANT);
             _batchsize = 1;
             _exc_handler = new AsyncExceptionHandler();
         }
 
         ~Async() {
-            if(_workers_running) stop();
+            if(_STATE != STATE_DORMANT) stop();
         }
 
         virtual void consume() = 0;
 
         void start(unsigned int n_threads) {
             _n_workers = n_threads;
-            set_global_state(STATE_WAIT);
             for (unsigned int t=0; t<_n_workers; ++t) {
                 #if(VERBOSITY)
                 std::cout << "Async spawn worker" << std::endl;
                 #endif
                 _worker_threads.push_back(std::thread(&Async::consume, this));
             }
+            set_global_state(STATE_RUNNING);
         }
 
         bool set_global_state(int state) {
@@ -112,6 +113,11 @@ class Async {
 
         int get_state() {
             return _STATE;
+        }
+
+        bool check_running() {
+            if (_STATE != STATE_RUNNING) return false;
+            return true;
         }
 
         // Define a lock for writing to standard out
@@ -190,6 +196,9 @@ template <class T> class AsyncConsumer: public virtual Async {
         unsigned int _n_pushed;
 
     public:
+
+        const char * name = "AsyncConsumer";
+
         AsyncConsumer(): 
             Async() {
             _in_queue = new queue<T, Cap>();
@@ -226,6 +235,9 @@ template <class T> class AsyncProducer: public virtual Async {
         unsigned int _n_popped;
 
     public:
+
+        const char * name = "AsyncProducer";
+
         AsyncProducer(): 
             Async() {
             _out_queue = new queue<T, Cap>();
@@ -264,6 +276,9 @@ template <class T, class V> class AsyncConsumerProducer:
     public AsyncConsumer<T>, public AsyncProducer<V> {
 
     public:
+
+        const char * name = "AsyncConsumerProducer";
+
         AsyncConsumerProducer<T,V>() :
             Async(),
             AsyncConsumer<T>(),

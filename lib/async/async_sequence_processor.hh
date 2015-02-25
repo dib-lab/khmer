@@ -19,7 +19,10 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
         unsigned int _n_processed;
         bool _paired;
 
+
     public:
+
+        const char * name = "AsyncSequenceProcessor";
 
         AsyncSequenceProcessor (khmer::Hashtable * ht):
                                 khmer::AsyncConsumerProducer<ReadBatchPtr,ReadBatchPtr>(),
@@ -36,8 +39,17 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
         unsigned int n_parsed();
         void write(const char * sequence);
         unsigned int parser_queue_load();
-        virtual bool iter_stop() = 0;
 
+        bool iter_stop();
+
+        void set_global_state(int state) {
+            AsyncConsumerProducer<ReadBatchPtr, ReadBatchPtr>::set_global_state(state);
+            #if(VERBOSITY)
+            lock_stdout();
+            std::cout << name << " STATE=" << _STATE << std::endl;
+            unlock_stdout();
+            #endif 
+        }
         bool is_paired();
 };
 
@@ -45,12 +57,13 @@ class AsyncSequenceProcessorTester: public AsyncSequenceProcessor {
 
     public:
 
+        const char * name = "AsyncSequenceProcessorTester";
+
         AsyncSequenceProcessorTester (khmer::Hashtable * ht):
                         khmer::AsyncSequenceProcessor(ht) {
         }
 
         virtual void consume();
-        virtual bool iter_stop();
 };
 }; // namespace khmer
 #endif

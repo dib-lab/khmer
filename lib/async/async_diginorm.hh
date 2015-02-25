@@ -11,7 +11,6 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
     protected:
 
         unsigned int _cutoff;
-        unsigned int _n_hashes_pushed;
         unsigned int _n_kept;
         #if(TIMING)
         double output_push_wait_global, reader_pop_wait_global, write_wait_global;
@@ -36,7 +35,6 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
         unsigned int n_kept();
         virtual void consume();
-        bool iter_stop();
 
         bool filter_single(ReadPtr read);
         bool filter_paired(ReadBatchPtr read);

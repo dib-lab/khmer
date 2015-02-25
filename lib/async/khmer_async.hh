@@ -41,6 +41,8 @@ static inline timespec timediff(timespec start, timespec end)
 #define TEND(dest)
 #endif
 
+#define print(msg) std::cout << msg << std::endl;
+
 typedef khmer::read_parsers::Read Read;
 
 typedef std::shared_ptr<Read> ReadPtr;

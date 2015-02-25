@@ -51,14 +51,14 @@ LIB_DEPENDS = [path_join("lib", bn + ".hh") for bn in [
 
 LIB_DEPENDS.extend(path_join("lib/async", bn+ ".hh") for bn in [
     "khmer_async", "async_models", "async_sequence_processor", 
-    "async_parser", "async_diginorm", "async_writers"])
+    "async_parser", "async_diginorm", ])
 
 LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner", ]]
 
 LIB_SOURCES.extend(path_join("lib/async", bn + ".cc") for bn in [
-    "async_sequence_processor", "async_diginorm", "async_writers", "async_parser"])
+    "async_sequence_processor", "async_diginorm", "async_parser"])
 
 KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/async/_khmerasyncmodule.cc"]
 KHMER_SOURCES.extend(LIB_SOURCES)
