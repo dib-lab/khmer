@@ -26,8 +26,8 @@ import screed
 
 
 def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    if hasattr(read, 'quality'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.quality)
     else:
         return ">%s\n%s\n" % (read.name, read.sequence)
 

@@ -38,17 +38,17 @@ def output_single(read, new_sequence):
     name = read.name
     sequence = new_sequence
 
-    accuracy = None
-    if hasattr(read, 'accuracy'):
-        accuracy = read.accuracy[:len(sequence)]
+    quality = None
+    if hasattr(read, 'quality'):
+        quality = read.quality[:len(sequence)]
 
         # in cases where sequence _lengthened_, need to truncate it to
         # match the quality score length.
-        sequence = sequence[:len(accuracy)]
+        sequence = sequence[:len(quality)]
 
-    if accuracy:
-        assert len(sequence) == len(accuracy), (sequence, accuracy)
-        return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
+    if quality:
+        assert len(sequence) == len(quality), (sequence, quality)
+        return "@%s\n%s\n+\n%s\n" % (name, sequence, quality)
     else:
         return ">%s\n%s\n" % (name, sequence)
 
