@@ -2692,7 +2692,7 @@ def test_trim_low_abund_trimtest_savetable():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-def test_counting_load_compressed_bigcount():
+def test_counting_load_gzipped_bigcount():
 
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -2708,10 +2708,10 @@ def test_counting_load_compressed_bigcount():
 
     fp = iter(open(outfile))
     line = fp.next().strip()
-    #assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
-#------------------------
+
+
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
