@@ -1,3 +1,14 @@
+2015-02-25  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/bloom_count.py: renamed to bloom-count.py
+   * sandbox/bloom_count.pyc: renamed to bloom-count.pyc
+   * sandbox/bloom_count_intersection.py: renamed to 
+     bloom-count-intersection.py
+   * sandbox/bloom_count_intersection.pyc: renamed to 
+     bloom-count-intersection.pyc
+   * sandbox/read_aligner.py: renamed to read-aligner.py
+   * sandbox/read_aligner.pyc: renamed to read-aligner.pyc
+
 2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * scripts/normalize-by-median.py: change to the default behavior to
