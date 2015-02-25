@@ -1,4 +1,4 @@
-#
+
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -23,7 +23,6 @@ import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
-
 
 def scriptpath(script):
     return script
@@ -1371,7 +1370,7 @@ def test_abundance_dist_nobigcount():
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+
 
     script = scriptpath('abundance-dist.py')
     args = ['-z', htfile, infile, outfile]
@@ -2693,17 +2692,26 @@ def test_trim_low_abund_trimtest_savetable():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-def test_counting():
-    infile = utils.get_temp_filename('count.ct.gz')
-    indir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('count.ct.gz'), infile)
-    assert os.path.exists(infile), infile
-    try:
-    	test_ct = khmer.load_counting_hash(infile)
-    except:
-    	assert 0, "Can't load a counting table with bigcount set"
+def test_counting_load_compressed_bigcount():
 
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
 
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17 )
+
+    script = scriptpath('abundance-dist.py')
+    args = ['-z', htfile, infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    #assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+#------------------------
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
