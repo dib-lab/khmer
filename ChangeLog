@@ -15,6 +15,13 @@
 
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
+    * khmer/_khmermodule.cc: expose HLL internals as read-only attributes.
+    * lib/hllcounter.{cc,hh}: simplify error checking, add getters for HLL.
+    * tests/test_hll.py: add test cases for increasing coverage, also fix
+    some of the previous ones using the new HLL read-only attributes.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
    * khmer/_khmermodule.cc: Fix coding style violations.
 
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
