@@ -1,3 +1,8 @@
+2015-02-25  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{collect-reads.py,saturate-by-median.py}: update for 'force'
+   argument in khmer.kfile functions, so that khmer-recipes compile.
+
 2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
    * sandbox/{collect-reads.py, correct-errors.py, 
