@@ -1,10 +1,17 @@
-2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
+2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * scripts/normalize-by-median.py: change to the default behavior to
    overwrite the sequences output file. Also add a new argument --append to
    append new reads to the output file.
    * tests/test_scripts.py: add a test for the --append option in
    normalize-by-median.py
+
+2015-02-25  Hussien Alameldin  <hussien@msu.edu>
+
+   * khmer/khmer_args.py: add 'hll' citation entry "Irber and Brown,
+     unpublished." to  _alg. dict.
+   * sandbox/unique-kmers.py: add call to 'info' with 'hll' in the
+     algorithms list.
 
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 

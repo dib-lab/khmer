@@ -74,7 +74,7 @@ def get_parser():
 
 
 def main():
-    info('unique-kmers.py', ['SeqAn'])
+    info('unique-kmers.py', ['SeqAn', 'hll'])
     args = get_parser().parse_args()
 
     hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
