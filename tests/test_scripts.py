@@ -2693,21 +2693,26 @@ def test_trim_low_abund_trimtest_savetable():
 
 
 def test_counting_load_gzipped_bigcount():
-
+      
+    import gzip 
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    htfile = _make_counting(infile, K=17 )
-
+    htfile = _make_counting(infile, K=17)
+    fd=gzip.GzipFile('test_ct.gz', mode='wb', compresslevel=9)
+    fd.write(htfile)   
+    
+    test_ct = khmer.load_counting_hash(htfile) #should be test_ct.gz 
     script = scriptpath('abundance-dist.py')
-    args = ['-z', htfile, infile, outfile]
+    args = ['-z', test_ct, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     fp = iter(open(outfile))
     line = fp.next().strip()
+    print line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
 
