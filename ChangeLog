@@ -5,6 +5,11 @@
    * tests/test_scripts.py: add a test function for the --csv option in
    abundance-dist-single.py
 
+2015-02-26  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
+   ref correct links and names
+
 2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
    * sandbox/{collect-reads.py, correct-errors.py, 

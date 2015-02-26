@@ -16,6 +16,7 @@ Use '-h' for parameter help.
 """
 import os
 import sys
+import csv
 import khmer
 import threading
 import textwrap
@@ -87,9 +88,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
         if args.csv:
-            hash_fp_csv = csv.writer(hash_fp)
+            hist_fp_csv = csv.writer(hist_fp)
             # write headers:
-            hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
+            hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
                                   'cumulative_fraction'])
 
     print >>sys.stderr, 'making k-mer counting table'
@@ -176,7 +177,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         frac = sofar / float(total)
 
         if args.csv:
-            hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+            hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
         else:
             print >> hist_fp, _, i, sofar, round(frac, 3)
 
