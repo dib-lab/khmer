@@ -12,8 +12,9 @@ We are still triaging and documenting the various scripts.
 
 Awaiting promotion to sandbox:
 
-* unique-kmers.py - estimate the number of k-mers present in a file with the HyperLogLog low-memory probabilistic cardinality estimation algorithm.
+* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference. (Used/tested in `2014 paper on semi-streaming algorithms <https://github.com/ged-lab/2014-streaming/blob/master/>`__)
 * correct-errors.py - streaming error correction.
+* unique-kmers.py - estimate the number of k-mers present in a file with the HyperLogLog low-memory probabilistic cardinality estimation algorithm.
 
 Scripts with recipes:
 
@@ -28,7 +29,6 @@ To keep, document, and build recipes for:
 * assemstats3.py - print out assembly statistics
 * build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
-* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference. (Used/tested in `2014 paper on semi-streaming algorithms <https://github.com/ged-lab/2014-streaming/blob/master/>`__)
 * collect-variants.py - used in a `gist <https://gist.github.com/ctb/6eaef7971ea429ab348d>`__
 * extract-single-partition.py - extract all the sequences that belong to a specific partition, from a file with multiple partitions
 * fasta-to-abundance-hist.py - generate abundance of k-mers by position within reads; use with abundance-hist-by-position.py
