@@ -23,7 +23,8 @@ import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
-from struct import pack, unpack
+
+from khmer._khmer import new_hashtable
 
 def scriptpath(script):
     return script
@@ -2706,18 +2707,18 @@ def test_counting_load_gzipped_bigcount():
        with gzip.open(outfile2, 'wb') as f_out:
           f_out.writelines(f_in)
     print outfile2
-    test_ct = khmer.load_counting_hash(outfile2)    
+    counting_hash = khmer.load_counting_hash(outfile2)    
     kmer='GG'
-    with open(htfile, 'rb') as countinghash:
-        print 'we are in the open'
-    """    #version, = unpack('B', countinghash.read(1))
-        ht_type, = unpack('B', countinghash.read(1))
-        use_bigcount, = unpack('B', countinghash.read(1))
-        #ksize, = unpack('I', countinghash.read(uint_size))
-        n_tables, = unpack('B', countinghash.read(1))
-        #table_size, = unpack('Q', countinghash.read(ulonglong_size))
-        print use_bigcount"""
-        
+    hashsizes = counting_hash.hashsizes()
+    kmer_size = counting_hash.ksize()
+    tracking = khmer._Hashbits(kmer_size, hashsizes)  
+    abundances = counting_hash.abundance_distribution(infile,tracking) 
+    flag=False
+    for _,i in enumerate(abundances):
+       if _ > 255 : 
+             flag= True
+             break
+    assert flag  
 
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
