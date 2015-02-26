@@ -57,6 +57,7 @@ def get_parser():
                         help='Overwrite output file if it exists')
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the histogram. '
+                        'Includes column headers.')
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
