@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -256,6 +257,9 @@ void Hashtable::save_tagset(std::string outfilename)
     }
 
     outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+    if (outfile.fail()) {
+        throw khmer_file_exception(strerror(errno));
+    }
     outfile.close();
 
     delete[] buf;
