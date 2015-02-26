@@ -87,10 +87,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
         if args.csv:
-        hash_fp_csv = csv.writer(hash_fp)
-        # write headers:
-        hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                              'cumulative_fraction'])
+            hash_fp_csv = csv.writer(hash_fp)
+            # write headers:
+            hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                                  'cumulative_fraction'])
 
     print >>sys.stderr, 'making k-mer counting table'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
