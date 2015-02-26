@@ -163,6 +163,21 @@ struct DefaultOverflowImplicit< std::basic_string<TChar, TCharTraits, TAlloc> >
 template <typename TChar, typename TCharTraits, typename TAlloc>
 struct IsSequence<std::basic_string<TChar, TCharTraits, TAlloc> > : True {};
 
+// ----------------------------------------------------------------------------
+// Metafunction Chunk
+// ----------------------------------------------------------------------------
+
+// Chunk interface for std::basic strings.
+template <typename TChar, typename TCharTraits, typename TAlloc, typename TSpec>
+struct Chunk<Iter<std::basic_string<TChar, TCharTraits, TAlloc>, AdaptorIterator<TChar*, TSpec> > >
+{
+    typedef typename Chunk<std::basic_string<TChar, TCharTraits, TAlloc> >::Type Type;
+};
+
+template <typename TChar, typename TCharTraits, typename TAlloc, typename TSpec>
+struct Chunk<Iter<std::basic_string<TChar, TCharTraits, TAlloc> const, AdaptorIterator<TChar*, TSpec> > > :
+    Chunk<Iter<std::basic_string<TChar, TCharTraits, TAlloc>, AdaptorIterator<TChar*, TSpec> > > {};
+
 // ===========================================================================
 // Functions
 // ===========================================================================

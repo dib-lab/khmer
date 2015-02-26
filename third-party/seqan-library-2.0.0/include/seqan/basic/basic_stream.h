@@ -62,6 +62,10 @@ template <typename TChar, typename TCharTraits, typename TAlloc>
 inline typename std::basic_string<TChar, TCharTraits, TAlloc>::size_type
 length(std::basic_string<TChar, TCharTraits, TAlloc> const & me);
 
+// Needed for std::basic_string.
+template <typename TContainer, typename TValue>
+inline void appendValue(TContainer SEQAN_FORWARD_ARG me, TValue SEQAN_FORWARD_CARG val);
+
 /*!
  * @macro SEQAN_HAS_ZLIB
  * @headerfile <seqan/stream.h>
