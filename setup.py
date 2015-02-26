@@ -100,7 +100,7 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter"])
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [

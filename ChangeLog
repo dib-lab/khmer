@@ -3,6 +3,39 @@
    * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
    ref correct links and names
 
+2015-02-25  Aditi Gupta  <agupta@msu.edu>
+
+   * sandbox/{collect-reads.py, correct-errors.py, 
+   normalize-by-median-pct.py, slice-reads-by-coverage.py, 
+   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}: 
+   Replaced 'accuracy' with 'quality'. Fixes #787.
+
+2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/normalize-by-median.py: change to the default behavior to
+   overwrite the sequences output file. Also add a new argument --append to
+   append new reads to the output file.
+   * tests/test_scripts.py: add a test for the --append option in
+   normalize-by-median.py
+
+2015-02-25  Hussien Alameldin  <hussien@msu.edu>
+
+   * khmer/khmer_args.py: add 'hll' citation entry "Irber and Brown,
+     unpublished." to  _alg. dict.
+   * sandbox/unique-kmers.py: add call to 'info' with 'hll' in the
+     algorithms list.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+    * khmer/_khmermodule.cc: expose HLL internals as read-only attributes.
+    * lib/hllcounter.{cc,hh}: simplify error checking, add getters for HLL.
+    * tests/test_hll.py: add test cases for increasing coverage, also fix
+    some of the previous ones using the new HLL read-only attributes.
+
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Fix coding style violations.
+
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
    * khmer/_khmermodule.cc: Update extension to use recommended practices,
