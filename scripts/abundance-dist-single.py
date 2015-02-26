@@ -55,6 +55,8 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the histogram. '
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
@@ -83,6 +85,11 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
+        if args.csv:
+        hash_fp_csv = csv.writer(hash_fp)
+        # write headers:
+        hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                              'cumulative_fraction'])
 
     print >>sys.stderr, 'making k-mer counting table'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
@@ -167,7 +174,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sofar += i
         frac = sofar / float(total)
 
-        print >> hist_fp, _, i, sofar, round(frac, 3)
+        if args.csv:
+            hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+        else:
+            print >> hist_fp, _, i, sofar, round(frac, 3)
 
         if sofar == total:
             break
