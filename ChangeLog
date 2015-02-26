@@ -1,3 +1,10 @@
+2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
+   Includes column headers.
+   * tests/test_scripts.py: add a test function for the --csv option in
+   abundance-dist-single.py
+
 2015-02-26  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
