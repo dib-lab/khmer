@@ -1,3 +1,15 @@
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{combine-pe.py,compare-partitions.py,count-within-radius.py,
+   degree-by-position.py,dn-identify-errors.py,ec.py,error-correct-pass2.py,
+   find-unpart.py,normalize-by-align.py,read_aligner.py,shuffle-fasta.py,
+   to-casava-1.8-fastq.py,uniqify-sequences.py}: removed from sandbox/ as
+   obsolete/unmaintained.
+   * sandbox/README.rst: updated to reflect readstats.py and trim-low-abund.py
+   promotion to sandbox/.
+   * doc/dev/scripts-and-sandbox.txt: updated to reflect sandbox/ script name
+   preferences, and note to remove from README.rst when moved over to scripts/.
+
 2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
    * sandbox/{collect-reads.py, correct-errors.py, 
