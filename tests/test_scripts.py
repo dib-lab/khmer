@@ -23,6 +23,7 @@ import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
+from struct import pack, unpack
 
 def scriptpath(script):
     return script
@@ -2696,26 +2697,27 @@ def test_counting_load_gzipped_bigcount():
       
     import gzip 
     infile = utils.get_temp_filename('test.fa')
-    outfile = utils.get_temp_filename('test.dist')
+    outfile1 = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    htfile = _make_counting(infile, K=17)
-    fd=gzip.GzipFile('test_ct.gz', mode='wb', compresslevel=9)
-    fd.write(htfile)   
-    
-    test_ct = khmer.load_counting_hash(htfile) #should be test_ct.gz 
-    script = scriptpath('abundance-dist.py')
-    args = ['-z', test_ct, infile, outfile]
-    utils.runscript(script, args, in_dir)
-
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    print line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
-
+    outfile2=utils.get_temp_filename('test_ct.gz')
+    htfile = _make_counting(infile, K=2)
+    with open(htfile, 'rb') as f_in:
+       with gzip.open(outfile2, 'wb') as f_out:
+          f_out.writelines(f_in)
+    print outfile2
+    test_ct = khmer.load_counting_hash(outfile2)    
+    kmer='GG'
+    with open(htfile, 'rb') as countinghash:
+        print 'we are in the open'
+    """    #version, = unpack('B', countinghash.read(1))
+        ht_type, = unpack('B', countinghash.read(1))
+        use_bigcount, = unpack('B', countinghash.read(1))
+        #ksize, = unpack('I', countinghash.read(uint_size))
+        n_tables, = unpack('B', countinghash.read(1))
+        #table_size, = unpack('Q', countinghash.read(ulonglong_size))
+        print use_bigcount"""
+        
 
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
