@@ -1,7 +1,7 @@
-2015-02-24  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-02-26  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
-   reference correct links and function arguments.
+   ref correct links and names
 
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
@@ -16,7 +16,6 @@
    column headers.
    * tests/test_scripts.py: add coverage for the new --csv option in
    abundance-dist.py
->>>>>>> 43e2217d4078d9c42f1e10df580e074a44c0efaa
 
 2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -69,7 +68,6 @@
    * khmer/{__init__.py,_khmermodule.cc},lib/{hashbits.cc,hashbits.hh,
    hashtable,tests/test_{c_wrapper,read_parsers}.py: remove unused callback
    functionality
->>>>>>> c1f9ee5656d1f6e95aa516a8ddbfa8ef28cd4fe3
 
 2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -159,7 +157,6 @@
    of sys.argv.
    * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
    * doc/user/scripts.txt: added trim-low-abund.py.
->>>>>>> 802abfe6e3240bfdb01f1d31dd1e93825e7061ee
 
 2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
 
