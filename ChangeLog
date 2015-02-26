@@ -1,5 +1,12 @@
 2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
 
+   * scripts/count-overlap.py: Use CSV format for the curve file output.
+   Includes column headers.
+   * tests/test_scripts.py: add a test function for the --csv option in
+   count-overlap.py
+
+2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
+
    * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
    Includes column headers.
    * tests/test_scripts.py: add a test function for the --csv option in
