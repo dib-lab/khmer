@@ -2,15 +2,10 @@
 
    * scripts/count-overlap.py: Use CSV format for the curve file output.
    Includes column headers.
-   * tests/test_scripts.py: add a test function for the --csv option in
-   count-overlap.py
-
-2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
-
    * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
    Includes column headers.
-   * tests/test_scripts.py: add a test function for the --csv option in
-   abundance-dist-single.py
+   * tests/test_scripts.py: add test functions for the --csv option in
+   abundance-dist-single.py and count-overlap.py
 
 2015-02-26  Jacob Fenton  <bocajnotnef@gmail.com>
 
