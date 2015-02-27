@@ -56,7 +56,7 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false', help="The default behaviour is "
                         "to count past 255 using bigcount. This flag turns "
-                        "this off, limiting counts to 255.")
+                        "bigcount off, limiting counts to 255.")
     parser.add_argument('--summary-info', '-s', default=None, metavar="FORMAT",
                         choices=['json', 'tsv'],
                         help="What format should the machine readable run "
