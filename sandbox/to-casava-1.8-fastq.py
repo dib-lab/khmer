@@ -47,10 +47,10 @@ def main():
             new_name = resub_read_2(new_name)
 
             output_file.write(
-                "@{name}\n{sequence}\n+\n{accuracy}\n".format(
+                "@{name}\n{sequence}\n+\n{quality}\n".format(
                     name=new_name,
                     sequence=read.sequence,
-                    accuracy=read.accuracy,
+                    quality=read.quality,
                 )
             )
 
