@@ -117,15 +117,18 @@ def test_extract_hashbits_info():
 
 
 def test_check_file_status_kfile():
+    fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
-        utils.get_temp_filename('thisfiledoesnotexistatall')
+        check_file_status(fn, False)
+        assert True
     except OSError as e:
         print >>sys.stder, '...failed to remove {fn}'.format(fn)
 
 
 def test_check_file_status_kfile_force():
+    fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
-        khmer.kfile('thisfiledoesnotexistatall', force)
+        check_file_status(fn, True)
         assert False 
     except OSError as e:
         print >>sys.stderr, '...failed to remove {fn}'.format(fn)
