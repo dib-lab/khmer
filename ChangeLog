@@ -1,3 +1,10 @@
+2015-02-25  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/bloom_count.py: renamed to bloom-count.py
+   * sandbox/bloom_count_intersection.py: renamed to 
+     bloom-count-intersection.py
+   * sandbox/read_aligner.py: renamed to read-aligner.py
+
 2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
