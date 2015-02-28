@@ -61,8 +61,8 @@ Good ideas to rewrite using newer tools/approaches:
 
 * assembly-diff.py - find sequences that differ between two assemblies
 * assembly-diff-2.py - find subsequences that differ between two assemblies
-* bloom_count.py - count # of unique k-mers; should be reimplemented with HyperLogLog
-* bloom_count_intersection.py - look at unique and disjoint #s of k-mers
+* bloom-count.py - count # of unique k-mers; should be reimplemented with HyperLogLog, Renamed from bloom_count.py in commit 4788c31
+* bloom-count-intersection.py - look at unique and disjoint #s of k-mers, Renamed from bloom_count_intersection.py in commit 4788c31.
 * split-sequences-by-length.py - break up short reads by length
 
 ----
@@ -83,7 +83,6 @@ Present in commit d295bc847 but removed thereafter:
 * `to-casava-1.8-fastq.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/to-casava-1.8-fastq.py>`__ - convert reads to different Casava format
 * `uniqify-sequences.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/uniqify-sequences.py>`__ - print out paths that are unique in the graph
 * `write-interleave.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/write-interleave.py>`__ - is this used by any protocol etc?
-
 
 Present in commit 691b0b3ae but removed thereafter:
 
