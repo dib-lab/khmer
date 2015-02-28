@@ -2260,7 +2260,7 @@ def test_count_overlap():
     assert '752053 238627' in data
 
 
-def test_count_overlap():
+def test_count_overlap_csv():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
     seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
