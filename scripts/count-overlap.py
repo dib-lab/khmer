@@ -19,6 +19,7 @@ Use '-h' for parameter help.
 
 """
 import sys
+import csv
 import khmer
 import textwrap
 from khmer.kfile import check_file_status, check_space
@@ -44,6 +45,9 @@ def get_parser():
                         help="input sequence filename")
     parser.add_argument('report_filename', metavar='output_report_filename',
                         help='output report filename')
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the curve output. '
+                        'Includes column headers.')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -65,6 +69,10 @@ def main():
 
     output = open(args.report_filename, 'w')
     f_curve_obj = open(args.report_filename + '.curve', 'w')
+    if args.csv:
+        f_curve_obj_csv = csv.writer(f_curve_obj)
+        # write headers:
+        f_curve_obj_csv.writerow(['input_seq', 'overlap_kmer'])
 
     ht2 = khmer.new_hashbits(kmer_size, args.min_tablesize, args.n_tables)
 
@@ -81,8 +89,10 @@ dataset2: %s
     output.write(printout1)
 
     for i in range(100):
-        to_print = str(list_curve[100 + i]) + ' ' + str(list_curve[i]) + '\n'
-        f_curve_obj.write(to_print)
+        if args.csv:
+            f_curve_obj_csv.writerow([list_curve[100 + i], list_curve[i]])
+        else:
+            print >> f_curve_obj, list_curve[100 + i], list_curve[i]
 
     print >> sys.stderr, 'wrote to: ' + args.report_filename
 
