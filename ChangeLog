@@ -1,4 +1,4 @@
-2015-02-23  Titus Brown  <titus@idyll.org>
+2015-03-02  Titus Brown  <titus@idyll.org>
 
    * sandbox/{combine-pe.py,compare-partitions.py,count-within-radius.py,
    degree-by-position.py,dn-identify-errors.py,ec.py,error-correct-pass2.py,
@@ -10,6 +10,11 @@
    * doc/dev/scripts-and-sandbox.txt: updated to reflect sandbox/ script name
    preferences, and note to remove from README.rst when moved over to scripts/.
 
+2015-02-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/load-into-counting.py: Be verbose in the help text, to clarify
+   what the -b flag does.
+
 2015-02-25  Hussien Alameldin  <hussien@msu.edu>
 
    * sandbox/bloom_count.py: renamed to bloom-count.py
@@ -20,9 +25,12 @@
 2015-02-26  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * scripts/abundance-dist-single.py: Use CSV format for the histogram.
+   * scripts/count-overlap.py: Use CSV format for the curve file output.
    Includes column headers.
-   * tests/test_scripts.py: add a test function for the --csv option in
-   abundance-dist-single.py
+   * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
+   Includes column headers.
+   * tests/test_scripts.py: add test functions for the --csv option in
+   abundance-dist-single.py and count-overlap.py
 
 2015-02-26  Jacob Fenton  <bocajnotnef@gmail.com>
 
