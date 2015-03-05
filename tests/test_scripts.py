@@ -2693,8 +2693,32 @@ def test_trim_low_abund_trimtest_savetable():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
-
 def test_counting_load_gzipped_bigcount():
+    
+    import gzip
+    infile = utils.get_temp_filename('test_ct')
+    ct = khmer.new_counting_hash(10, 1e7,4)
+    ct.set_use_bigcount(True) 
+    for i in range(500):
+	ct.count('ATATATATAT')
+    ct.save(infile)
+    
+    with open(infile, 'rb') as f_in:
+       with gzip.open('test_ct.gz', 'wb') as f_out:
+          f_out.writelines(f_in)
+   
+    newct= khmer.new_counting_hash(10, 1e7, 4)
+    newct.load('test_ct.gz')
+    flag = False
+    x=newct.get('ATATATATAT')
+    print x
+    if x == 500 : 
+         flag = True
+    
+    assert flag
+    # check that ct_loaded.get('ATATATATAT') == 500
+
+def test_abundance_distribution_gzipped_bigcount():
       
     import gzip 
     infile = utils.get_temp_filename('test.fa')
@@ -2702,7 +2726,14 @@ def test_counting_load_gzipped_bigcount():
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     outfile2=utils.get_temp_filename('test_ct.gz')
-    htfile = _make_counting(infile, K=2)
+    htfile = _make_counting(infile, K=2, BIGCOUNT=True)
+    # or:
+    
+    """ f_in= open(htfile,'rb').read() 
+    f_out = gzip.open(outfile2,'wb')
+    f_out.write(f_in) """
+    
+    #or: 
     with open(htfile, 'rb') as f_in:
        with gzip.open(outfile2, 'wb') as f_out:
           f_out.writelines(f_in)
@@ -2715,7 +2746,8 @@ def test_counting_load_gzipped_bigcount():
     abundances = counting_hash.abundance_distribution(infile,tracking) 
     flag=False
     for _,i in enumerate(abundances):
-       if _ > 255 : 
+       print _, i
+       if _ > 255 and i > 0: 
              flag= True
              break
     assert flag  
