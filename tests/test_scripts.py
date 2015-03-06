@@ -26,6 +26,7 @@ import screed
 
 from khmer._khmer import new_hashtable
 
+
 def scriptpath(script):
     return script
 
@@ -1369,15 +1370,11 @@ def test_abundance_dist_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-
-
+    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
     script = scriptpath('abundance-dist.py')
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
-
     fp = iter(open(outfile))
     line = fp.next().strip()
     assert line == '1 96 96 0.98', line
@@ -2693,64 +2690,52 @@ def test_trim_low_abund_trimtest_savetable():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
+
 def test_counting_load_gzipped_bigcount():
-    
     import gzip
     infile = utils.get_temp_filename('test_ct')
-    ct = khmer.new_counting_hash(10, 1e7,4)
-    ct.set_use_bigcount(True) 
+    ct = khmer.new_counting_hash(10, 1e7, 4)
+    ct.set_use_bigcount(True)
     for i in range(500):
-	ct.count('ATATATATAT')
+        ct.count('ATATATATAT')
     ct.save(infile)
-    
     with open(infile, 'rb') as f_in:
-       with gzip.open('test_ct.gz', 'wb') as f_out:
-          f_out.writelines(f_in)
-   
-    newct= khmer.new_counting_hash(10, 1e7, 4)
+        with gzip.open('test_ct.gz', 'wb') as f_out:
+            f_out.writelines(f_in)
+    newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load('test_ct.gz')
     flag = False
-    x=newct.get('ATATATATAT')
+    x = newct.get('ATATATATAT')
     print x
-    if x == 500 : 
-         flag = True
-    
+    if x == 500:
+        flag = True
     assert flag
-    # check that ct_loaded.get('ATATATATAT') == 500
+
 
 def test_abundance_distribution_gzipped_bigcount():
-      
-    import gzip 
+    import gzip
     infile = utils.get_temp_filename('test.fa')
     outfile1 = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    outfile2=utils.get_temp_filename('test_ct.gz')
+    outfile2 = utils.get_temp_filename('test_ct.gz')
     htfile = _make_counting(infile, K=2, BIGCOUNT=True)
-    # or:
-    
-    """ f_in= open(htfile,'rb').read() 
-    f_out = gzip.open(outfile2,'wb')
-    f_out.write(f_in) """
-    
-    #or: 
     with open(htfile, 'rb') as f_in:
-       with gzip.open(outfile2, 'wb') as f_out:
-          f_out.writelines(f_in)
-    print outfile2
-    counting_hash = khmer.load_counting_hash(outfile2)    
-    kmer='GG'
+        with gzip.open(outfile2, 'wb') as f_out:
+            f_out.writelines(f_in)
+    counting_hash = khmer.load_counting_hash(outfile2)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
-    tracking = khmer._Hashbits(kmer_size, hashsizes)  
-    abundances = counting_hash.abundance_distribution(infile,tracking) 
-    flag=False
-    for _,i in enumerate(abundances):
-       print _, i
-       if _ > 255 and i > 0: 
-             flag= True
-             break
-    assert flag  
+    tracking = khmer._Hashbits(kmer_size, hashsizes)
+    abundances = counting_hash.abundance_distribution(infile, tracking)
+    flag = False
+    for _, i in enumerate(abundances):
+        print _, i
+        if _ > 255 and i > 0:
+            flag = True
+            break
+    assert flag
+
 
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
