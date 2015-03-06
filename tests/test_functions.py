@@ -118,20 +118,20 @@ def test_extract_hashbits_info():
 
 def test_check_file_status_kfile():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
+    check_file_status_exited = False
     try:
         check_file_status(fn, False)
-        assert True
-    except OSError as e:
-        print >>sys.stder, '...failed to remove {fn}'.format(fn)
+    except SystemExit: 
+        check_file_status_exited = True
+    assert check_file_status_exited
 
 
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
-        check_file_status(fn, True)
-        assert False 
+        check_file_status(fn, True) 
     except OSError as e:
-        print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+        assert False
 
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
