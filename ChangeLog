@@ -1,3 +1,8 @@
+2015-03-06  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{collect-reads.py,saturate-by-median.py}: update for 'force'
+   argument in khmer.kfile functions, so that khmer-recipes compile.
+
 2015-03-02  Titus Brown  <titus@idyll.org>
 
    * sandbox/{combine-pe.py,compare-partitions.py,count-within-radius.py,
