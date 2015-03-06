@@ -139,10 +139,10 @@ def main():
             # Emit records if any passed
             if passed_length and passed_filter:
                 for record in batch:
-                    if hasattr(record, 'accuracy'):
+                    if hasattr(record, 'quality'):
                         outfp.write('@%s\n%s\n+\n%s\n' % (record.name,
                                                           record.sequence,
-                                                          record.accuracy))
+                                                          record.quality))
                     else:
                         outfp.write('>%s\n%s\n' %
                                     (record.name, record.sequence))

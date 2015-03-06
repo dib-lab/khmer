@@ -516,6 +516,42 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_append():
+    outfile = utils.get_temp_filename('test.fa.keep')
+    shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
+    in_dir = os.path.dirname(outfile)
+
+    CUTOFF = '1'
+    infile = utils.get_temp_filename('test.fa', in_dir)
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    script = scriptpath('normalize-by-median.py')
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, '--append', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile), outfile
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 2, seqs
+    assert 'GACAGCgtgCCGCA' in seqs[1], seqs
+
+
+def test_normalize_by_median_overwrite():
+    outfile = utils.get_temp_filename('test.fa.keep')
+    shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
+    in_dir = os.path.dirname(outfile)
+
+    CUTOFF = '1'
+    infile = utils.get_temp_filename('test.fa', in_dir)
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    script = scriptpath('normalize-by-median.py')
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile), outfile
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 1, seqs
+    assert 'GACAGCgtgCCGCA' in seqs[0], seqs
+
+
 def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
@@ -1406,6 +1442,27 @@ def test_abundance_dist_single():
     assert line == '1001 2 98 1.0', line
 
 
+def test_abundance_dist_single_csv():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--csv', infile,
+            outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+    line = fp.next().strip()
+    assert line == '1,96,96,0.98', line
+    line = fp.next().strip()
+    assert line == '1001,2,98,1.0', line
+
+
 def test_abundance_dist_single_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -2202,6 +2259,33 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+
+def test_count_overlap_csv():
+    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
+    in_dir = os.path.dirname(seqfile1)
+    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
+    outfile = utils.get_temp_filename('overlap.out', in_dir)
+    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
+    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
+    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
+    htfile = _make_graph(seqfile1, ksize=20)
+    script = scriptpath('count-overlap.py')
+    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize',
+            '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert os.path.exists(outfile), outfile
+    data = [x.strip() for x in open(outfile)]
+    data = set(data)
+    assert '# of unique k-mers in dataset2: 759047' in data
+    assert '# of overlap unique k-mers: 245621' in data
+    assert os.path.exists(curvefile), curvefile
+    data = [x.strip() for x in open(curvefile)]
+    data = set(data)
+    assert '178633,1155' in data
+    assert '496285,2970' in data
+    assert '752053,238627' in data
 
 
 def execute_streaming_diginorm(ifilename):

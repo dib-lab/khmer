@@ -4339,24 +4339,17 @@ static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
     self = (khmer_KHLLCounter_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        double error_rate = 0;
-        WordLength ksize = 0;
+        double error_rate = 0.01;
+        WordLength ksize = 20;
 
-        if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
+        if (!PyArg_ParseTuple(args, "|db", &error_rate, &ksize)) {
             Py_DECREF(self);
-            return NULL;
-        }
-
-        if ((error_rate < 0) || (error_rate > 1.0)) {
-            Py_DECREF(self);
-            PyErr_SetString(PyExc_ValueError,
-                            "Error rate should be between 0.0 and 1.0");
             return NULL;
         }
 
         try {
             self->hllcounter = new HLLCounter(error_rate, ksize);
-        } catch (khmer_exception &e) {
+        } catch (InvalidValue &e) {
             Py_DECREF(self);
             PyErr_SetString(PyExc_ValueError, e.what());
             return NULL;
@@ -4455,6 +4448,108 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static
+PyObject *
+hllcounter_get_erate(khmer_KHLLCounter_Object * me)
+{
+    return PyFloat_FromDouble(me->hllcounter->get_erate());
+}
+
+static
+PyObject *
+hllcounter_get_ksize(khmer_KHLLCounter_Object * me)
+{
+    return PyLong_FromLong(me->hllcounter->get_ksize());
+}
+
+static
+int
+hllcounter_set_ksize(khmer_KHLLCounter_Object * me, PyObject *value,
+                     void *closure)
+{
+    if (value == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute");
+        return -1;
+    }
+
+    long ksize = 0;
+    if (PyLong_Check(value)) {
+        ksize = PyLong_AsLong(value);
+    } else if (PyInt_Check(value)) {
+        ksize = PyInt_AsLong(value);
+    } else {
+        PyErr_SetString(PyExc_TypeError,
+                        "Please use an integer value for k-mer size");
+        return -1;
+    }
+
+    if (ksize <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Please set k-mer size to a value "
+                        "greater than zero");
+        return -1;
+    }
+
+    try {
+        me->hllcounter->set_ksize(ksize);
+    } catch (ReadOnlyAttribute &e) {
+        PyErr_SetString(PyExc_AttributeError, e.what());
+        return -1;
+    }
+
+    return 0;
+}
+
+static
+int
+hllcounter_set_erate(khmer_KHLLCounter_Object * me, PyObject *value,
+                     void *closure)
+{
+    if (value == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute");
+        return -1;
+    }
+
+    if (!PyFloat_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Please use a float value for k-mer size");
+        return -1;
+    }
+
+    double erate = PyFloat_AsDouble(value);
+    try {
+        me->hllcounter->set_erate(erate);
+    } catch (InvalidValue &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return -1;
+    } catch (ReadOnlyAttribute &e) {
+        PyErr_SetString(PyExc_AttributeError, e.what());
+        return -1;
+    }
+
+    return 0;
+}
+
+static
+PyObject *
+hllcounter_getalpha(khmer_KHLLCounter_Object * me)
+{
+    return PyFloat_FromDouble(me->hllcounter->get_alpha());
+}
+
+static
+PyObject *
+hllcounter_getcounters(khmer_KHLLCounter_Object * me)
+{
+    std::vector<int> counters = me->hllcounter->get_M();
+
+    PyObject * x = PyList_New(counters.size());
+    for (size_t i = 0; i < counters.size(); i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromLong(counters[i]));
+    }
+
+    return x;
+}
+
 static PyMethodDef khmer_hllcounter_methods[] = {
     {
         "add", (PyCFunction)hllcounter_add,
@@ -4476,6 +4571,38 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         METH_VARARGS,
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter."
+    },
+    {NULL} /* Sentinel */
+};
+
+static PyGetSetDef khmer_hllcounter_getseters[] = {
+    {
+        (char *)"alpha",
+        (getter)hllcounter_getalpha, NULL,
+        (char *)"alpha constant for this HLL counter.",
+        NULL
+    },
+    {
+        (char *)"error_rate",
+        (getter)hllcounter_get_erate, (setter)hllcounter_set_erate,
+        (char *)"Error rate for this HLL counter. "
+        "Can be changed prior to first counting, but becomes read-only after "
+        "that (raising AttributeError)",
+        NULL
+    },
+    {
+        (char *)"ksize",
+        (getter)hllcounter_get_ksize, (setter)hllcounter_set_ksize,
+        (char *)"k-mer size for this HLL counter."
+        "Can be changed prior to first counting, but becomes read-only after "
+        "that (raising AttributeError)",
+        NULL
+    },
+    {
+        (char *)"counters",
+        (getter)hllcounter_getcounters, NULL,
+        (char *)"Read-only internal counters.",
+        NULL
     },
     {NULL} /* Sentinel */
 };
@@ -4510,7 +4637,7 @@ static PyTypeObject khmer_KHLLCounter_Type = {
     0,                                         /* tp_iternext */
     khmer_hllcounter_methods,                  /* tp_methods */
     0,                                         /* tp_members */
-    0,                                         /* tp_getset */
+    khmer_hllcounter_getseters,                /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */
