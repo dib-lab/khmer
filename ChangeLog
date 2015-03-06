@@ -1,8 +1,8 @@
 2015-03-06  Jessica Mizzi  <mizzijes@msu.edu>
 
     * khmer/kfile.py: Added file not existing error for system exit
-    * tests/{test_scripts,test_functions}.py: Added tests for 
-    check_file_status for file existence and force option  
+    * tests/{test_scripts,test_functions}.py: Added tests for
+    check_file_status for file existence and force option
 
 2015-03-06  Titus Brown  <titus@idyll.org>
 

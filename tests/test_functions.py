@@ -121,7 +121,7 @@ def test_check_file_status_kfile():
     check_file_status_exited = False
     try:
         check_file_status(fn, False)
-    except SystemExit: 
+    except SystemExit:
         check_file_status_exited = True
     assert check_file_status_exited
 
@@ -129,7 +129,7 @@ def test_check_file_status_kfile():
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
-        check_file_status(fn, True) 
+        check_file_status(fn, True)
     except OSError as e:
         assert False
 
@@ -318,18 +318,3 @@ class Test_BrokenPairedReader(object):
         assert x == expected, x
         assert m == 3, m
         assert n == 2, n
-
-
-def check_file_status_kfile():
-    try:
-        kfile.check_file_status('thisfiledoesnotexistatall')
-    except OSError as e:
-        print >>sys.stder, '...failed to remove {fn}'.format(fn)
-
-
-def check_file_status_kfile_force():
-    if force:
-        try:
-            kfile.check_file_status('thisfiledoesnotexistatall')
-        except OSError as e:
-            print >>sys.stderr, '...failed to remove {fn}'.format(fn)
