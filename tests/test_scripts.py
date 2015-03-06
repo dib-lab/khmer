@@ -2783,15 +2783,15 @@ def test_counting_load_gzipped_bigcount():
     for i in range(500):
         ct.count('ATATATATAT')
     ct.save(infile)
-    with open(infile, 'rb') as f_in:
-        with gzip.open('test_ct.gz', 'wb') as f_out:
-            f_out.writelines(f_in)
+    outfile = utils.get_temp_filename('test_ct.gz')
+    fin = open(infile, 'rb').read()
+    fout = gzip.open(outfile, 'wb')
+    fout.write(fin)
     newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load('test_ct.gz')
     flag = False
-    x = newct.get('ATATATATAT')
-    print x
-    if x == 500:
+    count = newct.get('ATATATATAT')
+    if count == 500:
         flag = True
     assert flag
 
