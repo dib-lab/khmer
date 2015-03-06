@@ -60,15 +60,15 @@ The real full version
 
 khmer's scripts, at their heart, represents k-mers in a very memory
 efficient way by taking advantage of two data structures, `Bloom
-filters <http://en.wikipedia.org/wiki/Bloom_filter>`__ and `CountMin
-Sketches <https://sites.google.com/site/countminsketch/>`__, that are
+filters <http://en.wikipedia.org/wiki/Bloom_filter>`__ and `Count-Min
+Sketches <http://en.wikipedia.org/wiki/Count%E2%80%93min_sketch>`__, that are
 both *probabilistic* and *constant memory*.  The "probabilistic" part
 means that there are false positives: the less memory you use, the
 more likely it is that khmer will think that k-mers are present when
 they are not, in fact, present.
 
 Digital normalization (normalize-by-median and filter-abund) uses
-the CountMin Sketch data structure.
+the Count-Min Sketch data structure.
 
 Graph partitioning (load-graph etc.) uses the Bloom filter data structure.
 
@@ -76,7 +76,7 @@ The practical ramifications of this are pretty cool.  For example,
 your digital normalization is guaranteed not to increase in memory
 utilization, and graph partitioning is estimated to be 10-20x more
 memory efficient than any other de Bruijn graph representation.  And
-hash tables (which is what Bloom filters and CountMin Sketches use)
+hash tables (which is what Bloom filters and Count-Min Sketches use)
 are really fast and efficient.  Moreover, the optimal memory size for
 these primary data structures is dependent on the number of k-mers,
 but not explicitly on the size of k itself, which is very unusual.

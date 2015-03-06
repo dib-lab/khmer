@@ -41,6 +41,8 @@ All scripts in ``sandbox/`` must:
 * have a hash-bang line (``#! /usr/bin/env python2``) at the top
 * be command-line executable (``chmod a+x``)
 * have a Copyright message (see below)
+* have lowercase names
+* use '-' as a word separator, rather than '_' or CamelCase
 
 All *new* scripts being added to ``sandbox/`` should:
 
@@ -113,3 +115,4 @@ development/PR checklist::
    - [ ] standard command line options are implemented
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
+   - [ ] script has been removed from sandbox/README.rst

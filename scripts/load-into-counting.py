@@ -54,8 +54,9 @@ def get_parser():
                         help="The names of one or more FAST[AQ] input "
                         "sequence files.")
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
-                        action='store_false',
-                        help='Do not count k-mers past 255')
+                        action='store_false', help="The default behaviour is "
+                        "to count past 255 using bigcount. This flag turns "
+                        "bigcount off, limiting counts to 255.")
     parser.add_argument('--summary-info', '-s', default=None, metavar="FORMAT",
                         choices=['json', 'tsv'],
                         help="What format should the machine readable run "

@@ -253,6 +253,20 @@ class Hashbits(_Hashbits):
 
 
 class HLLCounter(_HLLCounter):
+    """
+    A HyperLogLog counter is a probabilistic data structure specialized on
+    cardinality estimation.
+    There is a precision/memory consumption trade-off: error rate determines
+    how much memory is consumed.
+
+    # Creating a new HLLCounter:
+
+    >>> khmer.HLLCounter(error_rate, ksize)
+
+    where the default values are:
+      - error_rate: 0.01
+      - ksize: 20
+    """
 
     def __len__(self):
         return self.estimate_cardinality()
