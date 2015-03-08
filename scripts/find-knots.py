@@ -89,7 +89,7 @@ def main():
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, False)
 
     check_space(infiles)
 
