@@ -100,7 +100,8 @@ cppcheck: $(CPPSOURCES)
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
+	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
+		scripts/ tests/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \

@@ -13,6 +13,7 @@ fi
 virtualenv -p ${PYTHON_EXECUTABLE} .env
 
 . .env/bin/activate
+pip install setuptools==3.4.1
 make install-dependencies
 
 if type ccache >/dev/null 2>&1

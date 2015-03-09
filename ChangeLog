@@ -1,6 +1,18 @@
-2015-02-24  Sherine Awad  <sherine.awad@gmail.com>
+2015-03-09  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table with bigcounts and test abundance with bigcounts
+
+2015-03-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: make 'pep8' target be more verbose
+   * jenkins-build.sh: specify setuptools version
+   * scripts/{abundance-dist,annotate-partitions,count-median,do-partition,
+   extract-paired-reads,extract-partitions,filter-stoptags,find-knots,
+   interleave-reads,merge-partitions,partition-graph,sample-reads-randomly,
+   split-paired-reads}.py,setup.py: fix new PEP8 errors
+   * setup.py: specify that this is a Python 2 only project (for now)
+   * tests/test_{counting_single,subset_graph}.py: make explicit the use of
+   floor division behavior.
 
 2015-03-06  Titus Brown  <titus@idyll.org>
 

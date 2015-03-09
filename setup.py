@@ -6,7 +6,6 @@
 """ Setup for khmer project. """
 
 import ez_setup
-ez_setup.use_setuptools(version="3.4.1")
 
 import os
 import sys
@@ -25,6 +24,8 @@ from distutils.dist import Distribution
 from distutils.errors import DistutilsPlatformError
 
 import versioneer
+ez_setup.use_setuptools(version="3.4.1")
+
 versioneer.VCS = 'git'
 versioneer.versionfile_source = 'khmer/_version.py'
 versioneer.versionfile_build = 'khmer/_version.py'
@@ -148,6 +149,7 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
+    "Programming Language :: Python :: 2 :: Only",
     "Programming Language :: Python :: 2.7",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
