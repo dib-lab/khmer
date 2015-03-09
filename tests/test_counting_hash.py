@@ -100,13 +100,15 @@ class Test_CountingHash(object):
 
         assert hi.get(GG) == 2
 
+
 def test_get_raw_tables():
     ht = khmer.new_counting_hash(20, 1e5, 4)
     tables = ht.get_raw_tables()
 
     for size, table in zip(ht.hashsizes(), tables):
-        assert type(table) is buffer
+        assert isinstance(table, buffer)
         assert size == len(table)
+
 
 def test_get_raw_tables_view():
     ht = khmer.new_counting_hash(20, 1e5, 4)

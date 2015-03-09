@@ -89,7 +89,8 @@ public:
 
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
-    Byte ** get_raw_tables() {
+    Byte ** get_raw_tables()
+    {
         return _counts;
     }
 

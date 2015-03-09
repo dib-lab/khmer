@@ -694,8 +694,9 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
         PyObject * buf = PyBuffer_FromMemory(table_ptrs[i], sizes[i]);
-        if(!PyBuffer_Check(buf))
+        if(!PyBuffer_Check(buf)) {
             return NULL;
+        }
         PyList_SET_ITEM(raw_tables, i, buf);
     }
 
@@ -1552,8 +1553,9 @@ static PyMethodDef khmer_counting_methods[] = {
     },
     { "output_fasta_kmer_pos_freq", (PyCFunction)hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get", (PyCFunction)hash_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "get_raw_tables", (PyCFunction)hash_get_raw_tables,
-       METH_VARARGS, "Get a list of the raw tables as memoryview objects"
+    {
+        "get_raw_tables", (PyCFunction)hash_get_raw_tables,
+        METH_VARARGS, "Get a list of the raw tables as memoryview objects"
     },
     { "get_min_count", (PyCFunction)hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", (PyCFunction)hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
