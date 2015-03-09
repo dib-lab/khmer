@@ -1,6 +1,7 @@
 2015-03-09  Sherine Awad  <sherine.awad@gmail.com>
 
-   * tests/test_scripts.py: Test loading of compressed counting table with bigcounts and test abundance with bigcounts
+   * tests/test_scripts.py: Test loading of compressed counting table
+   with bigcounts,and test abundance with bigcounts
 
 2015-03-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
