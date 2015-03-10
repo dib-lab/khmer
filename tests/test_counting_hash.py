@@ -113,13 +113,13 @@ def test_get_raw_tables():
 def test_get_raw_tables_view():
     ht = khmer.new_counting_hash(20, 1e5, 4)
     tables = ht.get_raw_tables()
-    for t in tables:
-        m = memoryview(t)
-        assert sum(m.tolist()) == 0
+    for tab in tables:
+        memv = memoryview(tab)
+        assert sum(memv.tolist()) == 0
     ht.consume('AAAATTTTCCCCGGGGAAAA')
-    for t in tables:
-        m = memoryview(t)
-        assert sum(m.tolist()) == 1
+    for tab in tables:
+        memv = memoryview(tab)
+        assert sum(memv.tolist()) == 1
 
 
 @attr('linux')
