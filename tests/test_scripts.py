@@ -2777,25 +2777,24 @@ def test_trim_low_abund_trimtest_savetable():
 
 def test_counting_load_gzipped_bigcount():
     import gzip
-    #infile = utils.get_temp_filename('test_ct')
     infile = utils.get_temp_filename('normC20k20.ct')
     ct = khmer.new_counting_hash(10, 1e7, 4)
     ct.set_use_bigcount(True)
     for i in range(500):
         ct.count('ATATATATAT')
     ct.save(infile)
-    #outfile = utils.get_temp_filename('test_ct.gz')
     outfile = utils.get_temp_filename('goodversion-k12.ht.gz')
     fin = open(infile, 'rb').read()
     fout = gzip.open(outfile, 'wb')
     fout.write(fin)
     newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load('test_ct.gz')
-    flag = False
+    #flag = False
     count = newct.get('ATATATATAT')
-    if count == 500:
-        flag = True
-    assert flag
+    #if count == 500:
+     #   flag = True
+    #assert flag
+    assert count == 500
 
 
 def test_abundance_distribution_gzipped_bigcount():
