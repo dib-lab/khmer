@@ -18,6 +18,7 @@ import subprocess
 import threading
 import bz2
 import io
+import gzip
 
 import khmer_tst_utils as utils
 import khmer
@@ -2776,7 +2777,6 @@ def test_trim_low_abund_trimtest_savetable():
 
 
 def test_counting_load_gzipped_bigcount():
-    import gzip
     infile = utils.get_temp_filename('test_ct')
     ct = khmer.new_counting_hash(10, 1e7, 4)
     ct.set_use_bigcount(True)
@@ -2794,7 +2794,6 @@ def test_counting_load_gzipped_bigcount():
 
 
 def test_abundance_distribution_gzipped_bigcount():
-    import gzip
     infile = utils.get_temp_filename('test.fa')
     outfile1 = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
