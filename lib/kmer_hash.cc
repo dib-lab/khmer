@@ -49,7 +49,7 @@ HashIntoType _cyclichash(const char * kmer_string, const WordLength k)
     HashIntoType hashvalue = 0;
 
     // Iterate through the kmer, hashing each
-    for (int i = 0; i < strlen(kmer_string); i++) {
+    for (size_t i = 0; i < strlen(kmer_string); i++) {
         // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
         hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
 
@@ -91,7 +91,7 @@ HashIntoType _revcyclichash(const char * kmer_string, const WordLength k)
     HashIntoType hashvalue = 0;
 
     // Iterate through the kmer backwards, hashing each base
-    for (int i = strlen(kmer_string) - 1; i >= 0; i--) {
+    for (size_t i = strlen(kmer_string) - 1; i > 0; i--) {
         // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
         hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
 
