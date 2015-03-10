@@ -26,6 +26,7 @@ import screed
 
 from khmer._khmer import new_hashtable
 
+
 def scriptpath(script):
     return script
 
@@ -2782,10 +2783,10 @@ def test_counting_load_gzipped_bigcount():
     for i in range(500):
         ct.count('ATATATATAT')
     ct.save(infile)
-    outfile =infile + '.gz'
+    outfile = infile + '.gz'
     with open(infile, 'rb') as f_in:
         with gzip.open(outfile, 'wb') as f_out:
-            f_out.writelines(f_in) 
+            f_out.writelines(f_in)
     newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load(outfile)
     count = newct.get('ATATATATAT')
