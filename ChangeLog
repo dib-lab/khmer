@@ -1,3 +1,9 @@
+2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/counting.hh, khmer/_khmermodule.cc: Expose the raw tables of
+   count-min sketches to the world of python using a buffer interface.
+   * tests/test_counting_hash.py: Tests of the above functionality.
+
 2015-03-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * Makefile: make 'pep8' target be more verbose
