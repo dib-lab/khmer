@@ -26,7 +26,6 @@ import screed
 
 from khmer._khmer import new_hashtable
 
-
 def scriptpath(script):
     return script
 
