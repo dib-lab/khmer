@@ -109,6 +109,10 @@ def test_sweep_reads():
 
     print os.listdir(in_dir)
 
+    assert os.path.exists(out1)
+    assert os.path.exists(out2)
+    assert os.path.exists(mout)
+    assert os.path.exists(oout)
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
@@ -149,6 +153,10 @@ def test_sweep_reads_fq():
     mout = os.path.join(in_dir, 'test_multi.fq')
     oout = os.path.join(in_dir, 'test_orphaned.fq')
 
+    assert os.path.exists(out1)
+    assert os.path.exists(out2)
+    assert os.path.exists(mout)
+    assert os.path.exists(oout)
     print open(out1).read()
 
     print os.listdir(in_dir)
