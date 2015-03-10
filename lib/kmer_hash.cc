@@ -38,7 +38,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 }
 
 // Bitwise Shifting
-HashIntoType _cyclichash(std::string kmer_string, const WordLength k)
+HashIntoType _cyclichash(const char * kmer_string, const WordLength k)
 {
     // Our list of random numbers for each base value
     // Hard coding in random vals from array
@@ -49,7 +49,7 @@ HashIntoType _cyclichash(std::string kmer_string, const WordLength k)
     HashIntoType hashvalue = 0;
 
     // Iterate through the kmer, hashing each
-    for (int i = 0; i < kmer_string.length(); i++) {
+    for (int i = 0; i < strlen(kmer_string); i++) {
         // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
         hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
 
@@ -58,25 +58,29 @@ HashIntoType _cyclichash(std::string kmer_string, const WordLength k)
         case 'A':
         case 'a':
             hashvalue ^= vals[0];
+	    break;
         case 'C':
         case 'c':
             hashvalue ^= vals[1];
+	    break;
         case 'G':
         case 'g':
             hashvalue ^= vals[2];
+	    break;
         case 'T':
         case 't':
         case 'U':
         case 'u':
             hashvalue ^= vals[3];
+	    break;
         default:
-            throw khmer_exception();
+            throw khmer_exception("Unknown nucleotide, not one of AaCcGgTtUu.");
         }// of Switch
     }
     return hashvalue;
 }
 
-HashIntoType _revcyclichash(std::string kmer_string, const WordLength k)
+HashIntoType _revcyclichash(const char * kmer_string, const WordLength k)
 {
     // Our list of random numbers for each base value
     // Hard coding in random vals from array
@@ -87,7 +91,7 @@ HashIntoType _revcyclichash(std::string kmer_string, const WordLength k)
     HashIntoType hashvalue = 0;
 
     // Iterate through the kmer backwards, hashing each base
-    for (int i = kmer_string.length(); i > -1; i--) {
+    for (int i = strlen(kmer_string) - 1; i >= 0; i--) {
         // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
         hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
 
@@ -96,19 +100,23 @@ HashIntoType _revcyclichash(std::string kmer_string, const WordLength k)
         case 'A':
         case 'a':
             hashvalue ^= compliment_vals[0];
+	    break;
         case 'C':
         case 'c':
             hashvalue ^= compliment_vals[1];
+	    break;
         case 'G':
         case 'g':
             hashvalue ^= compliment_vals[2];
+	    break;
         case 'T':
         case 't':
         case 'U':
         case 'u':
             hashvalue ^= compliment_vals[3];
+	    break;
         default:
-            throw khmer_exception();
+            throw khmer_exception("Unknown nucleotide, not one of AaCcGgTtUu.");
         }// of Switch
     }
     return hashvalue;
