@@ -301,7 +301,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
         myself->parser =
             IParser:: get_parser( ifile_name );
     } catch (InvalidStreamHandle &exc) {
-        PyErr_SetString( PyExc_ValueError, exc.what() );
+        PyErr_SetString( PyExc_IOError, exc.what() );
         return NULL;
     }
     return self;
