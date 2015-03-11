@@ -594,7 +594,7 @@
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
-    in the current dir by explictly specifying an output file.
+    in the current dir by explicitly specifying an output file.
 
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
@@ -1059,7 +1059,7 @@
 2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
-    normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
+    normalize-by-median,load-graph}.py: restore Python 2.6 compatibility for
     Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
 
 2014-06-15  Titus Brown  <t@idyll.org>
