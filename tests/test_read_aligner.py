@@ -45,7 +45,7 @@ def test_align_nothing():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCAAGGCTCGAGATTTACC"
 
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc = aligner.align(read)
@@ -75,7 +75,7 @@ def test_alignnocov():
 def test_align_middle():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume(read)
@@ -90,7 +90,7 @@ def test_align_middle():
 def test_align_middle_trunc():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
 
@@ -112,7 +112,7 @@ def test_align_middle_trunc():
 def test_align_middle_trunc_2():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
 
@@ -135,7 +135,7 @@ def test_align_fwd_nothing():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCAAGGCTCGAGATTTACC"
 
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc = aligner.align_forward(read)
@@ -150,7 +150,7 @@ def test_align_fwd_nothing():
 def test_align_fwd_nocov():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume("ACCTAGGTTCGACATGTACC")
@@ -165,7 +165,7 @@ def test_align_fwd_nocov():
 def test_align_fwd_middle():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume(read)
@@ -180,7 +180,7 @@ def test_align_fwd_middle():
 def test_align_fwd_middle_trunc():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
 
@@ -202,7 +202,7 @@ def test_align_fwd_middle_trunc():
 def test_align_fwd_middle_trunc_2():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
-    aligner = khmer.new_readaligner(ch, 0, 0)
+    aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
 
