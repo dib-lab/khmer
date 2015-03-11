@@ -25,6 +25,15 @@ def teardown():
     utils.cleanup()
 
 
+@attr('linux')
+def test_toobig():
+    try:
+        pt = khmer.Hashbits(32, 1e13, 1)
+        assert 0, "This should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test__get_set_tag_density():
     ht = khmer.Hashbits(32, 1, 1)
 
@@ -550,5 +559,5 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         assert 0, "this should fail"
     except IOError as e:
         print str(e)
-    except ValueError, e:
+    except ValueError as e:
         print str(e)

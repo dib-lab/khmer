@@ -23,8 +23,8 @@ from khmer.khmer_args import (build_hashbits_args, DEFAULT_MIN_TABLESIZE)
 
 
 def output_single(r):
-    if hasattr(r, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+    if hasattr(r, 'quality'):
+        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.quality)
     else:
         return ">%s\n%s\n" % (r.name, r.sequence)
 

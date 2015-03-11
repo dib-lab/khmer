@@ -81,11 +81,7 @@ public:
                                HashIntoType curve[2][100],
                                khmer::Hashbits &ht2,
                                unsigned int &total_reads,
-                               unsigned long long &n_consumed,
-                               CallbackFn callback,
-                               void * callback_data);
-
-
+                               unsigned long long &n_consumed);
 
     // just for overlap k-mer counting!
     unsigned int check_and_process_read_overlap(std::string &read,

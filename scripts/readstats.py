@@ -58,8 +58,8 @@ def main():
         seqs = 0
 
         try:
-            input_iter = screed.open(filename)
-        except (IOError, OSError, EOFError), exc:
+            input_iter = screed.open(filename, parse_description=False)
+        except (IOError, OSError, EOFError) as exc:
             print >>sys.stderr, 'ERROR in opening %s:' % filename
             print >>sys.stderr, '     ', str(exc)
             continue

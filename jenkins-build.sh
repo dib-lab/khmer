@@ -13,6 +13,7 @@ fi
 virtualenv -p ${PYTHON_EXECUTABLE} .env
 
 . .env/bin/activate
+pip install setuptools==3.4.1
 make install-dependencies
 
 if type ccache >/dev/null 2>&1
@@ -64,3 +65,7 @@ if type sloccount >/dev/null 2>&1
 then
 	make sloccount.sc
 fi
+
+# takes too long to run on every build
+#bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
+ 

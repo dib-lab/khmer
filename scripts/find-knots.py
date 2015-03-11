@@ -73,8 +73,8 @@ def get_parser():
                         ' the size of the k-mer counting table(s)')
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     return parser
 
 

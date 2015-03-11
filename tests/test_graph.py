@@ -239,7 +239,7 @@ class Test_Partitioning(object):
 
         print open(output_file).read()
 
-        x = set([r.accuracy for r in screed.open(output_file)])
+        x = set([r.quality for r in screed.open(output_file)])
         assert x, x
 
     def test_disconnected_20_a(self):
@@ -306,6 +306,26 @@ class Test_Partitioning(object):
 
 
 class Test_PythonAPI(object):
+
+    def test_find_all_tags_kmersize(self):
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
+
+        a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
+        b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
+        c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
+
+        print ht.consume(a)
+        try:
+            ppi = ht.find_all_tags(c[:19])
+            assert False, "should raise a ValueError for wrong k-mer size"
+        except ValueError:
+            pass
+
+        try:
+            ppi = ht.find_all_tags(c[:21])
+            assert False, "should raise a ValueError for wrong k-mer size"
+        except ValueError:
+            pass
 
     def test_ordered_connect(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)

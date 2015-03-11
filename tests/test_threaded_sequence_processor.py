@@ -60,15 +60,15 @@ def test_basic():
 def test_basic_fastq_like():
     tsp = ThreadedSequenceProcessor(idem, 1, 1, verbose=False)
 
-    input = [dict(name='a', sequence='AAA', accuracy='###'),
-             dict(name='b', sequence='TTT', accuracy='###'), ]
+    input = [dict(name='a', sequence='AAA', quality='###'),
+             dict(name='b', sequence='TTT', quality='###'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
 
     x = load_records_fastq(outfp)
     for i in x:
-        assert i['accuracy'] == '###'
+        assert i['quality'] == '###'
 
 
 def test_odd():

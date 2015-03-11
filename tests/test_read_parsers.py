@@ -25,7 +25,7 @@ def test_read_properties():
         assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
         assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
         assert read.annotations == ""
-        assert read.accuracy == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
+        assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
 def test_with_default_arguments():
@@ -62,7 +62,7 @@ def test_gzip_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -73,7 +73,7 @@ def test_gzip_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -94,7 +94,7 @@ def test_bzip2_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -105,7 +105,7 @@ def test_bzip2_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -117,7 +117,7 @@ def test_badbzip2():
         assert 0, "this should fail"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -164,9 +164,6 @@ def test_old_illumina_pair_mating():
 
     import threading
 
-    # Note: This file, when used in conjunction with a 65600 byte per-thread
-    #       prefetch buffer, tests the paired read mating logic with the
-    #       old Illumina read name format.
     rparser = ReadParser(utils.get_test_data("test-reads.fa"))
 
     def thread_1_runtime(rparser):
@@ -177,7 +174,6 @@ def test_old_illumina_pair_mating():
         for readnum, read in enumerate(rparser):
             if 0 == readnum:
                 pass
-                # assert "850:2:1:1198:16820/1" == read.name, read.name
 
     t1 = threading.Thread(target=thread_1_runtime, args=[rparser])
     t2 = threading.Thread(target=thread_2_runtime, args=[rparser])
@@ -318,6 +314,6 @@ def test_iternext():
         assert 0, "Shouldn't be able to iterate over non FASTA file"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

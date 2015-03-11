@@ -35,13 +35,13 @@ DEBUG = True
 
 def get_parser():
     epilog = ("""
-    
+
     Take a list of files containing sequences, and subsample 100,000
     sequences (:option:`-N`/:option:`--num_reads`) uniformly, using
     reservoir sampling.  Stop after first 100m sequences
     (:option:`-M`/:option:`--max_reads`). By default take one subsample,
     but take :option:`-S`/:option:`--samples` samples if specified.
-    
+
     The output is placed in :option:`-o`/:option:`--output` <file>
     (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
     (for more than one sample).
@@ -66,18 +66,11 @@ def get_parser():
     parser.add_argument('-o', '--output', dest='output_file',
                         metavar='output_file',
                         type=argparse.FileType('w'), default=None)
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     return parser
-
-
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def main():
@@ -113,7 +106,7 @@ def main():
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
-        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' % \
+        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' %\
             args.num_reads
         print >>sys.stderr, 'Subsampled reads will be placed in %s' % \
             output_filename
@@ -134,15 +127,14 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
-        for record in screed.open(filename):
+        for record in screed.open(filename, parse_description=False):
             total += 1
 
             if total % 10000 == 0:
                 print >>sys.stderr, '...', total, 'reads scanned'
                 if total >= args.max_reads:
-                    print >>sys.stderr, 'reached upper limit of %d reads',\
-                        ' (see -M); exiting' \
-                        % args.max_reads
+                    print >>sys.stderr, 'reached upper limit of %d reads' % \
+                        args.max_reads, '(see -M); exiting'
                     break
 
             # collect first N reads
