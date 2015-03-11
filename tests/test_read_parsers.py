@@ -195,7 +195,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         t.join()
 
     assert reads_count_1thr == sum(reads_counts_per_thread), \
-        reads_counts_per_thread
+        (reads_count_1thr, reads_counts_per_thread)
 
 
 @attr('multithread')
@@ -356,7 +356,7 @@ def test_constructor():
     try:
         ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
-    except ValueError as err:
+    except IOError as err:
         print str(err)
 
 

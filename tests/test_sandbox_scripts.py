@@ -161,6 +161,11 @@ def test_sweep_reads_fq():
 
     print os.listdir(in_dir)
 
+    assert os.path.exists(out1), err
+    assert os.path.exists(out2), err
+    assert os.path.exists(mout), err
+    assert os.path.exists(oout), err
+
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])

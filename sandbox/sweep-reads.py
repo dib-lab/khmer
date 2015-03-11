@@ -339,7 +339,7 @@ def main():
                 name = record.name
                 try:
                     labels = ht.sweep_label_neighborhood(seq, traversal_range)
-                except ValueError as e:
+                except IOError as e:
                     pass
                 else:
                     if hasattr(record, 'quality'):

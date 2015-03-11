@@ -890,9 +890,9 @@ def test_count_median_fq():
     data = [x.strip() for x in open(outfile)]
     data = set(data)
     assert len(data) == 2, data
-    assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
-
+    assert 'seq 1001 1001.0 0.0 18' in data, data
+    assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data,\
+            data
 
 def test_count_median_fq_csv():
     infile = utils.get_temp_filename('test.fa')
