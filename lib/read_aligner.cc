@@ -9,6 +9,16 @@
 namespace khmer
 {
 
+Alignment * _empty_alignment()
+{
+  Alignment* ret = new Alignment;
+  ret->score = -std::numeric_limits<double>::infinity();
+  ret->read_alignment = "";
+  ret->graph_alignment = "";
+  ret->truncated = true;
+  return ret;
+}
+
 static Nucl _ch_to_nucl(char base)
 {
     base = toupper(base);
@@ -586,10 +596,6 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
                 "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
                 forward->read_alignment.c_str(), forward->graph_alignment.c_str(),
                 forward->score, forward->truncated);
-        fprintf(stderr,
-                "REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
-                reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(),
-                reverse->score, reverse->truncated);
 #endif
 
     delete forward;
