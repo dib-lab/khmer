@@ -1,8 +1,12 @@
+2015-03-15  Kevin Murray  <spam@kdmurray.id.au>  &  Titus Brown  <titus@idyll.org>
+
+   * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
+   have the memoryview type/function.
 
 2015-03-11  Erich Schwarz  <ems394@cornell.edu>
 
-   * Added URLs and brief descriptions for khmer-relevant documentation in 
-   doc/introduction.txt, pointing to http://khmer-protocols.readthedocs.org and 
+   * Added URLs and brief descriptions for khmer-relevant documentation in
+   doc/introduction.txt, pointing to http://khmer-protocols.readthedocs.org and
    khmer-recipes.readthedocs.org, with brief descriptions of their content.
 
 2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
