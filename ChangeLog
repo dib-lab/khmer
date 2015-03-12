@@ -1,3 +1,8 @@
+2015-03-12  Kevin Murray  <spam@kdmurray.id.au>
+
+   * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
+   have the memoryview type/function.
+
 2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/counting.hh, khmer/_khmermodule.cc: Expose the raw tables of
