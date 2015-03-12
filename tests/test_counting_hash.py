@@ -12,6 +12,7 @@ import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
 
+import nose
 from nose.plugins.attrib import attr
 
 MAX_COUNT = 255
@@ -111,6 +112,10 @@ def test_get_raw_tables():
 
 
 def test_get_raw_tables_view():
+    try:
+        memoryview
+    except NameError:
+        raise nose.SkipTest("This test requires memoryview")
     ht = khmer.new_counting_hash(20, 1e5, 4)
     tables = ht.get_raw_tables()
     for tab in tables:
