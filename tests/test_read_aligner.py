@@ -217,6 +217,129 @@ def test_align_fwd_middle_trunc_2():
     assert trunc
 
 
+def test_align_fwd_covs_1():
+    K = 10
+    
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("CTCGACAAGTCCTTGACAGAT")
+    #           ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read) - K + 1
+    assert covs[0] == 19
+    assert min(covs[1:]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_2():
+    K = 10
+    
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GACGACAAGTCCTTGACAGAT")
+    #            ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read) - K + 1
+    assert covs[0] == 19
+    assert covs[1] == 19
+    assert min(covs[2:]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_3():
+    K = 10
+    
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTAGACAAGTCCTTGACAGAT")
+    #             ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read) - K + 1
+    assert covs[0] == 19
+    assert covs[1] == 19
+    assert covs[2] == 19
+    assert min(covs[3:]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_4():
+    K = 10
+    
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTCGACAAGTCCTTGACAGAG")
+    #                               ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read) - K + 1
+    assert covs[-1] == 19
+    assert min(covs[:-1]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_5():
+    K = 10
+    
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTCGACAAGTCCTTGACAGCT")
+    #                              ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read) - K + 1
+    assert covs[-1] == 19
+    assert covs[-2] == 19
+    assert min(covs[:-2]) == 20, covs
+    assert max(covs) == 20, covs
+
+
 def test_simple_readalign():
     return  # DISABLED @CTB
     ch = khmer.new_counting_hash(10, 1048576, 1)

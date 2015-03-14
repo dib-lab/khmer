@@ -429,7 +429,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
             graph_alignment = graph_base + graph_alignment;
             read_alignment = read_base + read_alignment;
             trusted = ((node->trusted)? "T" : "F") + trusted;
-            covs.push_back(node->cov);
+            covs.insert(covs.begin(), node->cov);
         } else {
             graph_alignment = graph_alignment + graph_base;
             read_alignment = read_alignment + read_base;
