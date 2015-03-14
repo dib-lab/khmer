@@ -1,3 +1,10 @@
+
+2015-03-11  Erich Schwarz  <ems394@cornell.edu>
+
+   * Added URLs and brief descriptions for khmer-relevant documentation in 
+   doc/introduction.txt, pointing to http://khmer-protocols.readthedocs.org and 
+   khmer-recipes.readthedocs.org, with brief descriptions of their content.
+
 2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/counting.hh, khmer/_khmermodule.cc: Expose the raw tables of
