@@ -521,7 +521,7 @@ Alignment* ReadAligner::Align(const std::string& read)
         start.kmer + forward->read_alignment;
     ret->graph_alignment = reverse->graph_alignment +
         start.kmer + forward->graph_alignment;
-    ret->score = ret->score -  GetNull(final_length);
+    ret->score = ret->score - GetNull(final_length);
     ret->truncated = forward->truncated || reverse->truncated;
 
 #if READ_ALIGNER_DEBUG
@@ -592,11 +592,14 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     ret->score = forward->score;
     ret->read_alignment = start.kmer + forward->read_alignment;
     ret->graph_alignment = start.kmer + forward->graph_alignment;
-    ret->score = ret->score -  GetNull(final_length);
+    ret->score = ret->score - GetNull(final_length);
     ret->truncated = forward->truncated;
 
     ret->covs = forward->covs;
     ret->covs.insert(ret->covs.begin(), start.k_cov);
+    for (unsigned int i = 0; i < k - 1; i++) {
+        ret->covs.push_back(0);
+    }
 
 #if READ_ALIGNER_DEBUG
         fprintf(stderr,

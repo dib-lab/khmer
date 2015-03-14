@@ -234,9 +234,9 @@ def test_align_fwd_covs_1():
         print ch.get(read[start:start+K]),
     print ''
 
-    assert len(covs) == len(read) - K + 1
+    assert len(covs) == len(read)
     assert covs[0] == 19
-    assert min(covs[1:]) == 20, covs
+    assert min(covs[1:-K]) == 20, covs
     assert max(covs) == 20, covs
 
 
@@ -258,10 +258,10 @@ def test_align_fwd_covs_2():
         print ch.get(read[start:start+K]),
     print ''
 
-    assert len(covs) == len(read) - K + 1
+    assert len(covs) == len(read)
     assert covs[0] == 19
     assert covs[1] == 19
-    assert min(covs[2:]) == 20, covs
+    assert min(covs[2:-K]) == 20, covs
     assert max(covs) == 20, covs
 
 
@@ -283,11 +283,11 @@ def test_align_fwd_covs_3():
         print ch.get(read[start:start+K]),
     print ''
 
-    assert len(covs) == len(read) - K + 1
+    assert len(covs) == len(read)
     assert covs[0] == 19
     assert covs[1] == 19
     assert covs[2] == 19
-    assert min(covs[3:]) == 20, covs
+    assert min(covs[3:-K]) == 20, covs
     assert max(covs) == 20, covs
 
 
@@ -309,9 +309,9 @@ def test_align_fwd_covs_4():
         print ch.get(read[start:start+K]),
     print ''
 
-    assert len(covs) == len(read) - K + 1
-    assert covs[-1] == 19
-    assert min(covs[:-1]) == 20, covs
+    assert len(covs) == len(read)
+    assert covs[-K] == 19
+    assert min(covs[:-K]) == 20, covs
     assert max(covs) == 20, covs
 
 
@@ -333,10 +333,10 @@ def test_align_fwd_covs_5():
         print ch.get(read[start:start+K]),
     print ''
 
-    assert len(covs) == len(read) - K + 1
-    assert covs[-1] == 19
-    assert covs[-2] == 19
-    assert min(covs[:-2]) == 20, covs
+    assert len(covs) == len(read)
+    assert covs[-K] == 19
+    assert covs[-K - 1] == 19
+    assert min(covs[:-K - 1]) == 20, covs
     assert max(covs) == 20, covs
 
 
