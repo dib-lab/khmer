@@ -119,7 +119,10 @@ def test_get_raw_tables_view():
     ht = khmer.new_counting_hash(20, 1e5, 4)
     tables = ht.get_raw_tables()
     for tab in tables:
-        memv = memoryview(tab)
+        try:
+            memv = memoryview(tab)
+        except TypeError:
+            raise nose.SkipTest("This test needs a higher version of Python.")
         assert sum(memv.tolist()) == 0
     ht.consume('AAAATTTTCCCCGGGGAAAA')
     for tab in tables:
