@@ -4211,8 +4211,15 @@ static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
 
     const char* alignment = aln->graph_alignment.c_str();
     const char* readAlignment = aln->read_alignment.c_str();
-    PyObject * ret = Py_BuildValue("dssO", aln->score, alignment,
-                                   readAlignment, (aln->truncated)? Py_True : Py_False);
+    PyObject * x = PyList_New(aln->covs.size());
+    for (size_t i = 0; i < aln->covs.size(); i++ ){
+      PyList_SET_ITEM(x, i, PyLong_FromLong(aln->covs[i]));
+    }
+
+    PyObject * ret = Py_BuildValue("dssOO", aln->score, alignment,
+                                   readAlignment,
+                                   (aln->truncated)? Py_True : Py_False,
+                                   x);
     delete aln;
 
     return ret;

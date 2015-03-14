@@ -100,6 +100,7 @@ struct AlignmentNode {
     double f_score;
     double h_score;
     bool trusted;
+    BoundedCounterType cov;
 
     size_t num_indels;
 
@@ -164,6 +165,7 @@ struct Alignment {
     std::string graph_alignment;
     std::string read_alignment;
     std::string trusted;
+    std::vector<BoundedCounterType> covs;
     double score;
     bool truncated;
 };

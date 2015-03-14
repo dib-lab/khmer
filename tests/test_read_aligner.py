@@ -138,7 +138,7 @@ def test_align_fwd_nothing():
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
-    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     print score, graphAlign, readAlign
 
@@ -154,7 +154,7 @@ def test_align_fwd_nocov():
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume("ACCTAGGTTCGACATGTACC")
-    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # should be the same
     eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
@@ -169,7 +169,7 @@ def test_align_fwd_middle():
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume(read)
-    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # should be the same
     eq_(readAlign, read)
@@ -186,7 +186,7 @@ def test_align_fwd_middle_trunc():
 
     # omit suffix from graph
     ch.consume(read[:-5])
-    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # should not be the same...
     neq_(readAlign, read)
@@ -208,7 +208,7 @@ def test_align_fwd_middle_trunc_2():
 
     # omit prefix from graph
     ch.consume(read[12:])
-    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # this will fail, because align_forward chooses the first kmer as the
     # seed.

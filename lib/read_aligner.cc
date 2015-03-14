@@ -255,6 +255,7 @@ void ReadAligner::Enumerate(
 
             next->score = curr->score + sc + m_sm.tsc[trans];
             next->trusted = (kmerCov >= m_trusted_cutoff);
+            next->cov = kmerCov;
             next->h_score = hcost;
             next->f_score = next->score + next->h_score;
 
@@ -380,6 +381,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";
+    std::vector<BoundedCounterType> covs;
     ret->score = node->score;
     ret->truncated = (node->seq_idx != 0)
                      && (node->seq_idx != read.length() - 1);
@@ -427,6 +429,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
             graph_alignment = graph_base + graph_alignment;
             read_alignment = read_base + read_alignment;
             trusted = ((node->trusted)? "T" : "F") + trusted;
+            covs.push_back(node->cov);
         } else {
             graph_alignment = graph_alignment + graph_base;
             read_alignment = read_alignment + read_base;
@@ -438,6 +441,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->graph_alignment = graph_alignment;
     ret->read_alignment = read_alignment;
     ret->trusted = trusted;
+    ret->covs = covs;
 
     return ret;
 
@@ -590,6 +594,9 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     ret->graph_alignment = start.kmer + forward->graph_alignment;
     ret->score = ret->score -  GetNull(final_length);
     ret->truncated = forward->truncated;
+
+    ret->covs = forward->covs;
+    ret->covs.insert(ret->covs.begin(), start.k_cov);
 
 #if READ_ALIGNER_DEBUG
         fprintf(stderr,
