@@ -1,3 +1,7 @@
+2015-03-12  Kevin Murray  <spam@kdmurray.id.au>
+
+   * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
+   have the memoryview type/function.
 
 2015-03-11  Erich Schwarz  <ems394@cornell.edu>
 
