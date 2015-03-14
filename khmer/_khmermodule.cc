@@ -688,7 +688,7 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 {
     CountingHash * counting = self->counting;
 
-    Byte ** table_ptrs = counting->get_raw_tables();
+    khmer::Byte ** table_ptrs = counting->get_raw_tables();
     std::vector<HashIntoType> sizes = counting->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());
