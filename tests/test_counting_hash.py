@@ -12,6 +12,7 @@ import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
 
+import nose
 from nose.plugins.attrib import attr
 
 MAX_COUNT = 255
@@ -99,6 +100,34 @@ class Test_CountingHash(object):
         hi.consume(collision_2)
 
         assert hi.get(GG) == 2
+
+
+def test_get_raw_tables():
+    ht = khmer.new_counting_hash(20, 1e5, 4)
+    tables = ht.get_raw_tables()
+
+    for size, table in zip(ht.hashsizes(), tables):
+        assert isinstance(table, buffer)
+        assert size == len(table)
+
+
+def test_get_raw_tables_view():
+    try:
+        memoryview
+    except NameError:
+        raise nose.SkipTest("This test requires memoryview")
+    ht = khmer.new_counting_hash(20, 1e5, 4)
+    tables = ht.get_raw_tables()
+    for tab in tables:
+        try:
+            memv = memoryview(tab)
+        except TypeError:
+            raise nose.SkipTest("This test needs a higher version of Python.")
+        assert sum(memv.tolist()) == 0
+    ht.consume('AAAATTTTCCCCGGGGAAAA')
+    for tab in tables:
+        memv = memoryview(tab)
+        assert sum(memv.tolist()) == 1
 
 
 @attr('linux')

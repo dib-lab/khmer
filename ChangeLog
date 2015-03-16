@@ -1,8 +1,37 @@
-2015-03-06  Jessica Mizzi  <mizzijes@msu.edu>
+2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
 
     * khmer/kfile.py: Added file not existing error for system exit
     * tests/{test_scripts,test_functions}.py: Added tests for
     check_file_status for file existence and force option
+
+2015-03-15  Kevin Murray  <spam@kdmurray.id.au>  &  Titus Brown  <titus@idyll.org>
+
+   * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
+   have the memoryview type/function.
+
+2015-03-11  Erich Schwarz  <ems394@cornell.edu>
+
+   * Added URLs and brief descriptions for khmer-relevant documentation in
+   doc/introduction.txt, pointing to http://khmer-protocols.readthedocs.org and
+   khmer-recipes.readthedocs.org, with brief descriptions of their content.
+
+2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/counting.hh, khmer/_khmermodule.cc: Expose the raw tables of
+   count-min sketches to the world of python using a buffer interface.
+   * tests/test_counting_hash.py: Tests of the above functionality.
+
+2015-03-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: make 'pep8' target be more verbose
+   * jenkins-build.sh: specify setuptools version
+   * scripts/{abundance-dist,annotate-partitions,count-median,do-partition,
+   extract-paired-reads,extract-partitions,filter-stoptags,find-knots,
+   interleave-reads,merge-partitions,partition-graph,sample-reads-randomly,
+   split-paired-reads}.py,setup.py: fix new PEP8 errors
+   * setup.py: specify that this is a Python 2 only project (for now)
+   * tests/test_{counting_single,subset_graph}.py: make explicit the use of
+   floor division behavior.
 
 2015-03-06  Titus Brown  <titus@idyll.org>
 

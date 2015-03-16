@@ -26,14 +26,14 @@ from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
 from khmer.kfile import check_file_status, check_space
+import re
+import platform
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
 
 # Debugging Support
-import re
-import platform
 if "Linux" == platform.system():
     def __debug_vm_usage(msg):
         print >>sys.stderr, "===> DEBUG: " + msg
