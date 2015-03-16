@@ -2788,7 +2788,7 @@ def test_counting_load_gzipped_bigcount():
     f_out = gzip.open(outfile, 'wb')
     f_out.write(data)
     f_out.close()
-    newct = khmer.new_counting_hash(10, 1e7, 4)
+    newct = khmer.new_counting_hash(10, 1e5, 4)
     newct.load(outfile)
     count = newct.get('ATATATATAT')
     assert count == 500
