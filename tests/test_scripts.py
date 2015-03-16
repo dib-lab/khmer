@@ -2778,7 +2778,7 @@ def test_trim_low_abund_trimtest_savetable():
 
 def test_counting_load_gzipped_bigcount():
     infile = utils.get_temp_filename('test_ct')
-    ct = khmer.new_counting_hash(10, 1e7, 4)
+    ct = khmer.new_counting_hash(10, 1e5, 4)
     ct.set_use_bigcount(True)
     for i in range(500):
         ct.count('ATATATATAT')
@@ -2787,7 +2787,7 @@ def test_counting_load_gzipped_bigcount():
     data = open(infile, 'rb').read()
     f_out = gzip.open(outfile, 'wb')
     f_out.write(data)
-    f_out.close ()
+    f_out.close()
     newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load(outfile)
     count = newct.get('ATATATATAT')
@@ -2804,7 +2804,7 @@ def test_abundance_distribution_gzipped_bigcount():
     data = open(htfile, 'rb').read()
     f_out = gzip.open(outfile2, 'wb')
     f_out.write(data)
-    f_out.close ()
+    f_out.close()
     counting_hash = khmer.load_counting_hash(outfile2)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
