@@ -2784,9 +2784,10 @@ def test_counting_load_gzipped_bigcount():
         ct.count('ATATATATAT')
     ct.save(infile)
     outfile = infile + '.gz'
-    with open(infile, 'rb') as f_in:
-        with gzip.open(outfile, 'wb') as f_out:
-            f_out.writelines(f_in)
+    data = open(infile, 'rb').read()
+    f_out = gzip.open(outfile, 'wb')
+    f_out.write(data)
+    f_out.close ()
     newct = khmer.new_counting_hash(10, 1e7, 4)
     newct.load(outfile)
     count = newct.get('ATATATATAT')
@@ -2800,9 +2801,10 @@ def test_abundance_distribution_gzipped_bigcount():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     outfile2 = utils.get_temp_filename('test_ct.gz')
     htfile = _make_counting(infile, K=2, BIGCOUNT=True)
-    with open(htfile, 'rb') as f_in:
-        with gzip.open(outfile2, 'wb') as f_out:
-            f_out.writelines(f_in)
+    data = open(htfile, 'rb').read()
+    f_out = gzip.open(outfile2, 'wb')
+    f_out.write(data)
+    f_out.close ()
     counting_hash = khmer.load_counting_hash(outfile2)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
