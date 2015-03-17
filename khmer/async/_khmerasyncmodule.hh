@@ -35,6 +35,9 @@ extern "C" {
     } catch (read_parsers::InvalidReadPair &e) { \
         PyErr_SetString(PyExc_IOError, "Asynchronous IParser encountered an invalid read pair"); \
         return NULL; \
+    } catch (khmer::khmer_exception &e) { \
+	PyErr_SetString(PyExc_RuntimeError, e.what()); \
+	return NULL; \
     } \
 }
 

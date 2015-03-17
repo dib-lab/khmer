@@ -145,7 +145,8 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
     Read * read_2_ptr;
 
     while(!(async_sp->pop(batch_ptr))) {
-        if(async_sp->iter_stop()) {
+        handle_exceptions(async_sp)
+	if(async_sp->iter_stop()) {
             //async_sp->lock_stdout();
             //std::cout << "\nITER STOP: kept " << async_diginorm->n_kept() 
             //    << " of " << async_diginorm->n_processed()
@@ -156,13 +157,12 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
             PyErr_SetNone(PyExc_StopIteration);
             return NULL;
         }
-        handle_exceptions(async_sp)
     }
 
     if(async_sp->is_paired()) {
         
-        read_1_ptr = new Read ( * batch_ptr->first() );
-        read_2_ptr = new Read ( * batch_ptr->second() );
+        read_1_ptr = new Read ( *batch_ptr->first() );
+        read_2_ptr = new Read ( *batch_ptr->second() );
 
         delete batch_ptr;
 

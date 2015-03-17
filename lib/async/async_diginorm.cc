@@ -91,12 +91,11 @@ void AsyncDiginorm::consume() {
             if (!filter) {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
-                //sp = copy_seq(batch->first());
                 TSTART()
                 write(batch->first()->sequence.c_str());
                 TEND(write_wait)
-                if (_paired) {
-                    //sp = copy_seq(batch->second());
+                
+		if (_paired) {
                     TSTART()
                     write(batch->second()->sequence.c_str());
                     TEND(write_wait)
@@ -111,8 +110,7 @@ void AsyncDiginorm::consume() {
             }
             __sync_fetch_and_add(&_n_processed, _batchsize);
         } else {
-            if (((aparser->get_state() == STATE_WAIT) 
-                && !(aparser->has_output()))
+            if (((aparser->get_state() == STATE_WAIT) && !(aparser->has_output()))
                 || aparser->get_state() == STATE_DORMANT) {
 
                 set_global_state(STATE_WAIT);

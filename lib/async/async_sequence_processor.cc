@@ -39,6 +39,7 @@ void AsyncSequenceProcessor::start(const std::string &filename,
     while(!aparser->check_running());
 
     _paired = paired;
+    _batchsize = aparser->get_batchsize();
     _n_processed = 0;
     AsyncConsumerProducer<ReadBatchPtr,ReadBatchPtr>::start(n_threads);
 }
