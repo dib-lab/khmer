@@ -35,8 +35,9 @@ void AsyncSequenceProcessor::start(const std::string &filename,
     }
 
     aparser = new AsyncSequenceParser();
+    // Give aparser our exception handler
+    aparser->register_exception_handler(_exc_handler);
     aparser->start(filename, paired);
-    while(!aparser->check_running());
 
     _paired = paired;
     _batchsize = aparser->get_batchsize();
@@ -64,6 +65,7 @@ bool AsyncSequenceProcessor::is_paired() {
 unsigned int AsyncSequenceProcessor::parser_queue_load() {
     return aparser->queue_load();
 }
+
 
 bool AsyncSequenceProcessor::iter_stop() {
     if(_STATE == STATE_WAIT ||

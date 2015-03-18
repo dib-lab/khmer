@@ -73,8 +73,8 @@ void AsyncDiginorm::consume() {
     unlock_stdout();
     #endif
 
-    print("spin on checking_running")
-    while(!check_running());
+    //print("spin on checking_running")
+    //while(!check_running());
 
     print("about to enter while loop in consume")
     std::cout << "aparser state is " << aparser->get_state() << std::endl;

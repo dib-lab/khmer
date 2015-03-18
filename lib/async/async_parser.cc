@@ -1,4 +1,5 @@
 #include "async_parser.hh"
+#include "khmer_exception.hh"
 
 using namespace khmer;
 using namespace khmer::read_parsers;
@@ -34,7 +35,15 @@ unsigned int AsyncSequenceParser::queue_load() {
 
 void AsyncSequenceParser::consume() {
     
-    IParser * parser = IParser::get_parser(_current_filename);
+    IParser * parser;
+    try {
+        parser = IParser::get_parser(_current_filename);
+    } catch (...) {
+        _exc_handler->push(std::current_exception());
+        stop();
+        return;
+    }
+
     // Use a function ptr to decide which imprint function to use
     // so as to avoid unnecssary branching
     ReadBatchPtr (*imprint) (IParser *);
@@ -51,10 +60,9 @@ void AsyncSequenceParser::consume() {
         try {
             batch = imprint(parser);
         } catch (...) {
-            // Exception, probably from read pairing; by default, we
-            // just transfer the exception and die
             _exc_handler->push( std::current_exception() );
             // TODO: flush queue here
+            stop();
             return;
         }
         __sync_fetch_and_add(&_n_parsed, _batchsize);
