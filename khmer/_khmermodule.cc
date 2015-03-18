@@ -728,8 +728,8 @@ hash_init_threadsafe(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
-    unsigned int block_size;
-    if(!PyArg_ParseTuple(args, "I", &block_size)) {
+    unsigned int block_size = TABLE_BLOCK_SIZE;
+    if(!PyArg_ParseTuple(args, "|I", &block_size)) {
         return NULL;
     }
     counting->init_threadstuff(block_size);
@@ -830,6 +830,39 @@ hash_count(khmer_KCountingHash_Object * me, PyObject * args)
 
     return PyLong_FromLong(1);
 }
+
+static
+PyObject *
+hash_count_ts(khmer_KCountingHash_Object * me, PyObject * args)
+{
+    CountingHash * counting = me->counting;
+
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    if (strlen(kmer) != counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mer length must be the same as the hashtable k-size");
+        return NULL;
+    }
+    
+    if(!counting->is_threadsafe()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                        "Must call init_threadsafe() before using count_ts!");
+        return NULL;
+    }
+
+    Py_BEGIN_ALLOW_THREADS 
+    counting->count_ts(_hash_forward(kmer, counting->ksize()));
+    Py_END_ALLOW_THREADS
+
+    return PyLong_FromLong(1);
+}
+
+
 
 static
 PyObject *
@@ -1577,6 +1610,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_occupied", (PyCFunction)hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", (PyCFunction)hash_n_entries, METH_VARARGS, "" },
     { "count", (PyCFunction)hash_count, METH_VARARGS, "Count the given kmer" },
+    { "count_ts", (PyCFunction)hash_count_ts, METH_VARARGS, "Count the given kmer in a threadsafe manner" },
     { "consume", (PyCFunction)hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_fasta", (PyCFunction)hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     {
