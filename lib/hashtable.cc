@@ -5,8 +5,8 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
 #include "hashtable.hh"
+#include "khmer.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
 

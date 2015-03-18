@@ -46,31 +46,46 @@ os.environ['OPT'] = " ".join(
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = []
-BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash"])
+LIB_DEPENDS = [path_join("lib", bn + ".hh") for bn in [
+    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash", ]]
 
-SOURCES = ["khmer/_khmermodule.cc"]
-SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
+LIB_DEPENDS.extend(path_join("lib/async", bn+ ".hh") for bn in [
+    "khmer_async", "async_models", "async_sequence_processor", 
+    "async_parser", "async_diginorm", ])
+
+LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner"])
+    "hashbits", "labelhash", "counting", "subset", "read_aligner", ]]
 
-EXTRA_COMPILE_ARGS = ['-O3', ]
+LIB_SOURCES.extend(path_join("lib/async", bn + ".cc") for bn in [
+    "async_sequence_processor", "async_diginorm", "async_parser"])
+
+KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/async/_khmerasyncmodule.cc"]
+KHMER_SOURCES.extend(LIB_SOURCES)
+KHMER_DEPENDS = ["khmer/_khmermodule.hh", "khmer/async/_khmerasyncmodule.hh"]
+KHMER_DEPENDS.extend(LIB_DEPENDS)
+
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
 
 if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
-EXTENSION_MOD_DICT = \
+
+KHMER_MOD_DICT = \
     {
-        "sources": SOURCES,
+        "sources": KHMER_SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
-        "depends": BUILD_DEPENDS,
+        "depends": KHMER_DEPENDS,
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+if sys.platform != 'darwin':
+    KHMER_MOD_DICT['extra_link_args'] = []
+
+EXTENSION_MODS = [  Extension("khmer._khmermodule",  # pylint: disable=W0142
+                          ** KHMER_MOD_DICT) ]
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -109,14 +124,14 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        "packages": ['khmer', 'khmer.tests', 'khmer.async'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.7.1'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": EXTENSION_MODS,
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
@@ -144,8 +159,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "zlib", bn + ".lo") for bn in [
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "zlib", bn + ".lo") for bn in [
                     "adler32", "compress", "crc32", "deflate", "gzclose",
                     "gzlib", "gzread", "gzwrite", "infback", "inffast",
                     "inflate", "inftrees", "trees", "uncompr", "zutil"])
@@ -153,8 +169,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "bzip2", bn + ".o") for bn in [
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "bzip2", bn + ".o") for bn in [
                     "blocksort", "huffman", "crctable", "randtable",
                     "compress", "decompress", "bzlib"])
         _build_ext.run(self)

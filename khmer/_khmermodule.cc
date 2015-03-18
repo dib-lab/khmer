@@ -12,11 +12,13 @@
 // Must be first.
 #include <Python.h>
 
+#include "_khmermodule.hh"
+#include "hashtable.hh"
+
 #include <iostream>
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-#include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
 #include "read_aligner.hh"
@@ -116,26 +118,6 @@ _debug_class_attrs( PyTypeObject &tobj )
 } // namespace khmer
 
 
-class _khmer_exception
-{
-private:
-    std::string _message;
-public:
-    _khmer_exception(std::string message) : _message(message) { };
-    inline const std::string get_message() const
-    {
-        return _message;
-    };
-};
-
-class _khmer_signal : public _khmer_exception
-{
-public:
-    _khmer_signal(std::string message) : _khmer_exception(message) { };
-};
-
-typedef pre_partition_info _pre_partition_info;
-
 // default callback obj;
 static PyObject *_callback_obj = NULL;
 
@@ -189,15 +171,7 @@ namespace python
 {
 
 
-static PyTypeObject Read_Type = { PyObject_HEAD_INIT( NULL ) };
-
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
-} Read_Object;
-
+PyTypeObject Read_Type = { PyObject_HEAD_INIT( NULL ) };
 
 static
 void
@@ -304,27 +278,10 @@ _init_Read_Type( )
 //
 
 
-static PyTypeObject ReadParser_Type
+PyTypeObject ReadParser_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("ReadParser_Object")
     = { PyObject_HEAD_INIT( NULL ) };
-static PyTypeObject ReadPairIterator_Type = { PyObject_HEAD_INIT( NULL ) };
-
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
-} ReadParser_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
-    //! Persistent value of pair mode across invocations.
-    int pair_mode;
-} ReadPairIterator_Object;
-
+PyTypeObject ReadPairIterator_Type = { PyObject_HEAD_INIT( NULL ) };
 
 static
 void
@@ -484,7 +441,10 @@ _ReadPairIterator_iternext( PyObject * self )
     ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
     PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
     ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
-    return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    Py_XDECREF(read_1_OBJECT);
+    Py_XDECREF(read_2_OBJECT);
+    return tup;
 }
 
 
@@ -660,25 +620,10 @@ void free_subset_partition_info(void * p)
     delete subset_p;
 }
 
-typedef struct {
-    PyObject_HEAD
-    CountingHash * counting;
-} khmer_KCountingHashObject;
-
-typedef struct {
-    PyObject_HEAD
-    SubsetPartition * subset;
-} khmer_KSubsetPartitionObject;
-
-typedef struct {
-    PyObject_HEAD
-    Hashbits * hashbits;
-} khmer_KHashbitsObject;
-
 static void khmer_subset_dealloc(PyObject *);
 static PyObject * khmer_subset_getattr(PyObject * obj, char * name);
 
-static PyTypeObject khmer_KSubsetPartitionType = {
+PyTypeObject khmer_KSubsetPartitionType = {
     PyObject_HEAD_INIT(NULL)
     0,
     "KSubset", sizeof(khmer_KSubsetPartitionObject),
@@ -702,11 +647,6 @@ static PyTypeObject khmer_KSubsetPartitionType = {
     "subset object",           /* tp_doc */
 };
 
-typedef struct {
-    PyObject_HEAD
-    ReadAligner * aligner;
-} khmer_ReadAlignerObject;
-
 static void khmer_counting_dealloc(PyObject *);
 
 static PyObject * hash_abundance_distribution(PyObject * self,
@@ -715,6 +655,20 @@ static PyObject * hash_abundance_distribution(PyObject * self,
 static PyObject * hash_abundance_distribution_with_reads_parser(
     PyObject * self,
     PyObject * args);
+
+static PyObject * hash_init_threadsafe(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    unsigned int block_size;
+    if(!PyArg_ParseTuple(args, "I", &block_size)) {
+        return NULL;
+    }
+    counting->init_threadstuff(block_size);
+
+    Py_RETURN_NONE;
+}
 
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
 {
@@ -1413,6 +1367,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
     { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
+    { "init_threadsafe", hash_init_threadsafe, METH_VARARGS, "" },
     { "n_unique_kmers", hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1457,7 +1412,7 @@ khmer_counting_getattr(PyObject * obj, char * name)
 
 #define is_counting_obj(v)  ((v)->ob_type == &khmer_KCountingHashType)
 
-static PyTypeObject khmer_KCountingHashType
+PyTypeObject khmer_KCountingHashType
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHashObject")
 = {
     PyObject_HEAD_INIT(NULL)
@@ -1565,7 +1520,7 @@ static int khmer_hashbits_init(khmer_KHashbitsObject * self, PyObject * args,
                                PyObject * kwds);
 static PyObject * khmer_hashbits_getattr(PyObject * obj, char * name);
 
-static PyTypeObject khmer_KHashbitsType
+PyTypeObject khmer_KHashbitsType
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbitsObject")
 = {
     PyObject_HEAD_INIT(NULL)
@@ -1624,7 +1579,6 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
-
     HashIntoType * dist = NULL;
 
     const char * exception = NULL;
@@ -3505,12 +3459,6 @@ khmer_subset_getattr(PyObject * obj, char * name)
 /////////////////
 
 // LabelHash addition
-typedef struct {
-    //PyObject_HEAD
-    khmer_KHashbitsObject khashbits;
-    LabelHash * labelhash;
-} khmer_KLabelHashObject;
-
 static void khmer_labelhash_dealloc(PyObject *);
 static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args,
                                 PyObject *kwds);
@@ -3893,7 +3841,7 @@ static PyMethodDef khmer_labelhash_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyTypeObject khmer_KLabelHashType = {
+PyTypeObject khmer_KLabelHashType = {
     PyObject_HEAD_INIT(NULL)
     0,                       /* ob_size */
     "_LabelHash",            /* tp_name */
@@ -3986,7 +3934,7 @@ static void khmer_readaligner_dealloc(PyObject* self)
 }
 
 
-static PyTypeObject khmer_ReadAlignerType = {
+PyTypeObject khmer_ReadAlignerType = {
     PyObject_HEAD_INIT(NULL)
     0,
     "ReadAligner", sizeof(khmer_ReadAlignerObject),
@@ -4351,6 +4299,29 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    if (PyType_Ready(&khmer_AsyncSequenceProcessorType) < 0) {
+        return;
+    }
+
+    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
+        return;
+    }
+
+    if (PyType_Ready(&khmer_AsyncSequenceProcessorTesterType) < 0) {
+        return;
+    }
+
+    Py_INCREF(&khmer_AsyncSequenceProcessorType);
+    PyModule_AddObject(m, "AsyncSequenceProcessor", 
+        (PyObject *)&khmer_AsyncSequenceProcessorType);
+
+    Py_INCREF(&khmer_AsyncSequenceProcessorTesterType);
+    PyModule_AddObject(m, "AsyncSequenceProcessorTester", 
+        (PyObject *)&khmer_AsyncSequenceProcessorTesterType);
+
+    Py_INCREF(&khmer_AsyncDiginormType);
+    PyModule_AddObject(m, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

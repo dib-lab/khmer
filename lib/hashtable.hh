@@ -28,6 +28,8 @@
 
 #define MAX_KEEPER_SIZE int(1e6)
 
+#define TABLE_BLOCK_SIZE 10000
+
 #define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
 #define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
 
@@ -174,6 +176,10 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
+    uint32_t * _table_spinlocks;
+    HashIntoType _n_table_blocks;
+    bool _threadsafe;
+
     Hashtable( WordLength ksize )
 	    : _max_count( MAX_KCOUNT ),
 	    _max_bigcount( MAX_BIGCOUNT ),
@@ -186,7 +192,7 @@ protected:
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
-
+        _threadsafe = false;
     }
 
     virtual ~Hashtable( )
@@ -241,8 +247,12 @@ public:
         return _ksize;
     }
 
+    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {};
+    bool is_threadsafe() { return _threadsafe; };
+
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
+    virtual void count_ts(HashIntoType khash) {};
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;

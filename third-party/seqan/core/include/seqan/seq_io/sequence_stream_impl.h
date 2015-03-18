@@ -247,6 +247,7 @@ public:
         {
         case SeqIOFileType_::FILE_TYPE_TEXT:
         {
+
 		_plainStream.reset(new std::ifstream(toCString(_filename), std::ios::binary | std::ios::in));
 	        _ifstreamReader.reset(new RecordReader<std::ifstream, SinglePass<> >(*_plainStream));
                 _fileFormat = this->_checkFormat(*_ifstreamReader);

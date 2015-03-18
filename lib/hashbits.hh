@@ -76,6 +76,8 @@ public:
     virtual void save(std::string);
     virtual void load(std::string);
 
+
+
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,
                                HashIntoType curve[2][100],
