@@ -95,14 +95,16 @@ public:
     }
 
     virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {
-        HashIntoType _max_size = _tablesizes.back();
-        _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
-        //std::cout << "Table lock blocks: " << _n_table_blocks << std::endl;
-        _table_spinlocks = new uint32_t[_n_table_blocks];
-        for (unsigned int i=0; i<_n_table_blocks; ++i) {
-            _table_spinlocks[i] = 0;
+        if(!_threadsafe) {
+            HashIntoType _max_size = _tablesizes.back();
+            _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
+            //std::cout << "Table lock blocks: " << _n_table_blocks << std::endl;
+            _table_spinlocks = new uint32_t[_n_table_blocks];
+            for (unsigned int i=0; i<_n_table_blocks; ++i) {
+                _table_spinlocks[i] = 0;
+            }
+            _threadsafe = true;
         }
-        _threadsafe = true;
     }
 
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
