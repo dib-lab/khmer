@@ -496,6 +496,89 @@ def test_find_spectral_error_positions_err():
     except ValueError:
         pass
 
+def test_count_ts():
+    kh = khmer.new_counting_hash(10, 1e6, 4)
+    kh.init_threadsafe()
+    
+    kmer1 = 'ATCGATCGAT'
+    kmer2 = 'ATATCGCGAT'
+
+    try:
+        kh.count_ts(kmer1)
+        for _ in xrange(10):
+            kh.count_ts(kmer2)
+    except RuntimeError:
+        assert 0, 'init_threadsafe was called, should succeed'
+    else:
+        assert kh.get(kmer1) == 1
+        assert kh.get(kmer2) == 10
+
+@attr('multithread')
+def test_count_ts_multi():
+    
+    import threading
+
+    kh = khmer.new_counting_hash(16, 1e6, 4)
+    kh.init_threadsafe()
+    
+    monomers = [nucl*16 for nucl in ['A', 'T', 'C', 'G']] 
+    
+    def count_func(kh, monomers, tid):
+        for kmer in monomers:
+            for _ in xrange(10):
+                kh.count_ts(kmer)
+    
+    threads = []
+    for tid in xrange(16):
+        t = \
+            threading.Thread(target=count_func,
+                             args=[kh, monomers, tid])
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
+
+    for kmer in monomers:
+        print kh.get(kmer)
+        assert kh.get(kmer) == 160
+
+def test_count_ts_initfail():
+
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+
+    try:
+        kh.count_ts('AATT')
+        assert 0, 'Should have thrown RuntimeError'
+    except RuntimeError as e:
+        print e
+
+@attr('multithread')
+def test_count_multithread_fail():
+    
+    import threading
+
+    kh = khmer.new_counting_hash(16, 1e6, 4)
+    
+    monomers = [nucl*16 for nucl in ['A', 'T', 'C', 'G']] 
+    
+    def count_func(kh, monomers, tid):
+        for kmer in monomers:
+            for _ in xrange(10):
+                kh.count(kmer)
+    
+    threads = []
+    for tid in xrange(16):
+        t = \
+            threading.Thread(target=count_func,
+                             args=[kh, monomers, tid])
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
+
+    for kmer in monomers:
+        print kh.get(kmer)
+        assert kh.get(kmer) > 200
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
