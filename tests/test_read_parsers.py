@@ -46,9 +46,10 @@ def test_with_default_arguments():
 
 
 def test_get_num_reads():
+    """Test ReadParser.get_num_reads()"""
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for read in rparser:
+    for _ in rparser:
         reads_count += 1
 
     assert reads_count == 100
@@ -57,21 +58,22 @@ def test_get_num_reads():
 
 @attr('multithread')
 def test_get_num_reads_threads():
+    """Test threadsaftey of ReadParser's read counting"""
     import threading
 
     def count_reads(rparser):
-        for read in rparser:
+        for _ in rparser:
             pass
 
-    N_THREADS = 4
+    n_threads = 4
     threads = []
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for tnum in xrange(N_THREADS):
-        t = threading.Thread(target=count_reads, args=[rparser, ])
-        threads.append(t)
-        t.start()
-    for t in threads:
-        t.join()
+    for _ in xrange(n_threads):
+        thr = threading.Thread(target=count_reads, args=[rparser, ])
+        threads.append(thr)
+        thr.start()
+    for thr in threads:
+        thr.join()
 
     assert rparser.get_num_reads() == 100
 
