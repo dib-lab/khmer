@@ -41,6 +41,7 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
+    _num_reads = 0;
 }
 
 bool SeqAnParser::is_complete()
@@ -57,6 +58,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     if (!atEnd) {
         ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.quality, _private->stream);
+        _num_reads++;
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
@@ -115,6 +117,7 @@ IParser(
     if (regex_rc) {
         throw khmer_exception();
     }
+    _num_reads = 0;
 }
 
 IParser::

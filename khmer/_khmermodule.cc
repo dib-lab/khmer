@@ -466,6 +466,20 @@ ReadParser_iter_reads(PyObject * self, PyObject * args )
     return PyObject_SelfIter( self );
 }
 
+static
+PyObject *
+ReadParser_get_num_reads(khmer_ReadParser_Object * me, PyObject * args)
+{
+    read_parsers:: IParser *  parser = me->parser;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    unsigned long n_reads = parser->get_num_reads();
+
+    return PyLong_FromLong(n_reads);
+}
 
 static
 PyObject *
@@ -504,6 +518,10 @@ static PyMethodDef _ReadParser_methods [ ] = {
     {
         "iter_read_pairs",  (PyCFunction)ReadParser_iter_read_pairs,
         METH_VARARGS,       "Iterates over paired reads as pairs."
+    },
+    {
+        "get_num_reads",  (PyCFunction)ReadParser_get_num_reads,
+        METH_VARARGS,       "Returns the current number of reads processed."
     },
 
     { NULL, NULL, 0, NULL } // sentinel
