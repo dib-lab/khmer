@@ -261,6 +261,7 @@ public:
 
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
+    virtual void count_ts(const char * kmer) {};
     virtual void count_ts(HashIntoType khash) {};
     
     virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {};

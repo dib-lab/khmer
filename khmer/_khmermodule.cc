@@ -856,7 +856,7 @@ hash_count_ts(khmer_KCountingHash_Object * me, PyObject * args)
     }
 
     Py_BEGIN_ALLOW_THREADS 
-    counting->count_ts(_hash_forward(kmer, counting->ksize()));
+    counting->count_ts(kmer);
     Py_END_ALLOW_THREADS
 
     return PyLong_FromLong(1);

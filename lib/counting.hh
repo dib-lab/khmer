@@ -98,7 +98,6 @@ public:
         if(!_threadsafe) {
             HashIntoType _max_size = _tablesizes.back();
             _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
-            //std::cout << "Table lock blocks: " << _n_table_blocks << std::endl;
             _table_spinlocks = new uint32_t[_n_table_blocks];
             for (unsigned int i=0; i<_n_table_blocks; ++i) {
                 _table_spinlocks[i] = 0;
@@ -209,6 +208,12 @@ public:
         }
 
     } // count
+
+    virtual void count_ts(const char * kmer)
+    {
+        HashIntoType hash = _hash(kmer, _ksize);
+        count_ts(hash);
+    }
 
     // Thread-safe counting function
     virtual void count_ts(HashIntoType khash)
