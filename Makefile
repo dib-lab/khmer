@@ -184,6 +184,21 @@ lib:
 	cd lib && \
 	$(MAKE)
 
+# Runs a test of ./lib
+libtest: FORCE
+	rm -rf install_target
+	mkdir -p install_target
+	pushd lib
+	$(MAKE) clean
+	$(MAKE) all
+	$(MAKE) install PREFIX=../install_target
+	popd
+	test -d install_target/include
+	test -f install_target/include/khmer.hh
+	test -d install_target/lib
+	test -f install_target/lib/libkhmer.a
+	rm -rf install_target
+
 ## test        : run the khmer test suite
 test: FORCE
 	./setup.py develop

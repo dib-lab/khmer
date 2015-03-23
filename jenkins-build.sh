@@ -69,15 +69,5 @@ fi
 # takes too long to run on every build
 #bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
 
-rm -rf install_target
-mkdir -p install_target
-pushd lib
-make clean
-make all
-make install PREFIX=../install_target
-popd
-test -d install_target/include
-test -f install_target/include/khmer.hh
-test -d install_target/lib
-test -f install_target/lib/libkhmer.a
-rm -rf install_target
+make lib
+make libtest
