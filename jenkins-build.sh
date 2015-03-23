@@ -80,5 +80,4 @@ test -d install_target/include
 test -f install_target/include/khmer.hh
 test -d install_target/lib
 test -f install_target/lib/libkhmer.a
-test -e install_target/lib/libkhmer.so
 rm -rf install_target
