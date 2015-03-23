@@ -1,9 +1,13 @@
-2015-03-18  Camille Scott  <camille.scott.w@gmail.com>
+2015-03-23  Camille Scott  <camille.scott.w@gmail.com>
 
     * lib/{hashtable.hh,counting.hh}: Add array of locks and a new
     counting function for thread-safe writing to the counting table
     * khmer/_khmermodule.cc: Expose new functionality to python
     * tests/test_counting_hash.py: Tests for thread-safety
+
+2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.hh: Add CountingHash::n_tables() accessor
 
 2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
 
