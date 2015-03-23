@@ -266,6 +266,7 @@ public:
     
     virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {};
     bool is_threadsafe() { return _threadsafe; };
+    HashIntoType n_lock_blocks() { return _n_table_blocks; };
     
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;

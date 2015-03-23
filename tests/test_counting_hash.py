@@ -514,7 +514,6 @@ def test_count_ts():
         assert kh.get(kmer1) == 1
         assert kh.get(kmer2) == 10
 
-
 @attr('multithread')
 def test_count_ts_multi():
 
@@ -544,6 +543,17 @@ def test_count_ts_multi():
         print kh.get(kmer)
         assert kh.get(kmer) == 160
 
+def test_init_threadsafe_small():
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.init_threadsafe()
+
+    assert kh.n_lock_blocks() == 1, kh.n_lock_blocks()
+
+def test_init_threadsafe_big():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    kh.init_threadsafe()
+
+    assert kh.n_lock_blocks() == (max(kh.hashsizes ()) / 10000), kh.n_lock_blocks()
 
 def test_count_ts_initfail():
 
