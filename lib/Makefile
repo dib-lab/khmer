@@ -174,7 +174,7 @@ KHMER_HEADERS= \
 	subset.hh \
 	trace_logger.hh
 
-TEST_PROGS = test-Colors
+TEST_PROGS = test-Colors test-read_aligner
 
 # START OF RULES #
 
