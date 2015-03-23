@@ -141,7 +141,7 @@ BZIP2_OBJS_BASE= \
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 
-#### Khmer proper below here ####
+#### khmer proper below here ####
 
 LIBKHMER_OBJS= \
 	counting.o \
