@@ -728,11 +728,11 @@ hash_init_threadsafe(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
-    unsigned int block_size = TABLE_BLOCK_SIZE;
-    if(!PyArg_ParseTuple(args, "|I", &block_size)) {
+    unsigned int n_table_locks = DEFAULT_TABLE_LOCKS;
+    if(!PyArg_ParseTuple(args, "|I", &n_table_locks)) {
         return NULL;
     }
-    counting->init_threadstuff(block_size);
+    counting->init_threadstuff(n_table_locks);
 
     Py_RETURN_NONE;
 }
@@ -754,14 +754,14 @@ hash_is_threadsafe(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_n_lock_blocks(khmer_KCountingHash_Object * me, PyObject * args)
+hash_n_table_locks(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
     }
 
-    HashIntoType val = counting->n_lock_blocks();
+    HashIntoType val = counting->n_table_locks();
     
     return PyLong_FromUnsignedLongLong(val);
 }
@@ -1619,7 +1619,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "set_use_bigcount", (PyCFunction)hash_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", (PyCFunction)hash_get_use_bigcount, METH_VARARGS, "" },
     { "init_threadsafe", (PyCFunction)hash_init_threadsafe, METH_VARARGS, "Initialize the table lock array" },
-    { "n_lock_blocks", (PyCFunction)hash_n_lock_blocks, METH_VARARGS, "Number of blocks in the lock array" },
+    { "n_table_locks", (PyCFunction)hash_n_table_locks, METH_VARARGS, "Number of blocks in the lock array" },
     { "is_threadsafe", (PyCFunction)hash_is_threadsafe, METH_VARARGS, "Check if the table lock array is initialized" },
     { "n_unique_kmers", (PyCFunction)hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
     { "n_occupied", (PyCFunction)hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },

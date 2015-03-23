@@ -519,7 +519,7 @@ def test_count_ts_multi():
 
     import threading
 
-    kh = khmer.new_counting_hash(16, 1e7, 4)
+    kh = khmer.new_counting_hash(16, 1e6, 4)
     kh.init_threadsafe()
 
     kmers = ['AAAACACAGTGTATAT',
@@ -548,15 +548,21 @@ def test_count_ts_multi():
 
 def test_init_threadsafe_small():
     kh = khmer.new_counting_hash(4, 4**4, 4)
-    kh.init_threadsafe()
+    kh.init_threadsafe(2)
 
-    assert kh.n_lock_blocks() == 1, kh.n_lock_blocks()
+    assert kh.n_table_locks() == 4, kh.n_table_locks()
 
-def test_init_threadsafe_big():
+def test_init_threadsafe():
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.init_threadsafe(256)
+
+    assert kh.n_table_locks() == 256, kh.n_table_locks()
+
+def test_init_threadsafe_default():
     kh = khmer.new_counting_hash(20, 1e6, 4)
     kh.init_threadsafe()
 
-    assert kh.n_lock_blocks() == (max(kh.hashsizes ()) / 10000), kh.n_lock_blocks()
+    assert kh.n_table_locks() == 128, kh.n_table_locks()
 
 def test_count_ts_initfail():
 
@@ -567,36 +573,6 @@ def test_count_ts_initfail():
         assert 0, 'Should have thrown RuntimeError'
     except RuntimeError as e:
         print e
-
-
-@attr('multithread')
-def test_count_multithread_fail():
-
-    import threading
-
-    kh = khmer.new_counting_hash(16, 1e6, 4)
-
-    monomers = [nucl * 16 for nucl in ['A', 'T', 'C', 'G']]
-
-    def count_func(kh, monomers, tid):
-        for kmer in monomers:
-            for _ in xrange(10):
-                kh.count(kmer)
-
-    threads = []
-    for tid in xrange(16):
-        t = \
-            threading.Thread(target=count_func,
-                             args=[kh, monomers, tid])
-        threads.append(t)
-        t.start()
-    for t in threads:
-        t.join()
-
-    for kmer in monomers:
-        print kh.get(kmer)
-        assert kh.get(kmer) > 200
-
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter

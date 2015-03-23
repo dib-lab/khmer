@@ -94,12 +94,11 @@ public:
         return _counts;
     }
 
-    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {
+    virtual void init_threadstuff(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS) {
         if(!_threadsafe) {
-            HashIntoType _max_size = _tablesizes.back();
-            _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
-            _table_spinlocks = new uint32_t[_n_table_blocks];
-            for (unsigned int i=0; i<_n_table_blocks; ++i) {
+            _n_table_locks = n_table_locks < 4 ? 4 : n_table_locks;
+            _table_spinlocks = new uint32_t[_n_table_locks];
+            for (unsigned int i=0; i<_n_table_locks; ++i) {
                 _table_spinlocks[i] = 0;
             }
             _threadsafe = true;
@@ -225,7 +224,7 @@ public:
     {
         bool is_new_kmer = true;
         unsigned int  n_full      = 0;
-        uint32_t lock_index = khash % _n_table_blocks;
+        uint32_t lock_index = khash % _n_table_locks;
         while(!__sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 0, 1));
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];

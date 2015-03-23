@@ -27,7 +27,7 @@
 #include "kmer_hash.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
-#define TABLE_BLOCK_SIZE 10000
+#define DEFAULT_TABLE_LOCKS 128
 
 #define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
 #define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
@@ -186,7 +186,7 @@ protected:
     unsigned int    _nbits_sub_1;
 
     uint32_t * _table_spinlocks;
-    HashIntoType _n_table_blocks;
+    HashIntoType _n_table_locks;
     bool _threadsafe;
 
     Hashtable( WordLength ksize )
@@ -264,9 +264,9 @@ public:
     virtual void count_ts(const char * kmer) {};
     virtual void count_ts(HashIntoType khash) {};
     
-    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {};
+    virtual void init_threadstuff(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS) {};
     bool is_threadsafe() { return _threadsafe; };
-    HashIntoType n_lock_blocks() { return _n_table_blocks; };
+    const HashIntoType n_table_locks() const { return _n_table_locks; };
     
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
