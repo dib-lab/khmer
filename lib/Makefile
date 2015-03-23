@@ -148,6 +148,7 @@ LIBKHMER_OBJS= \
 	hashbits.o \
 	hashtable.o \
 	kmer_hash.o \
+	labelhash.o \
 	read_parsers.o \
 	subset.o \
 	trace_logger.o \
@@ -170,7 +171,7 @@ KHMER_HEADERS= \
 	subset.hh \
 	trace_logger.hh
 
-TEST_PROGS = test-Colors test-mmHashTables test-Parser
+TEST_PROGS = test-Colors
 
 # START OF RULES #
 
