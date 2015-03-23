@@ -39,7 +39,7 @@ INCLUDES= -I ../third-party/seqan/core/include/ 	\
 	  -I ../third-party/bzip2/ 			\
 	  -I ../third-party/smhasher/
 
-CXXFLAGS=$(INCLUDES)
+CXXFLAGS=$(INCLUDES) -fopenmp
 CXX_WARNING_FLAGS=-Wall
 CXX_OPTIMIZATION_FLAGS=-O3
 CXX_SHARED_LIB_FLAGS=-fPIC
@@ -89,13 +89,7 @@ ifneq ($(shell uname), Linux)
 LIBS+= -pthread
 endif
 
-export CXX
-export CXXFLAGS
-export LIBS
-
 VERSION = $(shell python get_version.py)
-
-export VERSION
 
 LIBVERSION = $(shell python get_version.py| sed -e 's/^\([^-]*\)-.*/\1/')
 LIBKHMERSO=libkhmer.so.$(LIBVERSION)
@@ -104,6 +98,12 @@ CXXFLAGS+= -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+
+export CXX
+export CXXFLAGS
+export LIBS
+export VERSION
+
 
 #### Third party dependencies ####
 # ZLIB
@@ -147,8 +147,11 @@ LIBKHMER_OBJS= \
 	counting.o \
 	hashbits.o \
 	hashtable.o \
+	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
+	perf_metrics.o \
+	read_aligner.o \
 	read_parsers.o \
 	subset.o \
 	trace_logger.o \
