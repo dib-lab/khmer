@@ -519,13 +519,16 @@ def test_count_ts_multi():
 
     import threading
 
-    kh = khmer.new_counting_hash(16, 1e6, 4)
+    kh = khmer.new_counting_hash(16, 1e7, 4)
     kh.init_threadsafe()
 
-    monomers = [nucl * 16 for nucl in ['A', 'T', 'C', 'G']]
+    kmers = ['AAAACACAGTGTATAT',
+             'GGGGCACAATATAAAA',
+             'CAACTCCTGAAGATTA',
+             'ATATATATATATATAT']
 
-    def count_func(kh, monomers, tid):
-        for kmer in monomers:
+    def count_func(kh, kmers, tid):
+        for kmer in kmers:
             for _ in xrange(10):
                 kh.count_ts(kmer)
 
@@ -533,13 +536,13 @@ def test_count_ts_multi():
     for tid in xrange(16):
         t = \
             threading.Thread(target=count_func,
-                             args=[kh, monomers, tid])
+                             args=[kh, kmers, tid])
         threads.append(t)
         t.start()
     for t in threads:
         t.join()
 
-    for kmer in monomers:
+    for kmer in kmers:
         print kh.get(kmer)
         assert kh.get(kmer) == 160
 
