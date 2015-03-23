@@ -133,6 +133,11 @@ public:
         return _tablesizes[0];
     }
 
+    const size_t n_tables() const
+    {
+        return _n_tables;
+    }
+
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
                                           HashIntoType stop=0) const
