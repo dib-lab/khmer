@@ -34,7 +34,9 @@ PREFIX=~/
 
 ### NOTE: No user-serviceable parts below this line! ###
 
-INCLUDES= -I ../third-party/seqan/core/include/ \
+INCLUDES= -I ../third-party/seqan/core/include/ 	\
+	  -I ../third-party/zlib/ 			\
+	  -I ../third-party/bzip2/ 			\
 	  -I ../third-party/smhasher/
 
 CXXFLAGS=$(INCLUDES)
