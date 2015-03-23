@@ -1,3 +1,7 @@
+2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.hh: Add CountingHash::n_tables() accessor
+
 2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
 
     * khmer/kfile.py: Added file not existing error for system exit
