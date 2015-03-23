@@ -172,11 +172,11 @@ TEST_PROGS = test-Colors test-mmHashTables test-Parser
 
 # START OF RULES #
 
-# all rule comes first!
-all: $(LIBKHMERSO) libkhmer.a test
+# The all rule comes first!
+all: $(LIBKHMERSO) libkhmer.a
 
 clean:
-	rm -f *.o *.a *.so $(LIBKHMERSO) $(TEST_PROGS) $(ZLIB_DIR)/Makefile
+	rm -f *.o *.a *.so $(LIBKHMERSO) $(TEST_PROGS)
 	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
@@ -209,5 +209,6 @@ libkhmer.a: $(LIBKHMER_OBJS)
 	ar rcs $@ $(LIBKHMER_OBJS)
 	ranlib $@
 
+# catch-all rule for test drivers
 test-%: test-%.cc libkhmer.a
 	$(CXX) $(CXXFLAGS) -fopenmp -o $@ $< libkhmer.a
