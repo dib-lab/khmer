@@ -8,4 +8,5 @@ ktable_test
 ht-diff
 *.swp
 *.so
+*.so.*
 *.a
