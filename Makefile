@@ -188,11 +188,10 @@ lib:
 libtest: FORCE
 	rm -rf install_target
 	mkdir -p install_target
-	pushd lib
-	$(MAKE) clean
-	$(MAKE) all
-	$(MAKE) install PREFIX=../install_target
-	popd
+	cd lib && \
+	 $(MAKE) clean && \
+	 $(MAKE) all && \
+	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
 	test -f install_target/include/khmer.hh
 	test -d install_target/lib
