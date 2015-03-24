@@ -39,7 +39,7 @@ INCLUDES= -I ../third-party/seqan/core/include/ 	\
 	  -I ../third-party/bzip2/ 			\
 	  -I ../third-party/smhasher/
 
-CXXFLAGS=$(INCLUDES) -fopenmp
+CXXFLAGS=$(INCLUDES)
 CXX_WARNING_FLAGS=-Wall
 CXX_OPTIMIZATION_FLAGS=-O3
 CXX_SHARED_LIB_FLAGS=-fPIC
@@ -89,6 +89,13 @@ ifneq ($(shell uname), Linux)
 LIBS+= -pthread
 endif
 
+
+HAVE_OPENMP=$(shell $(CXX) -fopenmp -o .check_openmp .check_openmp.cc >/dev/null 2>&1 && echo true || echo false)
+ifeq ($(HAVE_OPENMP), true)
+	CFLAGS += -fopenmp
+	CXXFLAGS += -fopenmp
+endif
+
 VERSION = $(shell python get_version.py)
 
 LIBVERSION = $(shell python get_version.py| sed -e 's/^\([^-]*\)-.*/\1/')
@@ -98,7 +105,6 @@ CXXFLAGS+= -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
-
 export CXX
 export CXXFLAGS
 export LIBS
@@ -217,4 +223,4 @@ libkhmer.a: $(LIBKHMER_OBJS)
 
 # catch-all rule for test drivers
 test-%: test-%.cc libkhmer.a
-	$(CXX) $(CXXFLAGS) -fopenmp -o $@ $< libkhmer.a
+	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
