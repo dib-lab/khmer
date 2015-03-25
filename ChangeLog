@@ -3,6 +3,7 @@
    * lib/Makefile: Add libkhmer targets, clean up
    * lib/get_version.py: Rewrite to use versioneer.py
    * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
+   * lib/.check_openmp.cc: add source that checks compiler for openmp support.
 
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
