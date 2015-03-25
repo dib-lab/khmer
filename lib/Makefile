@@ -90,7 +90,8 @@ LIBS+= -pthread
 endif
 
 
-HAVE_OPENMP=$(shell $(CXX) -fopenmp -o .check_openmp .check_openmp.cc >/dev/null 2>&1 && echo true || echo false)
+HAVE_OPENMP=$(shell $(CXX) -fopenmp -o chkomp .check_openmp.cc 2>/dev/null && echo true || echo false; rm -f chkomp)
+
 ifeq ($(HAVE_OPENMP), true)
 	CFLAGS += -fopenmp
 	CXXFLAGS += -fopenmp
@@ -105,7 +106,9 @@ CXXFLAGS+= -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+
 export CXX
+export CFLAGS
 export CXXFLAGS
 export LIBS
 export VERSION
