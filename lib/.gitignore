@@ -1,11 +1,8 @@
-test-StreamReader
-test-CacheManager
 test-Parser
 test-HashTables
-smpFiltering
-bittest
-ktable_test
+test-read-aligner
 ht-diff
+chkomp
 *.swp
 *.so
 *.so.*
