@@ -5,7 +5,8 @@ WANT_PROFILING=false
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly,
 # you can instrument codes with it to get detailed multi-threaded profiling.
-# Otherwise, gprof is able to give you some information without threading info.  # Choose one of: gprof, TAU
+# Otherwise, gprof is able to give you some information without threading info.
+# Choose one of: gprof, TAU
 PROFILER_OF_CHOICE=gprof
 
 # Perform extra sanity checking?
@@ -99,7 +100,7 @@ endif
 
 VERSION = $(shell python get_version.py)
 
-LIBVERSION = $(shell python get_version.py| sed -e 's/^\([^-]*\)-.*/\1/')
+LIBVERSION = $(shell python get_version.py | sed -e 's/^\([^-]*\)-.*/\1/')
 LIBKHMERSO=libkhmer.so.$(LIBVERSION)
 
 CXXFLAGS+= -DVERSION=$(VERSION)
