@@ -191,8 +191,7 @@ def get_parser():
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_filename',
                         default='', help='only output a single file with the '
-                        'specified filename; use "stdout" to print to the '
-                        'terminal')
+                        'specified filename; use - to print to the terminal')
     parser.add_argument('--append', default=False, action='store_true',
                         help='append reads to the outputfile. '
                         'Only with -o specified')
@@ -239,7 +238,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.single_output_filename:
         output_name = args.single_output_filename
-        if output_name == "stdout":
+        if output_name == '-':
             outfp = sys.stdout
         else:
             if args.append:
