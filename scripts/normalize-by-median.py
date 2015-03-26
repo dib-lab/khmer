@@ -190,8 +190,9 @@ def get_parser():
                         'files', default=-1)
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_filename',
-                        default='', help='only output a single'
-                        ' file with the specified filename')
+                        default='', help='only output a single file with the '
+                        'specified filename; use "stdout" to print to the '
+                        'terminal')
     parser.add_argument('--append', default=False, action='store_true',
                         help='append reads to the outputfile. '
                         'Only with -o specified')
@@ -238,10 +239,13 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.single_output_filename:
         output_name = args.single_output_filename
-        if args.append:
-            outfp = open(args.single_output_filename, 'a')
+        if output_name == "stdout":
+            outfp = sys.stdout
         else:
-            outfp = open(args.single_output_filename, 'w')
+            if args.append:
+                outfp = open(args.single_output_filename, 'a')
+            else:
+                outfp = open(args.single_output_filename, 'w')
 
     for index, input_filename in enumerate(args.input_filenames):
         if not args.single_output_filename:
