@@ -228,7 +228,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print 'loading k-mer counting table from', args.loadtable
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print 'making k-mer counting table'
+        print >> sys.stderr, 'making k-mer counting table'
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
@@ -270,15 +270,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 corrupt_files.append(input_filename)
         else:
             if total_acc == 0 and discarded_acc == 0:
-                print 'SKIPPED empty file', input_filename
+                print >> sys.stderr, 'SKIPPED empty file', input_filename
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                      .format(inp=input_filename, kept=total - discarded,
-                              total=total, perc=int(100. - discarded /
-                                                    float(total) * 100.))
-                print 'output in', output_name
+                print >> sys.stderr, \
+                    'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                    .format(inp=input_filename, kept=total - discarded,
+                            total=total, perc=int(100. - discarded /
+                                                  float(total) * 100.))
+                print >> sys.stderr, 'output in', output_name
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -301,7 +302,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable.save(args.savetable)
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print >> sys.stderr, \
+        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
         print >> sys.stderr, "** WARNING: Finished with errors!"
