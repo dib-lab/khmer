@@ -199,7 +199,10 @@ test: $(TEST_PROGS)
 
 install: $(LIBKHMERSO) libkhmer.a $(KHMER_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/include
-	cp $(KHMER_HEADERS) ../third-party/smhasher/MurmurHash3.h $(PREFIX)/include
+	cp -r $(KHMER_HEADERS) \
+		../third-party/seqan/core/include/* \
+		../third-party/smhasher/MurmurHash3.h \
+		$(PREFIX)/include
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
 
