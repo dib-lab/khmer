@@ -760,9 +760,28 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    assert 'fp rate estimated to be' in out, out
+    assert 'fp rate estimated to be' in err, err
     assert '** ERROR: the k-mer counting table is too small' in err, err
 
+
+def test_normalize_by_median_stdout():
+    CUTOFF = '20'
+
+    infile = utils.get_temp_filename('test-stdout.fq')
+    in_dir = os.path.dirname(infile)
+    outfile = '100-reads-diginorm.fq'
+
+    shutil.copyfile(utils.get_test_data('100-reads.fq.gz'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-o', '-', infile, '>', outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile), outfile
+
+    with open(outfile) as fp:
+        linecount = sum(1 for _ in fp)
+    assert linecount == 400
 
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')

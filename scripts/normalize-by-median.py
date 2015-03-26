@@ -279,7 +279,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     .format(inp=input_filename, kept=total - discarded,
                             total=total, perc=int(100. - discarded /
                                                   float(total) * 100.))
-                print >> sys.stderr, 'output in', output_name
+                outname = output_name
+                if outname == '-':
+                    outname = 'stdout'
+                print >> sys.stderr, 'output in', outname
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
