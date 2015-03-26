@@ -31,7 +31,6 @@ WITH_INTERNAL_METRICS=false
 
 
 PREFIX=/usr/local
-PREFIX=~/
 
 ### NOTE: No user-serviceable parts below this line! ###
 
