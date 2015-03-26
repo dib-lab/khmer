@@ -189,12 +189,10 @@ def get_parser():
                         type=int, help='dump k-mer counting table every d '
                         'files', default=-1)
     parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_filename',
+                        dest='single_output_file',
+                        type=argparse.FileType('w'),
                         default='', help='only output a single file with the '
                         'specified filename; use - to print to the terminal')
-    parser.add_argument('--append', default=False, action='store_true',
-                        help='append reads to the outputfile. '
-                        'Only with -o specified')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
@@ -236,18 +234,12 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     discarded = 0
     input_filename = None
 
-    if args.single_output_filename:
-        output_name = args.single_output_filename
-        if output_name == '-':
-            outfp = sys.stdout
-        else:
-            if args.append:
-                outfp = open(args.single_output_filename, 'a')
-            else:
-                outfp = open(args.single_output_filename, 'w')
+    if args.single_output_file:
+        output_name = args.single_output_file.name
+        outfp = args.single_output_file
 
     for index, input_filename in enumerate(args.input_filenames):
-        if not args.single_output_filename:
+        if not args.single_output_file:
             output_name = os.path.basename(input_filename) + '.keep'
             outfp = open(output_name, 'w')
 
@@ -279,10 +271,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     .format(inp=input_filename, kept=total - discarded,
                             total=total, perc=int(100. - discarded /
                                                   float(total) * 100.))
-                outname = output_name
-                if outname == '-':
-                    outname = 'stdout'
-                print >> sys.stderr, 'output in', outname
+                print >> sys.stderr, 'output in', output_name
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
