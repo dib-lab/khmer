@@ -1,3 +1,7 @@
+2015-03-25  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/normalize-by-median.py: Added an option to send output to stdout.
+
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/counting.hh: Add CountingHash::n_tables() accessor
