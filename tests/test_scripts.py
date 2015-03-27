@@ -24,8 +24,6 @@ import khmer
 import khmer.kfile
 import screed
 
-from khmer._khmer import new_hashtable
-
 
 def scriptpath(script):
     return script
@@ -1406,11 +1404,14 @@ def test_abundance_dist_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
+
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
     htfile = _make_counting(infile, K=17, BIGCOUNT=False)
     script = scriptpath('abundance-dist.py')
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
+
     fp = iter(open(outfile))
     line = fp.next().strip()
     assert line == '1 96 96 0.98', line
