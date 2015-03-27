@@ -236,7 +236,7 @@ $(BZIP2_OBJS):
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o: %.cc $(KHMER_HEADERS)
+%.o: %.cc $(ZLIB_OBJS) $(ZLIB_PIC_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
