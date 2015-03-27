@@ -253,6 +253,3 @@ libkhmer.a: $(LIBKHMER_OBJS)
 # catch-all rule for test drivers
 test-%: test-%.cc libkhmer.a
 	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
-
-graphtest: graphtest.cc libkhmer.a
-	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
