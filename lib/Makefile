@@ -217,7 +217,6 @@ test: $(TEST_PROGS)
 install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/
 	cp -r $(KHMER_HEADERS) \
-		../third-party/seqan/core/include/* \
 		../third-party/smhasher/MurmurHash3.h \
 		$(PREFIX)/include/
 	cp khmer.pc $(PREFIX)/lib/pkgconfig/
