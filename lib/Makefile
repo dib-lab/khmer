@@ -43,7 +43,10 @@ CXXFLAGS=$(INCLUDES)
 CXX_WARNING_FLAGS=-Wall
 CXX_OPTIMIZATION_FLAGS=-O3
 CXX_SHARED_LIB_FLAGS=-fPIC
-CXXFLAGS+= $(CXX_WARNING_FLAGS) $(CXX_OPTIMIZATION_FLAGS) $(CXX_SHARED_LIB_FLAGS)
+CXXFLAGS+= 				\
+	   $(CXX_WARNING_FLAGS) 	\
+	   $(CXX_OPTIMIZATION_FLAGS)	\
+	   $(CXX_SHARED_LIB_FLAGS)
 
 CFLAGS=$(INCLUDES)
 C_WARNING_FLAGS=-Wall
@@ -90,7 +93,10 @@ LIBS+= -pthread
 endif
 
 
-HAVE_OPENMP=$(shell $(CXX) -fopenmp -o chkomp .check_openmp.cc 2>/dev/null && echo true || echo false; rm -f chkomp)
+HAVE_OPENMP=$(shell 						\
+	      $(CXX) -fopenmp -o chkomp .check_openmp.cc 	\
+	      2>/dev/null && echo true || echo false; 		\
+	      rm -f chkomp)
 
 ifeq ($(HAVE_OPENMP), true)
 	CFLAGS += -fopenmp
