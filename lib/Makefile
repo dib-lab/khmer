@@ -133,8 +133,25 @@ ZLIB_OBJS_BASE=\
 	gzlib.o \
 	gzread.o \
 	gzwrite.o
+ZLIB_PIC_OBJS_BASE=\
+	adler32.lo \
+	crc32.lo \
+	deflate.lo \
+	infback.lo \
+	inffast.lo \
+	inflate.lo \
+	inftrees.lo \
+	trees.lo \
+	zutil.lo \
+	compress.lo \
+	uncompr.lo \
+	gzclose.lo \
+	gzlib.lo \
+	gzread.lo \
+	gzwrite.lo
 
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
+ZLIB_PIC_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_PIC_OBJS_BASE))
 
 # BZ2
 BZIP2_DIR=../third-party/bzip2
@@ -166,7 +183,7 @@ LIBKHMER_OBJS= \
 	trace_logger.o \
 	murmur3.o \
 	$(BZIP2_OBJS) \
-	$(ZLIB_OBJS)
+	$(ZLIB_PIC_OBJS)
 
 KHMER_HEADERS= \
 	counting.hh \
@@ -207,7 +224,10 @@ install: $(LIBKHMERSO) libkhmer.a $(KHMER_HEADERS)
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE) CFLAGS+='-fPIC')
+	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
+
+$(ZLIB_PIC_OBJS):
+	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_PIC_OBJS_BASE))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
