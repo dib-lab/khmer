@@ -1,4 +1,10 @@
-2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/read_parsers.{cc,hh}: Obfuscate SeqAn SequenceStream objects with a
+   wrapper struct, to avoid #include-ing the SeqAn headers.
+   * lib/Makefile: Don't install the SeqAn headers.
+
+2015-03-27  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/Makefile: Add libkhmer targets, clean up
    * lib/get_version.py: Rewrite to use versioneer.py
