@@ -205,23 +205,29 @@ TEST_PROGS = test-Colors test-read-aligner
 # START OF RULES #
 
 # The all rule comes first!
-all: $(LIBKHMERSO) libkhmer.a
+all: $(LIBKHMERSO) libkhmer.a khmer.pc
 
 clean:
-	rm -f *.o *.a *.so $(LIBKHMERSO) $(TEST_PROGS)
+	rm -f *.o *.a *.so khmer.pc $(LIBKHMERSO) $(TEST_PROGS)
 	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
 test: $(TEST_PROGS)
 
-install: $(LIBKHMERSO) libkhmer.a $(KHMER_HEADERS)
-	mkdir -p $(PREFIX)/lib $(PREFIX)/include
+install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
+	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/
 	cp -r $(KHMER_HEADERS) \
 		../third-party/seqan/core/include/* \
 		../third-party/smhasher/MurmurHash3.h \
-		$(PREFIX)/include
+		$(PREFIX)/include/
+	cp khmer.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
+
+khmer.pc:
+	cp khmer.pc.in $@
+	sed -i 's,@prefix@,$(PREFIX),' $@
+	sed -i 's,@VERSION@,$(VERSION),' $@
 
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
