@@ -206,7 +206,7 @@ KHMER_HEADERS= \
 	subset.hh \
 	trace_logger.hh
 
-TEST_PROGS = test-Colors test-read-aligner
+TEST_PROGS = test-Colors test-read-aligner test-compile
 
 # START OF RULES #
 
@@ -258,4 +258,4 @@ libkhmer.a: $(LIBKHMER_OBJS)
 
 # catch-all rule for test drivers
 test-%: test-%.cc libkhmer.a
-	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
+	$(CXX) $(CXXFLAGS) -I . -o $@ $< libkhmer.a
