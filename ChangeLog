@@ -3,6 +3,16 @@
    * tests/test_scripts.py: Test loading of compressed counting table
    with bigcounts,and test abundance with bigcounts
 
+2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.hh: Add CountingHash::n_tables() accessor
+
+2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/kfile.py: Added file not existing error for system exit
+    * tests/{test_scripts,test_functions}.py: Added tests for
+    check_file_status for file existence and force option
+
 2015-03-15  Kevin Murray  <spam@kdmurray.id.au>  &  Titus Brown  <titus@idyll.org>
 
    * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
