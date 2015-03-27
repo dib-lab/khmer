@@ -223,10 +223,8 @@ install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
 
-khmer.pc:
-	cp khmer.pc.in $@
-	sed -i 's,@prefix@,$(PREFIX),' $@
-	sed -i 's,@VERSION@,$(VERSION),' $@
+khmer.pc: khmer.pc.in
+	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
@@ -254,4 +252,7 @@ libkhmer.a: $(LIBKHMER_OBJS)
 
 # catch-all rule for test drivers
 test-%: test-%.cc libkhmer.a
+	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
+
+graphtest: graphtest.cc libkhmer.a
 	$(CXX) $(CXXFLAGS) -o $@ $< libkhmer.a
