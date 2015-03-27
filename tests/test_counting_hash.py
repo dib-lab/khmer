@@ -7,6 +7,9 @@
 # pylint: disable=missing-docstring,protected-access
 import gzip
 
+import os
+import shutil
+
 import khmer
 import khmer_tst_utils as utils
 from khmer import ReadParser
@@ -33,6 +36,10 @@ DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
 def teardown():
     utils.cleanup()
+
+
+def scriptpath(script):
+    return script
 
 
 class Test_CountingHash(object):
@@ -1071,3 +1078,41 @@ def test_find_all_tags_list_error():
         assert False, "a ValueError should be raised for incorrect k-mer size"
     except ValueError:
         pass
+
+
+def test_abundance_distribution_gzipped_bigcount():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    outfile = utils.get_temp_filename('test_ct.gz')
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', str(1e7), '-N', str(2), '-k', str(2)]
+    htfile = utils.get_temp_filename('test_ct')
+    args.extend([htfile, infile])
+    utils.runscript(script, args)
+    assert os.path.exists(htfile)
+    data = open(htfile, 'rb').read()
+    f_out = gzip.open(outfile, 'wb')
+    f_out.write(data)
+    f_out.close()
+    counting_hash = khmer.load_counting_hash(outfile)
+    hashsizes = counting_hash.hashsizes()
+    kmer_size = counting_hash.ksize()
+    tracking = khmer._Hashbits(kmer_size, hashsizes)
+    abundances = counting_hash.abundance_distribution(infile, tracking)
+    flag = False
+    for _, i in enumerate(abundances):
+        print _, i
+        if _ > 255 and i > 0:
+            flag = True
+            break
+    assert flag
+
+
+def test_counting_load_gzipped_bigcount():
+    ct = khmer.new_counting_hash(10, 1e5, 4)
+    ct.set_use_bigcount(True)
+    for i in range(500):
+        ct.count('ATATATATAT')
+    count = ct.get('ATATATATAT')
+    assert count == 500

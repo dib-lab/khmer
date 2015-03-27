@@ -18,7 +18,6 @@ import subprocess
 import threading
 import bz2
 import io
-import gzip
 
 import khmer_tst_utils as utils
 import khmer
@@ -2774,48 +2773,6 @@ def test_trim_low_abund_trimtest_savetable():
             print record.name, record.sequence
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
-
-
-def test_counting_load_gzipped_bigcount():
-    infile = utils.get_temp_filename('test_ct')
-    ct = khmer.new_counting_hash(10, 1e5, 4)
-    ct.set_use_bigcount(True)
-    for i in range(500):
-        ct.count('ATATATATAT')
-    ct.save(infile)
-    outfile = infile + '.gz'
-    data = open(infile, 'rb').read()
-    f_out = gzip.open(outfile, 'wb')
-    f_out.write(data)
-    f_out.close()
-    newct = khmer.load_counting_hash(outfile)
-    count = newct.get('ATATATATAT')
-    assert count == 500
-
-
-def test_abundance_distribution_gzipped_bigcount():
-    infile = utils.get_temp_filename('test.fa')
-    outfile1 = utils.get_temp_filename('test.dist')
-    in_dir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    outfile2 = utils.get_temp_filename('test_ct.gz')
-    htfile = _make_counting(infile, K=2, BIGCOUNT=True)
-    data = open(htfile, 'rb').read()
-    f_out = gzip.open(outfile2, 'wb')
-    f_out.write(data)
-    f_out.close()
-    counting_hash = khmer.load_counting_hash(outfile2)
-    hashsizes = counting_hash.hashsizes()
-    kmer_size = counting_hash.ksize()
-    tracking = khmer._Hashbits(kmer_size, hashsizes)
-    abundances = counting_hash.abundance_distribution(infile, tracking)
-    flag = False
-    for _, i in enumerate(abundances):
-        print _, i
-        if _ > 255 and i > 0:
-            flag = True
-            break
-    assert flag
 
 
 def test_roundtrip_casava_format_1():
