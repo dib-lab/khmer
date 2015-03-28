@@ -1,3 +1,17 @@
+2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/read_parsers.{cc,hh}: Obfuscate SeqAn SequenceStream objects with a
+   wrapper struct, to avoid #include-ing the SeqAn headers.
+   * lib/Makefile: Don't install the SeqAn headers.
+
+2015-03-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Add libkhmer targets, clean up
+   * lib/get_version.py: Rewrite to use versioneer.py
+   * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
+   * lib/.check_openmp.cc: add source that checks compiler for openmp support.
+   * lib/khmer.pc.in: add pkg-config file for khmer
+
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/counting.hh: Add CountingHash::n_tables() accessor

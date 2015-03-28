@@ -16,7 +16,7 @@ const unsigned int ht_count = 5;
 const WordLength ksize = 30;
 
 const unsigned int num_test_seqs = 1;
-const std::string test_seqs[] { "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC" };
+const std::string test_seqs[] = { "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC" };
 
 //const std::string toalign = "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC"; //perfect alignment
 //const std::string toalign = "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAA"; //short perfect alignment
@@ -35,7 +35,7 @@ int main(void)
     for ( unsigned int i = 0; i < ht_count; ++i ) {
         ht_sizes.push_back( primetab.get_next_prime( ) );
     }
-    CountingHash ht = CountingHash(ksize, ht_sizes);
+    CountingHash ht(ksize, ht_sizes);
 
     for(unsigned int index = 0; index < num_test_seqs; index++) {
         std::cout << "Loading test sequence " << index << ": " << test_seqs[index] <<

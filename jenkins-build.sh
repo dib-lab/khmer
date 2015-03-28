@@ -68,4 +68,6 @@ fi
 
 # takes too long to run on every build
 #bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
- 
+
+make lib
+make libtest
