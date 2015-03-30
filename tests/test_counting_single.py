@@ -88,7 +88,7 @@ def test_complete_no_collision():
 
     assert n_rc_filled == kh.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
-    assert n_fwd_filled == kh.n_entries() / 2 + n_palindromes / 2, \
+    assert n_fwd_filled == kh.n_entries() // 2 + n_palindromes // 2, \
         n_fwd_filled
 
 

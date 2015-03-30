@@ -9,6 +9,10 @@
 
 #include <cstring>
 #include "khmer_exception.hh"
+#include <seqan/sequence.h>
+#include <seqan/seq_io.h>
+#include <seqan/stream.h>
+#include <pthread.h>
 
 namespace khmer
 {
@@ -17,39 +21,45 @@ namespace khmer
 namespace read_parsers
 {
 
+struct SeqAnParser::Handle {
+    seqan::SequenceStream stream;
+    uint32_t seqan_spin_lock;
+};
+
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
-    seqan::open(_stream, filename);
-    if (!seqan::isGood(_stream)) {
+    _private = new SeqAnParser::Handle();
+    seqan::open(_private->stream, filename);
+    if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
         message = message + filename + " for reading.";
         throw InvalidStreamHandle(message.c_str());
-    } else if (seqan::atEnd(_stream)) {
+    } else if (seqan::atEnd(_private->stream)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
         throw InvalidStreamHandle(message.c_str());
     }
     __asm__ __volatile__ ("" ::: "memory");
-    _seqan_spin_lock = 0;
+    _private->seqan_spin_lock = 0;
 }
 
 bool SeqAnParser::is_complete()
 {
-    return !seqan::isGood(_stream) || seqan::atEnd(_stream);
+    return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
 }
 
 void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
     int ret = -1;
-    while (!__sync_bool_compare_and_swap(& _seqan_spin_lock, 0, 1));
-    bool atEnd = seqan::atEnd(_stream);
+    while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
+    bool atEnd = seqan::atEnd(_private->stream);
     if (!atEnd) {
         ret = seqan::readRecord(the_read.name, the_read.sequence,
-                                the_read.quality, _stream);
+                                the_read.quality, _private->stream);
     }
     __asm__ __volatile__ ("" ::: "memory");
-    _seqan_spin_lock = 0;
+    _private->seqan_spin_lock = 0;
     if (atEnd) {
         throw NoMoreReadsAvailable();
     }
@@ -60,7 +70,8 @@ void SeqAnParser::imprint_next_read(Read &the_read)
 
 SeqAnParser::~SeqAnParser()
 {
-    seqan::close(_stream);
+    seqan::close(_private->stream);
+    delete _private;
 }
 
 IParser * const

@@ -100,7 +100,8 @@ cppcheck: $(CPPSOURCES)
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
+	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
+		scripts/ tests/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
@@ -182,6 +183,24 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 lib:
 	cd lib && \
 	$(MAKE)
+
+# Runs a test of ./lib
+libtest: FORCE
+	rm -rf install_target
+	mkdir -p install_target
+	cd lib && \
+	 $(MAKE) clean && \
+	 $(MAKE) all && \
+	 $(MAKE) install PREFIX=../install_target
+	test -d install_target/include
+	test -f install_target/include/khmer.hh
+	test -d install_target/lib
+	test -f install_target/lib/libkhmer.a
+	$(CXX) -o install_target/test-prog-static -I install_target/include \
+		lib/test-compile.cc install_target/lib/libkhmer.a
+	$(CXX) -o install_target/test-prog-dynamic -I install_target/include \
+		-L install_target/lib lib/test-compile.cc -lkhmer
+	rm -rf install_target
 
 ## test        : run the khmer test suite
 test: FORCE

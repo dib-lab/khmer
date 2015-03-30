@@ -8,13 +8,9 @@
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
 #include <regex.h>
-
-
+#include <iostream>
+#include <cstdlib>
 #include "khmer.hh"
 
 namespace khmer
@@ -123,8 +119,8 @@ public:
     void imprint_next_read(Read &the_read);
 
 private:
-    seqan::SequenceStream _stream;
-    uint32_t _seqan_spin_lock;
+    struct Handle;
+    Handle* _private;
 
 };
 
