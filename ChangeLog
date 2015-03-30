@@ -1,10 +1,5 @@
 2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
 
-   * scripts/find-knots.py: added force argument to check_file_status()
-   call in main()
-=======
-2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
-
    * lib/hashbits.hh: Add Hashbits::n_tables() accessor
 
 2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
