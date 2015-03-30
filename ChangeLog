@@ -54,7 +54,6 @@
    * setup.py: specify that this is a Python 2 only project (for now)
    * tests/test_{counting_single,subset_graph}.py: make explicit the use of
    floor division behavior.
->>>>>>> 9f4ccb1ddd11ddf97488021940e5767f5146399b
 
 2015-03-07  Alex Hyer  <theonehyer@gmail.com>
 
