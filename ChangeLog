@@ -1,3 +1,8 @@
+2015-03-07  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+   call in main()
+
 2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/hashbits.hh: Add Hashbits::n_tables() accessor
