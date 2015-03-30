@@ -61,6 +61,11 @@
    floor division behavior.
 >>>>>>> 9f4ccb1ddd11ddf97488021940e5767f5146399b
 
+2015-03-07  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+      call in main()
+
 2015-03-06  Titus Brown  <titus@idyll.org>
 
    * sandbox/{collect-reads.py,saturate-by-median.py}: update for 'force'
