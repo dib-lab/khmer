@@ -1,3 +1,8 @@
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * ChangeLog, lib/read_aligner.cc, sandbox/sweep-reads.py: fixed spelling
+   errors.
+
 2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
