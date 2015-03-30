@@ -1,3 +1,7 @@
+2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/hashbits.hh: Add Hashbits::n_tables() accessor
+
 2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * lib/read_parsers.{cc,hh}: Obfuscate SeqAn SequenceStream objects with a
