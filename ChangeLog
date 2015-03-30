@@ -1,3 +1,8 @@
+2015-03-30  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc: catch more exceptions
+   * tests/test_{sandbox_scripts,subset_graph}.py: make tests more resiliant
+
 2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * lib/count.cc: Make CountingHash::abundance_distribution threadsafe
