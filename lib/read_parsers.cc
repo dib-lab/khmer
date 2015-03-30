@@ -30,6 +30,7 @@ struct SeqAnParser::Handle {
 
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
+    _private = new SeqAnParser::Handle();
     bool ret = false;
     if (strlen(filename) == 1 && strcmp(filename, "-") == 0) {
 	ret = seqan::open(_private->file, std::cin);
