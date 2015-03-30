@@ -85,7 +85,7 @@ HashIntoType _revcyclichash(const char * kmer_string, const WordLength k)
     // Our list of random numbers for each base value
     // Hard coding in random vals from array
     // Random values generated from www.random.org
-    HashIntoType compliment_vals[] = {491989698, 127908739, 392233993, 303837760};
+    HashIntoType complement_vals[] = {491989698, 127908739, 392233993, 303837760};
     //std::vector<HashIntoType> compliment_random_base_vals (vals, vals + sizeof(vals) / sizeof(vals));
 
     HashIntoType hashvalue = 0;
@@ -99,21 +99,21 @@ HashIntoType _revcyclichash(const char * kmer_string, const WordLength k)
         switch (kmer_string[i]) {
         case 'A':
         case 'a':
-            hashvalue ^= compliment_vals[0];
+            hashvalue ^= complement_vals[0];
 	    break;
         case 'C':
         case 'c':
-            hashvalue ^= compliment_vals[1];
+            hashvalue ^= complement_vals[1];
 	    break;
         case 'G':
         case 'g':
-            hashvalue ^= compliment_vals[2];
+            hashvalue ^= complement_vals[2];
 	    break;
         case 'T':
         case 't':
         case 'U':
         case 'u':
-            hashvalue ^= compliment_vals[3];
+            hashvalue ^= complement_vals[3];
 	    break;
         default:
             throw khmer_exception("Unknown nucleotide, not one of AaCcGgTtUu.");
