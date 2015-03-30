@@ -41,7 +41,6 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
-    _num_reads = 0;
 }
 
 bool SeqAnParser::is_complete()
