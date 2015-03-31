@@ -1,3 +1,13 @@
+2015-03-31  Jacob Fenton  <bocajnotnef@gmail.com>
+   * scripts/test-{scripts.py, data/test-nonwritable}: added test for
+   check_file_writable using load_into_counting
+
+2015-03-31  Phillip Garland  <pgarland@gmail.com>
+
+   * khmer/file.py (check_file_writable): new function to check writability
+   * scripts/load-into-counting.py (main): early check to see if output is
+   writable
+
 2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/hashbits.hh: Add Hashbits::n_tables() accessor

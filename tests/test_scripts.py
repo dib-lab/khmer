@@ -54,6 +54,20 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_nonwritable():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_test_data('test-nonwritable')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok = True)
+    assert 'does not have write permission; exiting' in err, err
+    assert status == 1, status
+
+
 @attr('linux')
 def test_load_into_counting_toobig():
     script = scriptpath('load-into-counting.py')
