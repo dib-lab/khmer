@@ -84,8 +84,14 @@ struct IParser {
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
+    size_t		    get_num_reads()
+    {
+	    return _num_reads;
+    }
+
 protected:
 
+    size_t		_num_reads;
     regex_t		_re_read_2_nosub;
     regex_t		_re_read_1;
     regex_t		_re_read_2;
