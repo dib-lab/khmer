@@ -59,14 +59,13 @@ def test_load_into_counting_nonwritable():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
 
-    
     outfile = utils.get_test_data('test-nonwritable')
     os.chmod(outfile, stat.S_IWOTH | stat.S_IRUSR)
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
 
-    (status, out, err) = utils.runscript(script, args, fail_ok = True)
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert 'does not have write permission; exiting' in err, err
     assert status == 1, status
 
