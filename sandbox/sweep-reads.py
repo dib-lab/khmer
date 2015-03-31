@@ -1,10 +1,12 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
+
+from khmer import utils
 
 """
 Find all reads connected to the given contigs on a per-partition basis.
@@ -34,8 +36,10 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.file import (check_file_status, check_valid_file_exists,
-                        check_space)
+from khmer.kfile import (check_file_status, check_valid_file_exists,
+                         check_space)
+
+from khmer.utils import write_record
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -52,10 +56,10 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
-def fmt_fastq(name, seq, accuracy, labels=[]):
+def fmt_fastq(name, seq, quality, labels=[]):
     return '@{name}\t{labels}\n{seq}\n+\n{acc}\n'.format(
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq,
-        acc=accuracy)
+        acc=quality)
 
 
 class ReadBuffer(object):
@@ -191,7 +195,8 @@ def get_parser():
     parser.add_argument(dest='input_fastp', help='Reference fasta or fastp')
     parser.add_argument('input_files', nargs='+',
                         help='Reads to be swept and sorted')
-
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -224,13 +229,13 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    check_file_status(args.input_fastp)
+    check_file_status(args.input_fastp, args.force)
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)
 
     # Check disk space availability
-    check_space(all_input_files)
+    check_space(all_input_files, args.force)
 
     # figure out input file type (FA/FQ) -- based on first file
     ix = iter(screed.open(args.input_files[0]))
@@ -238,7 +243,7 @@ def main():
     del ix
 
     extension = 'fa'
-    if hasattr(record, 'accuracy'):      # fastq!
+    if hasattr(record, 'quality'):      # fastq!
         extension = 'fq'
 
     output_buffer = ReadBufferManager(
@@ -283,16 +288,8 @@ def main():
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
 
-                    if hasattr(record, 'accuracy'):
-                        outfp.write('@{name}\n{seq}+{accuracy}\n'.format(
-                            name=record.name,
-                            seq=record.sequence,
-                            accuracy=record.accuracy))
-                    else:
-                        outfp.write('>{name}\n{seq}\n'.format(
-                            name=record.name,
-                            seq=record.sequence))
-
+                    write_record(record, outfp)
+ 
             except IOError as e:
                 print >>sys.stderr, '!! ERROR !!', e
                 print >>sys.stderr, '...error splitting input. exiting...'
@@ -345,8 +342,8 @@ def main():
                 except ValueError as e:
                     pass
                 else:
-                    if hasattr(record, 'accuracy'):
-                        seq_str = fmt_fastq(name, seq, record.accuracy, labels)
+                    if hasattr(record, 'quality'):
+                        seq_str = fmt_fastq(name, seq, record.quality, labels)
                     else:
                         seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))

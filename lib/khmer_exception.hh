@@ -66,6 +66,31 @@ public:
     StreamReadError(const char * msg) : khmer_file_exception(msg) {}
 };
 
+
+///
+// An exception for invalid arguments to functions
+//
+
+class InvalidValue : public khmer_exception
+{
+public:
+    explicit InvalidValue(const char * msg) : khmer_exception(msg) { }
+    explicit InvalidValue(const std::string& msg)
+        : khmer_exception(msg) { }
+};
+
+///
+// An exception for trying to change a read-only attributes
+//
+
+class ReadOnlyAttribute : public khmer_exception
+{
+public:
+    explicit ReadOnlyAttribute(const char * msg) : khmer_exception(msg) { }
+    explicit ReadOnlyAttribute(const std::string& msg)
+        : khmer_exception(msg) { }
+};
+
 }
 
 #endif // KHMER_EXCEPTION_HH

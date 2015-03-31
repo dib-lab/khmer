@@ -1,6 +1,6 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
@@ -8,9 +8,8 @@
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
-#include <vector>
-#include "khmer_config.hh"
 #include "hashtable.hh"
+#include <vector>
 
 namespace khmer
 {
@@ -54,27 +53,18 @@ protected:
 public:
     KmerCountMap _bigcounts;
 
-    CountingHash(
-        WordLength ksize, HashIntoType single_tablesize,
-        uint32_t const number_of_threads =
-            get_active_config( ).get_number_of_threads( )
-    ) :
-        khmer::Hashtable(ksize, number_of_threads),
-        _use_bigcount(false), _bigcount_spin_lock(false), _n_unique_kmers(0)
+    CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
+        khmer::Hashtable(ksize), _use_bigcount(false),
+        _bigcount_spin_lock(false), _n_unique_kmers(0)
     {
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
     }
 
-    CountingHash(
-        WordLength ksize, std::vector<HashIntoType>& tablesizes,
-        uint32_t const number_of_threads =
-            get_active_config( ).get_number_of_threads( )
-    ) :
-        khmer::Hashtable(ksize, number_of_threads),
-        _use_bigcount(false), _bigcount_spin_lock(false),
-        _tablesizes(tablesizes), _n_unique_kmers(0)
+    CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
+        khmer::Hashtable(ksize), _use_bigcount(false),
+        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
     {
 
         _allocate_counters();
@@ -95,6 +85,13 @@ public:
 
             _n_tables = 0;
         }
+    }
+
+    // Writing to the tables outside of defined methods has undefined behavior!
+    // As such, this should only be used to return read-only interfaces
+    Byte ** get_raw_tables()
+    {
+        return _counts;
     }
 
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
@@ -134,6 +131,11 @@ public:
     const HashIntoType n_entries() const
     {
         return _tablesizes[0];
+    }
+
+    const size_t n_tables() const
+    {
+        return _n_tables;
     }
 
     // count number of occupied bins
@@ -258,6 +260,8 @@ public:
                                     BoundedCounterType min_abund) const;
     unsigned long trim_below_abundance(std::string seq,
                                        BoundedCounterType max_abund) const;
+    std::vector<unsigned int> find_spectral_error_positions(std::string seq,
+            BoundedCounterType min_abund) const;
 
     void collect_high_abundance_kmers(const std::string &infilename,
                                       unsigned int lower_count,

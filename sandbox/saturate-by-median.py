@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,8 +21,8 @@ from itertools import izip
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
-from khmer.file import (check_space, check_space_for_hashtable,
-                        check_valid_file_exists)
+from khmer.kfile import (check_space, check_space_for_hashtable,
+                         check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 1
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
@@ -185,9 +185,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_frequency = args.report_frequency
 
     check_valid_file_exists(args.input_filenames)
-    check_space(args.input_filenames)
+    check_space(args.input_filenames, False)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
 
     # list to save error files along with throwing exceptions
     if args.force:

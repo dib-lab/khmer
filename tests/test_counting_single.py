@@ -24,6 +24,15 @@ def test_no_collision():
     assert kh.get('TTTT') == 2
 
 
+@attr('linux')
+def test_toobig():
+    try:
+        ct = khmer.new_hashtable(4, 1000000000000)
+        assert 0, "this should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test_collision():
     kh = khmer.new_hashtable(4, 4)
 
@@ -39,12 +48,12 @@ def test_badcount():
     try:
         countingtable.count()
         assert 0, "count should require one argument"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.count('ABCDE')
         assert 0, "count should require k-mer size to be equal"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -53,7 +62,7 @@ def test_hashtable_n_entries():
     try:
         countingtable.n_entries("nope")
         assert 0, "n_entries should accept no arguments"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -79,7 +88,7 @@ def test_complete_no_collision():
 
     assert n_rc_filled == kh.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
-    assert n_fwd_filled == kh.n_entries() / 2 + n_palindromes / 2, \
+    assert n_fwd_filled == kh.n_entries() // 2 + n_palindromes // 2, \
         n_fwd_filled
 
 
@@ -268,7 +277,7 @@ def test_badget():
     try:
         kh.get("AGCTT")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -281,7 +290,6 @@ def test_64bitshift():
     assert 0 < kh.get_min_count(substr), kh.get_min_count(substr)
 
 
-@attr('highmem')
 def test_64bitshift_2():
     kh = khmer.new_hashtable(25, 4)
     fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
@@ -292,18 +300,17 @@ def test_64bitshift_2():
         assert kh.get(substr) > 0
 
 
-@attr('highmem')
 def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.new_hashtable(9, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
-    assert n_reads == 1
-    assert n_kmers == 0
+    assert n_reads == 1, n_reads
+    assert n_kmers == 0, n_kmers
 
     kh = khmer.new_hashtable(8, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
-    assert n_reads == 1
-    assert n_kmers == 1
+    assert n_reads == 1, n_reads
+    assert n_kmers == 1, n_kmers
 
 
 class Test_ConsumeString(object):
@@ -320,10 +327,9 @@ class Test_ConsumeString(object):
         try:
             self.kh.n_occupied("MU", 1, 3)
             assert 0, "n_occupied shouldn't accept three arguments"
-        except TypeError, err:
+        except TypeError as err:
             print str(err)
 
-    @attr('highmem')
     def test_abundance_by_pos(self):
         kh = self.kh
 
@@ -343,7 +349,6 @@ class Test_ConsumeString(object):
         assert dist[2] == 1
         assert sum(dist) == 2
 
-    @attr('highmem')
     def test_abundance_by_pos_bigcount(self):
         kh = self.kh
         kh.set_use_bigcount(True)       # count past MAX_COUNT
@@ -411,7 +416,6 @@ class Test_AbundanceDistribution(object):
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_fasta(A_filename)
 
-    @attr('highmem')
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')
 

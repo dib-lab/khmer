@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -16,13 +16,14 @@ Use '-h' for parameter help.
 """
 import os
 import sys
+import csv
 import khmer
 import threading
 import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
-from khmer.file import (check_file_status, check_space,
-                        check_space_for_hashtable)
+from khmer.kfile import (check_file_status, check_space,
+                         check_space_for_hashtable)
 
 
 def get_parser():
@@ -55,23 +56,29 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the histogram. '
+                        'Includes column headers.')
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
-    info('abundance-dist-single.py', ['counting'])
+    info('abundance-dist-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
     report_on_config(args)
 
-    check_file_status(args.input_sequence_filename)
-    check_space([args.input_sequence_filename])
+    check_file_status(args.input_sequence_filename, args.force)
+    check_space([args.input_sequence_filename], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize,
+                                  args.force)
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
@@ -80,11 +87,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
+        if args.csv:
+            hist_fp_csv = csv.writer(hist_fp)
+            # write headers:
+            hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                                  'cumulative_fraction'])
 
     print >>sys.stderr, 'making k-mer counting table'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                            args.n_tables,
-                                            args.threads)
+                                            args.n_tables)
     counting_hash.set_use_bigcount(args.bigcount)
 
     print >> sys.stderr, 'building k-mer tracking table'
@@ -96,10 +107,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         counting_hash.hashsizes()
     print >>sys.stderr, 'outputting to', args.output_histogram_filename
 
-    khmer.get_config().set_reads_input_buffer_size(args.threads * 64 * 1024)
-
     # start loading
-    rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
+    rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     print >>sys.stderr, 'consuming input, round 1 --', \
         args.input_sequence_filename
@@ -128,7 +137,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     print >>sys.stderr, 'preparing hist from %s...' % \
         args.input_sequence_filename
-    rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
+    rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     print >>sys.stderr, 'consuming input, round 2 --', \
         args.input_sequence_filename
@@ -167,7 +176,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sofar += i
         frac = sofar / float(total)
 
-        print >> hist_fp, _, i, sofar, round(frac, 3)
+        if args.csv:
+            hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+        else:
+            print >> hist_fp, _, i, sofar, round(frac, 3)
 
         if sofar == total:
             break

@@ -1,4 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+
 import argparse
 import screed
 import sys
@@ -6,8 +11,8 @@ import khmer
 
 
 def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    if hasattr(read, 'quality'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.quality)
     else:
         return ">%s\n%s\n" % (read.name, read.sequence)
 
@@ -44,8 +49,7 @@ def main():
             print >>sys.stderr, '...', n, n_kept
 
         seq = record.sequence.upper()
-        if 'N' in seq:
-            seq = seq.replace('N', 'G')
+        seq = seq.replace('N', 'A')
 
         try:
             med, _, _ = htable.get_median_count(seq)

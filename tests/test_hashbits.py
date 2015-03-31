@@ -137,7 +137,6 @@ def test_bloom_c_2():  # simple one
     assert ht2.n_unique_kmers() == 3
 
 
-@attr('highmem')
 def test_filter_if_present():
     ht = khmer.new_hashbits(32, 2, 2)
 
@@ -153,7 +152,6 @@ def test_filter_if_present():
     assert records[0]['name'] == '3'
 
 
-@attr('highmem')
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.new_hashbits(32, 1, 1)
@@ -179,7 +177,6 @@ def test_combine_pe():
     assert ht.count_partitions() == (1, 0)
 
 
-@attr('highmem')
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.new_hashbits(32, 1, 1)
@@ -197,7 +194,6 @@ def test_load_partitioned():
     assert ht.get(s3)
 
 
-@attr('highmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.new_hashbits(4, 2, 2)
@@ -210,7 +206,6 @@ def test_count_within_radius_simple():
     assert n == 1
 
 
-@attr('highmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     ht = khmer.new_hashbits(20, 1e5, 4)
@@ -225,7 +220,6 @@ def test_count_within_radius_big():
     assert n == 39
 
 
-@attr('highmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.new_hashbits(4, 2, 2)
@@ -281,7 +275,6 @@ def test_save_load_tagset_noclear():
     assert len(data) == 34, len(data)
 
 
-@attr('highmem')
 def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -303,7 +296,6 @@ def test_stop_traverse():
     assert n == 2, n
 
 
-@attr('highmem')
 def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -332,7 +324,6 @@ def test_tag_across_stoptraverse():
     assert n == 1, n
 
 
-@attr('highmem')
 def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -435,7 +426,6 @@ def test_extract_unique_paths_4():
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
-@attr('highmem')
 def test_find_unpart():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -458,7 +448,6 @@ def test_find_unpart():
     assert n == 1, n                     # all sequences connect
 
 
-@attr('highmem')
 def test_find_unpart_notraverse():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -481,7 +470,6 @@ def test_find_unpart_notraverse():
     assert n == 99, n                    # all sequences disconnected
 
 
-@attr('highmem')
 def test_find_unpart_fail():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
@@ -535,11 +523,11 @@ def test_badget():
     try:
         hbts.get("AGCTT")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
-####
+#
 
 
 def test_load_notexist_should_fail():
@@ -555,7 +543,7 @@ def test_load_notexist_should_fail():
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('temphashbitssave0.kh')
+    savepath = utils.get_temp_filename('temphashbitssave0.ct')
 
     hi = khmer.new_counting_hash(12, 1000)
     hi.consume_fasta(inpath)
@@ -573,7 +561,7 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -584,7 +572,7 @@ def test_save_load_tagset_notexist():
     try:
         ht.load_tagset(outfile)
         assert 0, "this test should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -666,13 +654,13 @@ def test_hashbits_file_version_check():
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
 def test_hashbits_file_type_check():
     kh = khmer.new_counting_hash(12, 1, 1)
-    savepath = utils.get_temp_filename('tempcountingsave0.kh')
+    savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
 
     ht = khmer.new_hashbits(12, 1, 1)
@@ -680,7 +668,7 @@ def test_hashbits_file_type_check():
     try:
         ht.load(savepath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -692,7 +680,7 @@ def test_stoptags_file_version_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -703,7 +691,7 @@ def test_stoptags_ksize_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -714,7 +702,7 @@ def test_stop_tags_filetype_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -726,7 +714,7 @@ def test_tagset_file_version_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -737,7 +725,7 @@ def test_tagset_ksize_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -748,15 +736,15 @@ def test_tagset_filetype_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
 def test_bad_primes_list():
     try:
-        coutingtable = khmer._new_hashbits(31, ["a", "b", "c"], 1)
+        coutingtable = khmer._Hashbits(31, ["a", "b", "c"], 1)
         assert 0, "Bad primes list should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)
 
 
@@ -765,11 +753,13 @@ def test_consume_absentfasta_with_reads_parser():
     try:
         presencetable.consume_fasta_with_reads_parser()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
-    readparser = ReadParser(utils.get_test_data('empty-file'))
     try:
+        readparser = ReadParser(utils.get_test_data('empty-file'))
         presencetable.consume_fasta_with_reads_parser(readparser)
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
+        print str(err)
+    except ValueError as err:
         print str(err)

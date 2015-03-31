@@ -53,6 +53,9 @@ k-mer counting and abundance filtering
 .. autoprogram:: filter-abund-single:get_parser()
         :prog: filter-abund-single.py
 
+.. autoprogram:: trim-low-abund:get_parser()
+        :prog: trim-low-abund.py
+
 .. autoprogram:: count-median:get_parser()
         :prog: count-median.py
 
@@ -125,6 +128,9 @@ Read handling: interleaving, splitting, etc.
 
 .. autoprogram:: interleave-reads:get_parser()
         :prog: interleave-reads.py
+
+.. autoprogram:: readstats:get_parser()
+        :prog: readstats.py
 
 .. autoprogram:: sample-reads-randomly:get_parser()
         :prog: sample-reads-randomly.py

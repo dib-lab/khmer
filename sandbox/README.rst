@@ -6,9 +6,15 @@ scripts that we have not fully tested.  They are also not under
 semantic versioning, so their functionality and command line arguments
 may change without notice.
 
-We are still in the middle of triaging and documenting the various scripts.
+We are still triaging and documenting the various scripts.
 
 ----
+
+Awaiting promotion to sandbox:
+
+* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference. (Used/tested in `2014 paper on semi-streaming algorithms <https://github.com/ged-lab/2014-streaming/blob/master/>`__)
+* correct-errors.py - streaming error correction.
+* unique-kmers.py - estimate the number of k-mers present in a file with the HyperLogLog low-memory probabilistic cardinality estimation algorithm.
 
 Scripts with recipes:
 
@@ -21,10 +27,9 @@ To keep, document, and build recipes for:
 
 * abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
 * assemstats3.py - print out assembly statistics
+* build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
-* combine-pe.py - combine partitions based on shared PE reads.
-* compare-partitions.py
-* dn-identify-errors.py - prototype script to identify errors in reads based on diginorm principles
+* collect-variants.py - used in a `gist <https://gist.github.com/ctb/6eaef7971ea429ab348d>`__
 * extract-single-partition.py - extract all the sequences that belong to a specific partition, from a file with multiple partitions
 * fasta-to-abundance-hist.py - generate abundance of k-mers by position within reads; use with abundance-hist-by-position.py
 * filter-below-abund.py - like filter-abund, but trim off high-abundance k-mers
@@ -38,9 +43,7 @@ To keep, document, and build recipes for:
 * normalize-by-median-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
 * print-stoptags.py - print out the stoptag k-mers
 * print-tagset.py - print out the tagset k-mers
-* readstats.py - print out read statistics
 * renumber-partitions.py - systematically renumber partitions
-* shuffle-fasta.py - FASTA file shuffler for small FASTA files
 * shuffle-reverse-rotary.py - FASTA file shuffler for larger FASTA files
 * split-fasta.py - break a FASTA file up into smaller chunks
 * stoptag-abundance-hist.py - print out abundance histogram of stoptags
@@ -52,32 +55,34 @@ To keep, document, and build recipes for:
 * sweep-reads.py - various ways to extract reads based on k-mer overlap
 * sweep-reads2.py - various ways to extract reads based on k-mer overlap
 * sweep-reads3.py - various ways to extract reads based on k-mer overlap
-* to-casava-1.8-fastq.py - convert reads to different Casava format
-* trim-low-abund.py - streaming version of filter-abund.
-* write-trimmomatic.py
+* write-trimmomatic.py - used to build Trimmomatic command lines in `khmer-protocols <http://khmer-protocols.readthedocs.org/en/latest/>`__
 
 Good ideas to rewrite using newer tools/approaches:
 
 * assembly-diff.py - find sequences that differ between two assemblies
 * assembly-diff-2.py - find subsequences that differ between two assemblies
-* bloom_count.py - count # of unique k-mers; should be reimplemented with HyperLogLog
-* bloom_count_intersection.py - look at unique and disjoint #s of k-mers
+* bloom-count.py - count # of unique k-mers; should be reimplemented with HyperLogLog, Renamed from bloom_count.py in commit 4788c31
+* bloom-count-intersection.py - look at unique and disjoint #s of k-mers, Renamed from bloom_count_intersection.py in commit 4788c31.
 * split-sequences-by-length.py - break up short reads by length
 
-To examine:
-
-* build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
-* count-within-radius.py - calculating graph density by position with seq
-* degree-by-position.py - calculating graph degree by position in seq
-* ec.py - new error correction foo
-* error-correct-pass2.py - new error correction foo
-* find-unpart.py - something to do with finding unpartitioned sequences
-* normalize-by-align.py  - new error correction foo
-* read_aligner.py - new error correction foo
-* uniqify-sequences.py - print out paths that are unique in the graph
-* write-interleave.py - is this used by any protocol etc?
-
 ----
+
+Present in commit d295bc847 but removed thereafter:
+
+* `combine-pe.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/combine-pe.py>`__ - combine partitions based on shared PE reads.
+* `compare-partitions.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/compare-partitions.py>`__ - compare read membership in partitions.
+* `count-within-radius.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/count-within-radius.py>`__ - calculating graph density by position with seq
+* `degree-by-position.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/degree-by-position.py>`__ - calculating graph degree by position in seq
+* `dn-identify-errors.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/dn-identify-errors.py>`__ - prototype script to identify errors in reads based on diginorm principles
+* `ec.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/ec.py>`__ - new error correction foo
+* `error-correct-pass2.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/error-correct-pass2.py>`__ - new error correction foo
+* `find-unpart.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/find-unpart.py>`__ - something to do with finding unpartitioned sequences
+* `normalize-by-align.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/normalize-by-align.py>`__  - new error correction foo
+* `read_aligner.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/read_aligner.py>`__ - new error correction foo
+* `shuffle-fasta.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/shuffle-fasta.py>`__ - FASTA file shuffler for small FASTA files
+* `to-casava-1.8-fastq.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/to-casava-1.8-fastq.py>`__ - convert reads to different Casava format
+* `uniqify-sequences.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/uniqify-sequences.py>`__ - print out paths that are unique in the graph
+* `write-interleave.py <https://github.com/ged-lab/khmer/blob/d295bc8477022e8c34649f131a2abe333a891d3d/sandbox/write-interleave.py>`__ - is this used by any protocol etc?
 
 Present in commit 691b0b3ae but removed thereafter:
 

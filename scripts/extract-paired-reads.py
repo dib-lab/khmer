@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,36 +20,10 @@ import os.path
 import textwrap
 import argparse
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
-
-def is_pair(name1, name2):
-    if name1.endswith('/1') and name2.endswith('/2'):
-        subpart1 = name1.split('/')[0]
-        subpart2 = name2.split('/')[0]
-        if subpart1 == subpart2:
-            assert subpart1
-            return True
-
-    return False
-
-
-def output_pair(read1, read2):
-    if hasattr(read1, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (read1.name, read1.sequence, read1.accuracy,
-             read2.name, read2.sequence, read2.accuracy)
-    else:
-        return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
-                                       read2.sequence)
-
-
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
+from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
 
 def get_parser():
@@ -72,8 +46,10 @@ def get_parser():
         description='Take a mixture of reads and split into pairs and '
         'orphans.', epilog=textwrap.dedent(epilog))
     parser.add_argument('infile')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -81,9 +57,9 @@ def main():
     info('extract-paired-reads.py')
     args = get_parser().parse_args()
 
-    check_file_status(args.infile)
+    check_file_status(args.infile, args.force)
     infiles = [args.infile]
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     outfile = os.path.basename(args.infile)
     if len(sys.argv) > 2:
@@ -96,44 +72,20 @@ def main():
     print >>sys.stderr, 'outputting interleaved pairs to "%s.pe"' % outfile
     print >>sys.stderr, 'outputting orphans to "%s.se"' % outfile
 
-    last_record = None
-    last_name = None
-
     n_pe = 0
     n_se = 0
 
-    record = None
-    index = 0
-    for index, record in enumerate(screed.open(sys.argv[1])):
+    screed_iter = screed.open(args.infile, parse_description=False)
+    for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
-            print '...', index
-        name = record['name'].split()[0]
+            print >>sys.stderr, '...', index
 
-        if last_record:
-            if is_pair(last_name, name):
-                paired_fp.write(output_pair(last_record, record))
-                name, record = None, None
-                n_pe += 1
-            else:
-                single_fp.write(output_single(last_record))
-                n_se += 1
-
-        last_name = name
-        last_record = record
-
-    if last_record:
-        if is_pair(last_name, name):
-            paired_fp.write(output_pair(last_record, record))
-            name, record = None, None
+        if is_pair:
+            write_record_pair(read1, read2, paired_fp)
             n_pe += 1
         else:
-            single_fp.write(output_single(last_record))
-            name, record = None, None
+            write_record(read1, single_fp)
             n_se += 1
-
-    if record:
-        single_fp.write(output_single(record))
-        n_se += 1
 
     single_fp.close()
     paired_fp.close()
@@ -143,10 +95,11 @@ def main():
 
     print >>sys.stderr, 'DONE; read %d sequences,' \
         ' %d pairs and %d singletons' % \
-        (index + 1, n_pe, n_se)
+        (n_pe * 2 + n_se, n_pe, n_se)
 
     print >> sys.stderr, 'wrote to: ' + outfile \
         + '.se' + ' and ' + outfile + '.pe'
+
 
 if __name__ == '__main__':
     main()

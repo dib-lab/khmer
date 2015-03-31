@@ -206,9 +206,9 @@ normalizations on multiple files in multiple steps. For example, break ::
 
 into multiple steps like so::
 
-  normalize-by-median.py [ ... ] --savetable file1.kh file1.fa
-  normalize-by-median.py [ ... ] --loadtable file1.kh --savetable file2.kh file2.fa
-  normalize-by-median.py [ ... ] --loadtable file2.kh --savetable file3.kh file3.fa
+  normalize-by-median.py [ ... ] --savetable file1.ct file1.fa
+  normalize-by-median.py [ ... ] --loadtable file1.ct --savetable file2.ct file2.fa
+  normalize-by-median.py [ ... ] --loadtable file2.ct --savetable file3.ct file3.fa
 
 The results should be identical!
 

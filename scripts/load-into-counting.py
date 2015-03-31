@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
@@ -21,9 +21,9 @@ import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
 from khmer.file import check_file_writable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 
 
 def get_parser():
@@ -36,14 +36,14 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer counting table from the given"
@@ -55,20 +55,23 @@ def get_parser():
                         help="The names of one or more FAST[AQ] input "
                         "sequence files.")
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
-                        action='store_false',
-                        help='Do not count k-mers past 255')
+                        action='store_false', help="The default behaviour is "
+                        "to count past 255 using bigcount. This flag turns "
+                        "bigcount off, limiting counts to 255.")
     parser.add_argument('--summary-info', '-s', default=None, metavar="FORMAT",
                         choices=['json', 'tsv'],
                         help="What format should the machine readable run "
                         "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():
 
-    info('load-into-counting.py', ['counting'])
+    info('load-into-counting.py', ['counting', 'SeqAn'])
 
     args = get_parser().parse_args()
     report_on_config(args)
@@ -77,10 +80,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+        check_file_status(name, args.force)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, args.force)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
@@ -94,17 +97,14 @@ def main():
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables, args.threads)
+                                     args.n_tables)
     htable.set_use_bigcount(args.bigcount)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     filename = None
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, args.threads)
+        rparser = khmer.ReadParser(filename)
         threads = []
         print >>sys.stderr, 'consuming input', filename
         for _ in xrange(args.threads):
@@ -116,11 +116,12 @@ def main():
             threads.append(cur_thrd)
             cur_thrd.start()
 
-        for _ in threads:
-            _.join()
+        for thread in threads:
+            thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args.n_tables * args.min_tablesize)
+            check_space_for_hashtable(args.n_tables * args.min_tablesize,
+                                      args.force)
             print >>sys.stderr, 'mid-save', base
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:

@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2014. It is licensed under
+# Copyright (C) Michigan State University, 2014-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
@@ -19,15 +19,15 @@ import sys
 import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 import argparse
 import screed
 
 
 def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    if hasattr(read, 'quality'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.quality)
     else:
         return ">%s\n%s\n" % (read.name, read.sequence)
 
@@ -39,7 +39,7 @@ def get_parser():
 
     Example::
 
-        collect-reads.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        collect-reads.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Collect reads until a given avg coverage.",
@@ -71,10 +71,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+        check_file_status(name, False)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, False)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
 
     print 'Saving k-mer counting table to %s' % base
     print 'Loading sequences from %s' % repr(filenames)
@@ -82,8 +82,7 @@ def main():
         print 'Outputting sequences to', args.output
 
     print 'making k-mer counting table'
-    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables)
+    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize)
     htable.set_use_bigcount(args.bigcount)
 
     total_coverage = 0.
