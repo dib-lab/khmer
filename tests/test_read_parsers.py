@@ -45,8 +45,40 @@ def test_with_default_arguments():
         assert m == n
 
 
-def test_gzip_decompression():
+def test_num_reads():
+    """Test ReadParser.num_reads"""
+    reads_count = 0
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
+    for _ in rparser:
+        reads_count += 1
 
+    assert reads_count == 100
+    assert rparser.num_reads == 100
+
+
+@attr('multithread')
+def test_num_reads_threads():
+    """Test threadsaftey of ReadParser's read counting"""
+    import threading
+
+    def count_reads(rparser):
+        for _ in rparser:
+            pass
+
+    n_threads = 4
+    threads = []
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
+    for _ in xrange(n_threads):
+        thr = threading.Thread(target=count_reads, args=[rparser, ])
+        threads.append(thr)
+        thr.start()
+    for thr in threads:
+        thr.join()
+
+    assert rparser.num_reads == 100
+
+
+def test_gzip_decompression():
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
     for read in rparser:
