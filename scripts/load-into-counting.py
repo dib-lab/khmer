@@ -21,7 +21,7 @@ import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
-from khmer.file import check_file_writable
+from khmer.kfile import check_file_writable
 from khmer.kfile import check_file_status, check_space
 from khmer.kfile import check_space_for_hashtable
 
