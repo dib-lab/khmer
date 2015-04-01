@@ -466,6 +466,12 @@ ReadParser_iter_reads(PyObject * self, PyObject * args )
     return PyObject_SelfIter( self );
 }
 
+static
+PyObject *
+ReadParser_get_num_reads(khmer_ReadParser_Object * me)
+{
+    return PyLong_FromLong(me->parser->get_num_reads());
+}
 
 static
 PyObject *
@@ -505,10 +511,18 @@ static PyMethodDef _ReadParser_methods [ ] = {
         "iter_read_pairs",  (PyCFunction)ReadParser_iter_read_pairs,
         METH_VARARGS,       "Iterates over paired reads as pairs."
     },
-
     { NULL, NULL, 0, NULL } // sentinel
 };
 
+static PyGetSetDef khmer_ReadParser_accessors[] = {
+    {
+        (char *)"num_reads",
+        (getter)ReadParser_get_num_reads, NULL,
+        (char *)"count of reads processed thus far.",
+        NULL
+    },
+    {NULL, NULL, NULL, NULL, NULL} /* Sentinel */
+};
 
 static PyTypeObject khmer_ReadParser_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
@@ -541,7 +555,7 @@ static PyTypeObject khmer_ReadParser_Type = {
     (iternextfunc)_ReadParser_iternext,        /* tp_iternext */
     _ReadParser_methods,                       /* tp_methods */
     0,                                         /* tp_members */
-    0,                                         /* tp_getset */
+    khmer_ReadParser_accessors,                /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */

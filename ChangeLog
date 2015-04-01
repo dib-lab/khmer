@@ -1,3 +1,9 @@
+2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: add read counting to IParser and subclasses
+   * khmer/_khmermodule.cc,tests/test_read_parsers.py: add 'num_reads'
+   attribute to khmer.ReadParser objects in python land, and test it.
+
 2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/hashbits.hh: Add Hashbits::n_tables() accessor
