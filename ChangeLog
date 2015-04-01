@@ -1,7 +1,7 @@
-2015-03-07  Alex Hyer  <theonehyer@gmail.com>
+2015-04-01  Alex Hyer  <theonehyer@gmail.com>
 
    * scripts/find-knots.py: added force argument to check_file_status()
-      call in main()
+   call in main().
 
 2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
 
