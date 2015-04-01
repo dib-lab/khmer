@@ -6,11 +6,13 @@
 #
 """This is khmer; please see http://khmer.readthedocs.org/."""
 
+from math import log
+
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
 from khmer._khmer import Hashbits as _Hashbits
 from khmer._khmer import HLLCounter as _HLLCounter
-from khmer._khmer import ReadAligner
+from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
 # tests/test_{functions,counting_hash,labelhash,counting_single}.py
@@ -275,6 +277,7 @@ class HLLCounter(_HLLCounter):
 
     """HyperLogLog counter.
 
+    """
     A HyperLogLog counter is a probabilistic data structure specialized on
     cardinality estimation.
     There is a precision/memory consumption trade-off: error rate determines
@@ -291,3 +294,35 @@ class HLLCounter(_HLLCounter):
 
     def __len__(self):
         return self.estimate_cardinality()
+
+
+class ReadAligner(_ReadAligner):
+
+    """
+    ReadAligner docs
+    """
+
+    defaultTransitionProbabilies = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
+        (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
+         log(0.0150068, 2), log(0.0000017, 2), log(0.0000003, 2)),  # M_
+        (log(0.5196194, 2), log(0.4647955, 2), log(0.0059060, 2),
+         log(0.0096792, 2)),  # Ir_
+        (log(0.7611255, 2), log(0.2294619, 2), log(0.0072673, 2),
+         log(0.0021453, 2)),  # Ig_
+        (log(0.0799009, 2), log(0.0000262, 2), log(0.0001836, 2),
+         log(0.9161349, 2), log(0.0033370, 2), log(0.0004173, 2)),  # Mu_
+        (log(0.1434529, 2), log(0.0036995, 2), log(0.2642928, 2),
+         log(0.5885548, 2)),  # Iru_
+        (log(0.1384551, 2), log(0.0431328, 2), log(0.6362921, 2),
+         log(0.1821200, 2))  # Igu_
+    )
+
+    defaultScoringMatrix = [
+        log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
+
+    def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
+                scoring_matrix=defaultScoringMatrix,
+                transition_probabilities=defaultTransitionProbabilies):
+        return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
+                                    bits_theta, scoring_matrix,
+                                    transition_probabilities)

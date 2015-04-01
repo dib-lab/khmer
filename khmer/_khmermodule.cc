@@ -4212,15 +4212,38 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
         khmer_KCountingHash_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
+        double scoring_matrix[] = { 0, 0, 0, 0 };
+        double transitions[] = {
+            0, 0, 0, 0, 0, 0, // M
+            0, 0, 0, 0, // Ir
+            0, 0, 0, 0, // Ig
+            0, 0, 0, 0, 0, 0, // Mu
+            0, 0, 0, 0, // Iru
+            0, 0, 0, 0 // Igu
+        };
 
-        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHash_Type, &ch,
-                             &trusted_cov_cutoff, &bits_theta)) {
+        if(!PyArg_ParseTuple(
+                    args,
+                    "O!Hd|(dddd)((dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd))",
+                    &khmer_KCountingHash_Type, &ch, &trusted_cov_cutoff,
+                    &bits_theta, &scoring_matrix[0], &scoring_matrix[1],
+                    &scoring_matrix[2], &scoring_matrix[3], &transitions[0],
+                    &transitions[1], &transitions[2], &transitions[3],
+                    &transitions[4], &transitions[5], &transitions[6],
+                    &transitions[7], &transitions[8], &transitions[9],
+                    &transitions[10], &transitions[11], &transitions[12],
+                    &transitions[13], &transitions[14], &transitions[15],
+                    &transitions[16], &transitions[17], &transitions[18],
+                    &transitions[19], &transitions[20], &transitions[21],
+                    &transitions[22], &transitions[23], &transitions[24],
+                    &transitions[25], &transitions[26], &transitions[27])) {
             Py_DECREF(self);
             return NULL;
         }
 
         self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
-                                        bits_theta);
+                                        bits_theta, scoring_matrix,
+                                        transitions);
     }
 
     return (PyObject *) self;
@@ -4246,7 +4269,7 @@ static PyTypeObject khmer_ReadAlignerType = {
     0,                          /*tp_getattro*/
     0,                          /*tp_setattro*/
     0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,         /*tp_flags*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,         /*tp_flags*/
     "ReadAligner object",           /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */

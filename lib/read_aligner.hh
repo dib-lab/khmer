@@ -227,7 +227,18 @@ public:
                   << std::endl;
 #endif
     }
+
+    ReadAligner(khmer::CountingHash* ch,
+                BoundedCounterType trusted_cutoff, double bits_theta,
+                double* scoring_matrix, double* transitions)
+        : bitmask(comp_bitmask(ch->ksize())),
+          rc_left_shift(ch->ksize() * 2 - 2),
+          m_ch(ch), m_sm(scoring_matrix[0], scoring_matrix[1],
+                         scoring_matrix[2], scoring_matrix[3],
+                         transitions),
+          m_trusted_cutoff(trusted_cutoff),
+          m_bits_theta(bits_theta) {};
+
 };
 }
-
 #endif // READ_ALIGNER_HH
