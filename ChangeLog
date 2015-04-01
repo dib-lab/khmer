@@ -1,3 +1,8 @@
+2015-03-07  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+      call in main()
+
 2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/read_parsers.{cc,hh}: add read counting to IParser and subclasses
@@ -60,11 +65,6 @@
    * setup.py: specify that this is a Python 2 only project (for now)
    * tests/test_{counting_single,subset_graph}.py: make explicit the use of
    floor division behavior.
-
-2015-03-07  Alex Hyer  <theonehyer@gmail.com>
-
-   * scripts/find-knots.py: added force argument to check_file_status()
-      call in main()
 
 2015-03-06  Titus Brown  <titus@idyll.org>
 
