@@ -1,12 +1,21 @@
-2015-03-31  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-04-01  Jacob Fenton  <bocajnotnef@gmail.com>
    * scripts/test-{scripts.py, data/test-nonwritable}: added test for
    check_file_writable using load_into_counting
 
-2015-03-31  Phillip Garland  <pgarland@gmail.com>
+2015-04-01  Phillip Garland  <pgarland@gmail.com>
 
    * khmer/file.py (check_file_writable): new function to check writability
    * scripts/load-into-counting.py (main): early check to see if output is
    writable
+
+2015-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Doxyfile.in: make documentation generation reproducible, removed timestamp
+
+2015-04-01  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+   call in main().
 
 2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
 
