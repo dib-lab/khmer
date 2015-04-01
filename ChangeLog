@@ -1,3 +1,7 @@
+2015-04-01  Luiz Irber  <irberlui@msu.edu>
+
+   * third-party/smhasher/MurmurHash3.{cc,h}: remove unused code, fix warnings.
+
 2015-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * Doxyfile.in: make documentation generation reproducible, removed timestamp
