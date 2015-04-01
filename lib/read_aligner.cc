@@ -611,4 +611,10 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     delete forward;
     return ret;
 }
+
+ScoringMatrix ReadAligner::getScoringMatrix()
+{
+    return m_sm;
+}
+
 }

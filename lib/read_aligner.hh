@@ -150,14 +150,17 @@ struct ScoringMatrix {
     const double untrusted_match;
     const double untrusted_mismatch;
 
-    const double* tsc;
+    double tsc[28];
 
     ScoringMatrix(double trusted_match, double trusted_mismatch,
                   double untrusted_match, double untrusted_mismatch,
                   double* trans)
         : trusted_match(trusted_match), trusted_mismatch(trusted_mismatch),
           untrusted_match(untrusted_match),
-          untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
+          untrusted_mismatch(untrusted_mismatch)
+    {
+        memcpy(tsc, trans, 28 * sizeof(double));
+    }
 };
 
 
@@ -229,7 +232,20 @@ public:
                   << std::endl;
 #endif
     }
+
+    ReadAligner(khmer::CountingHash* ch,
+                BoundedCounterType trusted_cutoff, double bits_theta,
+                double* scoring_matrix, double* transitions)
+        : bitmask(comp_bitmask(ch->ksize())),
+          rc_left_shift(ch->ksize() * 2 - 2),
+          m_ch(ch), m_sm(scoring_matrix[0], scoring_matrix[1],
+                         scoring_matrix[2], scoring_matrix[3],
+                         transitions),
+          m_trusted_cutoff(trusted_cutoff),
+          m_bits_theta(bits_theta) {};
+
+    ScoringMatrix getScoringMatrix();
+
 };
 }
-
 #endif // READ_ALIGNER_HH
