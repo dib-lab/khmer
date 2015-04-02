@@ -247,6 +247,17 @@ def test_casava_1_8_pair_mating():
     t2.join()
 
 
+def test_read_truncated():
+
+    rparser = ReadParser(utils.get_test_data("truncated.fq"))
+    try:
+        for read in rparser:
+            pass
+        assert 0, "No exception raised on a truncated file"
+    except IOError as err:
+        assert "Sequence is empty" in str(err), str(err)
+
+
 def test_iterator_identities():
 
     rparser = \
