@@ -77,6 +77,7 @@ def test_num_reads_threads():
 
     assert rparser.num_reads == 100
 
+
 def test_num_reads_truncated():
 
     n_reads = 0
@@ -87,7 +88,7 @@ def test_num_reads_truncated():
     except IOError as err:
         assert "Sequence is empty" in str(err), str(err)
     assert rparser.num_reads == 1, "%d valid reads in file, got %d" % (
-            n_reads, rparser.num_reads)
+        n_reads, rparser.num_reads)
 
 
 def test_gzip_decompression():
