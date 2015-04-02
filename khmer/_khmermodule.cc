@@ -333,6 +333,8 @@ _ReadParser_iternext( PyObject * self )
             stop_iteration = true;
         } catch (StreamReadError &e) {
             exc = e.what();
+        } catch (InvalidRead &e) {
+            exc = e.what();
         }
     }
     Py_END_ALLOW_THREADS
@@ -369,17 +371,22 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     bool    unknown_pair_reading_mode   = false;
     bool    invalid_read_pair       = false;
     bool    stream_read_error = false;
+    const char * value_error_what = NULL;
+    const char * io_error_what = NULL;
+
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
     if (!stop_iteration)
         try {
             parser->imprint_next_read_pair( the_read_pair, pair_mode );
         } catch (UnknownPairReadingMode &exc) {
-            unknown_pair_reading_mode = true;
+            value_error_what = exc.what();
+        } catch (InvalidRead &exc) {
+            io_error_what = exc.what();
         } catch (InvalidReadPair &exc) {
-            invalid_read_pair = true;
+            io_error_what = exc.what();
         } catch (StreamReadError &exc) {
-            stream_read_error = true;
+            io_error_what = "Input file error.";
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         }
@@ -389,20 +396,12 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     if (stop_iteration) {
         return NULL;
     }
-
-    if (unknown_pair_reading_mode) {
-        PyErr_SetString(
-            PyExc_ValueError, "Unknown pair reading mode supplied."
-        );
+    if (value_error_what != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_error_what);
         return NULL;
     }
-    if (invalid_read_pair) {
-        PyErr_SetString( PyExc_IOError, "Invalid read pair detected." );
-        return NULL;
-    }
-
-    if (stream_read_error) {
-        PyErr_SetString( PyExc_IOError, "Input file error.");
+    if (io_error_what != NULL) {
+        PyErr_SetString( PyExc_IOError, io_error_what);
         return NULL;
     }
 

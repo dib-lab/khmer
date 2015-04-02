@@ -63,18 +63,19 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
-    if (_num_reads > 0 && the_read.quality.length() != 0) {
-        _have_qualities = true;
-    }
-    if (the_read.sequence.length() == 0) {
-        throw InvalidRead("Sequence is empty");
-    }
-    if (_have_qualities) {
-        if (the_read.sequence.length() != the_read.quality.length()) {
-            throw InvalidRead("Sequence and quality lengths differ");
+    if (!atEnd) {
+        if (_num_reads > 0 && the_read.quality.length() != 0) {
+            _have_qualities = true;
         }
-    }
-    if (atEnd) {
+        if (the_read.sequence.length() == 0) {
+            throw InvalidRead("Sequence is empty");
+        }
+        if (_have_qualities) {
+            if (the_read.sequence.length() != the_read.quality.length()) {
+                throw InvalidRead("Sequence and quality lengths differ");
+            }
+        }
+    } else {
         throw NoMoreReadsAvailable();
     }
     if (ret != 0) {

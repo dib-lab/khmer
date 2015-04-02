@@ -25,7 +25,7 @@ struct NoMoreReadsAvailable : public  khmer_exception {
     explicit NoMoreReadsAvailable(const char *msg) :
         khmer_exception(msg) {}
     NoMoreReadsAvailable() :
-        khmer_exception("No more reads available in this file") {}
+        khmer_exception("No more reads available in this stream.") {}
 };
 
 struct InvalidRead : public  khmer_exception {
@@ -39,14 +39,14 @@ struct UnknownPairReadingMode : public  khmer_exception {
     explicit UnknownPairReadingMode(const char *msg) :
         khmer_exception(msg) {}
     UnknownPairReadingMode() :
-        khmer_exception("Unknown pair reading mode") {}
+        khmer_exception("Unknown pair reading mode supplied.") {}
 };
 
 struct InvalidReadPair : public  khmer_exception {
     explicit InvalidReadPair(const char *msg) :
         khmer_exception(msg) {}
     InvalidReadPair() :
-        khmer_exception("Invalid read pair") {}
+        khmer_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
