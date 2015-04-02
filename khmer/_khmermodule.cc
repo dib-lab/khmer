@@ -368,9 +368,6 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 
     ReadPair    the_read_pair;
     bool    stop_iteration      = false;
-    bool    unknown_pair_reading_mode   = false;
-    bool    invalid_read_pair       = false;
-    bool    stream_read_error = false;
     const char * value_error_what = NULL;
     const char * io_error_what = NULL;
 
