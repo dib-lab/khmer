@@ -24,29 +24,29 @@ namespace read_parsers
 struct NoMoreReadsAvailable : public  khmer_exception {
     explicit NoMoreReadsAvailable(const char *msg) :
         khmer_exception(msg) {}
-    explicit NoMoreReadsAvailable() :
-        khmer_exception("No More Reads Available In This File") {}
+    NoMoreReadsAvailable() :
+        khmer_exception("No more reads available in this file") {}
 };
 
 struct InvalidRead : public  khmer_exception {
     explicit InvalidRead(const char *msg) :
         khmer_exception(msg) {}
-    explicit InvalidRead() :
-        khmer_exception("Invalid Read") {}
+    InvalidRead() :
+        khmer_exception("Invalid read") {}
 };
 
 struct UnknownPairReadingMode : public  khmer_exception {
     explicit UnknownPairReadingMode(const char *msg) :
         khmer_exception(msg) {}
-    explicit UnknownPairReadingMode() :
-        khmer_exception("Unknown Pair Reading Mode") {}
+    UnknownPairReadingMode() :
+        khmer_exception("Unknown pair reading mode") {}
 };
 
 struct InvalidReadPair : public  khmer_exception {
     explicit InvalidReadPair(const char *msg) :
         khmer_exception(msg) {}
-    explicit InvalidReadPair() :
-        khmer_exception("Invalid Read Pair") {}
+    InvalidReadPair() :
+        khmer_exception("Invalid read pair") {}
 };
 
 struct Read {
