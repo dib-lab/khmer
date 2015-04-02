@@ -68,10 +68,16 @@ void SeqAnParser::imprint_next_read(Read &the_read)
             _have_qualities = true;
         }
         if (the_read.sequence.length() == 0) {
+            // We decrement the number of reads we've got, as the last one is
+            // invlaid
+            __sync_fetch_and_sub(&_num_reads, 1);
             throw InvalidRead("Sequence is empty");
         }
         if (_have_qualities) {
             if (the_read.sequence.length() != the_read.quality.length()) {
+                // We decrement the number of reads we've got, as the last one
+                // is invlaid
+                __sync_fetch_and_sub(&_num_reads, 1);
                 throw InvalidRead("Sequence and quality lengths differ");
             }
         }
@@ -79,6 +85,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
         throw NoMoreReadsAvailable();
     }
     if (ret != 0) {
+        // No need to decrement _num_reads, as we didn't increment it above
         throw StreamReadError();
     }
 }
