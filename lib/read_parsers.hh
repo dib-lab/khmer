@@ -22,12 +22,31 @@ namespace read_parsers
 {
 
 struct NoMoreReadsAvailable : public  khmer_exception {
+    explicit NoMoreReadsAvailable(const char *msg) :
+        khmer_exception(msg) {}
+    explicit NoMoreReadsAvailable() :
+        khmer_exception("No More Reads Available In This File") {}
+};
+
+struct InvalidRead : public  khmer_exception {
+    explicit InvalidRead(const char *msg) :
+        khmer_exception(msg) {}
+    explicit InvalidRead() :
+        khmer_exception("Invalid Read") {}
 };
 
 struct UnknownPairReadingMode : public  khmer_exception {
+    explicit UnknownPairReadingMode(const char *msg) :
+        khmer_exception(msg) {}
+    explicit UnknownPairReadingMode() :
+        khmer_exception("Unknown Pair Reading Mode") {}
 };
 
 struct InvalidReadPair : public  khmer_exception {
+    explicit InvalidReadPair(const char *msg) :
+        khmer_exception(msg) {}
+    explicit InvalidReadPair() :
+        khmer_exception("Invalid Read Pair") {}
 };
 
 struct Read {
@@ -92,6 +111,7 @@ struct IParser {
 protected:
 
     size_t		_num_reads;
+    bool        _have_qualities;
     regex_t		_re_read_2_nosub;
     regex_t		_re_read_1;
     regex_t		_re_read_2;
