@@ -2165,7 +2165,8 @@ def test_extract_long_sequences_fa():
     assert countlines == 22, countlines
 
     names = [r.name for r in screed.open(fa_outfile, parse_description=False)]
-    assert "895:1:37:17593:9954 2::foo" in names
+    assert "895:1:37:17593:9954/1" in names
+    assert "895:1:37:17593:9954/2" in names
 
 
 def test_extract_long_sequences_fq():
@@ -2187,6 +2188,7 @@ def test_extract_long_sequences_fq():
 
     names = [r.name for r in screed.open(fq_outfile, parse_description=False)]
     assert "895:1:37:17593:9954 1::foo" in names
+    assert "895:1:37:17593:9954 2::foo" in names
 
 
 def test_sample_reads_randomly_S():
