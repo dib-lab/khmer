@@ -1,3 +1,8 @@
+2015-04-03  Luiz Irber  <irberlui@msu.edu>
+
+   * lib/hllcounter.cc: Use for loop instead of transform on merge method,
+   now works on C++11.
+
 2015-04-01  Luiz Irber  <irberlui@msu.edu>
 
    * third-party/smhasher/MurmurHash3.{cc,h}: remove unused code, fix warnings.
