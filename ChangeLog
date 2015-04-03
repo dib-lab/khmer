@@ -1,11 +1,17 @@
 2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+   * lib/count.cc: Make CountingHash::abundance_distribution threadsafe
+   * khmer/_khmermodule.cc: remove newly unnecessary check for exception
+   * tests/test_scripts.py: added test to confirm the above
+
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
    * khmer/{__init__.py,_khmermodule.cc},lib/{counting,hashbits,hashtable,
    subset}.cc: catch IO errors and report them.
    * tests/test_hashbits.py: remove write to fixed path in /tmp
    * tests/test_scripts.py: added test for empty counting table file
 
-2015-04-13 Elmar Bucher <buchere@ohsu.edu>
+2015-04-13  Elmar Bucher  <buchere@ohsu.edu>
 
    * scripts/normalize-by-median.py (main): introduced warning for when at least
    two input files are named the same.
@@ -22,16 +28,17 @@
    * tests/test_scripts.py: Added functional test for diginorm stdout, removed
    test of --append option.
 
-2015-04-13 Scott Fay <scott.a.fay@gmail.com>
+2015-04-13  Scott Fay  <scott.a.fay@gmail.com>
 
-   * added checking of input_table by `check_file_status()`
+   * scripts/filter-abund.py: added checking of input_table by
+   `check_file_status()`
 
 2015-04-13  David Lin
 
    * scripts/abundance-dist.py: disambiguate documentation for force and 
    squash options
 
-2015-04-13  Michael R. Crusoe
+2015-04-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * README.rst,doc/index.rst: added link to gitter.im chat room
    * doc/README.rst: removed ancient, outdated, and unused file
