@@ -1756,19 +1756,9 @@ hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
 
     HashIntoType * dist = NULL;
 
-    const char * exception = NULL;
     Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(rparser, hashbits);
-    } catch (khmer::read_parsers::NoMoreReadsAvailable &exc ) {
-        exception = exc.what();
-    }
+    dist = counting->abundance_distribution(rparser, hashbits);
     Py_END_ALLOW_THREADS
-    if (exception != NULL) {
-        delete[] dist;
-        PyErr_SetString(PyExc_IOError, exception);
-        return NULL;
-    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {

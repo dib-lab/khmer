@@ -119,28 +119,31 @@ CountingHash::abundance_distribution(
         throw khmer_exception();
     }
 
-    while(!parser->is_complete()) {
-        read = parser->get_next_read();
-        seq = read.sequence;
+    try {
+        while(!parser->is_complete()) {
+            read = parser->get_next_read();
+            seq = read.sequence;
 
-        if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            if (check_and_normalize_read(seq)) {
+                KMerIterator kmers(seq.c_str(), _ksize);
 
-            while(!kmers.done()) {
-                HashIntoType kmer = kmers.next();
+                while(!kmers.done()) {
+                    HashIntoType kmer = kmers.next();
 
-                if (!tracking->get_count(kmer)) {
-                    tracking->count(kmer);
+                    if (!tracking->get_count(kmer)) {
+                        tracking->count(kmer);
 
-                    BoundedCounterType n = get_count(kmer);
-                    dist[n]++;
+                        BoundedCounterType n = get_count(kmer);
+                        dist[n]++;
+                    }
                 }
+
+                name.clear();
+                seq.clear();
             }
 
-            name.clear();
-            seq.clear();
         }
-
+    } catch (NoMoreReadsAvailable) {
     }
     return dist;
 }
