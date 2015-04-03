@@ -2158,7 +2158,7 @@ def test_extract_long_sequences_fa():
 
     in_dir_fa = os.path.dirname(fa_infile)
 
-    args = [fa_infile, '-l', '1-', '-o', fa_outfile]
+    args = [fa_infile, '-l', '10', '-o', fa_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_fa)
 
     countlines = sum(1 for line in open(fa_outfile))
