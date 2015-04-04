@@ -1,3 +1,12 @@
+2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
+   handling of truncated sequence files. Also revamp exceptions
+   * khmer/_khmermodule.cc: Use new/updated exceptions handling malformed
+   FASTA/Q files.
+   * tests/test_read_parsers.py: add a test of parsing of truncated fastq
+   files
+
 2015-04-03  Luiz Irber  <irberlui@msu.edu>
 
    * lib/hllcounter.cc: Use for loop instead of transform on merge method,
