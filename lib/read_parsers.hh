@@ -105,7 +105,7 @@ struct IParser {
 
     size_t		    get_num_reads()
     {
-	    return _num_reads;
+        return _num_reads;
     }
 
 protected:
