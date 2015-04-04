@@ -1408,7 +1408,7 @@ def test_abundance_dist_nobigcount():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     htfile = _make_counting(infile, K=17, BIGCOUNT=False)
-    
+
     script = scriptpath('abundance-dist.py')
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
