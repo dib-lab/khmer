@@ -44,7 +44,7 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('-b', '--no-bigcount', dest='bigcount',default=True,
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
     parser.add_argument('--csv', default=False, action='store_true',
