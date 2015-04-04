@@ -1,3 +1,35 @@
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * ChangeLog, lib/read_aligner.cc, sandbox/sweep-reads.py: fixed spelling
+   errors.
+
+2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
+   handling of truncated sequence files. Also revamp exceptions
+   * khmer/_khmermodule.cc: Use new/updated exceptions handling malformed
+   FASTA/Q files.
+   * tests/test_read_parsers.py: add a test of parsing of truncated fastq
+   files
+
+2015-04-03  Luiz Irber  <irberlui@msu.edu>
+
+   * lib/hllcounter.cc: Use for loop instead of transform on merge method,
+   now works on C++11.
+
+2015-04-01  Luiz Irber  <irberlui@msu.edu>
+
+   * third-party/smhasher/MurmurHash3.{cc,h}: remove unused code, fix warnings.
+
+2015-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Doxyfile.in: make documentation generation reproducible, removed timestamp
+
+2015-04-01  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+   call in main().
+
 2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/read_parsers.{cc,hh}: add read counting to IParser and subclasses
@@ -567,7 +599,7 @@
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
-    in the current dir by explictly specifying an output file.
+    in the current dir by explicitly specifying an output file.
 
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
@@ -1032,7 +1064,7 @@
 2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
-    normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
+    normalize-by-median,load-graph}.py: restore Python 2.6 compatibility for
     Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
 
 2014-06-15  Titus Brown  <t@idyll.org>
