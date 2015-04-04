@@ -18,7 +18,7 @@ import screed
 import nose
 from nose.plugins.attrib import attr
 
-from test_scripts import scriptpath 
+from test_scripts import scriptpath
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
@@ -38,7 +38,6 @@ DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
 def teardown():
     utils.cleanup()
-
 
 
 class Test_CountingHash(object):
