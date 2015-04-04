@@ -52,40 +52,43 @@ void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
     int ret = -1;
+    const char *invalid_read_exc = NULL;
     while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
     bool atEnd = seqan::atEnd(_private->stream);
     if (!atEnd) {
         ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.quality, _private->stream);
         if (ret == 0) {
-            _num_reads++;
+            // Detect if we're parsing something w/ qualities on the first read
+            // only
+            if (_num_reads == 0 && the_read.quality.length() != 0) {
+                _have_qualities = true;
+            }
+
+            // Handle error cases, or increment number of reads on success
+            if (the_read.sequence.length() == 0) {
+                invalid_read_exc = "Sequence is empty";
+            } else if (_have_qualities && (the_read.sequence.length() != \
+                                           the_read.quality.length())) {
+                invalid_read_exc = "Sequence and quality lengths differ";
+            } else {
+                _num_reads++;
+            }
         }
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
-    if (!atEnd) {
-        if (_num_reads > 0 && the_read.quality.length() != 0) {
-            _have_qualities = true;
-        }
-        if (the_read.sequence.length() == 0) {
-            // We decrement the number of reads we've got, as the last one is
-            // invlaid
-            __sync_fetch_and_sub(&_num_reads, 1);
-            throw InvalidRead("Sequence is empty");
-        }
-        if (_have_qualities) {
-            if (the_read.sequence.length() != the_read.quality.length()) {
-                // We decrement the number of reads we've got, as the last one
-                // is invlaid
-                __sync_fetch_and_sub(&_num_reads, 1);
-                throw InvalidRead("Sequence and quality lengths differ");
-            }
-        }
-    } else {
+    // Throw any error in the read, even if we're at the end
+    if (invalid_read_exc != NULL) {
+        throw InvalidRead(invalid_read_exc);
+    }
+    // Throw NoMoreReadsAvailable if none of the above errors were raised, even
+    // if ret == 0
+    if (atEnd) {
         throw NoMoreReadsAvailable();
     }
+    // Catch-all error in readRecord that isn't one of the above
     if (ret != 0) {
-        // No need to decrement _num_reads, as we didn't increment it above
         throw StreamReadError();
     }
 }
