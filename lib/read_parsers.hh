@@ -8,13 +8,9 @@
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
 #include <regex.h>
-
-
+#include <iostream>
+#include <cstdlib>
 #include "khmer.hh"
 
 namespace khmer
@@ -26,12 +22,31 @@ namespace read_parsers
 {
 
 struct NoMoreReadsAvailable : public  khmer_exception {
+    explicit NoMoreReadsAvailable(const char *msg) :
+        khmer_exception(msg) {}
+    NoMoreReadsAvailable() :
+        khmer_exception("No more reads available in this stream.") {}
+};
+
+struct InvalidRead : public  khmer_exception {
+    explicit InvalidRead(const char *msg) :
+        khmer_exception(msg) {}
+    InvalidRead() :
+        khmer_exception("Invalid read") {}
 };
 
 struct UnknownPairReadingMode : public  khmer_exception {
+    explicit UnknownPairReadingMode(const char *msg) :
+        khmer_exception(msg) {}
+    UnknownPairReadingMode() :
+        khmer_exception("Unknown pair reading mode supplied.") {}
 };
 
 struct InvalidReadPair : public  khmer_exception {
+    explicit InvalidReadPair(const char *msg) :
+        khmer_exception(msg) {}
+    InvalidReadPair() :
+        khmer_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
@@ -88,8 +103,15 @@ struct IParser {
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
+    size_t		    get_num_reads()
+    {
+        return _num_reads;
+    }
+
 protected:
 
+    size_t		_num_reads;
+    bool        _have_qualities;
     regex_t		_re_read_2_nosub;
     regex_t		_re_read_1;
     regex_t		_re_read_2;
@@ -123,8 +145,8 @@ public:
     void imprint_next_read(Read &the_read);
 
 private:
-    seqan::SequenceStream _stream;
-    uint32_t _seqan_spin_lock;
+    struct Handle;
+    Handle* _private;
 
 };
 

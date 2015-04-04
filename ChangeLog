@@ -1,7 +1,58 @@
-2015-03-09  Sherine Awad  <sherine.awad@gmail.com>
+2015-04-04  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table
    with bigcounts,and test abundance with bigcounts
+
+2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
+   handling of truncated sequence files. Also revamp exceptions
+   * khmer/_khmermodule.cc: Use new/updated exceptions handling malformed
+   FASTA/Q files.
+   * tests/test_read_parsers.py: add a test of parsing of truncated fastq
+   files
+
+2015-04-03  Luiz Irber  <irberlui@msu.edu>
+
+   * lib/hllcounter.cc: Use for loop instead of transform on merge method,
+   now works on C++11.
+
+2015-04-01  Luiz Irber  <irberlui@msu.edu>
+
+   * third-party/smhasher/MurmurHash3.{cc,h}: remove unused code, fix warnings.
+
+2015-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Doxyfile.in: make documentation generation reproducible, removed timestamp
+
+2015-04-01  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+   call in main().
+
+2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: add read counting to IParser and subclasses
+   * khmer/_khmermodule.cc,tests/test_read_parsers.py: add 'num_reads'
+   attribute to khmer.ReadParser objects in python land, and test it.
+
+2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/hashbits.hh: Add Hashbits::n_tables() accessor
+
+2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/read_parsers.{cc,hh}: Obfuscate SeqAn SequenceStream objects with a
+   wrapper struct, to avoid #include-ing the SeqAn headers.
+   * lib/Makefile: Don't install the SeqAn headers.
+
+2015-03-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Add libkhmer targets, clean up
+   * lib/get_version.py: Rewrite to use versioneer.py
+   * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
+   * lib/.check_openmp.cc: add source that checks compiler for openmp support.
+   * lib/khmer.pc.in: add pkg-config file for khmer
 
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
