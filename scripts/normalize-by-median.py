@@ -151,6 +151,10 @@ def get_parser():
     table up to that point will be dumped, and processing will continue on the
     next file.
 
+    To append reads to an output file (rather than overwriting it), send output
+    to STDOUT with `--out -` and use UNIX file redirection syntax (`>>`) to
+    append to the file.
+
     Example::
 
         normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
@@ -192,7 +196,8 @@ def get_parser():
                         dest='single_output_file',
                         type=argparse.FileType('w'),
                         default='', help='only output a single file with the '
-                        'specified filename; use - to print to the terminal')
+                        'specified filename; use a single dash '-' to specify '
+                        'that output should go to STDOUT (the terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
