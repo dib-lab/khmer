@@ -44,6 +44,9 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount',default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the histogram. '
                         'Includes column headers.')
@@ -66,6 +69,8 @@ def main():
            file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
+
+    counting_hash.set_use_bigcount(args.bigcount)
 
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
