@@ -57,16 +57,16 @@ Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown'''
 
 # The full version, including alpha/beta/rc tags.
 
-import pkg_resources
-try:
-    release = pkg_resources.get_distribution('khmer').version
-except pkg_resources.DistributionNotFound:
-    print 'To build the documentation, The distribution information of khmer' \
-        ' has to be available.  Either install the package into your' \
-        ' development environment or run "setup.py develop" to setup the' \
-        ' metadata.  A virtualenv is recommended!'
-    sys.exit(1)
-del pkg_resources
+sys.path.insert(0, '../')
+import versioneer
+versioneer.VCS = 'git'
+versioneer.versionfile_source = '../khmer/_version.py'
+versioneer.versionfile_build = '../khmer/_version.py'
+versioneer.tag_prefix = 'v'  # tags are like v1.2.0
+versioneer.parentdir_prefix = '..'
+release = versioneer.get_version()
+del versioneer
+sys.path.remove('../')
 
 # The short X.Y version.
 
