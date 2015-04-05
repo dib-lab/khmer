@@ -81,12 +81,13 @@ release makers, following this checklist by MRC.
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
         cd khmer
         make install-dependencies
-        make install
         make test
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 1st manual version check passed
-        cd ..
-        nosetests khmer --attr '!known_failing'
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
+        # there instead of the installed khmer module's tests
+        pushd ../not-khmer; nosetests khmer --attr '!known_failing'; popd
 
 
         # Secondly we test via pip
@@ -98,12 +99,12 @@ release makers, following this checklist by MRC.
         cd src/khmer
         make install-dependencies
         make dist
-        make install
         make test
+        cp dist/khmer*tar.gz ../../../testenv3/
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 2nd manual version check passed
-        cp dist/khmer*tar.gz ../../../testenv3/
-        cd ../..
         nosetests khmer --attr '!known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
@@ -118,7 +119,9 @@ release makers, following this checklist by MRC.
         cd khmer*
         make dist
         make test
-        pushd .. ; nosetests khmer --attr '!known_failing' ; popd
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        mkdir ../not-khmer
+        pushd ../not-khmer ; nosetests khmer --attr '!known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
