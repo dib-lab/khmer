@@ -1,5 +1,9 @@
 2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+   * setup.py: use the release version of screed 0.8
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
    * doc/*/*.txt: all documentation sources have been renamed to use the rst
    extension to indicate that they are reStructuredText files. This enables
    use of rich text editors on GitHub and elsewhere.
