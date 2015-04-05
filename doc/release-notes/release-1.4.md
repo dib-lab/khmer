@@ -109,7 +109,7 @@ A user reported that abundance-dist-single.py fails with small files and many th
 ## Contributors
 
 @ctb, @kdmurray91, @drtamermansour, @luizirber, @mr-c, @jessicamizzi,
-@standage, @bocanotnef, \*@alameldin, \*@aditi9783, \*@TheOneHyer, \*@bede,
+@standage, @bocajnotnef, \*@alameldin, \*@aditi9783, \*@TheOneHyer, \*@bede,
 \*@SchwarzEM, \*@reedacartwright, @Echelon9, @qingpeng, @SherineAwad, @PamelaM 
 
 \* Indicates new contributors
