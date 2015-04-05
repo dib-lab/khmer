@@ -51,5 +51,6 @@ Contents:
    user/index
    dev/index
    roadmap
+   release-notes/index
 
    LICENSE
