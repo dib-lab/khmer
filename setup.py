@@ -251,4 +251,4 @@ Distribution.reinitialize_command = reinitialize_command
 
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS,
-    **SETUP_METADATA)
+      **SETUP_METADATA)
