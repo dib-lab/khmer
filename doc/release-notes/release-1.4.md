@@ -10,7 +10,7 @@ Casava 1.8 read naming is now fully supported and in general the scripts no long
 
 Most scripts now support a "broken" interleaved paired-read format for FASTA/FASTQ nucleotide sequence files. [`trim-low-abund.py`](http://khmer.readthedocs.org/en/v1.4/user/scripts.html#trim-low-abund-py) has been promoted from the sandbox as well. #759 @ctb 
 
-The script to transform an interleaved paired-read nucleotide sequence file into two now allows one to name the output files which can be useful in combination with named pipes for streaming processing #762 @ctb 
+The script to transform an interleaved paired-read nucleotide sequence file into two (`extract-paired-reads.py`) now allows one to name the output files which can be useful in combination with named pipes for streaming processing #762 @ctb 
 
 Streaming everywhere: thanks to screed v0.8 we now support streaming of almost all inputs and outputs. #830 @aditi9783 #812 @mr-c
 
