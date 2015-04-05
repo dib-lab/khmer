@@ -1,9 +1,11 @@
 2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/*/*.txt: all documentation sources have been renamed to use the rst
-   extension to indicate that they are ReStructuredText files. This enables
+   extension to indicate that they are reStructuredText files. This enables
    use of rich text editors on GitHub and elsewhere.
    * doc/conf.py: update Sphinx configuration to reflect this change
+   * doc/requirements.txt: added hint to install version 3.4.1 of Setuptools;
+   this file is used by ReadTheDocs only.
 
 2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
