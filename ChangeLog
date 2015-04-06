@@ -1,5 +1,9 @@
 2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+   * jenkins-build.sh: updated OS X warning flag to quiet the build a bit
+
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
    * Makefile: added 'convert-release-notes' target for MD->RST conversion
    * doc/{,release-notes}/index.rst: include release notes in documentation
    * doc/release-notes/*.rst: added pandoc converted versions of release notes
