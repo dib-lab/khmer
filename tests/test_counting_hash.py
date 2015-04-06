@@ -1107,7 +1107,7 @@ def test_abundance_distribution_gzipped_bigcount():
     assert flag
 
 
-def test_counting_load_gzipped_bigcount():
+def test_counting_load_bigcount():
     ct = khmer.new_counting_hash(10, 1e5, 4)
     ct.set_use_bigcount(True)
     for i in range(500):
