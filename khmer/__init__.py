@@ -117,12 +117,15 @@ def extract_hashbits_info(filename):
     uchar_size = len(pack('B', 0))
     ulonglong_size = len(pack('Q', 0))
 
-    with open(filename, 'rb') as hashbits:
-        version, = unpack('B', hashbits.read(1))
-        ht_type, = unpack('B', hashbits.read(1))
-        ksize, = unpack('I', hashbits.read(uint_size))
-        n_tables, = unpack('B', hashbits.read(uchar_size))
-        table_size, = unpack('Q', hashbits.read(ulonglong_size))
+    try:
+        with open(filename, 'rb') as hashbits:
+            version, = unpack('B', hashbits.read(1))
+            ht_type, = unpack('B', hashbits.read(1))
+            ksize, = unpack('I', hashbits.read(uint_size))
+            n_tables, = unpack('B', hashbits.read(uchar_size))
+            table_size, = unpack('Q', hashbits.read(ulonglong_size))
+    except:
+        raise ValueError("Presence table '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, version, ht_type
 

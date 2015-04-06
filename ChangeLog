@@ -1,4 +1,4 @@
-2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * khmer/{__init__.py,_khmermodule.cc},lib/{counting,hashbits,hashtable,
    subset}.cc: catch IO errors and report them.
