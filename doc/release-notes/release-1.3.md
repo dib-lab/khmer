@@ -1,3 +1,5 @@
+# khmer v1.3 release notes
+
 This is the v1.3 release of khmer featuring a new FAST[AQ] parser from the
 SeqAn project.
 

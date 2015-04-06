@@ -1,3 +1,10 @@
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: added 'convert-release-notes' target for MD->RST conversion
+   * doc/{,release-notes}/index.rst: include release notes in documentation
+   * doc/release-notes/*.rst: added pandoc converted versions of release notes
+   * jenkins-build.sh: use the Sphinx method to install doc dependencies
+
 2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * setup.py: use the release version of screed 0.8

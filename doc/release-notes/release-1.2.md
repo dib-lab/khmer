@@ -1,3 +1,5 @@
+# khmer v1.2 release notes
+
 This is the v1.2 release of khmer: minor new features and bug fixes. The start
 of this release cycle coincided with the Mozilla Science Lab Global Sprint
 2014. We honor and thank the 19 new contributors (including four Michigan State
@@ -89,10 +91,10 @@ https://github.com/ged-lab/khmer/issues/75
 
 ## Contributors
 
-@mr-c, @ctb, *@bocajnotnef, *@Echelon9, *@jlippi, *@kdmurray91, @qingpeng,
-*@leogargu, *@jiarong, *@brtaylor92, *@iglpdc, @camillescott, *@HLWiencko,
-*@cowguru2000, *@drlabratory, *@jstapleton, *@b-wyss, *@jgluck, @fishjord,
-*@SherineAwad, *@pgarland, *@majoras-masque, @chuckpr, *@RodPic, @luizirber,
-*@jrherr 
+@mr-c, @ctb, \*@bocajnotnef, \*@Echelon9, \*@jlippi, \*@kdmurray91, @qingpeng,
+\*@leogargu, \*@jiarong, \*@brtaylor92, \*@iglpdc, @camillescott, \*@HLWiencko,
+\*@cowguru2000, \*@drlabratory, \*@jstapleton, \*@b-wyss, \*@jgluck, @fishjord,
+\*@SherineAwad, \*@pgarland, \*@majoras-masque, @chuckpr, \*@RodPic, @luizirber,
+\*@jrherr
 
 `*` Denotes new contributor
