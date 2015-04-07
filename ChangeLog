@@ -600,7 +600,6 @@
     work.
     * Makefile: refreshed cppcheck{,-result.xml} targets, added develop
     setuptools command prior to testing
->>>>>>> d4621d3831fa724f975c1acb323d6aece08dfbc4
 
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
