@@ -3,6 +3,10 @@
    * tests/test_script_arguments.py: added a test to check for the empty file
    warning when checking if a file exists
 
+2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst: add a ReadTheDocs badge
+
 2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * jenkins-build.sh: updated OS X warning flag to quiet the build a bit
