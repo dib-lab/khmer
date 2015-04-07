@@ -4,13 +4,14 @@
 // the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 //
 #include "read_aligner.hh"
-#include <stdlib.h>     /* labs */
+#include "khmer_exception.hh"
 
 namespace khmer
 {
 
 struct del_alignment_node_t {
-    del_alignment_node_t& operator()(AlignmentNode* p) {
+    del_alignment_node_t& operator()(AlignmentNode* p)
+    {
         delete p;
         return *this;
     }
@@ -33,7 +34,7 @@ double GetNull(size_t length)
 
 /*
   Turn two states in to a transition, or disallowed if the
-  transition isn't modeled
+  transition isn't modelled
  */
 Transition get_trans(State s1, State s2)
 {
@@ -236,6 +237,7 @@ void ReadAligner::Enumerate(
     }
 }
 
+#if READ_ALIGNER_DEBUG
 void ReadAligner::WriteNode(AlignmentNode* curr)
 {
     std::cerr << "curr: " << curr << " "
@@ -251,6 +253,7 @@ void ReadAligner::WriteNode(AlignmentNode* curr)
               << " bits_saved=" << curr->score - GetNull(curr->length)
               << std::endl;
 }
+#endif
 
 Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
                                  size_t seqLen,
@@ -337,8 +340,10 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
         return ret;
     }
 
-    assert(node->seq_idx < read.length());
-    assert(node->seq_idx >= 0);
+    if (!(node->seq_idx < read.length())) {
+        delete ret;
+        throw khmer_exception();
+    }
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";

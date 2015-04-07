@@ -13,6 +13,7 @@ fi
 virtualenv -p ${PYTHON_EXECUTABLE} .env
 
 . .env/bin/activate
+pip install setuptools==3.4.1
 make install-dependencies
 
 if type ccache >/dev/null 2>&1
@@ -23,19 +24,20 @@ then
 fi
 if [[ "${NODE_LABELS}" == *osx* ]]
 then
-	export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
+	export ARCHFLAGS=-Wno-error=unused-command-line-argument
 fi
 
 if type gcov >/dev/null 2>&1 && [[ "${NODE_LABELS}" != *osx* ]]
 then
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 	python setup.py build_ext --build-temp $PWD --debug --inplace \
-		--libraries gcov
+		--libraries gcov develop
 	make coverage-gcovr.xml coverage.xml
 	./setup.py install
 else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
 	./setup.py install
+	./setup.py develop
 	make nosetests.xml
 fi
 
@@ -52,8 +54,9 @@ if type hg >/dev/null 2>&1
 then
 	rm -Rf sphinx-contrib
 	#hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
-	hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
-	pip install --upgrade sphinx-contrib/autoprogram/
+	#hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
+	#pip install --upgrade sphinx-contrib/autoprogram/
+	pip install -r doc/requirements.txt
 	make doc
 fi
 make pylint 2>&1 > pylint.out
@@ -63,3 +66,9 @@ if type sloccount >/dev/null 2>&1
 then
 	make sloccount.sc
 fi
+
+# takes too long to run on every build
+#bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
+
+make lib
+make libtest

@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -16,11 +16,13 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import sys
+import csv
 import khmer
 import argparse
 import os
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -42,8 +44,13 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the histogram. '
+                        'Includes column headers.')
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -53,20 +60,21 @@ def main():
     infiles = [args.input_counting_table_filename,
                args.input_sequence_filename]
     for infile in infiles:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    print('hashtable from', args.input_counting_table_filename)
+    print ('hashtable from', args.input_counting_table_filename,
+           file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
 
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
-    tracking = khmer._new_hashbits(  # pylint: disable=protected-access
+    tracking = khmer._Hashbits(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print('K:', kmer_size)
-    print('HT sizes:', hashsizes)
-    print('outputting to', args.output_histogram_filename)
+    print ('K:', kmer_size, file=sys.stderr)
+    print ('HT sizes:', hashsizes, file=sys.stderr)
+    print ('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     if os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
@@ -75,9 +83,10 @@ def main():
                   file=sys.stderr)
             sys.exit(1)
 
-        print('** squashing existing file %s' % args.output_histogram_filename)
+        print('** squashing existing file %s' %
+              args.output_histogram_filename, file=sys.stderr)
 
-    print('preparing hist...')
+    print('preparing hist...', file=sys.stderr)
     abundances = counting_hash.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
@@ -88,7 +97,13 @@ def main():
         print("\tPlease verify that the input files are valid.",
               file=sys.stderr)
         sys.exit(1)
+
     hash_fp = open(args.output_histogram_filename, 'w')
+    if args.csv:
+        hash_fp_csv = csv.writer(hash_fp)
+        # write headers:
+        hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                              'cumulative_fraction'])
 
     sofar = 0
     for _, i in enumerate(abundances):
@@ -98,10 +113,14 @@ def main():
         sofar += i
         frac = sofar / float(total)
 
-        print(_, i, sofar, round(frac, 3), file=hash_fp)
+        if args.csv:
+            hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+        else:
+            print(_, i, sofar, round(frac, 3), file=hash_fp)
 
         if sofar == total:
             break
+
 
 if __name__ == '__main__':
     main()

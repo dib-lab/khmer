@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -23,8 +23,8 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
-from khmer.file import (check_file_status, check_space,
-                        check_space_for_hashtable)
+from khmer.kfile import (check_file_status, check_space,
+                         check_space_for_hashtable)
 #
 DEFAULT_CUTOFF = 2
 
@@ -56,30 +56,29 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():
-    info('filter-abund-single.py', ['counting'])
+    info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile)
-    check_space([args.datafile])
+    check_file_status(args.datafile, args.force)
+    check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
-
-    print 'making k-mer counting table'
+    print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables,
-                                     args.threads)
+                                     args.n_tables)
 
     # first, load reads into hash table
-    rparser = khmer.ReadParser(args.datafile, args.threads)
+    rparser = khmer.ReadParser(args.datafile)
     threads = []
-    print 'consuming input, round 1 --', args.datafile
+    print >>sys.stderr, 'consuming input, round 1 --', args.datafile
     for _ in xrange(args.threads):
         cur_thread = \
             threading.Thread(
@@ -93,11 +92,11 @@ def main():
         _.join()
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # now, trim.
 
@@ -116,19 +115,21 @@ def main():
         return None, None
 
     # the filtering loop
-    print 'filtering', args.datafile
+    print >>sys.stderr, 'filtering', args.datafile
     outfile = os.path.basename(args.datafile) + '.abundfilt'
     outfp = open(outfile, 'w')
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print 'output in', outfile
+    print >>sys.stderr, 'output in', outfile
 
     if args.savetable:
-        print 'Saving k-mer counting table filename', args.savetable
-        print '...saving to', args.savetable
+        print >>sys.stderr, 'Saving k-mer counting table filename', \
+            args.savetable
+        print >>sys.stderr, '...saving to', args.savetable
         htable.save(args.savetable)
+    print >>sys.stderr, 'wrote to: ', outfile
 
 if __name__ == '__main__':
     main()

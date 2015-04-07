@@ -8,10 +8,16 @@
 import screed
 import sys
 
-for record in screed.open(sys.argv[1]):
-    name = record['name']
-    sequence = record['sequence']
 
-    name = name.split()[0]
+def main():
+    for record in screed.open(sys.argv[1]):
+        name = record['name']
+        sequence = record['sequence']
 
-    print '>%s\n%s' % (name, sequence,)
+        name = name.split()[0]
+
+        print '>%s\n%s' % (name, sequence,)
+
+
+if __name__ == '__main__':
+    main()

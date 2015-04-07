@@ -22,6 +22,15 @@ def teardown():
 #  * thread-safety
 
 
+@attr('linux')
+def test_toobig():
+    try:
+        lh = LabelHash(20, 1e13, 1)
+        assert 0, "This should fail."
+    except MemoryError as err:
+        print str(err)
+
+
 def test_n_labels():
     lh = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
@@ -37,7 +46,7 @@ def test_get_label_dict():
     lb.consume_fasta_and_tag_with_labels(filename)
 
     labels = lb.get_label_dict()
-    expected = [0L, 1L, 2L, 3L]
+    expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
     for a_label in labels:
@@ -48,11 +57,11 @@ def test_get_tag_labels():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_fasta_and_tag_with_labels(filename)
-    tag = 173473779682L
+    tag = 173473779682
 
     labels = lb.get_tag_labels(tag)
     assert len(labels) == 1
-    assert labels.pop() == 0L
+    assert labels.pop() == 0
 
 
 def test_consume_fasta_and_tag_with_labels():
@@ -93,13 +102,13 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     # print lb.n_labels()
     # print labels
     assert len(labels) == 1
-    assert labels.pop() == 2L
+    assert labels.pop() == 2
     assert lb.n_labels() == 1
 
 
 def test_consume_sequence_and_tag_with_labels():
     lb = LabelHash(20, 1e6, 4)
-    label = 0L
+    label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
     n_consumed = lb.consume_sequence_and_tag_with_labels(sequence, label)
@@ -117,7 +126,7 @@ def test_sweep_tag_neighborhood():
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
-    assert tags.pop() == 173473779682L
+    assert tags.pop() == 173473779682
 
 
 def test_sweep_label_neighborhood():
@@ -127,7 +136,7 @@ def test_sweep_label_neighborhood():
 
     labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(labels) == 1
-    assert labels.pop() == 0L
+    assert labels.pop() == 0
 
 '''
 * The test data set as four reads: A, B, C, and D
@@ -153,8 +162,8 @@ def test_label_tag_correctness():
     print labels
     print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
     assert len(labels) == 2
-    assert 0L in labels
-    assert 1L in labels
+    assert 0 in labels
+    assert 1 in labels
 
     # read B
     labels = lb.sweep_label_neighborhood(
@@ -162,9 +171,9 @@ def test_label_tag_correctness():
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
     print labels
     assert len(labels) == 3
-    assert 0L in labels
-    assert 1L in labels
-    assert 2L in labels
+    assert 0 in labels
+    assert 1 in labels
+    assert 2 in labels
 
     # read C
     labels = lb.sweep_label_neighborhood(
@@ -173,15 +182,15 @@ def test_label_tag_correctness():
         'ACAACACATACA')
     print labels
     assert len(labels) == 2
-    assert 1L in labels
-    assert 2L in labels
+    assert 1 in labels
+    assert 2 in labels
 
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
     print labels
     assert len(labels) == 1
-    assert 3L in labels
+    assert 3 in labels
 
 #
 # Begin Hashbits tests
@@ -306,7 +315,6 @@ def test_bloom_c_2():  # simple one
     assert ht2.n_unique_kmers() == 3
 
 
-@attr('highmem')
 def test_filter_if_present():
     ht = khmer.LabelHash(32, 1e6, 2)
 
@@ -322,7 +330,6 @@ def test_filter_if_present():
     assert records[0]['name'] == '3'
 
 
-@attr('highmem')
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.LabelHash(32, 1, 1)
@@ -348,7 +355,6 @@ def test_combine_pe():
     assert ht.count_partitions() == (1, 0)
 
 
-@attr('highmem')
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.LabelHash(32, 1, 1)
@@ -366,7 +372,6 @@ def test_load_partitioned():
     assert ht.get(s3)
 
 
-@attr('highmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.LabelHash(4, 1e6, 2)
@@ -379,7 +384,6 @@ def test_count_within_radius_simple():
     assert n == 1
 
 
-@attr('highmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     ht = khmer.LabelHash(20, 1e6, 4)
@@ -394,7 +398,6 @@ def test_count_within_radius_big():
     assert n == 39
 
 
-@attr('highmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.LabelHash(4, 1e6, 2)
@@ -404,36 +407,6 @@ def test_count_kmer_degree():
     assert ht.kmer_degree('AAAT') == 1
     assert ht.kmer_degree('AATA') == 0
     assert ht.kmer_degree('TAAA') == 1
-
-
-@attr('highmem')
-def test_find_radius_for_volume():
-    inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.LabelHash(4, 1e6, 2)
-    ht.consume_fasta(inpfile)
-
-    assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 1, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 2, 100) == 100
-
-
-def test_circumference():
-    ht = khmer.LabelHash(4, 1e6, 2)
-
-    ht.count('ATGC')
-    ht.count('GATG')
-    ht.count('ATGG')
-
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 2
-
-    ht.count('ATGA')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 3, x
-
-    ht.count('TGAT')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 4, x
 
 
 def test_save_load_tagset():
@@ -480,7 +453,6 @@ def test_save_load_tagset_noclear():
     assert len(data) == 34, len(data)
 
 
-@attr('highmem')
 def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -502,7 +474,6 @@ def test_stop_traverse():
     assert n == 2, n
 
 
-@attr('highmem')
 def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -531,7 +502,6 @@ def test_tag_across_stoptraverse():
     assert n == 1, n
 
 
-@attr('highmem')
 def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -634,7 +604,6 @@ def test_extract_unique_paths_4():
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
-@attr('highmem')
 def test_find_unpart():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -657,7 +626,6 @@ def test_find_unpart():
     assert n == 1, n                     # all sequences connect
 
 
-@attr('highmem')
 def test_find_unpart_notraverse():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -680,7 +648,6 @@ def test_find_unpart_notraverse():
     assert n == 99, n                    # all sequences disconnected
 
 
-@attr('highmem')
 def test_find_unpart_fail():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
@@ -724,5 +691,5 @@ def test_bad_primes():
     try:
         hi = khmer._LabelHash.__new__(khmer.LabelHash, 6, ["a", "b", "c"])
         assert 0, "Non number prime list should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)

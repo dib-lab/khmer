@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -8,12 +8,11 @@
 This is khmer; please see http://khmer.readthedocs.org/.
 """
 
-from khmer._khmer import _new_counting_hash
-from khmer._khmer import _new_hashbits
-from khmer._khmer import set_reporting_callback
-from khmer._khmer import _LabelHash
-from khmer._khmer import _Hashbits
-from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
+from khmer._khmer import CountingHash
+from khmer._khmer import LabelHash as _LabelHash
+from khmer._khmer import Hashbits as _Hashbits
+from khmer._khmer import HLLCounter as _HLLCounter
+from khmer._khmer import ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
 # tests/test_{functions,counting_hash,labelhash,counting_single}.py
@@ -27,10 +26,11 @@ from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
 
-from khmer._khmer import get_config  # tests/test_read_parsers.py
-# tests/test_khmer_config.py
-# scripts/{filter-abund-single,load-graph}.py
-# scripts/{abundance-dist-single,load-into-counting}.py
+from khmer._khmer import hash_murmur3        # tests/test_functions.py
+from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
+
+from khmer._khmer import get_version_cpp as __version_cpp__
+# tests/test_version.py
 
 from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
@@ -57,10 +57,10 @@ def new_hashbits(k, starting_size, n_tables=2):
     """
     primes = get_n_primes_above_x(n_tables, starting_size)
 
-    return _new_hashbits(k, primes)
+    return _Hashbits(k, primes)
 
 
-def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
+def new_counting_hash(k, starting_size, n_tables=2):
     """Return a new countinghash object.
 
     Keyword arguments:
@@ -71,7 +71,7 @@ def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     """
     primes = get_n_primes_above_x(n_tables, starting_size)
 
-    return _new_counting_hash(k, primes, n_threads)
+    return CountingHash(k, primes)
 
 
 def load_hashbits(filename):
@@ -80,7 +80,7 @@ def load_hashbits(filename):
     Keyword argument:
     filename -- the name of the hashbits file
     """
-    hashtable = _new_hashbits(1, [1])
+    hashtable = _Hashbits(1, [1])
     hashtable.load(filename)
 
     return hashtable
@@ -92,20 +92,10 @@ def load_counting_hash(filename):
     Keyword argument:
     filename -- the name of the counting_hash file
     """
-    hashtable = _new_counting_hash(1, [1])
+    hashtable = CountingHash(1, [1])
     hashtable.load(filename)
 
     return hashtable
-
-
-def _default_reporting_callback(info, n_reads, other):
-    print '...', info, n_reads, other
-
-
-def reset_reporting_callback():
-    set_reporting_callback(_default_reporting_callback)
-
-reset_reporting_callback()
 
 
 def extract_hashbits_info(filename):
@@ -260,3 +250,23 @@ class Hashbits(_Hashbits):
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c
+
+
+class HLLCounter(_HLLCounter):
+    """
+    A HyperLogLog counter is a probabilistic data structure specialized on
+    cardinality estimation.
+    There is a precision/memory consumption trade-off: error rate determines
+    how much memory is consumed.
+
+    # Creating a new HLLCounter:
+
+    >>> khmer.HLLCounter(error_rate, ksize)
+
+    where the default values are:
+      - error_rate: 0.01
+      - ksize: 20
+    """
+
+    def __len__(self):
+        return self.estimate_cardinality()

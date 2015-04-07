@@ -1,6 +1,6 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
@@ -51,11 +51,16 @@ void CountingHash::output_fasta_kmer_pos_freq(
     outfile.close();
 }
 
+const HashIntoType CountingHash::n_unique_kmers() const
+{
+    return _n_unique_kmers;
+}
+
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
 
-    BoundedCounterType min_count = MAX_COUNT;
+    BoundedCounterType min_count = MAX_KCOUNT;
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -107,7 +112,7 @@ CountingHash::abundance_distribution(
     // if not, could lead to overflow.
     if (sizeof(BoundedCounterType) != 2) {
         delete[] dist;
-        throw std::exception();
+        throw khmer_exception();
     }
 
     while(!parser->is_complete()) {
@@ -282,7 +287,7 @@ void CountingHash::get_kadian_count(
     }
 
     if (!counts.size()) {
-        throw std::exception();
+        throw khmer_exception();
     }
     unsigned int kpos = nk * _ksize;
 
@@ -373,6 +378,62 @@ const
     }
 
     return seq.length();
+}
+
+std::vector<unsigned int> CountingHash::find_spectral_error_positions(
+    std::string seq,
+    BoundedCounterType max_abund)
+const
+{
+    std::vector<unsigned int> posns;
+    if (!check_and_normalize_read(seq)) {
+        throw khmer_exception("invalid read");
+    }
+
+    KMerIterator kmers(seq.c_str(), _ksize);
+
+    HashIntoType kmer = kmers.next();
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // find the first trusted k-mer
+    while (!kmers.done()) {
+        if (get_count(kmer) > max_abund) {
+            break;
+        }
+        kmer = kmers.next();
+    }
+
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // did we bypass some erroneous k-mers? call the last one.
+    if (kmers.get_start_pos() > 0) {
+        // if we are well past the first k, forget the whole thing (!? @CTB)
+        if (kmers.get_start_pos() >= _ksize && 0) {
+            return posns;
+        }
+        posns.push_back(kmers.get_start_pos() - 1);
+    }
+
+    while (!kmers.done()) {
+        kmer = kmers.next();
+        if (get_count(kmer) <= max_abund) { // error!
+            posns.push_back(kmers.get_end_pos() - 1);
+
+            // find next good
+            while (!kmers.done()) {
+                kmer = kmers.next();
+                if (get_count(kmer) > max_abund) { // a good stretch again.
+                    break;
+                }
+            }
+        }
+    }
+
+    return posns;
 }
 
 
@@ -635,10 +696,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         HashIntoType kmer;
         BoundedCounterType count;
 
-        int read_k, read_c;
         for (HashIntoType n = 0; n < n_counts; n++) {
-            read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
-            read_c = gzread(infile, (char *) &count, sizeof(count));
+            int read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
+            int read_c = gzread(infile, (char *) &count, sizeof(count));
 
             if (read_k <= 0 || read_c <= 0) {
                 std::string err = "K-mer count read error: " + infilename;
@@ -658,7 +718,7 @@ CountingHashFileWriter::CountingHashFileWriter(
     const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     unsigned int save_ksize = ht._ksize;
@@ -711,7 +771,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     unsigned int save_ksize = ht._ksize;

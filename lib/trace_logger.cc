@@ -7,10 +7,8 @@
 
 #include <fcntl.h>
 
-#include <cassert>
-
 #include "trace_logger.hh"
-
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -21,7 +19,9 @@ TraceLogger::
 TraceLogger( uint8_t const level, FILE * stream_handle )
     : _level( level ), _shared_stream( true ), _stream_handle( stream_handle )
 {
-    assert( NULL != stream_handle );
+    if( !(NULL != stream_handle) ) {
+        throw khmer_exception();
+    }
 }
 #endif
 

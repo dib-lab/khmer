@@ -19,6 +19,8 @@ doc/_build
 /.Rhistory
 coverage.xml
 coverage-gcovr.xml
+coverage-debug
+khmer-cov.tgz
 cppcheck-result.xml
 MANIFEST
 TAGS
@@ -27,6 +29,7 @@ pep8.out
 pylint.out
 .coverage
 doxygen.out
+Doxyfile
 doc/doxygen
 third-party/zlib/zconf.h
 sloccount.sc
@@ -38,3 +41,5 @@ third-party/zlib/zlib.pc
 pip-log.txt
 sphinx-contrib
 compile_commands.json
+.DS_Store
+pylint_report.txt

@@ -32,16 +32,19 @@ def main():
 
     hist = {}
 
-
     for i in range(65536):
-       hist[i] = 0
+        hist[i] = 0
 
     for n, record in enumerate(screed.open(seqfile)):
         if n > 0 and n % 100000 == 0:
             print '...', n
 
         seq = record.sequence.replace('N', 'A')
-        med, _, _ = ht.get_median_count(seq)
+
+        try:
+            med, _, _ = ht.get_median_count(seq)
+        except ValueError:
+            continue
 
         hist[med] = hist[med] + 1
 

@@ -40,11 +40,13 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht) {
+    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
+    {
         ;
     };
 
-    ~SubsetPartition() {
+    ~SubsetPartition()
+    {
         _clear_all_partitions();
     }
 
@@ -56,7 +58,8 @@ public:
     PartitionID get_partition_id(std::string kmer_s);
     PartitionID get_partition_id(HashIntoType kmer);
 
-    PartitionID * get_new_partition() {
+    PartitionID * get_new_partition()
+    {
         PartitionID* pp = new PartitionID(next_partition_id);
         next_partition_id++;
         return pp;
@@ -118,13 +121,13 @@ public:
     void count_partitions(size_t& n_partitions,
                           size_t& n_unassigned);
 
-    size_t output_partitioned_file(const std::string infilename,
-                                   const std::string outputfilename,
+    size_t output_partitioned_file(const std::string &infilename,
+                                   const std::string &outputfilename,
                                    bool output_unassigned=false,
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    unsigned int find_unpart(const std::string infilename,
+    unsigned int find_unpart(const std::string &infilename,
                              bool traverse,
                              bool stop_big_traversals,
                              CallbackFn callback=0,

@@ -19,9 +19,8 @@ def teardown():
 class Test_ExactGraphFu(object):
 
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4 ** 12)
+        self.ht = khmer.new_hashbits(12, 1e4)
 
-    @attr('highmem')
     def test_counts(self):
         ht = self.ht
         ht.consume_fasta(utils.get_test_data('test-graph.fa'))
@@ -114,7 +113,7 @@ class Test_ExactGraphFu(object):
 class Test_InexactGraphFu(object):
 
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4 ** 8 + 1)
+        self.ht = khmer.new_hashbits(12, 4 ** 2 + 1)
 
     def test_graph_links_next_a(self):
         ht = self.ht
@@ -193,13 +192,12 @@ class Test_InexactGraphFu(object):
 
 class Test_Partitioning(object):
 
-    @attr('highmem')
     def test_output_unassigned(self):
         import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 4, 4)
         ht.consume_fasta_and_tag(filename)
 
         output_file = utils.get_temp_filename('part0test')
@@ -211,13 +209,12 @@ class Test_Partitioning(object):
         assert len1 > 0
         assert len1 == len2, (len1, len2)
 
-    @attr('highmem')
     def test_not_output_unassigned(self):
         import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 4, 4)
         ht.consume_fasta_and_tag(filename)
 
         output_file = utils.get_temp_filename('parttest')
@@ -232,7 +229,7 @@ class Test_Partitioning(object):
     def test_output_fq(self):
         filename = utils.get_test_data('random-20-a.fq')
 
-        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht = khmer.new_hashbits(20, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
         subset = ht.do_subset_partition(0, 0)
         ht.merge_subset(subset)
@@ -242,54 +239,49 @@ class Test_Partitioning(object):
 
         print open(output_file).read()
 
-        x = set([r.accuracy for r in screed.open(output_file)])
+        x = set([r.quality for r in screed.open(output_file)])
         assert x, x
 
-    @attr('highmem')
     def test_disconnected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 1e5, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
-    @attr('highmem')
     def test_connected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht = khmer.new_hashbits(20, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
-    @attr('highmem')
     def test_disconnected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
-    @attr('highmem')
     def test_connected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
-        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht = khmer.new_hashbits(20, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
-    @attr('highmem')
     def test_disconnected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
@@ -300,11 +292,10 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (999, 0), x            # disconnected @ K = 32
 
-    @attr('highmem')
     def test_connected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
-        ht = khmer.new_hashbits(31, 1e6, 4)
+        ht = khmer.new_hashbits(31, 1e5, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -316,8 +307,28 @@ class Test_Partitioning(object):
 
 class Test_PythonAPI(object):
 
+    def test_find_all_tags_kmersize(self):
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
+
+        a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
+        b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
+        c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
+
+        print ht.consume(a)
+        try:
+            ppi = ht.find_all_tags(c[:19])
+            assert False, "should raise a ValueError for wrong k-mer size"
+        except ValueError:
+            pass
+
+        try:
+            ppi = ht.find_all_tags(c[:21])
+            assert False, "should raise a ValueError for wrong k-mer size"
+        except ValueError:
+            pass
+
     def test_ordered_connect(self):
-        ht = khmer.new_hashbits(20, 4 ** 15 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
