@@ -26,6 +26,7 @@ import textwrap
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
 DEFAULT_THRESHOLD = 5
@@ -36,13 +37,6 @@ def read_partition_file(filename):
                                           (filename, parse_description=False)):
         _, partition_id = record.name.rsplit('\t', 1)
         yield record_index, record, int(partition_id)
-
-
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def get_parser():
@@ -79,8 +73,8 @@ def get_parser():
     parser.add_argument('--output-unassigned', '-U', default=False,
                         action='store_true',
                         help='Output unassigned sequences, too')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -125,7 +119,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     is_fastq = False
 
     for index, read, pid in read_partition_file(args.part_filenames[0]):
-        if hasattr(read, 'accuracy'):
+        if hasattr(read, 'quality'):
             suffix = 'fq'
             is_fastq = True
         break
@@ -133,10 +127,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for filename in args.part_filenames:
         for index, read, pid in read_partition_file(filename):
             if is_fastq:
-                assert hasattr(read, 'accuracy'), \
+                assert hasattr(read, 'quality'), \
                     "all input files must be FASTQ if the first one is"
             else:
-                assert not hasattr(read, 'accuracy'), \
+                assert not hasattr(read, 'quality'), \
                     "all input files must be FASTA if the first one is"
 
             break
@@ -155,7 +149,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             if pid == 0:
                 n_unassigned += 1
                 if args.output_unassigned:
-                    print >>unassigned_fp, output_single(read)
+                    write_record(read, unassigned_fp)
 
     if args.output_unassigned:
         unassigned_fp.close()
@@ -245,7 +239,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
             outfp = group_fps[group_n]
 
-            outfp.write(output_single(read))
+            write_record(read, outfp)
             part_seqs += 1
 
     print >>sys.stderr, '---'

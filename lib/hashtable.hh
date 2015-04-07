@@ -281,18 +281,14 @@ public:
     void consume_fasta(
         std::string const   &filename,
         unsigned int	    &total_reads,
-        unsigned long long  &n_consumed,
-        CallbackFn	    callback	    = NULL,
-        void *		    callback_data   = NULL
+        unsigned long long  &n_consumed
     );
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     void consume_fasta(
         read_parsers:: IParser *	    parser,
         unsigned int	    &total_reads,
-        unsigned long long  &n_consumed,
-        CallbackFn	    callback	    = NULL,
-        void *		    callback_data   = NULL
+        unsigned long long  &n_consumed
     );
 
     void get_median_count(const std::string &s,
@@ -359,9 +355,7 @@ public:
     void consume_fasta_and_tag(
         std::string const	  &filename,
         unsigned int	  &total_reads,
-        unsigned long long  &n_consumed,
-        CallbackFn	  callback	  = NULL,
-        void *		  callback_data	  = NULL
+        unsigned long long  &n_consumed
     );
 
     // Count every k-mer from a stream of FASTA or FASTQ reads,
@@ -370,9 +364,7 @@ public:
     void consume_fasta_and_tag(
         read_parsers:: IParser *	    parser,
         unsigned int	    &total_reads,
-        unsigned long long  &n_consumed,
-        CallbackFn	    callback	    = NULL,
-        void *		    callback_data   = NULL
+        unsigned long long  &n_consumed
     );
 
     void consume_sequence_and_tag(const std::string& seq,
@@ -382,9 +374,7 @@ public:
 
     void consume_fasta_and_tag_with_stoptags(const std::string &filename,
             unsigned int &total_reads,
-            unsigned long long &n_consumed,
-            CallbackFn callback = 0,
-            void * callback_data = 0);
+            unsigned long long &n_consumed);
     void consume_fasta_and_traverse(const std::string &filename,
                                     unsigned int distance,
                                     unsigned int big_threshold,
@@ -393,17 +383,13 @@ public:
 
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
-                                   unsigned long long &n_consumed,
-                                   CallbackFn callback = 0,
-                                   void * callback_data = 0);
+                                   unsigned long long &n_consumed);
 
     virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
     virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
     void filter_if_present(const std::string &infilename,
-                           const std::string &outputfilename,
-                           CallbackFn callback=0,
-                           void * callback_data=0);
+                           const std::string &outputfilename);
 
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
                                            HashIntoType kmer_r,

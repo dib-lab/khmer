@@ -19,10 +19,22 @@ def check_file_status(file_path, force):
     AND if the file is NOT a fifo/block/named pipe then a warning is printed
     and sys.exit(1) is called
     """
+    mode = None
 
     if file_path is '-':
         return
-    mode = os.stat(file_path).st_mode
+    try:
+        mode = os.stat(file_path).st_mode
+    except OSError:
+        print >>sys.stderr, "ERROR: Input file %s does not exist" % \
+                            file_path
+
+        if not force:
+            print >>sys.stderr, "Exiting"
+            sys.exit(1)
+        else:
+            return
+
     # block devices will be nonzero
     if S_ISBLK(mode) or S_ISFIFO(mode):
         return

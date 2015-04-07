@@ -32,20 +32,16 @@ std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
 
 
-double get_alpha(const int p)
+double calc_alpha(const int p)
 {
-    if ((p < 4) or (p > 16)) {
-        double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2),
-                                   17));
-        double valid_upper_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 3));
-
-        std::stringstream message;
-        if (p < 4) {
-            message << "Max error should be smaller than " << valid_upper_bound;
-        } else {
-            message << "Min error should be greater than " << valid_lower_bound;
-        }
-        throw khmer_exception(message.str().c_str());
+    if (p < 4) {
+        // ceil(log2((1.04 / x) ^ 2)) = 4, solve for x
+        throw InvalidValue("Please set error rate to a value "
+                           "smaller than 0.367696");
+    } else if (p > 16) {
+        // ceil(log2((1.04 / x) ^ 2)) = 16, solve for x
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than 0.0040624");
     }
 
     /*
@@ -237,6 +233,10 @@ int get_rho(HashIntoType w, int max_width)
 
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
+    if (error_rate < 0) {
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than zero");
+    }
     int p = ceil(log2(pow(1.04 / error_rate, 2)));
     this->init(p, ksize);
 }
@@ -248,7 +248,7 @@ HLLCounter::HLLCounter(int p, WordLength ksize)
 
 void HLLCounter::init(int p, WordLength ksize)
 {
-    this->alpha = get_alpha(p);
+    this->alpha = calc_alpha(p);
     this->p = p;
     this->_ksize = ksize;
     this->m = 1 << p;
@@ -257,6 +257,36 @@ void HLLCounter::init(int p, WordLength ksize)
 
     init_raw_estimate_data();
     init_bias_data();
+}
+
+double HLLCounter::get_erate()
+{
+    return 1.04 / sqrt(this->m);
+}
+
+void HLLCounter::set_erate(double error_rate)
+{
+    if (count(this->M.begin(), this->M.end(), 0) != this->m) {
+        throw ReadOnlyAttribute("You can only change error rate prior to "
+                                "first counting");
+    }
+
+    if (error_rate < 0) {
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than zero");
+    }
+    int p = ceil(log2(pow(1.04 / error_rate, 2)));
+    this->init(p, this->_ksize);
+}
+
+void HLLCounter::set_ksize(WordLength new_ksize)
+{
+    if (count(this->M.begin(), this->M.end(), 0) != this->m) {
+        throw ReadOnlyAttribute("You can only change k-mer size prior to "
+                                "first counting");
+    }
+
+    this->init(this->p, new_ksize);
 }
 
 double HLLCounter::_Ep()
@@ -425,13 +455,7 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 
 void HLLCounter::merge(HLLCounter &other)
 {
-    std::transform(this->M.begin(), this->M.end(),
-                   other.M.begin(),
-                   this->M.begin(),
-                   std::max<int>);
-    /*
     for(unsigned int i=0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);
     }
-    */
 }

@@ -8,13 +8,11 @@
 This is khmer; please see http://khmer.readthedocs.org/.
 """
 
-from khmer._khmer import _new_counting_hash
-from khmer._khmer import _new_hashbits
-from khmer._khmer import set_reporting_callback
-from khmer._khmer import _LabelHash
-from khmer._khmer import _Hashbits
-from khmer._khmer import _HLLCounter
-from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
+from khmer._khmer import CountingHash
+from khmer._khmer import LabelHash as _LabelHash
+from khmer._khmer import Hashbits as _Hashbits
+from khmer._khmer import HLLCounter as _HLLCounter
+from khmer._khmer import ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
 # tests/test_{functions,counting_hash,labelhash,counting_single}.py
@@ -59,7 +57,7 @@ def new_hashbits(k, starting_size, n_tables=2):
     """
     primes = get_n_primes_above_x(n_tables, starting_size)
 
-    return _new_hashbits(k, primes)
+    return _Hashbits(k, primes)
 
 
 def new_counting_hash(k, starting_size, n_tables=2):
@@ -73,7 +71,7 @@ def new_counting_hash(k, starting_size, n_tables=2):
     """
     primes = get_n_primes_above_x(n_tables, starting_size)
 
-    return _new_counting_hash(k, primes)
+    return CountingHash(k, primes)
 
 
 def load_hashbits(filename):
@@ -82,7 +80,7 @@ def load_hashbits(filename):
     Keyword argument:
     filename -- the name of the hashbits file
     """
-    hashtable = _new_hashbits(1, [1])
+    hashtable = _Hashbits(1, [1])
     hashtable.load(filename)
 
     return hashtable
@@ -94,20 +92,10 @@ def load_counting_hash(filename):
     Keyword argument:
     filename -- the name of the counting_hash file
     """
-    hashtable = _new_counting_hash(1, [1])
+    hashtable = CountingHash(1, [1])
     hashtable.load(filename)
 
     return hashtable
-
-
-def _default_reporting_callback(info, n_reads, other):
-    print '...', info, n_reads, other
-
-
-def reset_reporting_callback():
-    set_reporting_callback(_default_reporting_callback)
-
-reset_reporting_callback()
 
 
 def extract_hashbits_info(filename):
@@ -265,6 +253,20 @@ class Hashbits(_Hashbits):
 
 
 class HLLCounter(_HLLCounter):
+    """
+    A HyperLogLog counter is a probabilistic data structure specialized on
+    cardinality estimation.
+    There is a precision/memory consumption trade-off: error rate determines
+    how much memory is consumed.
+
+    # Creating a new HLLCounter:
+
+    >>> khmer.HLLCounter(error_rate, ksize)
+
+    where the default values are:
+      - error_rate: 0.01
+      - ksize: 20
+    """
 
     def __len__(self):
         return self.estimate_cardinality()

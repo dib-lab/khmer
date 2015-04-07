@@ -1,8 +1,8 @@
-@895:1:37:17593:9954/1
+@895:1:37:17593:9954 1::FOO
 GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
 +
 ##################################################################################################################
-@seq
+@seq 1::BAR
 GGTTGACGGGGCTCAGGG
 +
 ##################

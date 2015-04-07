@@ -73,8 +73,8 @@ def get_parser():
                         ' the size of the k-mer counting table(s)')
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     return parser
 
 
@@ -89,7 +89,7 @@ def main():
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, False)
 
     check_space(infiles)
 

@@ -742,7 +742,7 @@ def test_tagset_filetype_check():
 
 def test_bad_primes_list():
     try:
-        coutingtable = khmer._new_hashbits(31, ["a", "b", "c"], 1)
+        coutingtable = khmer._Hashbits(31, ["a", "b", "c"], 1)
         assert 0, "Bad primes list should fail"
     except TypeError as e:
         print str(e)
@@ -761,5 +761,5 @@ def test_consume_absentfasta_with_reads_parser():
         assert 0, "this should fail"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)

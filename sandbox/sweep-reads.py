@@ -6,6 +6,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
 
+from khmer import utils
+
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
@@ -37,6 +39,8 @@ from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 from khmer.kfile import (check_file_status, check_valid_file_exists,
                          check_space)
 
+from khmer.utils import write_record
+
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
 DEFAULT_BUFFER_SIZE = 10
@@ -52,10 +56,10 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
-def fmt_fastq(name, seq, accuracy, labels=[]):
+def fmt_fastq(name, seq, quality, labels=[]):
     return '@{name}\t{labels}\n{seq}\n+\n{acc}\n'.format(
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq,
-        acc=accuracy)
+        acc=quality)
 
 
 class ReadBuffer(object):
@@ -181,7 +185,7 @@ def get_parser():
     labeling = parser.add_mutually_exclusive_group(required=True)
     labeling.add_argument('--label-by-pid', dest='label_by_pid',
                           action='store_true', help='separate reads by\
-                        referece partition id')
+                        reference partition id')
     labeling.add_argument('--label-by-seq', dest='label_by_seq',
                           action='store_true', help='separate reads by\
                         reference sequence')
@@ -239,7 +243,7 @@ def main():
     del ix
 
     extension = 'fa'
-    if hasattr(record, 'accuracy'):      # fastq!
+    if hasattr(record, 'quality'):      # fastq!
         extension = 'fq'
 
     output_buffer = ReadBufferManager(
@@ -284,16 +288,8 @@ def main():
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
 
-                    if hasattr(record, 'accuracy'):
-                        outfp.write('@{name}\n{seq}+{accuracy}\n'.format(
-                            name=record.name,
-                            seq=record.sequence,
-                            accuracy=record.accuracy))
-                    else:
-                        outfp.write('>{name}\n{seq}\n'.format(
-                            name=record.name,
-                            seq=record.sequence))
-
+                    write_record(record, outfp)
+ 
             except IOError as e:
                 print >>sys.stderr, '!! ERROR !!', e
                 print >>sys.stderr, '...error splitting input. exiting...'
@@ -346,8 +342,8 @@ def main():
                 except ValueError as e:
                     pass
                 else:
-                    if hasattr(record, 'accuracy'):
-                        seq_str = fmt_fastq(name, seq, record.accuracy, labels)
+                    if hasattr(record, 'quality'):
+                        seq_str = fmt_fastq(name, seq, record.quality, labels)
                     else:
                         seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))

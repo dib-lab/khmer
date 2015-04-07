@@ -6,7 +6,6 @@
 """ Setup for khmer project. """
 
 import ez_setup
-ez_setup.use_setuptools(version="3.4.1")
 
 import os
 import sys
@@ -25,6 +24,8 @@ from distutils.dist import Distribution
 from distutils.errors import DistutilsPlatformError
 
 import versioneer
+ez_setup.use_setuptools(version="3.4.1")
+
 versioneer.VCS = 'git'
 versioneer.versionfile_source = 'khmer/_version.py'
 versioneer.versionfile_build = 'khmer/_version.py'
@@ -100,7 +101,7 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter"])
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
@@ -148,6 +149,7 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
+    "Programming Language :: Python :: 2 :: Only",
     "Programming Language :: Python :: 2.7",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
@@ -174,7 +176,9 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.7.1'],
+        "install_requires": ['screed >= 0.8'],
+        # testing screed download link
+
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
@@ -243,6 +247,7 @@ def reinitialize_command(self, command, reinit_subcommands):
             cmd_obj, options)
     return cmd_obj
 Distribution.reinitialize_command = reinitialize_command
+
 
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS,

@@ -1,0 +1,56 @@
+@895:1:37:17593:9954/1
+GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
++
+##################################################################################################################
+@895:1:37:17593:9954/1
+GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
++
+##################################################################################################################
+@seqtrim/1
+GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCcCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
++
+##################################################################################################################
+@seqtrim/2
+GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCcGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
++
+##################################################################################################################
+@seqtrim2/1
+GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAtCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG
++
+##################################################################################################################
+@seq
+GGTTGACGGGGCTCAGGG
++
+##################
+@seq
+GGTTGACGGGGCTCAGGG
++
+##################
+@seq
+GGTTGACGGGGCTCAGGG
++
+##################
+@seq
+GGTTGACGGGGCTCAGGG
++
+##################
+@shortseq
+GAGGG
++
+#####
+@pair2:fiz 1::N
+GGTTGACGGGGCTCAcGG
++
+##################
+@pair2:fiz 2::N
+GGTTGACGGGGCTCAGGc
++
+##################
+@pair:foo 1::N
+GGTTGACGGGGCTCAGGG
++
+##################
+@pair:foo 2::N
+ATATGACATATATAGACA
++
+##################

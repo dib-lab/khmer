@@ -185,9 +185,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_frequency = args.report_frequency
 
     check_valid_file_exists(args.input_filenames)
-    check_space(args.input_filenames)
+    check_space(args.input_filenames, False)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
 
     # list to save error files along with throwing exceptions
     if args.force:

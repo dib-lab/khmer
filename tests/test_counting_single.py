@@ -24,6 +24,15 @@ def test_no_collision():
     assert kh.get('TTTT') == 2
 
 
+@attr('linux')
+def test_toobig():
+    try:
+        ct = khmer.new_hashtable(4, 1000000000000)
+        assert 0, "this should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test_collision():
     kh = khmer.new_hashtable(4, 4)
 
@@ -79,7 +88,7 @@ def test_complete_no_collision():
 
     assert n_rc_filled == kh.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
-    assert n_fwd_filled == kh.n_entries() / 2 + n_palindromes / 2, \
+    assert n_fwd_filled == kh.n_entries() // 2 + n_palindromes // 2, \
         n_fwd_filled
 
 

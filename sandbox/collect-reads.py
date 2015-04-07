@@ -26,8 +26,8 @@ import screed
 
 
 def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    if hasattr(read, 'quality'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.quality)
     else:
         return ">%s\n%s\n" % (read.name, read.sequence)
 
@@ -71,10 +71,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+        check_file_status(name, False)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, False)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
 
     print 'Saving k-mer counting table to %s' % base
     print 'Loading sequences from %s' % repr(filenames)
