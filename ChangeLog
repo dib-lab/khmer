@@ -9,6 +9,10 @@
    * scripts/load-into-counting.py (main): early check to see if output is
    writable
 
+2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst: add a ReadTheDocs badge
+
 2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * jenkins-build.sh: updated OS X warning flag to quiet the build a bit
