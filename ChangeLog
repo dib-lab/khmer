@@ -1,5 +1,5 @@
 2015-04-01  Jacob Fenton  <bocajnotnef@gmail.com>
-   * scripts/test-{scripts.py, data/test-nonwritable}: added test for
+   * scripts/test-{scripts.py,data/test-nonwritable}: added test for
    check_file_writable using load_into_counting
 
 2015-04-01  Phillip Garland  <pgarland@gmail.com>

@@ -60,7 +60,6 @@ def test_load_into_counting_nonwritable():
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
 
     outfile = utils.get_test_data('test-nonwritable')
-    os.chmod(outfile, stat.S_IWOTH | stat.S_IRUSR)
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
