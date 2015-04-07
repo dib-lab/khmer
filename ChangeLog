@@ -1,12 +1,55 @@
-2015-04-01  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-04-06  Jacob Fenton  <bocajnotnef@gmail.com>
    * scripts/test-{scripts.py,data/test-nonwritable}: added test for
    check_file_writable using load_into_counting
 
-2015-04-01  Phillip Garland  <pgarland@gmail.com>
+2015-04-06  Phillip Garland  <pgarland@gmail.com>
 
    * khmer/file.py (check_file_writable): new function to check writability
    * scripts/load-into-counting.py (main): early check to see if output is
    writable
+
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: updated OS X warning flag to quiet the build a bit
+
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: added 'convert-release-notes' target for MD->RST conversion
+   * doc/{,release-notes}/index.rst: include release notes in documentation
+   * doc/release-notes/*.rst: added pandoc converted versions of release notes
+   * jenkins-build.sh: use the Sphinx method to install doc dependencies
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: use the release version of screed 0.8
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/*/*.txt: all documentation sources have been renamed to use the rst
+   extension to indicate that they are reStructuredText files. This enables
+   use of rich text editors on GitHub and elsewhere.
+   * doc/conf.py: update Sphinx configuration to reflect this change
+   * doc/requirements.txt: added hint to install version 3.4.1 of Setuptools;
+   this file is used by ReadTheDocs only.
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * ChangeLog, lib/read_aligner.cc, sandbox/sweep-reads.py: fixed spelling
+   errors.
+
+2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
+   handling of truncated sequence files. Also revamp exceptions
+   * khmer/_khmermodule.cc: Use new/updated exceptions handling malformed
+   FASTA/Q files.
+   * tests/test_read_parsers.py: add a test of parsing of truncated fastq
+   files
+
+2015-04-03  Luiz Irber  <irberlui@msu.edu>
+
+   * lib/hllcounter.cc: Use for loop instead of transform on merge method,
+   now works on C++11.
 
 2015-04-01  Luiz Irber  <irberlui@msu.edu>
 
@@ -590,7 +633,7 @@
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
-    in the current dir by explictly specifying an output file.
+    in the current dir by explicitly specifying an output file.
 
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
@@ -1055,7 +1098,7 @@
 2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
-    normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
+    normalize-by-median,load-graph}.py: restore Python 2.6 compatibility for
     Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
 
 2014-06-15  Titus Brown  <t@idyll.org>

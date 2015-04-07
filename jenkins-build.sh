@@ -24,7 +24,7 @@ then
 fi
 if [[ "${NODE_LABELS}" == *osx* ]]
 then
-	export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
+	export ARCHFLAGS=-Wno-error=unused-command-line-argument
 fi
 
 if type gcov >/dev/null 2>&1 && [[ "${NODE_LABELS}" != *osx* ]]
@@ -54,8 +54,9 @@ if type hg >/dev/null 2>&1
 then
 	rm -Rf sphinx-contrib
 	#hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
-	hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
-	pip install --upgrade sphinx-contrib/autoprogram/
+	#hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
+	#pip install --upgrade sphinx-contrib/autoprogram/
+	pip install -r doc/requirements.txt
 	make doc
 fi
 make pylint 2>&1 > pylint.out
