@@ -1,4 +1,5 @@
 2015-04-06  Jacob Fenton  <bocajnotnef@gmail.com>
+
    * scripts/test-{scripts.py}: added test for check_file_writable using 
    load_into_counting
 
