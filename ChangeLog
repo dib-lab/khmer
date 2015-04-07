@@ -381,7 +381,6 @@
    * khmer/_khmermodule.cc: added functions hash_find_all_tags_list and
    hash_get_tags_and_positions to CountingHash objects.
    * tests/test_counting_hash.py: added tests for new functionality.
->>>>>>> 43c03839ebd8d8f8ff110f5a9450f4eacbce0b9e
 
 2015-01-25  Titus Brown  <titus@idyll.org>
 
