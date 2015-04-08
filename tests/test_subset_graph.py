@@ -83,7 +83,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4
 
@@ -102,7 +102,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4
 
@@ -121,7 +121,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4, len(divvy)
 
@@ -231,7 +231,7 @@ class Test_SaveLoadPmap(object):
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -298,7 +298,7 @@ class Test_SaveLoadPmap(object):
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
 
         outfile1 = utils.get_temp_filename('x.pmap')

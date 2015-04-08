@@ -66,8 +66,8 @@ def get_parser():
     parser.add_argument('-o', '--output', dest='output_file',
                         metavar='output_file',
                         type=argparse.FileType('w'), default=None)
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     return parser

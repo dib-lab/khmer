@@ -46,8 +46,8 @@ def get_parser():
         description='Take a mixture of reads and split into pairs and '
         'orphans.', epilog=textwrap.dedent(epilog))
     parser.add_argument('infile')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

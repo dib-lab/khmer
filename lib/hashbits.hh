@@ -68,9 +68,15 @@ public:
 
     }
 
+    // Accessors for protected/private table info members
     std::vector<HashIntoType> get_tablesizes() const
     {
         return _tablesizes;
+    }
+
+    const size_t n_tables() const
+    {
+        return _n_tables;
     }
 
     virtual void save(std::string);

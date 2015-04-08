@@ -42,8 +42,8 @@ def get_parser():
                         help='Keep individual subsets (default: False)')
     parser.add_argument('graphbase', help='basename for input and output '
                         'files')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
