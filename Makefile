@@ -256,4 +256,10 @@ coverity-configure:
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext
+
+convert-release-notes:
+	for file in doc/release-notes/*.md; do \
+		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
+		done
+
 FORCE:

@@ -34,7 +34,7 @@ double GetNull(size_t length)
 
 /*
   Turn two states in to a transition, or disallowed if the
-  transition isn't modeled
+  transition isn't modelled
  */
 Transition get_trans(State s1, State s2)
 {

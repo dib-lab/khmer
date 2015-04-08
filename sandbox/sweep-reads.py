@@ -185,7 +185,7 @@ def get_parser():
     labeling = parser.add_mutually_exclusive_group(required=True)
     labeling.add_argument('--label-by-pid', dest='label_by_pid',
                           action='store_true', help='separate reads by\
-                        referece partition id')
+                        reference partition id')
     labeling.add_argument('--label-by-seq', dest='label_by_seq',
                           action='store_true', help='separate reads by\
                         reference sequence')
