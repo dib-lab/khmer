@@ -1,3 +1,5 @@
+# khmer v1.0 release notes
+
 582 changed files with 40,527 additions and 31,772 deletions.
 
 The team has been hard at work since v0.8 to refine the codebase into a stable product.
