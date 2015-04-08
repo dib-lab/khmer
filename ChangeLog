@@ -3,10 +3,6 @@
    * tests/test_scripts.py: Test loading of compressed counting table
    with bigcounts,and test abundance with bigcounts
 
-2015-02-24  Sherine Awad  <sherine.awad@gmail.com>
-
-   * tests/test_scripts.py: Test loading of gzipped counting table with bigcounts and test abundance with bigcounts
-
 2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * README.rst: add a ReadTheDocs badge
