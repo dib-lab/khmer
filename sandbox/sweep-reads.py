@@ -35,7 +35,8 @@ from collections import defaultdict
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_hashbits_args, update_memory_parameters,
+                              report_on_config, info)
 from khmer.kfile import (check_file_status, check_valid_file_exists,
                          check_space)
 
@@ -204,6 +205,7 @@ def main():
     info('sweep-reads-buffered.py', ['sweep'])
     parser = get_parser()
     args = parser.parse_args()
+    update_memory_parameters(parser, args)
 
     if args.min_tablesize < MIN_HSIZE:
         args.min_tablesize = MIN_HSIZE
