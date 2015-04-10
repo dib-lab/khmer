@@ -1,7 +1,19 @@
-2015-04-07  Will Trimble
+2015-04-10  Will Trimble
 
    * tests/test_script_arguments.py: added a test to check for the empty file
    warning when checking if a file exists
+
+2015-04-06  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/test-{scripts.py}: added test for check_file_writable using 
+   load_into_counting
+
+2015-04-06  Phillip Garland  <pgarland@gmail.com>
+
+   * khmer/file.py (check_file_writable): new function to check writability
+   * scripts/load-into-counting.py (main): early check to see if output is
+   writable
+>>>>>>> 8a30b6d46447f6d7fa61396798e0356e674e9e85
 
 2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
 

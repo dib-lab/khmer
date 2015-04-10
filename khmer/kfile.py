@@ -11,6 +11,7 @@ File handling/checking utilities for command-line scripts.
 
 import os
 import sys
+import errno
 from stat import S_ISBLK, S_ISFIFO
 
 
@@ -50,6 +51,22 @@ def check_file_status(file_path, force):
                                 file_path
             if not force:
                 sys.exit(1)
+
+
+def check_file_writable(file_path):
+    """Returns if file_path is writable, exits out if it's not"""
+    try:
+        file_obj = open(file_path, "a")
+    except IOError as error:
+        if error.errno == errno.EACCES:
+            print >>sys.stderr, "ERROR: File %s does not have write " \
+                % file_path + "permission; exiting"
+            sys.exit(1)
+        else:
+            print >>sys.stderr, "ERROR: " + error.strerror
+    else:
+        file_obj.close()
+        return
 
 
 def check_space(in_files, force, _testhook_free_space=None):
