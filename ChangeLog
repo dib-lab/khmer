@@ -1,3 +1,14 @@
+2015-04-06  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/test-{scripts.py}: added test for check_file_writable using 
+   load_into_counting
+
+2015-04-06  Phillip Garland  <pgarland@gmail.com>
+
+   * khmer/file.py (check_file_writable): new function to check writability
+   * scripts/load-into-counting.py (main): early check to see if output is
+   writable
+
 2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * README.rst: add a ReadTheDocs badge

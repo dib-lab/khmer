@@ -21,6 +21,7 @@ import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
+from khmer.kfile import check_file_writable
 from khmer.kfile import check_file_status, check_space
 from khmer.kfile import check_space_for_hashtable
 
@@ -83,6 +84,9 @@ def main():
 
     check_space(args.input_sequence_filename, args.force)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
+
+    check_file_writable(base)
+    check_file_writable(base + ".info")
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
