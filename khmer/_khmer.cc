@@ -633,6 +633,44 @@ _PyObject_to_khmer_ReadParser( PyObject * py_object )
     return ((python:: khmer_ReadParser_Object *)py_object)->parser;
 }
 
+typedef struct {
+    PyObject_HEAD
+    pre_partition_info *   PrePartitionInfo;
+} khmer_PrePartitionInfo_Object;
+
+static
+void
+khmer_PrePartitionInfo_dealloc(khmer_PrePartitionInfo_Object * obj)
+{
+    delete obj->PrePartitionInfo;
+    obj->PrePartitionInfo = NULL;
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyTypeObject khmer_PrePartitionInfo_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "_khmer.PrePartitionInfo",            /* tp_name */
+    sizeof(khmer_PrePartitionInfo_Object),/* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    (destructor)khmer_PrePartitionInfo_dealloc,       /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    0,                                    /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+    "Stores a k-kmer and a set of tagged seen k-mers.", /* tp_doc */
+};
+
 
 /***********************************************************************/
 
@@ -1446,7 +1484,7 @@ hash_consume_fasta_and_tag(khmer_KCountingHash_Object * me, PyObject * args)
 
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
-/*
+
 static
 PyObject *
 hash_find_all_tags_truncate_on_abundance(khmer_KCountingHash_Object * me,
@@ -1488,13 +1526,13 @@ hash_find_all_tags_truncate_on_abundance(khmer_KCountingHash_Object * me,
 
     Py_END_ALLOW_THREADS
 
-    khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
-            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
+    khmer_PrePartitionInfo_Object * ppi_obj = (khmer_PrePartitionInfo_Object *)\
+            PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
 
-    subset_obj->subset = ppi;
+    ppi_obj->PrePartitionInfo = ppi;
 
-    return subset_obj;
-} */
+    return (PyObject*)ppi_obj;
+} 
 
 static
 PyObject *
@@ -1787,44 +1825,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
     (initproc)khmer_hashbits_init,   /* tp_init */
     0,                       /* tp_alloc */
     khmer_hashbits_new,                  /* tp_new */
-};
-
-typedef struct {
-    PyObject_HEAD
-    pre_partition_info *   PrePartitionInfo;
-} khmer_PrePartitionInfo_Object;
-
-static
-void
-khmer_PrePartitionInfo_dealloc(khmer_PrePartitionInfo_Object * obj)
-{
-    delete obj->PrePartitionInfo;
-    obj->PrePartitionInfo = NULL;
-    Py_TYPE(obj)->tp_free((PyObject*)obj);
-}
-
-static PyTypeObject khmer_PrePartitionInfo_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_khmer.PrePartitionInfo",            /* tp_name */
-    sizeof(khmer_PrePartitionInfo_Object),/* tp_basicsize */
-    0,                                    /* tp_itemsize */
-    (destructor)khmer_PrePartitionInfo_dealloc,       /* tp_dealloc */
-    0,                                    /* tp_print */
-    0,                                    /* tp_getattr */
-    0,                                    /* tp_setattr */
-    0,                                    /* tp_compare */
-    0,                                    /* tp_repr */
-    0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
-    0,                                    /* tp_as_mapping */
-    0,                                    /* tp_hash */
-    0,                                    /* tp_call */
-    0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
-    0,                                    /* tp_setattro */
-    0,                                    /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "Stores a k-kmer and a set of tagged seen k-mers.", /* tp_doc */
 };
 
 static
@@ -2641,7 +2641,7 @@ hashbits_consume_partitioned_fasta(khmer_KHashbits_Object * me, PyObject * args)
 
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
-/*
+
 static
 PyObject *
 hashbits_find_all_tags(khmer_KHashbits_Object * me, PyObject * args)
@@ -2678,7 +2678,12 @@ hashbits_find_all_tags(khmer_KHashbits_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-    return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
+    khmer_PrePartitionInfo_Object * ppi_obj = (khmer_PrePartitionInfo_Object *) \
+	PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
+
+    ppi_obj->PrePartitionInfo = ppi;
+
+    return (PyObject*)ppi;
 }
 
 static
@@ -2687,18 +2692,13 @@ hashbits_assign_partition_id(khmer_KHashbits_Object * me, PyObject * args)
 {
     Hashbits * hashbits = me->hashbits;
 
-    PyObject * ppi_obj;
-    if (!PyArg_ParseTuple(args, "O", &ppi_obj)) {
-        return NULL;
-    }
-
-    if (!PyCObject_Check(ppi_obj)) {
-        PyErr_SetString( PyExc_ValueError, "invalid pre_partition_info");
+    khmer_PrePartitionInfo_Object * ppi_obj;
+    if (!PyArg_ParseTuple(args, "O!", &khmer_PrePartitionInfo_Type, &ppi_obj)) {
         return NULL;
     }
 
     pre_partition_info * ppi;
-    ppi = (pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
+    ppi = ppi_obj->PrePartitionInfo;
 
     PartitionID p;
     p = hashbits->partition->assign_partition_id(ppi->kmer,
@@ -2706,7 +2706,7 @@ hashbits_assign_partition_id(khmer_KHashbits_Object * me, PyObject * args)
 
     return PyLong_FromLong(p);
 }
-*/
+
 
 static
 PyObject *
