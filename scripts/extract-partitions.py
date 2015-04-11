@@ -19,6 +19,7 @@ Use '-h' for parameter help.
 by output_unassigned...
 """
 from __future__ import print_function
+from builtins import range
 
 import sys
 import screed
@@ -159,7 +160,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     # develop histogram of partition sizes
     dist = {}
-    for pid, size in count.items():
+    for pid, size in list(count.items()):
         dist[size] = dist.get(size, 0) + 1
 
     # output histogram
@@ -177,7 +178,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(0)
 
     # sort groups by size
-    divvy = sorted(count.items(), key=lambda y: y[1])
+    divvy = sorted(list(count.items()), key=lambda y: y[1])
     divvy = [y for y in divvy if y[1] > args.min_part_size]
 
     # divvy up into different groups, based on having max_size sequences

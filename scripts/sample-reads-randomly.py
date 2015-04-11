@@ -16,6 +16,7 @@ By default take one subsample, but take -S samples if specified.
 Reads FASTQ and FASTA input, retains format for output.
 """
 from __future__ import print_function
+from builtins import range
 
 import argparse
 import screed

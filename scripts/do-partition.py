@@ -14,11 +14,14 @@ Do all the partition steps in one script.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 
 import khmer
 import sys
 import threading
-import Queue
+import queue
 import gc
 import os.path
 import os
@@ -49,7 +52,7 @@ def worker(queue, basename, stop_big_traversals):
     while True:
         try:
             (htable, index, start, stop) = queue.get(False)
-        except Queue.Empty:
+        except queue.Empty:
             print('exiting', file=sys.stderr)
             return
 
@@ -164,7 +167,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     divvy.append(0)
 
     # build a queue of tasks:
-    worker_q = Queue.Queue()
+    worker_q = queue.Queue()
 
     # break up the subsets into a list of worker tasks
     for _ in range(0, n_subsets):

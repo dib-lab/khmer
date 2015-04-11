@@ -15,13 +15,14 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from builtins import zip
 
 import sys
 import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
+
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -39,7 +40,7 @@ MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 
 def batchwise(coll, size):
     iter_coll = iter(coll)
-    return izip(*[iter_coll] * size)
+    return zip(*[iter_coll] * size)
 
 # Returns true if the pair of records are properly pairs
 

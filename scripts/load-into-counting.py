@@ -13,6 +13,9 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 
 import json
 import os
@@ -108,7 +111,7 @@ def main():
         rparser = khmer.ReadParser(filename)
         threads = []
         print('consuming input', filename, file=sys.stderr)
-        for _ in xrange(args.threads):
+        for _ in range(args.threads):
             cur_thrd = \
                 threading.Thread(
                     target=htable.consume_fasta_with_reads_parser,

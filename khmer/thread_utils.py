@@ -8,8 +8,12 @@
 Utilities for dealing with multithreaded processing of short reads.
 """
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 import threading
-import Queue
+import queue
 import sys
 import screed
 from khmer import utils
@@ -50,8 +54,8 @@ class ThreadedSequenceProcessor(object):
         self.n_workers = n_workers
         self.group_size = group_size
 
-        self.inqueue = Queue.Queue(self.QUEUESIZE)
-        self.outqueue = Queue.Queue(self.QUEUESIZE)
+        self.inqueue = queue.Queue(self.QUEUESIZE)
+        self.outqueue = queue.Queue(self.QUEUESIZE)
 
         self.worker_count = 0
         self.worker_count_lock = threading.Lock()
@@ -130,7 +134,7 @@ class ThreadedSequenceProcessor(object):
         while not self.done or not inq.empty():
             try:
                 g = inq.get(True, 1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
             bp_processed = 0
@@ -177,7 +181,7 @@ class ThreadedSequenceProcessor(object):
         while self.worker_count > 0 or not outq.empty():
             try:
                 g = outq.get(True, 1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
             for name, seq, quality in g.seqlist:

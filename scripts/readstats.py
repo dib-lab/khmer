@@ -13,6 +13,7 @@ Display summary statistics for one or more FASTA/FASTQ files.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from builtins import str
 
 import sys
 import screed

@@ -15,6 +15,9 @@ loading a prebuilt k-mer counting table.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 import os
 import sys
 import csv
@@ -113,7 +116,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     threads = []
     print('consuming input, round 1 --', \
         args.input_sequence_filename, file=sys.stderr)
-    for _ in xrange(args.threads):
+    for _ in range(args.threads):
         thread = \
             threading.Thread(
                 target=counting_hash.consume_fasta_with_reads_parser,
@@ -142,7 +145,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     threads = []
     print('consuming input, round 2 --', \
         args.input_sequence_filename, file=sys.stderr)
-    for _ in xrange(args.threads):
+    for _ in range(args.threads):
         thread = \
             threading.Thread(
                 target=__do_abundance_dist__,

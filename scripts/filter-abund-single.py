@@ -16,6 +16,7 @@ placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from builtins import range
 import os
 import sys
 import khmer
@@ -80,7 +81,7 @@ def main():
     rparser = khmer.ReadParser(args.datafile)
     threads = []
     print('consuming input, round 1 --', args.datafile, file=sys.stderr)
-    for _ in xrange(args.threads):
+    for _ in range(args.threads):
         cur_thread = \
             threading.Thread(
                 target=htable.consume_fasta_with_reads_parser,

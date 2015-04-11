@@ -15,6 +15,7 @@ Convert FASTQ files to FASTA format.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from builtins import str
 import sys
 import argparse
 import screed

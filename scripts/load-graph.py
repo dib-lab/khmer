@@ -14,6 +14,9 @@ Build a graph from the given sequences, save in <ptname>.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 
 import sys
 import threading
@@ -81,7 +84,7 @@ def main():
         rparser = khmer.ReadParser(filename)
         threads = []
         print('consuming input', filename, file=sys.stderr)
-        for num in xrange(args.threads):
+        for num in range(args.threads):
             cur_thread = threading.Thread(
                 target=target_method, args=(rparser,))
             threads.append(cur_thread)
