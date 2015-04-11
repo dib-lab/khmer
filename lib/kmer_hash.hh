@@ -79,6 +79,8 @@ HashIntoType _hash_murmur(const std::string& kmer);
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
-};
 
+HashIntoType _cyclichash(const char * kmer_string, WordLength k);
+HashIntoType _revcyclichash(const char * kmer_string, WordLength k);
+};
 #endif // KMER_HASH_HH

@@ -31,23 +31,95 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
+    _h = _cyclichash(kmer, k);
+    _r = _revcyclichash(kmer, k);
 
-    h |= twobit_repr(kmer[0]);
-    r |= twobit_comp(kmer[k-1]);
+    return uniqify_rc(_h, _r);
+}
 
-    for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
-        h = h << 2;
-        r = r << 2;
+// Bitwise Shifting
+HashIntoType _cyclichash(const char * kmer_string, const WordLength k)
+{
+    // Our list of random numbers for each base value
+    // Hard coding in random vals from array
+    // Random values generated from www.random.org
+    HashIntoType vals[] = {303837760, 392233993, 127908739, 491989698};
+    //std::vector<HashIntoType> random_base_vals (vals, vals + sizeof(vals) / sizeof(vals));
 
-        h |= twobit_repr(kmer[i]);
-        r |= twobit_comp(kmer[j]);
+    HashIntoType hashvalue = 0;
+
+    // Iterate through the kmer, hashing each
+    for (size_t i = 0; i < strlen(kmer_string); i++) {
+        // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
+        hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
+
+        // Hash each letter of the current kmer
+        switch (kmer_string[i]) {
+        case 'A':
+        case 'a':
+            hashvalue ^= vals[0];
+	    break;
+        case 'C':
+        case 'c':
+            hashvalue ^= vals[1];
+	    break;
+        case 'G':
+        case 'g':
+            hashvalue ^= vals[2];
+	    break;
+        case 'T':
+        case 't':
+        case 'U':
+        case 'u':
+            hashvalue ^= vals[3];
+	    break;
+        default:
+            throw khmer_exception("Unknown nucleotide, not one of AaCcGgTtUu.");
+        }// of Switch
     }
+    return hashvalue;
+}
 
-    _h = h;
-    _r = r;
+HashIntoType _revcyclichash(const char * kmer_string, const WordLength k)
+{
+    // Our list of random numbers for each base value
+    // Hard coding in random vals from array
+    // Random values generated from www.random.org
+    HashIntoType complement_vals[] = {491989698, 127908739, 392233993, 303837760};
+    //std::vector<HashIntoType> compliment_random_base_vals (vals, vals + sizeof(vals) / sizeof(vals));
 
-    return uniqify_rc(h, r);
+    HashIntoType hashvalue = 0;
+
+    // Iterate through the kmer backwards, hashing each base
+    for (size_t i = strlen(kmer_string) - 1; i > 0; i--) {
+        // A circular bitshift (http://en.wikipedia.org/wiki/Circular_shift)
+        hashvalue = (hashvalue << 1 | hashvalue >> (k - 1));
+
+        // Hash each letter of the current kmer
+        switch (kmer_string[i]) {
+        case 'A':
+        case 'a':
+            hashvalue ^= complement_vals[0];
+	    break;
+        case 'C':
+        case 'c':
+            hashvalue ^= complement_vals[1];
+	    break;
+        case 'G':
+        case 'g':
+            hashvalue ^= complement_vals[2];
+	    break;
+        case 'T':
+        case 't':
+        case 'U':
+        case 'u':
+            hashvalue ^= complement_vals[3];
+	    break;
+        default:
+            throw khmer_exception("Unknown nucleotide, not one of AaCcGgTtUu.");
+        }// of Switch
+    }
+    return hashvalue;
 }
 
 // _hash: return the maximum of the forward and reverse hash.
