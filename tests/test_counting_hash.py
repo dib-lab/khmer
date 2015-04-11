@@ -64,7 +64,7 @@ class Test_CountingHash(object):
         hi.consume(GG)
         hi.consume(collision_1)
 
-        assert hi.get(GG) == 1
+        assert hi.get(GG) == 1, (GG, hi.get(GG))
 
     def test_collision_2(self):
 

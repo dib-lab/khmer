@@ -1639,7 +1639,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "find_all_tags_list", (PyCFunction)hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", (PyCFunction)hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", (PyCFunction)hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
-/*    { "find_all_tags_truncate_on_abundance", (PyCFunction)hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" }, */
+    { "find_all_tags_truncate_on_abundance", (PyCFunction)hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
 
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -3451,8 +3451,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "trim_on_stoptags", (PyCFunction)hashbits_trim_on_stoptags, METH_VARARGS, "" },
     { "identify_stoptags_by_position", (PyCFunction)hashbits_identify_stoptags_by_position, METH_VARARGS, "" },
     { "do_subset_partition", (PyCFunction)hashbits_do_subset_partition, METH_VARARGS, "" },
-/*    { "find_all_tags", (PyCFunction)hashbits_find_all_tags, METH_VARARGS, "" }, */
-/*    { "assign_partition_id", (PyCFunction)hashbits_assign_partition_id, METH_VARARGS, "" }, */
+    { "find_all_tags", (PyCFunction)hashbits_find_all_tags, METH_VARARGS, "" },
+    { "assign_partition_id", (PyCFunction)hashbits_assign_partition_id, METH_VARARGS, "" },
     { "output_partitions", (PyCFunction)hashbits_output_partitions, METH_VARARGS, "" },
     { "find_unpart", (PyCFunction)hashbits_find_unpart, METH_VARARGS, "" },
     { "filter_if_present", (PyCFunction)hashbits_filter_if_present, METH_VARARGS, "" },
