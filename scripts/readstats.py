@@ -12,6 +12,7 @@ Display summary statistics for one or more FASTA/FASTQ files.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import screed
@@ -60,13 +61,13 @@ def main():
         try:
             input_iter = screed.open(filename, parse_description=False)
         except (IOError, OSError, EOFError) as exc:
-            print >>sys.stderr, 'ERROR in opening %s:' % filename
-            print >>sys.stderr, '     ', str(exc)
+            print('ERROR in opening %s:' % filename, file=sys.stderr)
+            print('     ', str(exc), file=sys.stderr)
             continue
 
         for record in input_iter:
             if seqs % 100000 == 0:
-                print >>sys.stderr, '...', filename, seqs
+                print('...', filename, seqs, file=sys.stderr)
             bp += len(record.sequence)
             seqs += 1
 
@@ -76,23 +77,22 @@ def main():
                                                                 seqs,
                                                                 avg_len,
                                                                 filename)
-            print >>sys.stderr, '... found', s
+            print('... found', s, file=sys.stderr)
             output.append(s)
 
             total_bp += bp
             total_seqs += seqs
         else:
-            print >>sys.stderr, 'No sequences found in %s' % filename
+            print('No sequences found in %s' % filename, file=sys.stderr)
 
     if total_seqs:
-        print >>args.outfp, '---------------'
-        print >>args.outfp, "\n".join(output)
-        print >>args.outfp, '---------------'
-        print >>args.outfp, '%d bp / %d seqs; %.1f average length -- total' % \
-            (total_bp, total_seqs, total_bp / float(total_seqs))
+        print('---------------', file=args.outfp)
+        print("\n".join(output), file=args.outfp)
+        print('---------------', file=args.outfp)
+        print('%d bp / %d seqs; %.1f average length -- total' % \
+            (total_bp, total_seqs, total_bp / float(total_seqs)), file=args.outfp)
     else:
-        print >>args.outfp, \
-            'No sequences found in %d files' % len(args.filenames)
+        print('No sequences found in %d files' % len(args.filenames), file=args.outfp)
 
 
 if __name__ == '__main__':

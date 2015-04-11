@@ -14,6 +14,7 @@ files (.1 and .2).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from __future__ import print_function
 import screed
 import sys
 import os
@@ -122,12 +123,12 @@ def main():
     # walk through all the reads in broken-paired mode.
     for index, is_pair, record1, record2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index:
-            print >> sys.stderr, '...', index
+            print('...', index, file=sys.stderr)
 
         # are we requiring pairs?
         if args.force_paired and not is_pair:
-            print >>sys.stderr, 'ERROR, %s is not part of a pair' % \
-                record1.name
+            print('ERROR, %s is not part of a pair' % \
+                record1.name, file=sys.stderr)
             sys.exit(1)
 
         if is_pair:
@@ -144,15 +145,14 @@ def main():
                 write_record(record1, fp_out2)
                 counter2 += 1
             else:
-                print >>sys.stderr, \
-                    "Unrecognized format for read pair information: %s" % name
-                print >>sys.stderr, "Exiting."
+                print("Unrecognized format for read pair information: %s" % name, file=sys.stderr)
+                print("Exiting.", file=sys.stderr)
                 sys.exit(1)
 
-    print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
-        (counter1 + counter2, counter1, counter2)
-    print >> sys.stderr, "/1 reads in %s" % out1
-    print >> sys.stderr, "/2 reads in %s" % out2
+    print("DONE; split %d sequences (%d left, %d right)" % \
+        (counter1 + counter2, counter1, counter2), file=sys.stderr)
+    print("/1 reads in %s" % out1, file=sys.stderr)
+    print("/2 reads in %s" % out2, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

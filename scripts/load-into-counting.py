@@ -12,6 +12,7 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import json
 import os
@@ -88,14 +89,14 @@ def main():
     check_file_writable(base)
     check_file_writable(base + ".info")
 
-    print >>sys.stderr, 'Saving k-mer counting table to %s' % base
-    print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
+    print('Saving k-mer counting table to %s' % base, file=sys.stderr)
+    print('Loading kmers from sequences in %s' % repr(filenames), file=sys.stderr)
 
     # clobber the '.info' file now, as we always open in append mode below
     if os.path.exists(base + '.info'):
         os.remove(base + '.info')
 
-    print >>sys.stderr, 'making k-mer counting table'
+    print('making k-mer counting table', file=sys.stderr)
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables)
     htable.set_use_bigcount(args.bigcount)
@@ -106,7 +107,7 @@ def main():
 
         rparser = khmer.ReadParser(filename)
         threads = []
-        print >>sys.stderr, 'consuming input', filename
+        print('consuming input', filename, file=sys.stderr)
         for _ in xrange(args.threads):
             cur_thrd = \
                 threading.Thread(
@@ -122,29 +123,29 @@ def main():
         if index > 0 and index % 10 == 0:
             check_space_for_hashtable(args.n_tables * args.min_tablesize,
                                       args.force)
-            print >>sys.stderr, 'mid-save', base
+            print('mid-save', base, file=sys.stderr)
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:
-            print >> info_fh, 'through', filename
+            print('through', filename, file=info_fh)
 
     n_kmers = htable.n_unique_kmers()
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers:', n_kmers
+        print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
         with open(base + '.info', 'a') as info_fp:
-            print >>info_fp, 'Total number of unique k-mers:', n_kmers
+            print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
-    print >>sys.stderr, 'saving', base
+    print('saving', base, file=sys.stderr)
     htable.save(base)
 
     fp_rate = khmer.calc_expected_collisions(htable)
 
     with open(base + '.info', 'a') as info_fp:
-        print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
+        print('fp rate estimated to be %1.3f\n' % fp_rate, file=info_fp)
 
     if args.summary_info:
         mr_fmt = args.summary_info.lower()
         mr_file = base + '.info.' + mr_fmt
-        print >> sys.stderr, "Writing summmary info to", mr_file
+        print("Writing summmary info to", mr_file, file=sys.stderr)
         with open(mr_file, 'w') as mr_fh:
             if mr_fmt == 'json':
                 mr_data = {
@@ -162,18 +163,18 @@ def main():
                     b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
                     fls=";".join(filenames)))
 
-    print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     if fp_rate > 0.20:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
-        print >> sys.stderr, "for this data set. Increase tablesize/# tables."
-        print >> sys.stderr, "**"
+        print("**", file=sys.stderr)
+        print("** ERROR: the k-mer counting table is too small", end=' ', file=sys.stderr)
+        print("for this data set. Increase tablesize/# tables.", file=sys.stderr)
+        print("**", file=sys.stderr)
         sys.exit(1)
 
-    print >>sys.stderr, 'DONE.'
-    print >>sys.stderr, 'wrote to:', base + '.info'
+    print('DONE.', file=sys.stderr)
+    print('wrote to:', base + '.info', file=sys.stderr)
 
 if __name__ == '__main__':
     main()
