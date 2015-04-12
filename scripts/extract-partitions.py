@@ -97,21 +97,22 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     check_space(args.part_filenames, args.force)
 
     print('---', file=sys.stderr)
-    print('reading partitioned files:', repr(args.part_filenames), file=sys.stderr)
+    print('reading partitioned files:', repr(
+        args.part_filenames), file=sys.stderr)
     if args.output_groups:
-        print('outputting to files named "%s.groupN.fa"' % \
-            args.prefix, file=sys.stderr)
-        print('min reads to keep a partition:', \
-            args.min_part_size, file=sys.stderr)
+        print('outputting to files named "%s.groupN.fa"' %
+              args.prefix, file=sys.stderr)
+        print('min reads to keep a partition:',
+              args.min_part_size, file=sys.stderr)
         print('max size of a group file:', args.max_size, file=sys.stderr)
     else:
         print('NOT outputting groups! Beware!', file=sys.stderr)
 
     if args.output_unassigned:
-        print('outputting unassigned reads to "%s.unassigned.fa"' % \
-            args.prefix, file=sys.stderr)
-    print('partition size distribution will go to %s' \
-        % distfilename, file=sys.stderr)
+        print('outputting unassigned reads to "%s.unassigned.fa"' %
+              args.prefix, file=sys.stderr)
+    print('partition size distribution will go to %s'
+          % distfilename, file=sys.stderr)
     print('---', file=sys.stderr)
 
     #
@@ -245,17 +246,17 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     print('---', file=sys.stderr)
     print('Of %d total seqs,' % total_seqs, file=sys.stderr)
-    print('extracted %d partitioned seqs into group files,' % \
-        part_seqs, file=sys.stderr)
-    print('discarded %d sequences from small partitions (see -m),' % \
-        toosmall_parts, file=sys.stderr)
-    print('and found %d unpartitioned sequences (see -U).' % \
-        n_unassigned, file=sys.stderr)
+    print('extracted %d partitioned seqs into group files,' %
+          part_seqs, file=sys.stderr)
+    print('discarded %d sequences from small partitions (see -m),' %
+          toosmall_parts, file=sys.stderr)
+    print('and found %d unpartitioned sequences (see -U).' %
+          n_unassigned, file=sys.stderr)
     print('', file=sys.stderr)
-    print('Created %d group files named %s.groupXXXX.%s' % \
-        (len(group_fps),
-         args.prefix,
-         suffix), file=sys.stderr)
+    print('Created %d group files named %s.groupXXXX.%s' %
+          (len(group_fps),
+           args.prefix,
+           suffix), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

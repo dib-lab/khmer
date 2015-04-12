@@ -94,12 +94,12 @@ def main():
     if n_pe == 0:
         raise Exception("no paired reads!? check file formats...")
 
-    print('DONE; read %d sequences,' \
-        ' %d pairs and %d singletons' % \
-        (n_pe * 2 + n_se, n_pe, n_se), file=sys.stderr)
+    print('DONE; read %d sequences,'
+          ' %d pairs and %d singletons' %
+          (n_pe * 2 + n_se, n_pe, n_se), file=sys.stderr)
 
-    print('wrote to: ' + outfile \
-        + '.se' + ' and ' + outfile + '.pe', file=sys.stderr)
+    print('wrote to: ' + outfile
+          + '.se' + ' and ' + outfile + '.pe', file=sys.stderr)
 
 
 if __name__ == '__main__':

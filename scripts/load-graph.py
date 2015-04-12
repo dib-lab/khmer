@@ -65,12 +65,13 @@ def main():
         (float(args.n_tables * args.min_tablesize) / 8.), args.force)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)
-    print('Loading kmers from sequences in %s' % repr(filenames), file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(filenames), file=sys.stderr)
     if args.no_build_tagset:
         print('We WILL NOT build the tagset.', file=sys.stderr)
     else:
-        print('We WILL build the tagset', \
-                            ' (for partitioning/traversal).', file=sys.stderr)
+        print('We WILL build the tagset',
+              ' (for partitioning/traversal).', file=sys.stderr)
 
     print('making k-mer presence table', file=sys.stderr)
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
@@ -110,12 +111,14 @@ def main():
     fp_rate = khmer.calc_expected_collisions(htable)
     print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
     if args.write_fp_rate:
-        print('\nfalse positive rate estimated to be %1.3f' % fp_rate, file=info_fp)
+        print('\nfalse positive rate estimated to be %1.3f' %
+              fp_rate, file=info_fp)
 
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print("**", file=sys.stderr)
         print(("** ERROR: the graph structure is too small for "
-                              "this data set. Increase table size/# tables."), file=sys.stderr)
+               "this data set. Increase table size/# tables."),
+              file=sys.stderr)
         print("**", file=sys.stderr)
         if not args.force:
             sys.exit(1)

@@ -127,8 +127,8 @@ def main():
     print('output in', outfile, file=sys.stderr)
 
     if args.savetable:
-        print('Saving k-mer counting table filename', \
-            args.savetable, file=sys.stderr)
+        print('Saving k-mer counting table filename',
+              args.savetable, file=sys.stderr)
         print('...saving to', args.savetable, file=sys.stderr)
         htable.save(args.savetable)
     print('wrote to: ', outfile, file=sys.stderr)

@@ -93,7 +93,8 @@ def main():
     check_file_writable(base + ".info")
 
     print('Saving k-mer counting table to %s' % base, file=sys.stderr)
-    print('Loading kmers from sequences in %s' % repr(filenames), file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(filenames), file=sys.stderr)
 
     # clobber the '.info' file now, as we always open in append mode below
     if os.path.exists(base + '.info'):
@@ -171,8 +172,10 @@ def main():
     # Change 0.2 only if you really grok it.  HINT: You don't.
     if fp_rate > 0.20:
         print("**", file=sys.stderr)
-        print("** ERROR: the k-mer counting table is too small", end=' ', file=sys.stderr)
-        print("for this data set. Increase tablesize/# tables.", file=sys.stderr)
+        print("** ERROR: the k-mer counting table is too small",
+              end=' ', file=sys.stderr)
+        print(
+            "for this data set. Increase tablesize/# tables.", file=sys.stderr)
         print("**", file=sys.stderr)
         sys.exit(1)
 

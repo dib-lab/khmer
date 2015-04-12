@@ -2605,7 +2605,6 @@ hashbits_assign_partition_id(khmer_KHashbits_Object * me, PyObject * args)
     return PyLong_FromLong(p);
 }
 
-
 static
 PyObject *
 hashbits_add_tag(khmer_KHashbits_Object * me, PyObject * args)
@@ -3037,7 +3036,6 @@ hashbits_load_subset_partitionmap(khmer_KHashbits_Object * me, PyObject * args)
     }
 
     Py_END_ALLOW_THREADS
-
 
     if (fail) {
         PyErr_SetString(PyExc_IOError, err.c_str());

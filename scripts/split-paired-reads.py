@@ -127,8 +127,8 @@ def main():
 
         # are we requiring pairs?
         if args.force_paired and not is_pair:
-            print('ERROR, %s is not part of a pair' % \
-                record1.name, file=sys.stderr)
+            print('ERROR, %s is not part of a pair' %
+                  record1.name, file=sys.stderr)
             sys.exit(1)
 
         if is_pair:
@@ -145,12 +145,13 @@ def main():
                 write_record(record1, fp_out2)
                 counter2 += 1
             else:
-                print("Unrecognized format for read pair information: %s" % name, file=sys.stderr)
+                print("Unrecognized format for read pair information: %s" %
+                      name, file=sys.stderr)
                 print("Exiting.", file=sys.stderr)
                 sys.exit(1)
 
-    print("DONE; split %d sequences (%d left, %d right)" % \
-        (counter1 + counter2, counter1, counter2), file=sys.stderr)
+    print("DONE; split %d sequences (%d left, %d right)" %
+          (counter1 + counter2, counter1, counter2), file=sys.stderr)
     print("/1 reads in %s" % out1, file=sys.stderr)
     print("/2 reads in %s" % out2, file=sys.stderr)
 

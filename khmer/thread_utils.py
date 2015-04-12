@@ -162,12 +162,13 @@ class ThreadedSequenceProcessor(object):
                 self.bp_written += bp_written
 
                 if self.verbose and self.n_processed % 500000 == 0:
-                    print("processed %d / wrote %d / removed %d" % \
-                        (self.n_processed, self.n_written,
-                         self.n_processed - self.n_written), file=sys.stderr)
-                    print("processed %d bp / wrote %d bp / removed %d bp" % \
-                        (self.bp_processed, self.bp_written,
-                         self.bp_processed - self.bp_written), file=sys.stderr)
+                    print("processed %d / wrote %d / removed %d" %
+                          (self.n_processed, self.n_written,
+                           self.n_processed - self.n_written), file=sys.stderr)
+                    print("processed %d bp / wrote %d bp / removed %d bp" %
+                          (self.bp_processed, self.bp_written,
+                           self.bp_processed - self.bp_written),
+                          file=sys.stderr)
                     discarded = self.bp_processed - self.bp_written
                     f = float(discarded) / float(self.bp_processed) * 100
                     print("discarded %.1f%%" % f, file=sys.stderr)
@@ -191,12 +192,12 @@ class ThreadedSequenceProcessor(object):
                     outfp.write('>%s\n%s\n' % (name, seq,))
 
         if self.verbose:
-            print("DONE writing.\nprocessed %d / wrote %d / removed %d" % \
-                (self.n_processed, self.n_written,
-                 self.n_processed - self.n_written), file=sys.stderr)
-            print("processed %d bp / wrote %d bp / removed %d bp" % \
-                (self.bp_processed, self.bp_written,
-                 self.bp_processed - self.bp_written), file=sys.stderr)
+            print("DONE writing.\nprocessed %d / wrote %d / removed %d" %
+                  (self.n_processed, self.n_written,
+                   self.n_processed - self.n_written), file=sys.stderr)
+            print("processed %d bp / wrote %d bp / removed %d bp" %
+                  (self.bp_processed, self.bp_written,
+                   self.bp_processed - self.bp_written), file=sys.stderr)
             discarded = self.bp_processed - self.bp_written
             f = float(discarded) / float(self.bp_processed) * 100
             print("discarded %.1f%%" % f, file=sys.stderr)

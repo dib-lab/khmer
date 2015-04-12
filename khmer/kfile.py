@@ -28,8 +28,8 @@ def check_file_status(file_path, force):
     try:
         mode = os.stat(file_path).st_mode
     except OSError:
-        print("ERROR: Input file %s does not exist" % \
-                            file_path, file=sys.stderr)
+        print("ERROR: Input file %s does not exist" %
+              file_path, file=sys.stderr)
 
         if not force:
             print("Exiting", file=sys.stderr)
@@ -42,14 +42,14 @@ def check_file_status(file_path, force):
         return
 
     if not os.path.exists(file_path):
-        print("ERROR: Input file %s does not exist; exiting" % \
-                            file_path, file=sys.stderr)
+        print("ERROR: Input file %s does not exist; exiting" %
+              file_path, file=sys.stderr)
         if not force:
             sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
-            print("ERROR: Input file %s is empty; exiting." % \
-                                file_path, file=sys.stderr)
+            print("ERROR: Input file %s is empty; exiting." %
+                  file_path, file=sys.stderr)
             if not force:
                 sys.exit(1)
 
@@ -60,8 +60,8 @@ def check_file_writable(file_path):
         file_obj = open(file_path, "a")
     except IOError as error:
         if error.errno == errno.EACCES:
-            print("ERROR: File %s does not have write " \
-                % file_path + "permission; exiting", file=sys.stderr)
+            print("ERROR: File %s does not have write "
+                  % file_path + "permission; exiting", file=sys.stderr)
             sys.exit(1)
         else:
             print("ERROR: " + error.strerror, file=sys.stderr)
@@ -98,14 +98,14 @@ def check_space(in_files, force, _testhook_free_space=None):
 
     size_diff = total_size - free_space
     if size_diff > 0:
-        print("ERROR: Not enough free space on disk " \
-                            "for output files;\n" \
-                            "       Need at least %.1f GB more." \
-                            % (float(size_diff) / 1e9), file=sys.stderr)
-        print("       Estimated output size: %.1f GB" \
-                            % (float(total_size) / 1e9,), file=sys.stderr)
-        print("       Free space: %.1f GB" \
-                            % (float(free_space) / 1e9,), file=sys.stderr)
+        print("ERROR: Not enough free space on disk "
+              "for output files;\n"
+              "       Need at least %.1f GB more."
+              % (float(size_diff) / 1e9), file=sys.stderr)
+        print("       Estimated output size: %.1f GB"
+              % (float(total_size) / 1e9,), file=sys.stderr)
+        print("       Free space: %.1f GB"
+              % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
             sys.exit(1)
 
@@ -124,14 +124,14 @@ def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
 
     size_diff = hash_size - free_space
     if size_diff > 0:
-        print("ERROR: Not enough free space on disk " \
-                            "for saved table files;" \
-                            "       Need at least %s GB more." \
-                            % (float(size_diff) / 1e9,), file=sys.stderr)
-        print("       Table size: %.1f GB" \
-                            % (float(hash_size) / 1e9,), file=sys.stderr)
-        print("       Free space: %.1f GB" \
-                            % (float(free_space) / 1e9,), file=sys.stderr)
+        print("ERROR: Not enough free space on disk "
+              "for saved table files;"
+              "       Need at least %s GB more."
+              % (float(size_diff) / 1e9,), file=sys.stderr)
+        print("       Table size: %.1f GB"
+              % (float(hash_size) / 1e9,), file=sys.stderr)
+        print("       Free space: %.1f GB"
+              % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
             sys.exit(1)
 
@@ -148,8 +148,8 @@ def check_valid_file_exists(in_files):
             if os.stat(in_file).st_size > 0:
                 return
             else:
-                print('WARNING: Input file %s is empty' % \
-                                    in_file, file=sys.stderr)
+                print('WARNING: Input file %s is empty' %
+                      in_file, file=sys.stderr)
         else:
-            print('WARNING: Input file %s not found' % \
-                                in_file, file=sys.stderr)
+            print('WARNING: Input file %s not found' %
+                  in_file, file=sys.stderr)

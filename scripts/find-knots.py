@@ -108,12 +108,15 @@ def main():
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print('loading %d pmap files (first one: %s)' % \
-        (len(pmap_files), pmap_files[0]), file=sys.stderr)
+    print('loading %d pmap files (first one: %s)' %
+          (len(pmap_files), pmap_files[0]), file=sys.stderr)
     print('---', file=sys.stderr)
-    print('output stoptags will be in', graphbase + '.stoptags', file=sys.stderr)
+    print('output stoptags will be in',
+          graphbase + '.stoptags', file=sys.stderr)
     if initial_stoptags:
-        print('(these output stoptags will include the already-loaded set)', file=sys.stderr)
+        print(
+            '(these output stoptags will include the already-loaded set)',
+            file=sys.stderr)
     print('---', file=sys.stderr)
 
     # create counting hash
@@ -135,7 +138,8 @@ def main():
         print('** merging subset... %s' % subset_file, file=sys.stderr)
         htable.merge_subset(subset)
 
-        print('** repartitioning, round 2... %s' % subset_file, file=sys.stderr)
+        print('** repartitioning, round 2... %s' %
+              subset_file, file=sys.stderr)
         size = htable.repartition_largest_partition(
             None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
             EXCURSION_KMER_COUNT_THRESHOLD)

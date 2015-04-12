@@ -86,8 +86,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
-        print('ERROR: %s exists; not squashing.' % \
-            args.output_histogram_filename, file=sys.stderr)
+        print('ERROR: %s exists; not squashing.' %
+              args.output_histogram_filename, file=sys.stderr)
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
@@ -107,15 +107,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                                   args.n_tables)
 
     print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
-    print('k-mer counting table sizes:', \
-        counting_hash.hashsizes(), file=sys.stderr)
+    print('k-mer counting table sizes:',
+          counting_hash.hashsizes(), file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print('consuming input, round 1 --', \
-        args.input_sequence_filename, file=sys.stderr)
+    print('consuming input, round 1 --',
+          args.input_sequence_filename, file=sys.stderr)
     for _ in range(args.threads):
         thread = \
             threading.Thread(
@@ -139,12 +139,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             read_parser, tracking)
         abundance_lists.append(abundances)
 
-    print('preparing hist from %s...' % \
-        args.input_sequence_filename, file=sys.stderr)
+    print('preparing hist from %s...' %
+          args.input_sequence_filename, file=sys.stderr)
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print('consuming input, round 2 --', \
-        args.input_sequence_filename, file=sys.stderr)
+    print('consuming input, round 2 --',
+          args.input_sequence_filename, file=sys.stderr)
     for _ in range(args.threads):
         thread = \
             threading.Thread(
@@ -166,9 +166,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     total = sum(abundance.values())
 
     if 0 == total:
-        print("ERROR: abundance distribution is uniformly zero; " \
-            "nothing to report.", file=sys.stderr)
-        print("\tPlease verify that the input files are valid.", file=sys.stderr)
+        print("ERROR: abundance distribution is uniformly zero; "
+              "nothing to report.", file=sys.stderr)
+        print(
+            "\tPlease verify that the input files are valid.", file=sys.stderr)
         sys.exit(1)
 
     sofar = 0

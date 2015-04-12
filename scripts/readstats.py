@@ -90,10 +90,12 @@ def main():
         print('---------------', file=args.outfp)
         print("\n".join(output), file=args.outfp)
         print('---------------', file=args.outfp)
-        print('%d bp / %d seqs; %.1f average length -- total' % \
-            (total_bp, total_seqs, total_bp / float(total_seqs)), file=args.outfp)
+        print('%d bp / %d seqs; %.1f average length -- total' %
+              (total_bp, total_seqs, total_bp / float(total_seqs)),
+              file=args.outfp)
     else:
-        print('No sequences found in %d files' % len(args.filenames), file=args.outfp)
+        print('No sequences found in %d files' %
+              len(args.filenames), file=args.outfp)
 
 
 if __name__ == '__main__':

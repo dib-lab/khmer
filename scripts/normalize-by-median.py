@@ -62,15 +62,16 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     for index, batch in enumerate(batchwise(screed.open(
             input_filename, parse_description=False), batch_size)):
         if index > 0 and index % 100000 == 0:
-            print('... kept {kept} of {total} or'\
-                ' {perc:2}%'.format(kept=total - discarded, total=total,
-                                    perc=int(100. - discarded /
-                                             float(total) * 100.)), file=sys.stderr)
+            print('... kept {kept} of {total} or'
+                  ' {perc:2}%'.format(kept=total - discarded, total=total,
+                                      perc=int(100. - discarded /
+                                               float(total) * 100.)),
+                  file=sys.stderr)
             print('... in file', input_filename, file=sys.stderr)
 
             if report_fp:
-                print(total, total - discarded, \
-                    1. - (discarded / float(total)), file=report_fp)
+                print(total, total - discarded,
+                      1. - (discarded / float(total)), file=report_fp)
                 report_fp.flush()
 
         total += batch_size
@@ -106,8 +107,8 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             discarded += batch_size
 
     if report_fp:
-        print(total, total - discarded, \
-            1. - (discarded / float(total)), file=report_fp)
+        print(total, total - discarded,
+              1. - (discarded / float(total)), file=report_fp)
         report_fp.flush()
 
     return total, discarded
@@ -118,12 +119,15 @@ def handle_error(error, output_name, input_name, fail_save, htable):
     print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
     if fail_save:
         tablename = os.path.basename(input_name) + '.ct.failed'
-        print('** ...dumping k-mer counting table to {tn}'.format(tn=tablename), file=sys.stderr)
+        print(
+            '** ...dumping k-mer counting table to {tn}'.format(tn=tablename),
+            file=sys.stderr)
         htable.save(tablename)
     try:
         os.remove(output_name)
     except:  # pylint: disable=bare-except
-        print('** ERROR: problem removing corrupt filtered file', file=sys.stderr)
+        print('** ERROR: problem removing corrupt filtered file',
+              file=sys.stderr)
 
 
 def get_parser():
@@ -272,7 +276,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
                       .format(inp=input_filename, kept=total - discarded,
                               total=total, perc=int(100. - discarded /
                                                     float(total) * 100.)))
@@ -309,8 +313,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if fp_rate > MAX_FALSE_POSITIVE_RATE:
         print("**", file=sys.stderr)
         print(("** ERROR: the k-mer counting table is too small"
-                              " for this data set. Increase tablesize/# "
-                              "tables."), file=sys.stderr)
+               " for this data set. Increase tablesize/# "
+               "tables."), file=sys.stderr)
         print("**", file=sys.stderr)
         print("** Do not use these results!!", file=sys.stderr)
         if not args.force:

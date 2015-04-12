@@ -108,7 +108,8 @@ def main():
     ###
 
     if len(set(args.input_filenames)) != len(args.input_filenames):
-        print("Error: Cannot input the same filename multiple times.", file=sys.stderr)
+        print("Error: Cannot input the same filename multiple times.",
+              file=sys.stderr)
         sys.exit(1)
 
     ###
@@ -126,15 +127,16 @@ def main():
     NORMALIZE_LIMIT = args.normalize_to
 
     if args.loadtable:
-        print('loading k-mer counting table from', args.loadtable, file=sys.stderr)
+        print('loading k-mer counting table from',
+              args.loadtable, file=sys.stderr)
         ct = khmer.load_counting_hash(args.loadtable)
     else:
         print('making k-mer counting table', file=sys.stderr)
         ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print('created temporary directory %s; ' \
-                        'use -T to change location' % tempdir, file=sys.stderr)
+    print('created temporary directory %s; '
+          'use -T to change location' % tempdir, file=sys.stderr)
 
     # ### FIRST PASS ###
 
@@ -165,8 +167,8 @@ def main():
                                            force_single=args.ignore_pairs)
         for n, is_pair, read1, read2 in paired_iter:
             if n % 10000 == 0:
-                print('...', n, filename, save_pass2, \
-                    n_reads, n_bp, written_reads, written_bp, file=sys.stderr)
+                print('...', n, filename, save_pass2, n_reads, n_bp,
+                      written_reads, written_bp, file=sys.stderr)
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
@@ -233,7 +235,7 @@ def main():
         pass2fp.close()
         trimfp.close()
 
-        print('%s: kept aside %d of %d from first pass, in %s' % \
+        print('%s: kept aside %d of %d from first pass, in %s' %
               (filename, save_pass2, n, filename))
         save_pass2_total += save_pass2
 
@@ -242,7 +244,7 @@ def main():
     skipped_n = 0
     skipped_bp = 0
     for _, pass2filename, trimfilename in pass2list:
-        print('second pass: looking at sequences kept aside in %s' % \
+        print('second pass: looking at sequences kept aside in %s' %
               pass2filename)
 
         # note that for this second pass, we don't care about paired
@@ -254,8 +256,8 @@ def main():
         for n, read in enumerate(screed.open(pass2filename,
                                              parse_description=False)):
             if n % 10000 == 0:
-                print('... x 2', n, pass2filename, \
-                    written_reads, written_bp, file=sys.stderr)
+                print('... x 2', n, pass2filename,
+                      written_reads, written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ct.get_median_count(seq)
@@ -296,26 +298,27 @@ def main():
     print('wrote %d reads, %d bp' % (written_reads, written_bp,))
     print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
                                                       n_passes))
-    print('removed %d reads and trimmed %d reads (%.2f%%)' % \
-        (n_reads - written_reads, trimmed_reads, percent_reads_trimmed))
-    print('trimmed or removed %.2f%% of bases (%d total)' % \
-        ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
+    print('removed %d reads and trimmed %d reads (%.2f%%)' %
+          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed))
+    print('trimmed or removed %.2f%% of bases (%d total)' %
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
         print('%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
                                                          percent_reads_hicov))
-        print('skipped %d reads/%d bases because of low coverage' % \
+        print('skipped %d reads/%d bases because of low coverage' %
               (skipped_n, skipped_bp))
 
     fp_rate = khmer.calc_expected_collisions(ct)
-    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate), file=sys.stderr)
+    print('fp rate estimated to be {fpr:1.3f}'.format(
+        fpr=fp_rate), file=sys.stderr)
 
     if fp_rate > MAX_FALSE_POSITIVE_RATE:
         print("**", file=sys.stderr)
         print(("** ERROR: the k-mer counting table is too small"
-                              " for this data set. Increase tablesize/# "
-                              "tables."), file=sys.stderr)
+               " for this data set. Increase tablesize/# "
+               "tables."), file=sys.stderr)
         print("**", file=sys.stderr)
         print("** Do not use these results!!", file=sys.stderr)
         sys.exit(1)
@@ -323,7 +326,8 @@ def main():
     print('output in *.abundtrim')
 
     if args.savetable:
-        print("Saving k-mer counting table to", args.savetable, file=sys.stderr)
+        print("Saving k-mer counting table to",
+              args.savetable, file=sys.stderr)
         ct.save(args.savetable)
 
 

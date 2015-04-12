@@ -118,9 +118,10 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     check_space(args.input_filenames, args.force)
 
-    print('Saving k-mer presence table to %s' % args.graphbase, file=sys.stderr)
-    print('Loading kmers from sequences in %s' % \
-        repr(args.input_filenames), file=sys.stderr)
+    print('Saving k-mer presence table to %s' %
+          args.graphbase, file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(args.input_filenames), file=sys.stderr)
     print('--', file=sys.stderr)
     print('SUBSET SIZE', args.subset_size, file=sys.stderr)
     print('N THREADS', args.threads, file=sys.stderr)
@@ -140,8 +141,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print("**", file=sys.stderr)
         print(("** ERROR: the graph structure is too small for"
-                              " this data set.  Increase k-mer presence table "
-                              "size/num of tables."), file=sys.stderr)
+               " this data set.  Increase k-mer presence table "
+               "size/num of tables."), file=sys.stderr)
         print("**", file=sys.stderr)
         if not args.force:
             sys.exit(1)
@@ -151,11 +152,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print('** This script brakes for lumps: ', \
-                            'stop_big_traversals is true.', file=sys.stderr)
+        print('** This script brakes for lumps: ',
+              'stop_big_traversals is true.', file=sys.stderr)
     else:
-        print('** Traverse all the things:', \
-                            ' stop_big_traversals is false.', file=sys.stderr)
+        print('** Traverse all the things:',
+              ' stop_big_traversals is false.', file=sys.stderr)
 
     #
     # now, partition!
@@ -203,15 +204,15 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         _.join()
 
     print('---', file=sys.stderr)
-    print('done making subsets! see %s.subset.*.pmap' % \
-        (args.graphbase,), file=sys.stderr)
+    print('done making subsets! see %s.subset.*.pmap' %
+          (args.graphbase,), file=sys.stderr)
 
     # merge-partitions
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print('loading %d pmap files (first one: %s)' % \
-        (len(pmap_files), pmap_files[0]), file=sys.stderr)
+    print('loading %d pmap files (first one: %s)' %
+          (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
     htable = khmer.new_hashbits(args.ksize, 1, 1)
 
