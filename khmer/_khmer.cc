@@ -352,7 +352,9 @@ _ReadParser_iternext( PyObject * self )
             stop_iteration = true;
         } catch (StreamReadError &e) {
             exc = e.what();
-        }
+        } catch (InvalidRead &e) {
+            exc = e.what();
+	}
     }
     Py_END_ALLOW_THREADS
 
