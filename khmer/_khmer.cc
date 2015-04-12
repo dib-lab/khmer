@@ -912,7 +912,6 @@ hash_consume_fasta_with_reads_parser(khmer_KCountingHash_Object * me,
     read_parsers:: IParser * rparser =
         _PyObject_to_khmer_ReadParser( rparser_obj );
 
-    char const * exc = "";
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed  = 0;
     unsigned int    total_reads = 0;
