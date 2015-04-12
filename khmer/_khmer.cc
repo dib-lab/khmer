@@ -1073,6 +1073,16 @@ hash_get(khmer_KCountingHash_Object * me, PyObject * args)
         }
 
         count = counting->get_count(s.c_str());
+    } else if (PyUnicode_Check(arg)) {
+	std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+		    arg, "utf-8", "strict"));
+        if (strlen(s.c_str()) != counting->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer size must equal the counting table k-mer size");
+            return NULL;
+        }
+
+        count = counting->get_count(s.c_str());
     }
 
     return PyLong_FromLong(count);
