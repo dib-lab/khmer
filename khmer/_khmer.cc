@@ -1487,55 +1487,6 @@ hash_consume_fasta_and_tag(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_find_all_tags_truncate_on_abundance(khmer_KCountingHash_Object * me,
-        PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * kmer_s = NULL;
-    BoundedCounterType min_count, max_count;
-
-    if (!PyArg_ParseTuple(args, "sHH", &kmer_s, &min_count, &max_count)) {
-        return NULL;
-    }
-
-    if (strlen(kmer_s) != counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer size must equal the k-mer size of the counting table");
-        return NULL;
-    }
-
-    pre_partition_info * ppi = NULL;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
-
-    try {
-        ppi = new pre_partition_info(kmer);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-    counting->partition->find_all_tags_truncate_on_abundance(kmer_f, kmer_r,
-            ppi->tagged_kmers,
-            counting->all_tags,
-            min_count,
-            max_count);
-    counting->add_kmer_to_tags(kmer);
-
-    Py_END_ALLOW_THREADS
-
-    khmer_PrePartitionInfo_Object * ppi_obj = (khmer_PrePartitionInfo_Object *)\
-            PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
-
-    ppi_obj->PrePartitionInfo = ppi;
-
-    return (PyObject*)ppi_obj;
-} 
-
-static
-PyObject *
 hash_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
                                         PyObject * args)
 {
@@ -1639,7 +1590,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "find_all_tags_list", (PyCFunction)hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", (PyCFunction)hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", (PyCFunction)hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
-    { "find_all_tags_truncate_on_abundance", (PyCFunction)hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
 
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
