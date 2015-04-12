@@ -2158,19 +2158,26 @@ PyObject *
 hashbits_repartition_largest_partition(khmer_KHashbits_Object * me,
                                        PyObject * args)
 {
+    Hashbits * hashbits = me->hashbits;
     khmer_KCountingHash_Object * counting_o = NULL;
-    khmer_KSubsetPartition_Object * subset_o = NULL;
+    PyObject * subset_o = NULL;
+    SubsetPartition * subset_p;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "O!O!III", &khmer_KSubsetPartition_Type, 
-		&subset_o, &khmer_KCountingHash_Type, &counting_o, &distance,
-		&threshold, &frequency)) {
+    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
+		&counting_o, &distance, &threshold, &frequency)) {
         return NULL;
+    }
+
+    if (subset_o != Py_None) {
+	subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
+    } else {
+	subset_p = hashbits->partition;
     }
 
     CountingHash * counting = counting_o->counting;
 
-    unsigned long next_largest = subset_o->subset->repartition_largest_partition(distance,
+    unsigned long next_largest = subset_p->repartition_largest_partition(distance,
                                  threshold, frequency, *counting);
 
     return PyLong_FromLong(next_largest);
