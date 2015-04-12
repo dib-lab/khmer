@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
@@ -8,7 +9,7 @@
 import khmer
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in

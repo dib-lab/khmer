@@ -1,3 +1,6 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -8,7 +11,7 @@ import tempfile
 import os
 import shutil
 from pkg_resources import Requirement, resource_filename, ResolutionError
-from cStringIO import StringIO
+from io import StringIO
 import nose
 import sys
 import traceback
@@ -97,8 +100,8 @@ def runscript(scriptname, args, in_directory=None,
             os.chdir(in_directory)
 
         try:
-            print 'running:', scriptname, 'in:', in_directory
-            print 'arguments', sysargs
+            print('running:', scriptname, 'in:', in_directory)
+            print('arguments', sysargs)
             status = _runscript(scriptname, sandbox=sandbox)
         except nose.SkipTest:
             raise
@@ -115,8 +118,8 @@ def runscript(scriptname, args, in_directory=None,
         os.chdir(cwd)
 
     if status != 0 and not fail_ok:
-        print out
-        print err
+        print(out)
+        print(err)
         assert False, (status, out, err)
 
     return status, out, err
@@ -147,8 +150,8 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
                 " " + args
             out = open(os.path.join(in_directory, "out"), 'w+b')
             err = open(os.path.join(in_directory, "err"), 'w+b')
-            print 'running:', scriptname, 'in:', in_directory
-            print 'arguments', sysargs
+            print('running:', scriptname, 'in:', in_directory)
+            print('arguments', sysargs)
             status = subprocess.call(args=sysargs, stdout=out, stderr=err,
                                      shell=True)
             os.chdir(cwd)
@@ -157,8 +160,8 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
                 out = out.read()
                 err.seek(0)
                 err = err.read()
-                print out
-                print err
+                print(out)
+                print(err)
                 assert False, (status, out, err)
 
             return status, out, err

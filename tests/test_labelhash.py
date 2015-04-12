@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
@@ -10,7 +14,7 @@ from khmer import LabelHash
 from screed.fasta import fasta_iter
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 
@@ -28,7 +32,7 @@ def test_toobig():
         lh = LabelHash(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_n_labels():
@@ -36,7 +40,7 @@ def test_n_labels():
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_fasta_and_tag_with_labels(filename)
 
-    print lh.n_labels()
+    print(lh.n_labels())
     assert lh.n_labels() == 4
 
 
@@ -70,22 +74,22 @@ def test_consume_fasta_and_tag_with_labels():
     filename = utils.get_test_data('test-transcript.fa')
 
     total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
-    print "doing get"
+    print("doing get")
     assert lb.get(read_1[:20])
     assert total_reads == 3
-    print "doing n_labels"
-    print lb.n_labels()
-    print "doing label dict"
-    print lb.get_label_dict()
-    print "get tagset"
+    print("doing n_labels")
+    print(lb.n_labels())
+    print("doing label dict")
+    print(lb.get_label_dict())
+    print("get tagset")
     for tag in lb.get_tagset():
-        print "forward hash"
-        print tag, khmer.forward_hash(tag, 20)
+        print("forward hash")
+        print(tag, khmer.forward_hash(tag, 20))
     for record in screed.open(filename):
-        print "Sweeping tags"
-        print lb.sweep_tag_neighborhood(record.sequence, 40)
-        print "Sweeping labels..."
-        print lb.sweep_label_neighborhood(record.sequence, 40)
+        print("Sweeping tags")
+        print(lb.sweep_tag_neighborhood(record.sequence, 40))
+        print("Sweeping labels...")
+        print(lb.sweep_label_neighborhood(record.sequence, 40))
     assert lb.n_labels() == 3
 
 
@@ -156,11 +160,11 @@ def test_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print lb.sweep_tag_neighborhood(
+    print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
-    print labels
-    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
+    print(labels)
+    print(len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19)
     assert len(labels) == 2
     assert 0 in labels
     assert 1 in labels
@@ -169,7 +173,7 @@ def test_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
-    print labels
+    print(labels)
     assert len(labels) == 3
     assert 0 in labels
     assert 1 in labels
@@ -180,7 +184,7 @@ def test_label_tag_correctness():
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
         'ACAACACATACA')
-    print labels
+    print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
@@ -188,7 +192,7 @@ def test_label_tag_correctness():
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
-    print labels
+    print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
@@ -376,7 +380,7 @@ def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.LabelHash(4, 1e6, 2)
 
-    print ht.consume_fasta(inpfile)
+    print(ht.consume_fasta(inpfile))
     n = ht.count_kmers_within_radius('AAAA', 1)
     assert n == 1
 
@@ -567,7 +571,7 @@ def test_extract_unique_paths_1():
 
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGAT']  # all but the last k-mer
 
 
@@ -576,7 +580,7 @@ def test_extract_unique_paths_2():
 
     kh.consume('ATGGAGAGAC')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGATG']  # all but the 1st k-mer
 
 
@@ -586,7 +590,7 @@ def test_extract_unique_paths_3():
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     # all but the 1st/last k-mer
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGAT']
 
@@ -600,7 +604,7 @@ def test_extract_unique_paths_4():
     kh.consume('ATAGACAGGA')
 
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
@@ -674,14 +678,14 @@ def test_simple_median():
     hi = khmer.LabelHash(6, 1e6, 2)
 
     (median, average, stddev) = hi.get_median_count("AAAAAA")
-    print median, average, stddev
+    print(median, average, stddev)
     assert median == 0
     assert average == 0.0
     assert stddev == 0.0
 
     hi.consume("AAAAAA")
     (median, average, stddev) = hi.get_median_count("AAAAAA")
-    print median, average, stddev
+    print(median, average, stddev)
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
@@ -692,4 +696,4 @@ def test_bad_primes():
         hi = khmer._LabelHash.__new__(khmer.LabelHash, 6, ["a", "b", "c"])
         assert 0, "Non number prime list should fail"
     except TypeError as e:
-        print str(e)
+        print(str(e))

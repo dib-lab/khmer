@@ -1,3 +1,9 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2015. It is licensed under
@@ -11,13 +17,13 @@ import sys
 import os
 import os.path
 import shutil
-from cStringIO import StringIO
+from io import StringIO
 import traceback
 import nose
 import glob
 import imp
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 import screed
 
@@ -54,7 +60,7 @@ class _checkImportSucceeds(object):
         try:
             mod = imp.load_source('__zzz', self.filename)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
             raise AssertionError("%s cannot be imported" % (self.filename,))
 
         #
@@ -73,7 +79,7 @@ class _checkImportSucceeds(object):
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
             except (ImportError, SyntaxError):
-                print traceback.format_exc()
+                print(traceback.format_exc())
                 raise AssertionError("%s cannot be exec'd" % (self.filename,))
             except:
                 pass                        # other failures are expected :)
@@ -107,17 +113,17 @@ def test_sweep_reads():
     mout = os.path.join(in_dir, 'test_multi.fa')
     oout = os.path.join(in_dir, 'test_orphaned.fa')
 
-    print os.listdir(in_dir)
+    print(os.listdir(in_dir))
 
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
     seqso = set([r.name for r in screed.open(oout)])
 
-    print seqs1
-    print seqs2
-    print seqsm
-    print seqso
+    print(seqs1)
+    print(seqs2)
+    print(seqsm)
+    print(seqso)
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
     assert (seqsm == set(['read4_multi\t0\t1']) or
@@ -149,19 +155,19 @@ def test_sweep_reads_fq():
     mout = os.path.join(in_dir, 'test_multi.fq')
     oout = os.path.join(in_dir, 'test_orphaned.fq')
 
-    print open(out1).read()
+    print(open(out1).read())
 
-    print os.listdir(in_dir)
+    print(os.listdir(in_dir))
 
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
     seqso = set([r.name for r in screed.open(oout)])
 
-    print seqs1
-    print seqs2
-    print seqsm
-    print seqso
+    print(seqs1)
+    print(seqs2)
+    print(seqsm)
+    print(seqso)
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
     assert (seqsm == set(['read4_multi\t0\t1']) or
@@ -186,9 +192,9 @@ def test_sweep_reads_2():
             'test', '--label-by-seq', inref, infile]
     status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
-    for i in xrange(99):
+    for i in range(99):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
-        print p, err, out
+        print(p, err, out)
         assert os.path.exists(p)
         os.remove(p)
     assert os.path.exists(os.path.join(wdir, 'test.counts.csv'))
@@ -206,9 +212,9 @@ def test_sweep_reads_3():
             'test', '--label-by-group', '10', infile, infile]
     status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
-    for i in xrange(10):
+    for i in range(10):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
-        print p, err, out
+        print(p, err, out)
         assert os.path.exists(p)
         os.remove(p)
 

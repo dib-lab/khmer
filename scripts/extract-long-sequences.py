@@ -16,6 +16,7 @@ length.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import argparse
 import screed
 import sys
@@ -45,7 +46,7 @@ def main():
         for record in screed.open(filename, parse_description=False):
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
-    print >> sys.stderr, 'wrote to: ' + args.output
+    print('wrote to: ' + args.output, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

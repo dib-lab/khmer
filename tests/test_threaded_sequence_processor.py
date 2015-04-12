@@ -1,9 +1,11 @@
+from future import standard_library
+standard_library.install_aliases()
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, SequenceGroup
-from cStringIO import StringIO
+from io import StringIO
 from screed.fasta import fasta_iter
 from screed.fastq import fastq_iter
-import Queue
+import queue
 from nose.plugins.attrib import attr
 
 
@@ -111,7 +113,7 @@ def test_paired_2thread():
             while not self.done or not inq.empty():
                 try:
                     g = inq.get(True, 1)
-                except Queue.Empty:
+                except queue.Empty:
                     continue
 
                 assert len(g.seqlist) == 2
@@ -160,7 +162,7 @@ def test_paired_2thread_more_seq():
             while not self.done or not inq.empty():
                 try:
                     g = inq.get(True, 1)
-                except Queue.Empty:
+                except queue.Empty:
                     continue
 
                 if len(g.seqlist) == 2:

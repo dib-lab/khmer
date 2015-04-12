@@ -7,10 +7,15 @@
 """
 Tests for various argument-handling code.
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 
 import sys
-import cStringIO
-import khmer_tst_utils as utils
+import io
+from . import khmer_tst_utils as utils
 
 import khmer.kfile
 
@@ -18,25 +23,25 @@ import khmer.kfile
 def test_check_space():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space(
             [fakelump_fa], force=False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_check_tablespace():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space_for_hashtable(
             1e9, force=False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
@@ -44,36 +49,36 @@ def test_check_tablespace():
 def test_check_space_force():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space(
             [fakelump_fa], force=True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_check_tablespace_force():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space_for_hashtable(
             1e9, force=True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_invalid_file_warn():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_valid_file_exists(["nonexistent", "nonexistent2"])
         assert sys.stderr.getvalue().count("\n") == 2,  \
             "Should produce two warning lines"
-    except SystemExit, e:
-        print str(e)
+    except SystemExit as e:
+        print(str(e))
     finally:
         sys.stderr = save_stderr

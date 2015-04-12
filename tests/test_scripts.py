@@ -1,3 +1,10 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
+from builtins import range
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,7 +19,7 @@ import sys
 import os
 import stat
 import shutil
-from cStringIO import StringIO
+from io import StringIO
 import traceback
 from nose.plugins.attrib import attr
 import subprocess
@@ -20,7 +27,7 @@ import threading
 import bz2
 import io
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
@@ -582,8 +589,8 @@ def test_normalize_by_median_version():
             continue
         break
 
-    print errlines
-    print err
+    print(errlines)
+    print(err)
 
     assert err.startswith('khmer ')
 
@@ -641,8 +648,8 @@ def test_normalize_by_median_paired_fq():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -713,7 +720,7 @@ def test_normalize_by_median_no_bigcount():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
-    print(out, err)
+    print((out, err))
 
     assert os.path.exists(hashfile), hashfile
     kh = khmer.load_counting_hash(hashfile)
@@ -1017,14 +1024,14 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     assert os.path.exists(tagset_file), tagset_file
 
     if do_partition:
-        print ">>>> DEBUG: Partitioning <<<"
+        print(">>>> DEBUG: Partitioning <<<")
         script = scriptpath('partition-graph.py')
         args = [outfile]
         if stop_big_traverse:
             args.insert(0, '--no-big-traverse')
         utils.runscript(script, args)
 
-        print ">>>> DEBUG: Merging Partitions <<<"
+        print(">>>> DEBUG: Merging Partitions <<<")
         script = scriptpath('merge-partitions.py')
         args = [outfile, '-k', str(ksize)]
         utils.runscript(script, args)
@@ -1033,7 +1040,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
         assert os.path.exists(final_pmap_file)
 
         if annotate_partitions:
-            print ">>>> DEBUG: Annotating Partitions <<<"
+            print(">>>> DEBUG: Annotating Partitions <<<")
             script = scriptpath('annotate-partitions.py')
             args = ["-k", str(ksize), outfile, infilename]
 
@@ -1196,7 +1203,7 @@ def test_annotate_partitions_2():
 
     parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
     parts = set(parts)
-    print parts
+    print(parts)
     assert len(parts) == 99, len(parts)
 
 
@@ -2222,7 +2229,7 @@ def test_sample_reads_randomly_S():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
+    print(seqs)
     assert seqs == set(['895:1:1:1298:13380', '895:1:1:1347:3237',
                         '895:1:1:1295:6189', '895:1:1:1342:11001',
                         '895:1:1:1252:19493', '895:1:1:1318:10532',
@@ -2233,7 +2240,7 @@ def test_sample_reads_randomly_S():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
+    print(seqs)
     assert seqs == set(['895:1:1:1384:20217', '895:1:1:1347:3237',
                         '895:1:1:1348:18672', '895:1:1:1290:11501',
                         '895:1:1:1386:7536', '895:1:1:1373:13994',
@@ -2244,7 +2251,7 @@ def test_sample_reads_randomly_S():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
+    print(seqs)
     assert seqs == set(['895:1:1:1326:7273', '895:1:1:1384:20217',
                         '895:1:1:1347:3237', '895:1:1:1353:6642',
                         '895:1:1:1340:19387', '895:1:1:1252:19493',
@@ -2358,9 +2365,9 @@ def execute_load_graph_streaming(filename):
 
     if status != 0:
         for line in out:
-            print out
+            print(out)
         for line in err:
-            print err
+            print(err)
         assert status == 0, status
     err.seek(0)
     err = err.read()
@@ -2701,7 +2708,7 @@ def test_trim_low_abund_highfpr():
                                      fail_ok=True)
 
     assert code == 1
-    print out
+    print(out)
     assert "ERROR: the k-mer counting table is too small" in err
 
 
@@ -2720,15 +2727,15 @@ def test_trim_low_abund_trimtest():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
@@ -2752,15 +2759,15 @@ def test_trim_low_abund_trimtest_after_load():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
@@ -2783,15 +2790,15 @@ def test_trim_low_abund_trimtest_savetable():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 

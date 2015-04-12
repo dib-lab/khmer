@@ -15,6 +15,7 @@ Partition-annotated sequences will be in <fileN>.part.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import os
 import argparse
@@ -76,16 +77,16 @@ def main():
 
     check_space(filenames, args.force)
 
-    print >>sys.stderr, 'loading partition map from:', partitionmap_file
+    print('loading partition map from:', partitionmap_file, file=sys.stderr)
     htable.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
-        print >>sys.stderr, 'outputting partitions for', infile
+        print('outputting partitions for', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print >>sys.stderr, 'output %d partitions for %s' % (
-            part_count, infile)
-        print >>sys.stderr, 'partitions are in', outfile
+        print('output %d partitions for %s' % (
+            part_count, infile), file=sys.stderr)
+        print('partitions are in', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

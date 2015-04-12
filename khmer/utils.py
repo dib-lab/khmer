@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -15,7 +16,7 @@ def print_error(msg):
 
     import sys
 
-    print >>sys.stderr, msg
+    print(msg, file=sys.stderr)
 
 
 def check_is_pair(record1, record2):

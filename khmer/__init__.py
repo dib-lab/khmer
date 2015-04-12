@@ -7,6 +7,7 @@
 """
 This is khmer; please see http://khmer.readthedocs.org/.
 """
+from builtins import range
 
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
