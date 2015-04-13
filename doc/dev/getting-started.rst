@@ -95,13 +95,10 @@ One-time Preparation
 	tar xzf virtualenv*
 	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
-   `Conda <https://github.com/conda/conda>`__ users on any platform can install
-   virtualenv this way::
+   `Conda <https://github.com/conda/conda>`__ users on any platform
+   should instead create a separate Conda environment::
 
-       conda install pip
-       hash -r
-       pip install virtualenv
-       python2.7 -m virtualenv env 
+       conda create -n khmer anaconda
 
 #. Activate the virtualenv and install a few packages::
 
@@ -113,12 +110,24 @@ One-time Preparation
    <https://nose.readthedocs.org/en/latest/>`__, packages we use for
    building the documentation and running the tests.)
 
+   In Conda to activate the previously created environment and install
+   dependencies::
+
+       source activate khmer
+       cd khmer
+       make install-dependencies
+
+
 Building khmer and running the tests
 ------------------------------------
 
 #. Activate (or re-activate) the virtualenv::
 
       source ../env/bin/activate
+
+   ... or for Conda users::
+
+      source activate khmer
 
    You can run this many times without any ill effects.
 
