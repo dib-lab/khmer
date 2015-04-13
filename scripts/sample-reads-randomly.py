@@ -26,7 +26,7 @@ import sys
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-from khmer.utils import write_record
+from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -63,6 +63,9 @@ def get_parser():
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
+    parser.add_argument('-p', '--paired', default=False, dest='paired',
+                        action='store_true', help='All input files are in '
+                        'paired interleaved format')
     parser.add_argument('-o', '--output', dest='output_file',
                         metavar='output_file',
                         type=argparse.FileType('w'), default=None)
@@ -127,7 +130,8 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
-        for record in screed.open(filename, parse_description=False):
+        screed_iter = screed.open(filename, parse_description=False)
+        for record in broken_paired_reader(screed_iter):
             total += 1
 
             if total % 10000 == 0:
@@ -158,7 +162,9 @@ def main():
             output_file = open(output_filename, 'w')
 
         for record in reads[0]:
-            write_record(record, output_file)
+            write_record(record[2], output_file)
+            if record[1] is True:
+                write_record(record[3], output_file)
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
@@ -166,7 +172,9 @@ def main():
                 (len(reads[n]), n_filename)
             output_file = open(n_filename, 'w')
             for record in reads[n]:
-                write_record(record, output_file)
+                write_record(record[2], output_file)
+                if record[1] is True:
+                    write_record(record[3], output_file)
 
 if __name__ == '__main__':
     main()
