@@ -158,7 +158,7 @@ static
 PyObject *
 Read_get_name(khmer_Read_Object * obj, void * closure )
 {
-    return PyBytes_FromString(obj->read->name.c_str()) ;
+    return PyUnicode_FromString(obj->read->name.c_str()) ;
 }
 
 
@@ -166,7 +166,7 @@ static
 PyObject *
 Read_get_sequence(khmer_Read_Object * obj, void * closure)
 {
-    return PyBytes_FromString(obj->read->sequence.c_str()) ;
+    return PyUnicode_FromString(obj->read->sequence.c_str()) ;
 }
 
 
@@ -174,7 +174,7 @@ static
 PyObject *
 Read_get_quality(khmer_Read_Object * obj, void * closure)
 {
-    return PyBytes_FromString(obj->read->quality.c_str()) ;
+    return PyUnicode_FromString(obj->read->quality.c_str()) ;
 }
 
 
@@ -182,7 +182,7 @@ static
 PyObject *
 Read_get_annotations(khmer_Read_Object * obj, void * closure)
 {
-    return PyBytes_FromString(obj->read->annotations.c_str()) ;
+    return PyUnicode_FromString(obj->read->annotations.c_str()) ;
 }
 
 
@@ -1110,7 +1110,7 @@ count_trim_on_abundance(khmer_KCountingHash_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS;
 
-    PyObject * trim_seq = PyBytes_FromStringAndSize(seq, trim_at);
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
     if (trim_seq == NULL) {
         return NULL;
     }
@@ -2135,6 +2135,15 @@ hashbits_get(khmer_KHashbits_Object * me, PyObject * args)
             return NULL;
         }
 
+        count = hashbits->get_count(s.c_str());
+    } else if (PyUnicode_Check(arg)) {
+	    std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+		    arg, "utf-8", "strict"));
+        if (strlen(s.c_str()) != hashbits->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer size must equal the presence table k-mer size");
+            return NULL;
+        }
         count = hashbits->get_count(s.c_str());
     } else {
         PyErr_SetString(PyExc_ValueError, "must pass in an int or string");
@@ -3294,7 +3303,7 @@ hashbits_extract_unique_paths(khmer_KHashbits_Object * me, PyObject * args)
     }
 
     for (unsigned int i = 0; i < results.size(); i++) {
-        PyList_SET_ITEM(x, i, PyBytes_FromString(results[i].c_str()));
+        PyList_SET_ITEM(x, i, PyUnicode_FromString(results[i].c_str()));
     }
 
     return x;
@@ -4654,7 +4663,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyBytes_FromString(_revhash(val, ksize).c_str());
+    return PyUnicode_FromString(_revhash(val, ksize).c_str());
 }
 
 static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
@@ -4691,7 +4700,7 @@ get_version_cpp( PyObject * self, PyObject * args )
 #define xstr(s) str(s)
 #define str(s) #s
     std::string dVersion = xstr(VERSION);
-    return PyBytes_FromString(dVersion.c_str());
+    return PyUnicode_FromString(dVersion.c_str());
 }
 
 
