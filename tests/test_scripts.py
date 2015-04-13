@@ -10,6 +10,7 @@
 import json
 import sys
 import os
+import stat
 import shutil
 from cStringIO import StringIO
 import traceback
@@ -52,6 +53,24 @@ def test_load_into_counting():
     (status, out, err) = utils.runscript(script, args)
     assert 'Total number of unique k-mers: 89' in err, err
     assert os.path.exists(outfile)
+
+
+def test_load_into_counting_nonwritable():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('test-nonwritable')
+    with open(outfile, 'w') as fout:
+        fout.write("This file is non-writable (after this)")
+
+    os.chmod(outfile, stat.S_IWOTH | stat.S_IRUSR)
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert 'does not have write permission; exiting' in err, err
+    assert status == 1, status
 
 
 @attr('linux')

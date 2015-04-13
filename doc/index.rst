@@ -12,6 +12,7 @@ khmer -- k-mer counting & filtering FTW
           Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown
 
 :Contact: khmer-project@idyll.org
+:Chat: https://gitter.im/ged-lab/khmer
 :License: BSD
 
 khmer is a library and suite of command line tools for working with
@@ -51,5 +52,6 @@ Contents:
    user/index
    dev/index
    roadmap
+   release-notes/index
 
    LICENSE

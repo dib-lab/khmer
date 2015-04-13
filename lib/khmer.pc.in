@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+sharedlibdir=${libdir}
+includedir=${prefix}/include
+
+Name: khmer
+Description: The unsupported core C++ library from the khmer project
+URL: http://khmer.readthedocs.org/
+Version: @VERSION@
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lkhmer
+Cflags: -I${includedir}

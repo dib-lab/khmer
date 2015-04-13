@@ -333,6 +333,8 @@ _ReadParser_iternext( PyObject * self )
             stop_iteration = true;
         } catch (StreamReadError &e) {
             exc = e.what();
+        } catch (InvalidRead &e) {
+            exc = e.what();
         }
     }
     Py_END_ALLOW_THREADS
@@ -366,20 +368,22 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 
     ReadPair    the_read_pair;
     bool    stop_iteration      = false;
-    bool    unknown_pair_reading_mode   = false;
-    bool    invalid_read_pair       = false;
-    bool    stream_read_error = false;
+    const char * value_error_what = NULL;
+    const char * io_error_what = NULL;
+
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
     if (!stop_iteration)
         try {
             parser->imprint_next_read_pair( the_read_pair, pair_mode );
         } catch (UnknownPairReadingMode &exc) {
-            unknown_pair_reading_mode = true;
+            value_error_what = exc.what();
+        } catch (InvalidRead &exc) {
+            io_error_what = exc.what();
         } catch (InvalidReadPair &exc) {
-            invalid_read_pair = true;
+            io_error_what = exc.what();
         } catch (StreamReadError &exc) {
-            stream_read_error = true;
+            io_error_what = "Input file error.";
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         }
@@ -389,20 +393,12 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     if (stop_iteration) {
         return NULL;
     }
-
-    if (unknown_pair_reading_mode) {
-        PyErr_SetString(
-            PyExc_ValueError, "Unknown pair reading mode supplied."
-        );
+    if (value_error_what != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_error_what);
         return NULL;
     }
-    if (invalid_read_pair) {
-        PyErr_SetString( PyExc_IOError, "Invalid read pair detected." );
-        return NULL;
-    }
-
-    if (stream_read_error) {
-        PyErr_SetString( PyExc_IOError, "Input file error.");
+    if (io_error_what != NULL) {
+        PyErr_SetString( PyExc_IOError, io_error_what);
         return NULL;
     }
 
@@ -466,6 +462,12 @@ ReadParser_iter_reads(PyObject * self, PyObject * args )
     return PyObject_SelfIter( self );
 }
 
+static
+PyObject *
+ReadParser_get_num_reads(khmer_ReadParser_Object * me)
+{
+    return PyLong_FromLong(me->parser->get_num_reads());
+}
 
 static
 PyObject *
@@ -505,10 +507,18 @@ static PyMethodDef _ReadParser_methods [ ] = {
         "iter_read_pairs",  (PyCFunction)ReadParser_iter_read_pairs,
         METH_VARARGS,       "Iterates over paired reads as pairs."
     },
-
     { NULL, NULL, 0, NULL } // sentinel
 };
 
+static PyGetSetDef khmer_ReadParser_accessors[] = {
+    {
+        (char *)"num_reads",
+        (getter)ReadParser_get_num_reads, NULL,
+        (char *)"count of reads processed thus far.",
+        NULL
+    },
+    {NULL, NULL, NULL, NULL, NULL} /* Sentinel */
+};
 
 static PyTypeObject khmer_ReadParser_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
@@ -541,7 +551,7 @@ static PyTypeObject khmer_ReadParser_Type = {
     (iternextfunc)_ReadParser_iternext,        /* tp_iternext */
     _ReadParser_methods,                       /* tp_methods */
     0,                                         /* tp_members */
-    0,                                         /* tp_getset */
+    khmer_ReadParser_accessors,                /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */
@@ -1432,50 +1442,6 @@ hash_consume_fasta_and_tag(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_find_all_tags_truncate_on_abundance(khmer_KCountingHash_Object * me,
-        PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * kmer_s = NULL;
-    BoundedCounterType min_count, max_count;
-
-    if (!PyArg_ParseTuple(args, "sHH", &kmer_s, &min_count, &max_count)) {
-        return NULL;
-    }
-
-    if (strlen(kmer_s) != counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer size must equal the k-mer size of the counting table");
-        return NULL;
-    }
-
-    _pre_partition_info * ppi = NULL;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
-
-    try {
-        ppi = new _pre_partition_info(kmer);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-    counting->partition->find_all_tags_truncate_on_abundance(kmer_f, kmer_r,
-            ppi->tagged_kmers,
-            counting->all_tags,
-            min_count,
-            max_count);
-    counting->add_kmer_to_tags(kmer);
-
-    Py_END_ALLOW_THREADS
-
-    return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
-}
-
-static
-PyObject *
 hash_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
                                         PyObject * args)
 {
@@ -1579,8 +1545,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "find_all_tags_list", (PyCFunction)hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", (PyCFunction)hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", (PyCFunction)hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
-    { "find_all_tags_truncate_on_abundance", (PyCFunction)hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
-
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

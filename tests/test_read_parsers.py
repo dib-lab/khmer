@@ -45,8 +45,53 @@ def test_with_default_arguments():
         assert m == n
 
 
-def test_gzip_decompression():
+def test_num_reads():
+    """Test ReadParser.num_reads"""
+    reads_count = 0
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
+    for _ in rparser:
+        reads_count += 1
 
+    assert reads_count == 100
+    assert rparser.num_reads == 100
+
+
+@attr('multithread')
+def test_num_reads_threads():
+    """Test threadsaftey of ReadParser's read counting"""
+    import threading
+
+    def count_reads(rparser):
+        for _ in rparser:
+            pass
+
+    n_threads = 4
+    threads = []
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
+    for _ in xrange(n_threads):
+        thr = threading.Thread(target=count_reads, args=[rparser, ])
+        threads.append(thr)
+        thr.start()
+    for thr in threads:
+        thr.join()
+
+    assert rparser.num_reads == 100
+
+
+def test_num_reads_truncated():
+
+    n_reads = 0
+    rparser = ReadParser(utils.get_test_data("truncated.fq"))
+    try:
+        for read in rparser:
+            n_reads += 1
+    except IOError as err:
+        assert "Sequence is empty" in str(err), str(err)
+    assert rparser.num_reads == 1, "%d valid reads in file, got %d" % (
+        n_reads, rparser.num_reads)
+
+
+def test_gzip_decompression():
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
     for read in rparser:
@@ -213,6 +258,17 @@ def test_casava_1_8_pair_mating():
 
     t1.join()
     t2.join()
+
+
+def test_read_truncated():
+
+    rparser = ReadParser(utils.get_test_data("truncated.fq"))
+    try:
+        for read in rparser:
+            pass
+        assert 0, "No exception raised on a truncated file"
+    except IOError as err:
+        assert "Sequence is empty" in str(err), str(err)
 
 
 def test_iterator_identities():
