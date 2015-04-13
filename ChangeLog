@@ -115,7 +115,6 @@
    * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
    * lib/.check_openmp.cc: add source that checks compiler for openmp support.
    * lib/khmer.pc.in: add pkg-config file for khmer
->>>>>>> 6ea6e65d9eb013712579953f26d966412427d555
 
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
