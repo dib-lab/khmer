@@ -6,6 +6,11 @@
    * tests/test_scripts.py: Added functional test for diginorm stdout, removed
    test of --append option.
 
+2015-04-13  David Lin
+
+   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   squash options
+
 2015-04-13  Michael R. Crusoe
 
    * README.rst,doc/index.rst: added link to gitter.im chat room
