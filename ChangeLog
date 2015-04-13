@@ -1,3 +1,7 @@
+2015-04-13  Thomas Fenzl <thomas.fenzl@gmx.net>
+   * khmer/_khmermodule.cc: removed unused find_all_tags_truncate_on_abundance
+   from python api
+
 2015-04-10  Will Trimble
 
    * tests/test_script_arguments.py: added a test to check for the empty file
