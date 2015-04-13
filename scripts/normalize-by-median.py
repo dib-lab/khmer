@@ -195,8 +195,8 @@ def get_parser():
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_file',
                         type=argparse.FileType('w'),
-                        default='', help='only output a single file with the '
-                        'specified filename; use a single dash '-' to specify '
+                        default=None, help='only output a single file with the '
+                        'specified filename; use a single dash "-" to specify '
                         'that output should go to STDOUT (the terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
@@ -240,8 +240,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     input_filename = None
 
     if args.single_output_file:
-        output_name = args.single_output_file.name
         outfp = args.single_output_file
+        try:
+            output_name = args.single_output_file.name
+        except AttributeError:
+            output_name = '<stdout>'
 
     for index, input_filename in enumerate(args.input_filenames):
         if not args.single_output_file:

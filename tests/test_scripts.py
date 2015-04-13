@@ -515,24 +515,6 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
-def test_normalize_by_median_append():
-    outfile = utils.get_temp_filename('test.fa.keep')
-    shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
-    in_dir = os.path.dirname(outfile)
-
-    CUTOFF = '1'
-    infile = utils.get_temp_filename('test.fa', in_dir)
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
-    script = scriptpath('normalize-by-median.py')
-
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, '--append', infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert os.path.exists(outfile), outfile
-    seqs = [r.sequence for r in screed.open(outfile)]
-    assert len(seqs) == 2, seqs
-    assert 'GACAGCgtgCCGCA' in seqs[1], seqs
-
-
 def test_normalize_by_median_overwrite():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -769,7 +751,7 @@ def test_normalize_by_median_stdout():
 
     infile = utils.get_temp_filename('test-stdout.fq')
     in_dir = os.path.dirname(infile)
-    outfile = '100-reads-diginorm.fq'
+    outfile = utils.get_temp_filename('100-reads-diginorm.fq')
 
     shutil.copyfile(utils.get_test_data('100-reads.fq.gz'), infile)
 
