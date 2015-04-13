@@ -139,7 +139,7 @@ def test_fakelump_load_stop_tags_trunc():
                                      EXCURSION_KMER_COUNT_THRESHOLD)
 
     ht.save_stop_tags(fakelump_fa_foo)
-    data = open(fakelump_fa_foo).read()
+    data = open(fakelump_fa_foo, 'rb').read()
 
     fp = open(fakelump_fa_foo, 'wb')
     fp.write(data[:10])
