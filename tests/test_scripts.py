@@ -534,6 +534,19 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_double_file_name():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = [infile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "WARNING: At least two input files are named" in err, err
+
+
 def test_normalize_by_median_overwrite():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
