@@ -2599,7 +2599,7 @@ hashbits_find_all_tags(khmer_KHashbits_Object * me, PyObject * args)
 
     ppi_obj->PrePartitionInfo = ppi;
 
-    return (PyObject*)ppi;
+    return (PyObject*)ppi_obj;
 }
 
 static
