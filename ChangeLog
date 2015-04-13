@@ -1,3 +1,8 @@
+2015-04-13  Scott Sievert <sieve121@umn.edu>
+
+   * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
+   sandbox/*, khmer/*
+
 2015-04-13  Michael R. Crusoe
 
    * README.rst,doc/index.rst: added link to gitter.im chat room
