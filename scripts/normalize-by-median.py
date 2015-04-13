@@ -247,10 +247,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.single_output_file:
         outfp = args.single_output_file
-        try:
-            output_name = args.single_output_file.name
-        except AttributeError:
+        if args.single_output_file is sys.stdout:
             output_name = '<stdout>'
+        else:
+            output_name = args.single_output_file.name
 
     for index, input_filename in enumerate(args.input_filenames):
         if not args.single_output_file:
