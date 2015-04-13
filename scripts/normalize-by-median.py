@@ -214,6 +214,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     report_fp = args.report
 
+    # check for similar filenames
+    filenames = []
+    for pathfilename in args.input_filenames:
+        filename = pathfilename.split('/')[-1]
+        if (filename in filenames):
+            print >>sys.stderr, "WARNING: At least two input files are named %s . (The script normalize-by-median.py can not handel this, only one .keep file for one of the input file will be generated.)" %filename
+        else:
+            filenames.append(filename)
+        
+    # check for others
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
