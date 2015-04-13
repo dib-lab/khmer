@@ -1,5 +1,12 @@
 2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
+   * scripts/sample-reads-randomly.py: use broken paired reader to provide paired-
+   end read support.
+   * tests/test_scripts.py: change test results to compensate for the change in
+   implementation.
+
+2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
+
    * scripts/normalize-by-median.py: Added support to the diginorm script for
    sending output to terminal (stdout) when using the conventional - as the output
    filename. Also removed --append option.
