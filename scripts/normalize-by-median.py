@@ -166,6 +166,11 @@ def get_parser():
 
     Example::
 
+""" "        normalize-by-median.py -p -k 17 -o - tests/test-data/test-fastq-reads.fq >> appended-output.fq"  # noqa
+    """
+
+    Example::
+
 """ "        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
     """
 
