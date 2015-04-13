@@ -76,16 +76,15 @@ def main():
     info('filter-abund.py', ['counting'])
     args = get_parser().parse_args()
 
-    counting_ht = args.input_table
+    check_file_status(args.input_table, args.force)
     infiles = args.input_filename
-
     for _ in infiles:
         check_file_status(_, args.force)
 
     check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading hashtable'
-    htable = khmer.load_counting_hash(counting_ht)
+    htable = khmer.load_counting_hash(args.input_table)
     ksize = htable.ksize()
 
     print >>sys.stderr, "K:", ksize
