@@ -535,13 +535,13 @@ def test_normalize_by_median():
 
 
 def test_normalize_by_median_double_file_name():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = [infile, infile]
+    args = [utils.get_test_data('test-abund-read-2.fa'), infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert "WARNING: At least two input files are named" in err, err
