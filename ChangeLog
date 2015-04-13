@@ -1,3 +1,7 @@
+2015-04-13 Scott Fay <scott.a.fay@gmail.com>
+
+   * added checking of input_table by `check_file_status()`
+
 2015-04-13  David Lin
 
    * scripts/abundance-dist.py: disambiguate documentation for force and 
