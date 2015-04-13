@@ -20,6 +20,7 @@ import shutil
 from io import StringIO
 import traceback
 import nose
+from nose.plugins.attrib import attr
 import glob
 import imp
 
@@ -89,6 +90,7 @@ class _checkImportSucceeds(object):
             sys.stdout, sys.stderr = oldout, olderr
 
 
+@attr('failing_python2')
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
@@ -131,6 +133,7 @@ def test_sweep_reads():
     assert seqso == set(['read5_orphan'])
 
 
+@attr('failing_python2')
 def test_sweep_reads_fq():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
@@ -180,6 +183,7 @@ def test_sweep_reads_fq():
     seqso = set([r.quality for r in screed.open(oout)])
 
 
+@attr('failing_python2')
 def test_sweep_reads_2():
 
     infile = utils.get_temp_filename('seqs.fa')
@@ -202,6 +206,7 @@ def test_sweep_reads_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
+@attr('failing_python2')
 def test_sweep_reads_3():
 
     infile = utils.get_temp_filename('seqs.fa')
