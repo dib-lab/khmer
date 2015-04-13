@@ -50,7 +50,8 @@ def get_parser():
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
-                        help="Continue even if input files (input_counting_table_filename or input_sequence_filename) do not exist or are empty")
+                        help='Continue even if specified input files '
+                        'do not exist or are empty.')
     return parser
 
 
