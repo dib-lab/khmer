@@ -271,6 +271,7 @@ public domain. The `_version.py` that it creates is also in the public
 domain.
 
 """
+from __future__ import print_function
 
 import os, sys, re, subprocess, errno
 from distutils.core import Command

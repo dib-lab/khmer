@@ -1,3 +1,4 @@
+from __future__ import print_function
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
@@ -38,7 +39,7 @@ def main():
 
     for i, (n, m) in enumerate(zip(x, y)):
         if m:
-            print '%d,%d,%d' % (i, n, m)
+            print('%d,%d,%d' % (i, n, m))
 
 
 if __name__ == '__main__':

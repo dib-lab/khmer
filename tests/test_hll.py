@@ -1,7 +1,5 @@
 from __future__ import division
 from __future__ import absolute_import
-from builtins import range
-from past.utils import old_div
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
@@ -11,7 +9,6 @@ from past.utils import old_div
 # pylint: disable=missing-docstring,protected-access
 
 import math
-import string
 
 import khmer
 
@@ -20,8 +17,12 @@ from screed.fasta import fasta_iter
 from . import khmer_tst_utils as utils
 from nose.tools import assert_raises
 
+try:
+    import string
+    TT = string.maketrans('ACGT', 'TGCA')
+except AttributeError:
+    TT = "".maketrans('ACGT', 'TGCA')
 
-TT = string.maketrans('ACGT', 'TGCA')
 K = 20  # size of kmer
 ERR_RATE = 0.01
 N_UNIQUE = 3960
@@ -56,8 +57,7 @@ def test_hll_add_python():
     n_unique = len(counter)
 
     assert n_unique == N_UNIQUE
-    assert abs(
-        1 - old_div(float(hllcpp.estimate_cardinality()), N_UNIQUE)) < ERR_RATE
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_consume_string():
@@ -69,8 +69,7 @@ def test_hll_consume_string():
     for n, record in enumerate(fasta_iter(open(filename))):
         hllcpp.consume_string(record['sequence'])
 
-    assert abs(
-        1 - old_div(float(hllcpp.estimate_cardinality()), N_UNIQUE)) < ERR_RATE
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_empty_fasta():
@@ -87,8 +86,7 @@ def test_hll_consume_fasta():
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
     hllcpp.consume_fasta(filename)
 
-    assert abs(
-        1 - old_div(float(hllcpp.estimate_cardinality()), N_UNIQUE)) < ERR_RATE
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_consume_fasta_ep():

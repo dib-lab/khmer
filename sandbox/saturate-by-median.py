@@ -11,13 +11,15 @@ Count saturation curve for reads with a coverage of 1, but collect
 reads whether or not they have high coverage.  This is better for
 assessing saturation of (esp) low-coverage data sets.
 """
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
+
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -34,7 +36,7 @@ MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 
 def batchwise(coll, size):
     iter_coll = iter(coll)
-    return izip(*[iter_coll] * size)
+    return zip(*[iter_coll] * size)
 
 # Returns true if the pair of records are properly pairs
 
@@ -63,14 +65,14 @@ def normalize_by_median(input_filename, htable, args, report_fp=None,
     for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if index > 0 and index % report_frequency == 0:
-            print '... kept {kept} of {total} or {perc:2}%'.format(
+            print('... kept {kept} of {total} or {perc:2}%'.format(
                 kept=total - discarded, total=total,
-                perc=int(100. - discarded / float(total) * 100.))
-            print '... in file', input_filename
+                perc=int(100. - discarded / float(total) * 100.)))
+            print('... in file', input_filename)
 
             if report_fp:
-                print >> report_fp, total, total - discarded, \
-                    1. - (discarded / float(total))
+                print(total, total - discarded, \
+                    1. - (discarded / float(total)), file=report_fp)
                 report_fp.flush()
 
         total += batch_size
@@ -105,8 +107,8 @@ def normalize_by_median(input_filename, htable, args, report_fp=None,
 
 
 def handle_error(error, input_name):
-    print >> sys.stderr, '** ERROR:', error
-    print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
+    print('** ERROR:', error, file=sys.stderr)
+    print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
 
 def get_parser():
     epilog = ("""
@@ -194,10 +196,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         corrupt_files = []
 
     if args.loadtable:
-        print 'loading k-mer counting table from', args.loadtable
+        print('loading k-mer counting table from', args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print 'making k-mer counting table'
+        print('making k-mer counting table')
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
@@ -216,42 +218,42 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         except IOError as err:
             handle_error(err, input_filename)
             if not args.force:
-                print >> sys.stderr, '** Exiting!'
+                print('** Exiting!', file=sys.stderr)
                 sys.exit(1)
             else:
-                print >> sys.stderr, '*** Skipping error file, moving on...'
+                print('*** Skipping error file, moving on...', file=sys.stderr)
                 corrupt_files.append(input_filename)
         else:
             if total_acc == 0 and discarded_acc == 0:
-                print 'SKIPPED empty file', input_filename
+                print('SKIPPED empty file', input_filename)
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
                     .format(inp=input_filename,
                             kept=total - discarded, total=total,
-                            perc=int(100. - discarded / float(total) * 100.))
+                            perc=int(100. - discarded / float(total) * 100.)))
 
     if args.savetable:
-        print 'Saving k-mer counting table through', input_filename
-        print '...saving to', args.savetable
+        print('Saving k-mer counting table through', input_filename)
+        print('...saving to', args.savetable)
         htable.save(args.savetable)
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate))
 
     if args.force and len(corrupt_files) > 0:
-        print >> sys.stderr, "** WARNING: Finished with errors!"
-        print >> sys.stderr, "** IOErrors occurred in the following files:"
-        print >> sys.stderr, "\t", " ".join(corrupt_files)
+        print("** WARNING: Finished with errors!", file=sys.stderr)
+        print("** IOErrors occurred in the following files:", file=sys.stderr)
+        print("\t", " ".join(corrupt_files), file=sys.stderr)
 
     if fp_rate > MAX_FALSE_POSITIVE_RATE:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
+        print("**", file=sys.stderr)
+        print(("** ERROR: the k-mer counting table is too small"
                               " for this data set.  Increase tablesize/# "
-                              "tables.")
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** Do not use these results!!"
+                              "tables."), file=sys.stderr)
+        print("**", file=sys.stderr)
+        print("** Do not use these results!!", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == '__main__':

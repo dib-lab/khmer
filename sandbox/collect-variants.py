@@ -12,6 +12,7 @@ Use '-h' for parameter help.
 
 TODO: add to sandbox README
 """
+from __future__ import print_function
 
 import sys
 import screed
@@ -41,16 +42,16 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_tables
-        print >>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % \
-            args.min_tablesize
-        print >>sys.stderr, ''
-        print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
+        print('\nPARAMETERS:', file=sys.stderr)
+        print(' - kmer size =    %d \t\t(-k)' % args.ksize, file=sys.stderr)
+        print(' - n hashes =     %d \t\t(-N)' % args.n_tables, file=sys.stderr)
+        print(' - min hashsize = %-5.2g \t(-x)' % \
+            args.min_tablesize, file=sys.stderr)
+        print('', file=sys.stderr)
+        print('Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize)' % \
-            (args.n_tables * args.min_tablesize)
-        print >>sys.stderr, '-' * 8
+            (args.n_tables * args.min_tablesize), file=sys.stderr)
+        print('-' * 8, file=sys.stderr)
 
     K = args.ksize
     HT_SIZE = args.min_tablesize
@@ -59,10 +60,10 @@ def main():
     filenames = args.input_filenames
 
     if args.loadhash:
-        print 'loading hashtable from', args.loadhash
+        print('loading hashtable from', args.loadhash)
         ht = khmer.load_counting_hash(args.loadhash)
     else:
-        print 'making hashtable'
+        print('making hashtable')
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     aligner = khmer.ReadAligner(ht, args.trusted_cutoff, args.bits_theta)
@@ -80,9 +81,9 @@ def main():
 
         for n, record in enumerate(screed.open(input_filename)):
             if n > 0 and n % 10000 == 0:
-                print '... kept', total - discarded, 'of', total, ', or', \
-                    int(100. - discarded / float(total) * 100.), '%'
-                print '... in file', input_filename
+                print('... kept', total - discarded, 'of', total, ', or', \
+                    int(100. - discarded / float(total) * 100.), '%')
+                print('... in file', input_filename)
 
             total += 1
 
@@ -133,26 +134,26 @@ def main():
                 discarded += 1
 
         if total:
-            print 'DONE with', input_filename, \
+            print('DONE with', input_filename, \
                 '; kept', total - discarded, 'of', total, 'or', \
-                int(100. - discarded / float(total) * 100.), '%'
-        print 'output in', output_name
+                int(100. - discarded / float(total) * 100.), '%')
+        print('output in', output_name)
 
     if args.savehash:
-        print 'Saving hashfile through', input_filename
-        print '...saving to', args.savehash
+        print('Saving hashfile through', input_filename)
+        print('...saving to', args.savehash)
         ht.save(args.savehash)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate)
 
     if fp_rate > 0.20:
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the counting hash is too small for"
-        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** Do not use these results!!"
+        print("**", file=sys.stderr)
+        print("** ERROR: the counting hash is too small for", file=sys.stderr)
+        print("** this data set.  Increase hashsize/num ht.", file=sys.stderr)
+        print("**", file=sys.stderr)
+        print("** Do not use these results!!", file=sys.stderr)
         sys.exit(-1)
 
 if __name__ == '__main__':
