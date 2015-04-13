@@ -1,3 +1,30 @@
+2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/normalize-by-median.py: Added support to the diginorm script for
+   sending output to terminal (stdout) when using the conventional - as the output
+   filename. Also removed --append option.
+   * tests/test_scripts.py: Added functional test for diginorm stdout, removed
+   test of --append option.
+
+2015-04-13 Scott Fay <scott.a.fay@gmail.com>
+
+   * added checking of input_table by `check_file_status()`
+
+2015-04-13  David Lin
+
+   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   squash options
+
+2015-04-13  Michael R. Crusoe
+
+   * README.rst,doc/index.rst: added link to gitter.im chat room
+   * doc/README.rst: removed ancient, outdated, and unused file
+
+2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * khmer/_khmermodule.cc: removed unused find_all_tags_truncate_on_abundance
+   from python api
+
 2015-04-10  Will Trimble
 
    * tests/test_script_arguments.py: added a test to check for the empty file

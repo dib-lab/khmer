@@ -151,6 +151,10 @@ def get_parser():
     table up to that point will be dumped, and processing will continue on the
     next file.
 
+    To append reads to an output file (rather than overwriting it), send output
+    to STDOUT with `--out -` and use UNIX file redirection syntax (`>>`) to
+    append to the file.
+
     Example::
 
         normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
@@ -158,6 +162,11 @@ def get_parser():
     Example::
 
 """ "        normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
+    """
+
+    Example::
+
+""" "        normalize-by-median.py -p -k 17 -o - tests/test-data/paired.fq >> appended-output.fq"  # noqa
     """
 
     Example::
@@ -189,12 +198,12 @@ def get_parser():
                         type=int, help='dump k-mer counting table every d '
                         'files', default=-1)
     parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_filename',
-                        default='', help='only output a single'
-                        ' file with the specified filename')
-    parser.add_argument('--append', default=False, action='store_true',
-                        help='append reads to the outputfile. '
-                        'Only with -o specified')
+                        dest='single_output_file',
+                        type=argparse.FileType('w'),
+                        default=None, help='only output a single file with '
+                        'the specified filename; use a single dash "-" to '
+                        'specify that output should go to STDOUT (the '
+                        'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
@@ -240,7 +249,7 @@ file for one of the input file will be generated.)" % filename
         print 'loading k-mer counting table from', args.loadtable
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print 'making k-mer counting table'
+        print >> sys.stderr, 'making k-mer counting table'
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
@@ -248,15 +257,15 @@ file for one of the input file will be generated.)" % filename
     discarded = 0
     input_filename = None
 
-    if args.single_output_filename:
-        output_name = args.single_output_filename
-        if args.append:
-            outfp = open(args.single_output_filename, 'a')
+    if args.single_output_file:
+        outfp = args.single_output_file
+        if args.single_output_file is sys.stdout:
+            output_name = '/dev/stdout'
         else:
-            outfp = open(args.single_output_filename, 'w')
+            output_name = args.single_output_file.name
 
     for index, input_filename in enumerate(args.input_filenames):
-        if not args.single_output_filename:
+        if not args.single_output_file:
             output_name = os.path.basename(input_filename) + '.keep'
             outfp = open(output_name, 'w')
 
@@ -279,15 +288,16 @@ file for one of the input file will be generated.)" % filename
                 corrupt_files.append(input_filename)
         else:
             if total_acc == 0 and discarded_acc == 0:
-                print 'SKIPPED empty file', input_filename
+                print >> sys.stderr, 'SKIPPED empty file', input_filename
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                      .format(inp=input_filename, kept=total - discarded,
-                              total=total, perc=int(100. - discarded /
-                                                    float(total) * 100.))
-                print 'output in', output_name
+                print >> sys.stderr, \
+                    'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                    .format(inp=input_filename, kept=total - discarded,
+                            total=total, perc=int(100. - discarded /
+                                                  float(total) * 100.))
+                print >> sys.stderr, 'output in', output_name
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -310,7 +320,8 @@ file for one of the input file will be generated.)" % filename
         htable.save(args.savetable)
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print >> sys.stderr, \
+        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
         print >> sys.stderr, "** WARNING: Finished with errors!"

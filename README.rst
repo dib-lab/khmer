@@ -40,7 +40,8 @@ them, please visit the following URLs:
 
 -  Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-You can contact the current maintainers at khmer-project@idyll.org.
+We chat at https://gitter.im/ged-lab/khmer and the maintainers can be
+contacted at khmer-project@idyll.org.
 
 IMPORTANT NOTE: CITE US!
 ------------------------
@@ -68,9 +69,6 @@ https://virtualenv.pypa.io/en/latest/virtualenv.html#installation
 khmer is under the BSD license; see doc/LICENSE.txt. Distribution,
 modification and redistribution, incorporation into other software, and
 pretty much everything else is allowed.
-
-khmer project contributors also edit documents collaboratively at `our wiki 
-<https://github.com/ged-lab/khmer/wiki/_pages>`__.
 
 MRC 2014-05-14
 
