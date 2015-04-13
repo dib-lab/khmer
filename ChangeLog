@@ -1,3 +1,6 @@
+2015-04-13  David Lin
+   * scripts/abundance-dist.py: updated documentation for force and squash options
+
 2015-04-13  Michael R. Crusoe
 
    * README.rst,doc/index.rst: added link to gitter.im chat room
