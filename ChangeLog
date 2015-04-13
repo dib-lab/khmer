@@ -1,5 +1,7 @@
 2015-04-13  David Lin
-   * scripts/abundance-dist.py: updated documentation for force and squash options
+
+   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   squash options
 
 2015-04-13  Michael R. Crusoe
 
