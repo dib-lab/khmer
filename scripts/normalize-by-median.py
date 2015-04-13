@@ -220,7 +220,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         filename = pathfilename.split('/')[-1]
         if (filename in filenames):
             print >>sys.stderr, "WARNING: At least two input files are named %s\
- . (The script normalize-by-median.py can not handel this, only one .keep file \
+ . (The script normalize-by-median.py can not handle this, only one .keep file \
 for one of the input file will be generated.)" %filename
         else:
             filenames.append(filename)
