@@ -1,3 +1,8 @@
+2015-04-13 Elmar Bucher <buchere@ohsu.edu>
+
+   * scripts/normalize-by-median.py (main): introduced warning for when at least
+   two input files are named the same.
+
 2015-04-13  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * doc/dev/getting-started.rst: clarify Conda usage
