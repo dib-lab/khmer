@@ -248,7 +248,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if args.single_output_file:
         outfp = args.single_output_file
         if args.single_output_file is sys.stdout:
-            output_name = '<stdout>'
+            output_name = '/dev/stdout'
         else:
             output_name = args.single_output_file.name
 
