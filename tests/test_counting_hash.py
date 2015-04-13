@@ -108,7 +108,7 @@ class Test_CountingHash(object):
         assert hi.get(GG) == 2
 
 
-@attr('known_failing')
+@attr('failing_python2')
 def test_get_raw_tables():
     ht = khmer.new_counting_hash(20, 1e5, 4)
     tables = ht.get_raw_tables()
@@ -118,7 +118,7 @@ def test_get_raw_tables():
         assert size == len(table)
 
 
-@attr('known_failing')
+@attr('failing_python2')
 def test_get_raw_tables_view():
     try:
         memoryview
