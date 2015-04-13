@@ -195,9 +195,10 @@ def get_parser():
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_file',
                         type=argparse.FileType('w'),
-                        default=None, help='only output a single file with the '
-                        'specified filename; use a single dash "-" to specify '
-                        'that output should go to STDOUT (the terminal)')
+                        default=None, help='only output a single file with '
+                        'the specified filename; use a single dash "-" to '
+                        'specify that output should go to STDOUT (the '
+                        'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',

@@ -746,24 +746,43 @@ def test_normalize_by_median_fpr():
     assert '** ERROR: the k-mer counting table is too small' in err, err
 
 
+def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
+    ifile = io.open(infile,  'rb')
+    ofile = io.open(outfile, 'wb')
+    chunk = ifile.read(CHUNKSIZE)
+    while len(chunk) > 0:
+        ofile.write(chunk)
+        chunk = ifile.read(CHUNKSIZE)
+    ifile.close()
+    ofile.close()
+
+
 def test_normalize_by_median_stdout():
     CUTOFF = '20'
 
-    infile = utils.get_temp_filename('test-stdout.fq')
+    infile = utils.get_test_data('100-reads.fq.gz')
     in_dir = os.path.dirname(infile)
-    outfile = utils.get_temp_filename('100-reads-diginorm.fq')
+    fifo = utils.get_temp_filename('fifo')
+    outfile = utils.get_temp_filename('outfile')
 
-    shutil.copyfile(utils.get_test_data('100-reads.fq.gz'), infile)
+    # Use a fifo to copy stdout to a file for checking
+    os.mkfifo(fifo)
+    thread = threading.Thread(target=write_by_chunks, args=(fifo, outfile))
+    thread.start()
 
+    # Execute diginorm
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-o', '-', infile, '>', outfile]
+    args = ['-C', CUTOFF, '-k', '17', '-o', fifo, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert os.path.exists(outfile), outfile
+    # Merge the thread
+    thread.join()
 
+    assert os.path.exists(outfile), outfile
     with open(outfile) as fp:
         linecount = sum(1 for _ in fp)
     assert linecount == 400
+
 
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')

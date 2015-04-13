@@ -1,8 +1,10 @@
-2015-03-25  Daniel Standage  <daniel.standage@gmail.com>
+2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/normalize-by-median.py: Added support to the diginorm script for
    sending output to terminal (stdout) when using the conventional - as the output
-   filename.
+   filename. Also removed --append option.
+   * tests/test_scripts.py: Added functional test for diginorm stdout, removed
+   test of --append option.
 
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
