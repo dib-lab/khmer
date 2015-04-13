@@ -1,4 +1,9 @@
-2015-04-13  Thomas Fenzl <thomas.fenzl@gmx.net>
+2015-04-13  Michael R. Crusoe
+
+   * README.rst,doc/index.rst: added link to gitter.im chat room
+   * doc/README.rst: removed ancient, outdated, and unused file
+
+2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
    * khmer/_khmermodule.cc: removed unused find_all_tags_truncate_on_abundance
    from python api
