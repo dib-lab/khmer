@@ -1,3 +1,8 @@
+2015-04-13  Elmar Bucher <buchere@ohsu.edu>
+
+   * scripts/normalize-by-median.py (main): introduced warning for when at east
+   two input files are named the same. gksdfkjs
+
 2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/normalize-by-median.py: Added support to the diginorm script for
