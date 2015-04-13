@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -208,9 +208,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                                          SETUP_METADATA["packages"])
 
         if "z" not in self.libraries:
-            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
-                    ' configure || bash ./configure --static ) && make -f '
-                    'Makefile.pic PIC']
+            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' &&  bash ./configure '
+                    '--static && make -f Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
             self.extensions[0].extra_objects.extend(
                 path_join("third-party", "zlib", bn + ".lo") for bn in [
