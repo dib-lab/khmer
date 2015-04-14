@@ -1,3 +1,8 @@
+2015-04-14  Elmar Bucher <buchere@ohsu.edu>
+	
+   * khmer/doc/dev/getting-started.rst: add information for OS X mac port
+   distro user.
+
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added copyright question
