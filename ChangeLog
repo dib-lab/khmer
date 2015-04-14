@@ -3,6 +3,16 @@
     * khmer/tests/test_scripts.py: refactor test_extract_long_sequences()
     into separate tests for fa and fq files.
 
+2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
+   * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,saturate-by-median},
+      scripts/{do-partition,filter-abund-single,load-graph,load-into-counting,
+      normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
+   * khmer/tests/test_scripts.py: modified tests to account for new error message
+
+2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
+
+   * lib/{hashbits.cc}: changed: adding doxygen comments
+
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added copyright question
@@ -20,7 +30,7 @@
 2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * khmer/_khmermodule.cc: catch more exceptions
-   * tests/test_{sandbox_scripts,subset_graph}.py: make tests more resiliant
+   * tests/test_{sandbox_scripts,subset_graph}.py: make tests more resilient
 
 2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 

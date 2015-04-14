@@ -34,6 +34,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+import sys
 
 from struct import pack, unpack
 
@@ -162,8 +163,9 @@ def extract_countinghash_info(filename):
         ht_type
 
 
-def calc_expected_collisions(hashtable):
+def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
+    Check to see that collision rate is within threshold.
 
     Keyword argument:
     hashtable: the hashtable object to inspect
@@ -175,6 +177,16 @@ def calc_expected_collisions(hashtable):
 
     fp_one = occupancy / min_size
     fp_all = fp_one ** n_ht
+
+    if fp_all > max_false_pos:
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** ERROR: the graph structure is too small for "
+        print >>sys.stderr, "this data set.  Increase k-mer presence table "
+        print >>sys.stderr, "size/num of tables."
+        print >>sys.stderr, "** Do not use these results!!"
+        print >>sys.stderr, "**"
+        if not force:
+            sys.exit(1)
 
     return fp_all
 
