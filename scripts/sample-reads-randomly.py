@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Subsample sequences from multiple files.
+
 Take a list of files containing sequences, and subsample 100,000 sequences (-N)
 uniformly, using reservoir sampling.  Stop after first 100m sequences (-M).
 By default take one subsample, but take -S samples if specified.

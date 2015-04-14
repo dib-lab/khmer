@@ -4,6 +4,15 @@
       normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
    * khmer/tests/test_scripts.py: modified tests to account for new error message
 
+2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * doc/dev/coding-guidelines-and-review.rst: added copyright question
+   to commit checklist.
+
+2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * */*.py: Make docstrings PEP 257 compliant.
+>>>>>>> 42fb8c13b663cbeb5d1502ed8de63704547e2bda
 
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 

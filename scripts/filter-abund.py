@@ -7,6 +7,8 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
+Sequence trimming by abundance using counting table.
+
 Trim sequences at k-mers of the given abundance, based on the given counting
 hash table.  Output sequences will be placed in 'infile.abundfilt'.
 

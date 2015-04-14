@@ -8,7 +8,7 @@ CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
-autopep8 pylint coverage gcovr nose screed
+autopep8 pylint coverage gcovr nose screed pep257
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -109,6 +109,18 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
+
+## pep257      : check Python code style
+pep257: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 --ignore=D100,D101,D102,D103 \
+		setup.py khmer/ scripts/ tests/ || true
+
+pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 setup.py khmer/ scripts/ tests/ \
+		> pep257_report.txt 2>&1 || true
+
+diff_pep257_report: pep257_report.txt
+	diff-quality --violations=pep8 pep257_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
