@@ -31,9 +31,6 @@ from khmer.kfile import (check_space, check_space_for_hashtable,
 from khmer.utils import write_record, check_is_pair
 DEFAULT_DESIRED_COVERAGE = 10
 
-MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
-# http://arxiv.org/abs/1309.2975
-
 # Iterate a collection in arbitrary batches
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
 
@@ -321,7 +318,10 @@ file for one of the input files will be generated.)" % filename
         print '...saving to', args.savetable
         htable.save(args.savetable)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+    # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
+
     print >> sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
@@ -329,16 +329,6 @@ file for one of the input files will be generated.)" % filename
         print >> sys.stderr, "** WARNING: Finished with errors!"
         print >> sys.stderr, "** IOErrors occurred in the following files:"
         print >> sys.stderr, "\t", " ".join(corrupt_files)
-
-    if fp_rate > MAX_FALSE_POSITIVE_RATE:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " for this data set. Increase tablesize/# "
-                              "tables.")
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** Do not use these results!!"
-        if not args.force:
-            sys.exit(1)
 
 if __name__ == '__main__':
     main()
