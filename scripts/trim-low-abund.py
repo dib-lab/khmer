@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -22,7 +22,7 @@ import tempfile
 import shutil
 import textwrap
 
-from screed.screedRecord import _screed_record_dict
+from screed import Record
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
@@ -34,7 +34,7 @@ DEFAULT_CUTOFF = 2
 
 
 def trim_record(read, trim_at):
-    new_read = _screed_record_dict()
+    new_read = Record()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
     if hasattr(read, 'quality'):
