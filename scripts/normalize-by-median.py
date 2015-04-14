@@ -232,8 +232,9 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-u', '--unpaired-reads', metavar="unpaired_reads_filename",
-                        help='with paired data only, include an unpaired file')
+    parser.add_argument('-u', '--unpaired-reads',
+                        metavar="unpaired_reads_filename", help='with paired data only,\
+                        include an unpaired file')
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
