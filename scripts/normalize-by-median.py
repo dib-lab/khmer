@@ -122,6 +122,12 @@ def handle_error(error, output_name, input_name, fail_save, htable):
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 def normalize_by_median_and_check(input_filename, outfp, htable, args, report_fp):
+    total = 0
+    discarded = 0
+    if not args.single_output_file:
+        output_name = os.path.basename(input_filename) + '.keep'
+        outfp = open(output_name, 'w')
+        
     try:
         total_acc, discarded_acc = normalize_by_median(input_filename, outfp, \
                                                         htable, args, report_fp)
@@ -282,8 +288,8 @@ file for one of the input files will be generated.)" % filename
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
-    total = 0
-    discarded = 0
+    # total = 0
+    # discarded = 0
     input_filename = None
 
     if args.single_output_file:
@@ -294,13 +300,6 @@ file for one of the input files will be generated.)" % filename
             output_name = args.single_output_file.name
 
     for index, input_filename in enumerate(args.input_filenames):
-        if not args.single_output_file:
-            output_name = os.path.basename(input_filename) + '.keep'
-            outfp = open(output_name, 'w')
-
-        total_acc = 0
-        discarded_acc = 0
-
         total_acc, discarded_acc = normalize_by_median_and_check(input_filename,\
                                                            outfp, htable, args,\
                                                            report_fp)
