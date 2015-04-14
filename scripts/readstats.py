@@ -44,8 +44,7 @@ def get_parser():
 
 
 def main():
-    "Main function - run when executed as a script."
-
+    """Main function - run when executed as a script."""
     parser = get_parser()
     args = parser.parse_args()
 
