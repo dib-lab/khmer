@@ -2219,7 +2219,7 @@ hashbits_trim_on_stoptags(khmer_KHashbits_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS;
 
-    PyObject * trim_seq = PyBytes_FromStringAndSize(seq, trim_at);
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
     if (trim_seq == NULL) {
         return NULL;
     }
