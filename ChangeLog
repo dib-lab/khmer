@@ -7,7 +7,6 @@
 2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
 
    * lib/{hashbits.cc}: changed: adding doxygen comments
->>>>>>> 6b55eb863185b97532a51d41ab17fdd90c1a3a2b
 
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 
@@ -17,7 +16,6 @@
 2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * */*.py: Make docstrings PEP 257 compliant.
->>>>>>> 42fb8c13b663cbeb5d1502ed8de63704547e2bda
 
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
