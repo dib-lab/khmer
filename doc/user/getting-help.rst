@@ -36,9 +36,15 @@ Asking a good question
   - Subject lines like *"arrgh cant get it to work"* or *"NEED HELP, POSTER DUE TOMORROW!!!!!"* are not likely to inspire anyone to help.
   - Example of a good subject line: *"Error message from normalize-by-median 'Hash writing file access failure:: Bad address'"*
 
-2. Include your OS version, Python version, and khmer version.
+2. Include your:
 
-#. Precisely describe what you are trying to do.  Reread it from the perspective of someone else trying to reproduce your task.
+ a. OS version:  ``uname -mrs``
+
+ b. Python version:  ``python --version``
+
+ c. and khmer version:  ``pip freeze | grep khmer``
+
+3. Precisely describe what you are trying to do.  Reread it from the perspective of someone else trying to reproduce your task.
 
 #. Copy-and-paste the exact command that is causing the problem.  Include the steps you performed leading up to the issue.
 
