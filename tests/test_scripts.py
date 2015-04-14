@@ -176,7 +176,6 @@ def test_load_into_counting_json():
     assert got_json == expected_json, got_json
 
 
-@attr('failing_python2')
 def test_load_into_counting_bad_summary_fmt():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']

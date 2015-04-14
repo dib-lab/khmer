@@ -181,7 +181,6 @@ def test_sweep_reads_fq():
     seqso = set([r.quality for r in screed.open(oout)])
 
 
-@attr('failing_python2')
 def test_sweep_reads_2():
 
     infile = utils.get_temp_filename('seqs.fa')
@@ -204,7 +203,6 @@ def test_sweep_reads_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
-@attr('failing_python2')
 def test_sweep_reads_3():
 
     infile = utils.get_temp_filename('seqs.fa')
