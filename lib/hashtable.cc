@@ -282,7 +282,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -336,7 +336,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
@@ -1256,7 +1256,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -1303,7 +1303,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 

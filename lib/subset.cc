@@ -1268,7 +1268,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
         } else {
             err = "Unknown error in opening file: " + other_filename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     try {
@@ -1299,7 +1299,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -1334,7 +1334,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             if (infile.gcount() == 0) {
                 std::string err;
                 err = "Unknown error reading data from: " + other_filename;
-                throw khmer_file_exception(err.c_str());
+                throw khmer_file_exception(err);
             }
         }
 

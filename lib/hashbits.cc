@@ -69,7 +69,7 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (_counts) {
@@ -137,7 +137,7 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Error reading from k-mer graph file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
