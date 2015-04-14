@@ -26,7 +26,7 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 
@@ -79,7 +79,7 @@ def main():
 
     infiles = [htfile, input_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(infiles, args.force)
 

@@ -15,7 +15,7 @@ import errno
 from stat import S_ISBLK, S_ISFIFO
 
 
-def check_file_status(file_path, force):
+def check_input_files(file_path, force):
     """Check the status of the file; if the file is empty or doesn't exist
     AND if the file is NOT a fifo/block/named pipe then a warning is printed
     and sys.exit(1) is called

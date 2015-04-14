@@ -11,7 +11,7 @@ import khmer_tst_utils as utils
 import collections
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
-from khmer.kfile import check_file_status
+from khmer.kfile import check_input_files
 
 
 def test_forward_hash():
@@ -120,7 +120,7 @@ def test_check_file_status_kfile():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     check_file_status_exited = False
     try:
-        check_file_status(fn, False)
+        check_input_files(fn, False)
     except SystemExit:
         check_file_status_exited = True
     assert check_file_status_exited
@@ -129,7 +129,7 @@ def test_check_file_status_kfile():
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
-        check_file_status(fn, True)
+        check_input_files(fn, True)
     except OSError as e:
         assert False
 

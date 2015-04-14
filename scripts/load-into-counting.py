@@ -22,7 +22,7 @@ import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -80,7 +80,7 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name, args.force)
+        check_input_files(name, args.force)
 
     check_space(args.input_sequence_filename, args.force)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)

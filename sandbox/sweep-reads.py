@@ -36,7 +36,7 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.kfile import (check_file_status, check_valid_file_exists,
+from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
 from khmer.utils import write_record
@@ -229,7 +229,7 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    check_file_status(args.input_fastp, args.force)
+    check_input_files(args.input_fastp, args.force)
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)

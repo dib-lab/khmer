@@ -21,7 +21,7 @@ import argparse
 import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 # @CTB K should be loaded from file...
@@ -57,7 +57,7 @@ def main():
     infiles = args.input_filenames
 
     for _ in infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(infiles, args.force)
 

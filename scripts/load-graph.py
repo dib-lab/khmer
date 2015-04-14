@@ -20,7 +20,7 @@ import threading
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -54,7 +54,7 @@ def main():
     filenames = args.input_filenames
 
     for _ in args.input_filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(args.input_filenames, args.force)
     check_space_for_hashtable(

@@ -25,7 +25,7 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
@@ -65,7 +65,7 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(args.infiles, args.force)
 

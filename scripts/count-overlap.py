@@ -22,7 +22,7 @@ import sys
 import csv
 import khmer
 import textwrap
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 
 DEFAULT_K = 32
@@ -59,7 +59,7 @@ def main():
     report_on_config(args, hashtype='hashbits')
 
     for infile in [args.ptfile, args.fafile]:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space([args.ptfile, args.fafile], args.force)
 

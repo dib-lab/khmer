@@ -21,7 +21,7 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer import __version__
 #
 
@@ -76,10 +76,10 @@ def main():
     info('filter-abund.py', ['counting'])
     args = get_parser().parse_args()
 
-    check_file_status(args.input_table, args.force)
+    check_input_files(args.input_table, args.force)
     infiles = args.input_filename
     for _ in infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(infiles, args.force)
 
