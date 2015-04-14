@@ -22,7 +22,7 @@ import tempfile
 import shutil
 import textwrap
 
-from screed.screedRecord import Record
+from screed import Record
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
