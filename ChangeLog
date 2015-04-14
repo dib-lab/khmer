@@ -4,6 +4,11 @@
       normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
    * khmer/tests/test_scripts.py: modified tests to account for new error message
 
+2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
+
+   * lib/{hashbits.cc}: changed: adding doxygen comments
+>>>>>>> 6b55eb863185b97532a51d41ab17fdd90c1a3a2b
+
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added copyright question

@@ -52,6 +52,10 @@ void Hashbits::save(std::string outfilename)
     outfile.close();
 }
 
+/**
+ * Loads @param infilename into Hashbits, with error checking on
+ * file type and file version.  Populates _counts internally.
+ */
 void Hashbits::load(std::string infilename)
 {
     ifstream infile;
@@ -141,12 +145,10 @@ void Hashbits::load(std::string infilename)
     }
 }
 
-// for counting overlap k-mers specifically!!
-
-//
-// check_and_process_read: checks for non-ACGT characters before consuming
-//
-
+/**
+ * Checks for non-ACGT characters before consuming read.
+ * This is specifically for counting overlap k-mers.
+ */
 unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
         bool &is_valid,
         Hashbits &ht2)
@@ -160,10 +162,9 @@ unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
     return consume_string_overlap(read, ht2);
 }
 
-//
-// consume_fasta: consume a FASTA file of reads
-//
-
+/**
+ * Consume a FASTA file of reads.
+ */
 void Hashbits::consume_fasta_overlap(const std::string &filename,
                                      HashIntoType curve[2][100],Hashbits &ht2,
                                      unsigned int &total_reads,
@@ -231,10 +232,9 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     delete parser;
 }
 
-//
-// consume_string: run through every k-mer in the given string, & hash it.
-//
-
+/**
+ * Run through every k-mer in the given string, & hash it.
+ */
 unsigned int Hashbits::consume_string_overlap(const std::string &s,
         Hashbits &ht2)
 {
