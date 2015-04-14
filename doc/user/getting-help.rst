@@ -40,23 +40,13 @@ people trying to help.
 Asking a good question
 ----------------------
 
-#. Be very specific in your subject line.
-  - If well written, it will more likely catch the eye of someone who knows
-    the solution.
-  - Subject lines like *"arrgh cant get it to work"* or *"NEED HELP,
-    POSTER DUE TOMORROW!!!!!"* are not likely to inspire anyone to help.
-  - Example of a good subject line: *"Error message from normalize-by-median
-    'Hash writing file access failure:: Bad address'"*
+#. Include your:
 
-2. Include your:
+   * OS version (Mac OS X or Linux):  ``uname -mrs``
+   * Python version:  ``python --version``
+   * and khmer version:  ``pip freeze | grep khmer``
 
- a. OS version (Mac OS X or Linux):  ``uname -mrs``
-
- b. Python version:  ``python --version``
-
- c. and khmer version:  ``pip freeze | grep khmer``
-
-3. Precisely describe what you are trying to do.  Reread it from the
+#. Precisely describe what you are trying to do.  Reread it from the
    perspective of someone else trying to reproduce your task.
 
 #. Copy-and-paste the exact command that is causing the problem.  Include the
