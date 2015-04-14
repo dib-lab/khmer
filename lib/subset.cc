@@ -1268,7 +1268,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
         } else {
             err = "Unknown error in opening file: " + other_filename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     try {
@@ -1281,12 +1281,12 @@ void SubsetPartition::merge_from_disk(string other_filename)
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_SUBSET)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -1294,12 +1294,12 @@ void SubsetPartition::merge_from_disk(string other_filename)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -1334,7 +1334,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             if (infile.gcount() == 0) {
                 std::string err;
                 err = "Unknown error reading data from: " + other_filename;
-                throw khmer_file_exception(err.c_str());
+                throw khmer_file_exception(err);
             }
         }
 

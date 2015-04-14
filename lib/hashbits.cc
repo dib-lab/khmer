@@ -69,7 +69,7 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (_counts) {
@@ -95,12 +95,12 @@ void Hashbits::load(std::string infilename)
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer graph from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_HASHBITS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer graph from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -137,7 +137,7 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Error reading from k-mer graph file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
