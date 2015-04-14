@@ -1,3 +1,7 @@
+2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
+
+   * lib/{hashbits.cc}: changed: adding doxygen comments
+
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added copyright question
