@@ -45,7 +45,6 @@ contacted at khmer-project@idyll.org.
 
 For getting help with please see this guide: http://khmer.readthedocs.org/user/getting-help.html
 
-
 IMPORTANT NOTE: CITE US!
 ------------------------
 

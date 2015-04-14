@@ -58,6 +58,5 @@ Asking a good question
 GitHub
 ------
 
-If you think you've found a legitimate bug or other problem with
-functionality, use GitHub to report an issue:
+You are also welcome to report an issue you are having using GitHub::
 https://github.com/ged-lab/khmer/issues/new
