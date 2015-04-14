@@ -121,6 +121,35 @@ def handle_error(error, output_name, input_name, fail_save, htable):
     except:  # pylint: disable=bare-except
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
+def normalize_by_median_and_check(input_filename, outfp, htable, args, report_fp):
+    try:
+        total_acc, discarded_acc = normalize_by_median(input_filename, outfp, \
+                                                        htable, args, report_fp)
+    except IOError as err:
+        handle_error(err, output_name, input_filename, args.fail_save,
+                     htable)
+        if not args.force:
+            print >> sys.stderr, '** Exiting!'
+
+            sys.exit(1)
+        else:
+            print >> sys.stderr, '*** Skipping error file, moving on...'
+            corrupt_files.append(input_filename)
+            return
+    else:
+        if total_acc == 0 and discarded_acc == 0:
+            print >> sys.stderr, 'SKIPPED empty file', input_filename
+        else:
+            total += total_acc
+            discarded += discarded_acc
+            print >> sys.stderr, \
+                'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                .format(inp=input_filename, kept=total - discarded,
+                        total=total, perc=int(100. - discarded /
+                                              float(total) * 100.))
+            print >> sys.stderr, 'output in', output_name
+            return total_acc, discarded_acc
+
 
 def get_parser():
     epilog = ("""
@@ -130,7 +159,8 @@ def get_parser():
     Paired end reads will be considered together if :option:`-p` is set. If
     either read will be kept, then both will be kept. This should result in
     keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially.
+    of repeats, especially. With :option: `-u`/:option:`--unpaired`, 
+    unpaired reads from the specified file will be read with the paired data. 
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
@@ -180,6 +210,8 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
+    parser.add_argument('-u', '--unpaired', metavar="unpaired_reads_filename", 
+                        help='')
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
@@ -269,32 +301,10 @@ file for one of the input files will be generated.)" % filename
         total_acc = 0
         discarded_acc = 0
 
-        try:
-            total_acc, discarded_acc = normalize_by_median(input_filename,
-                                                           outfp, htable, args,
+        total_acc, discarded_acc = normalize_by_median_and_check(input_filename,\
+                                                           outfp, htable, args,\
                                                            report_fp)
-        except IOError as err:
-            handle_error(err, output_name, input_filename, args.fail_save,
-                         htable)
-            if not args.force:
-                print >> sys.stderr, '** Exiting!'
 
-                sys.exit(1)
-            else:
-                print >> sys.stderr, '*** Skipping error file, moving on...'
-                corrupt_files.append(input_filename)
-        else:
-            if total_acc == 0 and discarded_acc == 0:
-                print >> sys.stderr, 'SKIPPED empty file', input_filename
-            else:
-                total += total_acc
-                discarded += discarded_acc
-                print >> sys.stderr, \
-                    'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                    .format(inp=input_filename, kept=total - discarded,
-                            total=total, perc=int(100. - discarded /
-                                                  float(total) * 100.))
-                print >> sys.stderr, 'output in', output_name
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -306,6 +316,14 @@ file for one of the input files will be generated.)" % filename
                 hashname = 'backup.ct'
                 print 'Nothing given for savetable, saving to', hashname
             htable.save(hashname)
+
+    if args.paired and args.unpaired:
+        args.paired = False
+        output_name = args.unpaired
+        if not args.single_output_file:
+            output_name = os.path.basename(args.unpaired) + '.keep'
+        outfp = open(output_name, 'w')
+        normalize_by_median_and_check(args.unpaired, outfp, htable, args, report_fp)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
