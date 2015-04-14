@@ -731,7 +731,6 @@ PyObject *
 hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         PyObject * args);
 
-/*
 static
 PyObject *
 hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
@@ -743,8 +742,13 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
-        PyObject * buf = PyBuffer_FromMemory(table_ptrs[i], sizes[i]);
-        if(!PyBuffer_Check(buf)) {
+        Py_buffer buffer;
+        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i], sizes[i], 0, PyBUF_FULL_RO);
+        if (res == -1) {
+            return NULL;
+        }
+        PyObject * buf = PyMemoryView_FromBuffer(&buffer);
+        if(!PyMemoryView_Check(buf)) {
             return NULL;
         }
         PyList_SET_ITEM(raw_tables, i, buf);
@@ -752,7 +756,6 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
     return raw_tables;
 }
-*/
 
 static
 PyObject *
@@ -1545,10 +1548,10 @@ static PyMethodDef khmer_counting_methods[] = {
     },
     { "output_fasta_kmer_pos_freq", (PyCFunction)hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get", (PyCFunction)hash_get, METH_VARARGS, "Get the count for the given k-mer" },
-/*    {
+    {
         "get_raw_tables", (PyCFunction)hash_get_raw_tables,
         METH_VARARGS, "Get a list of the raw tables as memoryview objects"
-    }, */
+    },
     { "get_min_count", (PyCFunction)hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", (PyCFunction)hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
     { "get_median_count", (PyCFunction)hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
