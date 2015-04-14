@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Split up pairs and singletons.
+
 Take a file containing a mixture of interleaved and orphaned reads, and
 extract them into separate files (.pe and .se).
 

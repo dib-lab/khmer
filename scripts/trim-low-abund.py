@@ -7,6 +7,7 @@
 #
 """
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
+
 Output sequences will be placed in 'infile.abundtrim'.
 
 % python scripts/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]

@@ -1,3 +1,7 @@
+2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * */*.py: Make docstrings PEP 257 compliant.
+
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
    * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
