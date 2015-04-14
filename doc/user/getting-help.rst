@@ -50,7 +50,7 @@ Asking a good question
 
 2. Include your:
 
- a. OS version(Mac OS X or Linux):  ``uname -mrs``
+ a. OS version (Mac OS X or Linux):  ``uname -mrs``
 
  b. Python version:  ``python --version``
 
