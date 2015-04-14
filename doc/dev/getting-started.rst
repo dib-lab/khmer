@@ -95,9 +95,14 @@ One-time Preparation
 	tar xzf virtualenv*
 	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install pip by execution from the command line::
+     
+       sudo port install py27-pip
+     
    `Conda <https://github.com/conda/conda>`__ users on any platform
    should instead create a separate Conda environment::
-
+     
        conda create -n khmer anaconda
 
 #. Activate the virtualenv and install a few packages::
@@ -116,6 +121,13 @@ One-time Preparation
        source activate khmer
        cd khmer
        make install-dependencies
+       
+#. Cppcheck installation:
+   
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo port install cppcheck
 
 
 Building khmer and running the tests
