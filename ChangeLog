@@ -1,3 +1,7 @@
+2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
+
+   * lib/{hashbits.cc}: changed: adding doxygen comments
+
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
    * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
