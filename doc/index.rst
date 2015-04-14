@@ -22,6 +22,8 @@ approach to sequence analysis, hence the name.
 
 :doc:`user/install`
 
+:doc:`user/getting-help`
+
 There are two mailing lists dedicated to khmer, an announcements-only list and
 a discussion list. To search their archives and sign-up for them, please visit
 the following URLs:
