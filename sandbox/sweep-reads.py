@@ -7,6 +7,8 @@ from __future__ import print_function, unicode_literals
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
 
+from io import open
+
 from khmer import utils
 
 """
@@ -382,13 +384,13 @@ def main():
 
     print('** outputting label number distribution...', file=sys.stderr)
     fn = os.path.join(outdir, '{pref}.dist.txt'.format(pref=output_pref))
-    with open(fn, 'wb') as outfp:
+    with open(fn, 'w', encoding='utf-8') as outfp:
         for nc in label_number_dist:
-            outfp.write('{nc}\n'.format(nc=nc).encode('utf-8'))
+            outfp.write('{nc}\n'.format(nc=nc))
 
     fn = os.path.join(outdir, '{pref}.counts.csv'.format(pref=output_pref))
     print('** outputting label read counts...', file=sys.stderr)
-    with open(fn, 'wb') as outfp:
+    with open(fn, 'w', encoding='utf-8') as outfp:
         for k in label_dict:
             outfp.write('{l},{c}\n'.format(l=k, c=label_dict[k]))
 

@@ -1,6 +1,4 @@
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -11,11 +9,15 @@ import tempfile
 import os
 import shutil
 from pkg_resources import Requirement, resource_filename, ResolutionError
-from io import StringIO
 import nose
 import sys
 import traceback
 import subprocess
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 def get_test_data(filename):

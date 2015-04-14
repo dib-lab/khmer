@@ -12,10 +12,7 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
+from __future__ import print_function, unicode_literals
 
 import json
 import os

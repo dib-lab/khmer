@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -143,15 +143,19 @@ def write_record(record, fileobj):
     Writes sequence record to 'fileobj' in FASTA/FASTQ format.
     """
     if hasattr(record, 'quality'):
-        fileobj.write(
-            '@{name}\n{seq}\n'
-            '+\n{qual}\n'.format(name=record.name,
-                                 seq=record.sequence,
-                                 qual=record.quality))
+        recstr = '@{name}\n{sequence}\n+\n{quality}\n'.format(
+            name=record.name,
+            sequence=record.sequence,
+            quality=record.quality)
     else:
-        fileobj.write(
-            '>{name}\n{seq}\n'.format(name=record.name,
-                                      seq=record.sequence))
+        recstr = '>{name}\n{sequence}\n'.format(
+            name=record.name,
+            sequence=record.sequence)
+
+    try:
+        fileobj.write(bytes(recstr, 'utf-8'))
+    except TypeError:
+        fileobj.write(recstr)
 
 
 def write_record_pair(read1, read2, fileobj):

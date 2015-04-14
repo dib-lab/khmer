@@ -1465,23 +1465,23 @@ def test_abundance_dist():
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
     os.remove(outfile)
     args = ['-z', '--csv', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
-    line = fp.next().strip()
-    assert line == '1,96,96,0.98', line
-    line = fp.next().strip()
-    assert line == '1001,2,98,1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
 
 
 @attr('failing_python2')
@@ -1498,11 +1498,11 @@ def test_abundance_dist_nobigcount():
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '255 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '255 2 98 1.0', line
 
 
 @attr('failing_python2')
@@ -1520,11 +1520,11 @@ def test_abundance_dist_single():
 
     assert 'Total number of unique k-mers: 98' in err, err
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 @attr('failing_python2')
@@ -1540,13 +1540,13 @@ def test_abundance_dist_single_csv():
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
-    line = fp.next().strip()
-    assert line == '1,96,96,0.98', line
-    line = fp.next().strip()
-    assert line == '1001,2,98,1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
 
 
 @attr('failing_python2')
@@ -1561,11 +1561,11 @@ def test_abundance_dist_single_nobigcount():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '255 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '255 2 98 1.0', line
 
 
 @attr('failing_python2')
@@ -1580,11 +1580,11 @@ def test_abundance_dist_single_nosquash():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 @attr('failing_python2')
@@ -1601,11 +1601,11 @@ def test_abundance_dist_single_savetable():
             tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 @attr('failing_python2')
