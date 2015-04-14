@@ -103,10 +103,10 @@ One-time Preparation
    `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
    already installed
 
-     
+
    `Conda <https://github.com/conda/conda>`__ users on any platform
    should instead create a separate Conda environment::
-     
+
        conda create -n khmer anaconda
 
 #. Activate the virtualenv and install a few packages::
@@ -128,6 +128,12 @@ One-time Preparation
        
 #. Cppcheck installation:
    
+   `Debian <https://www.debian.org/>`__ and
+   `Ubuntu <http://www.ubuntu.com/>`__ Linux distro users can
+   install cppcheck by executing from the command line::
+     
+       sudo apt-get install cppcheck
+
    `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
    install cppcheck by executing from the command line::
      

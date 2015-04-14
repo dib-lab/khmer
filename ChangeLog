@@ -1,7 +1,8 @@
-2015-04-14  Elmar Bucher <buchere@ohsu.edu>
+2015-04-14 Elmar Bucher <buchere@ohsu.edu>
 
    * khmer/doc/dev/getting-started.rst: add information for OS X
-   mac port distro and homebrew distro users.
+   mac port and homebrew distro users as well as Linux
+   Debian and Ubuntu distro users.
 
 2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
    * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,saturate-by-median},
