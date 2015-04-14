@@ -8,6 +8,8 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
+Sequence trimming by abundance w/o counting table.
+
 Trim sequences at k-mers of the given abundance for the given file,
 without loading a prebuilt counting table.  Output sequences will be
 placed in 'infile.abundfilt'.

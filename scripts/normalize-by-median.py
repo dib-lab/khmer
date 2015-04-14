@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Eliminate surplus reads.
+
 Eliminate reads with median k-mer abundance higher than
 DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
 
