@@ -2553,6 +2553,19 @@ def test_readstats():
     for k in readstats_output:
         assert k in out, (k, out)
 
+def test_readstats_csv():
+    readstats_output = ("358,5,71.6," + utils.get_test_data("test-sweep-reads.fq"),
+                        "916,11,83.3," + utils.get_test_data("paired-mixed.fq"))
+
+    args = [utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq"),
+            '--csv']
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
 
 def test_readstats_output():
     readstats_output = ("358 bp / 5 seqs; 71.6 average length",

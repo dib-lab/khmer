@@ -1,3 +1,7 @@
+2015-04-14  Thomas Fenzl  <thomas.fenzk@gmx.net>
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   added a --csv option to readstats, updated documentation for count-overlap
+
 2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * */*.py: Make docstrings PEP 257 compliant.

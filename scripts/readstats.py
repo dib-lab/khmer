@@ -14,6 +14,7 @@ Use '-h' for parameter help.
 """
 
 import sys
+import csv
 import screed
 import argparse
 import textwrap
@@ -38,9 +39,97 @@ def get_parser():
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
-                        type=argparse.FileType('w'), default=None)
-
+                        type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the statistics, '
+                        'including column headers.')
     return parser
+
+
+class StatisticsOutput(object):
+    #  pylint: disable=too-few-public-methods
+    """Output statistics for several data files.
+
+    The format of the output is determined by the formatter used.
+    All statistics are aggregated and a summary is added to the data.
+    """
+    def __init__(self, formatter):
+        self.formatter = formatter
+        self.bp_total = 0
+        self.seqs_total = 0
+
+    def __enter__(self):
+        self.formatter.write_header()
+        return self
+
+    def append(self, basepairs, seqs, filename):
+        """Append a new line for the given basepair number, sequences and file.
+        """
+        self.bp_total += basepairs
+        self.seqs_total += seqs
+        self.formatter.append(basepairs, seqs, basepairs/float(seqs), filename)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            avg = self.bp_total / float(self.seqs_total)
+            self.formatter.write_summary(self.bp_total, self.seqs_total, avg)
+
+
+class CsvFormatter(object):
+    """Format the statistis information as CSV."""
+    headers = ['bp', 'seqs', 'avg_len', 'filename']
+
+    def __init__(self, underlying_file):
+        self.file = csv.writer(underlying_file)
+
+    def write_header(self):
+        """Add headers for the csv columns."""
+        self.file.writerow(self.headers)
+
+    def append(self, basepairs, seqs, avg_len, filename):
+        """Append the data separated by comma."""
+        self.file.writerow([basepairs, seqs, "%.1f"%avg_len, filename])
+
+    def write_summary(self, bt_total, avg, seqs_total):
+        """Add a summary line."""
+        self.append(bt_total, seqs_total, avg, 'total')
+
+
+class StdFormatter(object):
+    """Format the statistics in a human readable string."""
+    def __init__(self, underlying_file):
+        self.file = underlying_file
+
+    def write_header(self):
+        """Write a header line."""
+        self.file.write('---------------\n')
+
+    def append(self, basepairs, seqs, avg_len, filename):
+        """Append the data human readable."""
+        self.file.write('%d bp / %d seqs; %.1f average length -- %s\n' %
+                        (basepairs,
+                         seqs,
+                         avg_len,
+                         filename))
+
+    def write_summary(self, bp_total, avg, seqs_total):
+        """Add a summary with the accumulated data."""
+        self.file.write('---------------\n')
+        self.file.write('%d bp / %d seqs; %.1f average length -- total\n' %
+                        (bp_total, seqs_total, avg))
+
+
+def analyze_file(filename):
+    """Run over the given file and count base pairs and sequences."""
+    bps = 0
+    seqs = 0
+    input_iter = screed.open(filename, parse_description=False)
+    for record in input_iter:
+        if seqs % 100000 == 0:
+            print >>sys.stderr, '...', filename, seqs
+        bps += len(record.sequence)
+        seqs += 1
+    return bps, seqs
 
 
 def main():
@@ -51,44 +140,37 @@ def main():
     total_bp = 0
     total_seqs = 0
 
-    output = []
-    for filename in args.filenames:
-        bp = 0
-        seqs = 0
+    statistics = []
 
+    for filename in args.filenames:
         try:
-            input_iter = screed.open(filename, parse_description=False)
+            bps, seqs = analyze_file(filename)
         except (IOError, OSError, EOFError) as exc:
             print >>sys.stderr, 'ERROR in opening %s:' % filename
             print >>sys.stderr, '     ', str(exc)
             continue
 
-        for record in input_iter:
-            if seqs % 100000 == 0:
-                print >>sys.stderr, '...', filename, seqs
-            bp += len(record.sequence)
-            seqs += 1
-
         if seqs:
-            avg_len = bp / float(seqs)
-            s = '%d bp / %d seqs; %.1f average length -- %s' % (bp,
-                                                                seqs,
-                                                                avg_len,
-                                                                filename)
-            print >>sys.stderr, '... found', s
-            output.append(s)
+            statistics.append((bps, seqs, filename))
+            avg = bps / float(seqs)
+            msg = '%d bps / %d seqs; %.1f average length -- %s' % (bps,
+                                                                   seqs,
+                                                                   avg,
+                                                                   filename)
 
-            total_bp += bp
-            total_seqs += seqs
+            print >>sys.stderr, '... found', msg
+
         else:
             print >>sys.stderr, 'No sequences found in %s' % filename
 
-    if total_seqs:
-        print >>args.outfp, '---------------'
-        print >>args.outfp, "\n".join(output)
-        print >>args.outfp, '---------------'
-        print >>args.outfp, '%d bp / %d seqs; %.1f average length -- total' % \
-            (total_bp, total_seqs, total_bp / float(total_seqs))
+    if statistics:
+        if args.csv:
+            formatter = CsvFormatter(args.outfp)
+        else:
+            formatter = StdFormatter(args.outfp)
+        with StatisticsOutput(formatter) as out:
+            for stat in statistics:
+                out.append(*stat)
     else:
         print >>args.outfp, \
             'No sequences found in %d files' % len(args.filenames)

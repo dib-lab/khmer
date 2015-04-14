@@ -46,8 +46,9 @@ def get_parser():
     parser.add_argument('report_filename', metavar='output_report_filename',
                         help='output report filename')
     parser.add_argument('--csv', default=False, action='store_true',
-                        help='Use the CSV format for the curve output. '
-                        'Includes column headers.')
+                        help='Use the CSV format for the curve output '
+                        'in ${output_report_filename}.curve, '
+                        'including column headers.')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
