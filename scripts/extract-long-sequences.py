@@ -8,6 +8,8 @@
 # pylint: disable=invalid-name,missing-docstring
 
 """
+Extract long sequences.
+
 Write out lines of FASTQ and FASTA files that exceed an argument-specified
 length.
 

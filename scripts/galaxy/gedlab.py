@@ -1,6 +1,4 @@
-"""
-k-mer count and presence
-"""
+"""k-mer count and presence."""
 
 from galaxy.datatypes.binary import Binary
 

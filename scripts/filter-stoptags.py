@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Sequence trimming using stoptags.
+
 Trim sequences at k-mers in the given stoptags file.  Output sequences
 will be placed in 'infile.stopfilt'.
 
