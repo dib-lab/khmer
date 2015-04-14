@@ -22,18 +22,17 @@ namespace khmer
 class khmer_exception : public std::exception
 {
 public:
-    explicit khmer_exception(const char * msg) : _msg(msg) { }
     explicit khmer_exception(const std::string& msg = "Generic khmer exception")
-        : _msg(msg.c_str()) { }
+        : _msg(msg) { }
 
     virtual ~khmer_exception() throw() { }
     virtual const char* what() const throw ()
     {
-        return _msg;
+        return _msg.c_str();
     }
 
 protected:
-    const char * _msg;
+    const std::string _msg;
 };
 
 ///
