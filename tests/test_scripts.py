@@ -49,7 +49,6 @@ def test_check_space():
         ['', utils.get_test_data('test-abund-read-2.fa')], False)
 
 
-@attr('failing_python2')
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
@@ -64,7 +63,6 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
-@attr('failing_python2')
 def test_load_into_counting_nonwritable():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
@@ -84,7 +82,6 @@ def test_load_into_counting_nonwritable():
 
 
 @attr('linux')
-@attr('failing_python2')
 def test_load_into_counting_toobig():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
@@ -99,7 +96,6 @@ def test_load_into_counting_toobig():
     assert "MemoryError" in err, err
 
 
-@attr('failing_python2')
 def test_load_into_counting_fail():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
@@ -114,7 +110,6 @@ def test_load_into_counting_fail():
     assert "ERROR:" in err
 
 
-@attr('failing_python2')
 def test_load_into_counting_multifile():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
@@ -130,7 +125,6 @@ def test_load_into_counting_multifile():
     assert os.path.exists(outfile)
 
 
-@attr('failing_python2')
 def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
@@ -153,7 +147,6 @@ def test_load_into_counting_tsv():
     assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
 
 
-@attr('failing_python2')
 def test_load_into_counting_json():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
@@ -215,7 +208,6 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     return outfile
 
 
-@attr('failing_python2')
 def test_filter_abund_1():
     script = scriptpath('filter-abund.py')
 
@@ -256,7 +248,6 @@ def test_filter_abund_1():
     assert os.path.exists(n_outfile2), n_outfile2
 
 
-@attr('failing_python2')
 def test_filter_abund_2():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -278,7 +269,6 @@ def test_filter_abund_2():
 # make sure that FASTQ records are retained.
 
 
-@attr('failing_python2')
 def test_filter_abund_3_fq_retained():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
@@ -306,7 +296,6 @@ def test_filter_abund_3_fq_retained():
 # make sure that FASTQ names are properly parsed, both formats.
 
 
-@attr('failing_python2')
 def test_filter_abund_4_fq_casava_18():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
@@ -326,7 +315,6 @@ def test_filter_abund_4_fq_casava_18():
     assert 'pair:foo 1::N' in seqs, seqs
 
 
-@attr('failing_python2')
 def test_filter_abund_1_singlefile():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -347,7 +335,6 @@ def test_filter_abund_1_singlefile():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
-@attr('failing_python2')
 def test_filter_abund_2_singlefile():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -370,7 +357,6 @@ def test_filter_abund_2_singlefile():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
-@attr('failing_python2')
 def test_filter_abund_2_singlefile_fq_casava_18():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -389,7 +375,6 @@ def test_filter_abund_2_singlefile_fq_casava_18():
     assert 'pair:foo 1::N' in seqs, seqs
 
 
-@attr('failing_python2')
 def test_filter_abund_4_retain_low_abund():
     # test that the -V option does not trim sequences that are low abundance
     infile = utils.get_temp_filename('test.fa')
@@ -412,7 +397,6 @@ def test_filter_abund_4_retain_low_abund():
 # test that the -V option *does* trim sequences that are low abundance
 
 
-@attr('failing_python2')
 def test_filter_abund_5_trim_high_abund():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -436,7 +420,6 @@ def test_filter_abund_5_trim_high_abund():
 # test that -V/-Z setting - should not trip if -Z is set high enough.
 
 
-@attr('failing_python2')
 def test_filter_abund_6_trim_high_abund_Z():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -460,7 +443,7 @@ def test_filter_abund_6_trim_high_abund_Z():
     assert badseq in seqs       # should be there, untrimmed
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_filter_stoptags():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -492,7 +475,7 @@ def test_filter_stoptags():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_filter_stoptags_fq():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -529,7 +512,7 @@ def test_filter_stoptags_fq():
     assert 'seq 1::BAR' in names
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.ct')
@@ -541,7 +524,7 @@ def test_normalize_by_median_indent():
     assert os.path.exists(outfile)
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median():
     CUTOFF = '1'
 
@@ -564,7 +547,7 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_append():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -583,7 +566,7 @@ def test_normalize_by_median_append():
     assert 'GACAGCgtgCCGCA' in seqs[1], seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_overwrite():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -602,7 +585,7 @@ def test_normalize_by_median_overwrite():
     assert 'GACAGCgtgCCGCA' in seqs[0], seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
@@ -621,7 +604,7 @@ def test_normalize_by_median_version():
     assert err.startswith('khmer ')
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_2():
     CUTOFF = '2'
 
@@ -643,7 +626,7 @@ def test_normalize_by_median_2():
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_paired():
     CUTOFF = '1'
 
@@ -665,7 +648,7 @@ def test_normalize_by_median_paired():
     assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_paired_fq():
     CUTOFF = '20'
 
@@ -694,7 +677,7 @@ def test_normalize_by_median_paired_fq():
     assert '895:1:37:17593:9954 2::FOO' in names, names
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_impaired():
     CUTOFF = '1'
 
@@ -708,7 +691,7 @@ def test_normalize_by_median_impaired():
     utils.runscript(script, args, in_dir, fail_ok=True)
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_force():
     CUTOFF = '1'
 
@@ -737,7 +720,7 @@ def test_normalize_by_median_force():
     assert '** IOErrors' in err
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
     hashfile = utils.get_temp_filename('test-out.ct')
@@ -760,7 +743,6 @@ def test_normalize_by_median_no_bigcount():
     assert kh.get('GGTTGACG') == 255
 
 
-@attr('failing_python2')
 def test_normalize_by_median_dumpfrequency():
     CUTOFF = '1'
 
@@ -790,7 +772,6 @@ def test_normalize_by_median_dumpfrequency():
     assert 'Nothing' in out
 
 
-@attr('failing_python2')
 def test_normalize_by_median_empty():
     CUTOFF = '1'
 
@@ -807,7 +788,6 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
-@attr('failing_python2')
 def test_normalize_by_median_fpr():
     MIN_TABLESIZE_PARAM = 1
 
@@ -825,7 +805,7 @@ def test_normalize_by_median_fpr():
     assert '** ERROR: the k-mer counting table is too small' in err, err
 
 
-@attr('failing_python2')
+@attr("failing_python3")
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -846,7 +826,7 @@ def test_count_median():
     assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
 
 
-@attr('failing_python2')
+@attr("failing_python3")
 def test_count_median_fq():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -867,7 +847,6 @@ def test_count_median_fq():
     assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
 
 
-@attr('failing_python2')
 def test_count_median_fq_csv():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -894,7 +873,6 @@ def test_count_median_fq_csv():
 #
 
 
-@attr('failing_python2')
 def test_load_graph():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
@@ -925,7 +903,6 @@ def test_load_graph():
     assert x == (1, 0), x
 
 
-@attr('failing_python2')
 def test_load_graph_no_tags():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
@@ -949,7 +926,6 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
-@attr('failing_python2')
 def test_load_graph_fail():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -964,7 +940,6 @@ def test_load_graph_fail():
     assert "ERROR:" in err
 
 
-@attr('failing_python2')
 def test_load_graph_write_fp():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e5', '-N', '2', '-k', '20', '-w']  # use small HT
@@ -987,7 +962,6 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
-@attr('failing_python2')
 def test_load_graph_multithread():
     script = scriptpath('load-graph.py')
 
@@ -1096,7 +1070,6 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     return outfile
 
 
-@attr('failing_python2')
 def test_partition_graph_1():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
@@ -1120,7 +1093,6 @@ def test_partition_graph_1():
     assert x == (1, 0), x          # should be exactly one partition.
 
 
-@attr('failing_python2')
 def test_partition_graph_nojoin_k21():
     # test with K=21
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
@@ -1145,7 +1117,6 @@ def test_partition_graph_nojoin_k21():
     assert x == (99, 0), x          # should be 99 partitions at K=21
 
 
-@attr('failing_python2')
 def test_partition_graph_nojoin_stoptags():
     # test with stoptags
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
@@ -1178,7 +1149,6 @@ def test_partition_graph_nojoin_stoptags():
     assert x == (2, 0), x          # should be 2 partitions
 
 
-@attr('failing_python2')
 def test_partition_graph_big_traverse():
     graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
                             do_partition=True, stop_big_traverse=False)
@@ -1194,7 +1164,6 @@ def test_partition_graph_big_traverse():
     assert x == (1, 0), x          # should be exactly one partition.
 
 
-@attr('failing_python2')
 def test_partition_graph_no_big_traverse():
     # do NOT exhaustively traverse
     graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
@@ -1211,7 +1180,6 @@ def test_partition_graph_no_big_traverse():
     assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
-@attr('failing_python2')
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
@@ -1233,7 +1201,6 @@ def test_annotate_partitions():
     assert len(parts) == 1
 
 
-@attr('failing_python2')
 def test_annotate_partitions_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -1257,7 +1224,6 @@ def test_annotate_partitions_2():
     assert len(parts) == 99, len(parts)
 
 
-@attr('failing_python2')
 def test_extract_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(
@@ -1287,7 +1253,6 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
-@attr('failing_python2')
 def test_extract_partitions_fq():
     seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(
@@ -1328,7 +1293,6 @@ def test_extract_partitions_fq():
     assert quals[0], quals
 
 
-@attr('failing_python2')
 def test_extract_partitions_output_unassigned():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(
@@ -1360,7 +1324,6 @@ def test_extract_partitions_output_unassigned():
     assert len(parts) == 1, len(parts)
 
 
-@attr('failing_python2')
 def test_extract_partitions_no_output_groups():
     seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(
@@ -1383,7 +1346,6 @@ def test_extract_partitions_no_output_groups():
     assert not os.path.exists(groupfile)
 
 
-@attr('failing_python2')
 def test_extract_partitions_pid_0():
     basefile = utils.get_test_data('random-20-a.fa.part')
     partfile = utils.get_temp_filename('random-20-a.fa.part')
@@ -1408,7 +1370,6 @@ def test_extract_partitions_pid_0():
     assert unassigned_content.strip().split('\t')[0] != ''
 
 
-@attr('failing_python2')
 def test_extract_partitions_multi_groups():
     basefile = utils.get_test_data('random-20-a.fa.part')
     partfile = utils.get_temp_filename('random-20-a.fa.part')
@@ -1431,7 +1392,6 @@ def test_extract_partitions_multi_groups():
     assert os.path.exists(groupfile3)
 
 
-@attr('failing_python2')
 def test_extract_partitions_no_groups():
     empty_file = utils.get_temp_filename('empty-file')
     basefile = utils.get_test_data('empty-file')
@@ -1451,7 +1411,6 @@ def test_extract_partitions_no_groups():
     assert not os.path.exists(groupfile)
 
 
-@attr('failing_python2')
 def test_abundance_dist():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1484,7 +1443,6 @@ def test_abundance_dist():
         assert line == '1001,2,98,1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1505,7 +1463,6 @@ def test_abundance_dist_nobigcount():
         assert line == '255 2 98 1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_single():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1527,7 +1484,6 @@ def test_abundance_dist_single():
         assert line == '1001 2 98 1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_single_csv():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1549,7 +1505,6 @@ def test_abundance_dist_single_csv():
         assert line == '1001,2,98,1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_single_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1568,7 +1523,6 @@ def test_abundance_dist_single_nobigcount():
         assert line == '255 2 98 1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_single_nosquash():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test-abund-read-2.fa')
@@ -1587,7 +1541,6 @@ def test_abundance_dist_single_nosquash():
         assert line == '1001 2 98 1.0', line
 
 
-@attr('failing_python2')
 def test_abundance_dist_single_savetable():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
@@ -1608,7 +1561,6 @@ def test_abundance_dist_single_savetable():
         assert line == '1001 2 98 1.0', line
 
 
-@attr('failing_python2')
 def test_do_partition():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = utils.get_temp_filename('out')
@@ -1627,7 +1579,6 @@ def test_do_partition():
     assert len(parts) == 1
 
 
-@attr('failing_python2')
 def test_do_partition_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -1647,7 +1598,6 @@ def test_do_partition_2():
     assert len(parts) == 99, len(parts)
 
 
-@attr('failing_python2')
 def test_do_partition_2_fq():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fq')
@@ -1667,7 +1617,6 @@ def test_do_partition_2_fq():
     assert '46 1::FIZ' in names
 
 
-@attr('failing_python2')
 def test_interleave_reads_1_fq():
     # test input files
     infile1 = utils.get_test_data('paired.fq.1')
@@ -1690,7 +1639,6 @@ def test_interleave_reads_1_fq():
     assert r == q, (r, q)
 
 
-@attr('failing_python2')
 def test_interleave_reads_broken_fq():
     # test input files
     infile1 = utils.get_test_data('paired-broken.fq.1')
@@ -1706,7 +1654,6 @@ def test_interleave_reads_broken_fq():
     assert status == 1
 
 
-@attr('failing_python2')
 def test_interleave_reads_broken_fq_2():
     # test input files
     infile1 = utils.get_test_data('paired-broken2.fq.1')
@@ -1722,7 +1669,6 @@ def test_interleave_reads_broken_fq_2():
     assert status == 1
 
 
-@attr('failing_python2')
 def test_interleave_reads_broken_fq_3():
     # test input files
     infile1 = utils.get_test_data('paired-broken3.fq.1')
@@ -1738,7 +1684,6 @@ def test_interleave_reads_broken_fq_3():
     assert status == 1
 
 
-@attr('failing_python2')
 def test_interleave_reads_broken_fq_4():
     # test input files
     infile1 = utils.get_test_data('paired-mixed-broken.fq')
@@ -1753,7 +1698,6 @@ def test_interleave_reads_broken_fq_4():
     assert status == 1
 
 
-@attr('failing_python2')
 def test_interleave_reads_2_fa():
     # test input files
     infile1 = utils.get_test_data('paired.fa.1')
@@ -1778,7 +1722,6 @@ def test_interleave_reads_2_fa():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_make_initial_stoptags():
     # gen input files using load-graph.py -t
     # should keep test_data directory size down
@@ -1811,7 +1754,6 @@ def test_make_initial_stoptags():
     assert os.path.exists(outfile1), outfile1
 
 
-@attr('failing_python2')
 def test_extract_paired_reads_1_fa():
     # test input file
     infile = utils.get_test_data('paired-mixed.fa')
@@ -1847,7 +1789,6 @@ def test_extract_paired_reads_1_fa():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_extract_paired_reads_2_fq():
     # test input file
     infile = utils.get_test_data('paired-mixed.fq')
@@ -1887,7 +1828,6 @@ def test_extract_paired_reads_2_fq():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_1_fa():
     # test input file
     infile = utils.get_test_data('paired.fa')
@@ -1923,7 +1863,6 @@ def test_split_paired_reads_1_fa():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_2_fq():
     # test input file
     infile = utils.get_test_data('paired.fq')
@@ -1961,7 +1900,6 @@ def test_split_paired_reads_2_fq():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_2_mixed_fq_require_pair():
     # test input file
     infile = utils.get_temp_filename('test.fq')
@@ -1976,7 +1914,6 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     assert "is not part of a pair" in err
 
 
-@attr('failing_python2')
 def test_split_paired_reads_2_mixed_fq():
     # test input file
     infile = utils.get_temp_filename('test.fq')
@@ -1991,7 +1928,6 @@ def test_split_paired_reads_2_mixed_fq():
     assert "split 11 sequences (7 left, 4 right)" in err, err
 
 
-@attr('failing_python2')
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     # test input file
     infile = utils.get_temp_filename('test.fq')
@@ -2006,7 +1942,6 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     assert "Unrecognized format" in err
 
 
-@attr('failing_python2')
 def test_split_paired_reads_3_output_dir():
     # test input file
     infile = utils.get_test_data('paired.fq')
@@ -2044,7 +1979,6 @@ def test_split_paired_reads_3_output_dir():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_3_output_files():
     # test input file
     infile = utils.get_test_data('paired.fq')
@@ -2082,7 +2016,6 @@ def test_split_paired_reads_3_output_files():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_3_output_files_left():
     # test input file
     infile = utils.get_test_data('paired.fq')
@@ -2120,7 +2053,6 @@ def test_split_paired_reads_3_output_files_left():
     assert n > 0
 
 
-@attr('failing_python2')
 def test_split_paired_reads_3_output_files_right():
     # test input file
     infile = utils.get_test_data('paired.fq')
@@ -2158,7 +2090,7 @@ def test_split_paired_reads_3_output_files_right():
     assert n > 0
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_sample_reads_randomly():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2182,7 +2114,7 @@ def test_sample_reads_randomly():
                         '850:2:1:2065:16816/1', '850:2:1:1792:15774/2'])
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_sample_reads_randomly_fq():
     infile = utils.get_temp_filename('test.fq.gz')
     in_dir = os.path.dirname(infile)
@@ -2210,7 +2142,6 @@ def test_sample_reads_randomly_fq():
                         '850:2:1:2273:13309 1::FOO'])
 
 
-@attr('failing_python2')
 def test_fastq_to_fasta():
 
     script = scriptpath('fastq-to-fasta.py')
@@ -2261,7 +2192,6 @@ def test_fastq_to_fasta():
     assert "4 lines dropped" in err
 
 
-@attr('failing_python2')
 def test_extract_long_sequences():
 
     script = scriptpath('extract-long-sequences.py')
@@ -2294,7 +2224,7 @@ def test_extract_long_sequences():
     assert countlines == 22, countlines
 
 
-@attr('failing_python2')
+@attr('failing_python3')
 def test_sample_reads_randomly_S():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
@@ -2349,7 +2279,6 @@ def test_sample_reads_randomly_S():
                         '895:1:1:1342:20695', '895:1:1:1303:6251'])
 
 
-@attr('failing_python2')
 def test_count_overlap():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
@@ -2377,7 +2306,6 @@ def test_count_overlap():
     assert '752053 238627' in data
 
 
-@attr('failing_python2')
 def test_count_overlap_csv():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
@@ -2482,7 +2410,6 @@ def execute_load_graph_streaming(filename):
     assert x == (1, 0), x
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_ufa():
     # uncompressed fa
@@ -2494,7 +2421,6 @@ def test_screed_streaming_ufa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_ufq():
     # uncompressed fq
@@ -2504,7 +2430,6 @@ def test_screed_streaming_ufq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_bzipfq():
     # bzip compressed fq
@@ -2514,7 +2439,6 @@ def test_screed_streaming_bzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_bzipfa():
     # bzip compressed fa
@@ -2526,7 +2450,6 @@ def test_screed_streaming_bzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_gzipfq():
     # gzip compressed fq
@@ -2536,7 +2459,6 @@ def test_screed_streaming_gzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
@@ -2547,18 +2469,19 @@ def test_screed_streaming_gzipfa():
 
 
 @attr('failing_python2')
+@attr('failing_python3')
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
 @attr('failing_python2')
+@attr('failing_python3')
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
@@ -2566,12 +2489,12 @@ def test_read_parser_streaming_bzfq():
 
 
 @attr('failing_python2')
+@attr('failing_python3')
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
-@attr('failing_python2')
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
@@ -2579,12 +2502,12 @@ def test_read_parser_streaming_bzfa():
 
 
 @attr('failing_python2')
+@attr('failing_python3')
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
 
 
-@attr('failing_python2')
 def test_readstats():
     readstats_output = ("358 bp / 5 seqs; 71.6 average length",
                         "916 bp / 11 seqs; 83.3 average length")
@@ -2598,7 +2521,6 @@ def test_readstats():
         assert k in out, (k, out)
 
 
-@attr('failing_python2')
 def test_readstats_output():
     readstats_output = ("358 bp / 5 seqs; 71.6 average length",
                         "916 bp / 11 seqs; 83.3 average length")
@@ -2617,7 +2539,6 @@ def test_readstats_output():
         assert k in out, (k, out)
 
 
-@attr('failing_python2')
 def test_readstats_empty():
     expected_output = "No sequences found in 2 files"
 
@@ -2630,7 +2551,6 @@ def test_readstats_empty():
     assert expected_output in out
 
 
-@attr('failing_python2')
 def test_trim_low_abund_1():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2648,7 +2568,6 @@ def test_trim_low_abund_1():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
-@attr('failing_python2')
 def test_trim_low_abund_1_duplicate_filename_err():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2664,7 +2583,6 @@ def test_trim_low_abund_1_duplicate_filename_err():
         pass
 
 
-@attr('failing_python2')
 def test_trim_low_abund_2():
     infile = utils.get_temp_filename('test.fa')
     infile2 = utils.get_temp_filename('test2.fa')
@@ -2686,7 +2604,6 @@ def test_trim_low_abund_2():
 # make sure that FASTQ records are retained.
 
 
-@attr('failing_python2')
 def test_trim_low_abund_3_fq_retained():
     infile = utils.get_temp_filename('test.fq')
     infile2 = utils.get_temp_filename('test2.fq')
@@ -2714,7 +2631,6 @@ def test_trim_low_abund_3_fq_retained():
 # test that the -V option does not trim sequences that are low abundance
 
 
-@attr('failing_python2')
 def test_trim_low_abund_4_retain_low_abund():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2734,7 +2650,6 @@ def test_trim_low_abund_4_retain_low_abund():
 # test that the -V option *does* trim sequences that are low abundance
 
 
-@attr('failing_python2')
 def test_trim_low_abund_5_trim_high_abund():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2756,7 +2671,6 @@ def test_trim_low_abund_5_trim_high_abund():
 # test that -V/-Z setting - should not trip if -Z is set high enough.
 
 
-@attr('failing_python2')
 def test_trim_low_abund_6_trim_high_abund_Z():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2778,7 +2692,6 @@ def test_trim_low_abund_6_trim_high_abund_Z():
     assert badseq in seqs       # should be there, untrimmed
 
 
-@attr('failing_python2')
 def test_trim_low_abund_keep_paired():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2795,7 +2708,6 @@ def test_trim_low_abund_keep_paired():
     assert seqs[-2:] == ['pair/1', 'pair/2'], seqs
 
 
-@attr('failing_python2')
 def test_trim_low_abund_keep_paired_casava18():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2813,7 +2725,6 @@ def test_trim_low_abund_keep_paired_casava18():
     assert seqs[-2:] == ['pair:foo 1::N', 'pair:foo 2::N'], seqs
 
 
-@attr('failing_python2')
 def test_trim_low_abund_highfpr():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2829,7 +2740,6 @@ def test_trim_low_abund_highfpr():
     assert "ERROR: the k-mer counting table is too small" in err
 
 
-@attr('failing_python2')
 def test_trim_low_abund_trimtest():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2858,7 +2768,6 @@ def test_trim_low_abund_trimtest():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-@attr('failing_python2')
 def test_trim_low_abund_trimtest_after_load():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2891,7 +2800,6 @@ def test_trim_low_abund_trimtest_after_load():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-@attr('failing_python2')
 def test_trim_low_abund_trimtest_savetable():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -2923,7 +2831,6 @@ def test_trim_low_abund_trimtest_savetable():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-@attr('failing_python2')
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
@@ -2942,7 +2849,6 @@ def test_roundtrip_casava_format_1():
     assert r == r2, (r, r2)
 
 
-@attr('failing_python2')
 def test_roundtrip_casava_format_2():
     # check that split-paired-reads -> interleave-reads produces a file
     # identical to input, when only paired reads are given.
@@ -2964,7 +2870,6 @@ def test_roundtrip_casava_format_2():
     assert r == r2, (r, r2)
 
 
-@attr('failing_python2')
 def test_existance_failure():
     expected_output = 'ERROR: Input file'
 

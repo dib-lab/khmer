@@ -90,7 +90,6 @@ class _checkImportSucceeds(object):
             sys.stdout, sys.stderr = oldout, olderr
 
 
-@attr('failing_python2')
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
@@ -133,7 +132,6 @@ def test_sweep_reads():
     assert seqso == set(['read5_orphan'])
 
 
-@attr('failing_python2')
 def test_sweep_reads_fq():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
