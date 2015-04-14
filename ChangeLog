@@ -1,3 +1,10 @@
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/{counting,hashbits,hashtable,
+   subset}.cc: catch IO errors and report them.
+   * tests/test_hashbits.py: remove write to fixed path in /tmp
+   * tests/test_scripts.py: added test for empty counting table file
+
 2015-04-13 Elmar Bucher <buchere@ohsu.edu>
 
    * scripts/normalize-by-median.py (main): introduced warning for when at least

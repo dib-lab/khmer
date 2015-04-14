@@ -584,7 +584,6 @@ def test_save_load_tagset_trunc():
     ht.add_tag('A' * 32)
     ht.add_tag('G' * 32)
     ht.save_tagset(outfile)
-    ht.save_tagset('/tmp/goodversion-k32.tagset')
 
     # truncate tagset file...
     fp = open(outfile, 'rb')

@@ -761,6 +761,20 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
+def test_normalize_by_median_emptycountingtable():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '--loadtable', infile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert 'ValueError' in err, (status, out, err)
+
+
 def test_normalize_by_median_fpr():
     MIN_TABLESIZE_PARAM = 1
 
