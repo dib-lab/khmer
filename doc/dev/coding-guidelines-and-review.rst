@@ -72,6 +72,7 @@ ready for review::
      http://en.wikipedia.org/wiki/Changelog#Format
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
+   - [ ] Is the Copyright year up to date?
 
 **Note** that after you submit the comment you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y
