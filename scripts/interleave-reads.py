@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Interleave left and right reads.
+
 Take two files containing left & right reads from a paired-end sequencing run,
 and interleave them.
 

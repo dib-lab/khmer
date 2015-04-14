@@ -4,9 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-"""
-This is khmer; please see http://khmer.readthedocs.org/.
-"""
+"""This is khmer; please see http://khmer.readthedocs.org/."""
 
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
@@ -182,7 +180,7 @@ def calc_expected_collisions(hashtable):
 
 
 def is_prime(number):
-    '''Checks if a number is prime.'''
+    """Check if a number is prime."""
     if number < 2:
         return False
     if number == 2:
@@ -196,13 +194,13 @@ def is_prime(number):
 
 
 def get_n_primes_near_x(number, target):
-    ''' Step backwards until a number of primes (other than 2) have been
+    """Step backwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
     number -- the number of primes to find
     target -- the number to step backwards from
-    '''
+    """
     primes = []
     i = target - 1
     if i % 2 == 0:
@@ -215,13 +213,13 @@ def get_n_primes_near_x(number, target):
 
 
 def get_n_primes_above_x(number, target):
-    '''Step forwards until a number of primes (other than 2) have been
+    """Step forwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
     number -- the number of primes to find
     target -- the number to step forwards from
-    '''
+    """
     primes = []
     i = target + 1
     if i % 2 == 0:
@@ -232,12 +230,11 @@ def get_n_primes_above_x(number, target):
         i += 2
     return primes
 
-'''
-Expose the cpython objects with __new__ implementations.
-These constructors add the functionality provided by the existing
-factory methods to the constructors defined over in cpython land.
-Additional functionality can be added to these classes as appropriate.
-'''
+
+# Expose the cpython objects with __new__ implementations.
+# These constructors add the functionality provided by the existing
+# factory methods to the constructors defined over in cpython land.
+# Additional functionality can be added to these classes as appropriate.
 
 
 class LabelHash(_LabelHash):
@@ -259,7 +256,9 @@ class Hashbits(_Hashbits):
 
 
 class HLLCounter(_HLLCounter):
-    """
+
+    """HyperLogLog counter.
+
     A HyperLogLog counter is a probabilistic data structure specialized on
     cardinality estimation.
     There is a precision/memory consumption trade-off: error rate determines

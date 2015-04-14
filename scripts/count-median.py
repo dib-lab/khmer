@@ -7,9 +7,11 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Count the median/avg k-mer abundance for each sequence in the input file,
-based on the k-mer counts in the given k-mer counting table.  Can be used to
-estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
+Count the median/avg k-mer abundance for each sequence in the input file.
+
+The abundance is based on the k-mer counts in the given k-mer counting
+table.  Can be used to estimate expression levels (mRNAseq) or coverage
+(genomic/metagenomic).
 
 % scripts/count-median.py <htname> <input seqs> <output counts>
 

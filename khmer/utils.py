@@ -9,18 +9,16 @@
 
 
 def print_error(msg):
-    """
-    Prints the given message to 'stderr'.
-    """
-
+    """Print the given message to 'stderr'."""
     import sys
 
     print >>sys.stderr, msg
 
 
 def check_is_pair(record1, record2):
-    """
-    Checks to see if the two sequence records are left and right pairs
+    """Check if the two sequence records belong to the same fragment.
+
+    In an matching pair the records are left and right pairs
     of each other, respectively.  Returns True or False as appropriate.
 
     Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
@@ -53,9 +51,9 @@ def check_is_pair(record1, record2):
 
 
 def check_is_left(name):
-    """
-    Checks if the name belongs to a 'left' sequence (/1).  Returns True or
-    False.
+    """Check if the name belongs to a 'left' sequence (/1).
+
+    Returns True or False.
 
     Handles both Casava formats: seq/1 and 'seq::... 1::...'
     """
@@ -70,9 +68,9 @@ def check_is_left(name):
 
 
 def check_is_right(name):
-    """
-    Checks if the name belongs to a 'right' sequence (/2).  Returns True or
-    False.
+    """Check if the name belongs to a 'right' sequence (/2).
+
+    Returns True or False.
 
     Handles both Casava formats: seq/2 and 'seq::... 2::...'
     """
@@ -87,7 +85,8 @@ def check_is_right(name):
 
 
 def broken_paired_reader(screed_iter, min_length=None, force_single=False):
-    """
+    """Read pairs from a stream.
+    
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
     records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
     'r2' is None if is_pair is False.
@@ -138,9 +137,7 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
 
 
 def write_record(record, fileobj):
-    """
-    Writes sequence record to 'fileobj' in FASTA/FASTQ format.
-    """
+    """Write sequence record to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(record, 'quality'):
         fileobj.write(
             '@{name}\n{seq}\n'
@@ -154,9 +151,7 @@ def write_record(record, fileobj):
 
 
 def write_record_pair(read1, read2, fileobj):
-    """
-    Writes pair of sequence records to 'fileobj' in FASTA/FASTQ format.
-    """
+    """Write a pair of sequence records to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(read1, 'quality'):
         assert hasattr(read2, 'quality')
     write_record(read1, fileobj)
