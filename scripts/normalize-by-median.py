@@ -303,8 +303,6 @@ file for one of the input files will be generated.)" % filename
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
-    # total = 0
-    # discarded = 0
     input_filename = None
 
     for index, input_filename in enumerate(args.input_filenames):
