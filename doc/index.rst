@@ -12,7 +12,7 @@ khmer -- k-mer counting & filtering FTW
           Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown
 
 :Contact: khmer-project@idyll.org
-:Repository: https://github.com/ged-lab/khmer
+:Github Repo: https://github.com/ged-lab/khmer
 :Chat: https://gitter.im/ged-lab/khmer
 :License: BSD
 
