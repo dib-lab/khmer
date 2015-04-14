@@ -579,7 +579,6 @@ def test_normalize_by_median_overwrite():
     assert 'GACAGCgtgCCGCA' in seqs[0], seqs
 
 
-@attr('failing_python3')
 def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
