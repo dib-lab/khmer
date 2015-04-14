@@ -100,6 +100,10 @@ One-time Preparation
      
        sudo port install py27-pip
      
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+   already installed
+
+     
    `Conda <https://github.com/conda/conda>`__ users on any platform
    should instead create a separate Conda environment::
      
@@ -128,6 +132,11 @@ One-time Preparation
    install cppcheck by executing from the command line::
      
        sudo port install cppcheck
+
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo brew install cppcheck
 
 
 Building khmer and running the tests
