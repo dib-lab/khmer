@@ -1,3 +1,8 @@
+2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * doc/dev/coding-guidelines-and-review.rst: added copyright question
+   to commit checklist.
+
 2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * */*.py: Make docstrings PEP 257 compliant.
