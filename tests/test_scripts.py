@@ -788,8 +788,8 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    assert 'fp rate estimated to be' in err, err
-    assert '** ERROR: the k-mer counting table is too small' in err, err
+    #assert 'fp rate estimated to be' in err, err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
@@ -2770,7 +2770,7 @@ def test_trim_low_abund_highfpr():
 
     assert code == 1
     print out
-    assert "ERROR: the k-mer counting table is too small" in err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def test_trim_low_abund_trimtest():

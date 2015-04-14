@@ -131,16 +131,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         print >>sys.stderr, 'consuming input', filename
         htable.consume_fasta_and_tag(filename)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.15, force=args.force) # 0.18 is ACTUAL MAX. Do not change.
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-    if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the graph structure is too small for"
-                              " this data set.  Increase k-mer presence table "
-                              "size/num of tables.")
-        print >> sys.stderr, "**"
-        if not args.force:
-            sys.exit(1)
 
     # partition-graph
 

@@ -31,9 +31,6 @@ from khmer.kfile import (check_space, check_space_for_hashtable,
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
-# see Zhang et al., http://arxiv.org/abs/1309.2975
-MAX_FALSE_POSITIVE_RATE = 0.8
-
 
 def trim_record(read, trim_at):
     new_read = _screed_record_dict()
@@ -308,18 +305,10 @@ def main():
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
 
-    fp_rate = khmer.calc_expected_collisions(ct)
+    fp_rate = khmer.calc_expected_collisions(ct, max_false_positive=.8, force=args.force) # see Zhang et al., http://arxiv.org/abs/1309.2975
     print >>sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
-    if fp_rate > MAX_FALSE_POSITIVE_RATE:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " for this data set. Increase tablesize/# "
-                              "tables.")
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** Do not use these results!!"
-        sys.exit(1)
 
     print 'output in *.abundtrim'
 
