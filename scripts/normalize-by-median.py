@@ -180,8 +180,9 @@ def get_parser():
     Paired end reads will be considered together if :option:`-p` is set. If
     either read will be kept, then both will be kept. This should result in
     keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially. With :option: `-u`/:option:`--unpaired`, 
-    unpaired reads from the specified file will be read with the paired data. 
+    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`, 
+    unpaired reads from the specified file will be read after the paired data
+    is read. 
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
@@ -231,7 +232,7 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-u', '--unpaired', metavar="unpaired_reads_filename",
+    parser.add_argument('-u', '--unpaired-reads', metavar="unpaired_reads_filename",
                         help='with paired data only, include an unpaired file')
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
@@ -322,15 +323,15 @@ file for one of the input files will be generated.)" % filename
                 print 'Nothing given for savetable, saving to', hashname
             htable.save(hashname)
 
-    if args.paired and args.unpaired:
+    if args.paired and args.unpaired_reads:
         args.paired = False
-        output_name = args.unpaired
+        output_name = args.unpaired_reads
         if not args.single_output_file:
-            output_name = os.path.basename(args.unpaired) + '.keep'
+            output_name = os.path.basename(args.unpaired_reads) + '.keep'
         outfp = open(output_name, 'w')
         total_acc, discarded_acc, corrupt_files = \
             normalize_by_median_and_check(
-                args.unpaired, htable, args, report_fp, corrupt_files)
+                args.unpaired_reads, htable, args, report_fp, corrupt_files)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
