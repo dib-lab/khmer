@@ -443,7 +443,6 @@ def test_filter_abund_6_trim_high_abund_Z():
     assert badseq in seqs       # should be there, untrimmed
 
 
-@attr('failing_python3')
 def test_filter_stoptags():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -475,7 +474,6 @@ def test_filter_stoptags():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
 
-@attr('failing_python3')
 def test_filter_stoptags_fq():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -512,7 +510,6 @@ def test_filter_stoptags_fq():
     assert 'seq 1::BAR' in names
 
 
-@attr('failing_python3')
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.ct')
@@ -524,7 +521,6 @@ def test_normalize_by_median_indent():
     assert os.path.exists(outfile)
 
 
-@attr('failing_python3')
 def test_normalize_by_median():
     CUTOFF = '1'
 
@@ -547,7 +543,6 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
-@attr('failing_python3')
 def test_normalize_by_median_append():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -566,7 +561,6 @@ def test_normalize_by_median_append():
     assert 'GACAGCgtgCCGCA' in seqs[1], seqs
 
 
-@attr('failing_python3')
 def test_normalize_by_median_overwrite():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -604,7 +598,6 @@ def test_normalize_by_median_version():
     assert err.startswith('khmer ')
 
 
-@attr('failing_python3')
 def test_normalize_by_median_2():
     CUTOFF = '2'
 
@@ -626,7 +619,6 @@ def test_normalize_by_median_2():
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
 
-@attr('failing_python3')
 def test_normalize_by_median_paired():
     CUTOFF = '1'
 
@@ -648,7 +640,6 @@ def test_normalize_by_median_paired():
     assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
 
 
-@attr('failing_python3')
 def test_normalize_by_median_paired_fq():
     CUTOFF = '20'
 
@@ -677,7 +668,6 @@ def test_normalize_by_median_paired_fq():
     assert '895:1:37:17593:9954 2::FOO' in names, names
 
 
-@attr('failing_python3')
 def test_normalize_by_median_impaired():
     CUTOFF = '1'
 
@@ -691,7 +681,6 @@ def test_normalize_by_median_impaired():
     utils.runscript(script, args, in_dir, fail_ok=True)
 
 
-@attr('failing_python3')
 def test_normalize_by_median_force():
     CUTOFF = '1'
 
@@ -720,7 +709,6 @@ def test_normalize_by_median_force():
     assert '** IOErrors' in err
 
 
-@attr('failing_python3')
 def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
     hashfile = utils.get_temp_filename('test-out.ct')
@@ -847,6 +835,7 @@ def test_count_median_fq():
     assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
 
 
+@attr('failing_python3')
 def test_count_median_fq_csv():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -2469,14 +2458,12 @@ def test_screed_streaming_gzipfa():
 
 
 @attr('failing_python2')
-@attr('failing_python3')
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
 @attr('failing_python2')
-@attr('failing_python3')
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
@@ -2489,7 +2476,6 @@ def test_read_parser_streaming_bzfq():
 
 
 @attr('failing_python2')
-@attr('failing_python3')
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
@@ -2502,7 +2488,6 @@ def test_read_parser_streaming_bzfa():
 
 
 @attr('failing_python2')
-@attr('failing_python3')
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))

@@ -13,6 +13,7 @@ import nose
 import sys
 import traceback
 import subprocess
+from io import open
 
 try:
     from StringIO import StringIO
@@ -150,8 +151,8 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
                 os.chdir(in_directory)
             sysargs = 'cat ' + stdinfilename + ' | python ' + scriptfile + \
                 " " + args
-            out = open(os.path.join(in_directory, "out"), 'w+b')
-            err = open(os.path.join(in_directory, "err"), 'w+b')
+            out = open(os.path.join(in_directory, "out"), 'w+', encoding='utf-8')
+            err = open(os.path.join(in_directory, "err"), 'w+', encoding='utf-8')
             print('running:', scriptname, 'in:', in_directory)
             print('arguments', sysargs)
             status = subprocess.call(args=sysargs, stdout=out, stderr=err,
