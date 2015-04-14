@@ -2233,23 +2233,18 @@ def test_fastq_to_fasta():
     assert "4 lines dropped" in err
 
 
-def test_extract_long_sequences():
-
+def test_extract_long_fq_sequences():
     script = scriptpath('extract-long-sequences.py')
     fq_infile = utils.get_temp_filename('test.fq')
-    fa_infile = utils.get_temp_filename('test.fa')
 
     shutil.copyfile(utils.get_test_data('paired-mixed.fq'), fq_infile)
-    shutil.copyfile(utils.get_test_data('paired-mixed.fa'), fa_infile)
 
     fq_outfile = fq_infile + '.keep.fq'
-    fa_outfile = fa_infile + '.keep.fa'
 
     in_dir_fq = os.path.dirname(fq_infile)
-    in_dir_fa = os.path.dirname(fa_infile)
 
     args = [fq_infile, '-l', '10', '-o', fq_outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir_fa)
+    (status, out, err) = utils.runscript(script, args, in_dir_fq)
 
     countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
@@ -2257,6 +2252,17 @@ def test_extract_long_sequences():
     names = [r.name for r in screed.open(fq_outfile, parse_description=False)]
     assert "895:1:37:17593:9954 1::foo" in names
     assert "895:1:37:17593:9954 2::foo" in names
+
+
+def test_extract_long_fa_sequences():
+    script = scriptpath('extract-long-sequences.py')
+    fa_infile = utils.get_temp_filename('test.fa')
+
+    shutil.copyfile(utils.get_test_data('paired-mixed.fa'), fa_infile)
+
+    fa_outfile = fa_infile + '.keep.fa'
+
+    in_dir_fa = os.path.dirname(fa_infile)
 
     args = [fa_infile, '-l', '10', '-o', fa_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_fa)
