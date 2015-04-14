@@ -534,22 +534,17 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
-def test_normalize_by_median_append():
-    outfile = utils.get_temp_filename('test.fa.keep')
-    shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
-    in_dir = os.path.dirname(outfile)
+def test_normalize_by_median_double_file_name():
+    infile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
 
-    CUTOFF = '1'
-    infile = utils.get_temp_filename('test.fa', in_dir)
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
     script = scriptpath('normalize-by-median.py')
-
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, '--append', infile]
+    args = [utils.get_test_data('test-abund-read-2.fa'), infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert os.path.exists(outfile), outfile
-    seqs = [r.sequence for r in screed.open(outfile)]
-    assert len(seqs) == 2, seqs
-    assert 'GACAGCgtgCCGCA' in seqs[1], seqs
+
+    assert "WARNING: At least two input files are named" in err, err
 
 
 def test_normalize_by_median_overwrite():
@@ -779,8 +774,46 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    assert 'fp rate estimated to be' in out, out
+    assert 'fp rate estimated to be' in err, err
     assert '** ERROR: the k-mer counting table is too small' in err, err
+
+
+def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
+    ifile = io.open(infile,  'rb')
+    ofile = io.open(outfile, 'wb')
+    chunk = ifile.read(CHUNKSIZE)
+    while len(chunk) > 0:
+        ofile.write(chunk)
+        chunk = ifile.read(CHUNKSIZE)
+    ifile.close()
+    ofile.close()
+
+
+def test_normalize_by_median_stdout():
+    CUTOFF = '20'
+
+    infile = utils.get_test_data('100-reads.fq.gz')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    outfile = utils.get_temp_filename('outfile')
+
+    # Use a fifo to copy stdout to a file for checking
+    os.mkfifo(fifo)
+    thread = threading.Thread(target=write_by_chunks, args=(fifo, outfile))
+    thread.start()
+
+    # Execute diginorm
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-o', fifo, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    # Merge the thread
+    thread.join()
+
+    assert os.path.exists(outfile), outfile
+    with open(outfile) as fp:
+        linecount = sum(1 for _ in fp)
+    assert linecount == 400
 
 
 def test_count_median():

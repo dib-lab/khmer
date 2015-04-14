@@ -43,14 +43,15 @@ def get_parser():
                         help='Do not output 0-count bins')
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
-                        help='Overwrite output file if it exists')
+                        help='Overwrite existing output_histogram_filename')
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the histogram. '
                         'Includes column headers.')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
-                        help='Overwrite output file if it exists')
+                        help='Continue even if specified input files '
+                        'do not exist or are empty.')
     return parser
 
 
