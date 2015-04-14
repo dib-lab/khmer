@@ -1,4 +1,11 @@
 2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: allow for paired and unpaired
+      files to be normalized together. separate function for error check
+   * khmer/tests/test_scripts.py: created test for paired/unpaired data
+
+2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
+
    * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,saturate-by-median},
       scripts/{do-partition,filter-abund-single,load-graph,load-into-counting,
       normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
