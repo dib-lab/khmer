@@ -10,7 +10,15 @@ How to get help
 
 #. Work through relevant examples in the `khmer-recipes repository <https://github.com/ged-lab/khmer-recipes>`__. Find **khmer-recipes** `documentation here <http://khmer-recipes.readthedocs.org/en/latest/#>`__.
 
-#. Google the error output and/or keywords related to your problem.  This will often bring up results from the mailing list, where others may have discussed solutions to the same issue.
+#. Google search for the error output and/or keywords related to your problem.  This will often bring up results from the mailing list, where others may have discussed solutions to the same issue.
+
+.. raw:: html
+
+    <form action="http://google.com/search" method="get">
+    <input type="text" name="q" size="28" maxlength="255" value="" /> <input type="submit" value="Google Search" />
+    <br/>
+    <input type="checkbox" name="sitesearch" value="http://lists.idyll.org/pipermail/khmer" checked /> only search khmer discussion email archive<br/>
+    </form>
 
 Mailing List
 ------------
