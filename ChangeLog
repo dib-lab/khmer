@@ -1,3 +1,7 @@
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
+   * Added how-to-help to user docs
+
 2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * */*.py: Make docstrings PEP 257 compliant.
