@@ -1,3 +1,9 @@
+2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: allow for paired and unpaired
+      files to be normalized together. separate function for error check
+   * khmer/tests/test_scripts.py: created test for paired/unpaired data
+
 2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
 
    * doc/user/getting-help.rst: added to user docs
