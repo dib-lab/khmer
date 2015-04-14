@@ -1,5 +1,11 @@
 2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
 
+   * doc/user/getting-help.rst: added to user docs
+   * doc/index.rst: changed: added link to getting-help doc
+   * README.rst: changed: added link to getting-help doc
+
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
    * docs/index.rst: added github repo and release notes page to main docs page
 
 2015-04-14  Susan Steinman  <steinman.tutoring@gmail.com>
