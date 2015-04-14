@@ -2250,7 +2250,7 @@ def test_extract_long_sequences():
     in_dir_fa = os.path.dirname(fa_infile)
 
     args = [fq_infile, '-l', '10', '-o', fq_outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir_fa)
+    (status, out, err) = utils.runscript(script, args, in_dir_fq)
 
     countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
