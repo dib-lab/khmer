@@ -97,7 +97,7 @@ def main():
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
             htable.n_unique_kmers())
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = khmer.calc_expected_collisions(htable, args.force)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # now, trim.
