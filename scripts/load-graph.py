@@ -103,7 +103,10 @@ def main():
     info_fp = open(base + '.info', 'w')
     info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.15, force=args.force)  # 0.18 is ACTUAL MAX. Do not change.
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
+    # 0.18 is ACTUAL MAX. Do not change.
+
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
     if args.write_fp_rate:
         print >> info_fp, \

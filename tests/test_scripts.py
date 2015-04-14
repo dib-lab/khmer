@@ -788,7 +788,6 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    #assert 'fp rate estimated to be' in err, err
     assert '** ERROR: the graph structure is too small' in err, err
 
 

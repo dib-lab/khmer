@@ -165,7 +165,7 @@ def extract_countinghash_info(filename):
         ht_type
 
 
-def calc_expected_collisions(hashtable, max_false_positive=.2, force=False):
+def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
     Check to see that collision rate is within threshold.
 
@@ -179,8 +179,8 @@ def calc_expected_collisions(hashtable, max_false_positive=.2, force=False):
 
     fp_one = occupancy / min_size
     fp_all = fp_one ** n_ht
- 
-    if fp_all > max_false_positive:
+
+    if fp_all > max_false_pos:
         print >>sys.stderr, "**"
         print >>sys.stderr, "** ERROR: the graph structure is too small for "
         print >>sys.stderr, "this data set.  Increase k-mer presence table "

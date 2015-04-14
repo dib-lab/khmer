@@ -237,7 +237,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     # re: threshold, see Zhang et al.,
     # http://arxiv.org/abs/1309.2975
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.8, force=args.force)
+    fp_rate = khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
     print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:

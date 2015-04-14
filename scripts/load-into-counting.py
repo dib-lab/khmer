@@ -136,7 +136,9 @@ def main():
     print >>sys.stderr, 'saving', base
     htable.save(base)
 
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.2, force=args.force)  # Change 0.2 only if you really grok it.  HINT: You don't.
+    # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
 
     with open(base + '.info', 'a') as info_fp:
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate

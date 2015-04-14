@@ -316,7 +316,10 @@ file for one of the input files will be generated.)" % filename
         print '...saving to', args.savetable
         htable.save(args.savetable)
 
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.8, force=args.force) # see Zhang et al., http://arxiv.org/abs/1309.2975
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+    # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
+
     print >> sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 

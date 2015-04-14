@@ -130,7 +130,7 @@ def main():
     info_fp.write('through end: %s\n' % filenames[-1])
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.2, force=args.force)
+    fp_rate = khmer.calc_expected_collisions(htable, args.force, max_false_positive=.2)
     print 'fp rate estimated to be %1.3f' % fp_rate
     print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
 

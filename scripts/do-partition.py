@@ -131,7 +131,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         print >>sys.stderr, 'consuming input', filename
         htable.consume_fasta_and_tag(filename)
 
-    fp_rate = khmer.calc_expected_collisions(htable, max_false_positive=.15, force=args.force) # 0.18 is ACTUAL MAX. Do not change.
+    # 0.18 is ACTUAL MAX. Do not change.
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # partition-graph

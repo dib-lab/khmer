@@ -305,10 +305,11 @@ def main():
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
 
-    fp_rate = khmer.calc_expected_collisions(ct, max_false_positive=.8, force=args.force) # see Zhang et al., http://arxiv.org/abs/1309.2975
+    fp_rate = \
+        khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
+    # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
     print >>sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
-
 
     print 'output in *.abundtrim'
 

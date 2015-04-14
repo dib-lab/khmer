@@ -144,7 +144,7 @@ def main():
         ht.save(args.savehash)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(ht, max_false_positive=.2, force=args.force)
+    fp_rate = khmer.calc_expected_collisions(ht, args.force, max_false_positive=.2)
     print 'fp rate estimated to be %1.3f' % fp_rate
 
 
