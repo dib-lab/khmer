@@ -112,7 +112,8 @@ diff_pep8_report: pep8_report.txt
 
 ## pep257      : check Python code style
 pep257: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 setup.py khmer/ scripts/ tests/ || true
+	pep257 --ignore=D100,D101,D102,D103 \
+		setup.py khmer/ scripts/ tests/ || true
 
 pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pep257 setup.py khmer/ scripts/ tests/ \

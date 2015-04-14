@@ -86,7 +86,7 @@ def check_is_right(name):
 
 def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     """Read pairs from a stream.
-    
+
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
     records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
     'r2' is None if is_pair is False.

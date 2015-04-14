@@ -25,9 +25,7 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 
 def build_hash_args(descr=None, epilog=None):
-    """Build an argparse.ArgumentParser with arguments for hash* based
-    scripts and return it.
-    """
+    """Build an ArgumentParser with args for bloom filter based scripts."""
     parser = argparse.ArgumentParser(
         description=descr, epilog=epilog,
         formatter_class=ComboFormatter)
@@ -55,10 +53,7 @@ def build_hash_args(descr=None, epilog=None):
 
 
 def build_counting_args(descr=None, epilog=None):
-    """Build an argparse.ArgumentParser with arguments for counting_hash
-    based scripts and return it.
-    """
-
+    """Build an ArgumentParser with args for counting_hash based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'counting'
 
@@ -66,7 +61,7 @@ def build_counting_args(descr=None, epilog=None):
 
 
 def build_hashbits_args(descr=None, epilog=None):
-    """Build ArgumentParser with args. for hashbits based scripts."""
+    """Build an ArgumentParser with args for hashbits based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'hashbits'
 
@@ -121,7 +116,9 @@ will be ignored.'''.format(hashfile=values))
 
 
 def report_on_config(args, hashtype='counting'):
-    """Summariz the configuration produced by the command-line arguments
+    """Print out configuration.
+
+    Summarize the configuration produced by the command-line arguments
     made available by this module.
     """
     from khmer.utils import print_error

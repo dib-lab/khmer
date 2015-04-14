@@ -194,7 +194,9 @@ def is_prime(number):
 
 
 def get_n_primes_near_x(number, target):
-    """Step backwards until a number of primes (other than 2) have been
+    """Backward-find primes smaller than target.
+
+    Step backwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
@@ -213,7 +215,9 @@ def get_n_primes_near_x(number, target):
 
 
 def get_n_primes_above_x(number, target):
-    """Step forwards until a number of primes (other than 2) have been
+    """Forward-find primes smaller than target.
+
+    Step forwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
