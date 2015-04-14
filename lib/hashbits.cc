@@ -11,6 +11,7 @@
 #include "read_parsers.hh"
 
 #include <sstream>
+#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -44,6 +45,9 @@ void Hashbits::save(std::string outfilename)
         outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
 
         outfile.write((const char *) _counts[i], tablebytes);
+    }
+    if (outfile.fail()) {
+        throw khmer_file_exception(strerror(errno));
     }
     outfile.close();
 }

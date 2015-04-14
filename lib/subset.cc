@@ -10,6 +10,7 @@
 #include "read_parsers.hh"
 
 #include <sstream>
+#include <errno.h>
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
@@ -1417,6 +1418,10 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
     // save remainder.
     if (n_bytes) {
         outfile.write(buf, n_bytes);
+    }
+    if (outfile.fail()) {
+        delete[] buf;
+        throw khmer_file_exception(strerror(errno));
     }
     outfile.close();
 
