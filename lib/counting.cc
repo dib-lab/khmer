@@ -513,12 +513,12 @@ CountingHashFileReader::CountingHashFileReader(
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_COUNTING_HT)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer count file from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &use_bigcount, 1);
@@ -621,13 +621,13 @@ CountingHashGzFileReader::CountingHashGzFileReader(
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             gzclose(infile);
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_COUNTING_HT)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer count file from " << infilename;
             gzclose(infile);
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
     }
 
