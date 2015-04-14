@@ -1,0 +1,10 @@
+-r requirements.txt
+sphinxcontrib-autoprogram
+pep8==1.5.7
+diff_cover
+autopep8
+pylint
+coverage
+gcovr
+nose
+pep257
