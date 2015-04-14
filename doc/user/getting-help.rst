@@ -37,8 +37,8 @@ When you ask a question, it is important that you ask in a way that ensures
 you get the best answer possible and minimizes back-and-forth with the good
 people trying to help.
 
-Asking a good question
-----------------------
+Asking a question
+-----------------
 
 #. Include your:
 
