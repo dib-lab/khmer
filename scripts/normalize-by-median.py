@@ -121,10 +121,21 @@ def handle_error(error, output_name, input_name, fail_save, htable):
     except:  # pylint: disable=bare-except
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
-def normalize_by_median_and_check(input_filename, outfp, htable, args, report_fp):
+def normalize_by_median_and_check(input_filename, htable, args, report_fp, corrupt_files):
     total = 0
     discarded = 0
-    if not args.single_output_file:
+
+    total_acc = None
+    discarded_acc = None
+
+    if args.single_output_file:
+        if args.single_output_file is sys.stdout:
+            output_name = '/dev/stdout'
+        else:
+            output_name = args.single_output_file.name
+        outfp = args.single_output_file
+
+    else:
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
         
@@ -141,7 +152,6 @@ def normalize_by_median_and_check(input_filename, outfp, htable, args, report_fp
         else:
             print >> sys.stderr, '*** Skipping error file, moving on...'
             corrupt_files.append(input_filename)
-            return
     else:
         if total_acc == 0 and discarded_acc == 0:
             print >> sys.stderr, 'SKIPPED empty file', input_filename
@@ -154,7 +164,8 @@ def normalize_by_median_and_check(input_filename, outfp, htable, args, report_fp
                         total=total, perc=int(100. - discarded /
                                               float(total) * 100.))
             print >> sys.stderr, 'output in', output_name
-            return total_acc, discarded_acc
+    
+    return total_acc, discarded_acc, corrupt_files
 
 
 def get_parser():
@@ -277,8 +288,7 @@ file for one of the input files will be generated.)" % filename
             args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
-    if args.force:
-        corrupt_files = []
+    corrupt_files = []
 
     if args.loadtable:
         print 'loading k-mer counting table from', args.loadtable
@@ -292,18 +302,9 @@ file for one of the input files will be generated.)" % filename
     # discarded = 0
     input_filename = None
 
-    if args.single_output_file:
-        outfp = args.single_output_file
-        if args.single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
-        else:
-            output_name = args.single_output_file.name
-
     for index, input_filename in enumerate(args.input_filenames):
-        total_acc, discarded_acc = normalize_by_median_and_check(input_filename,\
-                                                           outfp, htable, args,\
-                                                           report_fp)
-
+        total_acc, discarded_acc, corrupt_files = normalize_by_median_and_check(input_filename,\
+                                                           htable, args, report_fp, corrupt_files)
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -322,7 +323,7 @@ file for one of the input files will be generated.)" % filename
         if not args.single_output_file:
             output_name = os.path.basename(args.unpaired) + '.keep'
         outfp = open(output_name, 'w')
-        normalize_by_median_and_check(args.unpaired, outfp, htable, args, report_fp)
+        total_acc, discarded_acc, corrupt_files = normalize_by_median_and_check(args.unpaired, htable, args, report_fp, corrupt_files)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
