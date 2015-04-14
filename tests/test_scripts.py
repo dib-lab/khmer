@@ -533,6 +533,7 @@ def test_normalize_by_median():
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
+
 def test_normalize_by_median_unpaired_and_paired():
     CUTOFF = '1'
 
@@ -553,6 +554,7 @@ def test_normalize_by_median_unpaired_and_paired():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
 
 def test_normalize_by_median_double_file_name():
     infile = utils.get_temp_filename('test-abund-read-2.fa')

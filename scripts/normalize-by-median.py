@@ -123,7 +123,9 @@ def handle_error(error, output_name, input_name, fail_save, htable):
     except:  # pylint: disable=bare-except
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
-def normalize_by_median_and_check(input_filename, htable, args, report_fp, corrupt_files):
+
+def normalize_by_median_and_check(
+        input_filename, htable, args, report_fp, corrupt_files):
     total = 0
     discarded = 0
 
@@ -140,10 +142,10 @@ def normalize_by_median_and_check(input_filename, htable, args, report_fp, corru
     else:
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
-        
+
     try:
-        total_acc, discarded_acc = normalize_by_median(input_filename, outfp, \
-                                                        htable, args, report_fp)
+        total_acc, discarded_acc = normalize_by_median(input_filename, outfp,
+                                                       htable, args, report_fp)
     except IOError as err:
         handle_error(err, output_name, input_filename, args.fail_save,
                      htable)
@@ -166,7 +168,7 @@ def normalize_by_median_and_check(input_filename, htable, args, report_fp, corru
                         total=total, perc=int(100. - discarded /
                                               float(total) * 100.))
             print >> sys.stderr, 'output in', output_name
-    
+
     return total_acc, discarded_acc, corrupt_files
 
 
@@ -229,8 +231,8 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-u', '--unpaired', metavar="unpaired_reads_filename", 
-                        help='')
+    parser.add_argument('-u', '--unpaired', metavar="unpaired_reads_filename",
+                        help='with paired data only, include an unpaired file')
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
@@ -305,8 +307,9 @@ file for one of the input files will be generated.)" % filename
     input_filename = None
 
     for index, input_filename in enumerate(args.input_filenames):
-        total_acc, discarded_acc, corrupt_files = normalize_by_median_and_check(input_filename,\
-                                                           htable, args, report_fp, corrupt_files)
+        total_acc, discarded_acc, corrupt_files = \
+            normalize_by_median_and_check(
+                input_filename, htable, args, report_fp, corrupt_files)
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -325,7 +328,9 @@ file for one of the input files will be generated.)" % filename
         if not args.single_output_file:
             output_name = os.path.basename(args.unpaired) + '.keep'
         outfp = open(output_name, 'w')
-        total_acc, discarded_acc, corrupt_files = normalize_by_median_and_check(args.unpaired, htable, args, report_fp, corrupt_files)
+        total_acc, discarded_acc, corrupt_files = \
+            normalize_by_median_and_check(
+                args.unpaired, htable, args, report_fp, corrupt_files)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
