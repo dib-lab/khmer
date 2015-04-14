@@ -22,7 +22,7 @@ import tempfile
 import shutil
 import textwrap
 
-from screed.screedRecord import _screed_record_dict
+from screed.screedRecord import Record
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
@@ -37,7 +37,7 @@ MAX_FALSE_POSITIVE_RATE = 0.8
 
 
 def trim_record(read, trim_at):
-    new_read = _screed_record_dict()
+    new_read = Record()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
     if hasattr(read, 'quality'):

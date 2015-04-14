@@ -1,3 +1,7 @@
+2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: changed _screed_record_dict to Record
+
 2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
 
    * lib/{hashbits.cc}: changed: adding doxygen comments
