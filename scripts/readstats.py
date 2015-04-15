@@ -55,8 +55,6 @@ class StatisticsOutput(object):
     """
     def __init__(self, formatter):
         self.formatter = formatter
-        self.bp_total = 0
-        self.seqs_total = 0
 
     def __enter__(self):
         self.formatter.write_header()
@@ -65,14 +63,11 @@ class StatisticsOutput(object):
     def append(self, basepairs, seqs, filename):
         """Append a new line for the given basepair number, sequences and file.
         """
-        self.bp_total += basepairs
-        self.seqs_total += seqs
         self.formatter.append(basepairs, seqs, basepairs/float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
-            avg = self.bp_total / float(self.seqs_total)
-            self.formatter.write_summary(self.bp_total, self.seqs_total, avg)
+            self.formatter.finalize()
 
 
 class CsvFormatter(object):
@@ -90,15 +85,18 @@ class CsvFormatter(object):
         """Append the data separated by comma."""
         self.file.writerow([basepairs, seqs, "%.1f"%avg_len, filename])
 
-    def write_summary(self, bt_total, avg, seqs_total):
-        """Add a summary line."""
-        self.append(bt_total, seqs_total, avg, 'total')
+    def finalize(self):
+        """No statistics since the CSV data is supposed to be processed further.
+        """
+        pass
 
 
 class StdFormatter(object):
     """Format the statistics in a human readable string."""
     def __init__(self, underlying_file):
         self.file = underlying_file
+        self.bp_total = 0
+        self.seqs_total = 0
 
     def write_header(self):
         """Write a header line."""
@@ -106,17 +104,20 @@ class StdFormatter(object):
 
     def append(self, basepairs, seqs, avg_len, filename):
         """Append the data human readable."""
+        self.bp_total += basepairs
+        self.seqs_total += seqs
         self.file.write('%d bp / %d seqs; %.1f average length -- %s\n' %
                         (basepairs,
                          seqs,
                          avg_len,
                          filename))
 
-    def write_summary(self, bp_total, avg, seqs_total):
+    def finalize(self):
         """Add a summary with the accumulated data."""
         self.file.write('---------------\n')
+        avg = self.bp_total / float(self.seqs_total)
         self.file.write('%d bp / %d seqs; %.1f average length -- total\n' %
-                        (bp_total, seqs_total, avg))
+                        (self.bp_total, self.seqs_total, avg))
 
 
 def analyze_file(filename):
