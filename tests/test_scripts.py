@@ -534,6 +534,27 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_unpaired_and_paired():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
+
+    unpairedfile = utils.get_temp_filename('test1.fa', tempdir=in_dir)
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-u', unpairedfile, '-p', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 4029' in err, err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+
 def test_normalize_by_median_double_file_name():
     infile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)

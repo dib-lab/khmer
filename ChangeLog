@@ -12,6 +12,36 @@
       normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
    * khmer/tests/test_scripts.py: modified tests to account for new error message
 
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/release.txt: update release instructions to more thoroughly run
+   tests.
+
+2015-04-14  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: allow for paired and unpaired
+      files to be normalized together. separate function for error check
+   * khmer/tests/test_scripts.py: created test for paired/unpaired data
+
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
+   * doc/user/getting-help.rst: added to user docs
+   * doc/index.rst: changed: added link to getting-help doc
+   * README.rst: changed: added link to getting-help doc
+
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
+   * docs/index.rst: added github repo and release notes page to main docs page
+
+2015-04-14  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,
+   saturate-by-median},scripts/{do-partition,filter-abund-single,load-graph,
+   load-into-counting,normalize-by-median,trim-low-abund}: pulled out check
+   max collisions logic to init.
+   * khmer/tests/test_scripts.py: modified tests to account for new error
+   message
+
 2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
 
    * lib/{hashbits.cc}: changed: adding doxygen comments
