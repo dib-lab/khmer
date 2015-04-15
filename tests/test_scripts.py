@@ -2319,6 +2319,19 @@ def test_sample_reads_randomly_S():
                         '895:1:1:1342:20695', '895:1:1:1303:6251'])
 
 
+def test_count_overlap_invalid_datafile():
+    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
+    in_dir = os.path.dirname(seqfile1)
+    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
+    htfile = _make_graph(seqfile1, ksize=20)
+    outfile = utils.get_temp_filename('overlap.out', in_dir)
+    script = scriptpath('count-overlap.py')
+    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+            htfile + '.pt', htfile + '.pt', outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert "IOError" in err
+
+
 def test_count_overlap():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
