@@ -813,7 +813,7 @@ def test_normalize_by_median_fpr():
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
-    ifile = io.open(infile,  'rb')
+    ifile = io.open(infile, 'rb')
     ofile = io.open(outfile, 'wb')
     chunk = ifile.read(CHUNKSIZE)
     while len(chunk) > 0:
@@ -2586,9 +2586,12 @@ def test_readstats():
     for k in readstats_output:
         assert k in out, (k, out)
 
+
 def test_readstats_csv():
-    readstats_output = ("358,5,71.6," + utils.get_test_data("test-sweep-reads.fq"),
-                        "916,11,83.3," + utils.get_test_data("paired-mixed.fq"))
+    readstats_output = ("358,5,71.6," +
+                        utils.get_test_data("test-sweep-reads.fq"),
+                        "916,11,83.3," +
+                        utils.get_test_data("paired-mixed.fq"))
 
     args = [utils.get_test_data("test-sweep-reads.fq"),
             utils.get_test_data("paired-mixed.fq"),

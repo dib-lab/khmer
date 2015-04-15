@@ -53,6 +53,7 @@ class StatisticsOutput(object):
     The format of the output is determined by the formatter used.
     All statistics are aggregated and a summary is added to the data.
     """
+
     def __init__(self, formatter):
         self.formatter = formatter
 
@@ -63,7 +64,8 @@ class StatisticsOutput(object):
     def append(self, basepairs, seqs, filename):
         """Append a new line for the given basepair number, sequences and file.
         """
-        self.formatter.append(basepairs, seqs, basepairs/float(seqs), filename)
+        self.formatter.append(
+            basepairs, seqs, basepairs / float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
@@ -83,7 +85,7 @@ class CsvFormatter(object):
 
     def append(self, basepairs, seqs, avg_len, filename):
         """Append the data separated by comma."""
-        self.file.writerow([basepairs, seqs, "%.1f"%avg_len, filename])
+        self.file.writerow([basepairs, seqs, "%.1f" % avg_len, filename])
 
     def finalize(self):
         """No statistics since the CSV data is supposed to be processed further.
@@ -93,6 +95,7 @@ class CsvFormatter(object):
 
 class StdFormatter(object):
     """Format the statistics in a human readable string."""
+
     def __init__(self, underlying_file):
         self.file = underlying_file
         self.bp_total = 0
