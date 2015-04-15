@@ -1,3 +1,10 @@
+2015-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * khmer/utils.py: fix record checks to account for comments in old style
+   FASTQ data.
+   * tests/test-data/old-style-format-w-comments.fq: new test data.
+   * tests/test_scripts.py: add test against new test data.
+
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/release.txt: update release instructions to more thoroughly run
