@@ -3,6 +3,14 @@
    * khmer/scripts/normalize-by-median.py: pass individual arg values to 
       functions instead of ArgParse object
 
+2015-04-14  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   added a --csv option to readstats
+   updated documentation for count-overlap
+   * khmer/_khmermodule.cc: fixed missing error handling 
+   for hashbits_count_overlap
+
 2015-04-15  en zyme  <en_zyme@outlook.com>
 
    * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
