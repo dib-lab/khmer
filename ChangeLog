@@ -1,6 +1,7 @@
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * doc/dev/scripts-and-sandbox.rst: added requirements for streaming I/O
+   * scripts/trim-low-abund.py: added support for -o/--out
 
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
