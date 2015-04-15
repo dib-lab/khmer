@@ -1,6 +1,6 @@
 2015-04-15  Sherine Awad  <sherine.awad@gmail.com>
 
-  *Return make-coverage.py to sandbox, script was deleted by accident
+   * sandbox/make-coverage.py: restored, was deleted by accident
 
 2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
 
