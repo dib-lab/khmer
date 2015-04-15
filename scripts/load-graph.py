@@ -103,19 +103,14 @@ def main():
     info_fp = open(base + '.info', 'w')
     info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
+    # 0.18 is ACTUAL MAX. Do not change.
+
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
     if args.write_fp_rate:
         print >> info_fp, \
             '\nfalse positive rate estimated to be %1.3f' % fp_rate
-
-    if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the graph structure is too small for "
-                              "this data set. Increase table size/# tables.")
-        print >> sys.stderr, "**"
-        if not args.force:
-            sys.exit(1)
 
     print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
     if not args.no_build_tagset:

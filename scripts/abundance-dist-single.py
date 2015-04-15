@@ -7,10 +7,11 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Produce the k-mer abundance distribution for the given file, without
-loading a prebuilt k-mer counting table.
+Produce the k-mer abundance distribution for the given file.
 
 % python scripts/abundance-dist-single.py <data> <histout>
+
+The script does not load a prebuilt k-mer counting table.
 
 Use '-h' for parameter help.
 """

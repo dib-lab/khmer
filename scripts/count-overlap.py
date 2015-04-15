@@ -7,8 +7,9 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Count the overlap k-mers, which are the k-mers appearing in two sequence
-datasets.
+Count the overlap k-mers.
+
+Overlap k-mers are those appearing in two sequence datasets.
 
 usage: count-overlap_cpp.py [-h] [-q] [--ksize KSIZE] [--n_tables N_HASHES]
         [--tablesize HASHSIZE]
@@ -16,7 +17,6 @@ usage: count-overlap_cpp.py [-h] [-q] [--ksize KSIZE] [--n_tables N_HASHES]
         result
 
 Use '-h' for parameter help.
-
 """
 import sys
 import csv

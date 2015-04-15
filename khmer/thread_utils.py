@@ -4,9 +4,8 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-"""
-Utilities for dealing with multithreaded processing of short reads.
-"""
+"""Utilities for dealing with multithreaded processing of short reads."""
+
 import threading
 import Queue
 import sys
@@ -17,6 +16,7 @@ DEFAULT_GROUPSIZE = 100
 
 
 def verbose_loader(filename):
+    """Screed iterator that additionally prints progress info to stderr."""
     screed_iter = screed.open(filename, parse_description=False)
     for n, record in enumerate(screed_iter):
         if n % 100000 == 0:

@@ -130,16 +130,9 @@ def main():
     info_fp.write('through end: %s\n' % filenames[-1])
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
     print 'fp rate estimated to be %1.3f' % fp_rate
     print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
-
-    if fp_rate > 0.20:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " this data set.  Increase tablesize/# tables.")
-        print >> sys.stderr, "**"
-        sys.exit(1)
 
     print 'DONE.'
 

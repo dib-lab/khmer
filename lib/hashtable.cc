@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -256,6 +257,9 @@ void Hashtable::save_tagset(std::string outfilename)
     }
 
     outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+    if (outfile.fail()) {
+        throw khmer_file_exception(strerror(errno));
+    }
     outfile.close();
 
     delete[] buf;
@@ -278,7 +282,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -299,12 +303,12 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             err << "Incorrect file format version " << (int) version
                 << " while reading tagset from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -312,7 +316,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -332,7 +336,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
@@ -1252,7 +1256,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -1272,12 +1276,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             err << "Incorrect file format version " << (int) version
                 << " while reading stoptags from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -1285,7 +1289,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
         infile.read((char *) &tagset_size, sizeof(tagset_size));
 
@@ -1299,7 +1303,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 

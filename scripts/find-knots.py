@@ -7,8 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Find highly-connected k-mers and output them in a .stoptags file, for use
-in partitioning.
+Find highly-connected k-mers.
+
+k-mers are output into a .stoptags file, for later use in partitioning.
 
 % python scripts/find-knots.py <base>
 """

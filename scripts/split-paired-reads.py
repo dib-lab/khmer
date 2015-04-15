@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+De-interleave a file.
+
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
 

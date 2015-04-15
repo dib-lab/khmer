@@ -534,6 +534,40 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_unpaired_and_paired():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
+
+    unpairedfile = utils.get_temp_filename('test1.fa', tempdir=in_dir)
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-u', unpairedfile, '-p', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 4029' in err, err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+
+def test_normalize_by_median_double_file_name():
+    infile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = [utils.get_test_data('test-abund-read-2.fa'), infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "WARNING: At least two input files are named" in err, err
+
+
 def test_normalize_by_median_overwrite():
     outfile = utils.get_temp_filename('test.fa.keep')
     shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
@@ -748,6 +782,20 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
+def test_normalize_by_median_emptycountingtable():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '--loadtable', infile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert 'ValueError' in err, (status, out, err)
+
+
 def test_normalize_by_median_fpr():
     MIN_TABLESIZE_PARAM = 1
 
@@ -761,8 +809,7 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    assert 'fp rate estimated to be' in err, err
-    assert '** ERROR: the k-mer counting table is too small' in err, err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
@@ -1469,6 +1516,27 @@ def test_abundance_dist_single():
     script = scriptpath('abundance-dist-single.py')
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile,
             outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+
+def test_abundance_dist_threaded():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--threads', '18',
+            infile, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -2722,7 +2790,7 @@ def test_trim_low_abund_highfpr():
 
     assert code == 1
     print out
-    assert "ERROR: the k-mer counting table is too small" in err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def test_trim_low_abund_trimtest():
@@ -2865,3 +2933,27 @@ def test_existance_failure():
     assert status == 1
 
     assert expected_output in err
+
+
+def test_roundtrip_commented_format():
+    """Split/interleave roundtrip for old style format with comments (#873).
+
+    This should produce a file identical to the input when only paired
+    reads are given.
+    """
+    infile = utils.get_temp_filename('test.fq')
+    outfile = utils.get_temp_filename('test2.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('old-style-format-w-comments.fq'),
+                    infile)
+
+    _, out, err = utils.runscript('split-paired-reads.py', [infile], in_dir)
+
+    utils.runscript('interleave-reads.py', [infile + '.1',
+                                            infile + '.2',
+                                            '-o', outfile], in_dir)
+
+    r = open(infile).read()
+    r2 = open(outfile).read()
+    assert r == r2, (r, r2)
