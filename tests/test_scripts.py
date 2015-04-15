@@ -534,6 +534,27 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_unpaired_and_paired():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
+
+    unpairedfile = utils.get_temp_filename('test1.fa', tempdir=in_dir)
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-u', unpairedfile, '-p', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 4029' in err, err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+
 def test_normalize_by_median_double_file_name():
     infile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
@@ -788,8 +809,7 @@ def test_normalize_by_median_fpr():
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
     assert os.path.exists(infile + '.keep')
-    assert 'fp rate estimated to be' in err, err
-    assert '** ERROR: the k-mer counting table is too small' in err, err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
@@ -2770,7 +2790,7 @@ def test_trim_low_abund_highfpr():
 
     assert code == 1
     print out
-    assert "ERROR: the k-mer counting table is too small" in err
+    assert '** ERROR: the graph structure is too small' in err, err
 
 
 def test_trim_low_abund_trimtest():
