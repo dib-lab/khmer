@@ -2489,13 +2489,11 @@ def test_screed_streaming_gzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
-@attr('failing_python2')
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
-@attr('failing_python2')
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
@@ -2507,7 +2505,6 @@ def test_read_parser_streaming_bzfq():
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
-@attr('failing_python2')
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
@@ -2519,7 +2516,6 @@ def test_read_parser_streaming_bzfa():
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
-@attr('failing_python2')
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
