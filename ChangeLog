@@ -1,9 +1,13 @@
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/hashtable.cc: remove memory leak
+
 2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
 
    * khmer/scripts/normalize-by-median.py: pass individual arg values to 
       functions instead of ArgParse object
 
-2015-04-14  Thomas Fenzl  <thomas.fenzl@gmx.net>
+2015-04-15  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
    * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
    added a --csv option to readstats
