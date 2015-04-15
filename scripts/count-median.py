@@ -108,6 +108,7 @@ def main():
 
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
+            ave, stdev = [round(x, 9) for x in (ave, stdev)]
             if args.csv:
                 output.writerow([record.name, medn, ave, stdev, len(seq)])
             else:

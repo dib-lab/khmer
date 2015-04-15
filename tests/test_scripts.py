@@ -791,7 +791,6 @@ def test_normalize_by_median_fpr():
     assert '** ERROR: the k-mer counting table is too small' in err, err
 
 
-@attr("failing_python3")
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -812,7 +811,6 @@ def test_count_median():
     assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
 
 
-@attr("failing_python3")
 def test_count_median_fq():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -833,7 +831,6 @@ def test_count_median_fq():
     assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
 
 
-@attr('failing_python3')
 def test_count_median_fq_csv():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
@@ -856,8 +853,6 @@ def test_count_median_fq_csv():
     # verify that sequence names remain unparsed with '--csv'
     names = set([line.split(',')[0] for line in data])
     assert '895:1:37:17593:9954 1::FOO' in names, names
-
-#
 
 
 def test_load_graph():
