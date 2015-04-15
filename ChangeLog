@@ -6,11 +6,25 @@
    * khmer/_khmermodule.cc: fixed missing error handling 
    for hashbits_count_overlap
 
-2015-04-14 Susan Steinman <steinman.tutoring@gmail.com>
-   * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,saturate-by-median},
-      scripts/{do-partition,filter-abund-single,load-graph,load-into-counting,
-      normalize-by-median,trim-low-abund}: pulled out check max collisions logic to init.
-   * khmer/tests/test_scripts.py: modified tests to account for new error message
+2015-04-15  en zyme  <en_zyme@outlook.com>
+
+   * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+     khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
+     count-median, count-overlap, do-partition, extract-paired-reads, 
+     extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
+     find-knots, interleave-reads, load-graph, load-into-counting, 
+     make-initial-stoptags, merge-partitions, partition-graph,
+     sample-reads-randomly, split-paired-reads}.py:
+       check_file_status() -> check_input_files()
+   * khmer/tests/test_functions.py: check_file_status() -> check_input_files()
+
+2015-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * khmer/utils.py: fix record checks to account for comments in old style
+   FASTQ data.
+   * tests/test-data/old-style-format-w-comments.fq: new test data.
+   * tests/test_scripts.py: add test against new test data.
 
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 

@@ -26,7 +26,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -80,7 +80,7 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(args.filenames, args.force)
 
