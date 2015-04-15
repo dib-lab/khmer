@@ -1384,7 +1384,7 @@ def test_extract_partitions_no_output_groups():
 
     # We expect a sys.exit -> we need the test to be tolerant
     _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    print err
+    assert "NOT outputting groups! Beware!" in err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
