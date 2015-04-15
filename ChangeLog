@@ -1,3 +1,9 @@
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: implemented STDOUT output, redirected
+   existing print statements to STDERR, fixed existing & new PEP 8 issues 
+   * tests/test_scripts.py: added test for above changes
+
 2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * doc/conf.py: disable Sphinx smart rendering
