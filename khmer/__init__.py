@@ -323,14 +323,18 @@ class ReadAligner(_ReadAligner):
     def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
                 **kwargs):
 
-        if kwargs['filename']:
+        if 'filename' in kwargs:
             params = json.load(kwargs['filename'])
             scoring_matrix = params['scoring_matrix']
             transition_probabilities = params['transition_probabilities']
         else:
-            if kwargs['scoring_matrix'] is None:
+            if 'scoring_matrix' in kwargs:
+                scoring_matrix = kwargs['scoring_matrix']
+            else:
                 scoring_matrix = ReadAligner.defaultScoringMatrix
-            if kwargs['transition_probabilities'] is None:
+            if 'transition_probabilities' in kwargs:
+                transition_probabilities = kwargs['transition_probabilities']
+            else:
                 transition_probabilities = \
                     ReadAligner.defaultTransitionProbabilities
         return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
