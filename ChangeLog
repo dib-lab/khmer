@@ -1,4 +1,5 @@
 2015-04-15  en zyme  <en_zyme@outlook.com>
+
    * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
    * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
      khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
