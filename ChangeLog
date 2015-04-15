@@ -32,7 +32,6 @@
    max collisions logic to init.
    * khmer/tests/test_scripts.py: modified tests to account for new error
    message
->>>>>>> 192ae796ea8bb7c7ba0b84a1e1160547fba1d591
 
 2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
 
