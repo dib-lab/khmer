@@ -2918,6 +2918,20 @@ def test_trim_low_abund_trimtest_savetable():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
+# test that -o/--out option outputs to STDOUT
+
+
+def test_trim_low_abund_stdout():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert 'GGTTGACGGGGCTCAGGG' in out
+
 
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical

@@ -10,7 +10,8 @@
 Eliminate surplus reads.
 
 Eliminate reads with median k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
+DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep', with the
+option to output to STDOUT.
 
 % python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
 
