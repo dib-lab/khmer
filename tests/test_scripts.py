@@ -1376,7 +1376,7 @@ def test_extract_partitions_no_output_groups():
     in_dir = os.path.dirname(graphbase)
 
     # get the final part file
-    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
 
     # ok, now run extract-partitions.
     script = scriptpath('extract-partitions.py')
