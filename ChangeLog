@@ -1,3 +1,7 @@
+2015-04-15  Sherine Awad  <sherine.awad@gmail.com>
+
+   * sandbox/make-coverage.py: restored, was deleted by accident
+
 2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
 
    * khmer/tests/test_scripts.py: changed tests that use `runscript` with
