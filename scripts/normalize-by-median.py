@@ -29,6 +29,8 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
 from khmer.utils import write_record, check_is_pair
+from oxli.khmer_api import diginorm
+
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
