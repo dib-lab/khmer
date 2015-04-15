@@ -1,3 +1,9 @@
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/tests/khmer_tst_utils.py,doc/dev/a-quick-guide-to-testing.rst
+      edited docstring and docs to remind people to make sure tests test
+      errors correctly
+
 2015-04-15  Sherine Awad  <sherine.awad@gmail.com>
 
    * sandbox/make-coverage.py: restored, was deleted by accident
@@ -6,10 +12,6 @@
 
    * khmer/tests/test_scripts.py: changed tests that use `runscript` with
       `fail_okay=True` to use asserts to confirm the correct failure type
-
-   * khmer/tests/khmer_tst_utils.py,doc/dev/a-quick-guide-to-testing.rst
-      edited docstring and docs to remind people to make sure tests test
-      errors correctly
 
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
