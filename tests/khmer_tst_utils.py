@@ -79,6 +79,8 @@ def runscript(scriptname, args, in_directory=None,
 
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.
+
+    When using :attr:`fail_ok`=False in tests, specify the expected error.
     """
     sysargs = [scriptname]
     sysargs.extend(args)

@@ -1,3 +1,9 @@
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/tests/khmer_tst_utils.py,doc/dev/a-quick-guide-to-testing.rst
+      edited docstring and docs to remind people to make sure tests test
+      errors correctly
+
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * sandbox/make-coverage.py: tweak for importability
