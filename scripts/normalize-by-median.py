@@ -44,14 +44,15 @@ def batchwise(coll, size):
 
 
 # pylint: disable=too-many-locals,too-many-branches
-def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
+def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
+                        report_fp=None):
 
-    desired_coverage = args.cutoff
+    desired_coverage = cutoff
     ksize = htable.ksize()
 
     # In paired mode we read two records at a time
     batch_size = 1
-    if args.paired:
+    if paired:
         batch_size = 2
 
     index = -1
@@ -75,7 +76,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
 
         # If in paired mode, check that the reads are properly interleaved
 
-        if args.paired:
+        if paired:
             if not check_is_pair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
                     {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
@@ -125,32 +126,33 @@ def handle_error(error, output_name, input_name, fail_save, htable):
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
-def normalize_by_median_and_check(
-        input_filename, htable, args, report_fp, corrupt_files):
+def normalize_by_median_and_check(input_filename, htable, single_output_file,
+                                  fail_save, paired, cutoff, force,
+                                  corrupt_files, report_fp=None):
     total = 0
     discarded = 0
 
     total_acc = None
     discarded_acc = None
 
-    if args.single_output_file:
-        if args.single_output_file is sys.stdout:
+    if single_output_file:
+        if single_output_file is sys.stdout:
             output_name = '/dev/stdout'
         else:
-            output_name = args.single_output_file.name
-        outfp = args.single_output_file
+            output_name = single_output_file.name
+        outfp = single_output_file
 
     else:
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
     try:
-        total_acc, discarded_acc = normalize_by_median(input_filename, outfp,
-                                                       htable, args, report_fp)
+        total_acc, discarded_acc = normalize_by_median(
+            input_filename, outfp, htable, paired, cutoff, report_fp=None)
     except IOError as err:
-        handle_error(err, output_name, input_filename, args.fail_save,
+        handle_error(err, output_name, input_filename, fail_save,
                      htable)
-        if not args.force:
+        if not force:
             print >> sys.stderr, '** Exiting!'
 
             sys.exit(1)
@@ -310,7 +312,9 @@ file for one of the input files will be generated.)" % filename
     for index, input_filename in enumerate(args.input_filenames):
         total_acc, discarded_acc, corrupt_files = \
             normalize_by_median_and_check(
-                input_filename, htable, args, report_fp, corrupt_files)
+                input_filename, htable, args.single_output_file,
+                args.fail_save, args.paired, args.cutoff, args.force,
+                corrupt_files, report_fp)
 
         if (args.dump_frequency > 0 and
                 index > 0 and index % args.dump_frequency == 0):
@@ -331,7 +335,9 @@ file for one of the input files will be generated.)" % filename
         outfp = open(output_name, 'w')
         total_acc, discarded_acc, corrupt_files = \
             normalize_by_median_and_check(
-                args.unpaired_reads, htable, args, report_fp, corrupt_files)
+                args.unpaired_reads, htable, args.single_output_file,
+                args.fail_save, args.paired, args.cutoff, args.force,
+                corrupt_files, report_fp)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(

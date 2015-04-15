@@ -21,7 +21,7 @@ import argparse
 import textwrap
 import khmer
 import sys
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 DEFAULT_K = 32
@@ -70,9 +70,9 @@ def main():
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    check_file_status(partitionmap_file, args.force)
+    check_input_files(partitionmap_file, args.force)
     for _ in filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(filenames, args.force)
 

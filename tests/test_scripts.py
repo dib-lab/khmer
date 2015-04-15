@@ -813,7 +813,7 @@ def test_normalize_by_median_fpr():
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
-    ifile = io.open(infile,  'rb')
+    ifile = io.open(infile, 'rb')
     ofile = io.open(outfile, 'wb')
     chunk = ifile.read(CHUNKSIZE)
     while len(chunk) > 0:
@@ -2340,6 +2340,19 @@ def test_sample_reads_randomly_S():
                         '895:1:1:1342:20695', '895:1:1:1303:6251'])
 
 
+def test_count_overlap_invalid_datafile():
+    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
+    in_dir = os.path.dirname(seqfile1)
+    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
+    htfile = _make_graph(seqfile1, ksize=20)
+    outfile = utils.get_temp_filename('overlap.out', in_dir)
+    script = scriptpath('count-overlap.py')
+    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+            htfile + '.pt', htfile + '.pt', outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert "IOError" in err
+
+
 def test_count_overlap():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
@@ -2567,6 +2580,22 @@ def test_readstats():
 
     args = [utils.get_test_data("test-sweep-reads.fq"),
             utils.get_test_data("paired-mixed.fq")]
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_csv():
+    readstats_output = ("358,5,71.6," +
+                        utils.get_test_data("test-sweep-reads.fq"),
+                        "916,11,83.3," +
+                        utils.get_test_data("paired-mixed.fq"))
+
+    args = [utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq"),
+            '--csv']
     status, out, err = utils.runscript('readstats.py', args)
     assert status == 0
 

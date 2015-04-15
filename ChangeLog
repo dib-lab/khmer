@@ -1,5 +1,9 @@
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
+   * scripts/trim-low-abund.py: fixed existing & new PEP 8 issues
+
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
    * scripts/trim-low-abund.py: actually implemented STDOUT output, redirected
    existing print statements to STDERR
    * tests/test_scripts.py: added test for above changes
@@ -8,6 +12,37 @@
 
    * doc/dev/scripts-and-sandbox.rst: added requirements for streaming I/O
    * scripts/trim-low-abund.py: added support for -o/--out
+
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/hashtable.cc: remove memory leak
+   * scripts/readstats.py,tests/test_scripts.py: fix PEP8 violations
+
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: pass individual arg values to 
+      functions instead of ArgParse object
+
+2015-04-15  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   added a --csv option to readstats
+   updated documentation for count-overlap
+   * khmer/_khmermodule.cc: fixed missing error handling 
+   for hashbits_count_overlap
+
+2015-04-15  en zyme  <en_zyme@outlook.com>
+
+   * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+     khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
+     count-median, count-overlap, do-partition, extract-paired-reads, 
+     extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
+     find-knots, interleave-reads, load-graph, load-into-counting, 
+     make-initial-stoptags, merge-partitions, partition-graph,
+     sample-reads-randomly, split-paired-reads}.py:
+       check_file_status() -> check_input_files()
+   * khmer/tests/test_functions.py: check_file_status() -> check_input_files()
 
 2015-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
 

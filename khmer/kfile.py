@@ -13,7 +13,7 @@ import errno
 from stat import S_ISBLK, S_ISFIFO
 
 
-def check_file_status(file_path, force):
+def check_input_files(file_path, force):
     """Check the status of the file.
 
     If the file is empty or doesn't exist AND if the file is NOT a

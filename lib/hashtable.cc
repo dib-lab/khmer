@@ -258,6 +258,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
     outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
     if (outfile.fail()) {
+        delete[] buf;
         throw khmer_file_exception(strerror(errno));
     }
     outfile.close();
