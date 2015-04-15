@@ -25,6 +25,7 @@ Scripts with recipes:
 
 To keep, document, and build recipes for:
 
+* `make-coverage.py - RPKM calculation script
 * abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
 * assemstats3.py - print out assembly statistics
 * build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
@@ -148,7 +149,6 @@ Present in commit 691b0b3ae but removed thereafter:
 * `multi-abyss.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/multi-abyss.py>`__ - better done with parallel
 * `make-coverage-by-position-for-node.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/make-coverage-by-position-for-node.py>`__ - deprecated coverage calculation
 * `make-coverage-histogram.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/make-coverage-histogram.py>`__ - build coverage histograms
-* `make-coverage.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/make-coverage.py>`__ - RPKM calculation script
 * `make-random.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/make-random.py>`__ - make random DNA; see dbg-graph-null project.
 * `make-read-stats.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/make-read-stats.py>`__ - see readstats.py
 * `multi-stats.py <https://github.com/ged-lab/khmer/tree/691b0b3aefe83e9e8f5f2b80f5f9516664a4654a/sandbox/multi-stats.py>`__ - see readstats.py
