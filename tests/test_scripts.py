@@ -815,7 +815,7 @@ def test_normalize_by_median_fpr():
 
 
 def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
-    ifile = io.open(infile,  'rb')
+    ifile = io.open(infile, 'rb')
     ofile = io.open(outfile, 'wb')
     chunk = ifile.read(CHUNKSIZE)
     while len(chunk) > 0:
