@@ -1,3 +1,15 @@
+2015-04-15  en zyme  <en_zyme@outlook.com>
+   * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+     khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
+     count-median, count-overlap, do-partition, extract-paired-reads, 
+     extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
+     find-knots, interleave-reads, load-graph, load-into-counting, 
+     make-initial-stoptags, merge-partitions, partition-graph,
+     sample-reads-randomly, split-paired-reads}.py:
+       check_file_status() -> check_input_files()
+   * khmer/tests/test_functions.py: check_file_status() -> check_input_files()
+
 2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/normalize-by-median.py: Added support to the diginorm script for
