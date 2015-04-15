@@ -43,6 +43,8 @@ them, please visit the following URLs:
 We chat at https://gitter.im/ged-lab/khmer and the maintainers can be
 contacted at khmer-project@idyll.org.
 
+For getting help with please see this guide: http://khmer.readthedocs.org/user/getting-help.html
+
 IMPORTANT NOTE: CITE US!
 ------------------------
 

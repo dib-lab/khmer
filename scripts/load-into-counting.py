@@ -136,7 +136,9 @@ def main():
     print >>sys.stderr, 'saving', base
     htable.save(base)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
 
     with open(base + '.info', 'a') as info_fp:
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
@@ -163,14 +165,6 @@ def main():
                     fls=";".join(filenames)))
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-
-    # Change 0.2 only if you really grok it.  HINT: You don't.
-    if fp_rate > 0.20:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
-        print >> sys.stderr, "for this data set. Increase tablesize/# tables."
-        print >> sys.stderr, "**"
-        sys.exit(1)
 
     print >>sys.stderr, 'DONE.'
     print >>sys.stderr, 'wrote to:', base + '.info'
