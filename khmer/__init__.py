@@ -7,6 +7,7 @@
 """This is khmer; please see http://khmer.readthedocs.org/."""
 
 from math import log
+import json
 
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
@@ -299,7 +300,7 @@ class HLLCounter(_HLLCounter):
 
 class ReadAligner(_ReadAligner):
 
-    """Public ReadAligner."""
+    """Sequence to graph aligner."""
 
     defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
         (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
@@ -320,12 +321,18 @@ class ReadAligner(_ReadAligner):
         log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
 
     def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
-                scoring_matrix=None, transition_probabilities=None):
-        if scoring_matrix is None:
-            scoring_matrix = ReadAligner.defaultScoringMatrix
-        if transition_probabilities is None:
-            transition_probabilities = \
-                ReadAligner.defaultTransitionProbabilities
+                **kwargs):
+
+        if kwargs['filename']:
+            params = json.load(kwargs['filename'])
+            scoring_matrix = params['scoring_matrix']
+            transition_probabilities = params['transition_probabilities']
+        else:
+            if kwargs['scoring_matrix'] is None:
+                scoring_matrix = ReadAligner.defaultScoringMatrix
+            if kwargs['transition_probabilities'] is None:
+                transition_probabilities = \
+                    ReadAligner.defaultTransitionProbabilities
         return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
                                     bits_theta, scoring_matrix,
                                     transition_probabilities)
