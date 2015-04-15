@@ -83,7 +83,7 @@ class CsvFormatter(object):
 
     def append(self, basepairs, seqs, avg_len, filename):
         """Append the data separated by comma."""
-        self.file.writerow([basepairs, seqs, "%.1f"%avg_len, filename])
+        self.file.writerow([basepairs, seqs, "%.1f" % avg_len, filename])
 
     def finalize(self):
         """No statistics since the CSV data is supposed to be processed further.

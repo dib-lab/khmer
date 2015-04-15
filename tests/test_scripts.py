@@ -99,7 +99,8 @@ def test_load_into_counting_fail():
 
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
-    assert "ERROR:" in err
+    print err
+    assert "** ERROR: the graph structure is too small" in err
 
 
 def test_load_into_counting_multifile():
@@ -684,7 +685,8 @@ def test_normalize_by_median_impaired():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
-    utils.runscript(script, args, in_dir, fail_ok=True)
+    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert '** ERROR: Error: Improperly interleaved pairs ' in err
 
 
 def test_normalize_by_median_force():
@@ -980,7 +982,7 @@ def test_load_graph_fail():
 
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
-    assert "ERROR:" in err
+    assert "** ERROR: the graph structure is too small" in err
 
 
 def test_load_graph_write_fp():
@@ -1381,8 +1383,8 @@ def test_extract_partitions_no_output_groups():
     args = ['-n', 'extracted', partfile]
 
     # We expect a sys.exit -> we need the test to be tolerant
-    utils.runscript(script, args, in_dir, fail_ok=True)
-
+    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    print err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
@@ -1446,8 +1448,8 @@ def test_extract_partitions_no_groups():
     script = scriptpath('extract-partitions.py')
     args = ['extracted', empty_file]
 
-    utils.runscript(script, args, in_dir, fail_ok=True)
-
+    _, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert "ERROR: Input file", "is empty; Exiting." in err
     # No group files should be created
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
 
@@ -1714,8 +1716,9 @@ def test_interleave_reads_broken_fq():
     script = scriptpath('interleave-reads.py')
     args = [infile1, infile2, '-o', outfile]
 
-    status, err, out = utils.runscript(script, args, fail_ok=True)
+    status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
+    assert 'ERROR: Input files contain different number of records.' in err
 
 
 def test_interleave_reads_broken_fq_2():
@@ -1729,8 +1732,9 @@ def test_interleave_reads_broken_fq_2():
     script = scriptpath('interleave-reads.py')
     args = [infile1, infile2, '-o', outfile]
 
-    status, err, out = utils.runscript(script, args, fail_ok=True)
+    status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
+    assert "ERROR: This doesn't look like paired data!" in err
 
 
 def test_interleave_reads_broken_fq_3():
@@ -1744,8 +1748,9 @@ def test_interleave_reads_broken_fq_3():
     script = scriptpath('interleave-reads.py')
     args = [infile1, infile2, '-o', outfile]
 
-    status, err, out = utils.runscript(script, args, fail_ok=True)
+    status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
+    assert "ERROR: This doesn't look like paired data!" in err
 
 
 def test_interleave_reads_broken_fq_4():
@@ -1758,8 +1763,9 @@ def test_interleave_reads_broken_fq_4():
     script = scriptpath('interleave-reads.py')
     args = [infile1, '-o', outfile]
 
-    status, err, out = utils.runscript(script, args, fail_ok=True)
+    status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
+    assert "ERROR: given only one filename, that doesn't contain _R1_" in err
 
 
 def test_interleave_reads_2_fa():
@@ -2298,11 +2304,12 @@ def test_sample_reads_randomly_S():
     args = ['-N', '10', '-R', '1', '-S', '3']
 
     badargs = list(args)
-    badargs.extend(['-o', 'test', 'test.fq', 'test.fq'])
+    badargs.extend(['-o', 'test', infile, infile])
     (status, out, err) = utils.runscript(script, badargs, in_dir, fail_ok=True)
     assert status == 1, (status, out, err)
+    assert "Error: cannot specify -o with more than one sample" in err
 
-    args.append('test.fq')
+    args.append(infile)
 
     utils.runscript(script, args, in_dir)
 
@@ -2586,9 +2593,12 @@ def test_readstats():
     for k in readstats_output:
         assert k in out, (k, out)
 
+
 def test_readstats_csv():
-    readstats_output = ("358,5,71.6," + utils.get_test_data("test-sweep-reads.fq"),
-                        "916,11,83.3," + utils.get_test_data("paired-mixed.fq"))
+    readstats_output = ("358,5,71.6," +
+                        utils.get_test_data("test-sweep-reads.fq"),
+                        "916,11,83.3," +
+                        utils.get_test_data("paired-mixed.fq"))
 
     args = [utils.get_test_data("test-sweep-reads.fq"),
             utils.get_test_data("paired-mixed.fq"),
@@ -2815,7 +2825,6 @@ def test_trim_low_abund_highfpr():
                                      fail_ok=True)
 
     assert code == 1
-    print out
     assert '** ERROR: the graph structure is too small' in err, err
 
 
