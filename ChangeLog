@@ -1,6 +1,11 @@
+
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * scripts/trim-low-abund.py: fixed existing & new PEP 8 issues
+
+2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * doc/conf.py: disable Sphinx smart rendering
 
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
