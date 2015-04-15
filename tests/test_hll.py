@@ -17,15 +17,11 @@ from screed.fasta import fasta_iter
 from . import khmer_tst_utils as utils
 from nose.tools import assert_raises
 
-try:
-    import string
-    TT = string.maketrans('ACGT', 'TGCA')
-except AttributeError:
-    TT = "".maketrans('ACGT', 'TGCA')
 
 K = 20  # size of kmer
 ERR_RATE = 0.01
 N_UNIQUE = 3960
+TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
 
 
 def teardown():
@@ -46,7 +42,7 @@ def test_hll_add_python():
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - K):
             kmer = sequence[n:n + K]
-            rc = kmer[::-1].translate(TT)
+            rc = "".join(TRANSLATE[c] for c in kmer[::-1])
 
             hllcpp.add(kmer)
 
