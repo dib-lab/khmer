@@ -1,3 +1,7 @@
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: added support for -o/--out
+
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/release.txt: update release instructions to more thoroughly run
