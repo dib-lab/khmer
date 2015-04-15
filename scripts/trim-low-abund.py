@@ -21,6 +21,7 @@ import khmer
 import tempfile
 import shutil
 import textwrap
+import argparse
 
 from screed.screedRecord import _screed_record_dict
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
@@ -78,6 +79,14 @@ def get_parser():
     parser.add_argument('--normalize-to', '-Z', type=int,
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
+
+    parser.add_argument('-o', '--out', metavar="filename",
+                        dest='single_output_file',
+                        type=argparse.FileType('w'),
+                        default=None, help='only output a single file with '
+                        'the specified filename; use a single dash "-" to '
+                        'specify that output should go to STDOUT (the '
+                        'terminal)')
 
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         default=False,

@@ -1,3 +1,7 @@
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: added support for -o/--out
+
 2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * lib/hashtable.cc: remove memory leak
@@ -69,6 +73,10 @@
 2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
 
    * lib/{hashbits.cc}: changed: adding doxygen comments
+
+2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * doc/dev/scripts-and-sandbox.rst: added requirements for streaming I/O
 
 2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
 

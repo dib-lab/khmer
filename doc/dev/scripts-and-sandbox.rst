@@ -114,5 +114,7 @@ development/PR checklist::
    - [ ] argparse help text exists, with an epilog docstring, with examples and options
    - [ ] standard command line options are implemented
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
+   - [ ] support as an input file, if appropriate
+   - [ ] support designation of an output file (including STDOUT), if appropriate
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
    - [ ] script has been removed from sandbox/README.rst
