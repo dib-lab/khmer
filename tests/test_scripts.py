@@ -2933,3 +2933,27 @@ def test_existance_failure():
     assert status == 1
 
     assert expected_output in err
+
+
+def test_roundtrip_commented_format():
+    """Split/interleave roundtrip for old style format with comments (#873).
+
+    This should produce a file identical to the input when only paired
+    reads are given.
+    """
+    infile = utils.get_temp_filename('test.fq')
+    outfile = utils.get_temp_filename('test2.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('old-style-format-w-comments.fq'),
+                    infile)
+
+    _, out, err = utils.runscript('split-paired-reads.py', [infile], in_dir)
+
+    utils.runscript('interleave-reads.py', [infile + '.1',
+                                            infile + '.2',
+                                            '-o', outfile], in_dir)
+
+    r = open(infile).read()
+    r2 = open(outfile).read()
+    assert r == r2, (r, r2)
