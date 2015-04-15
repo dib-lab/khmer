@@ -324,7 +324,8 @@ class ReadAligner(_ReadAligner):
         if scoring_matrix is None:
             scoring_matrix = ReadAligner.defaultScoringMatrix
         if transition_probabilities is None:
-            transition_probabilities = ReadAligner.defaultTransitionProbabilities
+            transition_probabilities = \
+                ReadAligner.defaultTransitionProbabilities
         return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
                                     bits_theta, scoring_matrix,
                                     transition_probabilities)
