@@ -166,7 +166,9 @@ def extract_countinghash_info(filename):
 
 
 def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
-    """Do a quick & dirty expected collision rate calculation on a hashtable.
+    """Check expected collision rate for a counting table.
+
+    Do a quick & dirty expected collision rate calculation on a hashtable.
     Check to see that collision rate is within threshold.
 
     Keyword argument:
@@ -277,7 +279,6 @@ class HLLCounter(_HLLCounter):
 
     """HyperLogLog counter.
 
-    """
     A HyperLogLog counter is a probabilistic data structure specialized on
     cardinality estimation.
     There is a precision/memory consumption trade-off: error rate determines
@@ -298,11 +299,9 @@ class HLLCounter(_HLLCounter):
 
 class ReadAligner(_ReadAligner):
 
-    """
-    ReadAligner docs
-    """
+    """Public ReadAligner."""
 
-    defaultTransitionProbabilies = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
+    defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
         (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
          log(0.0150068, 2), log(0.0000017, 2), log(0.0000003, 2)),  # M_
         (log(0.5196194, 2), log(0.4647955, 2), log(0.0059060, 2),
@@ -321,8 +320,14 @@ class ReadAligner(_ReadAligner):
         log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
 
     def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
-                scoring_matrix=defaultScoringMatrix,
-                transition_probabilities=defaultTransitionProbabilies):
+                scoring_matrix=None, transition_probabilities=None):
+        if scoring_matrix is None:
+            scoring_matrix = ReadAligner.defaultScoringMatrix
+        if transition_probabilities is None:
+            transition_probabilities = ReadAligner.defaultTransitionProbabilities
         return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
                                     bits_theta, scoring_matrix,
                                     transition_probabilities)
+
+    def __init__(self, *args):
+        _ReadAligner.__init__(self, args)
