@@ -1,3 +1,8 @@
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/tests/test_scripts.py: changed tests that use `runscript` with
+      `fail_okay=True` to use asserts to confirm the correct failure type
+
 2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * doc/conf.py: disable Sphinx smart rendering
