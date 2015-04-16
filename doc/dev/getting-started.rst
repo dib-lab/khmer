@@ -291,13 +291,13 @@ Claiming an issue and starting to develop
 
       git push origin
 
-#. When you are ready to have the pull request reviewed, please add a
-   comment "ready for review!".
+#. When you are ready to have the pull request reviewed, please mention 
+   @luizirber, @camillescott, @mr-c, or @ctb with a comment 'Ready for review!'
 
 #. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
-   'ping!' in the comments if you are looking for feedback -- this
-   will alert us that you are still on the line -- but we will
+   'ping!' and an @ in the comments if you are looking for feedback 
+   -- this will alert us that you are still on the line -- but we will
    automatically get notified of your pull request and any new
    comments, so use sparingly.
 

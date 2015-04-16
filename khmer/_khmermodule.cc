@@ -1858,7 +1858,10 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
-    }
+    } catch (InvalidStreamHandle &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    } 
 
     HashIntoType n = hashbits->n_unique_kmers();
     HashIntoType n_overlap = hashbits->n_overlap_kmers();

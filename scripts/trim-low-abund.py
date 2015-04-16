@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,6 +21,7 @@ import khmer
 import tempfile
 import shutil
 import textwrap
+import argparse
 
 from screed.screedRecord import _screed_record_dict
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
@@ -78,6 +79,13 @@ def get_parser():
     parser.add_argument('--normalize-to', '-Z', type=int,
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
+
+    parser.add_argument('-o', '--out', metavar="filename",
+                        type=argparse.FileType('w'),
+                        default=None, help='only output a single file with '
+                        'the specified filename; use a single dash "-" to '
+                        'specify that output should go to STDOUT (the '
+                        'terminal)')
 
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         default=False,
@@ -148,13 +156,15 @@ def main():
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        trimfilename = os.path.basename(filename) + '.abundtrim'
+        if args.out is None:
+            trimfp = open(os.path.basename(filename) + '.abundtrim', 'w')
+        else:
+            trimfp = args.out
 
-        pass2list.append((filename, pass2filename, trimfilename))
+        pass2list.append((filename, pass2filename, trimfp))
 
         screed_iter = screed.open(filename, parse_description=False)
         pass2fp = open(pass2filename, 'w')
-        trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
         n = 0
@@ -229,26 +239,24 @@ def main():
                             trimmed_reads += 1
 
         pass2fp.close()
-        trimfp.close()
 
-        print '%s: kept aside %d of %d from first pass, in %s' % \
-              (filename, save_pass2, n, filename)
+        print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' % \
+            (filename, save_pass2, n, filename)
         save_pass2_total += save_pass2
 
     # ### SECOND PASS. ###
 
     skipped_n = 0
     skipped_bp = 0
-    for _, pass2filename, trimfilename in pass2list:
-        print 'second pass: looking at sequences kept aside in %s' % \
-              pass2filename
+    for _, pass2filename, trimfp in pass2list:
+        print >>sys.stderr, 'second pass: looking at sequences kept aside in %s' % \
+            pass2filename
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        trimfp = open(trimfilename, 'a')
         for n, read in enumerate(screed.open(pass2filename,
                                              parse_description=False)):
             if n % 10000 == 0:
@@ -290,21 +298,21 @@ def main():
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print 'read %d reads, %d bp' % (n_reads, n_bp,)
-    print 'wrote %d reads, %d bp' % (written_reads, written_bp,)
-    print 'looked at %d reads twice (%.2f passes)' % (save_pass2_total,
-                                                      n_passes)
-    print 'removed %d reads and trimmed %d reads (%.2f%%)' % \
+    print >>sys.stderr, 'read %d reads, %d bp' % (n_reads, n_bp,)
+    print >>sys.stderr, 'wrote %d reads, %d bp' % (written_reads, written_bp,)
+    print >>sys.stderr, 'looked at %d reads twice (%.2f passes)' % \
+        (save_pass2_total, n_passes)
+    print >>sys.stderr, 'removed %d reads and trimmed %d reads (%.2f%%)' % \
         (n_reads - written_reads, trimmed_reads, percent_reads_trimmed)
-    print 'trimmed or removed %.2f%% of bases (%d total)' % \
+    print >>sys.stderr, 'trimmed or removed %.2f%% of bases (%d total)' % \
         ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print '%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
-                                                         percent_reads_hicov)
-        print 'skipped %d reads/%d bases because of low coverage' % \
-              (skipped_n, skipped_bp)
+        print >>sys.stderr, '%d reads were high coverage (%.2f%%);' % \
+            (n_reads - skipped_n, percent_reads_hicov)
+        print >>sys.stderr, 'skipped %d reads/%d bases because of low coverage' % \
+            (skipped_n, skipped_bp)
 
     fp_rate = \
         khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
@@ -312,7 +320,7 @@ def main():
     print >>sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
-    print 'output in *.abundtrim'
+    print >>sys.stderr, 'output in *.abundtrim'
 
     if args.savetable:
         print >>sys.stderr, "Saving k-mer counting table to", args.savetable

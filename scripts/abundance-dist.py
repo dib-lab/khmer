@@ -20,7 +20,7 @@ import csv
 import khmer
 import argparse
 import os
-from khmer.kfile import check_file_status
+from khmer.kfile import check_input_files
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -61,7 +61,7 @@ def main():
     infiles = [args.input_counting_table_filename,
                args.input_sequence_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     print ('hashtable from', args.input_counting_table_filename,
            file=sys.stderr)
