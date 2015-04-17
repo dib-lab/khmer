@@ -1,3 +1,8 @@
+2015-04-17  Jessica Mizzi  <mizzijes@msu.edu>
+
+   * tests/test_scripts.py: split test_extract_long_sequences 
+   into test_extract_long_sequences_fa and test_extract_long_sequences_fq
+
 2015-04-15  Elmar Bucher <buchere@ohsu.edu>
 
    * khmer/doc/dev/getting-started.rst: add information for OS X
