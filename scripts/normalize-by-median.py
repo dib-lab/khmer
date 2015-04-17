@@ -29,7 +29,7 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
 from khmer.utils import write_record, check_is_pair
-from oxli.khmer_api import diginorm
+from oxli import khmer_api
 
 DEFAULT_DESIRED_COVERAGE = 10
 
@@ -58,8 +58,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     index = -1
     total = 0
     discarded = 0
-    for index, batch in enumerate(batchwise(screed.open(
-            input_filename, parse_description=False), batch_size)):
+    for index, batch in enumerate(batchwise(input_iter, batch_size)):
         if index > 0 and index % 100000 == 0:
             print >>sys.stderr, '... kept {kept} of {total} or'\
                 ' {perc:2}%'.format(kept=total - discarded, total=total,
