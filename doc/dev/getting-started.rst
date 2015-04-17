@@ -1,3 +1,9 @@
+.. This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+   Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   the three-clause BSD license; see doc/LICENSE.txt.
+   Contact: khmer-project@idyll.org
+
+
 Getting started with khmer development
 ======================================
 
@@ -95,6 +101,15 @@ One-time Preparation
 	tar xzf virtualenv*
 	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install pip by execution from the command line::
+     
+       sudo port install py27-pip
+     
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+   already installed
+
+
    `Conda <https://github.com/conda/conda>`__ users on any platform
    should instead create a separate Conda environment::
 
@@ -116,6 +131,24 @@ One-time Preparation
        source activate khmer
        cd khmer
        make install-dependencies
+       
+#. Cppcheck installation:
+   
+   `Debian <https://www.debian.org/>`__ and
+   `Ubuntu <http://www.ubuntu.com/>`__ Linux distro users can
+   install cppcheck by executing from the command line::
+     
+       sudo apt-get install cppcheck
+
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo port install cppcheck
+
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo brew install cppcheck
 
 
 Building khmer and running the tests
@@ -254,13 +287,13 @@ Claiming an issue and starting to develop
 
       git push origin
 
-#. When you are ready to have the pull request reviewed, please add a
-   comment "ready for review!".
+#. When you are ready to have the pull request reviewed, please mention 
+   @luizirber, @camillescott, @mr-c, or @ctb with a comment 'Ready for review!'
 
 #. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
-   'ping!' in the comments if you are looking for feedback -- this
-   will alert us that you are still on the line -- but we will
+   'ping!' and an @ in the comments if you are looking for feedback 
+   -- this will alert us that you are still on the line -- but we will
    automatically get notified of your pull request and any new
    comments, so use sparingly.
 

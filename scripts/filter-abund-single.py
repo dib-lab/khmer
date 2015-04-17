@@ -25,7 +25,7 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
-from khmer.kfile import (check_file_status, check_space,
+from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 #
 DEFAULT_CUTOFF = 2
@@ -66,7 +66,7 @@ def get_parser():
 def main():
     info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile, args.force)
+    check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
         check_space_for_hashtable(
