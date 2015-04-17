@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Sequence trimming using stoptags.
+
 Trim sequences at k-mers in the given stoptags file.  Output sequences
 will be placed in 'infile.stopfilt'.
 
@@ -21,7 +23,7 @@ import argparse
 import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 # @CTB K should be loaded from file...
@@ -43,8 +45,8 @@ def get_parser():
     parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -57,7 +59,7 @@ def main():
     infiles = args.input_filenames
 
     for _ in infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(infiles, args.force)
 

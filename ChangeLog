@@ -1,6 +1,327 @@
-2015-04-03  Jessica Mizzi  <mizzijes@msu.edu>
+2015-04-17  Jessica Mizzi  <mizzijes@msu.edu>
 
-   * tests/test_scripts.py: split test_extract_long_sequences into test_extract_long_sequences_fa and test_extract_long_sequences_fq
+   * tests/test_scripts.py: split test_extract_long_sequences 
+   into test_extract_long_sequences_fa and test_extract_long_sequences_fq
+
+2015-04-15  Elmar Bucher <buchere@ohsu.edu>
+
+   * khmer/doc/dev/getting-started.rst: add information for OS X
+   mac port and homebrew distro users as well as Linux
+   Debian and Ubuntu distro users.
+   And add copyright header.
+
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/tests/khmer_tst_utils.py,doc/dev/a-quick-guide-to-testing.rst
+      edited docstring and docs to remind people to make sure tests test
+      errors correctly
+
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * sandbox/make-coverage.py: tweak for importability
+
+2015-04-15  Sherine Awad  <sherine.awad@gmail.com>
+
+   * sandbox/make-coverage.py: restored, was deleted by accident
+
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/tests/test_scripts.py: changed tests that use `runscript` with
+      `fail_okay=True` to use asserts to confirm the correct failure type
+
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * doc/dev/getting-started.rst: clarified dev communication
+
+2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: implemented STDOUT output, redirected
+   existing print statements to STDERR, fixed existing & new PEP 8 issues 
+   * tests/test_scripts.py: added test for above changes
+
+2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * doc/conf.py: disable Sphinx smart rendering
+
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/hashtable.cc: remove memory leak
+   * scripts/readstats.py,tests/test_scripts.py: fix PEP8 violations
+
+2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: pass individual arg values to 
+      functions instead of ArgParse object
+
+2015-04-15  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   added a --csv option to readstats
+   updated documentation for count-overlap
+   * khmer/_khmermodule.cc: fixed missing error handling 
+   for hashbits_count_overlap
+
+2015-04-15  en zyme  <en_zyme@outlook.com>
+
+   * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+     khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
+     count-median, count-overlap, do-partition, extract-paired-reads, 
+     extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
+     find-knots, interleave-reads, load-graph, load-into-counting, 
+     make-initial-stoptags, merge-partitions, partition-graph,
+     sample-reads-randomly, split-paired-reads}.py:
+       check_file_status() -> check_input_files()
+   * khmer/tests/test_functions.py: check_file_status() -> check_input_files()
+
+2015-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * khmer/utils.py: fix record checks to account for comments in old style
+   FASTQ data.
+   * tests/test-data/old-style-format-w-comments.fq: new test data.
+   * tests/test_scripts.py: add test against new test data.
+
+2015-04-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/release.txt: update release instructions to more thoroughly run
+   tests.
+
+2015-04-14  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/scripts/normalize-by-median.py: allow for paired and unpaired
+      files to be normalized together. separate function for error check
+   * khmer/tests/test_scripts.py: created test for paired/unpaired data
+
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
+   * doc/user/getting-help.rst: added to user docs
+   * doc/index.rst: changed: added link to getting-help doc
+   * README.rst: changed: added link to getting-help doc
+
+2015-04-14  Scott Fay  <scott.a.fay@gmail.com>
+
+   * docs/index.rst: added github repo and release notes page to main docs page
+
+2015-04-14  Susan Steinman  <steinman.tutoring@gmail.com>
+
+   * khmer/{__init__.py},sandbox/{collect-reads,collect-variants,
+   saturate-by-median},scripts/{do-partition,filter-abund-single,load-graph,
+   load-into-counting,normalize-by-median,trim-low-abund}: pulled out check
+   max collisions logic to init.
+   * khmer/tests/test_scripts.py: modified tests to account for new error
+   message
+
+2015-04-14  Josiah Seaman  <josiah@dnaskittle.com>
+
+   * lib/{hashbits.cc}: changed: adding doxygen comments
+
+2015-04-14  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * doc/dev/coding-guidelines-and-review.rst: added copyright question
+   to commit checklist.
+
+2015-04-14  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * */*.py: Make docstrings PEP 257 compliant.
+
+2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
+   khmer_exception to use std::string to fix memory management.
+
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc: catch more exceptions
+   * tests/test_{sandbox_scripts,subset_graph}.py: make tests more resilient
+
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/count.cc: Make CountingHash::abundance_distribution threadsafe
+   * khmer/_khmermodule.cc: remove newly unnecessary check for exception
+   * tests/test_scripts.py: added test to confirm the above
+
+2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/{counting,hashbits,hashtable,
+   subset}.cc: catch IO errors and report them.
+   * tests/test_hashbits.py: remove write to fixed path in /tmp
+   * tests/test_scripts.py: added test for empty counting table file
+
+2015-04-13  Elmar Bucher  <buchere@ohsu.edu>
+
+   * scripts/normalize-by-median.py (main): introduced warning for when at least
+   two input files are named the same.
+
+2015-04-13  Andreas Härpfer  <ahaerpfer@gmail.com>
+
+   * doc/dev/getting-started.rst: clarify Conda usage
+
+2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/normalize-by-median.py: Added support to the diginorm script for
+   sending output to terminal (stdout) when using the conventional - as the output
+   filename. Also removed --append option.
+   * tests/test_scripts.py: Added functional test for diginorm stdout, removed
+   test of --append option.
+
+2015-04-13  Scott Fay  <scott.a.fay@gmail.com>
+
+   * scripts/filter-abund.py: added checking of input_table by
+   `check_file_status()`
+
+2015-04-13  David Lin
+
+   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   squash options
+
+2015-04-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * README.rst,doc/index.rst: added link to gitter.im chat room
+   * doc/README.rst: removed ancient, outdated, and unused file
+
+2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * khmer/_khmermodule.cc: removed unused find_all_tags_truncate_on_abundance
+   from python api
+
+2015-04-10  Will Trimble
+
+   * tests/test_script_arguments.py: added a test to check for the empty file
+   warning when checking if a file exists
+
+2015-04-10  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/test-{scripts.py}: added test for check_file_writable using 
+   load_into_counting
+
+2015-04-10  Phillip Garland  <pgarland@gmail.com>
+
+   * khmer/file.py (check_file_writable): new function to check writability
+   * scripts/load-into-counting.py (main): early check to see if output is
+   writable
+
+2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst: add a ReadTheDocs badge
+
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * jenkins-build.sh: updated OS X warning flag to quiet the build a bit
+
+2015-04-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: added 'convert-release-notes' target for MD->RST conversion
+   * doc/{,release-notes}/index.rst: include release notes in documentation
+   * doc/release-notes/*.rst: added pandoc converted versions of release notes
+   * jenkins-build.sh: use the Sphinx method to install doc dependencies
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: use the release version of screed 0.8
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/*/*.txt: all documentation sources have been renamed to use the rst
+   extension to indicate that they are reStructuredText files. This enables
+   use of rich text editors on GitHub and elsewhere.
+   * doc/conf.py: update Sphinx configuration to reflect this change
+   * doc/requirements.txt: added hint to install version 3.4.1 of Setuptools;
+   this file is used by ReadTheDocs only.
+
+2015-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * ChangeLog, lib/read_aligner.cc, sandbox/sweep-reads.py: fixed spelling
+   errors.
+
+2015-04-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: Work around an issue (#884) in SeqAn 1.4.x
+   handling of truncated sequence files. Also revamp exceptions
+   * khmer/_khmermodule.cc: Use new/updated exceptions handling malformed
+   FASTA/Q files.
+   * tests/test_read_parsers.py: add a test of parsing of truncated fastq
+   files
+
+2015-04-03  Luiz Irber  <irberlui@msu.edu>
+
+   * lib/hllcounter.cc: Use for loop instead of transform on merge method,
+   now works on C++11.
+
+2015-04-01  Luiz Irber  <irberlui@msu.edu>
+
+   * third-party/smhasher/MurmurHash3.{cc,h}: remove unused code, fix warnings.
+
+2015-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Doxyfile.in: make documentation generation reproducible, removed timestamp
+
+2015-04-01  Alex Hyer  <theonehyer@gmail.com>
+
+   * scripts/find-knots.py: added force argument to check_file_status()
+   call in main().
+
+2015-03-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/read_parsers.{cc,hh}: add read counting to IParser and subclasses
+   * khmer/_khmermodule.cc,tests/test_read_parsers.py: add 'num_reads'
+   attribute to khmer.ReadParser objects in python land, and test it.
+
+2015-03-28  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/hashbits.hh: Add Hashbits::n_tables() accessor
+
+2015-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * lib/read_parsers.{cc,hh}: Obfuscate SeqAn SequenceStream objects with a
+   wrapper struct, to avoid #include-ing the SeqAn headers.
+   * lib/Makefile: Don't install the SeqAn headers.
+
+2015-03-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Add libkhmer targets, clean up
+   * lib/get_version.py: Rewrite to use versioneer.py
+   * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
+   * lib/.check_openmp.cc: add source that checks compiler for openmp support.
+   * lib/khmer.pc.in: add pkg-config file for khmer
+
+2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.hh: Add CountingHash::n_tables() accessor
+
+2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/kfile.py: Added file not existing error for system exit
+    * tests/{test_scripts,test_functions}.py: Added tests for
+    check_file_status for file existence and force option
+
+2015-03-15  Kevin Murray  <spam@kdmurray.id.au>  &  Titus Brown  <titus@idyll.org>
+
+   * tests/test_counting_hash.py: Skip get_raw_tables test if python doesn't
+   have the memoryview type/function.
+
+2015-03-11  Erich Schwarz  <ems394@cornell.edu>
+
+   * Added URLs and brief descriptions for khmer-relevant documentation in
+   doc/introduction.txt, pointing to http://khmer-protocols.readthedocs.org and
+   khmer-recipes.readthedocs.org, with brief descriptions of their content.
+
+2015-03-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/counting.hh, khmer/_khmermodule.cc: Expose the raw tables of
+   count-min sketches to the world of python using a buffer interface.
+   * tests/test_counting_hash.py: Tests of the above functionality.
+
+2015-03-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * Makefile: make 'pep8' target be more verbose
+   * jenkins-build.sh: specify setuptools version
+   * scripts/{abundance-dist,annotate-partitions,count-median,do-partition,
+   extract-paired-reads,extract-partitions,filter-stoptags,find-knots,
+   interleave-reads,merge-partitions,partition-graph,sample-reads-randomly,
+   split-paired-reads}.py,setup.py: fix new PEP8 errors
+   * setup.py: specify that this is a Python 2 only project (for now)
+   * tests/test_{counting_single,subset_graph}.py: make explicit the use of
+   floor division behavior.
 
 2015-03-06  Titus Brown  <titus@idyll.org>
 
@@ -508,7 +829,7 @@
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
-    in the current dir by explictly specifying an output file.
+    in the current dir by explicitly specifying an output file.
 
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
@@ -973,7 +1294,7 @@
 2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
-    normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
+    normalize-by-median,load-graph}.py: restore Python 2.6 compatibility for
     Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
 
 2014-06-15  Titus Brown  <t@idyll.org>

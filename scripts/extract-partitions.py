@@ -24,7 +24,7 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -73,8 +73,8 @@ def get_parser():
     parser.add_argument('--output-unassigned', '-U', default=False,
                         action='store_true',
                         help='Output unassigned sequences, too')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -90,7 +90,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     n_unassigned = 0
 
     for infile in args.part_filenames:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(args.part_filenames, args.force)
 

@@ -24,7 +24,7 @@ import argparse
 import khmer
 import sys
 from khmer.khmer_args import (add_threading_args, info)
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 
 # Debugging Support
 import re
@@ -88,8 +88,8 @@ def get_parser():
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -103,7 +103,7 @@ def main():
 
     filenames = [basename + '.pt', basename + '.tagset']
     for _ in filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(filenames, args.force)
 

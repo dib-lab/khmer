@@ -9,7 +9,7 @@ import khmer
 import screed
 
 import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+import os
 
 
 def teardown():
@@ -26,7 +26,9 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        divvy = ht.divide_tags_into_subsets(1)
+        assert len(divvy) is 3
+        (a, b, c) = divvy
 
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
@@ -45,7 +47,9 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        divvy = ht.divide_tags_into_subsets(1)
+        assert len(divvy) is 3
+        (a, b, c) = divvy
 
         x = ht.do_subset_partition(b, c)
         ht.merge_subset(x)
@@ -83,7 +87,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4
 
@@ -102,7 +106,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4
 
@@ -121,7 +125,7 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
         assert len(divvy) == 4, len(divvy)
 
@@ -202,6 +206,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -231,7 +236,7 @@ class Test_SaveLoadPmap(object):
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -245,6 +250,8 @@ class Test_SaveLoadPmap(object):
         ht.save_subset_partitionmap(y, outfile2)
         del y
 
+        assert os.path.exists(outfile1)
+        assert os.path.exists(outfile2)
         a = ht.load_subset_partitionmap(outfile1)
         b = ht.load_subset_partitionmap(outfile2)
 
@@ -272,6 +279,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -298,7 +306,7 @@ class Test_SaveLoadPmap(object):
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
-        subset_size = total_reads / 2 + total_reads % 2
+        subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -312,6 +320,8 @@ class Test_SaveLoadPmap(object):
         ht.save_subset_partitionmap(y, outfile2)
         del y
 
+        assert os.path.exists(outfile1)
+        assert os.path.exists(outfile2)
         ht.merge_subset_from_disk(outfile1)
         ht.merge_subset_from_disk(outfile2)
 
@@ -328,6 +338,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -369,6 +380,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')

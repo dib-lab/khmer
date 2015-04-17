@@ -58,6 +58,11 @@ We suggest the following approach to writing tests for **new code**:
    your code -- if statements, fence-post bound errors, etc. -- and write
    tests that exercise those bits of code specifically.
 
+#. Make sure tests that expect a function call to fail (esp. with
+   fail_ok=True) are failing for the expected reason. Run the code from the
+   command line and see what the behavior is. For troubleshooting tests,
+   catch the error with try: ... except: or print err.
+
 For adding tests to **old code**, we recommend a mix of two approaches:
 
 #. use `"stupidity driven testing"

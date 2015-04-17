@@ -21,7 +21,7 @@ import argparse
 import textwrap
 import khmer
 import sys
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 DEFAULT_K = 32
@@ -53,8 +53,8 @@ def get_parser():
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequences to '
                         'annotate.')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -70,9 +70,9 @@ def main():
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    check_file_status(partitionmap_file, args.force)
+    check_input_files(partitionmap_file, args.force)
     for _ in filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(filenames, args.force)
 

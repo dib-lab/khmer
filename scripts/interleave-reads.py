@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Interleave left and right reads.
+
 Take two files containing left & right reads from a paired-end sequencing run,
 and interleave them.
 
@@ -25,7 +27,7 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
@@ -53,8 +55,8 @@ def get_parser():
     parser.add_argument('-o', '--output', metavar="filename",
                         type=argparse.FileType('w'),
                         default=sys.stdout)
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -65,7 +67,7 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(args.infiles, args.force)
 

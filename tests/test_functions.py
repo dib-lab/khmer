@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -11,6 +11,7 @@ import khmer_tst_utils as utils
 import collections
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
+from khmer.kfile import check_input_files
 
 
 def test_forward_hash():
@@ -113,6 +114,24 @@ def test_extract_hashbits_info():
             os.remove(fn)
         except OSError as e:
             print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+
+
+def test_check_file_status_kfile():
+    fn = utils.get_temp_filename('thisfiledoesnotexist')
+    check_file_status_exited = False
+    try:
+        check_input_files(fn, False)
+    except SystemExit:
+        check_file_status_exited = True
+    assert check_file_status_exited
+
+
+def test_check_file_status_kfile_force():
+    fn = utils.get_temp_filename('thisfiledoesnotexist')
+    try:
+        check_input_files(fn, True)
+    except OSError as e:
+        assert False
 
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])

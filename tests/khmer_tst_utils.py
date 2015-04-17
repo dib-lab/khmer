@@ -75,9 +75,12 @@ def _runscript(scriptname, sandbox=False):
 
 def runscript(scriptname, args, in_directory=None,
               fail_ok=False, sandbox=False):
-    """
+    """Run a Python script using exec().
+
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.
+
+    When using :attr:`fail_ok`=False in tests, specify the expected error.
     """
     sysargs = [scriptname]
     sysargs.extend(args)
@@ -124,11 +127,11 @@ def runscript(scriptname, args, in_directory=None,
 
 def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
                       fail_ok=False, sandbox=False):
-    """
+    """Run a Python script using subprocess().
+
     Run the given Python script, with the given args, in the given directory,
     using 'subprocess'.
     """
-
     cwd = os.getcwd()
 
     status = -1

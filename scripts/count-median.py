@@ -7,9 +7,11 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Count the median/avg k-mer abundance for each sequence in the input file,
-based on the k-mer counts in the given k-mer counting table.  Can be used to
-estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
+Count the median/avg k-mer abundance for each sequence in the input file.
+
+The abundance is based on the k-mer counts in the given k-mer counting
+table.  Can be used to estimate expression levels (mRNAseq) or coverage
+(genomic/metagenomic).
 
 % scripts/count-median.py <htname> <input seqs> <output counts>
 
@@ -26,7 +28,7 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 
@@ -59,8 +61,8 @@ def get_parser():
                         help='input FAST[AQ] sequence filename')
     parser.add_argument('output', metavar='output_summary_filename',
                         help='output summary filename')
-    parser.add_argument('--version', action='version', version='%(prog)s '
-                        + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     parser.add_argument('--csv', default=False, action='store_true',
@@ -79,7 +81,7 @@ def main():
 
     infiles = [htfile, input_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(infiles, args.force)
 
