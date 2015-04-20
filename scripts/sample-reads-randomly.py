@@ -126,7 +126,7 @@ def main():
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
         screed_iter = screed.open(filename, parse_description=False)
-        for count, ispair, record1, record2 in broken_paired_reader(screed_iter):
+        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(screed_iter):
             if count % 10000 == 0:
                 print >>sys.stderr, '...', count, 'reads scanned'
                 if count >= args.max_reads:
@@ -137,7 +137,7 @@ def main():
             # collect first N reads
             if count <= args.num_reads:
                 for n in range(num_samples):
-                    reads[n].append((record1, record2))
+                    reads[n].append((rcrd1, rcrd2))
             else:
                 # use reservoir sampling to replace reads at random
                 # see http://en.wikipedia.org/wiki/Reservoir_sampling
@@ -145,7 +145,7 @@ def main():
                 for n in range(num_samples):
                     guess = random.randint(1, count)
                     if guess <= args.num_reads:
-                        reads[n][guess - 1] = (record1, record2)
+                        reads[n][guess - 1] = (rcrd1, rcrd2)
 
     # output all the subsampled reads:
     if len(reads) == 1:
