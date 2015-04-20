@@ -63,9 +63,6 @@ def get_parser():
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
-    parser.add_argument('-p', '--paired', default=False, dest='paired',
-                        action='store_true', help='All input files are in '
-                        'paired interleaved format')
     parser.add_argument('-o', '--output', dest='output_file',
                         metavar='output_file',
                         type=argparse.FileType('w'), default=None)
