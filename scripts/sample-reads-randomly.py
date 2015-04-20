@@ -122,34 +122,30 @@ def main():
     for n in range(num_samples):
         reads.append([])
 
-    total = 0
-
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
         screed_iter = screed.open(filename, parse_description=False)
-        for record in broken_paired_reader(screed_iter):
-            total += 1
-
-            if total % 10000 == 0:
-                print >>sys.stderr, '...', total, 'reads scanned'
-                if total >= args.max_reads:
+        for count, ispair, record1, record2 in broken_paired_reader(screed_iter):
+            if count % 10000 == 0:
+                print >>sys.stderr, '...', count, 'reads scanned'
+                if count >= args.max_reads:
                     print >>sys.stderr, 'reached upper limit of %d reads' % \
                         args.max_reads, '(see -M); exiting'
                     break
 
             # collect first N reads
-            if total <= args.num_reads:
+            if count <= args.num_reads:
                 for n in range(num_samples):
-                    reads[n].append(record)
+                    reads[n].append((record1, record2))
             else:
                 # use reservoir sampling to replace reads at random
                 # see http://en.wikipedia.org/wiki/Reservoir_sampling
 
                 for n in range(num_samples):
-                    guess = random.randint(1, total)
+                    guess = random.randint(1, count)
                     if guess <= args.num_reads:
-                        reads[n][guess - 1] = record
+                        reads[n][guess - 1] = (record1, record2)
 
     # output all the subsampled reads:
     if len(reads) == 1:
@@ -158,20 +154,20 @@ def main():
         if not output_file:
             output_file = open(output_filename, 'w')
 
-        for record in reads[0]:
-            write_record(record[2], output_file)
-            if record[1] is True:
-                write_record(record[3], output_file)
+        for records in reads[0]:
+            write_record(records[0], output_file)
+            if records[1] is not None:
+                write_record(records[1], output_file)
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
             print >>sys.stderr, 'Writing %d sequences to %s' % \
                 (len(reads[n]), n_filename)
             output_file = open(n_filename, 'w')
-            for record in reads[n]:
-                write_record(record[2], output_file)
-                if record[1] is True:
-                    write_record(record[3], output_file)
+            for records in reads[n]:
+                write_record(records[0], output_file)
+                if records[1] is not None:
+                    write_record(records[1], output_file)
 
 if __name__ == '__main__':
     main()
