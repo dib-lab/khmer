@@ -23,7 +23,7 @@ def check_file_status(file_path, force):
     """
     mode = None
 
-    if file_path is '-':
+    if file_path == '-':
         return
     try:
         mode = os.stat(file_path).st_mode
