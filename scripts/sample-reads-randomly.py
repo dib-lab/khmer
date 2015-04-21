@@ -63,6 +63,8 @@ def get_parser():
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
+    parser.add_argument('--force_single', default=False, action='store_true',
+                        help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
                         metavar='output_file',
                         type=argparse.FileType('w'), default=None)
@@ -126,7 +128,8 @@ def main():
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
         screed_iter = screed.open(filename, parse_description=False)
-        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(screed_iter):
+        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(screed_iter,
+                                               force_single=args.force_single):
             if count % 10000 == 0:
                 print >>sys.stderr, '...', count, 'reads scanned'
                 if count >= args.max_reads:

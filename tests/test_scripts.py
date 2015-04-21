@@ -2129,6 +2129,31 @@ def test_sample_reads_randomly():
                         '850:2:1:3096:9791/2'])
 
 
+def test_sample_reads_randomly_force_single():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    script = scriptpath('sample-reads-randomly.py')
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single']
+    args.append(infile)
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.subset'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print seqs
+    assert seqs == set(['850:2:1:1792:19533/1', '850:2:1:1128:19912/1',
+                        '850:2:1:2273:13309/2', '850:2:1:2503:19287/1',
+                        '850:2:1:2691:14602/2', '850:2:1:2400:12145/1',
+                        '850:2:1:1984:20334/1', '850:2:1:1762:5439/2',
+                        '850:2:1:2065:16816/2', '850:2:1:2263:5863/1',
+                        '850:2:1:2084:17145/2'])
+
+
 def test_sample_reads_randomly_fq():
     infile = utils.get_temp_filename('test.fq.gz')
     in_dir = os.path.dirname(infile)

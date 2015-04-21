@@ -1,3 +1,10 @@
+2015-04-21  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/sample-reads-randomly.py: use broken paired reader to provide paired-
+   end read support.
+   * tests/test_scripts.py: change test results to compensate for the change in
+   implementation.
+
 2015-04-13 Elmar Bucher <buchere@ohsu.edu>
 
    * scripts/normalize-by-median.py (main): introduced warning for when at least
@@ -6,13 +13,6 @@
 2015-04-13  Andreas Härpfer  <ahaerpfer@gmail.com>
 
    * doc/dev/getting-started.rst: clarify Conda usage
-
-2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
-
-   * scripts/sample-reads-randomly.py: use broken paired reader to provide paired-
-   end read support.
-   * tests/test_scripts.py: change test results to compensate for the change in
-   implementation.
 
 2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
