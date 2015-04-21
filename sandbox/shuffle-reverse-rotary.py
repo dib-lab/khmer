@@ -1,3 +1,4 @@
+from __future__ import print_function
 #! /usr/bin/env python2
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
@@ -30,12 +31,12 @@ def main():
         for record in screed.open(filename):
             total += 1
             if total % 10000 == 0:
-                print '...', total
+                print('...', total)
             loc = total % ROTARY_SIZE
             fp_d[loc].write('>%s\n%s\n' % (record.name, record.sequence))
 
-    print 'reverse-rotary shuffled %d sequences into %d files (%s.NNN)' % \
-        (total, ROTARY_SIZE, prefix)
+    print('reverse-rotary shuffled %d sequences into %d files (%s.NNN)' % \
+        (total, ROTARY_SIZE, prefix))
 
 
 if __name__ == '__main__':

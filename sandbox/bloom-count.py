@@ -1,3 +1,4 @@
+from __future__ import print_function
 #! /usr/bin/env python2
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
@@ -31,9 +32,9 @@ def main():
                 n_unique += 1
             ht.count(kmer)
 
-    print n_unique
-    print ht.n_occupied()
-    print ht.n_unique_kmers()
+    print(n_unique)
+    print(ht.n_occupied())
+    print(ht.n_unique_kmers())
 
 
 if __name__ == '__main__':

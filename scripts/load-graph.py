@@ -13,6 +13,7 @@ Build a graph from the given sequences, save in <ptname>.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function, unicode_literals
 
 import sys
 import threading
@@ -31,6 +32,7 @@ def get_parser():
 
     parser = build_graph.build_parser(parser)
     return parser
+
 
 if __name__ == '__main__':
     parser = get_parser()

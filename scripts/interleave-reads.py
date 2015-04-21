@@ -16,13 +16,13 @@ and interleave them.
 
 By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 # TODO: take fa as well?
 #      support gzip option?
 
 import screed
 import sys
-import itertools
 import os
 import textwrap
 import argparse
@@ -31,6 +31,11 @@ from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
+
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
 
 
 def get_parser():
@@ -77,38 +82,38 @@ def main():
     else:
         s2_file = s1_file.replace('_R1_', '_R2_')
         if s1_file == s2_file:
-            print >>sys.stderr, ("ERROR: given only one filename, that "
-                                 "doesn't contain _R1_. Exiting.")
+            print(("ERROR: given only one filename, that "
+                   "doesn't contain _R1_. Exiting."), file=sys.stderr)
             sys.exit(1)
 
-        print >> sys.stderr, ("given only one file; "
-                              "guessing that R2 file is %s" % s2_file)
+        print(("given only one file; "
+               "guessing that R2 file is %s" % s2_file), file=sys.stderr)
 
     fail = False
     if not os.path.exists(s1_file):
-        print >> sys.stderr, "Error! R1 file %s does not exist" % s1_file
+        print("Error! R1 file %s does not exist" % s1_file, file=sys.stderr)
         fail = True
 
     if not os.path.exists(s2_file):
-        print >> sys.stderr, "Error! R2 file %s does not exist" % s2_file
+        print("Error! R2 file %s does not exist" % s2_file, file=sys.stderr)
         fail = True
 
     if fail and not args.force:
         sys.exit(1)
 
-    print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
+    print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
     counter = 0
     screed_iter_1 = screed.open(s1_file, parse_description=False)
     screed_iter_2 = screed.open(s2_file, parse_description=False)
-    for read1, read2 in itertools.izip_longest(screed_iter_1, screed_iter_2):
+    for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
         if read1 is None or read2 is None:
-            print >>sys.stderr, ("ERROR: Input files contain different number"
-                                 " of records.")
+            print(("ERROR: Input files contain different number"
+                   " of records."), file=sys.stderr)
             sys.exit(1)
 
         if counter % 100000 == 0:
-            print >> sys.stderr, '...', counter, 'pairs'
+            print('...', counter, 'pairs', file=sys.stderr)
         counter += 1
 
         name1 = read1.name
@@ -122,14 +127,14 @@ def main():
         read2.name = name2
 
         if not check_is_pair(read1, read2):
-            print >>sys.stderr, "ERROR: This doesn't look like paired data! " \
-                "%s %s" % (read1.name, read2.name)
+            print("ERROR: This doesn't look like paired data! "
+                  "%s %s" % (read1.name, read2.name), file=sys.stderr)
             sys.exit(1)
 
         write_record_pair(read1, read2, args.output)
 
-    print >> sys.stderr, 'final: interleaved %d pairs' % counter
-    print >> sys.stderr, 'output written to', args.output.name
+    print('final: interleaved %d pairs' % counter, file=sys.stderr)
+    print('output written to', args.output.name, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

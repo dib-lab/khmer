@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -11,7 +13,7 @@ from khmer import LabelHash, CountingLabelHash
 from screed.fasta import fasta_iter
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 
@@ -29,7 +31,7 @@ def test_toobig():
         lh = LabelHash(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_error_create():
@@ -46,7 +48,7 @@ def test_n_labels():
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_fasta_and_tag_with_labels(filename)
 
-    print lh.n_labels()
+    print(lh.n_labels())
     assert lh.n_labels() == 4
 
 
@@ -174,22 +176,22 @@ def test_consume_fasta_and_tag_with_labels():
     filename = utils.get_test_data('test-transcript.fa')
 
     total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
-    print "doing get"
+    print("doing get")
     assert lb.graph.get(read_1[:20])
     assert total_reads == 3
-    print "doing n_labels"
-    print lb.n_labels()
-    print "doing label dict"
-    print lb.get_label_dict()
-    print "get tagset"
+    print("doing n_labels")
+    print(lb.n_labels())
+    print("doing label dict")
+    print(lb.get_label_dict())
+    print("get tagset")
     for tag in lb.graph.get_tagset():
-        print "forward hash"
-        print tag, khmer.forward_hash(tag, 20)
+        print("forward hash")
+        print(tag, khmer.forward_hash(tag, 20))
     for record in screed.open(filename):
-        print "Sweeping tags"
-        print lb.sweep_tag_neighborhood(record.sequence, 40)
-        print "Sweeping labels..."
-        print lb.sweep_label_neighborhood(record.sequence, 40)
+        print("Sweeping tags")
+        print(lb.sweep_tag_neighborhood(record.sequence, 40))
+        print("Sweeping labels...")
+        print(lb.sweep_label_neighborhood(record.sequence, 40))
     assert lb.n_labels() == 3
 
 
@@ -260,11 +262,11 @@ def test_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print lb.sweep_tag_neighborhood(
+    print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
-    print labels
-    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
+    print(labels)
+    print(len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19)
     assert len(labels) == 2
     assert 0 in labels
     assert 1 in labels
@@ -273,7 +275,7 @@ def test_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
-    print labels
+    print(labels)
     assert len(labels) == 3
     assert 0 in labels
     assert 1 in labels
@@ -284,7 +286,7 @@ def test_label_tag_correctness():
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
         'ACAACACATACA')
-    print labels
+    print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
@@ -292,7 +294,7 @@ def test_label_tag_correctness():
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
-    print labels
+    print(labels)
     assert len(labels) == 1
     assert 3 in labels
 

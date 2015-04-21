@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -7,7 +9,7 @@
 import khmer
 from nose.plugins.attrib import attr
 import os
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import collections
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
@@ -84,7 +86,7 @@ def test_extract_countinghash_info():
 
         info = khmer.extract_countinghash_info(fn)
         ksize, table_size, n_tables, _, _, _ = info
-        print ksize, table_size, n_tables
+        print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
         assert table_size == size
@@ -93,7 +95,7 @@ def test_extract_countinghash_info():
         try:
             os.remove(fn)
         except OSError as e:
-            print >>sys.stder, '...failed to remove {fn}'.format(fn)
+            print('...failed to remove {fn}'.format(fn), file=sys.stder)
 
 
 def test_extract_hashbits_info():
@@ -104,7 +106,7 @@ def test_extract_hashbits_info():
 
         info = khmer.extract_hashbits_info(fn)
         ksize, table_size, n_tables, _, _ = info
-        print ksize, table_size, n_tables
+        print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
         assert table_size == size
@@ -113,7 +115,7 @@ def test_extract_hashbits_info():
         try:
             os.remove(fn)
         except OSError as e:
-            print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+            print('...failed to remove {fn}'.format(fn), file=sys.stderr)
 
 
 def test_check_file_status_kfile():

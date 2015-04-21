@@ -5,6 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import print_function
 import screed
 import sys
 
@@ -16,7 +17,7 @@ def main():
 
         name = name.split()[0]
 
-        print '>%s\n%s' % (name, sequence,)
+        print('>%s\n%s' % (name, sequence,))
 
 
 if __name__ == '__main__':

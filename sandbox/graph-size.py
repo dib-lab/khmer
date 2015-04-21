@@ -5,6 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import print_function
 import khmer
 import sys
 import screed
@@ -30,19 +31,19 @@ def main():
     if len(sys.argv) == 3:
         outfile = sys.argv[2]
 
-    print 'input file to graphsize filter: %s' % infile
-    print 'filtering to output:', outfile
-    print '-- settings:'
-    print 'K', K
-    print 'HASHTABLE SIZE %g' % HASHTABLE_SIZE
-    print 'N HASHTABLES %d' % N_HT
-    print 'THRESHOLD', THRESHOLD
-    print 'N THREADS', WORKER_THREADS
-    print '--'
+    print('input file to graphsize filter: %s' % infile)
+    print('filtering to output:', outfile)
+    print('-- settings:')
+    print('K', K)
+    print('HASHTABLE SIZE %g' % HASHTABLE_SIZE)
+    print('N HASHTABLES %d' % N_HT)
+    print('THRESHOLD', THRESHOLD)
+    print('N THREADS', WORKER_THREADS)
+    print('--')
 
-    print 'creating ht'
+    print('creating ht')
     ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
-    print 'eating fa', infile
+    print('eating fa', infile)
     total_reads, n_consumed = ht.consume_fasta(infile)
     outfp = open(outfile, 'w')
 

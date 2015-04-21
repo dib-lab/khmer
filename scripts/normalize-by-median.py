@@ -17,6 +17,7 @@ option to output to STDOUT.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 from __future__ import print_function
 
@@ -158,9 +159,9 @@ def get_parser():
     Paired end reads will be considered together if :option:`-p` is set. If
     either read will be kept, then both will be kept. This should result in
     keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`, 
+    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`,
     unpaired reads from the specified file will be read after the paired data
-    is read. 
+    is read.
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
@@ -354,6 +355,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print("** WARNING: Finished with errors!", file=sys.stderr)
         print("** IOErrors occurred in the following files:", file=sys.stderr)
         print("\t", " ".join(corrupt_files), file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

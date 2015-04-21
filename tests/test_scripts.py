@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,7 +15,7 @@ import sys
 import os
 import stat
 import shutil
-from cStringIO import StringIO
+from io import StringIO
 import traceback
 from nose.plugins.attrib import attr
 import subprocess
@@ -20,7 +23,7 @@ import threading
 import bz2
 import io
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
@@ -99,7 +102,7 @@ def test_load_into_counting_fail():
 
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
-    print err
+    print(err)
     assert "** ERROR: the graph structure is too small" in err
 
 
@@ -804,8 +807,8 @@ def test_normalize_by_median_version():
             continue
         break
 
-    print errlines
-    print err
+    print(errlines)
+    print(err)
 
     assert err.startswith('khmer ')
 
@@ -863,8 +866,8 @@ def test_normalize_by_median_paired_fq():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -930,7 +933,7 @@ def test_normalize_by_median_no_bigcount():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
-    print(out, err)
+    print((out, err))
 
     assert os.path.exists(hashfile), hashfile
     kh = khmer.load_counting_hash(hashfile)
@@ -1085,8 +1088,6 @@ def test_count_median_fq_csv():
     # verify that sequence names remain unparsed with '--csv'
     names = set([line.split(',')[0] for line in data])
     assert '895:1:37:17593:9954 1::FOO' in names, names
-
-#
 
 
 def test_load_graph():
@@ -1358,14 +1359,14 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     assert os.path.exists(tagset_file), tagset_file
 
     if do_partition:
-        print ">>>> DEBUG: Partitioning <<<"
+        print(">>>> DEBUG: Partitioning <<<")
         script = scriptpath('partition-graph.py')
         args = [outfile]
         if stop_big_traverse:
             args.insert(0, '--no-big-traverse')
         utils.runscript(script, args)
 
-        print ">>>> DEBUG: Merging Partitions <<<"
+        print(">>>> DEBUG: Merging Partitions <<<")
         script = scriptpath('merge-partitions.py')
         args = [outfile, '-k', str(ksize)]
         utils.runscript(script, args)
@@ -1374,7 +1375,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
         assert os.path.exists(final_pmap_file)
 
         if annotate_partitions:
-            print ">>>> DEBUG: Annotating Partitions <<<"
+            print(">>>> DEBUG: Annotating Partitions <<<")
             script = scriptpath('annotate-partitions.py')
             args = ["-k", str(ksize), outfile, infilename]
 
@@ -1553,7 +1554,7 @@ def test_annotate_partitions_2():
 
     parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
     parts = set(parts)
-    print parts
+    print(parts)
     assert len(parts) == 99, len(parts)
 
 
@@ -1787,23 +1788,23 @@ def test_abundance_dist():
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
     os.remove(outfile)
     args = ['-z', '--csv', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
-    line = fp.next().strip()
-    assert line == '1,96,96,0.98', line
-    line = fp.next().strip()
-    assert line == '1001,2,98,1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
 
 
 def test_abundance_dist_nobigcount():
@@ -1819,11 +1820,11 @@ def test_abundance_dist_nobigcount():
     args = ['-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '255 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '255 2 98 1.0', line
 
 
 def test_abundance_dist_single():
@@ -1840,11 +1841,11 @@ def test_abundance_dist_single():
 
     assert 'Total number of unique k-mers: 98' in err, err
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 def test_abundance_dist_threaded():
@@ -1861,11 +1862,11 @@ def test_abundance_dist_threaded():
 
     assert 'Total number of unique k-mers: 98' in err, err
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 def test_abundance_dist_single_csv():
@@ -1880,13 +1881,13 @@ def test_abundance_dist_single_csv():
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
-    line = fp.next().strip()
-    assert line == '1,96,96,0.98', line
-    line = fp.next().strip()
-    assert line == '1001,2,98,1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
 
 
 def test_abundance_dist_single_nobigcount():
@@ -1900,11 +1901,11 @@ def test_abundance_dist_single_nobigcount():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '255 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '255 2 98 1.0', line
 
 
 def test_abundance_dist_single_nosquash():
@@ -1918,11 +1919,11 @@ def test_abundance_dist_single_nosquash():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 def test_abundance_dist_single_savetable():
@@ -1938,11 +1939,11 @@ def test_abundance_dist_single_savetable():
             tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
-    fp = iter(open(outfile))
-    line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
-    line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
 
 
 def test_do_partition():
@@ -2523,10 +2524,24 @@ def test_sample_reads_randomly():
     outfile = infile + '.subset'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile)])
-    print list(sorted(seqs))
+    if sys.version_info.major == 2:
+        answer = set(['850:2:1:2691:14602/1', '850:2:1:1762:5439/1',
+                      '850:2:1:2399:20086/2', '850:2:1:2503:4494/2',
+                      '850:2:1:2084:17145/1', '850:2:1:2273:13309/1',
+                      '850:2:1:2263:11143/2', '850:2:1:1984:7162/2',
+                      '850:2:1:2065:16816/1', '850:2:1:1792:15774/2'])
+    else:
+        answer = set(['850:2:1:1946:20852/1', '850:2:1:1251:16575/1',
+                      '850:2:1:1625:9364/2', '850:2:1:3123:15968/1',
+                      '850:2:1:1601:18498/2', '850:2:1:1267:6790/1',
+                      '850:2:1:2562:16360/2', '850:2:1:1199:4197/1',
+                      '850:2:1:1832:14607/1', '850:2:1:2401:4896/1'])
 
-    assert seqs == set(['850:2:1:1859:11742/1', '850:2:1:1859:11742/2',
+    seqs = set([r.name for r in screed.open(outfile)])
+    print(list(sorted(seqs)))
+
+    if sys.version_info.major == 2:
+        answer = set(['850:2:1:1859:11742/1', '850:2:1:1859:11742/2',
                         '850:2:1:2131:17360/1', '850:2:1:2131:17360/2',
                         '850:2:1:2416:7565/1', '850:2:1:2416:7565/2',
                         '850:2:1:2490:13491/1', '850:2:1:2490:13491/2',
@@ -2536,6 +2551,10 @@ def test_sample_reads_randomly():
                         '850:2:1:3206:13876/1', '850:2:1:3206:13876/2',
                         '850:2:1:3631:20919/1', '850:2:1:3631:20919/2',
                         '850:2:1:3655:15581/1', '850:2:1:3655:15581/2'])
+    else:
+        answer = set()
+
+    assert seqs == answer
 
 
 def test_sample_reads_randomly_force_single():
@@ -2554,7 +2573,7 @@ def test_sample_reads_randomly_force_single():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print list(sorted(seqs))
+    print(list(sorted(seqs)))
     assert seqs == set(['850:2:1:2399:20086/2',
                         '850:2:1:2273:13309/1',
                         '850:2:1:2065:16816/1',
@@ -2582,20 +2601,29 @@ def test_sample_reads_randomly_fq():
     outfile = infile + '.subset'
     assert os.path.exists(outfile), outfile
 
+    if sys.version_info.major == 2:
+        answer = set(['850:2:1:2399:20086/2',
+                      '850:2:1:1762:5439 1::FOO',
+                      '850:2:1:2065:16816/1',
+                      '850:2:1:2263:11143/2',
+                      '850:2:1:1792:15774/2',
+                      '850:2:1:2691:14602/1',
+                      '850:2:1:2503:4494 1::FOO',
+                      '850:2:1:2084:17145/1',
+                      '850:2:1:1984:7162 1::FOO',
+                      '850:2:1:2273:13309 1::FOO'])
+    else:
+        answer = set(['850:2:1:1946:20852/1', '850:2:1:2401:4896 1::FOO',
+                      '850:2:1:1251:16575 1::FOO',
+                      '850:2:1:1199:4197 1::FOO', '850:2:1:1625:9364/2',
+                      '850:2:1:1267:6790 1::FOO',
+                      '850:2:1:2562:16360 1::FOO', '850:2:1:1601:18498/2',
+                      '850:2:1:3123:15968 1::FOO', '850:2:1:1832:14607/1'])
+
     seqs = set([r.name for r in screed.open(outfile,
                                             parse_description=False)])
-
-    print list(sorted(seqs))
-    assert seqs == set(['850:2:1:2399:20086/2',
-                        '850:2:1:1762:5439 1::FOO',
-                        '850:2:1:2065:16816/1',
-                        '850:2:1:2263:11143/2',
-                        '850:2:1:1792:15774/2',
-                        '850:2:1:2691:14602/1',
-                        '850:2:1:2503:4494 1::FOO',
-                        '850:2:1:2084:17145/1',
-                        '850:2:1:1984:7162 1::FOO',
-                        '850:2:1:2273:13309 1::FOO'])
+    print(list(sorted(seqs)))
+    assert seqs == answer
 
 
 def test_fastq_to_fasta():
@@ -2717,37 +2745,59 @@ def test_sample_reads_randomly_S():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
-    print list(sorted(seqs))
+    print(list(sorted(seqs)))
 
-    assert seqs == set(['895:1:1:1303:14389', '895:1:1:1347:3237',
-                        '895:1:1:1295:6189', '895:1:1:1308:20421',
-                        '895:1:1:1320:11648', '895:1:1:1352:5369',
-                        '895:1:1:1318:10532', '895:1:1:1363:11839',
-                        '895:1:1:1355:13535', '895:1:1:1349:15165'])
+    print(seqs)
+    if sys.version_info.major == 2:
+        answer = set(['895:1:1:1303:14389', '895:1:1:1347:3237',
+                      '895:1:1:1295:6189', '895:1:1:1308:20421',
+                      '895:1:1:1320:11648', '895:1:1:1352:5369',
+                      '895:1:1:1318:10532', '895:1:1:1363:11839',
+                      '895:1:1:1355:13535', '895:1:1:1349:15165'])
+    else:
+        answer = set(['895:1:1:1338:15407', '895:1:1:1362:3983',
+                      '895:1:1:1308:20421', '895:1:1:1276:16426',
+                      '895:1:1:1349:13984', '895:1:1:1378:18986',
+                      '895:1:1:1357:19736', '895:1:1:1290:11501',
+                      '895:1:1:1376:16513', '895:1:1:1265:2265'])
+    assert seqs == answer
 
     outfile = infile + '.subset.1'
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
-    print list(sorted(seqs))
+    print(list(sorted(seqs)))
 
-    assert seqs == set(['895:1:1:1303:14389', '895:1:1:1373:4848',
-                        '895:1:1:1357:19736', '895:1:1:1347:3237',
-                        '895:1:1:1338:7557', '895:1:1:1388:11093',
-                        '895:1:1:1296:1784', '895:1:1:1290:11501',
-                        '895:1:1:1355:13535', '895:1:1:1303:6251'])
-
-    outfile = infile + '.subset.2'
-    assert os.path.exists(outfile), outfile
+    if sys.version_info.major == 2:
+        answer = set(['895:1:1:1303:14389', '895:1:1:1373:4848',
+                      '895:1:1:1357:19736', '895:1:1:1347:3237',
+                      '895:1:1:1338:7557', '895:1:1:1388:11093',
+                      '895:1:1:1296:1784', '895:1:1:1290:11501',
+                      '895:1:1:1355:13535', '895:1:1:1303:6251'])
+    else:
+        answer = set(['895:1:1:1307:4308', '895:1:1:1338:7557',
+                      '895:1:1:1308:2539', '895:1:1:1383:3089',
+                      '895:1:1:1330:9540', '895:1:1:1386:14753',
+                      '895:1:1:1327:13028', '895:1:1:1340:19387',
+                      '895:1:1:1287:13756', '895:1:1:1327:15301'])
+    assert seqs == answer
 
     seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
-    print list(sorted(seqs))
+    print(list(sorted(seqs)))
 
-    assert seqs == set(['895:1:1:1298:13380', '895:1:1:1348:18672',
-                        '895:1:1:1309:4153', '895:1:1:1252:19493',
-                        '895:1:1:1368:4434', '895:1:1:1348:1257',
-                        '895:1:1:1383:3089', '895:1:1:1355:13535',
-                        '895:1:1:1303:6251', '895:1:1:1349:15165'])
+    if sys.version_info.major == 2:
+        answer = set(['895:1:1:1298:13380', '895:1:1:1348:18672',
+                      '895:1:1:1309:4153', '895:1:1:1252:19493',
+                      '895:1:1:1368:4434', '895:1:1:1348:1257',
+                      '895:1:1:1383:3089', '895:1:1:1355:13535',
+                      '895:1:1:1303:6251', '895:1:1:1349:15165'])
+    else:
+        answer = set(['895:1:1:1381:7062', '895:1:1:1373:13994',
+                      '895:1:1:1351:14718', '895:1:1:1376:16513',
+                      '895:1:1:1344:1968', '895:1:1:1348:1257',
+                      '895:1:1:1362:3983', '895:1:1:1363:9988',
+                      '895:1:1:1273:17782', '895:1:1:1368:4434'])
+    assert seqs == answer
 
 
 def test_count_overlap_invalid_datafile():
@@ -2760,7 +2810,10 @@ def test_count_overlap_invalid_datafile():
     args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert "IOError" in err
+    if sys.version_info.major == 2:
+        assert "IOError" in err
+    else:
+        assert "OSError" in err
 
 
 def test_count_overlap():
@@ -2869,9 +2922,9 @@ def execute_load_graph_streaming(filename):
 
     if status != 0:
         for line in out:
-            print out
+            print(out)
         for line in err:
-            print err
+            print(err)
         assert status == 0, status
     err.seek(0)
     err = err.read()
@@ -2894,7 +2947,6 @@ def execute_load_graph_streaming(filename):
     assert x == (1, 0), x
 
 
-@attr('known_failing')
 def test_screed_streaming_ufa():
     # uncompressed fa
     o = execute_streaming_diginorm(utils.get_test_data('test-abund-read-2.fa'))
@@ -2905,7 +2957,6 @@ def test_screed_streaming_ufa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@attr('known_failing')
 def test_screed_streaming_ufq():
     # uncompressed fq
     o = execute_streaming_diginorm(utils.get_test_data('test-fastq-reads.fq'))
@@ -2914,7 +2965,6 @@ def test_screed_streaming_ufq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
 
 
-@attr('known_failing')
 def test_screed_streaming_bzipfq():
     # bzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.bz2'))
@@ -2923,7 +2973,6 @@ def test_screed_streaming_bzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
 
 
-@attr('known_failing')
 def test_screed_streaming_bzipfa():
     # bzip compressed fa
     o = execute_streaming_diginorm(
@@ -3246,15 +3295,15 @@ def test_trim_low_abund_trimtest():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
@@ -3278,15 +3327,15 @@ def test_trim_low_abund_trimtest_after_load():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
@@ -3309,15 +3358,15 @@ def test_trim_low_abund_trimtest_savetable():
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
-            print record.name, record.sequence
+            print(record.name, record.sequence)
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
