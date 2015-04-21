@@ -128,8 +128,9 @@ def main():
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
         screed_iter = screed.open(filename, parse_description=False)
-        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(screed_iter,
-                                               force_single=args.force_single):
+        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(
+                screed_iter,
+                force_single=args.force_single):
             if count % 10000 == 0:
                 print >>sys.stderr, '...', count, 'reads scanned'
                 if count >= args.max_reads:
