@@ -25,10 +25,7 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 
 def build_hash_args(descr=None, epilog=None):
-    """Build an argparse.ArgumentParser with arguments for hash* based
-    scripts and return it.
-    """
-
+    """Build an ArgumentParser with args for bloom filter based scripts."""
     parser = argparse.ArgumentParser(
         description=descr, epilog=epilog,
         formatter_class=ComboFormatter)
@@ -56,10 +53,7 @@ def build_hash_args(descr=None, epilog=None):
 
 
 def build_counting_args(descr=None, epilog=None):
-    """Build an argparse.ArgumentParser with arguments for counting_hash
-    based scripts and return it.
-    """
-
+    """Build an ArgumentParser with args for counting_hash based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'counting'
 
@@ -67,10 +61,7 @@ def build_counting_args(descr=None, epilog=None):
 
 
 def build_hashbits_args(descr=None, epilog=None):
-    """Build an argparse.ArgumentParser with arguments for hashbits based
-    scripts and return it.
-    """
-
+    """Build an ArgumentParser with args for hashbits based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'hashbits'
 
@@ -125,11 +116,11 @@ will be ignored.'''.format(hashfile=values))
 
 
 def report_on_config(args, hashtype='counting'):
-    """
-        Summarizes the configuration produced by the command-line arguments
-        made available by this module.
-    """
+    """Print out configuration.
 
+    Summarize the configuration produced by the command-line arguments
+    made available by this module.
+    """
     from khmer.utils import print_error
 
     if args.quiet:
@@ -166,6 +157,7 @@ def report_on_config(args, hashtype='counting'):
 
 
 def add_threading_args(parser):
+    """Add option for threading to options parser."""
     parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
 
@@ -184,6 +176,7 @@ _algorithms = {
 
 
 def info(scriptname, algorithm_list=None):
+    """Print version and project info to stderr."""
     import khmer
 
     sys.stderr.write("\n")

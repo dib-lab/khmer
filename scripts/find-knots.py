@@ -7,8 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Find highly-connected k-mers and output them in a .stoptags file, for use
-in partitioning.
+Find highly-connected k-mers.
+
+k-mers are output into a .stoptags file, for later use in partitioning.
 
 % python scripts/find-knots.py <base>
 """
@@ -19,7 +20,7 @@ import os
 import textwrap
 import khmer
 import sys
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 # counting hash parameters.
@@ -89,7 +90,7 @@ def main():
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
-        check_file_status(_)
+        check_input_files(_, False)
 
     check_space(infiles)
 

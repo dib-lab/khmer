@@ -7,9 +7,11 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Count the median/avg k-mer abundance for each sequence in the input file,
-based on the k-mer counts in the given k-mer counting table.  Can be used to
-estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
+Count the median/avg k-mer abundance for each sequence in the input file.
+
+The abundance is based on the k-mer counts in the given k-mer counting
+table.  Can be used to estimate expression levels (mRNAseq) or coverage
+(genomic/metagenomic).
 
 % scripts/count-median.py <htname> <input seqs> <output counts>
 
@@ -26,7 +28,7 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 
@@ -79,7 +81,7 @@ def main():
 
     infiles = [htfile, input_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(infiles, args.force)
 

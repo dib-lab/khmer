@@ -1,3 +1,5 @@
+# khmer v1.0.1 release notes
+
 This is bugfix release. Note: the installation instructions have been slightly simplified.
 
 https://khmer.readthedocs.org/en/v1.0.1/

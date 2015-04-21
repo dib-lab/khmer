@@ -1,6 +1,6 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
@@ -131,6 +131,11 @@ public:
     const HashIntoType n_entries() const
     {
         return _tablesizes[0];
+    }
+
+    const size_t n_tables() const
+    {
+        return _n_tables;
     }
 
     // count number of occupied bins

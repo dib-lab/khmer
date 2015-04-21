@@ -1,3 +1,5 @@
+# khmer v1.1 release notes
+
 This is v1.1, a minor version release; this version adds several new scripts.
 
 Docs at: https://khmer.readthedocs.org/en/v1.1/

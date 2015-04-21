@@ -3,7 +3,7 @@
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
-""" Setup for khmer project. """
+"""Setup for khmer project."""
 
 import ez_setup
 
@@ -50,6 +50,7 @@ os.environ['OPT'] = " ".join(
 
 
 def check_for_openmp():
+    """Check for OpenMP support."""
     # Create a temporary directory
     tmpdir = tempfile.mkdtemp()
     curdir = os.getcwd()
@@ -176,7 +177,7 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.8rc1'],
+        "install_requires": ['screed >= 0.8'],
         # testing screed download link
 
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
@@ -203,6 +204,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
     """
 
     def run(self):
+        """Run extension builder."""
         if "%x" % sys.maxsize != '7fffffffffffffff':
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
@@ -233,13 +235,13 @@ _DISTUTILS_REINIT = Distribution.reinitialize_command
 
 
 def reinitialize_command(self, command, reinit_subcommands):
-    '''
-    Monkeypatch distutils.Distribution.reinitialize_command() to match behavior
-    of Distribution.get_command_obj()
+    """Monkeypatch the original version from distutils.
 
+    It's supposed to match the behavior of Distribution.get_command_obj()
     This fixes issues with 'pip install -e' and './setup.py nosetests' not
-    respecting the setup.cfg configuration directives for the build_ext command
-    '''
+    respecting the setup.cfg configuration directives for the build_ext
+    command.
+    """
     cmd_obj = _DISTUTILS_REINIT(self, command, reinit_subcommands)
     options = self.command_options.get(command)
     if options:
@@ -249,8 +251,6 @@ def reinitialize_command(self, command, reinit_subcommands):
 Distribution.reinitialize_command = reinitialize_command
 
 
-# remove dependency_link once screed is published to actual PyPi
 # pylint: disable=W0142
-setup(cmdclass=CMDCLASS, dependency_links=[
-    "https://testpypi.python.org/pypi/screed/0.8-rc4"],
-    **SETUP_METADATA)
+setup(cmdclass=CMDCLASS,
+      **SETUP_METADATA)
