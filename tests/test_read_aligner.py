@@ -219,7 +219,7 @@ def test_align_fwd_middle_trunc_2():
 
 def test_align_fwd_covs_1():
     K = 10
-    
+
     ch = khmer.new_counting_hash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -242,7 +242,7 @@ def test_align_fwd_covs_1():
 
 def test_align_fwd_covs_2():
     K = 10
-    
+
     ch = khmer.new_counting_hash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -267,7 +267,7 @@ def test_align_fwd_covs_2():
 
 def test_align_fwd_covs_3():
     K = 10
-    
+
     ch = khmer.new_counting_hash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -293,7 +293,7 @@ def test_align_fwd_covs_3():
 
 def test_align_fwd_covs_4():
     K = 10
-    
+
     ch = khmer.new_counting_hash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -317,7 +317,7 @@ def test_align_fwd_covs_4():
 
 def test_align_fwd_covs_5():
     K = 10
-    
+
     ch = khmer.new_counting_hash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
