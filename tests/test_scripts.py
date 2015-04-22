@@ -1321,7 +1321,8 @@ def test_extract_partitions_header_whitespace():
     dist = open(distfile).readline()
     assert dist.strip() == '1 11957 11957 11957'
 
-    parts = [r.name.split('\t')[1] for r in screed.open(partfile, parse_description=False)]
+    parts = [r.name.split('\t')[1]
+             for r in screed.open(partfile, parse_description=False)]
     assert len(parts) == 13538, len(parts)
     parts = set(parts)
     assert len(parts) == 12601, len(parts)
