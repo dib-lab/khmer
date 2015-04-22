@@ -1,3 +1,10 @@
+2015-04-21  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/sample-reads-randomly.py: use broken paired reader to provide
+   paired-end read support.
+   * tests/test_scripts.py: change test results to compensate for the change in
+   implementation.
+
 2015-04-17  Jessica Mizzi  <mizzijes@msu.edu>
 
    * tests/test_scripts.py: split test_extract_long_sequences 
@@ -124,11 +131,6 @@
 
    * */*.py: Make docstrings PEP 257 compliant.
 
-2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
-
-   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
-   khmer_exception to use std::string to fix memory management.
-
 2015-04-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * khmer/_khmermodule.cc: catch more exceptions
@@ -147,10 +149,15 @@
    * tests/test_hashbits.py: remove write to fixed path in /tmp
    * tests/test_scripts.py: added test for empty counting table file
 
+2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
+
+   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
+   khmer_exception to use std::string to fix memory management.
+
 2015-04-13  Elmar Bucher  <buchere@ohsu.edu>
 
-   * scripts/normalize-by-median.py (main): introduced warning for when at least
-   two input files are named the same.
+   * scripts/normalize-by-median.py (main): introduced warning for when at
+   least two input files are named the same.
 
 2015-04-13  Andreas Härpfer  <ahaerpfer@gmail.com>
 
@@ -159,8 +166,8 @@
 2015-04-13  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/normalize-by-median.py: Added support to the diginorm script for
-   sending output to terminal (stdout) when using the conventional - as the output
-   filename. Also removed --append option.
+   sending output to terminal (stdout) when using the conventional - as the
+   output filename. Also removed --append option.
    * tests/test_scripts.py: Added functional test for diginorm stdout, removed
    test of --append option.
 
