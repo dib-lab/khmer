@@ -1311,7 +1311,7 @@ def test_extract_partitions_header_whitespace():
     script = scriptpath('extract-partitions.py')
     args = ['extracted', partfile]
 
-    runscript(script, args, in_dir)
+    utils.runscript(script, args, in_dir)
 
     distfile = os.path.join(in_dir, 'extracted.dist')
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
