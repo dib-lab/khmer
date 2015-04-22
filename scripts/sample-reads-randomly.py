@@ -139,7 +139,7 @@ def main():
                     break
 
             # collect first N reads
-            if count <= args.num_reads:
+            if count < args.num_reads:
                 for n in range(num_samples):
                     reads[n].append((rcrd1, rcrd2))
             else:
