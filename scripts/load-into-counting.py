@@ -22,7 +22,7 @@ import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -80,7 +80,7 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name, args.force)
+        check_input_files(name, args.force)
 
     check_space(args.input_sequence_filename, args.force)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
@@ -136,7 +136,9 @@ def main():
     print >>sys.stderr, 'saving', base
     htable.save(base)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
 
     with open(base + '.info', 'a') as info_fp:
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
@@ -163,14 +165,6 @@ def main():
                     fls=";".join(filenames)))
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-
-    # Change 0.2 only if you really grok it.  HINT: You don't.
-    if fp_rate > 0.20:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
-        print >> sys.stderr, "for this data set. Increase tablesize/# tables."
-        print >> sys.stderr, "**"
-        sys.exit(1)
 
     print >>sys.stderr, 'DONE.'
     print >>sys.stderr, 'wrote to:', base + '.info'

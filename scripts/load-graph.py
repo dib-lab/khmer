@@ -20,7 +20,7 @@ import threading
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -54,7 +54,7 @@ def main():
     filenames = args.input_filenames
 
     for _ in args.input_filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(args.input_filenames, args.force)
     check_space_for_hashtable(
@@ -103,19 +103,14 @@ def main():
     info_fp = open(base + '.info', 'w')
     info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
+    # 0.18 is ACTUAL MAX. Do not change.
+
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
     if args.write_fp_rate:
         print >> info_fp, \
             '\nfalse positive rate estimated to be %1.3f' % fp_rate
-
-    if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the graph structure is too small for "
-                              "this data set. Increase table size/# tables.")
-        print >> sys.stderr, "**"
-        if not args.force:
-            sys.exit(1)
 
     print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
     if not args.no_build_tagset:

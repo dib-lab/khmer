@@ -7,6 +7,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
+Split up pairs and singletons.
+
 Take a file containing a mixture of interleaved and orphaned reads, and
 extract them into separate files (.pe and .se).
 
@@ -20,7 +22,7 @@ import os.path
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 from khmer.utils import broken_paired_reader, write_record, write_record_pair
@@ -57,7 +59,7 @@ def main():
     info('extract-paired-reads.py')
     args = get_parser().parse_args()
 
-    check_file_status(args.infile, args.force)
+    check_input_files(args.infile, args.force)
     infiles = [args.infile]
     check_space(infiles, args.force)
 

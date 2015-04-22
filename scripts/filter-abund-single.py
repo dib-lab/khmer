@@ -7,6 +7,8 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
+Sequence trimming by abundance w/o counting table.
+
 Trim sequences at k-mers of the given abundance for the given file,
 without loading a prebuilt counting table.  Output sequences will be
 placed in 'infile.abundfilt'.
@@ -23,7 +25,7 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
-from khmer.kfile import (check_file_status, check_space,
+from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 #
 DEFAULT_CUTOFF = 2
@@ -64,7 +66,7 @@ def get_parser():
 def main():
     info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile, args.force)
+    check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
         check_space_for_hashtable(
@@ -95,7 +97,7 @@ def main():
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
             htable.n_unique_kmers())
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    fp_rate = khmer.calc_expected_collisions(htable, args.force)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # now, trim.

@@ -1258,7 +1258,12 @@ hash_save(khmer_KCountingHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    counting->save(filename);
+    try {
+        counting->save(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -1751,19 +1756,9 @@ hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
 
     HashIntoType * dist = NULL;
 
-    const char * exception = NULL;
     Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(rparser, hashbits);
-    } catch (khmer::read_parsers::NoMoreReadsAvailable &exc ) {
-        exception = exc.what();
-    }
+    dist = counting->abundance_distribution(rparser, hashbits);
     Py_END_ALLOW_THREADS
-    if (exception != NULL) {
-        delete[] dist;
-        PyErr_SetString(PyExc_IOError, exception);
-        return NULL;
-    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
@@ -1863,7 +1858,10 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
-    }
+    } catch (InvalidStreamHandle &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    } 
 
     HashIntoType n = hashbits->n_unique_kmers();
     HashIntoType n_overlap = hashbits->n_overlap_kmers();
@@ -2032,7 +2030,12 @@ hashbits_save_stop_tags(khmer_KHashbits_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashbits->save_stop_tags(filename);
+    try {
+        hashbits->save_stop_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -2082,8 +2085,14 @@ hashbits_repartition_largest_partition(khmer_KHashbits_Object * me,
 
     CountingHash * counting = counting_o->counting;
 
-    unsigned long next_largest = subset_p->repartition_largest_partition(distance,
-                                 threshold, frequency, *counting);
+    unsigned long next_largest;
+    try {
+        next_largest = subset_p->repartition_largest_partition(distance,
+                       threshold, frequency, *counting);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
 
     return PyLong_FromLong(next_largest);
 }
@@ -2808,7 +2817,12 @@ hashbits_save_partitionmap(khmer_KHashbits_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashbits->partition->save_partitionmap(filename);
+    try {
+        hashbits->partition->save_partitionmap(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -2961,7 +2975,12 @@ hashbits_save(khmer_KHashbits_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashbits->save(filename);
+    try {
+        hashbits->save(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3006,7 +3025,12 @@ hashbits_save_tagset(khmer_KHashbits_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashbits->save_tagset(filename);
+    try {
+        hashbits->save_tagset(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3027,7 +3051,12 @@ hashbits_save_subset_partitionmap(khmer_KHashbits_Object * me, PyObject * args)
 
     Py_BEGIN_ALLOW_THREADS
 
-    subset_p->save_partitionmap(filename);
+    try {
+        subset_p->save_partitionmap(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_END_ALLOW_THREADS
 
@@ -4657,7 +4686,15 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
+    PyObject * hash;
+    try {
+        hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
+        return hash;
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+
 }
 
 static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)

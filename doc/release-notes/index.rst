@@ -1,5 +1,5 @@
-Release notes for khmer
-=======================
+Release notes
+=============
 
 Contents:
 
