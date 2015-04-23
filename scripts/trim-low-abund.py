@@ -240,8 +240,8 @@ def main():
 
         pass2fp.close()
 
-        print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' % \
-            (filename, save_pass2, n, filename)
+        print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' \
+            % (filename, save_pass2, n, filename)
         save_pass2_total += save_pass2
 
     # ### SECOND PASS. ###
@@ -249,8 +249,8 @@ def main():
     skipped_n = 0
     skipped_bp = 0
     for _, pass2filename, trimfp in pass2list:
-        print >>sys.stderr, 'second pass: looking at sequences kept aside in %s' % \
-            pass2filename
+        print >>sys.stderr, ('second pass: looking at sequences kept aside '
+                             'in %s') % pass2filename
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
@@ -311,8 +311,8 @@ def main():
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
         print >>sys.stderr, '%d reads were high coverage (%.2f%%);' % \
             (n_reads - skipped_n, percent_reads_hicov)
-        print >>sys.stderr, 'skipped %d reads/%d bases because of low coverage' % \
-            (skipped_n, skipped_bp)
+        print >>sys.stderr, ('skipped %d reads/%d bases because of low'
+                             'coverage') % (skipped_n, skipped_bp)
 
     fp_rate = \
         khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
