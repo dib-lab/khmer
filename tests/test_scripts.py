@@ -1298,6 +1298,36 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
+def test_extract_partitions_header_whitespace():
+    seqfile = utils.get_test_data('test-overlap2.fa')
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'test-overlap2.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+
+    utils.runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '1 11957 11957 11957'
+
+    parts = [r.name.split('\t')[1]
+             for r in screed.open(partfile, parse_description=False)]
+    assert len(parts) == 13538, len(parts)
+    parts = set(parts)
+    assert len(parts) == 12601, len(parts)
+
+
 def test_extract_partitions_fq():
     seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(

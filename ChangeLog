@@ -1,3 +1,8 @@
+2015-04-23  Lex Nederbragt  <lex.nederbragt@ibv.uio.no>
+
+   * tests/test_scripts.py: added a test for extract-partitions:
+   whitespace in fasta header.
+
 2015-04-21  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/sample-reads-randomly.py: use broken paired reader to provide
