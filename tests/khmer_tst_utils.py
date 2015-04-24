@@ -154,8 +154,10 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
                 os.chdir(in_directory)
             sysargs = 'cat ' + stdinfilename + ' | python ' + scriptfile + \
                 " " + args
-            out = open(os.path.join(in_directory, "out"), 'w+', encoding='utf-8')
-            err = open(os.path.join(in_directory, "err"), 'w+', encoding='utf-8')
+            out = open(
+                os.path.join(in_directory, "out"), 'w+', encoding='utf-8')
+            err = open(
+                os.path.join(in_directory, "err"), 'w+', encoding='utf-8')
             print('running:', scriptname, 'in:', in_directory)
             print('arguments', sysargs)
             status = subprocess.call(args=sysargs, stdout=out, stderr=err,

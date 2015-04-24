@@ -182,8 +182,10 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
 
     if fp_all > max_false_pos:
         print("**", file=sys.stderr)
-        print("** ERROR: the graph structure is too small for ", file=sys.stderr)
-        print("this data set.  Increase k-mer presence table ", file=sys.stderr)
+        print(
+            "** ERROR: the graph structure is too small for ", file=sys.stderr)
+        print(
+            "this data set.  Increase k-mer presence table ", file=sys.stderr)
         print("size/num of tables.", file=sys.stderr)
         print("** Do not use these results!!", file=sys.stderr)
         print("**", file=sys.stderr)

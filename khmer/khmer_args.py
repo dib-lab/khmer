@@ -212,11 +212,13 @@ def info(scriptname, algorithm_list=None):
 
     for alg in algorithm_list:
         sys.stderr.write("||   * ")
-        algstr = _algorithms[alg].encode('utf-8', 'surrogateescape').decode('utf-8', 'replace')
+        algstr = _algorithms[alg].encode(
+            'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
             sys.stderr.write(algstr)
         except UnicodeEncodeError:
-            sys.stderr.write(algstr.encode(sys.getfilesystemencoding(), 'replace'))
+            sys.stderr.write(
+                algstr.encode(sys.getfilesystemencoding(), 'replace'))
         sys.stderr.write("\n")
 
     sys.stderr.write("||\n|| Please see http://khmer.readthedocs.org/en/"
