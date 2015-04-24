@@ -100,8 +100,8 @@ def main():
           ' %d pairs and %d singletons' %
           (n_pe * 2 + n_se, n_pe, n_se), file=sys.stderr)
 
-    print('wrote to: ' + outfile
-          + '.se' + ' and ' + outfile + '.pe', file=sys.stderr)
+    print('wrote to: ' + outfile + '.se' + ' and ' + outfile + '.pe',
+          file=sys.stderr)
 
 
 if __name__ == '__main__':
