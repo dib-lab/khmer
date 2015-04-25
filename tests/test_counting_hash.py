@@ -1085,7 +1085,7 @@ def test_abundance_distribution_gzipped_bigcount():
     outfile = utils.get_temp_filename('test_ct.gz')
     script = scriptpath('load-into-counting.py')
     htfile = utils.get_temp_filename('test_ct')
-    args = ['-x', str(1e7), '-N', str(2), '-k', str(2),htfile,infile]
+    args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
     utils.runscript(script, args)
     assert os.path.exists(htfile)
     data = open(htfile, 'rb').read()
