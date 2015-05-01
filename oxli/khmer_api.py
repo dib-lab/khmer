@@ -36,25 +36,32 @@ def build_graph(input_stream, graph):
             graph.consume(read2.sequence)
 
 
-def diginorm(input_stream, ct, coverage):
+def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
     n = 0
     discard = 0
+    passed = False
     for _, is_pair, read1, read2 in input_stream:
         if is_pair:
             med1, _, _ = ct.get_median_count(read1.sequence)
             med2, _, _ = ct.get_median_count(read2.sequence)
 
-            if med1 < coverage or med2 < coverage:
+            if (med1 < coverage && len(read1.sequence) > ksize) \
+                    or (med2 < coverage && len(read2.sequence) > ksize:
                 ct.consume(read1.sequence)
                 ct.consume(read2.sequence)
                 yield n, True, read1, read2
                 n += 2
+            else:
+                discard += 2
+                passed = False
         else:
             med, _, _ = ct.get_median_count(read1.sequence)
-            if med < coverage:
+            if med < coverage && len(read1.sequence) > ksize:
                 ct.consume(read1.sequence)
                 yield n, False, read1, None
                 n += 1
+            else:
+                discard += 1
 
 
 def trim(input_stream, ct, normalize_coverage, trusted_coverage):
