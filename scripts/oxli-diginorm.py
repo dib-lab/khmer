@@ -61,7 +61,7 @@ def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
     total = 0
     discarded = 0
     for index, batch in enumerate(batchwise(screed.open(
-        input_filename, parse_description=False), batch_size)):
+            input_filename, parse_description=False), batch_size)):
         if index > 0 and index % 100000 == 0:
             print >>sys.stderr, '... kept {kept} of {total} or'\
                 ' {perc:2}%'.format(kept=total - discarded, total=total,
@@ -277,6 +277,7 @@ def oxli_diginorm(filename, graph, des_cov):
     input_iter = broken_paired_reader(input_iter)
     input_iter = khmer_api.clean_reads(input_iter)
     input_iter = khmer_api.oxli_diginorm
+
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
