@@ -324,16 +324,18 @@ class ReadAligner(_ReadAligner):
                 **kwargs):
 
         if 'filename' in kwargs:
-            params = json.load(kwargs['filename'])
+            with open(kwargs.pop('filename')) as paramfile:
+                params = json.load(paramfile)
             scoring_matrix = params['scoring_matrix']
             transition_probabilities = params['transition_probabilities']
         else:
             if 'scoring_matrix' in kwargs:
-                scoring_matrix = kwargs['scoring_matrix']
+                scoring_matrix = kwargs.pop('scoring_matrix')
             else:
                 scoring_matrix = ReadAligner.defaultScoringMatrix
             if 'transition_probabilities' in kwargs:
-                transition_probabilities = kwargs['transition_probabilities']
+                transition_probabilities = kwargs.pop(
+                    'transition_probabilities')
             else:
                 transition_probabilities = \
                     ReadAligner.defaultTransitionProbabilities
@@ -341,5 +343,8 @@ class ReadAligner(_ReadAligner):
                                     bits_theta, scoring_matrix,
                                     transition_probabilities)
 
-    def __init__(self, *args):
-        _ReadAligner.__init__(self, args)
+    def __init__(self, *args, **kwargs):
+        _ReadAligner.__init__(self, args, kwargs)
+
+    def save(self):
+        pass
