@@ -300,7 +300,18 @@ class HLLCounter(_HLLCounter):
 
 class ReadAligner(_ReadAligner):
 
-    """Sequence to graph aligner."""
+    """Sequence to graph aligner.
+
+    ReadAligner uses a CountingHash (the counts of k-mers in the target DNA
+    sequences) as an implicit De Bruijn graph. Input DNA sequences are aligned
+    to this graph via a paired Hidden Markov Model.
+
+    The HMM is configured upon class instantiation; default paramaters for the
+    HMM are provided in 'defaultTransitionProbablitites' and
+    'defaultScoringMatrix'.
+
+    The main method is 'align'.
+    """
 
     defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
         (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
@@ -344,7 +355,40 @@ class ReadAligner(_ReadAligner):
                                     transition_probabilities)
 
     def __init__(self, *args, **kwargs):
-        _ReadAligner.__init__(self, args, kwargs)
+        """
+        ReadAligner initialization.
 
-    def save(self):
-        pass
+        HMM state notation abbreviations:
+        M_t - trusted match; M_u - untrusted match
+        Ir_t - trusted read insert; Ir_u - untrusted read insert
+        Ig_t - trusted graph insert; Ig_u - untrusted graph insert
+
+        Keyword arguments:
+        filename - a path to a JSON encoded file providing the scoring matrix
+            for the HMM in an entry named 'scoring_matrix' and the transition
+            probababilties for the HMM in an entry named
+            'transition_probabilities'. If provided the remaining keyword
+            arguments are ignored. (default: None)
+        scoring_matrix - a list of floats: trusted match, trusted mismatch,
+            unstrusted match, untrusted mismatch. (default:
+                ReadAligner.defaultScoringMatrix)
+        transition_probabilities - A sparse matrix as a tuple of six tuples.
+            The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.
+            Transition are notated as 'StartState-NextState':
+            (
+              ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),
+              (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),
+              (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),
+              ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),
+              (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),
+              (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)
+            )
+            (default: ReadAligner.defaultTransitionProbabilities)
+
+
+        Note: the underlying CPython implementation creates the ReadAligner
+        during the __new__ process and so the class initialization actually
+        occurs there. Instatiation is documented here in __init__ as this is
+        the traditional way.
+        """
+        _ReadAligner.__init__(self, args, kwargs)
