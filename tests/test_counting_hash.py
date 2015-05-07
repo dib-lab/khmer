@@ -1099,14 +1099,14 @@ def test_abundance_distribution_gzipped_bigcount():
     abundances = counting_hash.abundance_distribution(
         infile, tracking)  # calculate abundance distribution for compressed bigcount table
     flag = False
-    # check if abundance is > 255, otherwise gzipped bigcount was not loaded
-    # correctly
+    # check if abundance is > 255
+    # if ok  gzipped bigcount was loaded correctly
     for _, i in enumerate(abundances):
         print _, i
         if _ > 255 and i > 0:
             flag = True
             break
-    assert flag
+    assert flag 
 
 
 def test_counting_load_bigcount():
