@@ -1080,24 +1080,27 @@ def test_find_all_tags_list_error():
 
 def test_abundance_distribution_gzipped_bigcount():
     infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     outfile = utils.get_temp_filename('test_ct.gz')
     script = scriptpath('load-into-counting.py')
     htfile = utils.get_temp_filename('test_ct')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
-    utils.runscript(script, args)
+    utils.runscript(script, args)  # create a bigcount table
     assert os.path.exists(htfile)
     data = open(htfile, 'rb').read()
-    f_out = gzip.open(outfile, 'wb')
+    f_out = gzip.open(outfile, 'wb')  # compress the created bigcount table
     f_out.write(data)
     f_out.close()
+    # load the compressed bigcount table
     counting_hash = khmer.load_counting_hash(outfile)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
     tracking = khmer._Hashbits(kmer_size, hashsizes)
-    abundances = counting_hash.abundance_distribution(infile, tracking)
+    abundances = counting_hash.abundance_distribution(
+        infile, tracking)  # calculate abundance distribution for compressed bigcount table
     flag = False
+    # check if abundance is > 255, otherwise gzipped bigcount was not loaded
+    # correctly
     for _, i in enumerate(abundances):
         print _, i
         if _ > 255 and i > 0:
