@@ -28,14 +28,14 @@ def output_single(read, new_sequence):
     name = read.name
     sequence = new_sequence
 
-    accuracy = None
-    if hasattr(read, 'accuracy'):
-        accuracy = read.accuracy[:len(sequence)]
-        sequence = sequence[:len(accuracy)] # in cases where sequence _lengthened_
+    quality = None
+    if hasattr(read, 'quality'):
+        quality = read.quality[:len(sequence)]
+        sequence = sequence[:len(quality)] # in cases where sequence _lengthened_
 
-    if accuracy:
-        assert len(sequence) == len(accuracy), (sequence, accuracy)
-        return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
+    if quality:
+        assert len(sequence) == len(quality), (sequence, quality)
+        return "@%s\n%s\n+\n%s\n" % (name, sequence, quality)
     else:
         return ">%s\n%s\n" % (name, sequence)
 
@@ -59,9 +59,9 @@ def main():
     print 'loading counts'
     ht = khmer.load_counting_hash(args.counts_table)
 
-    aligner = khmer.new_readaligner(ht,
-                                    args.trusted_cov,
-                                    args.bits_theta)
+    aligner = khmer.ReadAligner(ht,
+                                args.trusted_cov,
+                                args.bits_theta)
 
     print "trusted:", args.trusted_cov
 

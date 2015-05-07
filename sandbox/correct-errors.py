@@ -70,7 +70,7 @@ def main():
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
 
-    parser.add_argument("--trusted-cov", dest="trusted_cov", type=int,
+    parser.add_argument("-C", "--trusted-cov", dest="trusted_cov", type=int,
                         default=DEFAULT_CUTOFF)
     parser.add_argument("--theta", dest="bits_theta", type=float, default=1.0)
 
