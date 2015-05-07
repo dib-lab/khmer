@@ -1096,8 +1096,8 @@ def test_abundance_distribution_gzipped_bigcount():
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
     tracking = khmer._Hashbits(kmer_size, hashsizes)
-    abundances = counting_hash.abundance_distribution(
-        infile, tracking)  # calculate abundance distribution for compressed bigcount table
+    abundances = counting_hash.abundance_distribution(infile, tracking) 
+    # calculate abundance distribution for compressed bigcount table
     flag = False
     # check if abundance is > 255
     # if ok  gzipped bigcount was loaded correctly
