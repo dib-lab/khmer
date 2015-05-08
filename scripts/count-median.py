@@ -19,7 +19,7 @@ Use '-h' for parameter help.
 
 The output file contains sequence id, median, average, stddev, and seq length.
 
-NOTE: All 'N's in the input sequences are converted to 'G's.
+NOTE: All 'N's in the input sequences are converted to 'A's.
 """
 import screed
 import argparse
@@ -49,7 +49,7 @@ def get_parser():
 
        count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
 
-    NOTE: All 'N's in the input sequences are converted to 'G's.
+    NOTE: All 'N's in the input sequences are converted to 'A's.
     """
     parser = argparse.ArgumentParser(
         description='Count k-mers summary stats for sequences',
@@ -105,7 +105,7 @@ def main():
                               parse_description=parse_description):
         seq = record.sequence.upper()
         if 'N' in seq:
-            seq = seq.replace('N', 'G')
+            seq = seq.replace('N', 'A')
 
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
