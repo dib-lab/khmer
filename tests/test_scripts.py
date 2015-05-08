@@ -463,7 +463,8 @@ def test_filter_abund_7_retain_Ns():
     # ...and that an 'N' remains in the output sequences
     found_N = False
     for s in seqs:
-        if 'N' in s: found_N = True
+        if 'N' in s:
+            found_N = True
     assert found_N, seqs
 
 
@@ -495,7 +496,8 @@ def test_filter_abund_single_8_retain_Ns():
     # ...and that an 'N' remains in the output sequences
     found_N = False
     for s in seqs:
-        if 'N' in s: found_N = True
+        if 'N' in s:
+            found_N = True
     assert found_N, seqs
 
 

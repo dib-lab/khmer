@@ -108,11 +108,11 @@ def main():
         seq = record.sequence
         seqN = seq.replace('N', 'A')
 
-        trim_seq, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
+        _, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
 
         if trim_at >= args.ksize:
             # be sure to not to change the 'N's in the trimmed sequence -
-            # so, return 'seq' not 'seqN' or 'trim_seq'.
+            # so, return 'seq' and not 'seqN'.
             return name, seq[:trim_at]
 
         return None, None
