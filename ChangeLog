@@ -1,3 +1,15 @@
+2015-05-08  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
+   scripts/{count-median.py,filter-abund-single.py,filter-abund.py}: changed
+   sequence-reading behavior to replace 'N' with 'A', to be consistent with
+   rest of code base.
+   * scripts/{filter-abund.py,filter-abund-single.py}: changed behavior of
+   scripts to keep sequences with 'N's in them, and count them as 'A's.
+   * tests/test_scripts.py: added tests for new
+   filter-abund/filter-abund-single behavior.
+   * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
+
 2015-04-23  Lex Nederbragt  <lex.nederbragt@ibv.uio.no>
 
    * tests/test_scripts.py: added a test for extract-partitions:
