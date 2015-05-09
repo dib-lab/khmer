@@ -1096,7 +1096,7 @@ def test_abundance_distribution_gzipped_bigcount():
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
     tracking = khmer._Hashbits(kmer_size, hashsizes)
-    abundances = counting_hash.abundance_distribution(infile, tracking) 
+    abundances = counting_hash.abundance_distribution(infile, tracking)
     # calculate abundance distribution for compressed bigcount table
     flag = False
     # check if abundance is > 255
@@ -1106,13 +1106,13 @@ def test_abundance_distribution_gzipped_bigcount():
         if _ > 255 and i > 0:
             flag = True
             break
-    assert flag 
+    assert flag
 
 
 def test_counting_load_bigcount():
-    ct = khmer.new_counting_hash(10, 1e5, 4)
-    ct.set_use_bigcount(True)
+    count_table = khmer.new_counting_hash(10, 1e5, 4)
+    count_table.set_use_bigcount(True)
     for i in range(500):
-        ct.count('ATATATATAT')
-    count = ct.get('ATATATATAT')
+        count_table.count('ATATATATAT')
+    count = count_table.get('ATATATATAT')
     assert count == 500
