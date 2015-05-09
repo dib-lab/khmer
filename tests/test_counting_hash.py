@@ -18,7 +18,7 @@ import screed
 import nose
 from nose.plugins.attrib import attr
 
-from  tests.test_scripts import scriptpath
+from tests.test_scripts import scriptpath
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
