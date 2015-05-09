@@ -29,7 +29,7 @@ def get_parser():
         description="Output abundances of the k-mers in "
         "the sequence files using a pre-made k-mer counting table.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    
+
     parser.add_argument('input_counting_table_filename', help='The name of the'
                         ' input k-mer counting table file.')
     parser.add_argument('input_sequence_filenames', help='The input'
@@ -41,7 +41,7 @@ def get_parser():
                         default=None, help='output counts to this file')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
-    
+
     return parser
 
 
@@ -53,7 +53,7 @@ def main():
            file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
-    
+
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
     tracking = khmer._Hashbits(  # pylint: disable=protected-access

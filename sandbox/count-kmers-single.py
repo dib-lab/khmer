@@ -27,11 +27,12 @@ from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 import threading
 
+
 def get_parser():
     parser = build_counting_args(
         descr="Output abundances of the k-mers in the sequence file.")
     add_threading_args(parser)
-    
+
     parser.add_argument('input_sequence_filename', help='The input'
                         ' FAST[AQ] sequence file.')
 
@@ -41,7 +42,7 @@ def get_parser():
                         default=None, help='output counts to this file')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
-    
+
     return parser
 
 
@@ -50,11 +51,11 @@ def main():
     args = get_parser().parse_args()
 
     check_input_files(args.input_sequence_filename, False)
-    
+
     print ('making k-mer counting table', file=sys.stderr)
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                             args.n_tables)
-    #@CTB counting_hash.set_use_bigcount(args.bigcount)
+    # @CTB counting_hash.set_use_bigcount(args.bigcount)
 
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
@@ -93,7 +94,7 @@ def main():
             if not tracking.get(kmer):
                 tracking.count(kmer)
                 writer.writerow([kmer, str(counting_hash.get(kmer))])
-    
+
     if args.report_total_kmers:
         print ('Total number of unique k-mers: {0}'.format(
             counting_hash.n_unique_kmers()), file=sys.stderr)
