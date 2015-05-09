@@ -23,13 +23,11 @@ import screed
 import csv
 from khmer.khmer_args import info
 
-# TODO
-# write 'count-kmers-single.py' a la abundance-dist-single
 
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Output abundances of the k-mers in "
-        "the sequence file using a pre-made k-mer counting table.",
+        "the sequence files using a pre-made k-mer counting table.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
     parser.add_argument('input_counting_table_filename', help='The name of the'
@@ -41,6 +39,8 @@ def get_parser():
                         dest='output_file',
                         type=argparse.FileType('w'),
                         default=None, help='output counts to this file')
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     
     return parser
 
@@ -71,7 +71,11 @@ def main():
                 if not tracking.get(kmer):
                     tracking.count(kmer)
                     writer.writerow([kmer, str(counting_hash.get(kmer))])
-    
+
+    if args.report_total_kmers:
+        print ('Total number of unique k-mers: {0}'.format(
+            counting_hash.n_unique_kmers()), file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()
