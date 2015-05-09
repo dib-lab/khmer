@@ -18,7 +18,7 @@ import screed
 import nose
 from nose.plugins.attrib import attr
 
-from test_scripts import scriptpath
+from  tests.test_scripts import scriptpath
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
@@ -1078,7 +1078,7 @@ def test_find_all_tags_list_error():
         pass
 
 
-def test_abundance_distribution_gzipped_bigcount():
+def test_abund_dist_gz_bigcount():
     infile = utils.get_temp_filename('test.fa')
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     outfile = utils.get_temp_filename('test_ct.gz')
@@ -1113,6 +1113,7 @@ def test_counting_load_bigcount():
     count_table = khmer.new_counting_hash(10, 1e5, 4)
     count_table.set_use_bigcount(True)
     for i in range(500):
+        print i
         count_table.count('ATATATATAT')
     count = count_table.get('ATATATATAT')
     assert count == 500
