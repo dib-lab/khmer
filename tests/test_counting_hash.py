@@ -1113,6 +1113,6 @@ def test_counting_load_bigcount():
     count_table = khmer.new_counting_hash(10, 1e5, 4)
     count_table.set_use_bigcount(True)
     for i in range(500):
-        count_table.count('ATATATATAT')
+        print i, count_table.count('ATATATATAT')
     count = count_table.get('ATATATATAT')
     assert count == 500
