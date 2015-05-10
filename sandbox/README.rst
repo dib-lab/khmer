@@ -10,9 +10,11 @@ We are still triaging and documenting the various scripts.
 
 ----
 
-Awaiting promotion to sandbox:
+Awaiting promotion to scripts:
 
 * calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference. (Used/tested in `2014 paper on semi-streaming algorithms <https://github.com/ged-lab/2014-streaming/blob/master/>`__)
+* count-kmers.py - output k-mer counts for multiple input files.
+* count-kmers-single.py - output k-mer counts for a single k-mer file.
 * correct-errors.py - streaming error correction.
 * unique-kmers.py - estimate the number of k-mers present in a file with the HyperLogLog low-memory probabilistic cardinality estimation algorithm.
 
