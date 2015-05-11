@@ -79,7 +79,8 @@ def main():
         target_method = htable.consume_fasta_and_tag_with_reads_parser
 
     for _, filename in enumerate(filenames):
-        input_iter = screed.open(filename)
+        input_iter = khmer.ReadParser(filename)
+        input_iter = khmer.utils.broken_paired_reader(input_iter)
         khmer_api.build_graph(input_iter, htable)
 
     if args.report_total_kmers:

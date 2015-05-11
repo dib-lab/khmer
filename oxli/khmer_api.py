@@ -30,10 +30,14 @@ def output_reads(input_stream, out_fp):
 
 
 def build_graph(input_stream, graph):
-    for n, is_pair, read1, read2 in input_stream:
-        graph.consume(read1.sequence)
-        if is_pair:
-            graph.consume(read2.sequence)
+    try:
+        for n, is_pair, read1, read2 in input_stream:
+            graph.consume(read1.sequence)
+            if is_pair:
+                graph.consume(read2.sequence)
+    except ValueError:
+        for n, is_pair, read1 in input_stream:
+            graph.consume(read1.sequence)
 
 
 def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
