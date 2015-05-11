@@ -4182,8 +4182,72 @@ static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
     return ret;
 }
 
+static PyObject* khmer_ReadAligner_get_scoring_matrix(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "dddd", matrix.trusted_match, matrix.trusted_mismatch,
+                          matrix.untrusted_match, matrix.untrusted_mismatch);
+}
+
+static PyObject* khmer_ReadAligner_get_transition_probabilities(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "(dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd)",
+                          &matrix.tsc[0], &matrix.tsc[1], &matrix.tsc[2],
+                          &matrix.tsc[3], &matrix.tsc[4], &matrix.tsc[5],
+                          &matrix.tsc[6], &matrix.tsc[7], &matrix.tsc[8],
+                          &matrix.tsc[9], &matrix.tsc[10], &matrix.tsc[11],
+                          &matrix.tsc[12], &matrix.tsc[13], &matrix.tsc[14],
+                          &matrix.tsc[15], &matrix.tsc[16], &matrix.tsc[17],
+                          &matrix.tsc[18], &matrix.tsc[19], &matrix.tsc[20],
+                          &matrix.tsc[21], &matrix.tsc[22], &matrix.tsc[23],
+                          &matrix.tsc[24], &matrix.tsc[25], &matrix.tsc[26],
+                          &matrix.tsc[27]);
+}
+
 static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align", (PyCFunction)readaligner_align, METH_VARARGS, ""},
+    {
+        "get_scoring_matrix", (PyCFunction)khmer_ReadAligner_get_scoring_matrix,
+        METH_VARARGS,
+	"Get the scoring matrix in use.\n\n\
+Returns a tuple of floats: (trusted_match, trusted_mismatch, untrusted_match, \
+untrusted_mismatch)"
+    },
+    {
+	"get_transition_probabilities",
+	(PyCFunction)khmer_ReadAligner_get_transition_probabilities,
+	METH_VARARGS,
+        "Get the transition probabilties in use.\n\n\
+HMM state notation abbreviations:\n\
+    M_t - trusted match; M_u - untrusted match\n\
+    Ir_t - trusted read insert; Ir_u - untrusted read insert\n\
+    Ig_t - trusted graph insert; Ig_u - untrusted graph insert\n\
+\
+Returns a sparse matrix as a tuple of six tuples.\n\
+The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.\n\
+Transition are notated as 'StartState-NextState':\n\
+(\n\
+  ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),\n\
+  (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),\n\
+  (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),\n\
+  ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),\n\
+  (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),\n\
+  (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)\n\
+)"
+    },
     {NULL} /* Sentinel */
 };
 

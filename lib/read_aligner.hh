@@ -239,6 +239,8 @@ public:
           m_trusted_cutoff(trusted_cutoff),
           m_bits_theta(bits_theta) {};
 
+    ScoringMatrix getScoringMatrix();
+
 };
 }
 #endif // READ_ALIGNER_HH

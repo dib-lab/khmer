@@ -227,6 +227,10 @@ def test_readaligner_load():
     ct = khmer.new_counting_hash(32, 1048576, 1)
     parameters_json = utils.get_test_data('readaligner-default.json')
     aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
+    assert aligner.get_scoring_matrix()[0] == -0.06642736173897607, (
+        aligner.get_scoring_matrix()[0])
+    assert aligner.get_transition_probabilities()[0][0] == \
+            -0.021973842014145723, aligner.get_transition_probabilities()[0][0]
     for seq in ht_seqs:
         ct.consume(seq)
 
