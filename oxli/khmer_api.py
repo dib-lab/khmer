@@ -5,7 +5,7 @@
 # Contact: khmer-project@idyll.org
 #
 
-from screed.screedRecord import Record
+from screed.screedRecord import _screed_record_dict
 import os
 from khmer.utils import write_record, write_record_pair
 
