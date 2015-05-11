@@ -25,6 +25,7 @@ from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 from oxli import khmer_api
 
+
 def get_parser():
     parser = build_hashbits_args(descr="Load sequences into the compressible "
                                  "graph format plus optional tagset.")
