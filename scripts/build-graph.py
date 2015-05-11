@@ -73,15 +73,8 @@ def main():
     print >>sys.stderr, 'making k-mer presence table'
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
-    if args.no_build_tagset:
-        target_method = htable.consume_fasta_with_reads_parser
-    else:
-        target_method = htable.consume_fasta_and_tag_with_reads_parser
-
-    for _, filename in enumerate(filenames):
-        input_iter = khmer.ReadParser(filename)
-        input_iter = khmer.utils.broken_paired_reader(input_iter)
-        khmer_api.build_graph(input_iter, htable)
+    khmer_api.build_graph(filenames, htable, args.threads,
+                          not args.no_build_tagset)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(

@@ -7,6 +7,8 @@
 
 from screed.screedRecord import _screed_record_dict
 import os
+import threading
+import khmer
 from khmer.utils import write_record, write_record_pair
 
 def clean_reads(input_stream):
@@ -29,16 +31,25 @@ def output_reads(input_stream, out_fp):
             write_record(read1, out_fp)
 
 
-def build_graph(input_stream, graph):
-    try:
-        for n, is_pair, read1, read2 in input_stream:
-            graph.consume(read1.sequence)
-            if is_pair:
-                graph.consume(read2.sequence)
-    except ValueError:
-        for n, is_pair, read1 in input_stream:
-            graph.consume(read1.sequence)
+def build_graph(ifilenames, graph, num_threads = 1, tags = False):
+    
+    if(tags):
+        eat = graph.consume_fasta_and_tag_with_reads_parser
+    else:
+        eat = graph.consume_fasta_with_reads_parser
+    
+    for _, ifile in enumerate(ifilenames):
+        rparser = khmer.ReadParser(ifile)
+        threads = []
+    
+        for num in xrange(num_threads):
+            cur_thread = threading.Thread( target=eat, args=(rparser,))
+            threads.append(cur_thread)
+            cur_thread.start()
 
+        for thread in threads:
+            thread.join()
+        
 
 def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
     n = 0
