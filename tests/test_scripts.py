@@ -948,6 +948,38 @@ def test_load_graph():
     assert x == (1, 0), x
 
 
+def test_build_graph():
+    script = scriptpath('build-graph.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+
+
 def test_load_graph_no_tags():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']

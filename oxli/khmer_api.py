@@ -5,7 +5,7 @@
 # Contact: khmer-project@idyll.org
 #
 
-from screed.screedRecord import _screed_record_dict
+from screed.screedRecord import Record
 import os
 from khmer.utils import write_record, write_record_pair
 
@@ -45,8 +45,8 @@ def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
             med1, _, _ = ct.get_median_count(read1.sequence)
             med2, _, _ = ct.get_median_count(read2.sequence)
 
-            if (med1 < coverage && len(read1.sequence) > ksize) \
-                    or (med2 < coverage && len(read2.sequence) > ksize:
+            if (med1 < coverage and len(read1.sequence) > ksize) \
+                    or (med2 < coverage and len(read2.sequence) > ksize):
                 ct.consume(read1.sequence)
                 ct.consume(read2.sequence)
                 yield n, True, read1, read2
@@ -56,7 +56,7 @@ def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
                 passed = False
         else:
             med, _, _ = ct.get_median_count(read1.sequence)
-            if med < coverage && len(read1.sequence) > ksize:
+            if med < coverage and len(read1.sequence) > ksize:
                 ct.consume(read1.sequence)
                 yield n, False, read1, None
                 n += 1
