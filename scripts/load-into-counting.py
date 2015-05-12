@@ -158,16 +158,20 @@ def main():
                     "num_kmers": n_kmers,
                     "files": filenames,
                     "mrinfo_version": "0.2.0",
-                    "num_reads" : total_num_reads,
+                    "num_reads": total_num_reads,
                 }
                 json.dump(mr_data, mr_fh)
                 mr_fh.write('\n')
             elif mr_fmt == 'tsv':
                 mr_fh.write("ht_name\tfpr\tnum_kmers\tnum_reads\tfiles\n")
-                mr_fh.write(
-                        "{b:s}\t{fpr:1.3f}\t{k:d}\t{r:d}\t{fls:s}\n".format(
-                            b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
-                            r=total_num_reads, fls=";".join(filenames)))
+                vals = [
+                    os.path.basename(base),
+                    "{:1.3f}".format(fp_rate),
+                    str(n_kmers),
+                    str(total_num_reads),
+                    ";".join(filenames),
+                ]
+                mr_fh.write("\t".join(vals) + "\n")
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
