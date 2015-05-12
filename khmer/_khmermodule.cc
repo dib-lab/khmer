@@ -1861,7 +1861,7 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     } catch (InvalidStreamHandle &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
-    } 
+    }
 
     HashIntoType n = hashbits->n_unique_kmers();
     HashIntoType n_overlap = hashbits->n_overlap_kmers();
@@ -4222,14 +4222,14 @@ static PyMethodDef khmer_ReadAligner_methods[] = {
     {
         "get_scoring_matrix", (PyCFunction)khmer_ReadAligner_get_scoring_matrix,
         METH_VARARGS,
-	"Get the scoring matrix in use.\n\n\
+        "Get the scoring matrix in use.\n\n\
 Returns a tuple of floats: (trusted_match, trusted_mismatch, untrusted_match, \
 untrusted_mismatch)"
     },
     {
-	"get_transition_probabilities",
-	(PyCFunction)khmer_ReadAligner_get_transition_probabilities,
-	METH_VARARGS,
+        "get_transition_probabilities",
+        (PyCFunction)khmer_ReadAligner_get_transition_probabilities,
+        METH_VARARGS,
         "Get the transition probabilties in use.\n\n\
 HMM state notation abbreviations:\n\
     M_t - trusted match; M_u - untrusted match\n\
@@ -4277,14 +4277,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
         double scoring_matrix[] = { 0, 0, 0, 0 };
-        double transitions[] = {
-            0, 0, 0, 0, 0, 0, // M
-            0, 0, 0, 0, // Ir
-            0, 0, 0, 0, // Ig
-            0, 0, 0, 0, 0, 0, // Mu
-            0, 0, 0, 0, // Iru
-            0, 0, 0, 0 // Igu
-        };
+        double * transitions = new double[28];
 
         if(!PyArg_ParseTuple(
                     args,
