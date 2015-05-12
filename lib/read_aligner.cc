@@ -522,4 +522,10 @@ Alignment* ReadAligner::Align(const std::string& read)
         return ret;
     }
 }
+
+ScoringMatrix ReadAligner::getScoringMatrix()
+{
+    return m_sm;
+}
+
 }
