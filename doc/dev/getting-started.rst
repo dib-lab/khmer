@@ -46,7 +46,7 @@ One-time Preparation
        On recent Debian and Ubuntu this can be done with::
 
            sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
-           g++
+           g++ git astyle gcovr cppcheck
 
        For RHEL6::
 
