@@ -1,3 +1,7 @@
+2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/getting-started.rst: added missing dev tools to install list
+
 2015-05-12  Kevin Murray  <spam@kdmurray.id.au>
 
    * scripts/load-into-counting.py,test/test_scripts.py: Add the number of
