@@ -4205,16 +4205,16 @@ static PyObject* khmer_ReadAligner_get_transition_probabilities(
     ScoringMatrix matrix = me->aligner->getScoringMatrix();
 
     return Py_BuildValue( "(dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd)",
-                          &matrix.tsc[0], &matrix.tsc[1], &matrix.tsc[2],
-                          &matrix.tsc[3], &matrix.tsc[4], &matrix.tsc[5],
-                          &matrix.tsc[6], &matrix.tsc[7], &matrix.tsc[8],
-                          &matrix.tsc[9], &matrix.tsc[10], &matrix.tsc[11],
-                          &matrix.tsc[12], &matrix.tsc[13], &matrix.tsc[14],
-                          &matrix.tsc[15], &matrix.tsc[16], &matrix.tsc[17],
-                          &matrix.tsc[18], &matrix.tsc[19], &matrix.tsc[20],
-                          &matrix.tsc[21], &matrix.tsc[22], &matrix.tsc[23],
-                          &matrix.tsc[24], &matrix.tsc[25], &matrix.tsc[26],
-                          &matrix.tsc[27]);
+                          matrix.tsc[0], matrix.tsc[1], matrix.tsc[2],
+                          matrix.tsc[3], matrix.tsc[4], matrix.tsc[5],
+                          matrix.tsc[6], matrix.tsc[7], matrix.tsc[8],
+                          matrix.tsc[9], matrix.tsc[10], matrix.tsc[11],
+                          matrix.tsc[12], matrix.tsc[13], matrix.tsc[14],
+                          matrix.tsc[15], matrix.tsc[16], matrix.tsc[17],
+                          matrix.tsc[18], matrix.tsc[19], matrix.tsc[20],
+                          matrix.tsc[21], matrix.tsc[22], matrix.tsc[23],
+                          matrix.tsc[24], matrix.tsc[25], matrix.tsc[26],
+                          matrix.tsc[27]);
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {
