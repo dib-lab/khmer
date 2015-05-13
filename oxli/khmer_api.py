@@ -9,7 +9,7 @@ from screed.screedRecord import _screed_record_dict
 import os
 import threading
 import khmer
-from khmer.utils import write_record, write_record_pair
+from khmer.utils import write_record, write_record_pair, broken_paired_reader
 
 def clean_reads(input_stream):
     for n, is_pair, read1, read2 in input_stream:
@@ -33,7 +33,7 @@ def output_reads(input_stream, out_fp):
 
 def build_graph(ifilenames, graph, num_threads = 1, tags = False):
     
-    if(tags):
+    if tags:
         eat = graph.consume_fasta_and_tag_with_reads_parser
     else:
         eat = graph.consume_fasta_with_reads_parser
@@ -43,7 +43,7 @@ def build_graph(ifilenames, graph, num_threads = 1, tags = False):
         threads = []
     
         for num in xrange(num_threads):
-            cur_thread = threading.Thread( target=eat, args=(rparser,))
+            cur_thread = threading.Thread(target=eat, args=(rparser,))
             threads.append(cur_thread)
             cur_thread.start()
 
@@ -51,7 +51,7 @@ def build_graph(ifilenames, graph, num_threads = 1, tags = False):
             thread.join()
         
 
-def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
+def diginorm(input_stream, ct, coverage, ksize=0, ofp=False):
     n = 0
     discard = 0
     passed = False
@@ -60,8 +60,8 @@ def diginorm(input_stream, ct, coverage, ksize=0, ofp = False):
             med1, _, _ = ct.get_median_count(read1.sequence)
             med2, _, _ = ct.get_median_count(read2.sequence)
 
-            if (med1 < coverage and len(read1.sequence) > ksize) \
-                    or (med2 < coverage and len(read2.sequence) > ksize):
+            if ((med1 < coverage and len(read1.sequence) > ksize)
+                    or (med2 < coverage and len(read2.sequence) > ksize)):
                 ct.consume(read1.sequence)
                 ct.consume(read2.sequence)
                 yield n, True, read1, read2
@@ -100,7 +100,7 @@ def trim(input_stream, ct, normalize_coverage, trusted_coverage):
 
 
 def streamtrim(input_stream, ct, normalize_coverage, trusted_coverage):
-    import khmer.utils
+    #import khmer.utils
     vault = TemporaryReadStorage()
 
     n = 0
