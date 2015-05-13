@@ -1001,8 +1001,45 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
+def test_build_graph_no_tags():
+    script = scriptpath('build-graph.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert not os.path.exists(tagset_file), tagset_file
+
+    assert khmer.load_hashbits(ht_file)
+
+    # can't think of a good way to make sure this worked, beyond just
+    # loading the ht file...
+
+
 def test_load_graph_fail():
     script = scriptpath('load-graph.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == 1, status
+    assert "** ERROR: the graph structure is too small" in err
+
+
+def test_build_graph_fail():
+    script = scriptpath('build-graph.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -1037,8 +1074,41 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
+def test_build_graph_write_fp():
+    script = scriptpath('build-graph.py')
+    args = ['-x', '1e5', '-N', '2', '-k', '20', '-w']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    data = [x.strip() for x in open(info_file)]
+    data = set(data)
+    assert '3959 unique k-mers' in data
+    assert 'false positive rate estimated to be 0.002' in data
+
+
 def test_load_graph_multithread():
     script = scriptpath('load-graph.py')
+
+    outfile = utils.get_temp_filename('test')
+    infile = utils.get_test_data('test-reads.fa')
+
+    args = ['-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
+
+    (status, out, err) = utils.runscript(script, args)
+
+
+def test_build_graph_multithread():
+    script = scriptpath('build-graph.py')
 
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
@@ -1053,6 +1123,53 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 annotate_partitions=False,
                 stop_big_traverse=False):
     script = scriptpath('load-graph.py')
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = infilename
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
+        utils.runscript(script, args)
+
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(ksize)]
+        utils.runscript(script, args)
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
+
+        if annotate_partitions:
+            script = scriptpath('annotate-partitions.py')
+            args = ["-k", str(ksize), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            utils.runscript(script, args, in_dir)
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
+
+    return outfile
+
+
+def _build_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
+                 do_partition=False,
+                 annotate_partitions=False,
+                 stop_big_traverse=False):
+    script = scriptpath('build-graph.py')
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1168,9 +1285,56 @@ def test_partition_graph_1():
     assert x == (1, 0), x          # should be exactly one partition.
 
 
+def test_partition_graph_1_with_build_graph():
+    graphbase = _build_graph(utils.get_test_data('random-20-a.fa'))
+
+    script = scriptpath('partition-graph.py')
+    args = [graphbase]
+
+    utils.runscript(script, args)
+
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(20)]
+    utils.runscript(script, args)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
+
+
 def test_partition_graph_nojoin_k21():
     # test with K=21
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
+
+    script = scriptpath('partition-graph.py')
+    args = [graphbase]
+
+    utils.runscript(script, args)
+
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(21)]
+    utils.runscript(script, args)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (99, 0), x          # should be 99 partitions at K=21
+
+
+def test_partition_graph_nojoin_k21_with_build_graph():
+    # test with K=21
+    graphbase = _build_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
 
     script = scriptpath('partition-graph.py')
     args = [graphbase]
@@ -1224,9 +1388,56 @@ def test_partition_graph_nojoin_stoptags():
     assert x == (2, 0), x          # should be 2 partitions
 
 
+def test_partition_graph_nojoin_stoptags_with_build_graph():
+    # test with stoptags
+    graphbase = _build_graph(utils.get_test_data('random-20-a.fa'))
+
+    # add in some stop tags
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
+    stoptags_file = graphbase + '.stoptags'
+    ht.save_stop_tags(stoptags_file)
+    del ht
+
+    # run script with stoptags option
+    script = scriptpath('partition-graph.py')
+    args = ['--stoptags', stoptags_file, graphbase]
+
+    utils.runscript(script, args)
+
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(20)]
+    utils.runscript(script, args)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (2, 0), x          # should be 2 partitions
+
+
 def test_partition_graph_big_traverse():
     graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
                             do_partition=True, stop_big_traverse=False)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
+
+
+def test_partition_graph_big_traverse_with_build_graph():
+    graphbase = _build_graph(utils.get_test_data('biglump-random-20-a.fa'),
+                             do_partition=True, stop_big_traverse=False)
 
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
@@ -1255,9 +1466,46 @@ def test_partition_graph_no_big_traverse():
     assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
+def test_partition_graph_no_big_traverse_with_build_graph():
+    # do NOT exhaustively traverse
+    graphbase = _build_graph(utils.get_test_data('biglump-random-20-a.fa'),
+                             do_partition=True, stop_big_traverse=True)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x[0] == 4, x       # should be four partitions, broken at knot.
+
+
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final pmap file
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    script = scriptpath('annotate-partitions.py')
+    args = ["-k", "20", graphbase, seqfile]
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+
+def test_annotate_partitions_with_build_graph():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _build_graph(seqfile, do_partition=True)
     in_dir = os.path.dirname(graphbase)
 
     # get the final pmap file
@@ -1299,9 +1547,61 @@ def test_annotate_partitions_2():
     assert len(parts) == 99, len(parts)
 
 
+def test_annotate_partitions_2_build_graph():
+    # test with K=21 (no joining of sequences)
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _build_graph(seqfile, do_partition=True,
+                             ksize=21)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final pmap file
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    script = scriptpath('annotate-partitions.py')
+    args = ["-k", "21", graphbase, seqfile]
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    print parts
+    assert len(parts) == 99, len(parts)
+
+
 def test_extract_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+
+    utils.runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+
+def test_extract_partitions_build_graph():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _build_graph(
         seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
 
@@ -1358,9 +1658,79 @@ def test_extract_partitions_header_whitespace():
     assert len(parts) == 12601, len(parts)
 
 
+def test_extract_partitions_header_whitespace_build_graph():
+    seqfile = utils.get_test_data('test-overlap2.fa')
+    graphbase = _build_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'test-overlap2.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+
+    utils.runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '1 11957 11957 11957'
+
+    parts = [r.name.split('\t')[1]
+             for r in screed.open(partfile, parse_description=False)]
+    assert len(parts) == 13538, len(parts)
+    parts = set(parts)
+    assert len(parts) == 12601, len(parts)
+
+
 def test_extract_partitions_fq():
     seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+
+    utils.runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fq')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    screed_iter = screed.open(partfile, parse_description=False)
+    names = [r.name.split('\t')[0] for r in screed_iter]
+    assert '35 1::FOO' in names
+    assert '46 1::FIZ' in names
+
+    screed_iter = screed.open(partfile, parse_description=False)
+    parts = [r.name.split('\t')[1] for r in screed_iter]
+
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+    quals = set([r.quality for r in screed.open(partfile)])
+    quals = list(quals)
+    assert quals[0], quals
+
+
+def test_extract_partitions_fq_build_graph():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _build_graph(
         seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
 
@@ -1429,9 +1799,62 @@ def test_extract_partitions_output_unassigned():
     assert len(parts) == 1, len(parts)
 
 
+def test_extract_partitions_output_unassigned_build_graph():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _build_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-U', 'extracted', partfile]
+
+    utils.runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    unassigned_file = os.path.join(in_dir, 'extracted.unassigned.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+    assert os.path.exists(unassigned_file)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+
 def test_extract_partitions_no_output_groups():
     seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-n', 'extracted', partfile]
+
+    # We expect a sys.exit -> we need the test to be tolerant
+    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert "NOT outputting groups! Beware!" in err
+    # Group files are created after output_groups is
+    # checked. They should not exist in this scenario
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert not os.path.exists(groupfile)
+
+
+def test_extract_partitions_no_output_groups_build_graph():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _build_graph(
         seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
 

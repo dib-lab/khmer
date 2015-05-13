@@ -1,3 +1,8 @@
+2015-05-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{__init__.py,khmer_api.py},scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlized load_graph script, tests
+
 2015-04-23  Lex Nederbragt  <lex.nederbragt@ibv.uio.no>
 
    * tests/test_scripts.py: added a test for extract-partitions:
