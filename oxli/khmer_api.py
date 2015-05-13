@@ -9,6 +9,7 @@ from screed.screedRecord import _screed_record_dict
 import os
 import threading
 import khmer
+import sys, screed, khmer.utils
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 
 def clean_reads(input_stream):
@@ -100,7 +101,6 @@ def trim(input_stream, ct, normalize_coverage, trusted_coverage):
 
 
 def streamtrim(input_stream, ct, normalize_coverage, trusted_coverage):
-    #import khmer.utils
     vault = TemporaryReadStorage()
 
     n = 0
@@ -171,8 +171,6 @@ def _trim_record(read, ct, cutoff):
 
 
 if __name__ == '__main__':
-    import khmer, sys, screed, khmer.utils
-    from khmer.utils import broken_paired_reader
     filename = sys.argv[1]
 
     graph = khmer.new_counting_hash(20, 1e7, 4)
