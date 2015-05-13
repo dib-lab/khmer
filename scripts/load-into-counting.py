@@ -102,6 +102,8 @@ def main():
 
     filename = None
 
+    total_num_reads = 0
+
     for index, filename in enumerate(filenames):
 
         rparser = khmer.ReadParser(filename)
@@ -126,6 +128,7 @@ def main():
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:
             print >> info_fh, 'through', filename
+        total_num_reads += rparser.num_reads
 
     n_kmers = htable.n_unique_kmers()
     if args.report_total_kmers:
@@ -154,15 +157,21 @@ def main():
                     "fpr": fp_rate,
                     "num_kmers": n_kmers,
                     "files": filenames,
-                    "mrinfo_version": "0.1.0",
+                    "mrinfo_version": "0.2.0",
+                    "num_reads": total_num_reads,
                 }
                 json.dump(mr_data, mr_fh)
                 mr_fh.write('\n')
             elif mr_fmt == 'tsv':
-                mr_fh.write("ht_name\tfpr\tnum_kmers\tfiles\n")
-                mr_fh.write("{b:s}\t{fpr:1.3f}\t{k:d}\t{fls:s}\n".format(
-                    b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
-                    fls=";".join(filenames)))
+                mr_fh.write("ht_name\tfpr\tnum_kmers\tnum_reads\tfiles\n")
+                vals = [
+                    os.path.basename(base),
+                    "{:1.3f}".format(fp_rate),
+                    str(n_kmers),
+                    str(total_num_reads),
+                    ";".join(filenames),
+                ]
+                mr_fh.write("\t".join(vals) + "\n")
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 

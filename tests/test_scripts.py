@@ -136,7 +136,8 @@ def test_load_into_counting_tsv():
         tabfile_lines = tabfh.readlines()
     assert len(tabfile_lines) == 2
     outbase = os.path.basename(outfile)
-    expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
+    tsv = [outbase, '0.000', '95', '1001', infile]
+    expected_tsv_line = '\t'.join(tsv) + '\n'
     assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
 
 
@@ -162,8 +163,9 @@ def test_load_into_counting_json():
         "files": [infile],
         "ht_name": outbase,
         "num_kmers": 95,
+        "num_reads": 1001,
         "fpr": 9.024965705097741e-11,
-        "mrinfo_version": "0.1.0",
+        "mrinfo_version": "0.2.0",
     }
 
     assert got_json == expected_json, got_json
