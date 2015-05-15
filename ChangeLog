@@ -1,3 +1,10 @@
+2015-5-15 Tamer Mansour <drtamermansour@gmail.com>
+
+   * normalize-by-median changed to count kmers from both PE reads when either
+   one of them is below the coverage cutoff
+   * The function hash_consume in khmer/_khmermodule.cc changed to checks for
+   non-ACGT characters
+
 2015-05-13  Scott Sievert <sieve121@umn.edu>
 
    * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
