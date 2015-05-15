@@ -4,6 +4,7 @@
    one of them is below the coverage cutoff
    * The function hash_consume in khmer/_khmermodule.cc changed to checks for
    non-ACGT characters
+   * Add 2 tests to test_script.py to test for the 2 new behaviors
 
 2015-05-13  Scott Sievert <sieve121@umn.edu>
 
