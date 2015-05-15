@@ -26,6 +26,7 @@ C = 10
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
+SKIP_READS = 1e6
 CHECK_EXIT = 25000
 
 
@@ -83,6 +84,9 @@ def main():
         print >>sys.stderr, 'opening', filename
 
         for n, record in enumerate(screed.open(filename)):
+            if n < SKIP_READS:
+                continue
+
             total += 1
 
             if total % CHECK_EXIT == 0:
