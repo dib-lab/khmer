@@ -47,6 +47,9 @@ def main():
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--errors-per-read', dest='errors_per_read',
                         type=argparse.FileType('w'), default=None)
+    parser.add_argument('--skip-reads', dest='skip_reads',
+                        type=int, default=SKIP_READS,
+                        help="skip this many reads at beginning of each file")
 
     args = parser.parse_args()
 
@@ -84,7 +87,7 @@ def main():
         print >>sys.stderr, 'opening', filename
 
         for n, record in enumerate(screed.open(filename)):
-            if n < SKIP_READS:
+            if n < args.skip_reads:
                 continue
 
             total += 1
