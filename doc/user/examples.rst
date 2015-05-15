@@ -18,9 +18,9 @@ as the effect of digital normalization and partitioning on the k-mer
 abundance distribution.
 
 See `the script for running everything
-<https://github.com/ged-lab/khmer/blob/master/examples/stamps/do.sh>`__
+<https://github.com/dib-lab/khmer/blob/master/examples/stamps/do.sh>`__
 and `the IPython Notebook
-<http://nbviewer.ipython.org/urls/raw.github.com/ged-lab/khmer/master/examples/stamps%2520k-mer%2520distributions.ipynb>`__.
+<http://nbviewer.ipython.org/urls/raw.github.com/dib-lab/khmer/master/examples/stamps%2520k-mer%2520distributions.ipynb>`__.
 
 For an overall discussion and some slides to explain what's going on,
 visit `the Web site for a 2013 HMP metagenome assembly webinar that

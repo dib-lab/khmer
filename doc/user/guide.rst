@@ -29,7 +29,7 @@ khmer is a general `framework for low-memory k-mer counting, filtering,
 and advanced trickery <http://khmer.readthedocs.org/en/latest/>`__.
 
 The latest source is always available `here
-<https://github.com/ged-lab/khmer>`__.
+<https://github.com/dib-lab/khmer>`__.
 
 khmer is really focused on short read data, and, more specifically,
 Illumina, because that's where we have a too-much-data problem.
