@@ -54,7 +54,6 @@ def WithDiagnostics(ifile, batch_size, fp, paired, norm):
     """
 
     index = 0
-    # global total, discarded
 
     for index, batch in enumerate(batchwise(
                                   screed.open(ifile, parse_description=False),
@@ -98,6 +97,8 @@ class Normalizer(object):
         self.corrupt_files = []
 
     def __call__(self, input_filename, force_paired=False):
+        seq = ""
+        
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
@@ -119,11 +120,11 @@ class Normalizer(object):
                 med, _, _ = self.htable.get_median_count(seq)
 
                 if med < desired_coverage:
-                    self.htable.consume(seq)
                     passed_filter = True
 
             if passed_length and passed_filter:
                 for record in batch:
+                    self.htable.consume(seq)
                     yield record
             else:
                 self.discarded += batch_size
