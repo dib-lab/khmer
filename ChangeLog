@@ -1,7 +1,14 @@
-2015-05-13  Scott Sievert <sieve121@umn.edu>
+2015-05-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-   * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
-   sandbox/*, khmer/*
+   * all files: references to github.com/ged-lab changed to
+   github.com/dib-lab. All GitHub URLs normalized to use HTTPS
+   * README.rst: broken landscape.io badge removed
+   * doc/user/known-issues.rst: removed two known issues fixed in v1.4 release
+
+2015-05-13  Scott Sievert  <sieve121@umn.edu>
+
+   * tests/*,scripts/*,lib/*,sandbox/*,khmer/*: changed "doc/LICENSE.txt" to
+   "LICENSE" in copyright header.
 
 2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
