@@ -1,7 +1,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 
@@ -136,7 +136,8 @@ def test_load_into_counting_tsv():
         tabfile_lines = tabfh.readlines()
     assert len(tabfile_lines) == 2
     outbase = os.path.basename(outfile)
-    expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
+    tsv = [outbase, '0.000', '95', '1001', infile]
+    expected_tsv_line = '\t'.join(tsv) + '\n'
     assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
 
 
@@ -162,8 +163,9 @@ def test_load_into_counting_json():
         "files": [infile],
         "ht_name": outbase,
         "num_kmers": 95,
+        "num_reads": 1001,
         "fpr": 9.024965705097741e-11,
-        "mrinfo_version": "0.1.0",
+        "mrinfo_version": "0.2.0",
     }
 
     assert got_json == expected_json, got_json
@@ -2206,17 +2208,18 @@ def test_sample_reads_randomly():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
-    assert seqs == set(['850:2:1:1849:7272/1',  '850:2:1:1849:7272/2',
-                        '850:2:1:1574:8683/1',  '850:2:1:1574:8683/2',
+    print list(sorted(seqs))
+
+    assert seqs == set(['850:2:1:1859:11742/1', '850:2:1:1859:11742/2',
+                        '850:2:1:2131:17360/1', '850:2:1:2131:17360/2',
+                        '850:2:1:2416:7565/1', '850:2:1:2416:7565/2',
+                        '850:2:1:2490:13491/1', '850:2:1:2490:13491/2',
+                        '850:2:1:2962:3999/1', '850:2:1:2962:3999/2',
                         '850:2:1:3096:20321/1', '850:2:1:3096:20321/2',
-                        '850:2:1:1228:13560/1', '850:2:1:1228:13560/2',
-                        '850:2:1:1169:15266/1', '850:2:1:1169:15266/2',
-                        '850:2:1:1406:4262/1',  '850:2:1:1406:4262/2',
-                        '850:2:1:2416:7565/1',  '850:2:1:2416:7565/2',
-                        '850:2:1:1859:11742/1', '850:2:1:1859:11742/2',
-                        '850:2:1:1204:4333/1',  '850:2:1:1204:4333/2',
-                        '850:2:1:2131:17360/1', '850:2:1:2131:17360/2'])
+                        '850:2:1:3164:6414/1', '850:2:1:3164:6414/2',
+                        '850:2:1:3206:13876/1', '850:2:1:3206:13876/2',
+                        '850:2:1:3631:20919/1', '850:2:1:3631:20919/2',
+                        '850:2:1:3655:15581/1', '850:2:1:3655:15581/2'])
 
 
 def test_sample_reads_randomly_force_single():
@@ -2235,7 +2238,7 @@ def test_sample_reads_randomly_force_single():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
+    print list(sorted(seqs))
     assert seqs == set(['850:2:1:2399:20086/2',
                         '850:2:1:2273:13309/1',
                         '850:2:1:2065:16816/1',
@@ -2266,7 +2269,7 @@ def test_sample_reads_randomly_fq():
     seqs = set([r.name for r in screed.open(outfile,
                                             parse_description=False)])
 
-    print seqs
+    print list(sorted(seqs))
     assert seqs == set(['850:2:1:2399:20086/2',
                         '850:2:1:1762:5439 1::FOO',
                         '850:2:1:2065:16816/1',
@@ -2398,49 +2401,37 @@ def test_sample_reads_randomly_S():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
-    assert seqs == set(['895:1:1:1273:17782',
-                        '895:1:1:1276:16426',
-                        '895:1:1:1295:6189',
-                        '895:1:1:1308:20421',
-                        '895:1:1:1320:11648',
-                        '895:1:1:1352:5369',
-                        '895:1:1:1363:11839',
-                        '895:1:1:1299:3449',
-                        '895:1:1:1342:11001',
-                        '895:1:1:1355:13535'])
+    print list(sorted(seqs))
+
+    assert seqs == set(['895:1:1:1303:14389', '895:1:1:1347:3237',
+                        '895:1:1:1295:6189', '895:1:1:1308:20421',
+                        '895:1:1:1320:11648', '895:1:1:1352:5369',
+                        '895:1:1:1318:10532', '895:1:1:1363:11839',
+                        '895:1:1:1355:13535', '895:1:1:1349:15165'])
 
     outfile = infile + '.subset.1'
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
-    assert seqs == set(['895:1:1:1303:14389',
-                        '895:1:1:1373:4848',
-                        '895:1:1:1347:3237',
-                        '895:1:1:1338:15407',
-                        '895:1:1:1388:11093',
-                        '895:1:1:1290:11501',
-                        '895:1:1:1308:20421',
-                        '895:1:1:1355:13535',
-                        '895:1:1:1303:6251',
-                        '895:1:1:1381:4958'])
+    print list(sorted(seqs))
+
+    assert seqs == set(['895:1:1:1303:14389', '895:1:1:1373:4848',
+                        '895:1:1:1357:19736', '895:1:1:1347:3237',
+                        '895:1:1:1338:7557', '895:1:1:1388:11093',
+                        '895:1:1:1296:1784', '895:1:1:1290:11501',
+                        '895:1:1:1355:13535', '895:1:1:1303:6251'])
 
     outfile = infile + '.subset.2'
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    print seqs
-    assert seqs == set(['895:1:1:1331:1766',
-                        '895:1:1:1295:6189',
-                        '895:1:1:1309:4153',
-                        '895:1:1:1252:19493',
-                        '895:1:1:1287:13756',
-                        '895:1:1:1368:4434',
-                        '895:1:1:1348:1257',
-                        '895:1:1:1255:18861',
-                        '895:1:1:1383:3089',
-                        '895:1:1:1348:18672'])
+    print list(sorted(seqs))
+
+    assert seqs == set(['895:1:1:1298:13380', '895:1:1:1348:18672',
+                        '895:1:1:1309:4153', '895:1:1:1252:19493',
+                        '895:1:1:1368:4434', '895:1:1:1348:1257',
+                        '895:1:1:1383:3089', '895:1:1:1355:13535',
+                        '895:1:1:1303:6251', '895:1:1:1349:15165'])
 
 
 def test_count_overlap_invalid_datafile():
