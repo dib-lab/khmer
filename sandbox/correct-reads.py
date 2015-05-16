@@ -37,6 +37,7 @@ DEFAULT_CUTOFF = 2
 
 
 def correct_sequence(aligner, sequence):
+    # align to graph.
     score, graph_alignment, read_alignment, truncated = \
            aligner.align(sequence)
 
@@ -47,6 +48,14 @@ def correct_sequence(aligner, sequence):
         return True, graph_seq
 
     return False, sequence
+
+
+def fix_quality(record):
+    if len(record.sequence) < len(record.quality):
+        record.quality = record.quality[:len(record.sequence)]
+
+    while len(record.sequence) > len(record.quality):
+        record.quality += 'I' # @CTB hack
 
 
 def get_parser():
@@ -203,7 +212,7 @@ def main():
                             corrected_reads += 1
                         read1.sequence = new_seq1
                         if hasattr(read1, 'quality'):
-                            read1.quality = read1.quality[:len(new_seq1)]
+                            fix_quality(read1)
 
                     is_aligned, new_seq2 = correct_sequence(aligner, seq2)
                     if is_aligned:
@@ -211,7 +220,7 @@ def main():
                             corrected_reads += 1
                         read2.sequence = new_seq2
                         if hasattr(read2, 'quality'):
-                            read2.quality = read2.quality[:len(new_seq2)]
+                            fix_quality(read2)
 
                     write_record_pair(read1, read2, corrfp)
                     written_reads += 2
@@ -238,7 +247,7 @@ def main():
                             corrected_reads += 1
                         read1.sequence = new_seq
                         if hasattr(read1, 'quality'):
-                            read1.quality = read1.quality[:len(new_seq)]
+                            fix_quality(read1)
 
                         write_record(read1, corrfp)
 
@@ -290,7 +299,7 @@ def main():
                         corrected_reads += 1
                     read.sequence = new_seq
                     if hasattr(read, 'quality'):
-                        read.quality = read.quality[:len(new_seq)]
+                        fix_quality(read)
                     write_record(read, corrfp)
 
                     written_reads += 1
