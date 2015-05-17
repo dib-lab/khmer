@@ -138,9 +138,15 @@ format: astyle autopep8
 
 ## pylint      : run static code analysis on Python code
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
+ifndef JENKINS_URL
+	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+		--rcfile=.pylintrc setup.py khmer/[!_]*.py khmer/__init__.py \
+		scripts/*.py tests || true
+else
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		|| true
+endif
 
 pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
