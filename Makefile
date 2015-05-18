@@ -101,10 +101,10 @@ cppcheck: $(CPPSOURCES)
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
-		scripts/ tests/ || true
+		scripts/ tests/ oxli/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt
@@ -129,7 +129,7 @@ astyle: $(CPPSOURCES)
 ## autopep8    : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
-		setup.py khmer/*.py scripts/*.py tests/*.py
+		setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
 ## format      : check/fix all code indentation and formatting (runs astyle and autopep8)
@@ -140,12 +140,12 @@ format: astyle autopep8
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		|| true
+		oxli/*.py || true
 
 pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		sandbox/*.py > pylint_report.txt || true
+		sandbox/*.py oxli/*.py > pylint_report.txt || true
 
 diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
