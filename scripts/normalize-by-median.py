@@ -181,7 +181,7 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
                 .format(inp=input_filename, kept=total - discarded,
                         total=total, perc=int(100. - discarded /
                                               float(total) * 100.))
-            print >> sys.stderr, 'output in', outfp
+            print >> sys.stderr, 'output in', output_name
 
     return total_acc, discarded_acc, corrupt_files
 
@@ -281,6 +281,24 @@ def get_parser():
     return parser
 
 
+def SavingTable(input_filenames, freq, ht, savename):
+    index = 0
+    while index < len(input_filenames):
+        yield input_filenames[index]
+
+        if (freq > 0 and index > 0 and index % freq == 0):
+            print 'Backup: Saving k-mer counting file through', \
+                input_filenames[index]
+            if savename:
+                hashname = savename
+                print '...saving to', hashname
+            else:
+                hashname = 'backup.ct'
+                print 'Nothing given for savetable, saving to', hashname
+                ht.save(hashname)
+        index = index + 1
+
+
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
@@ -319,24 +337,16 @@ file for one of the input files will be generated.)" % filename
                                          args.n_tables)
 
     input_filename = None
+    global index
+    index = 0
 
-    for index, input_filename in enumerate(args.input_filenames):
+    for f in SavingTable(args.input_filenames, args.dump_frequency, htable,
+                         args.savetable):
         total_acc, discarded_acc, corrupt_files = \
             normalize_by_median_and_check(
-                input_filename, htable, args.single_output_file,
+                f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
                 corrupt_files, report_fp)
-
-        if (args.dump_frequency > 0 and
-                index > 0 and index % args.dump_frequency == 0):
-            print 'Backup: Saving k-mer counting file through', input_filename
-            if args.savetable:
-                hashname = args.savetable
-                print '...saving to', hashname
-            else:
-                hashname = 'backup.ct'
-                print 'Nothing given for savetable, saving to', hashname
-            htable.save(hashname)
 
     if args.paired and args.unpaired_reads:
         args.paired = False
