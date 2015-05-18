@@ -4214,6 +4214,7 @@ static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
                                    (aln->truncated)? Py_True : Py_False,
                                    x);
     delete aln;
+    Py_DECREF(x);
 
     return ret;
 }
