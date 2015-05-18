@@ -591,7 +591,7 @@ def test_normalize_by_median_skip_Nreads():
 
     args = ['-C', CUTOFF, '-k', '17', '-t', '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 96' in err, err
     assert 'kept 2 of 2 or 100%' in err, err
 
 
