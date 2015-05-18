@@ -2,7 +2,7 @@
 
    * normalize-by-median changed to count kmers from both PE reads when either
    one of them is below the coverage cutoff
-   * The function hash_consume in khmer/_khmermodule.cc changed to checks for
+   * The function hash_consume in khmer/_khmermodule.cc changed to check for
    non-ACGT characters
    * Add 2 tests to test_script.py to test for the 2 new behaviors
 
