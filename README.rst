@@ -6,13 +6,13 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 .. image:: https://readthedocs.org/projects/khmer/badge
     :target: https://readthedocs.org/projects/khmer/
     :alt: Documentation Status
-.. image:: https://badge.fury.io/py/khmer.png
+.. image:: https://badge.fury.io/py/khmer.svg
     :target: http://badge.fury.io/py/khmer
     :alt: PyPI Package
-.. image:: https://pypip.in/d/khmer/badge.png
+.. image:: https://pypip.in/d/khmer/badge.svg
     :target: https://crate.io/packages/khmer
     :alt: Downloads Counter
-.. image:: https://pypip.in/license/khmer/badge.png
+.. image:: https://pypip.in/license/khmer/badge.svg
     :target: https://pypi.python.org/pypi/khmer/
     :alt: License
 .. image:: http://ci.ged.msu.edu/job/khmer-master/badge/icon
