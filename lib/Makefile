@@ -74,6 +74,10 @@ ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../third-party/zlib/
 endif
 
+ifeq ($(USE_SYSTEM_ZSTD), false)
+INCLUDES += -I ../third-party/zstd/ 			\
+endif
+
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
 INCLUDES += -I ../third-party/bzip2/
 endif
@@ -218,6 +222,9 @@ BZIP2_OBJS_BASE= \
 
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
+# ZSTD
+ZSTD_DIR=../third-party/zstd
+ZSTD_OBJS=zstd.o
 
 #### oxli proper below here ####
 
@@ -241,6 +248,11 @@ ifeq ($(USE_SYSTEM_ZLIB), false)
 LIBKHMER_OBJS  += $(ZLIB_OBJS)
 PRECOMILE_OBJS += $(ZLIB_OBJS)
 PRECLEAN_TARGS += zlibclean
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
+LIBKHMER_OBJS  += $(ZSTD_OBJS)
+PRECOMILE_OBJS += $(ZSTD_OBJS)
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
@@ -269,6 +281,7 @@ all: $(LIBKHMERSO) liboxli.a oxli.pc
 
 zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
+
 libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
@@ -292,6 +305,9 @@ $(ZLIB_OBJS):
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
+
+$(ZSTD_OBJS):
+	$(CC) -std=c99 -Wall -Wextra -Wundef -Wshadow -Wcast-align -Wstrict-prototypes -fPIC -c $(ZSTD_DIR)/zstd.c
 
 # MurMur3
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
