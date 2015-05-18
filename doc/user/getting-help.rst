@@ -51,4 +51,4 @@ GitHub
 ------
 
 You are also welcome to report an issue you are having using GitHub::
-https://github.com/ged-lab/khmer/issues/new
+https://github.com/dib-lab/khmer/issues/new

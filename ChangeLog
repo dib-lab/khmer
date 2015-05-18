@@ -1,3 +1,10 @@
+2015-05-18  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * all files: references to github.com/ged-lab changed to
+   github.com/dib-lab. All GitHub URLs normalized to use HTTPS
+   * README.rst: broken landscape.io badge removed
+   * doc/user/known-issues.rst: removed two known issues fixed in v1.4 release
+
 2015-05-18  Titus Brown  <titus@idyll.org>
 
    * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
@@ -10,10 +17,10 @@
    filter-abund/filter-abund-single behavior.
    * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
 
-2015-05-13  Scott Sievert <sieve121@umn.edu>
+2015-05-13  Scott Sievert  <sieve121@umn.edu>
 
-   * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
-   sandbox/*, khmer/*
+   * tests/*,scripts/*,lib/*,sandbox/*,khmer/*: changed "doc/LICENSE.txt" to
+   "LICENSE" in copyright header.
 
 2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -821,8 +828,8 @@
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
-    https://github.com/ged-lab/khmer/issues/249
-    https://github.com/ged-lab/khmer/pull/641
+    https://github.com/dib-lab/khmer/issues/249
+    https://github.com/dib-lab/khmer/pull/641
     Supports reading from non-seekable plain and gziped FAST[AQ] files (a.k.a
     pipe or streaming support)
 
