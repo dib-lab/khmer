@@ -1,4 +1,4 @@
-2015-05-08  Titus Brown  <titus@idyll.org>
+2015-05-18  Titus Brown  <titus@idyll.org>
 
    * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
    scripts/{count-median.py,filter-abund-single.py,filter-abund.py}: changed
@@ -9,6 +9,27 @@
    * tests/test_scripts.py: added tests for new
    filter-abund/filter-abund-single behavior.
    * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
+
+2015-05-13  Scott Sievert <sieve121@umn.edu>
+
+   * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
+   sandbox/*, khmer/*
+
+2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/getting-started.rst: added missing dev tools to install list
+
+2015-05-12  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/load-into-counting.py,test/test_scripts.py: Add the number of
+   reads processed to the machine readable output files of --summary-info.
+
+2015-05-11  Titus Brown  <titus@idyll.org>
+
+   * scripts/sample-reads-randomly.py: fixed boundary error in
+   sample-reads-randomly.py.
+   * tests/test_scripts.py: updated tests to correspond with correct
+   behavior of sample-reads-randomly.py.
 
 2015-04-23  Lex Nederbragt  <lex.nederbragt@ibv.uio.no>
 
