@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -130,9 +130,10 @@ def main():
     for filename in args.filenames:
         print >>sys.stderr, 'opening', filename, 'for reading'
         screed_iter = screed.open(filename, parse_description=False)
-        for count, ispair, rcrd1, rcrd2 in broken_paired_reader(
+
+        for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,
-                force_single=args.force_single):
+                force_single=args.force_single)):
             if count % 10000 == 0:
                 print >>sys.stderr, '...', count, 'reads scanned'
                 if count >= args.max_reads:
@@ -145,6 +146,8 @@ def main():
                 for n in range(num_samples):
                     reads[n].append((rcrd1, rcrd2))
             else:
+                assert len(reads[n]) <= count
+
                 # use reservoir sampling to replace reads at random
                 # see http://en.wikipedia.org/wiki/Reservoir_sampling
 

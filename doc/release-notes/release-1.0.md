@@ -61,25 +61,25 @@ All of these are pre-existing.
 
 Some users have reported that normalize-by-median.py will utilize more
 memory than it was configured for. This is being investigated in
-https://github.com/ged-lab/khmer/issues/266
+https://github.com/dib-lab/khmer/issues/266
 
 Some FASTQ files confuse our parser when running with more than one thread.
 For example, while using load-into-counting.py. If you experience this then
 add "--threads=1" to your command line. This issue is being tracked in
-https://github.com/ged-lab/khmer/issues/249
+https://github.com/dib-lab/khmer/issues/249
 
 If your k-mer table (hashfile) gets truncated, perhaps from a full filesystem, then our
-tools currently will get stuck. This is being tracked in https://github.com/ged-lab/khmer/issues/247 and https://github.com/ged-lab/khmer/issues/96 and https://github.com/ged-lab/khmer/issues/246
+tools currently will get stuck. This is being tracked in https://github.com/dib-lab/khmer/issues/247 and https://github.com/dib-lab/khmer/issues/96 and https://github.com/dib-lab/khmer/issues/246
 
 Paired-end reads from Casava 1.8 currently require renaming for use in
 normalize-by-median and abund-filter when used in paired mode. The
-integration of a fix for this is being tracked in https://github.com/ged-lab/khmer/issues/23
+integration of a fix for this is being tracked in https://github.com/dib-lab/khmer/issues/23
 
 annotate-partitions.py only outputs FASTA even if given a FASTQ file. This
-issue is being tracked in https://github.com/ged-lab/khmer/issues/46
+issue is being tracked in https://github.com/dib-lab/khmer/issues/46
 
 A user reported that abundance-dist-single.py fails with small files and many
-threads. This issue is being tracked in https://github.com/ged-lab/khmer/issues/75
+threads. This issue is being tracked in https://github.com/dib-lab/khmer/issues/75
 
 ## Contributors
 

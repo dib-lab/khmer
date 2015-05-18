@@ -17,16 +17,13 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
     :alt: License
 .. image:: http://ci.ged.msu.edu/job/khmer-master/badge/icon
     :target: http://ci.ged.msu.edu/job/khmer-master/
-.. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
-    :target: https://landscape.io/github/ged-lab/khmer/master
-    :alt: Python Code Health
 .. image:: https://scan.coverity.com/projects/621/badge.svg
     :target: https://scan.coverity.com/projects/621
     :alt: Coverity Scan Build Status
 
 The official repository is at
 
-https://github.com/ged-lab/khmer
+https://github.com/dib-lab/khmer
 
 and you can read the docs online here:
 
@@ -40,7 +37,7 @@ them, please visit the following URLs:
 
 -  Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-We chat at https://gitter.im/ged-lab/khmer and the maintainers can be
+We chat at https://gitter.im/dib-lab/khmer and the maintainers can be
 contacted at khmer-project@idyll.org.
 
 For getting help with please see this guide: http://khmer.readthedocs.org/user/getting-help.html

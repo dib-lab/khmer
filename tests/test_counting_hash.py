@@ -1,11 +1,14 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,protected-access
 import gzip
+
+import os
+import shutil
 
 import khmer
 import khmer_tst_utils as utils
@@ -14,6 +17,8 @@ import screed
 
 import nose
 from nose.plugins.attrib import attr
+
+from tests.test_scripts import scriptpath
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
@@ -1071,3 +1076,43 @@ def test_find_all_tags_list_error():
         assert False, "a ValueError should be raised for incorrect k-mer size"
     except ValueError:
         pass
+
+
+def test_abund_dist_gz_bigcount():
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    outfile = utils.get_temp_filename('test_ct.gz')
+    script = scriptpath('load-into-counting.py')
+    htfile = utils.get_temp_filename('test_ct')
+    args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
+    utils.runscript(script, args)  # create a bigcount table
+    assert os.path.exists(htfile)
+    data = open(htfile, 'rb').read()
+    f_out = gzip.open(outfile, 'wb')  # compress the created bigcount table
+    f_out.write(data)
+    f_out.close()
+    # load the compressed bigcount table
+    counting_hash = khmer.load_counting_hash(outfile)
+    hashsizes = counting_hash.hashsizes()
+    kmer_size = counting_hash.ksize()
+    tracking = khmer._Hashbits(kmer_size, hashsizes)
+    abundances = counting_hash.abundance_distribution(infile, tracking)
+    # calculate abundance distribution for compressed bigcount table
+    flag = False
+    # check if abundance is > 255
+    # if ok  gzipped bigcount was loaded correctly
+    for _, i in enumerate(abundances):
+        print _, i
+        if _ > 255 and i > 0:
+            flag = True
+            break
+    assert flag
+
+
+def test_counting_load_bigcount():
+    count_table = khmer.new_counting_hash(10, 1e5, 4)
+    count_table.set_use_bigcount(True)
+    for i in range(500):
+        print i, count_table.count('ATATATATAT')
+    count = count_table.get('ATATATATAT')
+    assert count == 500

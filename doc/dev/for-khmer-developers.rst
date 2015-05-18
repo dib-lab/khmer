@@ -1,11 +1,11 @@
 A guide for khmer committers
 ============================
 
-This document is for people with commit rights to github.com/ged-lab/khmer.
+This document is for people with commit rights to github.com/dib-lab/khmer.
 
 ----
 
-If you have commit privileges to the ged-lab/khmer repository, here are a
+If you have commit privileges to the dib-lab/khmer repository, here are a
 few useful tips.
 
 First, never merge something unless it's been through a review!  This
