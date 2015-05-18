@@ -1,5 +1,5 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
@@ -4214,6 +4214,7 @@ static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
                                    (aln->truncated)? Py_True : Py_False,
                                    x);
     delete aln;
+    Py_DECREF(x);
 
     return ret;
 }

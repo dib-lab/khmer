@@ -193,7 +193,7 @@ htmlhelp_basename = 'khmerdoc'
 html_context = {
    "google_analytics_id" : 'UA-51731094-1',
    "disqus_shortname" : 'khmer-docs',
-#   "github_base_account" : 'ged-lab',
+#   "github_base_account" : 'dib-lab',
    "github_project" : 'khmer',
 }
 

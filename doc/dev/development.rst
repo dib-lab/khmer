@@ -23,11 +23,11 @@ git and GitHub strategies
 Still in the works, but read `this
 <http://scottchacon.com/2011/08/31/github-flow.html>`__.
 
-Make a branch on ged-lab (preferred so others can contribute) or fork the
+Make a branch on dib-lab (preferred so others can contribute) or fork the
 repository and make a branch there.
 
 Each piece or fix you are working on should have its own branch; make a pull-
-request to ged-lab/master to aid in code review, testing, and feedback.
+request to dib-lab/master to aid in code review, testing, and feedback.
 
 If you want your code integrated then it needs to be mergable
 
@@ -38,7 +38,7 @@ Example pull request update using the command line:
  #. Checkout the source branch of the pull request
      ``git checkout my-pull-request``
  #. Pull in the destination of the pull request and resolve any conflicts
-     ``git pull git@github.com:ged-lab/khmer.git master``
+     ``git pull git@github.com:dib-lab/khmer.git master``
  #. Push your update to the source of the pull request ``git push``
  #. Jenkins will automatically attempt to build and test your pull requests.
 
