@@ -24,6 +24,8 @@ import os
 import khmer
 import textwrap
 from itertools import izip
+from contextlib import contextmanager
+
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -126,6 +128,22 @@ def handle_error(error, output_name, input_name, fail_save, htable):
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
+@contextmanager
+def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, dicarded, jedi):
+    try:
+        yield
+    except IOError as err:
+        handle_error(err, ofile, ifile, save_on_fail,
+                     ht)
+        if not jedi:
+            print >> sys.stderr, '** Exiting!'
+
+            sys.exit(1)
+        else:
+            print >> sys.stderr, '*** Skipping error file, moving on...'
+            corrupted.append(ifile)
+
+
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
                                   fail_save, paired, cutoff, force,
                                   corrupt_files, report_fp=None):
@@ -146,23 +164,16 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    try:
+    with FailSafe(input_filename, outfp, fail_save, htable, corrupt_files,
+                  total, discarded, force):
+
         total_acc, discarded_acc = normalize_by_median(
             input_filename, outfp, htable, paired, cutoff, report_fp=None)
-    except IOError as err:
-        handle_error(err, output_name, input_filename, fail_save,
-                     htable)
-        if not force:
-            print >> sys.stderr, '** Exiting!'
 
-            sys.exit(1)
-        else:
-            print >> sys.stderr, '*** Skipping error file, moving on...'
-            corrupt_files.append(input_filename)
-    else:
         if total_acc == 0 and discarded_acc == 0:
             print >> sys.stderr, 'SKIPPED empty file', input_filename
-        else:
+        elif total_acc is not None and discarded_acc is not None:
+            # will be none if the context manager caught an error
             total += total_acc
             discarded += discarded_acc
             print >> sys.stderr, \
@@ -170,7 +181,7 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
                 .format(inp=input_filename, kept=total - discarded,
                         total=total, perc=int(100. - discarded /
                                               float(total) * 100.))
-            print >> sys.stderr, 'output in', output_name
+            print >> sys.stderr, 'output in', outfp
 
     return total_acc, discarded_acc, corrupt_files
 
