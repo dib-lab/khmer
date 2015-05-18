@@ -92,7 +92,7 @@ def main():
         for record in screed.open(filename):
             seq = record.sequence.upper()
             if 'N' in seq:
-                seq = seq.replace('N', 'G')
+                seq = seq.replace('N', 'A')
 
             try:
                 med, _, _ = htable.get_median_count(seq)
