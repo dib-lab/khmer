@@ -79,6 +79,8 @@ class CountingHash : public khmer::Hashtable
     friend class CountingHashFileWriter;
     friend class CountingHashGzFileReader;
     friend class CountingHashGzFileWriter;
+    friend class CountingHashZstdFileReader;
+    friend class CountingHashZstdFileWriter;
 
 protected:
     bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
@@ -341,8 +343,24 @@ public:
     CountingHashGzFileWriter(const std::string &outfilename,
                              const CountingHash &ht);
 };
-}
 
+static const std::string zstd_magic = "Zstd\1";
+
+class CountingHashZstdFileReader : public CountingHashFile
+{
+public:
+    CountingHashZstdFileReader(const std::string &infilename,
+                               CountingHash &ht);
+};
+
+class CountingHashZstdFileWriter : public CountingHashFile
+{
+public:
+    CountingHashZstdFileWriter(const std::string &outfilename,
+                             const CountingHash &ht);
+};
+
+};
 #endif // COUNTING_HH
 
 // vim: set sts=2 sw=2:

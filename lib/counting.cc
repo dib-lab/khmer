@@ -48,6 +48,11 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "zlib.h"
+#include "zstd.h"
+#include <math.h>
+#include <algorithm>
+#include <sstream>
+#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -457,6 +462,8 @@ void CountingHashFile::load(
 
     if (type == "gz") {
         CountingHashGzFileReader(filename, ht);
+    } else if (type == "zstd") {
+        CountingHashZstdFileReader(filename, ht);
     } else {
         CountingHashFileReader(filename, ht);
     }
@@ -473,6 +480,8 @@ void CountingHashFile::save(
 
     if (type == "gz") {
         CountingHashGzFileWriter(filename, ht);
+    } else if (type == "zstd") {
+        CountingHashZstdFileWriter(filename, ht);
     } else {
         CountingHashFileWriter(filename, ht);
     }
@@ -780,6 +789,201 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     gzclose(infile);
 }
+
+CountingHashZstdFileReader::CountingHashZstdFileReader(
+    const std::string   &infilename,
+    CountingHash    &ht)
+{
+    ifstream infile;
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+        infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!infile.is_open()) {
+            err = "Cannot open k-mer count file: " + infilename;
+        } else {
+            err = "Unknown error in opening file: " + infilename;
+        }
+        throw khmer_file_exception(err + " " + strerror(errno));
+    }
+
+    if (ht._counts) {
+        for (unsigned int i = 0; i < ht._n_tables; i++) {
+            delete[] ht._counts[i];
+            ht._counts[i] = NULL;
+        }
+        delete[] ht._counts;
+        ht._counts = NULL;
+    }
+    ht._tablesizes.clear();
+
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        size_t zipped_tabsize = 0; // Compressed legnth
+        unsigned char version = 0, ht_type = 0, use_bigcount = 0;
+        char file_zstd_magic[6] = "";
+
+        infile.read((char *) file_zstd_magic, zstd_magic.size());
+        if (file_zstd_magic != zstd_magic) {
+            throw khmer_file_exception(
+                    "Invalid zstd-compressed counting hash");
+        }
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str());
+        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw khmer_file_exception(err.str());
+        }
+
+        infile.read((char *) &use_bigcount, 1);
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+
+        ht._ksize = (WordLength) save_ksize;
+        ht._n_tables = (unsigned int) save_n_tables;
+        ht._init_bitstuff();
+
+        ht._use_bigcount = use_bigcount;
+
+        ht._counts = new Byte*[ht._n_tables];
+        for (unsigned int i = 0; i < ht._n_tables; i++) {
+            ht._counts[i] = NULL;
+        }
+
+        for (unsigned int i = 0; i < ht._n_tables; i++) {
+            HashIntoType tablesize;
+            char *z_buffer = NULL;
+            size_t zip_res = 0;
+
+            infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+            infile.read((char *) &zipped_tabsize, sizeof(zipped_tabsize));
+
+            tablesize = (HashIntoType) save_tablesize;
+            ht._tablesizes.push_back(tablesize);
+
+            ht._counts[i] = new Byte[tablesize];
+            z_buffer = new char[zipped_tabsize];
+            unsigned long long loaded = 0;
+            while (loaded != zipped_tabsize) {
+                infile.read((char *) z_buffer, zipped_tabsize - loaded);
+                loaded += infile.gcount();
+            }
+            zip_res = ZSTD_decompress((void *) ht._counts[i], tablesize,
+                                      (void *) z_buffer, zipped_tabsize);
+            if (ZSTD_isError(zip_res)) {
+                std::string msg = "Couldn't decompress counting hash: ";
+                msg += ZSTD_getErrorName(zip_res);
+                throw khmer_file_exception(msg);
+            }
+        }
+
+        HashIntoType n_counts = 0;
+        infile.read((char *) &n_counts, sizeof(n_counts));
+
+        if (n_counts) {
+            ht._bigcounts.clear();
+
+            HashIntoType kmer;
+            BoundedCounterType count;
+
+            for (HashIntoType n = 0; n < n_counts; n++) {
+                infile.read((char *) &kmer, sizeof(kmer));
+                infile.read((char *) &count, sizeof(count));
+                ht._bigcounts[kmer] = count;
+            }
+        }
+
+        infile.close();
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (infile.eof()) {
+            err = "Unexpected end of k-mer count file: " + infilename;
+        } else {
+            err = "Error reading from k-mer count file: " + infilename + " "
+                  + strerror(errno);
+        }
+        throw khmer_file_exception(err);
+    }
+}
+
+CountingHashZstdFileWriter::CountingHashZstdFileWriter(
+    const std::string   &outfilename,
+    const CountingHash  &ht)
+{
+    if (!ht._counts[0]) {
+        throw khmer_exception();
+    }
+
+    unsigned int save_ksize = ht._ksize;
+    unsigned char save_n_tables = ht._n_tables;
+    unsigned long long save_tablesize;
+
+    ofstream outfile(outfilename.c_str(), ios::binary);
+
+    outfile.write(zstd_magic.c_str(), zstd_magic.size());
+    unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write((const char *) &version, 1);
+
+    unsigned char ht_type = SAVED_COUNTING_HT;
+    outfile.write((const char *) &ht_type, 1);
+
+    unsigned char use_bigcount = 0;
+    if (ht._use_bigcount) {
+        use_bigcount = 1;
+    }
+    outfile.write((const char *) &use_bigcount, 1);
+
+    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+    outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
+
+    for (unsigned int i = 0; i < save_n_tables; i++) {
+        size_t zip_res = 0;
+        save_tablesize = ht._tablesizes[i];
+        char *z_buffer = new char[save_tablesize];
+
+        zip_res = ZSTD_compress((void *) z_buffer, save_tablesize,
+                                (void *) ht._counts[i], save_tablesize);
+        if (ZSTD_isError(zip_res)) {
+            std::string msg = "Couldn't compress counting hash: ";
+            msg += ZSTD_getErrorName(zip_res);
+            throw khmer_file_exception(msg);
+        }
+        outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
+        outfile.write((const char *) &zip_res, sizeof(zip_res));
+        outfile.write((const char *) z_buffer, zip_res);
+    }
+
+    HashIntoType n_counts = ht._bigcounts.size();
+    outfile.write((const char *) &n_counts, sizeof(n_counts));
+
+    if (n_counts) {
+        KmerCountMap::const_iterator it = ht._bigcounts.begin();
+
+        for (; it != ht._bigcounts.end(); ++it) {
+            outfile.write((const char *) &it->first, sizeof(it->first));
+            outfile.write((const char *) &it->second, sizeof(it->second));
+        }
+    }
+    if (outfile.fail()) {
+        throw khmer_file_exception(strerror(errno));
+    }
+    outfile.close();
+}
+
 
 CountingHashFileWriter::CountingHashFileWriter(
     const std::string   &outfilename,

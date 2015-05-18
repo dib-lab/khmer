@@ -661,6 +661,28 @@ def test_save_load_gz():
     assert sum(x) == 3966, sum(x)
     assert x == y, (x, y)
 
+def test_save_load_zstd():
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('tempcountingsave2.ht.zstd')
+
+    sizes = list(PRIMES_1m)
+    sizes.append(1000005)
+
+    hi = khmer.CountingHash(12, sizes)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    ht = khmer.CountingHash(12, sizes)
+    ht.load(savepath)
+
+    tracking = khmer._Hashbits(12, sizes)
+    x = hi.abundance_distribution(inpath, tracking)
+
+    tracking = khmer._Hashbits(12, sizes)
+    y = ht.abundance_distribution(inpath, tracking)
+
+    assert sum(x) == 3966, sum(x)
+    assert x == y, (x, y)
 
 def test_load_empty_files():
     def do_load_ct(fname):
