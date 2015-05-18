@@ -1,3 +1,8 @@
+2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
+
+   * tests/test_scripts.py: Test loading of compressed counting table
+   with bigcounts,and test abundance with bigcounts
+
 2015-05-18  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * all files: references to github.com/ged-lab changed to
