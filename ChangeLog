@@ -1,9 +1,21 @@
-2015-05-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+2015-05-18  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * all files: references to github.com/ged-lab changed to
    github.com/dib-lab. All GitHub URLs normalized to use HTTPS
    * README.rst: broken landscape.io badge removed
    * doc/user/known-issues.rst: removed two known issues fixed in v1.4 release
+
+2015-05-18  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
+   scripts/{count-median.py,filter-abund-single.py,filter-abund.py}: changed
+   sequence-reading behavior to replace 'N' with 'A', to be consistent with
+   rest of code base.
+   * scripts/{filter-abund.py,filter-abund-single.py}: changed behavior of
+   scripts to keep sequences with 'N's in them, and count them as 'A's.
+   * tests/test_scripts.py: added tests for new
+   filter-abund/filter-abund-single behavior.
+   * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
 
 2015-05-13  Scott Sievert  <sieve121@umn.edu>
 
