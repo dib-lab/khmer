@@ -912,9 +912,10 @@ hash_consume(khmer_KCountingHash_Object * me, PyObject * args)
                         "string length must >= the hashtable k-mer size");
         return NULL;
     }
-
+    std::string read(long_str);
+    bool is_valid;
     unsigned int n_consumed;
-    n_consumed = counting->consume_string(long_str);
+    n_consumed = counting->check_and_process_read(read, is_valid);
 
     return PyLong_FromLong(n_consumed);
 }

@@ -94,12 +94,12 @@ def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
             med, _, _ = htable.get_median_count(seq)
 
             if med < desired_coverage:
-                htable.consume(seq)
                 passed_filter = True
 
         # Emit records if any passed
         if passed_length and passed_filter:
             for record in batch:
+                htable.consume(record.sequence)
                 write_record(record, outfp)
         else:
             discarded += batch_size
