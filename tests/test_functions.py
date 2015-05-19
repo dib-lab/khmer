@@ -133,6 +133,24 @@ def test_check_file_status_kfile_force():
     except OSError as e:
         assert False
 
+def _do_check_input_file_zipped(filename):
+    check_file_status_exited = False
+    try:
+        check_input_files(filename, False)
+    except SystemExit:
+        check_file_status_exited = True
+    assert check_file_status_exited
+
+def test_check_input_files_zipped():
+    # check non-existant zipped files
+    for ext in ['.gz', '.bz2']:
+        fn = utils.get_temp_filename('thisfiledoesnotexist' + ext)
+        _do_check_input_file_zipped(fn)
+    # Check empty files, compressed or not
+    for ext in ['', '.gz', '.bz2']:
+        fn = utils.get_test_data('empty-file' + ext)
+        _do_check_input_file_zipped(fn)
+
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
 FakeFastaRead = collections.namedtuple('Read', ['name', 'sequence'])
