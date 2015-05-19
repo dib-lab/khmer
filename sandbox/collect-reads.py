@@ -1,6 +1,6 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
@@ -92,7 +92,7 @@ def main():
         for record in screed.open(filename):
             seq = record.sequence.upper()
             if 'N' in seq:
-                seq = seq.replace('N', 'G')
+                seq = seq.replace('N', 'A')
 
             try:
                 med, _, _ = htable.get_median_count(seq)

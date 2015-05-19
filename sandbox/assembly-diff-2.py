@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
@@ -27,14 +27,14 @@ def main():
     for n, record in enumerate(screed.open(filename1)):
         if n % 10000 == 0:
             print '...', filename1, n
-        seq = record.sequence.upper().replace('N', 'G')
+        seq = record.sequence.upper().replace('N', 'A')
         kh.consume(seq)
 
     path_n = 0
     for n, record in enumerate(screed.open(filename2)):
         if n % 10000 == 0:
             print '...', filename2, n
-        seq = record.sequence.upper().replace('N', 'G')
+        seq = record.sequence.upper().replace('N', 'A')
         paths = kh.extract_unique_paths(seq, UNIQUE_LEN, UNIQUE_F)
         kh.consume(seq)
 
