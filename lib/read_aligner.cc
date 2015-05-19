@@ -455,7 +455,7 @@ struct SearchStart {
 
 Alignment* ReadAligner::Align(const std::string& read)
 {
-    int k = m_ch->ksize();
+    WordLength k = m_ch->ksize();
     size_t num_kmers = read.length() - k + 1;
 
     SearchStart start;
@@ -543,8 +543,7 @@ Alignment* ReadAligner::Align(const std::string& read)
 
 Alignment* ReadAligner::AlignForward(const std::string& read)
 {
-    int k = m_ch->ksize();
-    size_t num_kmers = read.length() - k + 1;
+    WordLength k = m_ch->ksize();
 
     // start with seed at position 0
     SearchStart start;
@@ -575,7 +574,6 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     startingNode.f_score = 0;
     startingNode.h_score = 0;
     Alignment* forward = NULL;
-    Alignment* reverse = NULL;
     size_t final_length = 0;
 
     if(start.k_cov >= m_trusted_cutoff) {
@@ -597,7 +595,7 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
 
     ret->covs = forward->covs;
     ret->covs.insert(ret->covs.begin(), start.k_cov);
-    for (unsigned int i = 0; i < k - 1; i++) {
+    for (WordLength i = 0; i < k - 1; i++) {
         ret->covs.push_back(0);
     }
 

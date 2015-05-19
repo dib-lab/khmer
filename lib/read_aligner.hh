@@ -150,17 +150,14 @@ struct ScoringMatrix {
     const double untrusted_match;
     const double untrusted_mismatch;
 
-    double tsc[28];
+    const double* tsc;
 
     ScoringMatrix(double trusted_match, double trusted_mismatch,
                   double untrusted_match, double untrusted_mismatch,
                   double* trans)
         : trusted_match(trusted_match), trusted_mismatch(trusted_mismatch),
           untrusted_match(untrusted_match),
-          untrusted_mismatch(untrusted_mismatch)
-    {
-        memcpy(tsc, trans, 28 * sizeof(double));
-    }
+          untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
 };
 
 
