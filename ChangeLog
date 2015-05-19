@@ -1,3 +1,10 @@
+2015-05-19  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlified load_graph script, tests
+   * scripts/load-graph.py: replaced with oxlified version
+   * setup.py: added oxli module and entry point
+
 2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table
