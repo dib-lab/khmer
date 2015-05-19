@@ -175,7 +175,7 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.8'],
         # testing screed download link
@@ -184,6 +184,11 @@ SETUP_METADATA = \
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
+        "entry_points": {
+            'console_scripts': [
+                "oxli = oxli:main"
+            ]
+        },
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
