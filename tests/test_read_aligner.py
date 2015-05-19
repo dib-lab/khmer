@@ -543,13 +543,25 @@ def test_readalign_new():
 def test_readaligner_load():
     ct = khmer.new_counting_hash(32, 1048576, 1)
     parameters_json = utils.get_test_data('readaligner-default.json')
-    aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
-    assert aligner.get_scoring_matrix()[0] == -0.06642736173897607, (
-        aligner.get_scoring_matrix()[0])
-    assert aligner.get_transition_probabilities()[0][0] == \
-        -0.021973842014145723, aligner.get_transition_probabilities()[0][0]
+    a_aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
+    a_scoring_matrix = a_aligner.get_scoring_matrix()
+    a_transition_probabilities = a_aligner.get_transition_probabilities()
+    assert a_scoring_matrix[0] == -0.06642736173897607, a_scoring_matrix[0]
+    assert a_transition_probabilities[0][0] == -0.021973842014145723, (
+        a_transition_probabilities[0][0])
+
     for seq in ht_seqs:
         ct.consume(seq)
 
     for query in queries:
-        aligner.align(query['seq'])
+        a_aligner.align(query['seq'])
+
+    b_aligner = khmer.ReadAligner(
+        ct, 0, 0, transition_probabilities=a_transition_probabilities,
+        scoring_matrix=a_scoring_matrix)
+    b_scoring_matrix = b_aligner.get_scoring_matrix()
+    b_transition_probabilities = b_aligner.get_transition_probabilities()
+    assert b_scoring_matrix == a_scoring_matrix, (
+        a_scoring_matrix, b_scoring_matrix)
+    assert b_transition_probabilities == a_transition_probabilities, (
+        a_transition_probabilities, b_transition_probabilities)
