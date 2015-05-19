@@ -884,7 +884,18 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     unsigned long long  n_consumed  = 0;
     unsigned int    total_reads = 0;
     Py_BEGIN_ALLOW_THREADS
-    hashtable->consume_fasta(rparser, total_reads, n_consumed);
+    try {
+        hashtable->consume_fasta(rparser, total_reads, n_consumed);
+    } catch (StreamReadError &e) {
+        exc = e.what();
+        exc_raised = true;
+    } catch (InvalidRead &e) {
+        exc = e.what();
+        exc_raised = true;
+    } catch (_khmer_signal &e) {
+        exc = e.get_message().c_str();
+        exc_raised = true;
+    }
     Py_END_ALLOW_THREADS
 
     return Py_BuildValue("IK", total_reads, n_consumed);
