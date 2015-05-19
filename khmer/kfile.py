@@ -52,7 +52,7 @@ def check_input_files(file_path, force):
         file_size = os.stat(file_path).st_size
 
         if file_size == 0:
-            is_empty = True;
+            is_empty = True
         elif file_path.endswith('gz'):
             fh = gzip.open(file_path, 'rb')
             if fh.read(1) == '':

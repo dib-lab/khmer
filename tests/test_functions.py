@@ -133,6 +133,7 @@ def test_check_file_status_kfile_force():
     except OSError as e:
         assert False
 
+
 def _do_check_input_file_zipped(filename):
     check_file_status_exited = False
     try:
@@ -140,6 +141,7 @@ def _do_check_input_file_zipped(filename):
     except SystemExit:
         check_file_status_exited = True
     assert check_file_status_exited
+
 
 def test_check_input_files_zipped():
     # check non-existant zipped files
