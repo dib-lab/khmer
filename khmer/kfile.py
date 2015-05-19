@@ -11,6 +11,8 @@ import os
 import sys
 import errno
 from stat import S_ISBLK, S_ISFIFO
+import gzip
+import bz2file
 
 
 def check_input_files(file_path, force):
@@ -46,7 +48,21 @@ def check_input_files(file_path, force):
         if not force:
             sys.exit(1)
     else:
-        if os.stat(file_path).st_size == 0:
+        is_empty = False
+        file_size = os.stat(file_path).st_size
+
+        if file_size == 0:
+            is_empty = True;
+        elif file_path.endswith('gz'):
+            fh = gzip.open(file_path, 'rb')
+            if fh.read(1) == '':
+                is_empty = True
+        elif file_path.endswith('bz2'):
+            fh = bz2file.open(file_path, 'rb')
+            if fh.read(1) == '':
+                is_empty = True
+
+        if is_empty:
             print >>sys.stderr, "ERROR: Input file %s is empty; exiting." % \
                                 file_path
             if not force:
