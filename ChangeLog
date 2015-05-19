@@ -1,5 +1,11 @@
-2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
+2015-05-19  Kevin Murray  <spam@kdmurray.id.au>
 
+   * khmer/kfile.py: make check_input_files check content length of zipped
+   files.
+   * tests/test_functions.py,tests/test-data/empty-file*: Add test of zero
+   content length zipped files.
+
+2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
    * tests/test_scripts.py: Test loading of compressed counting table
    with bigcounts,and test abundance with bigcounts
 
