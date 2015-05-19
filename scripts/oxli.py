@@ -12,7 +12,7 @@ Single entry point script for khmer
 
 import argparse
 import textwrap
-from oxli import build_graph
+from oxli import build_graph, common
 
 
 def get_parser():
@@ -27,11 +27,12 @@ def get_parser():
     subparsers = parser.add_subparsers()
 
     # build-graph (formerly load-graph) parsers here
-    parser_build_graph = subparsers.add_parser('build_graph',
-                                               help="Load sequences into the compressible graph "
-                                               "format plus optional tagset",
-                                               description="Load sequences into the compressible "
-                                               "graph format plus optional tagset")
+    parser_build_graph = \
+            subparsers.add_parser('build_graph',
+                help="Load sequences into the compressible graph format plus "
+                "optional tagset",
+                description="Load sequences into the compressible graph format"
+                "plus optional tagset")
 
     common.add_hashbits_args(parser_build_graph)
     build_graph.add_args(parser_build_graph)
@@ -39,14 +40,9 @@ def get_parser():
 
     return parser
 
-
 def execute_build_graph(args):
-    """
-    oxli build_graph arg handling function
-    """
-    ifiles = []
-    for element in args.input_filenames:
-        ifiles.append(element)
+    build_graph.main(args)
+    
 
 def main():
     """

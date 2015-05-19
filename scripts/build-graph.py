@@ -24,10 +24,15 @@ from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 from oxli import khmer_api, build_graph
-from build_graph import main, build_parser
 
+def get_parser():
+    parser = build_hashbits_args(descr="Load-Graph called.")
+    parser = build_graph.build_parser(parser)
+    return parser
 
 if __name__ == '__main__':
-    main()
+    parser = get_parser()
+    args = parser.parse_args()
+    build_graph.main(args)
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

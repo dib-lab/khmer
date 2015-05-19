@@ -28,8 +28,6 @@ from oxli import common
 
 
 def build_parser(parser):
-    common.add_hashbits_args(parser)
-
     add_threading_args(parser)
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
@@ -48,11 +46,14 @@ def build_parser(parser):
     return parser
 
 
-def main():
+def main(args=None):
     info('load-graph.py', ['graph', 'SeqAn'])
-    args = get_parser().parse_args()
-    report_on_config(args, hashtype='hashbits')
+    
+    if args is None:
+        parser = build_hashbits_args(descr="This shouldn't happen...")
+        args = build_parser(parser).parse_args()
 
+    report_on_config(args, hashtype='hashbits')
     base = args.output_filename
     filenames = args.input_filenames
 
