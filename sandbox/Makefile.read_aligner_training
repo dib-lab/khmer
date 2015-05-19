@@ -6,6 +6,9 @@ N_HASHES= 4
 
 all: estimated_probabilities.${KSIZE}.json
 
+mockRefG.fa:
+	wget https://github.com/dib-lab/khmer-testdata/raw/master/mockRefG.fa
+
 %.fastq.gz:
 	wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR172/SRR172903/SRR172903.fastq.gz
 	wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR172/SRR172902/SRR172902.fastq.gz
@@ -13,7 +16,10 @@ all: estimated_probabilities.${KSIZE}.json
 combined_reads.ht: SRR172902.fastq.gz SRR172903.fastq.gz
 	python $(KHMER)/scripts/load-into-counting.py --ksize $(KSIZE) -x $(HASH_SIZE) -N $(N_HASHES) $@ $^
 
-combined_reads_mapping.bam: SRR172902.fastq.gz SRR172903.fastq.gz
+mockRefG.1.bt1: mockRefG.fa
+	bowtie2-build mockRefG.fa
+
+combined_reads_mapping.bam: SRR172902.fastq.gz SRR172903.fastq.gz mockRefG.1.bt1
 	bowtie2 -x mockRefG -U SRR172902.fastq.gz -U SRR172903.fastq.gz | samtools view -S -F4 -b - > combined_reads_mapping.bam
 
 estimated_probabilities.${KSIZE}.json: combined_reads.ht combined_reads_mapping.bam
