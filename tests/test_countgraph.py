@@ -681,7 +681,7 @@ def test_save_load_bigcount():
 
         assert loaded_ht.ksize() == 12
         assert loaded_ht.get(kmer) == 257
-        assert loaded_ht.get_use_bigcount() == True
+        assert loaded_ht.get_use_bigcount() is True
 
     for ext in ['', '.gz', '.zstd']:
         _do_cg_save_load_bigcount('temp_ht_' + ext)
@@ -711,13 +711,14 @@ def test_zstd_load_unzipped_table():
     err_msg = str(ar.exception)
     assert expected_err_msg in err_msg, err_msg
 
+
 def test_zstd_load_nonexistant():
     """test loading a nonexistant table with .zstd extension"""
     zstd_path = utils.get_temp_filename("doesntexist.kh.zstd")
 
     expected_err_msg = "Cannot open k-mer count file"
 
-    with assert_raises(IOError) as ar:
+    with assert_raises(OSError) as ar:
         khmer.load_counting_hash(zstd_path)
     err_msg = str(ar.exception)
     assert expected_err_msg in err_msg, err_msg
