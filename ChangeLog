@@ -1,3 +1,10 @@
+2015-05-20  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlified load_graph script, tests
+   * scripts/load-graph.py: replaced with oxlified version
+   * setup.py: added oxli module and entry point
+
 2015-05-20  Kevin Murray  <spam@kdmurray.id.au>
 
    * .gitignore: Add htmlcov/ and diff-cover.html to gitignore
