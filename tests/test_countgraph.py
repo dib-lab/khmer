@@ -712,6 +712,48 @@ def test_zstd_load_unzipped_table():
     assert expected_err_msg in err_msg, err_msg
 
 
+def test_load_zstd_bad_files():
+    """Test loading a zstd-compressed CountingHash w/ bad files"""
+    bad_files = [
+        ('badversion.kh.zstd', 'Incorrect file format version'),
+        ('badtype.kh.zstd', 'Incorrect file format type'),
+    ]
+
+    for fname, expected_err_msg in bad_files:
+        inpath = utils.get_test_data(fname)
+
+        # Check that a sane error is raised
+        with assert_raises(IOError) as ar:
+            khmer.load_counting_hash(inpath)
+        err_msg = str(ar.exception)
+        assert expected_err_msg in err_msg, err_msg
+
+
+def test_zstd_load_truncated_table():
+    """Test loading a truncated zstd-compressed CountingHash"""
+    inpath = utils.get_test_data('random-20-a.fa')
+    orig_path = utils.get_temp_filename("test.kh.zstd")
+    trunc_path = utils.get_temp_filename("trunc.kh.zstd")
+
+    # Make a zstd-compressed hash table
+    orig_ht = khmer.CountingHash(12, PRIMES_1m)
+    orig_ht.consume_fasta(inpath)
+    orig_ht.save(orig_path)
+    del orig_ht
+
+    # truncate the hash table
+    with open(orig_path, 'rb') as orig, open(trunc_path, 'wb') as trunc:
+        # write header + a bit
+        trunc.write(orig.read(128))
+
+    # Check that a sane error is raised
+    expected_err_msg = "Unexpected end of k-mer count file"
+    with assert_raises(IOError) as ar:
+        khmer.load_counting_hash(trunc_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
+
+
 def test_zstd_load_nonexistant():
     """test loading a nonexistant table with .zstd extension"""
     zstd_path = utils.get_temp_filename("doesntexist.kh.zstd")
