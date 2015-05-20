@@ -711,6 +711,17 @@ def test_zstd_load_unzipped_table():
     err_msg = str(ar.exception)
     assert expected_err_msg in err_msg, err_msg
 
+def test_zstd_load_nonexistant():
+    """test loading a nonexistant table with .zstd extension"""
+    zstd_path = utils.get_temp_filename("doesntexist.kh.zstd")
+
+    expected_err_msg = "Cannot open k-mer count file"
+
+    with assert_raises(IOError) as ar:
+        khmer.load_counting_hash(zstd_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
+
 
 def test_load_empty_files():
     def do_load_ct(fname):
