@@ -178,7 +178,8 @@ coverage-report: .coverage
 
 coverage-gcovr.xml: coverage-debug .coverage
 	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
-          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*'
+          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*' \
+	  --exclude-unreachable-branches
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
@@ -280,5 +281,8 @@ convert-release-notes:
 	for file in doc/release-notes/*.md; do \
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
+
+list-authors:
+	git log --format='\author[]{%aN}' | sort -uk2 | less
 
 FORCE:
