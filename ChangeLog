@@ -1,3 +1,9 @@
+2015-05-20  Kevin Murray  <spam@kdmurray.id.au>
+
+   * .gitignore: Add htmlcov/ and diff-cover.html to gitignore
+   * Makefile: Use rm -f to remove files to quash error messages on
+   non-existant files
+
 2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table
