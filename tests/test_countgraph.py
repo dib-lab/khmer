@@ -635,54 +635,82 @@ def test_load_gz():
     assert x == y, (x, y)
 
 
-def test_save_load_gz():
-    inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
+def test_counting_hash_consume_save_load_abund():
+    """Test cycle of consume, save, load, abundance-dist with (un)zipped HT"""
 
-    sizes = list(PRIMES_1m)
-    sizes.append(1000005)
+    def _do_c_h_consume_save_load_abund(outfile, infile='random-20-a.fa',
+                                        expected_sum=3966):
+        inpath = utils.get_test_data(infile)
+        savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
 
-    hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
-    hi.save(savepath)
+        orig_ht = khmer._CountingHash(12, PRIMES_1m)
+        orig_ht.consume_fasta(inpath)
+        orig_ht.save(savepath)
 
-    ht = khmer._Countgraph(12, sizes)
-    try:
-        ht.load(savepath)
-    except OSError as err:
-        assert 0, 'Should not produce an OSError: ' + str(err)
+        loaded_ht = khmer.load_counting_hash(savepath)
+        tracking = khmer._Hashbits(12, PRIMES_1m)
+        orig = orig_ht.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._Nodegraph(12, sizes)
-    x = hi.abundance_distribution(inpath, tracking)
+        tracking = khmer._Hashbits(12, PRIMES_1m)
+        loaded = loaded_ht.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._Nodegraph(12, sizes)
-    y = ht.abundance_distribution(inpath, tracking)
+        assert sum(orig) == expected_sum, sum(orig)
+        assert orig == loaded, (orig, loaded)
 
-    assert sum(x) == 3966, sum(x)
-    assert x == y, (x, y)
+    for ext in ['', '.gz', '.zstd']:
+        _do_c_h_consume_save_load_abund('temp_ht_' + ext)
 
-def test_save_load_zstd():
-    inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('tempcountingsave2.ht.zstd')
 
-    sizes = list(PRIMES_1m)
-    sizes.append(1000005)
+def test_save_load_bigcount():
+    """Test a save, load cycle of CountingHash with bigcounts & all zip
+    formats"""
 
-    hi = khmer.CountingHash(12, sizes)
-    hi.consume_fasta(inpath)
-    hi.save(savepath)
+    def _do_cg_save_load_bigcount(outfile):
+        savepath = utils.get_temp_filename(outfile)
 
-    ht = khmer.CountingHash(12, sizes)
-    ht.load(savepath)
+        kmer = 'ATATATATATAT'
 
-    tracking = khmer._Hashbits(12, sizes)
-    x = hi.abundance_distribution(inpath, tracking)
+        orig_ht = khmer.CountingHash(12, 10000, 1)
+        orig_ht.set_use_bigcount(True)
+        for _ in range(257):
+            orig_ht.count(kmer)
+        orig_ht.save(savepath)
+        del orig_ht
 
-    tracking = khmer._Hashbits(12, sizes)
-    y = ht.abundance_distribution(inpath, tracking)
+        loaded_ht = khmer.load_counting_hash(savepath)
 
-    assert sum(x) == 3966, sum(x)
-    assert x == y, (x, y)
+        assert loaded_ht.ksize() == 12
+        assert loaded_ht.get(kmer) == 257
+        assert loaded_ht.get_use_bigcount() == True
+
+    for ext in ['', '.gz', '.zstd']:
+        _do_cg_save_load_bigcount('temp_ht_' + ext)
+
+
+def test_zstd_save_tiny_table():
+    """test zstd save with tiny table created"""
+    savepath = utils.get_temp_filename("test.kh.zstd")
+
+    ht = khmer.CountingHash(1, 10, 1)
+    with assert_raises(OSError) as ar:
+        ht.save(savepath)
+    assert "ZSTD_ERROR" in str(ar.exception), str(ar.exception)
+
+
+def test_zstd_load_unzipped_table():
+    """test loading a normal table with .zstd extension"""
+    normal_path = utils.get_test_data("normC20k20.ct")
+    zstd_path = utils.get_temp_filename("test.kh.zstd")
+
+    shutil.copyfile(normal_path, zstd_path)
+
+    expected_err_msg = "Invalid zstd-compressed counting hash"
+
+    with assert_raises(OSError) as ar:
+        khmer.load_counting_hash(zstd_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
+
 
 def test_load_empty_files():
     def do_load_ct(fname):
