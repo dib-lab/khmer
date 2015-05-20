@@ -20,6 +20,8 @@ doc/_build
 coverage.xml
 coverage-gcovr.xml
 coverage-debug
+htmlcov/
+diff-cover.html
 khmer-cov.tgz
 cppcheck-result.xml
 MANIFEST

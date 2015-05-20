@@ -63,11 +63,12 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so || true
-	rm khmer/*.pyc lib/*.pyc || true
+	rm -f khmer/_khmermodule.so
+	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
-	rm coverage-debug || true
-	rm -Rf .coverage || true
+	rm -f coverage-debug
+	rm -Rf .coverage
+	rm -f diff-cover.html
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
