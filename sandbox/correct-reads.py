@@ -60,7 +60,7 @@ def fix_quality(record):
 
 def get_parser():
     epilog = """
-    The output is one file for each input file, <input file>.abundtrim, placed
+    The output is one file for each input file, <input file>.corr, placed
     in the current directory.  This output contains the input sequences,
     corrected at low-abundance k-mers.
 
@@ -97,8 +97,7 @@ def get_parser():
 
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         default=False,
-                        help='Only trim low-abundance k-mers from sequences '
-                        'that have high coverage.')
+                        help='Only correct sequences that have high coverage.')
 
     add_loadhash_args(parser)
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
@@ -338,7 +337,7 @@ def main():
     print >>sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
-    print >>sys.stderr, 'output in *.abundtrim'
+    print >>sys.stderr, 'output in *.corr'
 
     if args.savetable:
         print >>sys.stderr, "Saving k-mer counting table to", args.savetable
