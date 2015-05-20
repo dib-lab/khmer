@@ -689,7 +689,7 @@ def test_save_load_bigcount():
 
 def test_zstd_save_tiny_table():
     """test zstd save with tiny table created"""
-    savepath = utils.get_temp_filename("test.kh.zstd")
+    savepath = utils.get_temp_filename("test.ct.zstd")
 
     ht = khmer.CountingHash(1, 10, 1)
     with assert_raises(OSError) as ar:
@@ -700,7 +700,7 @@ def test_zstd_save_tiny_table():
 def test_zstd_load_unzipped_table():
     """test loading a normal table with .zstd extension"""
     normal_path = utils.get_test_data("normC20k20.ct")
-    zstd_path = utils.get_temp_filename("test.kh.zstd")
+    zstd_path = utils.get_temp_filename("test.ct.zstd")
 
     shutil.copyfile(normal_path, zstd_path)
 
@@ -715,8 +715,8 @@ def test_zstd_load_unzipped_table():
 def test_load_zstd_bad_files():
     """Test loading a zstd-compressed CountingHash w/ bad files"""
     bad_files = [
-        ('badversion.kh.zstd', 'Incorrect file format version'),
-        ('badtype.kh.zstd', 'Incorrect file format type'),
+        ('badversion.ct.zstd', 'Incorrect file format version'),
+        ('badtype.ct.zstd', 'Incorrect file format type'),
     ]
 
     for fname, expected_err_msg in bad_files:
@@ -732,8 +732,8 @@ def test_load_zstd_bad_files():
 def test_zstd_load_truncated_table():
     """Test loading a truncated zstd-compressed CountingHash"""
     inpath = utils.get_test_data('random-20-a.fa')
-    orig_path = utils.get_temp_filename("test.kh.zstd")
-    trunc_path = utils.get_temp_filename("trunc.kh.zstd")
+    orig_path = utils.get_temp_filename("test.ct.zstd")
+    trunc_path = utils.get_temp_filename("trunc.ct.zstd")
 
     # Make a zstd-compressed hash table
     orig_ht = khmer.CountingHash(12, PRIMES_1m)
@@ -756,7 +756,7 @@ def test_zstd_load_truncated_table():
 
 def test_zstd_load_nonexistant():
     """test loading a nonexistant table with .zstd extension"""
-    zstd_path = utils.get_temp_filename("doesntexist.kh.zstd")
+    zstd_path = utils.get_temp_filename("doesntexist.ct.zstd")
 
     expected_err_msg = "Cannot open k-mer count file"
 
