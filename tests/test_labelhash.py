@@ -32,6 +32,7 @@ def test_toobig():
 
 
 def test_n_labels():
+    #hb = khmer.Hashbits(20, 1e7, 4)
     lh = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_fasta_and_tag_with_labels(filename)
@@ -71,14 +72,14 @@ def test_consume_fasta_and_tag_with_labels():
 
     total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
     print "doing get"
-    assert lb.get(read_1[:20])
+    assert lb.hashbits.get(read_1[:20])
     assert total_reads == 3
     print "doing n_labels"
     print lb.n_labels()
     print "doing label dict"
     print lb.get_label_dict()
     print "get tagset"
-    for tag in lb.get_tagset():
+    for tag in lb.hashbits.get_tagset():
         print "forward hash"
         print tag, khmer.forward_hash(tag, 20)
     for record in screed.open(filename):
@@ -122,7 +123,7 @@ def test_consume_sequence_and_tag_with_labels():
 def test_sweep_tag_neighborhood():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    lb.consume_fasta_and_tag(filename)
+    lb.hashbits.consume_fasta_and_tag(filename)
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
@@ -200,10 +201,10 @@ def test_label_tag_correctness():
 def test__get_set_tag_density():
     ht = khmer.LabelHash(32, 1, 1)
 
-    orig = ht._get_tag_density()
+    orig = ht.hashbits._get_tag_density()
     assert orig != 2
-    ht._set_tag_density(2)
-    assert ht._get_tag_density() == 2
+    ht.hashbits._set_tag_density(2)
+    assert ht.hashbits._get_tag_density() == 2
 
 
 def test_n_occupied_1():
@@ -217,10 +218,10 @@ def test_n_occupied_1():
     ht1 = khmer.LabelHash(K, HT_SIZE, N_HT)
 
     for n, record in enumerate(fasta_iter(open(filename))):
-        ht1.consume(record['sequence'])
+        ht1.hashbits.consume(record['sequence'])
 
     # this number calculated independently
-    assert ht1.n_occupied() == 3877
+    assert ht1.hashbits.n_occupied() == 3877
 
 
 def test_bloom_python_1():
@@ -239,13 +240,13 @@ def test_bloom_python_1():
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - K):
             kmer = sequence[n:n + K]
-            if (not ht2.get(kmer)):
+            if (not ht2.hashbits.get(kmer)):
                 n_unique += 1
-            ht2.count(kmer)
+            ht2.hashbits.count(kmer)
 
     assert n_unique == 3960
-    assert ht2.n_occupied() == 3882
-    assert ht2.n_unique_kmers() == 3960  # this number equals to n_unique
+    assert ht2.hashbits.n_occupied() == 3882
+    assert ht2.hashbits.n_unique_kmers() == 3960  # this number equals to n_unique
 
 
 def test_bloom_c_1():
@@ -260,10 +261,10 @@ def test_bloom_c_1():
     ht3 = khmer.LabelHash(K, HT_SIZE, N_HT)
 
     for n, record in enumerate(fasta_iter(open(filename))):
-        ht3.consume(record['sequence'])
+        ht3.hashbits.consume(record['sequence'])
 
-    assert ht3.n_occupied() == 3882
-    assert ht3.n_unique_kmers() == 3960
+    assert ht3.hashbits.n_occupied() == 3882
+    assert ht3.hashbits.n_unique_kmers() == 3960
 
 
 def test_n_occupied_2():  # simple one
@@ -272,17 +273,17 @@ def test_n_occupied_2():  # simple one
     N_HT = 1
 
     ht1 = khmer.LabelHash(K, HT_SIZE, N_HT)
-    ht1.count('AAAA')  # 00 00 00 00 = 0
-    assert ht1.n_occupied() == 1
+    ht1.hashbits.count('AAAA')  # 00 00 00 00 = 0
+    assert ht1.hashbits.n_occupied() == 1
 
-    ht1.count('ACTG')  # 00 10 01 11 =
-    assert ht1.n_occupied() == 2
+    ht1.hashbits.count('ACTG')  # 00 10 01 11 =
+    assert ht1.hashbits.n_occupied() == 2
 
-    ht1.count('AACG')  # 00 00 10 11 = 11  # collision 1
+    ht1.hashbits.count('AACG')  # 00 00 10 11 = 11  # collision 1
 
-    assert ht1.n_occupied() == 2
-    ht1.count('AGAC')   # 00  11 00 10 # collision 2
-    assert ht1.n_occupied() == 2
+    assert ht1.hashbits.n_occupied() == 2
+    ht1.hashbits.count('AGAC')   # 00  11 00 10 # collision 2
+    assert ht1.hashbits.n_occupied() == 2
 
 
 def test_bloom_c_2():  # simple one
@@ -293,26 +294,26 @@ def test_bloom_c_2():  # simple one
 
     # use only 1 hashtable, no bloom filter
     ht1 = khmer.LabelHash(K, HT_SIZE, N_HT1)
-    ht1.count('AAAA')  # 00 00 00 00 = 0
-    ht1.count('ACTG')  # 00 10 01 11 =
-    assert ht1.n_unique_kmers() == 2
-    ht1.count('AACG')  # 00 00 10 11 = 11  # collision  with 1st kmer
-    assert ht1.n_unique_kmers() == 2
-    ht1.count('AGAC')   # 00  11 00 10 # collision  with 2nd kmer
-    assert ht1.n_unique_kmers() == 2
+    ht1.hashbits.count('AAAA')  # 00 00 00 00 = 0
+    ht1.hashbits.count('ACTG')  # 00 10 01 11 =
+    assert ht1.hashbits.n_unique_kmers() == 2
+    ht1.hashbits.count('AACG')  # 00 00 10 11 = 11  # collision  with 1st kmer
+    assert ht1.hashbits.n_unique_kmers() == 2
+    ht1.hashbits.count('AGAC')   # 00  11 00 10 # collision  with 2nd kmer
+    assert ht1.hashbits.n_unique_kmers() == 2
 
     # use two hashtables with 11,13
     ht2 = khmer.LabelHash(K, HT_SIZE, N_HT2)
-    ht2.count('AAAA')  # 00 00 00 00 = 0
+    ht2.hashbits.count('AAAA')  # 00 00 00 00 = 0
 
-    ht2.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
-    assert ht2.n_unique_kmers() == 2
-    ht2.count('AACG')  # 00 00 10 11 = 11  # collision with only 1st kmer
-    assert ht2.n_unique_kmers() == 3
-    ht2.count('AGAC')   # 00  11 00 10  3*16 +2 = 50
+    ht2.hashbits.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
+    assert ht2.hashbits.n_unique_kmers() == 2
+    ht2.hashbits.count('AACG')  # 00 00 10 11 = 11  # collision with only 1st kmer
+    assert ht2.hashbits.n_unique_kmers() == 3
+    ht2.hashbits.count('AGAC')   # 00  11 00 10  3*16 +2 = 50
     # collision with both 2nd and 3rd kmers
 
-    assert ht2.n_unique_kmers() == 3
+    assert ht2.hashbits.n_unique_kmers() == 3
 
 
 def test_filter_if_present():
@@ -322,8 +323,8 @@ def test_filter_if_present():
     inputfile = utils.get_test_data('filter-test-B.fa')
     outfile = utils.get_temp_filename('filter')
 
-    ht.consume_fasta(maskfile)
-    ht.filter_if_present(inputfile, outfile)
+    ht.hashbits.consume_fasta(maskfile)
+    ht.hashbits.filter_if_present(inputfile, outfile)
 
     records = list(fasta_iter(open(outfile)))
     assert len(records) == 1
@@ -334,53 +335,53 @@ def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.LabelHash(32, 1, 1)
 
-    ht.consume_partitioned_fasta(inpfile)
-    assert ht.count_partitions() == (2, 0)
+    ht.hashbits.consume_partitioned_fasta(inpfile)
+    assert ht.hashbits.count_partitions() == (2, 0)
 
     s1 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
-    pid1 = ht.get_partition_id(s1)
+    pid1 = ht.hashbits.get_partition_id(s1)
 
     s2 = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
-    pid2 = ht.get_partition_id(s2)
+    pid2 = ht.hashbits.get_partition_id(s2)
 
     assert pid1 == 2
     assert pid2 == 80293
 
-    ht.join_partitions(pid1, pid2)
+    ht.hashbits.join_partitions(pid1, pid2)
 
-    pid1 = ht.get_partition_id(s1)
-    pid2 = ht.get_partition_id(s2)
+    pid1 = ht.hashbits.get_partition_id(s1)
+    pid2 = ht.hashbits.get_partition_id(s2)
 
     assert pid1 == pid2
-    assert ht.count_partitions() == (1, 0)
+    assert ht.hashbits.count_partitions() == (1, 0)
 
 
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.LabelHash(32, 1, 1)
 
-    ht.consume_partitioned_fasta(inpfile)
-    assert ht.count_partitions() == (2, 0)
+    ht.hashbits.consume_partitioned_fasta(inpfile)
+    assert ht.hashbits.count_partitions() == (2, 0)
 
     s1 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
-    assert ht.get(s1)
+    assert ht.hashbits.get(s1)
 
     s2 = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
-    assert ht.get(s2)
+    assert ht.hashbits.get(s2)
 
     s3 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGTTCCTGGTGGCTA"[-32:]
-    assert ht.get(s3)
+    assert ht.hashbits.get(s3)
 
 
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.LabelHash(4, 1e6, 2)
 
-    print ht.consume_fasta(inpfile)
-    n = ht.count_kmers_within_radius('AAAA', 1)
+    print ht.hashbits.consume_fasta(inpfile)
+    n = ht.hashbits.count_kmers_within_radius('AAAA', 1)
     assert n == 1
 
-    n = ht.count_kmers_within_radius('AAAA', 10)
+    n = ht.hashbits.count_kmers_within_radius('AAAA', 10)
     assert n == 1
 
 
@@ -388,25 +389,25 @@ def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     ht = khmer.LabelHash(20, 1e6, 4)
 
-    ht.consume_fasta(inpfile)
-    n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
+    ht.hashbits.consume_fasta(inpfile)
+    n = ht.hashbits.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
     assert n == 3960
 
     ht = khmer.LabelHash(21, 1e6, 4)
-    ht.consume_fasta(inpfile)
-    n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
+    ht.hashbits.consume_fasta(inpfile)
+    n = ht.hashbits.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
     assert n == 39
 
 
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.LabelHash(4, 1e6, 2)
-    ht.consume_fasta(inpfile)
+    ht.hashbits.consume_fasta(inpfile)
 
-    assert ht.kmer_degree('AAAA') == 2
-    assert ht.kmer_degree('AAAT') == 1
-    assert ht.kmer_degree('AATA') == 0
-    assert ht.kmer_degree('TAAA') == 1
+    assert ht.hashbits.kmer_degree('AAAA') == 2
+    assert ht.hashbits.kmer_degree('AAAT') == 1
+    assert ht.hashbits.kmer_degree('AATA') == 0
+    assert ht.hashbits.kmer_degree('TAAA') == 1
 
 
 def test_save_load_tagset():
@@ -414,13 +415,13 @@ def test_save_load_tagset():
 
     outfile = utils.get_temp_filename('tagset')
 
-    ht.add_tag('A' * 32)
-    ht.save_tagset(outfile)
+    ht.hashbits.add_tag('A' * 32)
+    ht.hashbits.save_tagset(outfile)
 
-    ht.add_tag('G' * 32)
+    ht.hashbits.add_tag('G' * 32)
 
-    ht.load_tagset(outfile)              # implicitly => clear_tags=True
-    ht.save_tagset(outfile)
+    ht.hashbits.load_tagset(outfile)              # implicitly => clear_tags=True
+    ht.hashbits.save_tagset(outfile)
 
     # if tags have been cleared, then the new tagfile will be larger (34 bytes)
     # else smaller (26 bytes).
@@ -436,13 +437,13 @@ def test_save_load_tagset_noclear():
 
     outfile = utils.get_temp_filename('tagset')
 
-    ht.add_tag('A' * 32)
-    ht.save_tagset(outfile)
+    ht.hashbits.add_tag('A' * 32)
+    ht.hashbits.save_tagset(outfile)
 
-    ht.add_tag('G' * 32)
+    ht.hashbits.add_tag('G' * 32)
 
-    ht.load_tagset(outfile, False)       # set clear_tags => False; zero tags
-    ht.save_tagset(outfile)
+    ht.hashbits.load_tagset(outfile, False)       # set clear_tags => False; zero tags
+    ht.hashbits.save_tagset(outfile)
 
     # if tags have been cleared, then the new tagfile will be large (34 bytes);
     # else small (26 bytes).
@@ -464,13 +465,13 @@ def test_stop_traverse():
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
-    ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
+    ht.hashbits.add_stop_tag('TTGCATACGTTGAGCCAGCG')
 
-    ht.consume_fasta_and_tag(filename)   # DO NOT join reads across stoptags
-    subset = ht.do_subset_partition(0, 0, True)
-    ht.merge_subset(subset)
+    ht.hashbits.consume_fasta_and_tag(filename)   # DO NOT join reads across stoptags
+    subset = ht.hashbits.do_subset_partition(0, 0, True)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()
+    n, _ = ht.hashbits.count_partitions()
     assert n == 2, n
 
 
@@ -485,20 +486,20 @@ def test_tag_across_stoptraverse():
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
-    ht.add_stop_tag('CCGAATATATAACAGCGACG')
+    ht.hashbits.add_stop_tag('CCGAATATATAACAGCGACG')
 
-    ht.consume_fasta_and_tag_with_stoptags(filename)  # DO join reads across
+    ht.hashbits.consume_fasta_and_tag_with_stoptags(filename)  # DO join reads across
 
-    subset = ht.do_subset_partition(0, 0)
-    n, _ = ht.count_partitions()
+    subset = ht.hashbits.do_subset_partition(0, 0)
+    n, _ = ht.hashbits.count_partitions()
     assert n == 99                       # reads only connected by traversal...
 
-    n, _ = ht.subset_count_partitions(subset)
+    n, _ = ht.hashbits.subset_count_partitions(subset)
     assert n == 2                        # but need main to cross stoptags.
 
-    ht.merge_subset(subset)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()         # ta-da!
+    n, _ = ht.hashbits.count_partitions()         # ta-da!
     assert n == 1, n
 
 
@@ -512,61 +513,61 @@ def test_notag_across_stoptraverse():
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
 
     # connecting k-mer at the beginning/end of a read: breaks up into two.
-    ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
+    ht.hashbits.add_stop_tag('TTGCATACGTTGAGCCAGCG')
 
-    ht.consume_fasta_and_tag_with_stoptags(filename)
+    ht.hashbits.consume_fasta_and_tag_with_stoptags(filename)
 
-    subset = ht.do_subset_partition(0, 0)
-    ht.merge_subset(subset)
+    subset = ht.hashbits.do_subset_partition(0, 0)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()
+    n, _ = ht.hashbits.count_partitions()
     assert n == 2, n
 
 
 def test_find_stoptags():
     ht = khmer.LabelHash(5, 1, 1)
-    ht.add_stop_tag("AAAAA")
+    ht.hashbits.add_stop_tag("AAAAA")
 
-    assert ht.identify_stoptags_by_position("AAAAA") == [0]
-    assert ht.identify_stoptags_by_position("AAAAAA") == [0, 1]
-    assert ht.identify_stoptags_by_position("TTTTT") == [0]
-    assert ht.identify_stoptags_by_position("TTTTTT") == [0, 1]
+    assert ht.hashbits.identify_stoptags_by_position("AAAAA") == [0]
+    assert ht.hashbits.identify_stoptags_by_position("AAAAAA") == [0, 1]
+    assert ht.hashbits.identify_stoptags_by_position("TTTTT") == [0]
+    assert ht.hashbits.identify_stoptags_by_position("TTTTTT") == [0, 1]
 
 
 def test_find_stoptags2():
     ht = khmer.LabelHash(4, 1, 1)
-    ht.add_stop_tag("ATGC")
+    ht.hashbits.add_stop_tag("ATGC")
 
-    x = ht.identify_stoptags_by_position("ATGCATGCGCAT")
+    x = ht.hashbits.identify_stoptags_by_position("ATGCATGCGCAT")
     assert x == [0, 2, 4, 8], x
 
 
 def test_get_ksize():
     kh = khmer.LabelHash(22, 1, 1)
-    assert kh.ksize() == 22
+    assert kh.hashbits.ksize() == 22
 
 
 def test_get_hashsizes():
     kh = khmer.LabelHash(22, 100, 4)
-    assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
+    assert kh.hashbits.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
 
 
 def test_extract_unique_paths_0():
     kh = khmer.LabelHash(10, 1e5, 4)
 
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGATG']
 
-    kh.consume('ATGGAGAGACACAGATAGACAGGAGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    kh.hashbits.consume('ATGGAGAGACACAGATAGACAGGAGTGGCGATG')
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     assert not x
 
 
 def test_extract_unique_paths_1():
     kh = khmer.LabelHash(10, 1e5, 4)
 
-    kh.consume('AGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    kh.hashbits.consume('AGTGGCGATG')
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     print x
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGAT']  # all but the last k-mer
 
@@ -574,8 +575,8 @@ def test_extract_unique_paths_1():
 def test_extract_unique_paths_2():
     kh = khmer.LabelHash(10, 1e5, 4)
 
-    kh.consume('ATGGAGAGAC')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    kh.hashbits.consume('ATGGAGAGAC')
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     print x
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGATG']  # all but the 1st k-mer
 
@@ -583,9 +584,9 @@ def test_extract_unique_paths_2():
 def test_extract_unique_paths_3():
     kh = khmer.LabelHash(10, 1e5, 4)
 
-    kh.consume('ATGGAGAGAC')
-    kh.consume('AGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    kh.hashbits.consume('ATGGAGAGAC')
+    kh.hashbits.consume('AGTGGCGATG')
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     print x
     # all but the 1st/last k-mer
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGAT']
@@ -594,12 +595,12 @@ def test_extract_unique_paths_3():
 def test_extract_unique_paths_4():
     kh = khmer.LabelHash(10, 1e5, 4)
 
-    kh.consume('ATGGAGAGAC')
-    kh.consume('AGTGGCGATG')
+    kh.hashbits.consume('ATGGAGAGAC')
+    kh.hashbits.consume('AGTGGCGATG')
 
-    kh.consume('ATAGACAGGA')
+    kh.hashbits.consume('ATAGACAGGA')
 
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+    x = kh.hashbits.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     print x
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
@@ -613,16 +614,16 @@ def test_find_unpart():
     N_HT = 3  # number of hashtables
 
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
-    ht.consume_fasta_and_tag(filename)
+    ht.hashbits.consume_fasta_and_tag(filename)
 
-    subset = ht.do_subset_partition(0, 0)
-    ht.merge_subset(subset)
+    subset = ht.hashbits.do_subset_partition(0, 0)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()
+    n, _ = ht.hashbits.count_partitions()
     assert n == 49
 
-    ht.find_unpart(filename2, True, False)
-    n, _ = ht.count_partitions()
+    ht.hashbits.find_unpart(filename2, True, False)
+    n, _ = ht.hashbits.count_partitions()
     assert n == 1, n                     # all sequences connect
 
 
@@ -635,16 +636,16 @@ def test_find_unpart_notraverse():
     N_HT = 3  # number of hashtables
 
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
-    ht.consume_fasta_and_tag(filename)
+    ht.hashbits.consume_fasta_and_tag(filename)
 
-    subset = ht.do_subset_partition(0, 0)
-    ht.merge_subset(subset)
+    subset = ht.hashbits.do_subset_partition(0, 0)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()
+    n, _ = ht.hashbits.count_partitions()
     assert n == 49
 
-    ht.find_unpart(filename2, False, False)     # <-- don't traverse
-    n, _ = ht.count_partitions()
+    ht.hashbits.find_unpart(filename2, False, False)     # <-- don't traverse
+    n, _ = ht.hashbits.count_partitions()
     assert n == 99, n                    # all sequences disconnected
 
 
@@ -657,30 +658,30 @@ def test_find_unpart_fail():
     N_HT = 3  # number of hashtables
 
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
-    ht.consume_fasta_and_tag(filename)
+    ht.hashbits.consume_fasta_and_tag(filename)
 
-    subset = ht.do_subset_partition(0, 0)
-    ht.merge_subset(subset)
+    subset = ht.hashbits.do_subset_partition(0, 0)
+    ht.hashbits.merge_subset(subset)
 
-    n, _ = ht.count_partitions()
+    n, _ = ht.hashbits.count_partitions()
     assert n == 49
 
-    ht.find_unpart(filename2, True, False)
-    n, _ = ht.count_partitions()
+    ht.hashbits.find_unpart(filename2, True, False)
+    n, _ = ht.hashbits.count_partitions()
     assert n == 49, n                    # only 49 sequences worth of tags
 
 
 def test_simple_median():
     hi = khmer.LabelHash(6, 1e6, 2)
 
-    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    (median, average, stddev) = hi.hashbits.get_median_count("AAAAAA")
     print median, average, stddev
     assert median == 0
     assert average == 0.0
     assert stddev == 0.0
 
-    hi.consume("AAAAAA")
-    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    hi.hashbits.consume("AAAAAA")
+    (median, average, stddev) = hi.hashbits.get_median_count("AAAAAA")
     print median, average, stddev
     assert median == 1
     assert average == 1.0
