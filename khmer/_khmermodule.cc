@@ -3754,15 +3754,25 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        khmer_KHashbits_Object * kho;
+        PyObject * hashtable_o;
+        khmer::Hashtable * hashtable = NULL;
 
-        if (!PyArg_ParseTuple(args, "O!", &khmer_KHashbits_Type, &kho)) {
+        if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
+        if (PyObject_TypeCheck(hashtable_o, &khmer_KHashbits_Type)) {
+          khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
+          hashtable = kho->hashbits;
+        }
+        else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountingHash_Type)) {
+          khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
+          hashtable = cho->counting;
+        }
+
         try {
-            self->labelhash = new LabelHash(kho->hashbits);
+          self->labelhash = new LabelHash(hashtable);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
