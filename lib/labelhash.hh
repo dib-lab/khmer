@@ -152,6 +152,9 @@ public:
     void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
                                      LabelPtrSet& found_labels);
 
+    void save_labels_and_tags(std::string);
+    void load_labels_and_tags(std::string);
+
 };
 };
 

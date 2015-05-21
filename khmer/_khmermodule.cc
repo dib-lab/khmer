@@ -4086,6 +4086,48 @@ labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
     return PyLong_FromSize_t(labelhash->n_labels());
 }
 
+static
+PyObject *
+labelhash_save_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->save_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+labelhash_load_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->load_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef khmer_labelhash_methods[] = {
     { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
@@ -4095,7 +4137,8 @@ static PyMethodDef khmer_labelhash_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
-    {NULL, NULL, 0, NULL}           /* sentinel */
+    { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
+    { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
 static PyTypeObject khmer_KLabelHash_Type = {

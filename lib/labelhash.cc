@@ -7,9 +7,15 @@
 
 #include "labelhash.hh"
 
+#include <sstream>
+#include <errno.h>
+
+#define IO_BUF_SIZE 250*1000*1000
+
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
+using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
@@ -336,4 +342,174 @@ LabelHash::~LabelHash()
             itr!=label_ptrs.end(); ++itr) {
         delete itr->second;
     }
+}
+
+
+// Save a partition map to disk.
+
+void LabelHash::save_labels_and_tags(std::string filename)
+{
+    ofstream outfile(filename.c_str(), ios::binary);
+
+    unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write((const char *) &version, 1);
+
+    unsigned char ht_type = SAVED_LABELSET;
+    outfile.write((const char *) &ht_type, 1);
+
+    unsigned int save_ksize = _ht->ksize();
+    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+
+    ///
+
+    char * buf = NULL;
+    buf = new char[IO_BUF_SIZE];
+    unsigned int n_bytes = 0;
+
+    // For each tag in the partition map, save the tag and the associated
+    // partition ID.
+
+    LabelPtrMap::const_iterator pi = label_ptrs.begin();
+    for (; pi != label_ptrs.end(); ++pi) {
+      //      HashIntoType k = pi->first; // unsigned long long int
+      Label * l = pi->second; // unsigned long long int;
+
+      HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
+      *k_p = pi->first;
+      n_bytes += sizeof(HashIntoType);
+
+      Label * l_p = (Label *) (buf + n_bytes);
+      *l_p = *(pi->second);
+      n_bytes += sizeof(Label);
+
+      //std::cout << "ao " << *k_p << " - " << *l_p << "\n";
+
+      // flush to disk
+      if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(Label)) {
+        outfile.write(buf, n_bytes);
+        n_bytes = 0;
+      }
+    }
+    // save remainder.
+    if (n_bytes) {
+        outfile.write(buf, n_bytes);
+    }
+
+    if (outfile.fail()) {
+        delete[] buf;
+        throw khmer_file_exception(strerror(errno));
+    }
+    outfile.close();
+
+    delete[] buf;
+}
+
+void LabelHash::load_labels_and_tags(std::string filename)
+{
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try {
+        infile.open(filename.c_str(), ios::binary);
+    }  catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!infile.is_open()) {
+            err = "Cannot open labels/tags file: " + filename;
+        } else {
+            err = "Unknown error in opening file: " + filename;
+        }
+        throw khmer_file_exception(err);
+    }
+
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char version, ht_type;
+
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading labels/tags from " << filename;
+            throw khmer_file_exception(err.str());
+        } else if (!(ht_type == SAVED_LABELSET)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading labels/tags from " << filename;
+            throw khmer_file_exception(err.str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        if (!(save_ksize == _ht->ksize())) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading labels/tags from " << filename;
+            throw khmer_file_exception(err.str());
+        }
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        err = "Unknown error reading header info from: " + filename;
+        throw khmer_file_exception(err);
+    }
+
+    char * buf = new char[IO_BUF_SIZE];
+
+    unsigned int loaded = 0;
+    long remainder;
+
+
+    HashIntoType * kmer_p = NULL;
+    Label * labelp = NULL;
+
+    remainder = 0;
+    unsigned int iteration = 0;
+    while (!infile.eof()) {
+      //std::cout << "XXX " << loaded << " : " << "\n";
+        unsigned int i;
+
+        try {
+            infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+        } catch (std::ifstream::failure &e) {
+
+            // We may get an exception here if we fail to read all the
+            // expected bytes due to EOF -- only pass it up if we read
+            // _nothing_.  Note that the while loop exits on EOF.
+
+            if (infile.gcount() == 0) {
+                std::string err;
+                err = "Unknown error reading data from: " + filename;
+                //std::cout << err;
+                throw khmer_file_exception(err);
+            }
+        }
+
+        long n_bytes = infile.gcount() + remainder;
+        remainder = n_bytes % (sizeof(Label) + sizeof(HashIntoType));
+        n_bytes -= remainder;
+
+        iteration++;
+
+        for (i = 0; i < n_bytes;) {
+            kmer_p = (HashIntoType *) (buf + i);
+            i += sizeof(HashIntoType);
+            labelp = (Label *) (buf + i);
+            i += sizeof(Label);
+
+            check_and_allocate_label(*labelp);
+            link_tag_and_label(*kmer_p, *labelp);
+
+            //std::cout << "a " << *kmer_p << " - " << *labelp << "\n";
+
+            loaded++;
+        }
+        if (!(i == n_bytes)) {
+          //std::cout << "XYZ " << i << " : " << n_bytes << "\n";
+          throw khmer_exception();
+        }
+        memcpy(buf, buf + n_bytes, remainder);
+    }
+
+    delete[] buf;
 }
