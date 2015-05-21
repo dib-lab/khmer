@@ -262,6 +262,16 @@ class LabelHash(_LabelHash):
         return c
 
 
+class CountingLabelHash(_LabelHash):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_above_x(n_tables, starting_size)
+        hb = CountingHash(k, primes)
+        c = _LabelHash.__new__(cls, hb)
+        c.graph = hb
+        return c
+
+
 class Hashbits(_Hashbits):
 
     def __new__(cls, k, starting_size, n_tables):
