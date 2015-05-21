@@ -3724,7 +3724,7 @@ static PyMethodDef khmer_subset_methods[] = {
 
 // LabelHash addition
 typedef struct {
-    //PyObject_HEAD
+    PyObject_HEAD
     LabelHash * labelhash;
 } khmer_KLabelHash_Object;
 
@@ -3754,14 +3754,12 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        PyObject * hbo;
+        khmer_KHashbits_Object * kho;
 
-        if (!PyArg_ParseTuple(args, "O", &hbo)) {
+        if (!PyArg_ParseTuple(args, "O!", &khmer_KHashbits_Type, &kho)) {
             Py_DECREF(self);
             return NULL;
         }
-
-        khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hbo;
 
         try {
             self->labelhash = new LabelHash(kho->hashbits);
@@ -4824,7 +4822,7 @@ init_khmer(void)
     }
     // add LabelHash
 
-    khmer_KLabelHash_Type.tp_base = &khmer_KHashbits_Type;
+    khmer_KLabelHash_Type.tp_methods = khmer_labelhash_methods;
     if (PyType_Ready(&khmer_KLabelHash_Type) < 0) {
         return;
     }
