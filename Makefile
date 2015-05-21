@@ -283,6 +283,18 @@ convert-release-notes:
 		done
 
 list-authors:
-	git log --format='\author[]{%aN}' | sort -uk2 | less
+	@echo '\author[1]{Michael R. Crusoe}'
+	@git log --format='\author[]{%aN}' | sort -uk2 | \
+		grep -v 'root\|crusoe\|titus'
+	@echo '\author[]{C. Titus Brown}'
+	@echo '\affil[1]{mcrusoe@msu.edu}'
+	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
+		awk -F\\ '{print "\\"$$3}' | grep -v \
+		'root\|crusoe\|titus\|waffle'
+	@echo '\affil[]{titus@idyll.org}'
+
+list-author-emails:
+	@echo 'name, E-Mail Address'
+	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle'
 
 FORCE:
