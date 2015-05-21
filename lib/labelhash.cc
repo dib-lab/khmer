@@ -369,8 +369,8 @@ void LabelHash::save_labels_and_tags(std::string filename)
     // For each tag in the partition map, save the tag and the associated
     // partition ID.
 
-    LabelPtrMap::const_iterator pi = label_ptrs.begin();
-    for (; pi != label_ptrs.end(); ++pi) {
+    TagLabelPtrMap::const_iterator pi = tag_labels.begin();
+    for (; pi != tag_labels.end(); ++pi) {
       //      HashIntoType k = pi->first; // unsigned long long int
       Label * l = pi->second; // unsigned long long int;
 
@@ -497,8 +497,11 @@ void LabelHash::load_labels_and_tags(std::string filename)
             labelp = (Label *) (buf + i);
             i += sizeof(Label);
 
-            check_and_allocate_label(*labelp);
-            link_tag_and_label(*kmer_p, *labelp);
+            Label * labelp2;
+
+            _ht->all_tags.insert(*kmer_p);
+            labelp2 = check_and_allocate_label(*labelp);
+            link_tag_and_label(*kmer_p, *labelp2);
 
             //std::cout << "a " << *kmer_p << " - " << *labelp << "\n";
 
