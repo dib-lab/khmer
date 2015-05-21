@@ -61,7 +61,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
     while (!parser->is_complete( )) {
         read = parser->get_next_read( );
 
-        if (check_and_normalize_read( read.sequence )) {
+        if (_ht->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!
             unsigned long long this_n_consumed = 0;
             the_label = check_and_allocate_label(_tag_label);
@@ -83,7 +83,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
 #if (0)
         // run callback, if specified
         if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
-            std::cout << "n tags: " << all_tags.size() << "\n";
+            std::cout << "n tags: " << _ht->all_tags.size() << "\n";
             try {
                 callback("consume_fasta_and_tag_with_labels", callback_data, total_reads_TL,
                          n_consumed);
@@ -126,7 +126,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
         read = parser->get_next_read();
         seq = read.sequence;
 
-        if (check_and_normalize_read(seq)) {
+        if (_ht->check_and_normalize_read(seq)) {
             // First, figure out what the partition is (if non-zero), and save that.
             printdbg(parsing partition id)
             p = _parse_partition_id(read.name);
@@ -182,17 +182,17 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KMerIterator kmers(seq.c_str(), _ht->_ksize);
     HashIntoType kmer;
 
-    unsigned int since = _tag_density / 2 + 1;
+    unsigned int since = _ht->_tag_density / 2 + 1;
 
     printdbg(entering while loop)
         while(!kmers.done()) {
             kmer = kmers.next();
             bool is_new_kmer;
 
-            if ((is_new_kmer = test_and_set_bits( kmer ))) {
+            if ((is_new_kmer = _ht->test_and_set_bits( kmer ))) {
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }
@@ -203,7 +203,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             } else {
                 printdbg(entering tag spin lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
-                kmer_tagged = set_contains(all_tags, kmer);
+                kmer_tagged = set_contains(_ht->all_tags, kmer);
                 //RELEASE_ALL_TAGS_SPIN_LOCK
                 printdbg(released tag spin lock)
                 if (kmer_tagged) {
@@ -228,7 +228,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                 }
             }
 #else
-            if (!is_new_kmer && set_contains(all_tags, kmer)) {
+            if (!is_new_kmer && set_contains(_ht->all_tags, kmer)) {
                 since = 1;
                 if (found_tags) {
                     found_tags->insert(kmer);
@@ -238,11 +238,11 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             }
 #endif
             //
-            if (since >= _tag_density) {
+            if (since >= _ht->_tag_density) {
                 printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
-                all_tags.insert(kmer);
+                _ht->all_tags.insert(kmer);
                 //RELEASE_ALL_TAGS_SPIN_LOCK
                 printdbg(released tag spin lock)
 
@@ -260,9 +260,9 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             printdbg(moving to next iter)
         } // iteration over kmers
     printdbg(finished iteration: dropping last tag)
-    if (since >= _tag_density/2 - 1) {
+    if (since >= _ht->_tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
-        all_tags.insert(kmer);	// insert the last k-mer, too.
+        _ht->all_tags.insert(kmer);	// insert the last k-mer, too.
         //RELEASE_ALL_TAGS_SPIN_LOCK
 
         // Label code: TODO: MAKE THREADSAFE!
@@ -284,12 +284,13 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
 
     SeenSet tagged_kmers;
     unsigned int num_traversed;
-    num_traversed = partition->sweep_for_tags(seq, tagged_kmers, all_tags,
+    num_traversed = _ht->partition->sweep_for_tags(seq, tagged_kmers,
+                                                   _ht->all_tags,
                     range, break_on_stoptags, stop_big_traversals);
     traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
     if (range == 0) {
-        if (!(num_traversed == seq.length()-ksize()+1)) {
+        if (!(num_traversed == seq.length()-_ht->ksize()+1)) {
             throw khmer_exception();
         }
     }

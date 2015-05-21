@@ -3725,7 +3725,6 @@ static PyMethodDef khmer_subset_methods[] = {
 // LabelHash addition
 typedef struct {
     //PyObject_HEAD
-    khmer_KHashbits_Object khashbits;
     LabelHash * labelhash;
 } khmer_KLabelHash_Object;
 
@@ -3748,9 +3747,6 @@ static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-// a little weird; we don't actually want to call Hashbits' new method. Rather, we
-// define our own new method, and redirect the base's hashbits object to point to our
-// labelhash object
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
                                       PyObject *kwds)
 {
@@ -3758,42 +3754,21 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        WordLength k = 0;
-        PyListObject * sizes_list_o = NULL;
+        PyObject * hbo;
 
-        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "O", &hbo)) {
             Py_DECREF(self);
             return NULL;
         }
 
-        std::vector<HashIntoType> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
-        }
+        khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hbo;
 
-
-        // We want the hashbits pointer in the base class to point to our labelhash,
-        // so that the KHashbits methods are called on the correct object (a LabelHash)
         try {
-            self->labelhash = new LabelHash(k, sizes);
+            self->labelhash = new LabelHash(kho->hashbits);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashbits.hashbits = (Hashbits *)self->labelhash;
     }
 
     return (PyObject *) self;
@@ -3945,7 +3920,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         return NULL;
     }
 
-    unsigned int range = (2 * hb->_get_tag_density()) + 1;
+    unsigned int range = (2 * hb->_ht->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -3959,7 +3934,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < hb->ksize()) {
+    if (strlen(seq) < hb->_ht->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4017,7 +3992,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    unsigned int range = (2 * labelhash->_get_tag_density()) + 1;
+    unsigned int range = (2 * labelhash->_ht->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -4031,7 +4006,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < labelhash->ksize()) {
+    if (strlen(seq) < labelhash->_ht->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4041,8 +4016,8 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->partition->sweep_for_tags(seq, tagged_kmers,
-                                         labelhash->all_tags, range, break_on_stop_tags, stop_big_traversals);
+    labelhash->_ht->partition->sweep_for_tags(seq, tagged_kmers,
+                                         labelhash->_ht->all_tags, range, break_on_stop_tags, stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 

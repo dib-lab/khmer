@@ -18,7 +18,7 @@
 namespace khmer
 {
 
-class LabelHash : public khmer::Hashbits
+class LabelHash
 {
 protected:
     // Does the given tag already have the given label?
@@ -82,12 +82,11 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
+    khmer::Hashtable * _ht;
 
-    LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
-        : khmer::Hashbits(ksize, tablesizes)
+    LabelHash(Hashtable * ht) : _ht(ht)
     {
         _tag_labels_spin_lock = 0;
-        _all_tags_spin_lock = 0;
 
     }
 
