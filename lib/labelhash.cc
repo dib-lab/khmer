@@ -174,7 +174,7 @@ void LabelHash::link_tag_and_label(HashIntoType& kmer, Label& kmer_label)
 {
     printdbg(linking tag and label)
     tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
-    label_tag_ptrs.insert(LabelTagPtrPair(kmer_label, &kmer));
+    label_tag_ptrs.insert(LabelTagPair(kmer_label, kmer));
     printdbg(done linking tag and label)
 }
 
@@ -312,9 +312,9 @@ LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag)
     return labels;
 }
 
-TagPtrSet LabelHash::get_label_tags(const Label& label)
+TagSet LabelHash::get_label_tags(const Label& label)
 {
-    TagPtrSet tags;
+    TagSet tags;
     //unsigned int num_tags;
     _get_tags_from_label(label, label_tag_ptrs, tags);
     return tags;
@@ -382,7 +382,7 @@ void LabelHash::save_labels_and_tags(std::string filename)
       *l_p = *(pi->second);
       n_bytes += sizeof(Label);
 
-      //std::cout << "ao " << *k_p << " - " << *l_p << "\n";
+      // std::cout << *k_p << " - " << *l_p << "\n";
 
       // flush to disk
       if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(Label)) {
@@ -494,16 +494,17 @@ void LabelHash::load_labels_and_tags(std::string filename)
         for (i = 0; i < n_bytes;) {
             kmer_p = (HashIntoType *) (buf + i);
             i += sizeof(HashIntoType);
+
             labelp = (Label *) (buf + i);
             i += sizeof(Label);
 
             Label * labelp2;
 
+            // std::cout << *kmer_p << " - " << *labelp << "\n";
+
             _ht->all_tags.insert(*kmer_p);
             labelp2 = check_and_allocate_label(*labelp);
             link_tag_and_label(*kmer_p, *labelp2);
-
-            //std::cout << "a " << *kmer_p << " - " << *labelp << "\n";
 
             loaded++;
         }

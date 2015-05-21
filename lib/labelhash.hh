@@ -37,14 +37,14 @@ protected:
     }
 
     // Does the given label already have a tag associated with it?
-    bool _cmap_contains_tag(const LabelTagPtrMap& cmap,
+    bool _cmap_contains_tag(const LabelTagMap& cmap,
                             Label& the_label,
                             HashIntoType& kmer)
     {
-        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+        std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(the_label);
-        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            if(*(it->second) == kmer) {
+        for (LabelTagMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            if(it->second == kmer) {
                 return true;
             }
         }
@@ -66,13 +66,13 @@ protected:
     }
 
     unsigned int _get_tags_from_label(const Label& label,
-                                      const LabelTagPtrMap& cmap,
-                                      TagPtrSet& labeled_tags)
+                                      const LabelTagMap& cmap,
+                                      TagSet& labeled_tags)
     {
         unsigned int num_tags = 0;
-        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+        std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(label);
-        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+        for (LabelTagMap::const_iterator it=ret.first; it!=ret.second; ++it) {
             labeled_tags.insert(it->second);
             ++num_tags;
         }
@@ -93,7 +93,7 @@ public:
     ~LabelHash();
 
     TagLabelPtrMap tag_labels;
-    LabelTagPtrMap label_tag_ptrs;
+    LabelTagMap label_tag_ptrs;
     LabelPtrMap label_ptrs;
 
     size_t n_labels() const
@@ -139,7 +139,7 @@ public:
             SeenSet * new_tags = 0);
 
     LabelPtrSet get_tag_labels(const HashIntoType& tag);
-    TagPtrSet get_label_tags(const Label& label);
+    TagSet get_label_tags(const Label& label);
 
     void link_tag_and_label(HashIntoType& kmer, Label& label);
 

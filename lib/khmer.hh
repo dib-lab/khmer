@@ -105,11 +105,11 @@ PartitionCountDistribution;
 // types used in @camillescott's sparse labeling extension
 typedef unsigned long long int Label;
 typedef std::multimap<HashIntoType, Label*> TagLabelPtrMap;
-typedef std::multimap<Label, HashIntoType*> LabelTagPtrMap;
+typedef std::multimap<Label, HashIntoType> LabelTagMap;
 typedef std::pair<HashIntoType, Label*> TagLabelPtrPair;
-typedef std::pair<Label, HashIntoType*> LabelTagPtrPair;
+typedef std::pair<Label, HashIntoType> LabelTagPair;
 typedef std::set<Label*> LabelPtrSet;
-typedef std::set<HashIntoType*> TagPtrSet;
+typedef std::set<HashIntoType> TagSet;
 typedef std::map<Label, Label*> LabelPtrMap;
 
 template <typename T>
