@@ -92,7 +92,7 @@ release makers, following this checklist by MRC.
 
         # Secondly we test via pip
         
-        cd ../testenv2
+        cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install -e git+https://github.com/dib-lab/khmer.git@v${new_version}-${rc}#egg=khmer
