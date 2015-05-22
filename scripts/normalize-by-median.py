@@ -45,6 +45,39 @@ def batchwise(coll, size):
 # Returns true if the pair of records are properly pairs
 
 
+def WithDiagnostics(ifile, batch_size, fp, paired):
+    index = 0
+    global total, discarded
+
+    for batch in batchwise(screed.open(ifile, parse_description=False),
+                           batch_size):
+
+        if index > 0 and index % 100000 == 0:
+            print >>sys.stderr, '... kept {kept} of {total} or'\
+                ' {perc:2}%'.format(kept=total - discarded, total=total,
+                                    perc=int(100. - discarded /
+                                             float(total) * 100.))
+            print >>sys.stderr, '... in file', input_filename
+
+            if report_fp:
+                print >> fp, total, total - discarded, \
+                    1. - (discarded / float(total))
+                report_fp.flush()
+
+        total += batch_size
+
+        # If in paired mode, check that the reads are properly interleaved
+
+        if paired:
+            if not check_is_pair(batch[0], batch[1]):
+                raise IOError('Error: Improperly interleaved pairs \
+                    {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
+
+        yield batch
+
+        index = index + 1
+
+
 # pylint: disable=too-many-locals,too-many-branches
 def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
                         report_fp=None):
@@ -58,30 +91,12 @@ def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
         batch_size = 2
 
     index = -1
+    # global some things to work with our iterator
+    global total, discarded
     total = 0
     discarded = 0
-    for index, batch in enumerate(batchwise(screed.open(
-            input_filename, parse_description=False), batch_size)):
-        if index > 0 and index % 100000 == 0:
-            print >>sys.stderr, '... kept {kept} of {total} or'\
-                ' {perc:2}%'.format(kept=total - discarded, total=total,
-                                    perc=int(100. - discarded /
-                                             float(total) * 100.))
-            print >>sys.stderr, '... in file', input_filename
-
-            if report_fp:
-                print >> report_fp, total, total - discarded, \
-                    1. - (discarded / float(total))
-                report_fp.flush()
-
-        total += batch_size
-
-        # If in paired mode, check that the reads are properly interleaved
-
-        if paired:
-            if not check_is_pair(batch[0], batch[1]):
-                raise IOError('Error: Improperly interleaved pairs \
-                    {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
+    for batch in WithDiagnostics(input_filename, batch_size, report_fp,
+                                 paired):
 
         # Emit the batch of reads if any read passes the filter
         # and all reads are longer than K
@@ -129,8 +144,8 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, discarded, 
-        force):
+def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, discarded,
+             force):
     try:
         yield
     except IOError as err:
