@@ -537,6 +537,23 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_report_fp():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '-t', '-R', outfile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "fp rate estimated to be 0.626" in err, err
+    report = open(outfile, 'r')
+    line = report.readline()
+    assert "100000 25232 0.25232" in line, line
+
+
 def test_normalize_by_median_unpaired_and_paired():
     CUTOFF = '1'
 

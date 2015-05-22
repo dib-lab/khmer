@@ -168,7 +168,7 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
                   total, discarded, force):
 
         total_acc, discarded_acc = normalize_by_median(
-            input_filename, outfp, htable, paired, cutoff, report_fp=None)
+            input_filename, outfp, htable, paired, cutoff, report_fp)
 
         if total_acc == 0 and discarded_acc == 0:
             print >> sys.stderr, 'SKIPPED empty file', input_filename
