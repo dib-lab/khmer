@@ -144,7 +144,7 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def FailSafe(ifile, ofile, save_on_fail, ht, total, discarded, force):
+def FailSafe(ifile, ofile, save_on_fail, ht, force):
     global corrupt_files, total, discarded, total_acc, discarded_acc
     try:
         yield
@@ -158,6 +158,19 @@ def FailSafe(ifile, ofile, save_on_fail, ht, total, discarded, force):
         else:
             print >> sys.stderr, '*** Skipping error file, moving on...'
             corrupt_files.append(ifile)
+
+    if total_acc == 0 and discarded_acc == 0:
+        print >> sys.stderr, 'SKIPPED empty file', ifile
+    elif total_acc is not None and discarded_acc is not None:
+        # will be none if the context manager caught an error
+        total += total_acc
+        discarded += discarded_acc
+        print >> sys.stderr, \
+            'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+            .format(inp=ifile, kept=total - discarded,
+                    total=total, perc=int(100. - discarded /
+                                          float(total) * 100.))
+        print >> sys.stderr, 'output in', ofile
 
 
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
@@ -181,24 +194,10 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    with FailSafe(input_filename, outfp, fail_save, htable, total, discarded,
-                  force):
+    with FailSafe(input_filename, outfp, fail_save, htable, force):
 
         total_acc, discarded_acc = normalize_by_median(
             input_filename, outfp, htable, paired, cutoff, report_fp)
-
-        if total_acc == 0 and discarded_acc == 0:
-            print >> sys.stderr, 'SKIPPED empty file', input_filename
-        elif total_acc is not None and discarded_acc is not None:
-            # will be none if the context manager caught an error
-            total += total_acc
-            discarded += discarded_acc
-            print >> sys.stderr, \
-                'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                .format(inp=input_filename, kept=total - discarded,
-                        total=total, perc=int(100. - discarded /
-                                              float(total) * 100.))
-            print >> sys.stderr, 'output in', output_name
 
     return total_acc, discarded_acc, corrupt_files
 
