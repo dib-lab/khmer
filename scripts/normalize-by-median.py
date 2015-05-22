@@ -129,13 +129,14 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, dicarded, jedi):
+def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, discarded, 
+        force):
     try:
         yield
     except IOError as err:
         handle_error(err, ofile, ifile, save_on_fail,
                      ht)
-        if not jedi:
+        if not force:
             print >> sys.stderr, '** Exiting!'
 
             sys.exit(1)
