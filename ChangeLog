@@ -1,6 +1,7 @@
 2015-05-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * scripts/normalize-by-median.py: minor refactoring
+   * scripts/normalize-by-median.py: minor refactoring, fixed -R
+   * tests/test_scripts.py: added test for normalize's -R arg
 
 2015-05-13  Scott Sievert <sieve121@umn.edu>
 
