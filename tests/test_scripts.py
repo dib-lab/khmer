@@ -849,8 +849,8 @@ def test_normalize_by_median_dumpfrequency():
     assert test_ht.count(test_good_read2[:17]) > 0
 
     assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
-    assert out.count('Backup: Saving') == 2
-    assert 'Nothing' in out
+    assert err.count('Backup: Saving') == 2
+    assert 'Nothing' in err
 
 
 def test_normalize_by_median_empty():

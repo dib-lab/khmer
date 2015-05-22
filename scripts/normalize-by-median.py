@@ -303,14 +303,14 @@ def SavingTable(input_filenames, freq, ht, savename):
         yield input_filenames[index]
 
         if (freq > 0 and index > 0 and index % freq == 0):
-            print 'Backup: Saving k-mer counting file through', \
+            print >>sys.stderr, 'Backup: Saving k-mer counting file through', \
                 input_filenames[index]
             if savename:
                 hashname = savename
                 print '...saving to', hashname
             else:
                 hashname = 'backup.ct'
-                print 'Nothing given for savetable, saving to', hashname
+                print >>sys.stderr, 'Nothing given for savetable, saving to', hashname
                 ht.save(hashname)
         index = index + 1
 
