@@ -144,8 +144,8 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, discarded,
-             force):
+def FailSafe(ifile, ofile, save_on_fail, ht, total, discarded, force):
+    global corrupt_files, total, discarded, total_acc, discarded_acc
     try:
         yield
     except IOError as err:
@@ -157,12 +157,13 @@ def FailSafe(ifile, ofile, save_on_fail, ht, corrupted, total, discarded,
             sys.exit(1)
         else:
             print >> sys.stderr, '*** Skipping error file, moving on...'
-            corrupted.append(ifile)
+            corrupt_files.append(ifile)
 
 
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
                                   fail_save, paired, cutoff, force,
-                                  corrupt_files, report_fp=None):
+                                  report_fp=None):
+    global corrupt_files, total, discarded, total_acc, discarded_acc
     total = 0
     discarded = 0
 
@@ -180,8 +181,8 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    with FailSafe(input_filename, outfp, fail_save, htable, corrupt_files,
-                  total, discarded, force):
+    with FailSafe(input_filename, outfp, fail_save, htable, total, discarded,
+                  force):
 
         total_acc, discarded_acc = normalize_by_median(
             input_filename, outfp, htable, paired, cutoff, report_fp)
@@ -342,6 +343,7 @@ file for one of the input files will be generated.)" % filename
             args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
+    global corrupt_files
     corrupt_files = []
 
     if args.loadtable:
@@ -362,7 +364,7 @@ file for one of the input files will be generated.)" % filename
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
-                corrupt_files, report_fp)
+                report_fp)
 
     if args.paired and args.unpaired_reads:
         args.paired = False
@@ -374,7 +376,7 @@ file for one of the input files will be generated.)" % filename
             normalize_by_median_and_check(
                 args.unpaired_reads, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
-                corrupt_files, report_fp)
+                report_fp)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
