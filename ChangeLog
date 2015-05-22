@@ -3,10 +3,47 @@
    * scripts/normalize-by-median.py: minor refactoring, fixed -R
    * tests/test_scripts.py: added test for normalize's -R arg
 
-2015-05-13  Scott Sievert <sieve121@umn.edu>
+2015-05-20  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
-   sandbox/*, khmer/*
+   * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlified load_graph script, tests
+   * scripts/load-graph.py: replaced with oxlified version
+   * setup.py: added oxli module and entry point
+
+2015-05-20  Kevin Murray  <spam@kdmurray.id.au>
+
+   * .gitignore: Add htmlcov/ and diff-cover.html to gitignore
+   * Makefile: Use rm -f to remove files to quash error messages on
+   non-existant files
+
+2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
+
+   * tests/test_scripts.py: Test loading of compressed counting table
+   with bigcounts,and test abundance with bigcounts
+
+2015-05-18  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * all files: references to github.com/ged-lab changed to
+   github.com/dib-lab. All GitHub URLs normalized to use HTTPS
+   * README.rst: broken landscape.io badge removed
+   * doc/user/known-issues.rst: removed two known issues fixed in v1.4 release
+
+2015-05-18  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
+   scripts/{count-median.py,filter-abund-single.py,filter-abund.py}: changed
+   sequence-reading behavior to replace 'N' with 'A', to be consistent with
+   rest of code base.
+   * scripts/{filter-abund.py,filter-abund-single.py}: changed behavior of
+   scripts to keep sequences with 'N's in them, and count them as 'A's.
+   * tests/test_scripts.py: added tests for new
+   filter-abund/filter-abund-single behavior.
+   * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
+
+2015-05-13  Scott Sievert  <sieve121@umn.edu>
+
+   * tests/*,scripts/*,lib/*,sandbox/*,khmer/*: changed "doc/LICENSE.txt" to
+   "LICENSE" in copyright header.
 
 2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -814,8 +851,8 @@
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
-    https://github.com/ged-lab/khmer/issues/249
-    https://github.com/ged-lab/khmer/pull/641
+    https://github.com/dib-lab/khmer/issues/249
+    https://github.com/dib-lab/khmer/pull/641
     Supports reading from non-seekable plain and gziped FAST[AQ] files (a.k.a
     pipe or streaming support)
 

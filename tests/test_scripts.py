@@ -1,5 +1,5 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
@@ -388,10 +388,9 @@ def test_filter_abund_4_retain_low_abund():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
-# test that the -V option *does* trim sequences that are low abundance
-
 
 def test_filter_abund_5_trim_high_abund():
+    # test that the -V option *does* trim sequences that are high abundance
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -411,10 +410,11 @@ def test_filter_abund_5_trim_high_abund():
     # trimmed sequence @ error
     assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
 
-# test that -V/-Z setting - should not trip if -Z is set high enough.
-
 
 def test_filter_abund_6_trim_high_abund_Z():
+    # test that -V/-Z settings interact properly -
+    # trimming should not happen if -Z is set high enough.
+
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -435,6 +435,72 @@ def test_filter_abund_6_trim_high_abund_Z():
     badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
              'GATTTCCGGGCGG'
     assert badseq in seqs       # should be there, untrimmed
+
+
+def test_filter_abund_7_retain_Ns():
+    # check that filter-abund retains sequences with Ns, and treats them as As.
+
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    # copy test file over to test.fq & load into counting table
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = scriptpath('filter-abund.py')
+    args = ['-C', '3', counting_ht, infile]
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    # test for a sequence with an 'N' in it --
+    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    assert '895:1:37:17593:9954 1::FOO_withN' in names, names
+
+    # check to see if that 'N' was properly changed to an 'A'
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAG' not in seqs, seqs
+
+    # ...and that an 'N' remains in the output sequences
+    found_N = False
+    for s in seqs:
+        if 'N' in s:
+            found_N = True
+    assert found_N, seqs
+
+
+def test_filter_abund_single_8_retain_Ns():
+    # check that filter-abund-single retains
+    # sequences with Ns, and treats them as As.
+
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    # copy test file over to test.fq & load into counting table
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-k', '17', '-x', '1e7', '-N', '2', '-C', '3', infile]
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    # test for a sequence with an 'N' in it --
+    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    assert '895:1:37:17593:9954 1::FOO_withN' in names, names
+
+    # check to see if that 'N' was properly changed to an 'A'
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAG' not in seqs, seqs
+
+    # ...and that an 'N' remains in the output sequences
+    found_N = False
+    for s in seqs:
+        if 'N' in s:
+            found_N = True
+    assert found_N, seqs
 
 
 def test_filter_stoptags():
@@ -939,7 +1005,37 @@ def test_count_median_fq_csv():
 
 def test_load_graph():
     script = scriptpath('load-graph.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e7', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+def test_oxli_build_graph():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data('random-20-a.fa')
@@ -990,6 +1086,29 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
+def test_oxli_build_graph_no_tags():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert not os.path.exists(tagset_file), tagset_file
+
+    assert khmer.load_hashbits(ht_file)
+
+    # can't think of a good way to make sure this worked, beyond just
+    # loading the ht file...
+
+
 def test_load_graph_fail():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -1004,9 +1123,46 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+def test_oxli_build_graph_fail():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == 1, status
+    assert "** ERROR: the graph structure is too small" in err
+
+
 def test_load_graph_write_fp():
     script = scriptpath('load-graph.py')
-    args = ['-x', '1e5', '-N', '2', '-k', '20', '-w']  # use small HT
+    args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    data = [x.strip() for x in open(info_file)]
+    data = set(data)
+    assert '3959 unique k-mers' in data, data
+    assert 'false positive rate estimated to be 0.002' in data
+
+
+def test_oxli_build_graph_write_fp():
+    script = scriptpath('oxli')
+    # use small HT
+    args = ['build-graph', '-x', '1e5', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data('random-20-a.fa')
@@ -1033,6 +1189,17 @@ def test_load_graph_multithread():
     infile = utils.get_test_data('test-reads.fa')
 
     args = ['-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
+
+    (status, out, err) = utils.runscript(script, args)
+
+
+def test_oxli_build_graph_multithread():
+    script = scriptpath('oxli')
+
+    outfile = utils.get_temp_filename('test')
+    infile = utils.get_test_data('test-reads.fa')
+
+    args = ['build-graph', '-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
 
@@ -1851,7 +2018,7 @@ def test_make_initial_stoptags():
     in_dir = os.path.dirname(bzinfile)
 
     genscript = scriptpath('load-graph.py')
-    genscriptargs = ['-t', 'test-reads', 'test-reads.fq.bz2']
+    genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
     # test input file gen'd by load-graphs
@@ -2561,7 +2728,7 @@ def execute_load_graph_streaming(filename):
     '''
 
     script = scriptpath('load-graph.py')
-    args = '-x 1e7 -N 2 -k 20 -t out -'
+    args = '-x 1e7 -N 2 -k 20 out -'
 
     infile = utils.get_temp_filename('temp')
     in_dir = os.path.dirname(infile)

@@ -1,5 +1,5 @@
 #! /usr/bin/env python2
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
@@ -174,8 +174,8 @@ SETUP_METADATA = \
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
-        "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        "url": 'https://khmer.readthedocs.org/',
+        "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.8'],
         # testing screed download link
@@ -184,6 +184,11 @@ SETUP_METADATA = \
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
+        "entry_points": {
+            'console_scripts': [
+                "oxli = oxli:main"
+            ]
+        },
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
