@@ -290,11 +290,13 @@ list-authors:
 	@echo '\affil[1]{mcrusoe@msu.edu}'
 	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
 		awk -F\\ '{print "\\"$$3}' | grep -v \
-		'root\|crusoe\|titus\|waffle'
+		'root\|crusoe\|titus\|waffle\|boyce'
+	# R. Boyce requested to be removed 2015/05/21
+	# via pers correspondence to MRC
 	@echo '\affil[]{titus@idyll.org}'
 
 list-author-emails:
 	@echo 'name, E-Mail Address'
-	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle'
+	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
 
 FORCE:
