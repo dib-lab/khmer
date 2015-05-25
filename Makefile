@@ -193,7 +193,7 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 		Doxyfile
 	doxygen
 
-lib:
+lib: FORCE
 	cd lib && \
 	$(MAKE)
 
