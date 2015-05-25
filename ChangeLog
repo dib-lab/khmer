@@ -1,3 +1,7 @@
+2015-05-25  Kevin Murray  <spam@kdmurray.id.au>
+
+   * Makefile: Fix issue with 'lib' target not building by using FORCE
+
 2015-05-20  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
