@@ -1,3 +1,7 @@
+2015-05-26  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Remove old libkhmer.so versions during make clean
+
 2015-05-25  Kevin Murray  <spam@kdmurray.id.au>
 
    * Makefile: Fix issue with 'lib' target not building by using FORCE
