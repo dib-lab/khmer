@@ -122,7 +122,7 @@ IParser(
             REG_EXTENDED | REG_NOSUB
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R2 nosub regex");
     }
     regex_rc =
         regcomp(
@@ -130,7 +130,7 @@ IParser(
             "^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R1 regex");
     }
     regex_rc =
         regcomp(
@@ -138,7 +138,7 @@ IParser(
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R2 regex");
     }
     _num_reads = 0;
     _have_qualities = false;
@@ -169,7 +169,9 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
         _imprint_next_read_pair_in_error_mode( the_read_pair );
         break;
     default:
-        throw UnknownPairReadingMode( );
+        std::ostringstream oss;
+        oss << "Unknown pair reading mode: " << mode;
+        throw UnknownPairReadingMode(oss.str().c_str());
     }
 }
 
