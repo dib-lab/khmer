@@ -82,9 +82,9 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
-    khmer::Hashtable * _ht;
+    khmer::Hashtable * graph;
 
-    LabelHash(Hashtable * ht) : _ht(ht)
+    LabelHash(Hashtable * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
 

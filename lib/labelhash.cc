@@ -67,7 +67,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
     while (!parser->is_complete( )) {
         read = parser->get_next_read( );
 
-        if (_ht->check_and_normalize_read( read.sequence )) {
+        if (graph->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!
             unsigned long long this_n_consumed = 0;
             the_label = check_and_allocate_label(_tag_label);
@@ -89,9 +89,10 @@ LabelHash::consume_fasta_and_tag_with_labels(
 #if (0)
         // run callback, if specified
         if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
-            std::cout << "n tags: " << _ht->all_tags.size() << "\n";
+            std::cout << "n tags: " << graph->all_tags.size() << "\n";
             try {
-                callback("consume_fasta_and_tag_with_labels", callback_data, total_reads_TL,
+                callback("consume_fasta_and_tag_with_labels", callback_data,
+                         total_reads_TL,
                          n_consumed);
             } catch (...) {
                 delete parser;
@@ -132,8 +133,9 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
         read = parser->get_next_read();
         seq = read.sequence;
 
-        if (_ht->check_and_normalize_read(seq)) {
-            // First, figure out what the partition is (if non-zero), and save that.
+        if (graph->check_and_normalize_read(seq)) {
+            // First, figure out what the partition is (if non-zero), and
+            // save that.
             printdbg(parsing partition id)
             p = _parse_partition_id(read.name);
             printdbg(checking label and allocating if necessary) {
@@ -188,17 +190,17 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), _ht->_ksize);
+    KMerIterator kmers(seq.c_str(), graph->_ksize);
     HashIntoType kmer;
 
-    unsigned int since = _ht->_tag_density / 2 + 1;
+    unsigned int since = graph->_tag_density / 2 + 1;
 
     printdbg(entering while loop)
         while(!kmers.done()) {
             kmer = kmers.next();
             bool is_new_kmer;
 
-            if ((is_new_kmer = _ht->test_and_set_bits( kmer ))) {
+            if ((is_new_kmer = graph->test_and_set_bits( kmer ))) {
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }
@@ -209,7 +211,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             } else {
                 printdbg(entering tag spin lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
-                kmer_tagged = set_contains(_ht->all_tags, kmer);
+                kmer_tagged = set_contains(graph->all_tags, kmer);
                 //RELEASE_ALL_TAGS_SPIN_LOCK
                 printdbg(released tag spin lock)
                 if (kmer_tagged) {
@@ -234,7 +236,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                 }
             }
 #else
-            if (!is_new_kmer && set_contains(_ht->all_tags, kmer)) {
+            if (!is_new_kmer && set_contains(graph->all_tags, kmer)) {
                 since = 1;
                 if (found_tags) {
                     found_tags->insert(kmer);
@@ -244,11 +246,12 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             }
 #endif
             //
-            if (since >= _ht->_tag_density) {
-                printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
+            if (since >= graph->_tag_density) {
+                printdbg(exceeded tag density: drop a tag and label --
+                         getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
-                _ht->all_tags.insert(kmer);
+                graph->all_tags.insert(kmer);
                 //RELEASE_ALL_TAGS_SPIN_LOCK
                 printdbg(released tag spin lock)
 
@@ -266,9 +269,9 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             printdbg(moving to next iter)
         } // iteration over kmers
     printdbg(finished iteration: dropping last tag)
-    if (since >= _ht->_tag_density/2 - 1) {
+    if (since >= graph->_tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
-        _ht->all_tags.insert(kmer);	// insert the last k-mer, too.
+        graph->all_tags.insert(kmer);	// insert the last k-mer, too.
         //RELEASE_ALL_TAGS_SPIN_LOCK
 
         // Label code: TODO: MAKE THREADSAFE!
@@ -290,13 +293,13 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
 
     SeenSet tagged_kmers;
     unsigned int num_traversed;
-    num_traversed = _ht->partition->sweep_for_tags(seq, tagged_kmers,
-                                                   _ht->all_tags,
+    num_traversed = graph->partition->sweep_for_tags(seq, tagged_kmers,
+                                                     graph->all_tags,
                     range, break_on_stoptags, stop_big_traversals);
     traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
     if (range == 0) {
-        if (!(num_traversed == seq.length()-_ht->ksize()+1)) {
+        if (!(num_traversed == seq.length()-graph->ksize()+1)) {
             throw khmer_exception();
         }
     }
@@ -357,7 +360,7 @@ void LabelHash::save_labels_and_tags(std::string filename)
     unsigned char ht_type = SAVED_LABELSET;
     outfile.write((const char *) &ht_type, 1);
 
-    unsigned int save_ksize = _ht->ksize();
+    unsigned int save_ksize = graph->ksize();
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
 
     ///
@@ -442,7 +445,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
-        if (!(save_ksize == _ht->ksize())) {
+        if (!(save_ksize == graph->ksize())) {
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading labels/tags from " << filename;
@@ -502,7 +505,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
             // std::cout << *kmer_p << " - " << *labelp << "\n";
 
-            _ht->all_tags.insert(*kmer_p);
+            graph->all_tags.insert(*kmer_p);
             labelp2 = check_and_allocate_label(*labelp);
             link_tag_and_label(*kmer_p, *labelp2);
 

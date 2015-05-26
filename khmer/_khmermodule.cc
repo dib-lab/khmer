@@ -3928,7 +3928,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         return NULL;
     }
 
-    unsigned int range = (2 * hb->_ht->_get_tag_density()) + 1;
+    unsigned int range = (2 * hb->graph->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -3942,7 +3942,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < hb->_ht->ksize()) {
+    if (strlen(seq) < hb->graph->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4000,7 +4000,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    unsigned int range = (2 * labelhash->_ht->_get_tag_density()) + 1;
+    unsigned int range = (2 * labelhash->graph->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -4014,7 +4014,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < labelhash->_ht->ksize()) {
+    if (strlen(seq) < labelhash->graph->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4024,8 +4024,10 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->_ht->partition->sweep_for_tags(seq, tagged_kmers,
-                                         labelhash->_ht->all_tags, range, break_on_stop_tags, stop_big_traversals);
+    labelhash->graph->partition->sweep_for_tags(seq, tagged_kmers,
+                                                labelhash->graph->all_tags,
+                                                range, break_on_stop_tags,
+                                                stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 
