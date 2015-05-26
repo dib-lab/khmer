@@ -24,11 +24,11 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
-def build_hash_args(descr=None, epilog=None):
+def build_hash_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
-    parser = argparse.ArgumentParser(
-        description=descr, epilog=epilog,
-        formatter_class=ComboFormatter)
+    if parser is None:
+        parser = argparse.ArgumentParser(description=descr, epilog=epilog,
+                                         formatter_class=ComboFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
@@ -60,9 +60,10 @@ def build_counting_args(descr=None, epilog=None):
     return parser
 
 
-def build_hashbits_args(descr=None, epilog=None):
+def build_hashbits_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for hashbits based scripts."""
-    parser = build_hash_args(descr=descr, epilog=epilog)
+
+    parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
     parser.hashtype = 'hashbits'
 
     return parser
