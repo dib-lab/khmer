@@ -21,32 +21,32 @@ namespace khmer
 namespace read_parsers
 {
 
-struct NoMoreReadsAvailable : public  khmer_exception {
+struct NoMoreReadsAvailable : public  khmer_file_exception {
     explicit NoMoreReadsAvailable(const char *msg) :
-        khmer_exception(msg) {}
+        khmer_file_exception(msg) {}
     NoMoreReadsAvailable() :
-        khmer_exception("No more reads available in this stream.") {}
+        khmer_file_exception("No more reads available in this stream.") {}
 };
 
-struct InvalidRead : public  khmer_exception {
+struct InvalidRead : public  khmer_file_exception {
     explicit InvalidRead(const char *msg) :
-        khmer_exception(msg) {}
+        khmer_file_exception(msg) {}
     InvalidRead() :
-        khmer_exception("Invalid read") {}
+        khmer_file_exception("Invalid FASTA/Q read") {}
 };
 
-struct UnknownPairReadingMode : public  khmer_exception {
+struct UnknownPairReadingMode : public  khmer_file_exception {
     explicit UnknownPairReadingMode(const char *msg) :
-        khmer_exception(msg) {}
+        khmer_file_exception(msg) {}
     UnknownPairReadingMode() :
-        khmer_exception("Unknown pair reading mode supplied.") {}
+        khmer_file_exception("Unknown pair reading mode supplied.") {}
 };
 
-struct InvalidReadPair : public  khmer_exception {
+struct InvalidReadPair : public  khmer_file_exception {
     explicit InvalidReadPair(const char *msg) :
-        khmer_exception(msg) {}
+        khmer_file_exception(msg) {}
     InvalidReadPair() :
-        khmer_exception("Invalid read pair detected.") {}
+        khmer_file_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
