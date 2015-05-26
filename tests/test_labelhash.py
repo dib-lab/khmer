@@ -54,6 +54,30 @@ def test_get_label_dict():
         assert a_label in expected
 
 
+def test_get_label_dict_save_load():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    lb_pre.save_labels_and_tags(savepath)
+
+    # trash the old LabelHash
+    del lb_pre
+
+    # create new, load labels & tags
+    lb = LabelHash(20, 1e7, 4)
+    lb.load_labels_and_tags(savepath)
+
+    labels = lb.get_label_dict()
+    expected = [0, 1, 2, 3]
+    for e_label in expected:
+        assert e_label in labels
+    for a_label in labels:
+        assert a_label in expected
+
+
 def test_get_tag_labels():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
@@ -152,6 +176,63 @@ def test_label_tag_correctness():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
+
+    # read A
+    labels = lb.sweep_label_neighborhood(
+        'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
+        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+    print lb.sweep_tag_neighborhood(
+        'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
+    print labels
+    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+    assert len(labels) == 2
+    assert 0 in labels
+    assert 1 in labels
+
+    # read B
+    labels = lb.sweep_label_neighborhood(
+        'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
+        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    print labels
+    assert len(labels) == 3
+    assert 0 in labels
+    assert 1 in labels
+    assert 2 in labels
+
+    # read C
+    labels = lb.sweep_label_neighborhood(
+        'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
+        'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
+        'ACAACACATACA')
+    print labels
+    assert len(labels) == 2
+    assert 1 in labels
+    assert 2 in labels
+
+    # read D
+    labels = lb.sweep_label_neighborhood(
+        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    print labels
+    assert len(labels) == 1
+    assert 3 in labels
+
+
+def test_label_tag_correctness_save_load():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    lb_pre.save_labels_and_tags(savepath)
+
+    # trash the old LabelHash
+    del lb_pre
+
+    # create new, load labels & tags
+    lb = LabelHash(20, 1e7, 4)
+    lb.load_labels_and_tags(savepath)
 
     # read A
     labels = lb.sweep_label_neighborhood(
