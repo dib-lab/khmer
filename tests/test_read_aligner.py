@@ -4,12 +4,58 @@
 # the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 #
 import khmer
-from nose.tools import assert_almost_equals
+import khmer_tst_utils as utils
+# from nose.tools import assert_almost_equals
 
 
-# DISABLING TESTS until model probabilities are finalized
+def pretty_compare(a, b):
+    print len(a), len(b)
+
+    line1 = []
+    line2 = []
+    line3 = []
+    for (x, y) in zip(a, b):
+        line1.append(x)
+        line2.append(y)
+        if x == y:
+            line3.append('|')
+        else:
+            line3.append('x')
+
+    for i in range(0, len(line1), 60):
+        print "".join(line1[i:i+60])
+        print "".join(line3[i:i+60])
+        print "".join(line2[i:i+60])
+
+
 def eq_(v1, v2):
-    return True
+    assert len(v1)
+    if v1 != v2:
+        pretty_compare(v1, v2)
+    assert v1 == v2, (v1, v2)
+
+
+def neq_(v1, v2):
+    assert len(v1)
+    if v1 == v2:
+        pretty_compare(v1, v2)
+    assert v1 != v2, (v1, v2)
+
+
+def test_align_nothing():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "ACCAAGGCTCGAGATTTACC"
+
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    score, graphAlign, readAlign, trunc = aligner.align(read)
+
+    print score, graphAlign, readAlign
+
+    assert trunc
+    assert len(graphAlign) == 0
+    assert len(readAlign) == 0
 
 
 def test_alignnocov():
@@ -24,9 +70,279 @@ def test_alignnocov():
     # should be the same
     eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
     eq_(graphAlign, 'ACCTAGGTTCGACATGTACC')
+    assert not trunc
+
+
+def test_align_middle():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "TCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    ch.consume(read)
+    score, graphAlign, readAlign, trunc = aligner.align(read)
+
+    # should be the same
+    eq_(readAlign, read)
+    eq_(graphAlign, read)
+    assert not trunc
+
+
+def test_align_middle_trunc():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "TCGACAAGTCCTTGACAGATGGGGGG"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+
+    # omit suffix from graph
+    ch.consume(read[:-5])
+    score, graphAlign, readAlign, trunc = aligner.align(read)
+
+    # should not be the same...
+    neq_(readAlign, read)
+    neq_(graphAlign, read)
+
+    eq_(readAlign, read[:-5])
+    eq_(graphAlign, read[:-5])
+
+    # ...but truncated
+    assert trunc
+
+
+def test_align_middle_trunc_2():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
+
+    # omit prefix from graph
+    ch.consume(read[12:])
+    score, graphAlign, readAlign, trunc = aligner.align(read)
+
+    # here, the alignment must start not at the beginning
+    print readAlign
+    print graphAlign
+
+    eq_(readAlign, read[12:])
+    eq_(graphAlign, read[12:])
+
+    # ...but truncated
+    assert trunc
+
+
+def test_align_fwd_nothing():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "ACCAAGGCTCGAGATTTACC"
+
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+
+    print score, graphAlign, readAlign
+
+    assert trunc
+    assert len(graphAlign) == 0
+    assert len(readAlign) == 0
+
+
+def test_align_fwd_nocov():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "ACCTAGGTTCGACATGTACC"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    ch.consume("ACCTAGGTTCGACATGTACC")
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+
+    # should be the same
+    eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
+    eq_(graphAlign, 'ACCTAGGTTCGACATGTACC')
+    assert not trunc
+
+
+def test_align_fwd_middle():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "TCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    ch.consume(read)
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+
+    # should be the same
+    eq_(readAlign, read)
+    eq_(graphAlign, read)
+    assert not trunc
+
+
+def test_align_fwd_middle_trunc():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "TCGACAAGTCCTTGACAGATGGGGGG"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+
+    # omit suffix from graph
+    ch.consume(read[:-5])
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+
+    # should not be the same...
+    neq_(readAlign, read)
+    neq_(graphAlign, read)
+
+    eq_(readAlign, read[:-5])
+    eq_(graphAlign, read[:-5])
+
+    # ...but truncated
+    assert trunc
+
+
+def test_align_fwd_middle_trunc_2():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
+
+    # omit prefix from graph
+    ch.consume(read[12:])
+    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+
+    # this will fail, because align_forward chooses the first kmer as the
+    # seed.
+    assert not readAlign
+    assert not graphAlign
+    assert trunc
+
+
+def test_align_fwd_covs_1():
+    K = 10
+
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("CTCGACAAGTCCTTGACAGAT")
+    #           ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read)
+    assert covs[0] == 19
+    assert min(covs[1:-K]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_2():
+    K = 10
+
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GACGACAAGTCCTTGACAGAT")
+    #            ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read)
+    assert covs[0] == 19
+    assert covs[1] == 19
+    assert min(covs[2:-K]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_3():
+    K = 10
+
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTAGACAAGTCCTTGACAGAT")
+    #             ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read)
+    assert covs[0] == 19
+    assert covs[1] == 19
+    assert covs[2] == 19
+    assert min(covs[3:-K]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_4():
+    K = 10
+
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTCGACAAGTCCTTGACAGAG")
+    #                               ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read)
+    assert covs[-K] == 19
+    assert min(covs[:-K]) == 20, covs
+    assert max(covs) == 20, covs
+
+
+def test_align_fwd_covs_5():
+    K = 10
+
+    ch = khmer.new_counting_hash(K, 1048576, 1)
+    read = "GTCGACAAGTCCTTGACAGAT"
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    for i in range(19):
+        ch.consume(read)
+
+    ch.consume("GTCGACAAGTCCTTGACAGCT")
+    #                              ^
+    score, g, r, is_t, covs = aligner.align_forward(read)
+
+    print covs, g
+    for start in range(0, len(read) - K + 1):
+        print ch.get(read[start:start+K]),
+    print ''
+
+    assert len(covs) == len(read)
+    assert covs[-K] == 19
+    assert covs[-K - 1] == 19
+    assert min(covs[:-K - 1]) == 20, covs
+    assert max(covs) == 20, covs
 
 
 def test_simple_readalign():
+    return  # DISABLED @CTB
     ch = khmer.new_counting_hash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 2, 0)
     for i in range(20):
@@ -46,6 +362,7 @@ def test_simple_readalign():
 
 
 def test_readalign():
+    return  # DISABLED!
     ch = khmer.new_counting_hash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for i in range(20):
@@ -207,6 +524,7 @@ queries = [
 
 
 def test_readalign_new():
+    return  # DISABLED
     ch = khmer.new_counting_hash(32, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for seq in ht_seqs:
@@ -218,5 +536,32 @@ def test_readalign_new():
         print readAlign
         eq_(graphAlign, query["graph_aln"])
         eq_(readAlign, query["read_aln"])
-        eq_(trunc, query["truncated"])
+        assert trunc == query["truncated"]
         # assert_almost_equals(score, query["score"])
+
+
+def test_readaligner_load():
+    ct = khmer.new_counting_hash(32, 1048576, 1)
+    parameters_json = utils.get_test_data('readaligner-default.json')
+    a_aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
+    a_scoring_matrix = a_aligner.get_scoring_matrix()
+    a_transition_probabilities = a_aligner.get_transition_probabilities()
+    assert a_scoring_matrix[0] == -0.06642736173897607, a_scoring_matrix[0]
+    assert a_transition_probabilities[0][0] == -0.021973842014145723, (
+        a_transition_probabilities[0][0])
+
+    for seq in ht_seqs:
+        ct.consume(seq)
+
+    for query in queries:
+        a_aligner.align(query['seq'])
+
+    b_aligner = khmer.ReadAligner(
+        ct, 0, 0, transition_probabilities=a_transition_probabilities,
+        scoring_matrix=a_scoring_matrix)
+    b_scoring_matrix = b_aligner.get_scoring_matrix()
+    b_transition_probabilities = b_aligner.get_transition_probabilities()
+    assert b_scoring_matrix == a_scoring_matrix, (
+        a_scoring_matrix, b_scoring_matrix)
+    assert b_transition_probabilities == a_transition_probabilities, (
+        a_transition_probabilities, b_transition_probabilities)

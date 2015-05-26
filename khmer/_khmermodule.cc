@@ -1861,7 +1861,7 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     } catch (InvalidStreamHandle &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
-    } 
+    }
 
     HashIntoType n = hashbits->n_unique_kmers();
     HashIntoType n_overlap = hashbits->n_overlap_kmers();
@@ -3724,8 +3724,7 @@ static PyMethodDef khmer_subset_methods[] = {
 
 // LabelHash addition
 typedef struct {
-    //PyObject_HEAD
-    khmer_KHashbits_Object khashbits;
+    PyObject_HEAD
     LabelHash * labelhash;
 } khmer_KLabelHash_Object;
 
@@ -3748,9 +3747,6 @@ static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-// a little weird; we don't actually want to call Hashbits' new method. Rather, we
-// define our own new method, and redirect the base's hashbits object to point to our
-// labelhash object
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
                                       PyObject *kwds)
 {
@@ -3758,42 +3754,29 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        WordLength k = 0;
-        PyListObject * sizes_list_o = NULL;
+        PyObject * hashtable_o;
+        khmer::Hashtable * hashtable = NULL;
 
-        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
-        std::vector<HashIntoType> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
+        if (PyObject_TypeCheck(hashtable_o, &khmer_KHashbits_Type)) {
+          khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
+          hashtable = kho->hashbits;
+        }
+        else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountingHash_Type)) {
+          khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
+          hashtable = cho->counting;
         }
 
-
-        // We want the hashbits pointer in the base class to point to our labelhash,
-        // so that the KHashbits methods are called on the correct object (a LabelHash)
         try {
-            self->labelhash = new LabelHash(k, sizes);
+          self->labelhash = new LabelHash(hashtable);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashbits.hashbits = (Hashbits *)self->labelhash;
     }
 
     return (PyObject *) self;
@@ -3945,7 +3928,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         return NULL;
     }
 
-    unsigned int range = (2 * hb->_get_tag_density()) + 1;
+    unsigned int range = (2 * hb->_ht->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -3959,7 +3942,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < hb->ksize()) {
+    if (strlen(seq) < hb->_ht->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4017,7 +4000,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    unsigned int range = (2 * labelhash->_get_tag_density()) + 1;
+    unsigned int range = (2 * labelhash->_ht->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -4031,7 +4014,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < labelhash->ksize()) {
+    if (strlen(seq) < labelhash->_ht->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4041,8 +4024,8 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->partition->sweep_for_tags(seq, tagged_kmers,
-                                         labelhash->all_tags, range, break_on_stop_tags, stop_big_traversals);
+    labelhash->_ht->partition->sweep_for_tags(seq, tagged_kmers,
+                                         labelhash->_ht->all_tags, range, break_on_stop_tags, stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 
@@ -4103,6 +4086,48 @@ labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
     return PyLong_FromSize_t(labelhash->n_labels());
 }
 
+static
+PyObject *
+labelhash_save_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->save_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+labelhash_load_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->load_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef khmer_labelhash_methods[] = {
     { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
@@ -4112,7 +4137,8 @@ static PyMethodDef khmer_labelhash_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
-    {NULL, NULL, 0, NULL}           /* sentinel */
+    { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
+    { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
 static PyTypeObject khmer_KLabelHash_Type = {
@@ -4182,8 +4208,110 @@ static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
     return ret;
 }
 
+static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
+                                            PyObject * args)
+{
+    ReadAligner * aligner = me->aligner;
+
+    const char * read;
+
+    if (!PyArg_ParseTuple(args, "s", &read)) {
+        return NULL;
+    }
+
+    /*if (strlen(read) < (unsigned int)aligner->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }*/
+
+    Alignment * aln;
+    aln = aligner->AlignForward(read);
+
+    const char* alignment = aln->graph_alignment.c_str();
+    const char* readAlignment = aln->read_alignment.c_str();
+    PyObject * x = PyList_New(aln->covs.size());
+    for (size_t i = 0; i < aln->covs.size(); i++ ){
+      PyList_SET_ITEM(x, i, PyLong_FromLong(aln->covs[i]));
+    }
+
+    PyObject * ret = Py_BuildValue("dssOO", aln->score, alignment,
+                                   readAlignment,
+                                   (aln->truncated)? Py_True : Py_False,
+                                   x);
+    delete aln;
+    Py_DECREF(x);
+
+    return ret;
+}
+
+static PyObject* khmer_ReadAligner_get_scoring_matrix(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "dddd", matrix.trusted_match, matrix.trusted_mismatch,
+                          matrix.untrusted_match, matrix.untrusted_mismatch);
+}
+
+static PyObject* khmer_ReadAligner_get_transition_probabilities(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "(dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd)",
+                          matrix.tsc[0], matrix.tsc[1], matrix.tsc[2],
+                          matrix.tsc[3], matrix.tsc[4], matrix.tsc[5],
+                          matrix.tsc[6], matrix.tsc[7], matrix.tsc[8],
+                          matrix.tsc[9], matrix.tsc[10], matrix.tsc[11],
+                          matrix.tsc[12], matrix.tsc[13], matrix.tsc[14],
+                          matrix.tsc[15], matrix.tsc[16], matrix.tsc[17],
+                          matrix.tsc[18], matrix.tsc[19], matrix.tsc[20],
+                          matrix.tsc[21], matrix.tsc[22], matrix.tsc[23],
+                          matrix.tsc[24], matrix.tsc[25], matrix.tsc[26],
+                          matrix.tsc[27]);
+}
+
 static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align", (PyCFunction)readaligner_align, METH_VARARGS, ""},
+    {"align_forward", (PyCFunction)readaligner_align_forward, METH_VARARGS, ""},
+    {
+        "get_scoring_matrix", (PyCFunction)khmer_ReadAligner_get_scoring_matrix,
+        METH_VARARGS,
+        "Get the scoring matrix in use.\n\n\
+Returns a tuple of floats: (trusted_match, trusted_mismatch, untrusted_match, \
+untrusted_mismatch)"
+    },
+    {
+        "get_transition_probabilities",
+        (PyCFunction)khmer_ReadAligner_get_transition_probabilities,
+        METH_VARARGS,
+        "Get the transition probabilties in use.\n\n\
+HMM state notation abbreviations:\n\
+    M_t - trusted match; M_u - untrusted match\n\
+    Ir_t - trusted read insert; Ir_u - untrusted read insert\n\
+    Ig_t - trusted graph insert; Ig_u - untrusted graph insert\n\
+\
+Returns a sparse matrix as a tuple of six tuples.\n\
+The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.\n\
+Transition are notated as 'StartState-NextState':\n\
+(\n\
+  ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),\n\
+  (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),\n\
+  (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),\n\
+  ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),\n\
+  (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),\n\
+  (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)\n\
+)"
+    },
     {NULL} /* Sentinel */
 };
 
@@ -4212,15 +4340,31 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
         khmer_KCountingHash_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
+        double scoring_matrix[] = { 0, 0, 0, 0 };
+        double * transitions = new double[28];
 
-        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHash_Type, &ch,
-                             &trusted_cov_cutoff, &bits_theta)) {
+        if(!PyArg_ParseTuple(
+                    args,
+                    "O!Hd|(dddd)((dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd))",
+                    &khmer_KCountingHash_Type, &ch, &trusted_cov_cutoff,
+                    &bits_theta, &scoring_matrix[0], &scoring_matrix[1],
+                    &scoring_matrix[2], &scoring_matrix[3], &transitions[0],
+                    &transitions[1], &transitions[2], &transitions[3],
+                    &transitions[4], &transitions[5], &transitions[6],
+                    &transitions[7], &transitions[8], &transitions[9],
+                    &transitions[10], &transitions[11], &transitions[12],
+                    &transitions[13], &transitions[14], &transitions[15],
+                    &transitions[16], &transitions[17], &transitions[18],
+                    &transitions[19], &transitions[20], &transitions[21],
+                    &transitions[22], &transitions[23], &transitions[24],
+                    &transitions[25], &transitions[26], &transitions[27])) {
             Py_DECREF(self);
             return NULL;
         }
 
         self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
-                                        bits_theta);
+                                        bits_theta, scoring_matrix,
+                                        transitions);
     }
 
     return (PyObject *) self;
@@ -4246,7 +4390,7 @@ static PyTypeObject khmer_ReadAlignerType = {
     0,                          /*tp_getattro*/
     0,                          /*tp_setattro*/
     0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,         /*tp_flags*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,         /*tp_flags*/
     "ReadAligner object",           /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
@@ -4849,7 +4993,7 @@ init_khmer(void)
     }
     // add LabelHash
 
-    khmer_KLabelHash_Type.tp_base = &khmer_KHashbits_Type;
+    khmer_KLabelHash_Type.tp_methods = khmer_labelhash_methods;
     if (PyType_Ready(&khmer_KLabelHash_Type) < 0) {
         return;
     }
