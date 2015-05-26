@@ -31,6 +31,15 @@ def test_toobig():
         print str(err)
 
 
+def test_error_create():
+    from khmer import _LabelHash
+    try:
+        lh = _LabelHash(None)
+        assert 0, "This should fail."
+    except ValueError as err:
+        print str(err)
+
+
 def test_n_labels():
     lh = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')

@@ -3770,6 +3770,12 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
           khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
           hashtable = cho->counting;
         }
+        else {
+          PyErr_SetString(PyExc_ValueError,
+                          "graph object must be a NodeGraph or CountGraph");
+          Py_DECREF(self);
+          return NULL;
+        }
 
         try {
           self->labelhash = new LabelHash(hashtable);
