@@ -1,0 +1,11 @@
+# Magic descriptions of khmer file types for file(1) command.
+# Format is described in magic(5).
+
+0 string OXLI Binary from the khmer project,
+>4 byte x file format version %u,
+>5 byte 1 k-mer count table
+>5 byte 2 k-mer presence table
+>5 byte 3 k-mer tagset
+>5 byte 4 k-mer partition stoptags
+>5 byte 5 k-mer partition subset
+>5 byte 6 labels/tags for implicit k-mer De Bruijn graph

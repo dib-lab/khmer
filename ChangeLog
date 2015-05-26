@@ -1,3 +1,19 @@
+2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/__init__.py,lib/{counting,hashbits,hashtable,subset}.cc,
+   lib/khmer.hh: add signature to beginning of all binary file types
+   * tests/test-data/normC20k20.ct: update to new format by prepending
+   "OXLICountGraph" to the data stream
+   * tests/test_{counting_hash,functions,scripts,hashbits,hashbits_obj,
+   labelhash}.py: tests should fail, not error (add try, except + assert
+   blocks). Adapted other tests to cope with the new file formats
+   * lib/magic: new, teaches the unix `file` command about khmer file types
+   * doc/whats-new-2.0.rst: document these changes
+
 2015-06-14  Titus Brown  <titus@idyll.org>
 
    * tests/test_counting_hash.py: fixed duplicated test

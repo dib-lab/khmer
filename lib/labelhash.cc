@@ -346,6 +346,7 @@ void LabelHash::save_labels_and_tags(std::string filename)
 {
     ofstream outfile(filename.c_str(), ios::binary);
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -419,11 +420,19 @@ void LabelHash::load_labels_and_tags(std::string filename)
     unsigned long n_labeltags = 1;
     try {
         unsigned int save_ksize = 0;
+	char signature[4];
         unsigned char version = 0, ht_type = 0;
 
+	infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+	if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading labels/tags from " << filename
+                << " Should be: " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading labels/tags from " << filename;
