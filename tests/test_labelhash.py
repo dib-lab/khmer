@@ -32,7 +32,6 @@ def test_toobig():
 
 
 def test_n_labels():
-    #hb = khmer.Hashbits(20, 1e7, 4)
     lh = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_fasta_and_tag_with_labels(filename)
