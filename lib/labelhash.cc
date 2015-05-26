@@ -375,7 +375,6 @@ void LabelHash::save_labels_and_tags(std::string filename)
     TagLabelPtrMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
       //      HashIntoType k = pi->first; // unsigned long long int
-      Label * l = pi->second; // unsigned long long int;
 
       HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
       *k_p = pi->first;
