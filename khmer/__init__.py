@@ -258,7 +258,7 @@ class LabelHash(_LabelHash):
     def __new__(cls, k, starting_size, n_tables):
         hb = Hashbits(k, starting_size, n_tables)
         c = _LabelHash.__new__(cls, hb)
-        c.hashbits = hb
+        c.graph = hb
         return c
 
 
