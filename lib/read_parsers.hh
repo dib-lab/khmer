@@ -28,25 +28,25 @@ struct NoMoreReadsAvailable : public  khmer_file_exception {
         khmer_file_exception("No more reads available in this stream.") {}
 };
 
-struct InvalidRead : public  khmer_file_exception {
+struct InvalidRead : public  khmer_value_exception {
     explicit InvalidRead(const char *msg) :
-        khmer_file_exception(msg) {}
+        khmer_value_exception(msg) {}
     InvalidRead() :
-        khmer_file_exception("Invalid FASTA/Q read") {}
+        khmer_value_exception("Invalid FASTA/Q read") {}
 };
 
-struct UnknownPairReadingMode : public  khmer_file_exception {
+struct UnknownPairReadingMode : public  khmer_value_exception {
     explicit UnknownPairReadingMode(const char *msg) :
-        khmer_file_exception(msg) {}
+        khmer_value_exception(msg) {}
     UnknownPairReadingMode() :
-        khmer_file_exception("Unknown pair reading mode supplied.") {}
+        khmer_value_exception("Unknown pair reading mode supplied.") {}
 };
 
-struct InvalidReadPair : public  khmer_file_exception {
+struct InvalidReadPair : public  khmer_value_exception {
     explicit InvalidReadPair(const char *msg) :
-        khmer_file_exception(msg) {}
+        khmer_value_exception(msg) {}
     InvalidReadPair() :
-        khmer_file_exception("Invalid read pair detected.") {}
+        khmer_value_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
