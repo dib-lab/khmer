@@ -17,7 +17,7 @@ namespace khmer
 ///
 // A base class for all exceptions.
 //
-// All exceptions should be derived from this base class.
+// All exceptions should be derived from this base class or a sub-class
 //
 class khmer_exception : public std::exception
 {
@@ -35,6 +35,9 @@ protected:
     const std::string _msg;
 };
 
+
+/////// Base Exceptions /////
+
 ///
 // A base class for file exceptions.
 //
@@ -45,7 +48,16 @@ public:
         : khmer_exception(msg) { }
 };
 
-struct InvalidStreamBuffer : public khmer_exception {
+// A base exception for value exceptions
+class khmer_value_exception : public khmer_exception
+{
+public:
+    explicit khmer_value_exception(const std::string& msg)
+        : khmer_exception(msg) { }
+};
+
+
+struct InvalidStreamBuffer : public khmer_file_exception {
 };
 
 class InvalidStreamHandle : public khmer_file_exception
@@ -69,11 +81,11 @@ public:
 // An exception for invalid arguments to functions
 //
 
-class InvalidValue : public khmer_exception
+class InvalidValue : public khmer_value_exception
 {
 public:
     explicit InvalidValue(const std::string& msg)
-        : khmer_exception(msg) { }
+        : khmer_value_exception(msg) { }
 };
 
 ///
