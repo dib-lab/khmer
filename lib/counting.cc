@@ -35,7 +35,11 @@ void CountingHash::output_fasta_kmer_pos_freq(
     Read read;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         long numPos = seq.length() - _ksize + 1;
@@ -180,7 +184,11 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(
     unsigned long long read_num = 0;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
 
         seq = read.sequence;
         bool valid_read = check_and_normalize_read(seq);
@@ -944,7 +952,11 @@ void CountingHash::collect_high_abundance_kmers(
 
     bool done = false;
     while(!parser->is_complete() && !done)  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         currSeq = read.sequence;
 
         // do we want to process it?
