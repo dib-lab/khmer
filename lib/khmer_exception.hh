@@ -63,7 +63,8 @@ class InvalidStream : public khmer_file_exception
 public:
     InvalidStream()
         : khmer_file_exception("Generic InvalidStream error") {}
-    InvalidStream(const std::string& msg) : khmer_file_exception(msg) {}
+    explicit InvalidStream(const std::string& msg)
+        : khmer_file_exception(msg) {}
 };
 
 class StreamReadError : public khmer_file_exception
@@ -71,7 +72,8 @@ class StreamReadError : public khmer_file_exception
 public:
     StreamReadError()
         : khmer_file_exception("Generic StreamReadError error") {}
-    StreamReadError(const std::string& msg) : khmer_file_exception(msg) {}
+    explicit StreamReadError(const std::string& msg)
+        : khmer_file_exception(msg) {}
 };
 
 
@@ -97,7 +99,7 @@ public:
         : khmer_exception(msg) { }
 };
 
-}
+} // end namespace khmer
 
 #endif // KHMER_EXCEPTION_HH
 
