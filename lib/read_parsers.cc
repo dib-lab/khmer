@@ -33,11 +33,11 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
         message = message + filename + " for reading.";
-        throw InvalidStreamHandle(message.c_str());
+        throw InvalidStream(message.c_str());
     } else if (seqan::atEnd(_private->stream)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
-        throw InvalidStreamHandle(message.c_str());
+        throw InvalidStream(message.c_str());
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
