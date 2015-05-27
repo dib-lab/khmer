@@ -152,7 +152,7 @@ def test_fakelump_load_stop_tags_trunc():
     try:
         ht.load_stop_tags(fakelump_fa_foo)
         assert 0, "this test should fail"
-    except IOError:
+    except OSError:
         pass
 
 
@@ -165,5 +165,5 @@ def test_fakelump_load_stop_tags_notexist():
     try:
         ht.load_stop_tags(fakelump_fa_foo)
         assert 0, "this test should fail"
-    except IOError:
+    except OSError:
         pass

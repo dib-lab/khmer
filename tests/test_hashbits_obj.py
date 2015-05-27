@@ -559,7 +559,7 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
         presencetable.consume_fasta_and_tag_with_reads_parser(readsparser)
         assert 0, "this should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
     except ValueError as e:
         print(str(e))
