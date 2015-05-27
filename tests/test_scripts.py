@@ -934,7 +934,7 @@ def test_normalize_by_median_force():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert '*** Skipping' in err
-    assert '** IOErrors' in err
+    assert '** I/O Errors' in err, err
 
 
 def test_normalize_by_median_no_bigcount():

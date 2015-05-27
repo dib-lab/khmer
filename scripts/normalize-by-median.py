@@ -351,7 +351,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.force and len(corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
-        print("** IOErrors occurred in the following files:", file=sys.stderr)
+        print("** I/O Errors occurred in the following files:", file=sys.stderr)
         print("\t", " ".join(corrupt_files), file=sys.stderr)
 
 
