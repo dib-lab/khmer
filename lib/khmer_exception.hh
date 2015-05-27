@@ -56,16 +56,14 @@ public:
         : khmer_exception(msg) { }
 };
 
+/////// Specialised Exceptions /////
 
-struct InvalidStreamBuffer : public khmer_file_exception {
-};
-
-class InvalidStreamHandle : public khmer_file_exception
+class InvalidStream : public khmer_file_exception
 {
 public:
-    InvalidStreamHandle()
-        : khmer_file_exception("Generic InvalidStreamHandle error") {}
-    InvalidStreamHandle(const std::string& msg) : khmer_file_exception(msg) {}
+    InvalidStream()
+        : khmer_file_exception("Generic InvalidStream error") {}
+    InvalidStream(const std::string& msg) : khmer_file_exception(msg) {}
 };
 
 class StreamReadError : public khmer_file_exception
