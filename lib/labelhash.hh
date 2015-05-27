@@ -84,7 +84,7 @@ protected:
 public:
     khmer::Hashtable * graph;
 
-    LabelHash(Hashtable * ht) : graph(ht)
+    explicit LabelHash(Hashtable * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
 

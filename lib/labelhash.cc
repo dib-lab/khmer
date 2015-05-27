@@ -482,7 +482,6 @@ void LabelHash::load_labels_and_tags(std::string filename)
             if (infile.gcount() == 0) {
                 std::string err;
                 err = "Unknown error reading data from: " + filename;
-                //std::cout << err;
                 throw khmer_file_exception(err);
             }
         }
@@ -511,8 +510,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
             loaded++;
         }
         if (!(i == n_bytes)) {
-          //std::cout << "XYZ " << i << " : " << n_bytes << "\n";
-          throw khmer_exception();
+          throw khmer_exception("unknown error reading labels and tags");
         }
         memcpy(buf, buf + n_bytes, remainder);
     }
