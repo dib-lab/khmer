@@ -48,11 +48,17 @@ def batchwise(coll, size):
 
 
 def WithDiagnostics(ifile, batch_size, fp, paired):
+    """
+    Generator/context manager to do boilerplate output of statistics while
+    normalizing data. Also checks for properly paired data.
+    """
+
     index = 0
     global total, discarded
 
-    for batch in batchwise(screed.open(ifile, parse_description=False),
-                           batch_size):
+    for index, batch in enumerate(batchwise(
+                                  screed.open(ifile, parse_description=False),
+                                  batch_size)):
 
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
@@ -78,8 +84,6 @@ def WithDiagnostics(ifile, batch_size, fp, paired):
                     {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
 
         yield batch
-
-        index = index + 1
 
 
 # pylint: disable=too-many-locals,too-many-branches
@@ -149,7 +153,12 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def FailSafe(ifile, ofile, save_on_fail, ht, force):
+def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
+    """
+    Context manager to do boilerplate excepting of IOErrors; also does
+    upkeep on some statistics and diagnostic output.
+    """
+
     global corrupt_files, total, discarded, total_acc, discarded_acc
     try:
         yield
@@ -199,7 +208,7 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    with FailSafe(input_filename, outfp, fail_save, htable, force):
+    with CatchIOErrors(input_filename, outfp, fail_save, htable, force):
 
         total_acc, discarded_acc = normalize_by_median(
             input_filename, outfp, htable, paired, cutoff, report_fp)
@@ -302,14 +311,16 @@ def get_parser():
     return parser
 
 
-def SavingTable(input_filenames, freq, ht, savename):
-    index = 0
-    while index < len(input_filenames):
-        yield input_filenames[index]
+def CheckpointCountingTable(input_filenames, freq, ht, savename):
+    """
+    Generator/context manager to progressively save counting tables
+    """
 
+    for index, ifile in enumerate(input_filenames):
+        yield ifile
         if (freq > 0 and index > 0 and index % freq == 0):
             print('Backup: Saving k-mer counting file through ' +
-                  input_filenames[index], file=sys.stderr)
+                  ifile, file=sys.stderr)
             if savename:
                 hashname = savename
                 print('...saving to ' + hashname, file=sys.stderr)
@@ -318,8 +329,6 @@ def SavingTable(input_filenames, freq, ht, savename):
                 print('Nothing given for savetable, saving to ' + hashname,
                       file=sys.stderr)
             ht.save(hashname)
-
-        index = index + 1
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
@@ -366,14 +375,15 @@ file for one of the input files will be generated.)" % filename,
     global index
     index = 0
 
-    for f in SavingTable(args.input_filenames, args.dump_frequency, htable,
-                         args.savetable):
+    for f in CheckpointCountingTable(args.input_filenames, args.dump_frequency,
+                                     htable, args.savetable):
         total_acc, discarded_acc, corrupt_files = \
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
                 report_fp)
 
+    # Stuff to handle paired and unpaired data
     if args.paired and args.unpaired_reads:
         args.paired = False
         output_name = args.unpaired_reads
