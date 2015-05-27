@@ -214,7 +214,7 @@ TEST_PROGS = test-Colors test-read-aligner test-compile
 all: $(LIBKHMERSO) libkhmer.a khmer.pc
 
 clean:
-	rm -f *.o *.a *.so khmer.pc $(LIBKHMERSO) $(TEST_PROGS)
+	rm -f *.o *.a *.so* khmer.pc $(TEST_PROGS)
 	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
