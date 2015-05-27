@@ -3055,35 +3055,49 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    Hashbits * hashbits = tracking_obj->hashbits;
-    HashIntoType * dist;
-
-    char const * result = "";
-    bool exception = false;
+    Hashbits           *hashbits        = tracking_obj->hashbits;
+    HashIntoType       *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
     } catch (khmer_file_exception &e) {
-        exception = true;
-        result = e.what();
+        file_exception = exc.what();
+    } catch (khmer_value_exception &exc) {
+        value_exception = exc.what();
     }
     Py_END_ALLOW_THREADS
 
-    if (exception) {
-        PyErr_SetString(PyExc_IOError, result);
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
         return NULL;
     }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
-        delete[] dist;
+        if (dist != NULL) {
+            delete []dist;
+        }
         return NULL;
     }
     for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
     }
 
-    delete[] dist;
+    if (dist != NULL) {
+        delete []dist;
+    }
 
     return x;
 }
