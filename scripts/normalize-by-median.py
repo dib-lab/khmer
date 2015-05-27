@@ -18,6 +18,8 @@ option to output to STDOUT.
 Use '-h' for parameter help.
 """
 
+from __future__ import print_function
+
 import sys
 import screed
 import os
@@ -53,15 +55,17 @@ def WithDiagnostics(ifile, batch_size, fp, paired):
                            batch_size):
 
         if index > 0 and index % 100000 == 0:
-            print >>sys.stderr, '... kept {kept} of {total} or'\
-                ' {perc:2}%'.format(kept=total - discarded, total=total,
-                                    perc=int(100. - discarded /
-                                             float(total) * 100.))
-            print >>sys.stderr, '... in file', input_filename
+            print('... kept {kept} of {total} or {perc:2}%'
+                  .format(kept=total - discarded,
+                          total=total,
+                          perc=int(100. - discarded / float(total) * 100.)),
+                  file=sys.stderr)
+
+            print('... in file ' + input_filename, file=sys.stderr)
 
             if report_fp:
-                print >> fp, total, total - discarded, \
-                    1. - (discarded / float(total))
+                print(total + " " + total - discarded + " " +
+                      1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
         total += batch_size
@@ -122,25 +126,26 @@ def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
             discarded += batch_size
 
     if report_fp:
-        print >> report_fp, total, total - discarded, \
-            1. - (discarded / float(total))
+        print(str(total) + " " + str(total - discarded) + " " +
+              str(1. - (discarded / float(total))), file=report_fp)
         report_fp.flush()
 
     return total, discarded
 
 
 def handle_error(error, output_name, input_name, fail_save, htable):
-    print >> sys.stderr, '** ERROR:', error
-    print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
+    print('** ERROR: ' + str(error), file=sys.stderr)
+    print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
     if fail_save:
         tablename = os.path.basename(input_name) + '.ct.failed'
-        print >> sys.stderr, \
-            '** ...dumping k-mer counting table to {tn}'.format(tn=tablename)
+        print('** ...dumping k-mer counting table to {tn}'
+              .format(tn=tablename), file=sys.stderr)
         htable.save(tablename)
     try:
         os.remove(output_name)
     except:  # pylint: disable=bare-except
-        print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
+        print('** ERROR: problem removing corrupt filtered file',
+              file=sys.stderr)
 
 
 @contextmanager
@@ -156,21 +161,21 @@ def FailSafe(ifile, ofile, save_on_fail, ht, force):
 
             sys.exit(1)
         else:
-            print >> sys.stderr, '*** Skipping error file, moving on...'
+            print('*** Skipping error file, moving on...', file=sys.stderr)
             corrupt_files.append(ifile)
 
     if total_acc == 0 and discarded_acc == 0:
-        print >> sys.stderr, 'SKIPPED empty file', ifile
+        print('SKIPPED empty file ' + ifile, file=sys.stderr)
     elif total_acc is not None and discarded_acc is not None:
         # will be none if the context manager caught an error
         total += total_acc
         discarded += discarded_acc
-        print >> sys.stderr, \
-            'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-            .format(inp=ifile, kept=total - discarded,
-                    total=total, perc=int(100. - discarded /
-                                          float(total) * 100.))
-        print >> sys.stderr, 'output in', ofile
+        print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
+              .format(inp=ifile, kept=total - discarded,
+                      total=total,
+                      perc=int(100. - discarded / float(total) * 100.)),
+              file=sys.stderr)
+        print('output in ' + ofile.name, file=sys.stderr)
 
 
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
@@ -303,15 +308,17 @@ def SavingTable(input_filenames, freq, ht, savename):
         yield input_filenames[index]
 
         if (freq > 0 and index > 0 and index % freq == 0):
-            print >>sys.stderr, 'Backup: Saving k-mer counting file through', \
-                input_filenames[index]
+            print('Backup: Saving k-mer counting file through ' +
+                  input_filenames[index], file=sys.stderr)
             if savename:
                 hashname = savename
-                print '...saving to', hashname
+                print('...saving to ' + hashname, file=sys.stderr)
             else:
                 hashname = 'backup.ct'
-                print >>sys.stderr, 'Nothing given for savetable, saving to', hashname
-                ht.save(hashname)
+                print('Nothing given for savetable, saving to ' + hashname,
+                      file=sys.stderr)
+            ht.save(hashname)
+
         index = index + 1
 
 
@@ -328,9 +335,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     for pathfilename in args.input_filenames:
         filename = pathfilename.split('/')[-1]
         if (filename in filenames):
-            print >>sys.stderr, "WARNING: At least two input files are named \
+            print("WARNING: At least two input files are named \
 %s . (The script normalize-by-median.py can not handle this, only one .keep \
-file for one of the input files will be generated.)" % filename
+file for one of the input files will be generated.)" % filename,
+                  file=sys.stderr)
         else:
             filenames.append(filename)
 
@@ -346,10 +354,11 @@ file for one of the input files will be generated.)" % filename
     corrupt_files = []
 
     if args.loadtable:
-        print 'loading k-mer counting table from', args.loadtable
+        print('loading k-mer counting table from ' + args.loadtable,
+              file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print >> sys.stderr, 'making k-mer counting table'
+        print('making k-mer counting table', file=sys.stderr)
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
@@ -378,25 +387,25 @@ file for one of the input files will be generated.)" % filename
                 report_fp)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            htable.n_unique_kmers())
+        print('Total number of unique k-mers: {0}'
+              .format(htable.n_unique_kmers()),
+              file=sys.stderr)
 
     if args.savetable:
-        print 'Saving k-mer counting table through', input_filename
-        print '...saving to', args.savetable
+        print('...saving to ' + args.savetable, file=sys.stderr)
         htable.save(args.savetable)
 
     fp_rate = \
         khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
-    print >> sys.stderr, \
-        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
+          file=sys.stderr)
 
     if args.force and len(corrupt_files) > 0:
-        print >> sys.stderr, "** WARNING: Finished with errors!"
-        print >> sys.stderr, "** IOErrors occurred in the following files:"
-        print >> sys.stderr, "\t", " ".join(corrupt_files)
+        print("** WARNING: Finished with errors!", file=sys.stderr)
+        print("** IOErrors occurred in the following files:", file=sys.stderr)
+        print("\t", " ".join(corrupt_files), file=sys.stderr)
 
 if __name__ == '__main__':
     main()
