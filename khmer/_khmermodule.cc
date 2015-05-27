@@ -990,11 +990,6 @@ hashtable_get_hashsizes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_collect_high_abundance_kmers(khmer_KHashtable_Object * me,
-                                  PyObject * args);
-
-static
-PyObject *
 hashtable_consume_and_tag(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2413,8 +2408,6 @@ typedef struct {
     PyObject_HEAD
     ReadAligner * aligner;
 } khmer_ReadAligner_Object;
-
-static void khmer_hashtable_dealloc(khmer_KHashtable_Object * obj);
 
 static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj);
 
@@ -3999,43 +3992,6 @@ static PyTypeObject khmer_ReadAlignerType = {
     0,                         /* tp_alloc */
     khmer_ReadAligner_new,     /* tp_new */
 };
-
-static PyObject * hash_collect_high_abundance_kmers(khmer_KCountingHash_Object *
-        me , PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * filename = NULL;
-    unsigned int lower_count, upper_count;
-
-    if (!PyArg_ParseTuple(args, "sII", &filename, &lower_count, &upper_count)) {
-        return NULL;
-    }
-
-    SeenSet found_kmers;
-    counting->collect_high_abundance_kmers(filename, lower_count, upper_count,
-                                           found_kmers);
-
-    // create a new hashbits object...
-    std::vector<HashIntoType> sizes;
-    sizes.push_back(1);
-
-    khmer_KHashbits_Object * khashbits_obj = (khmer_KHashbits_Object *) \
-            PyObject_New(khmer_KHashbits_Object, &khmer_KHashbits_Type);
-    if (khashbits_obj == NULL) {
-        return NULL;
-    }
-
-    // ...and set the collected kmers as the stoptags.
-    try {
-        khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-    khashbits_obj->hashbits->stop_tags.swap(found_kmers);
-
-    return (PyObject *) khashbits_obj;
-}
 
 static
 PyObject *
