@@ -2520,7 +2520,7 @@ count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-hash_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
+count_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
                                    PyObject * args)
 {
     CountingHash * counting = me->counting;
@@ -2540,7 +2540,7 @@ hash_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-hash_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
+count_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2566,7 +2566,7 @@ hash_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
+count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 {
     CountingHash * counting = self->counting;
 
@@ -2587,7 +2587,7 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
 static
 PyObject *
-hash_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
+count_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2606,7 +2606,7 @@ hash_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
+count_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2621,7 +2621,7 @@ hash_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
+count_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2645,7 +2645,7 @@ hash_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
+count_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2669,7 +2669,7 @@ hash_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_output_fasta_kmer_pos_freq(khmer_KCountingHash_Object * me,
+count_output_fasta_kmer_pos_freq(khmer_KCountingHash_Object * me,
                                 PyObject * args)
 {
     CountingHash * counting = me->counting;
@@ -2688,7 +2688,7 @@ hash_output_fasta_kmer_pos_freq(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-hash_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
+count_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
                                    PyObject * args)
 {
     CountingHash * counting = me->counting;
@@ -2741,7 +2741,7 @@ hash_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
+count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         PyObject * args)
 {
     CountingHash * counting = me->counting;
@@ -2778,7 +2778,7 @@ hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-hash_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
+count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
 {
     CountingHash * counting = me->counting;
 
@@ -2824,7 +2824,7 @@ hash_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-hash_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
+count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
                                         PyObject * args)
 {
     CountingHash * counting = me->counting;
@@ -2880,22 +2880,22 @@ hash_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
 }
 
 static PyMethodDef khmer_counting_methods[] = {
-    { "set_use_bigcount", (PyCFunction)hash_set_use_bigcount, METH_VARARGS, "" },
-    { "get_use_bigcount", (PyCFunction)hash_get_use_bigcount, METH_VARARGS, "" },
-    { "output_fasta_kmer_pos_freq", (PyCFunction)hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
-    { "get_min_count", (PyCFunction)hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
-    { "get_max_count", (PyCFunction)hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "get_kadian_count", (PyCFunction)hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
+    { "set_use_bigcount", (PyCFunction)count_set_use_bigcount, METH_VARARGS, "" },
+    { "get_use_bigcount", (PyCFunction)count_get_use_bigcount, METH_VARARGS, "" },
+    { "output_fasta_kmer_pos_freq", (PyCFunction)count_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
+    { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
+    { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
+    { "get_kadian_count", (PyCFunction)count_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
-    { "abundance_distribution", (PyCFunction)hash_abundance_distribution, METH_VARARGS, "" },
-    { "abundance_distribution_with_reads_parser", (PyCFunction)hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
-    { "fasta_count_kmers_by_position", (PyCFunction)hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
-    { "fasta_dump_kmers_by_abundance", (PyCFunction)hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
-    { "get_raw_tables", (PyCFunction)hash_get_raw_tables,
+    { "abundance_distribution", (PyCFunction)count_abundance_distribution, METH_VARARGS, "" },
+    { "abundance_distribution_with_reads_parser", (PyCFunction)count_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
+    { "fasta_count_kmers_by_position", (PyCFunction)count_fasta_count_kmers_by_position, METH_VARARGS, "" },
+    { "fasta_dump_kmers_by_abundance", (PyCFunction)count_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
+    { "get_raw_tables", (PyCFunction)count_get_raw_tables,
         METH_VARARGS, "Get a list of the raw tables as memoryview objects" },
-    { "do_subset_partition_with_abundance", (PyCFunction)hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
+    { "do_subset_partition_with_abundance", (PyCFunction)count_do_subset_partition_with_abundance, METH_VARARGS, "" },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
