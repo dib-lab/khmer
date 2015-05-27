@@ -3016,6 +3016,7 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
         try {
             self->counting = new CountingHash(k, sizes);
         } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
             return PyErr_NoMemory();
         }
         self->khashtable.hashtable = (Hashtable *) self->counting;
@@ -3115,6 +3116,7 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
         try {
             self->hashbits = new Hashbits(k, sizes);
         } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
             return PyErr_NoMemory();
         }
         self->khashtable.hashtable = self->hashbits;
