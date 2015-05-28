@@ -5,6 +5,7 @@
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,protected-access
+import os
 import khmer
 from khmer import LabelHash, CountingLabelHash
 from screed.fasta import fasta_iter
@@ -106,6 +107,54 @@ def test_get_label_dict_save_load_wrong_ksize():
     except IOError as err:
         print str(err)
         assert "Incorrect k-mer size 19" in str(err)
+
+
+def test_save_load_corrupted():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    lb_pre.save_labels_and_tags(savepath)
+
+    # trash the old LabelHash
+    del lb_pre
+
+    lb = LabelHash(20, 1e7, 4)
+
+    # produce all possible truncated versions of this file
+    data = open(savepath, 'rb').read()
+    for i in range(len(data)):
+        truncated = utils.get_temp_filename('trunc.labels')
+        fp = open(truncated, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            lb.load_labels_and_tags(truncated)
+            assert 0, "this should not succeed -- truncated file len %d" % (i,)
+        except IOError as err:
+            print 'expected failure for', i, ': ', str(err)
+
+
+def test_save_fail_readonly():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    fp = open(savepath, 'w')
+    fp.close()
+
+    os.chmod(savepath, 0x444)
+
+    try:
+        lb_pre.save_labels_and_tags(savepath)
+        assert 0, "this should fail: read-only file"
+    except IOError as err:
+        print str(err)
 
 
 def test_get_tag_labels():

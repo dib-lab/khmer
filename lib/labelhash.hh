@@ -139,7 +139,6 @@ public:
             SeenSet * new_tags = 0);
 
     LabelPtrSet get_tag_labels(const HashIntoType& tag);
-    TagSet get_label_tags(const Label& label);
 
     void link_tag_and_label(HashIntoType& kmer, Label& label);
 
