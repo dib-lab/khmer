@@ -473,6 +473,8 @@ void LabelHash::load_labels_and_tags(std::string filename)
             // _nothing_.  Note that the while loop exits on EOF.
 
             if (infile.gcount() == 0) {
+                delete[] buf;
+
                 std::string err;
                 err = "Unknown error reading data from: " + filename;
                 throw khmer_file_exception(err);
@@ -501,16 +503,19 @@ void LabelHash::load_labels_and_tags(std::string filename)
             loaded++;
         }
         if (!(i == n_bytes)) {
+          delete[] buf;
           throw khmer_file_exception("unknown error reading labels and tags");
         }
         memcpy(buf, buf + n_bytes, remainder);
     }
 
     if (remainder != 0) {
+      delete[] buf;
       throw khmer_file_exception("unknown error reading labels and tags");
     }
 
     if (loaded != n_labeltags) {
+      delete[] buf;
       throw khmer_file_exception("error loading labels: too few loaded");
     }
 
