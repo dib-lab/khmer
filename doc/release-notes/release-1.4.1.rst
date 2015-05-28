@@ -1,9 +1,10 @@
 khmer v1.4.1 release notes
 ==========================
 
-This is the v1.4.1 release of khmer. Due to the Python 3 migration we
-need to modify the dependency on the Screed library to be only version
-0.8.
+This is the v1.4.1 release of khmer. Due to the upcoming Python 3
+compatibility in both khmer and Screed we need to modify the dependency
+between khmer and the Screed library to be only the existing version
+0.8, and not some future version.
 
 If you have khmer 1.4 installed then there is no benefit to upgrading;
 this point release is to keep ``pip install khmer`` still working when
