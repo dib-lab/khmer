@@ -350,9 +350,11 @@ class ReadAligner(_ReadAligner):
             else:
                 transition_probabilities = \
                     ReadAligner.defaultTransitionProbabilities
-        return _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
-                                    bits_theta, scoring_matrix,
-                                    transition_probabilities)
+        r = _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
+                                 bits_theta, scoring_matrix,
+                                 transition_probabilities)
+        r.graph = counting_table
+        return r
 
     def __init__(self, *args, **kwargs):
         """

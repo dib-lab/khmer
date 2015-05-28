@@ -42,6 +42,12 @@ def neq_(v1, v2):
     assert v1 != v2, (v1, v2)
 
 
+def test_graph_attribute():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    aligner = khmer.ReadAligner(ch, 0, 0)
+    assert aligner.graph is ch
+
+
 def test_align_nothing():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCAAGGCTCGAGATTTACC"
