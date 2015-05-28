@@ -486,7 +486,9 @@ static PyGetSetDef khmer_ReadParser_accessors[] = {
     {NULL, NULL, NULL, NULL, NULL} /* Sentinel */
 };
 
-static PyTypeObject khmer_ReadParser_Type = {
+static PyTypeObject khmer_ReadParser_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object")
+= {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
     "_khmer.ReadParser",                        /* tp_name */
     sizeof(khmer_ReadParser_Object),           /* tp_basicsize */
@@ -539,6 +541,10 @@ void _init_ReadParser_Type_constants()
     int result;
 
     PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ALLOW_UNPAIRED", value);
     Py_XDECREF(value);
@@ -548,6 +554,10 @@ void _init_ReadParser_Type_constants()
     }
 
     value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_IGNORE_UNPAIRED", value );
     Py_XDECREF(value);
@@ -557,6 +567,10 @@ void _init_ReadParser_Type_constants()
     }
 
     value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ERROR_ON_UNPAIRED", value);
     Py_XDECREF(value);
@@ -2709,7 +2723,7 @@ count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
 {
     khmer::CountingHash * counting = me->counting;
 
-    char * seq = NULL;
+    const char * seq = NULL;
     khmer::BoundedCounterType max_count = 0; // unsigned short int
 
     if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
