@@ -177,7 +177,7 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.8'],
+        "install_requires": ['screed == 0.8'],
         # testing screed download link
 
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],

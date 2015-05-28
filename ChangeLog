@@ -1,3 +1,7 @@
+2015-05-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: depend on screed v0.8 ONLY and no higher.
+
 2015-05-13  Scott Sievert <sieve121@umn.edu>
 
    * changed "doc/LICENSE.txt" to "LICENSE" in tests/*, scripts/*, lib/*,
