@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
@@ -104,15 +104,16 @@ def main():
 
     # the filtering function.
     def process_fn(record):
-        name = record['name']
-        seq = record['sequence']
-        if 'N' in seq:
-            return None, None
+        name = record.name
+        seq = record.sequence
+        seqN = seq.replace('N', 'A')
 
-        trim_seq, trim_at = htable.trim_on_abundance(seq, args.cutoff)
+        _, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
 
         if trim_at >= args.ksize:
-            return name, trim_seq
+            # be sure to not to change the 'N's in the trimmed sequence -
+            # so, return 'seq' and not 'seqN'.
+            return name, seq[:trim_at]
 
         return None, None
 

@@ -1,7 +1,68 @@
-2015-04-25  Sherine Awad  <sherine.awad@gmail.com>
+2015-05-26  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Remove old libkhmer.so versions during make clean
+
+2015-05-25  Kevin Murray  <spam@kdmurray.id.au>
+
+   * Makefile: Fix issue with 'lib' target not building by using FORCE
+
+2015-05-20  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlified load_graph script, tests
+   * scripts/load-graph.py: replaced with oxlified version
+   * setup.py: added oxli module and entry point
+
+2015-05-20  Kevin Murray  <spam@kdmurray.id.au>
+
+   * .gitignore: Add htmlcov/ and diff-cover.html to gitignore
+   * Makefile: Use rm -f to remove files to quash error messages on
+   non-existant files
+
+2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table
    with bigcounts,and test abundance with bigcounts
+
+2015-05-18  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * all files: references to github.com/ged-lab changed to
+   github.com/dib-lab. All GitHub URLs normalized to use HTTPS
+   * README.rst: broken landscape.io badge removed
+   * doc/user/known-issues.rst: removed two known issues fixed in v1.4 release
+
+2015-05-18  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{assembly-diff-2.py,sandbox/collect-reads.py},
+   scripts/{count-median.py,filter-abund-single.py,filter-abund.py}: changed
+   sequence-reading behavior to replace 'N' with 'A', to be consistent with
+   rest of code base.
+   * scripts/{filter-abund.py,filter-abund-single.py}: changed behavior of
+   scripts to keep sequences with 'N's in them, and count them as 'A's.
+   * tests/test_scripts.py: added tests for new
+   filter-abund/filter-abund-single behavior.
+   * tests/test-data/test-filter-abund-Ns.fq: new test file for new tests.
+
+2015-05-13  Scott Sievert  <sieve121@umn.edu>
+
+   * tests/*,scripts/*,lib/*,sandbox/*,khmer/*: changed "doc/LICENSE.txt" to
+   "LICENSE" in copyright header.
+
+2015-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/getting-started.rst: added missing dev tools to install list
+
+2015-05-12  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/load-into-counting.py,test/test_scripts.py: Add the number of
+   reads processed to the machine readable output files of --summary-info.
+
+2015-05-11  Titus Brown  <titus@idyll.org>
+
+   * scripts/sample-reads-randomly.py: fixed boundary error in
+   sample-reads-randomly.py.
+   * tests/test_scripts.py: updated tests to correspond with correct
+   behavior of sample-reads-randomly.py.
 
 2015-04-23  Lex Nederbragt  <lex.nederbragt@ibv.uio.no>
 
@@ -793,8 +854,8 @@
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
-    https://github.com/ged-lab/khmer/issues/249
-    https://github.com/ged-lab/khmer/pull/641
+    https://github.com/dib-lab/khmer/issues/249
+    https://github.com/dib-lab/khmer/pull/641
     Supports reading from non-seekable plain and gziped FAST[AQ] files (a.k.a
     pipe or streaming support)
 

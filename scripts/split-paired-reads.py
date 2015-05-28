@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -58,6 +58,7 @@ def get_parser():
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
+        #we should add nargs='?', default='/dev/stdin'
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
         epilog=textwrap.dedent(epilog),

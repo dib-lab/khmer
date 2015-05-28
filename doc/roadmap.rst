@@ -12,7 +12,7 @@ fundamental changes need to happen. This document outlines our plan to do so
 while minimizing the impact of these changes on our existing users.
 
 The discussion that lead to this document can be read at
-https://github.com/ged-lab/khmer/issues/389
+https://github.com/dib-lab/khmer/issues/389
 
 Remainder of v1.x series
 ========================
