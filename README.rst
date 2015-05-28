@@ -6,20 +6,19 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 .. image:: https://readthedocs.org/projects/khmer/badge
     :target: https://readthedocs.org/projects/khmer/
     :alt: Documentation Status
-.. image:: https://badge.fury.io/py/khmer.png
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+    :target: https://gitter.im/dib-lab/khmer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+    :alt: Join chat room
+.. image:: https://badge.fury.io/py/khmer.svg
     :target: http://badge.fury.io/py/khmer
     :alt: PyPI Package
-.. image:: https://pypip.in/d/khmer/badge.png
-    :target: https://crate.io/packages/khmer
-    :alt: Downloads Counter
-.. image:: https://pypip.in/license/khmer/badge.png
+.. image:: https://img.shields.io/pypi/dm/khmer.svg
     :target: https://pypi.python.org/pypi/khmer/
+    :alt: Downloads Counter
+.. image:: https://img.shields.io/github/license/dib-lab/khmer.svg
     :alt: License
 .. image:: http://ci.ged.msu.edu/job/khmer-master/badge/icon
     :target: http://ci.ged.msu.edu/job/khmer-master/
-.. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
-    :target: https://landscape.io/github/ged-lab/khmer/master
-    :alt: Python Code Health
 .. image:: https://scan.coverity.com/projects/621/badge.svg
     :target: https://scan.coverity.com/projects/621
     :alt: Coverity Scan Build Status
