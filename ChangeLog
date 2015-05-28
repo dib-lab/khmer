@@ -1,5 +1,13 @@
 2015-05-26  Titus Brown  <titus@idyll.org>
 
+   * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable
+   is at base of CountingHash and Hashbits.
+   * lib/hashbits.hh: add n_entries() function from Hashtable::n_entries.
+   * lib/hashtable.hh: add several virtual functions to Hashtable that exist in
+   CountingHash and Hashbits.
+
+2015-05-26  Titus Brown  <titus@idyll.org>
+
    * khmer/{__init__.py,_khmermodule.cc},lib/labelhash.{cc,hh},
    lib/{hashtable,khmer}.hh: changed LabelHash to be a "friend" of Hashtable,
    rather than a subclass; allowed initialization with either a CountingHash
