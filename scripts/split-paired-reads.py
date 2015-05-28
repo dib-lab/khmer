@@ -58,13 +58,12 @@ def get_parser():
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
-        #we should add nargs='?', default='/dev/stdin'
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
         epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('infile')
+    parser.add_argument('infile', nargs='?',default='/dev/stdin')
 
     parser.add_argument('-o', '--output-dir', metavar="output_directory",
                         dest='output_directory', default='', help='Output '
