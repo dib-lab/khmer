@@ -63,7 +63,7 @@ def get_parser():
         epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('infile')
+    parser.add_argument('infile', nargs='?',default='/dev/stdin')
 
     parser.add_argument('-o', '--output-dir', metavar="output_directory",
                         dest='output_directory', default='', help='Output '
