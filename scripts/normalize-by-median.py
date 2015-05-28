@@ -86,48 +86,59 @@ def WithDiagnostics(ifile, batch_size, fp, paired):
         yield batch
 
 
+class Normalizer(object):
+    def __init__(self, desired_coverage, htable, report_fp=None):
+        self.htable = htable
+        self.desired_coverage = desired_coverage
+        self.report_fp = report_fp
+
+        self.total = 0
+        self.discarded = 0
+
+    def __call__(self, input_filename, force_paired=False):
+        desired_coverage = self.desired_coverage
+        ksize = self.htable.ksize()
+
+        batch_size = 1
+        if force_paired:
+            batch_size = 2
+        
+        for batch in WithDiagnostics(input_filename, batch_size,
+                                     self.report_fp, force_paired):
+            passed_filter = False
+            passed_length = True
+            
+            for record in batch:
+                if len(record.sequence) < ksize:
+                    passed_length = False
+                    continue
+
+                seq = record.sequence.replace('N', 'A')
+                med, _, _ = self.htable.get_median_count(seq)
+
+                if med < desired_coverage:
+                    self.htable.consume(seq)
+                    passed_filter = True
+
+            if passed_length and passed_filter:
+                for record in batch:
+                    yield record
+            else:
+                self.discarded += batch_size
+                
+            
+
 # pylint: disable=too-many-locals,too-many-branches
 def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
                         report_fp=None):
 
-    desired_coverage = cutoff
-    ksize = htable.ksize()
+    norm = Normalizer(cutoff, htable, report_fp)
 
-    # In paired mode we read two records at a time
-    batch_size = 1
-    if paired:
-        batch_size = 2
+    for record in norm(input_filename, paired):
+        write_record(record, outfp)
 
-    index = -1
-    # global some things to work with our iterator
-    global total, discarded
-    total = 0
-    discarded = 0
-    for batch in WithDiagnostics(input_filename, batch_size, report_fp,
-                                 paired):
-
-        # Emit the batch of reads if any read passes the filter
-        # and all reads are longer than K
-        passed_filter = False
-        passed_length = True
-        for record in batch:
-            if len(record.sequence) < ksize:
-                passed_length = False
-                continue
-
-            seq = record.sequence.replace('N', 'A')
-            med, _, _ = htable.get_median_count(seq)
-
-            if med < desired_coverage:
-                htable.consume(seq)
-                passed_filter = True
-
-        # Emit records if any passed
-        if passed_length and passed_filter:
-            for record in batch:
-                write_record(record, outfp)
-        else:
-            discarded += batch_size
+    total = norm.total
+    discarded = norm.discarded
 
     if report_fp:
         print(str(total) + " " + str(total - discarded) + " " +
