@@ -1,3 +1,9 @@
+2015-06-12  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/{khmermodule.cc},tests/test_hashbits.py: Add Unicode support to
+   hashbits.get method.
+   * tests/test_hll.py: Avoid using translate for revcomp calculation.
+
 2015-06-12  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * scripts/trim-low-abund.py: changed _screed_record_dict to Record
