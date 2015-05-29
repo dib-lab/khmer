@@ -2126,7 +2126,7 @@ hashbits_get(khmer_KHashbits_Object * me, PyObject * args)
         count = hashbits->get_count(s.c_str());
     } else if (PyUnicode_Check(arg)) {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-            arg, "utf-8", "strict"));
+                                             arg, "utf-8", "strict"));
         if (strlen(s.c_str()) != hashbits->ksize()) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer size must equal the presence table k-mer size");
