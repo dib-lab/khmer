@@ -3724,8 +3724,7 @@ static PyMethodDef khmer_subset_methods[] = {
 
 // LabelHash addition
 typedef struct {
-    //PyObject_HEAD
-    khmer_KHashbits_Object khashbits;
+    PyObject_HEAD
     LabelHash * labelhash;
 } khmer_KLabelHash_Object;
 
@@ -3748,9 +3747,6 @@ static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-// a little weird; we don't actually want to call Hashbits' new method. Rather, we
-// define our own new method, and redirect the base's hashbits object to point to our
-// labelhash object
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
                                       PyObject *kwds)
 {
@@ -3758,42 +3754,35 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        WordLength k = 0;
-        PyListObject * sizes_list_o = NULL;
+        PyObject * hashtable_o;
+        khmer::Hashtable * hashtable = NULL;
 
-        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
-        std::vector<HashIntoType> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
+        if (PyObject_TypeCheck(hashtable_o, &khmer_KHashbits_Type)) {
+          khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
+          hashtable = kho->hashbits;
+        }
+        else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountingHash_Type)) {
+          khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
+          hashtable = cho->counting;
+        }
+        else {
+          PyErr_SetString(PyExc_ValueError,
+                          "graph object must be a NodeGraph or CountGraph");
+          Py_DECREF(self);
+          return NULL;
         }
 
-
-        // We want the hashbits pointer in the base class to point to our labelhash,
-        // so that the KHashbits methods are called on the correct object (a LabelHash)
         try {
-            self->labelhash = new LabelHash(k, sizes);
+          self->labelhash = new LabelHash(hashtable);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashbits.hashbits = (Hashbits *)self->labelhash;
     }
 
     return (PyObject *) self;
@@ -3945,7 +3934,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         return NULL;
     }
 
-    unsigned int range = (2 * hb->_get_tag_density()) + 1;
+    unsigned int range = (2 * hb->graph->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -3959,7 +3948,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < hb->ksize()) {
+    if (strlen(seq) < hb->graph->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4017,7 +4006,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         return NULL;
     }
 
-    unsigned int range = (2 * labelhash->_get_tag_density()) + 1;
+    unsigned int range = (2 * labelhash->graph->_get_tag_density()) + 1;
     if (r >= 0) {
         range = r;
     }
@@ -4031,7 +4020,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
         stop_big_traversals = true;
     }
 
-    if (strlen(seq) < labelhash->ksize()) {
+    if (strlen(seq) < labelhash->graph->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
@@ -4041,8 +4030,10 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->partition->sweep_for_tags(seq, tagged_kmers,
-                                         labelhash->all_tags, range, break_on_stop_tags, stop_big_traversals);
+    labelhash->graph->partition->sweep_for_tags(seq, tagged_kmers,
+                                                labelhash->graph->all_tags,
+                                                range, break_on_stop_tags,
+                                                stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 
@@ -4103,6 +4094,48 @@ labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
     return PyLong_FromSize_t(labelhash->n_labels());
 }
 
+static
+PyObject *
+labelhash_save_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->save_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+labelhash_load_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+{
+    const char * filename = NULL;
+    LabelHash * labelhash = me->labelhash;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    try {
+        labelhash->load_labels_and_tags(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef khmer_labelhash_methods[] = {
     { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
@@ -4112,7 +4145,8 @@ static PyMethodDef khmer_labelhash_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
-    {NULL, NULL, 0, NULL}           /* sentinel */
+    { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
+    { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
 static PyTypeObject khmer_KLabelHash_Type = {
@@ -4849,7 +4883,7 @@ init_khmer(void)
     }
     // add LabelHash
 
-    khmer_KLabelHash_Type.tp_base = &khmer_KHashbits_Type;
+    khmer_KLabelHash_Type.tp_methods = khmer_labelhash_methods;
     if (PyType_Ready(&khmer_KLabelHash_Type) < 0) {
         return;
     }
