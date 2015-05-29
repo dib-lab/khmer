@@ -587,8 +587,7 @@ def test_save_load_large():
         assert orig_count == 3966, orig_count
         assert loaded_count == orig_count, loaded_count
 
-    #for ctfile in ['temp.ct.gz', 'temp.ct']:
-    for ctfile in ['temp.ct.gz', ]:
+    for ctfile in ['temp.ct.gz', 'temp.ct']:
         do_test(ctfile)
 
 
