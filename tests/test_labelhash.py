@@ -5,8 +5,9 @@
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,protected-access
+import os
 import khmer
-from khmer import LabelHash
+from khmer import LabelHash, CountingLabelHash
 from screed.fasta import fasta_iter
 import screed
 
@@ -84,6 +85,76 @@ def test_get_label_dict_save_load():
         assert e_label in labels
     for a_label in labels:
         assert a_label in expected
+
+
+def test_get_label_dict_save_load_wrong_ksize():
+    lb_pre = LabelHash(19, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    lb_pre.save_labels_and_tags(savepath)
+
+    # trash the old LabelHash
+    del lb_pre
+
+    # create new, load labels & tags
+    lb = LabelHash(20, 1e7, 4)
+    try:
+        lb.load_labels_and_tags(savepath)
+        assert 0, "this should not succeed - different ksize"
+    except IOError as err:
+        print str(err)
+        assert "Incorrect k-mer size 19" in str(err)
+
+
+def test_save_load_corrupted():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    lb_pre.save_labels_and_tags(savepath)
+
+    # trash the old LabelHash
+    del lb_pre
+
+    lb = LabelHash(20, 1e7, 4)
+
+    # produce all possible truncated versions of this file
+    data = open(savepath, 'rb').read()
+    for i in range(len(data)):
+        truncated = utils.get_temp_filename('trunc.labels')
+        fp = open(truncated, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            lb.load_labels_and_tags(truncated)
+            assert 0, "this should not succeed -- truncated file len %d" % (i,)
+        except IOError as err:
+            print 'expected failure for', i, ': ', str(err)
+
+
+def test_save_fail_readonly():
+    lb_pre = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb_pre.consume_fasta_and_tag_with_labels(filename)
+
+    # save labels to a file
+    savepath = utils.get_temp_filename('saved.labels')
+    fp = open(savepath, 'w')
+    fp.close()
+
+    os.chmod(savepath, 0x444)
+
+    try:
+        lb_pre.save_labels_and_tags(savepath)
+        assert 0, "this should fail: read-only file"
+    except IOError as err:
+        print str(err)
 
 
 def test_get_tag_labels():
@@ -226,6 +297,52 @@ def test_label_tag_correctness():
     assert 3 in labels
 
 
+def test_counting_label_tag_correctness():
+    lb = CountingLabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('test-labels.fa')
+    lb.consume_fasta_and_tag_with_labels(filename)
+
+    # read A
+    labels = lb.sweep_label_neighborhood(
+        'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
+        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+    print lb.sweep_tag_neighborhood(
+        'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
+    print labels
+    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+    assert len(labels) == 2
+    assert 0 in labels
+    assert 1 in labels
+
+    # read B
+    labels = lb.sweep_label_neighborhood(
+        'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
+        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    print labels
+    assert len(labels) == 3
+    assert 0 in labels
+    assert 1 in labels
+    assert 2 in labels
+
+    # read C
+    labels = lb.sweep_label_neighborhood(
+        'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
+        'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
+        'ACAACACATACA')
+    print labels
+    assert len(labels) == 2
+    assert 1 in labels
+    assert 2 in labels
+
+    # read D
+    labels = lb.sweep_label_neighborhood(
+        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    print labels
+    assert len(labels) == 1
+    assert 3 in labels
+
+
 def test_label_tag_correctness_save_load():
     lb_pre = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
@@ -281,3 +398,29 @@ def test_label_tag_correctness_save_load():
     print labels
     assert len(labels) == 1
     assert 3 in labels
+
+
+def test_load_wrong_filetype():
+    lb = LabelHash(20, 1e7, 4)
+
+    # try to load a tagset
+    filename = utils.get_test_data('goodversion-k32.tagset')
+    try:
+        lb.load_labels_and_tags(filename)
+        assert 0, "this should not succeed - bad file type"
+    except IOError as err:
+        print str(err)
+        assert "Incorrect file format type" in str(err)
+
+
+def test_load_wrong_fileversion():
+    lb = LabelHash(20, 1e7, 4)
+
+    # try to load a tagset from an old version
+    filename = utils.get_test_data('badversion-k32.tagset')
+    try:
+        lb.load_labels_and_tags(filename)
+        assert 0, "this should not succeed - bad file type"
+    except IOError as err:
+        print str(err)
+        assert "Incorrect file format version" in str(err)

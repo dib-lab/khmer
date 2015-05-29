@@ -315,14 +315,6 @@ LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag)
     return labels;
 }
 
-TagSet LabelHash::get_label_tags(const Label& label)
-{
-    TagSet tags;
-    //unsigned int num_tags;
-    _get_tags_from_label(label, label_tag_ptrs, tags);
-    return tags;
-}
-
 void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
         LabelPtrSet& found_labels)
 {
@@ -363,6 +355,9 @@ void LabelHash::save_labels_and_tags(std::string filename)
     unsigned int save_ksize = graph->ksize();
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
 
+    unsigned long n_labeltags = tag_labels.size();
+    outfile.write((const char *) &n_labeltags, sizeof(n_labeltags));
+
     ///
 
     char * buf = NULL;
@@ -374,8 +369,6 @@ void LabelHash::save_labels_and_tags(std::string filename)
 
     TagLabelPtrMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
-      //      HashIntoType k = pi->first; // unsigned long long int
-
       HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
       *k_p = pi->first;
       n_bytes += sizeof(HashIntoType);
@@ -383,8 +376,6 @@ void LabelHash::save_labels_and_tags(std::string filename)
       Label * l_p = (Label *) (buf + n_bytes);
       *l_p = *(pi->second);
       n_bytes += sizeof(Label);
-
-      // std::cout << *k_p << " - " << *l_p << "\n";
 
       // flush to disk
       if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(Label)) {
@@ -425,9 +416,10 @@ void LabelHash::load_labels_and_tags(std::string filename)
         throw khmer_file_exception(err);
     }
 
+    unsigned long n_labeltags = 1;
     try {
         unsigned int save_ksize = 0;
-        unsigned char version, ht_type;
+        unsigned char version = 0, ht_type = 0;
 
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
@@ -450,6 +442,8 @@ void LabelHash::load_labels_and_tags(std::string filename)
                 << " while reading labels/tags from " << filename;
             throw khmer_file_exception(err.str());
         }
+
+        infile.read((char *) &n_labeltags, sizeof(n_labeltags));
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + filename;
@@ -458,7 +452,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
     char * buf = new char[IO_BUF_SIZE];
 
-    unsigned int loaded = 0;
+    unsigned long loaded = 0;
     long remainder;
 
 
@@ -468,7 +462,6 @@ void LabelHash::load_labels_and_tags(std::string filename)
     remainder = 0;
     unsigned int iteration = 0;
     while (!infile.eof()) {
-      //std::cout << "XXX " << loaded << " : " << "\n";
         unsigned int i;
 
         try {
@@ -480,9 +473,10 @@ void LabelHash::load_labels_and_tags(std::string filename)
             // _nothing_.  Note that the while loop exits on EOF.
 
             if (infile.gcount() == 0) {
+                delete[] buf;
+
                 std::string err;
                 err = "Unknown error reading data from: " + filename;
-                //std::cout << err;
                 throw khmer_file_exception(err);
             }
         }
@@ -502,8 +496,6 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
             Label * labelp2;
 
-            // std::cout << *kmer_p << " - " << *labelp << "\n";
-
             graph->all_tags.insert(*kmer_p);
             labelp2 = check_and_allocate_label(*labelp);
             link_tag_and_label(*kmer_p, *labelp2);
@@ -511,10 +503,20 @@ void LabelHash::load_labels_and_tags(std::string filename)
             loaded++;
         }
         if (!(i == n_bytes)) {
-          //std::cout << "XYZ " << i << " : " << n_bytes << "\n";
-          throw khmer_exception();
+          delete[] buf;
+          throw khmer_file_exception("unknown error reading labels and tags");
         }
         memcpy(buf, buf + n_bytes, remainder);
+    }
+
+    if (remainder != 0) {
+      delete[] buf;
+      throw khmer_file_exception("unknown error reading labels and tags");
+    }
+
+    if (loaded != n_labeltags) {
+      delete[] buf;
+      throw khmer_file_exception("error loading labels: too few loaded");
     }
 
     delete[] buf;
