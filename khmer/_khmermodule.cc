@@ -910,12 +910,12 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
     } else if (PyUnicode_Check(arg)) {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
             arg, "utf-8", "strict"));
-        if (strlen(s.c_str()) != hashbits->ksize()) {
+        if (strlen(s.c_str()) != hashtable->ksize()) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer size must equal the presence table k-mer size");
             return NULL;
         }
-        count = hashbits->get_count(s.c_str());
+        count = hashtable->get_count(s.c_str());
     } else if (PyBytes_Check(arg)) {
         std::string s = PyBytes_AsString(arg);
 
