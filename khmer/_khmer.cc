@@ -846,9 +846,6 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned int          total_reads   = 0;
     try {
         hashtable->consume_fasta(filename, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_OSError, e.get_message().c_str());
-        return NULL;
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -3833,6 +3830,7 @@ labelhash_consume_sequence_and_tag_with_labels(khmer_KLabelHash_Object * me,
     }
     unsigned long long n_consumed = 0;
     Label * the_label = hb->check_and_allocate_label(c);
+
     hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
     return Py_BuildValue("K", n_consumed);
 }
@@ -4453,8 +4451,11 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned int        total_reads   = 0;
     try {
         me->hllcounter->consume_fasta(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
+    } catch (khmer_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (khmer_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
 
