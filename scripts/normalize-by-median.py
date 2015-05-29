@@ -47,18 +47,22 @@ def batchwise(coll, size):
 # Returns true if the pair of records are properly pairs
 
 
-def WithDiagnostics(ifile, batch_size, fp, paired):
+def WithDiagnostics(ifile, batch_size, fp, paired, norm):
     """
     Generator/context manager to do boilerplate output of statistics while
     normalizing data. Also checks for properly paired data.
     """
 
     index = 0
-    global total, discarded
+    # global total, discarded
 
     for index, batch in enumerate(batchwise(
                                   screed.open(ifile, parse_description=False),
                                   batch_size)):
+
+        norm.total += batch_size
+        total = norm.total
+        discarded = norm.discarded
 
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
@@ -74,10 +78,7 @@ def WithDiagnostics(ifile, batch_size, fp, paired):
                       1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
-        total += batch_size
-
         # If in paired mode, check that the reads are properly interleaved
-
         if paired:
             if not check_is_pair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
@@ -94,6 +95,7 @@ class Normalizer(object):
 
         self.total = 0
         self.discarded = 0
+        self.corrupt_files = []
 
     def __call__(self, input_filename, force_paired=False):
         desired_coverage = self.desired_coverage
@@ -102,12 +104,12 @@ class Normalizer(object):
         batch_size = 1
         if force_paired:
             batch_size = 2
-        
+
         for batch in WithDiagnostics(input_filename, batch_size,
-                                     self.report_fp, force_paired):
+                                     self.report_fp, force_paired, self):
             passed_filter = False
             passed_length = True
-            
+
             for record in batch:
                 if len(record.sequence) < ksize:
                     passed_length = False
@@ -125,27 +127,28 @@ class Normalizer(object):
                     yield record
             else:
                 self.discarded += batch_size
-                
-            
+
 
 # pylint: disable=too-many-locals,too-many-branches
 def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
-                        report_fp=None):
+                        fail_save, force, report_fp=None):
 
     norm = Normalizer(cutoff, htable, report_fp)
 
-    for record in norm(input_filename, paired):
-        write_record(record, outfp)
+    with CatchIOErrors(input_filename, outfp, fail_save, htable, force, norm):
 
-    total = norm.total
-    discarded = norm.discarded
+        for record in norm(input_filename, paired):
+            write_record(record, outfp)
 
-    if report_fp:
-        print(str(total) + " " + str(total - discarded) + " " +
-              str(1. - (discarded / float(total))), file=report_fp)
-        report_fp.flush()
+        total = norm.total
+        discarded = norm.discarded
 
-    return total, discarded
+        if report_fp:
+            print(str(total) + " " + str(total - discarded) + " " +
+                  str(1. - (discarded / float(total))), file=report_fp)
+            report_fp.flush()
+
+    return norm.total, norm.discarded, norm.corrupt_files
 
 
 def handle_error(error, output_name, input_name, fail_save, htable):
@@ -164,32 +167,32 @@ def handle_error(error, output_name, input_name, fail_save, htable):
 
 
 @contextmanager
-def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
+def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
     """
     Context manager to do boilerplate excepting of IOErrors; also does
     upkeep on some statistics and diagnostic output.
     """
 
-    global corrupt_files, total, discarded, total_acc, discarded_acc
+    # global corrupt_files, total, discarded, total_acc, discarded_acc
+    caught_error = False
     try:
         yield
     except IOError as err:
-        handle_error(err, ofile, ifile, save_on_fail,
-                     ht)
+        caught_error = True
+        handle_error(err, ofile, ifile, save_on_fail, ht)
         if not force:
             print >> sys.stderr, '** Exiting!'
 
             sys.exit(1)
         else:
             print('*** Skipping error file, moving on...', file=sys.stderr)
-            corrupt_files.append(ifile)
+            norm.corrupt_files.append(ifile)
 
-    if total_acc == 0 and discarded_acc == 0:
+    if norm.total == 0 and norm.discarded == 0:
         print('SKIPPED empty file ' + ifile, file=sys.stderr)
-    elif total_acc is not None and discarded_acc is not None:
-        # will be none if the context manager caught an error
-        total += total_acc
-        discarded += discarded_acc
+    elif not caught_error:
+        total = norm.total
+        discarded = norm.discarded
         print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
               .format(inp=ifile, kept=total - discarded,
                       total=total,
@@ -201,7 +204,6 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
                                   fail_save, paired, cutoff, force,
                                   report_fp=None):
-    global corrupt_files, total, discarded, total_acc, discarded_acc
     total = 0
     discarded = 0
 
@@ -219,10 +221,9 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    with CatchIOErrors(input_filename, outfp, fail_save, htable, force):
-
-        total_acc, discarded_acc = normalize_by_median(
-            input_filename, outfp, htable, paired, cutoff, report_fp)
+    total_acc, discarded_acc, corrupt_files = normalize_by_median(
+        input_filename, outfp, htable, paired, cutoff, fail_save, force,
+        report_fp)
 
     return total_acc, discarded_acc, corrupt_files
 
@@ -329,7 +330,7 @@ def CheckpointCountingTable(input_filenames, freq, ht, savename):
 
     for index, ifile in enumerate(input_filenames):
         yield ifile
-        if (freq > 0 and index > 0 and index % freq == 0):
+        if freq > 0 and index > 0 and index % freq == 0:
             print('Backup: Saving k-mer counting file through ' +
                   ifile, file=sys.stderr)
             if savename:
@@ -370,7 +371,6 @@ file for one of the input files will be generated.)" % filename,
             args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
-    global corrupt_files
     corrupt_files = []
 
     if args.loadtable:
@@ -383,16 +383,15 @@ file for one of the input files will be generated.)" % filename,
                                          args.n_tables)
 
     input_filename = None
-    global index
-    index = 0
 
     for f in CheckpointCountingTable(args.input_filenames, args.dump_frequency,
                                      htable, args.savetable):
-        total_acc, discarded_acc, corrupt_files = \
+        total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
                 report_fp)
+        corrupt_files += corrupt
 
     # Stuff to handle paired and unpaired data
     if args.paired and args.unpaired_reads:
@@ -401,11 +400,12 @@ file for one of the input files will be generated.)" % filename,
         if not args.single_output_file:
             output_name = os.path.basename(args.unpaired_reads) + '.keep'
         outfp = open(output_name, 'w')
-        total_acc, discarded_acc, corrupt_files = \
+        total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 args.unpaired_reads, htable, args.single_output_file,
                 args.fail_save, args.paired, args.cutoff, args.force,
                 report_fp)
+        corrupt_files += corrupt
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'
