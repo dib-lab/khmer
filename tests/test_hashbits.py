@@ -521,7 +521,13 @@ def test_badget():
     assert hbts.get("GATGAG") == 0
 
     try:
-        hbts.get("AGCTT")
+        hbts.get(b"AGCTT")
+        assert 0, "this should fail"
+    except ValueError as err:
+        print str(err)
+
+    try:
+        hbts.get(u"AGCTT")
         assert 0, "this should fail"
     except ValueError as err:
         print str(err)
