@@ -590,16 +590,18 @@ def test_save_load_tagset_trunc():
     data = fp.read()
     fp.close()
 
-    fp = open(outfile, 'wb')
-    fp.write(data[:26])
-    fp.close()
+    for i in range(len(data)):
+        fp = open(outfile, 'wb')
+        fp.write(data[:i])
+        fp.close()
 
-    # try loading it...
-    try:
-        ht.load_tagset(outfile)
-        assert 0, "this test should fail"
-    except IOError:
-        pass
+        # try loading it...
+        try:
+            ht.load_tagset(outfile)
+            assert 0, "this test should fail"
+        except IOError as err:
+            print str(err), i
+
 
 # to build the test files used below, add 'test' to this function
 # and then look in /tmp. You will need to tweak the version info in
