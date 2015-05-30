@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <errno.h>
+#include <assert.h>
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
@@ -1354,19 +1355,13 @@ void SubsetPartition::merge_from_disk(string other_filename)
             diskp = (PartitionID *) (buf + i);
             i += sizeof(PartitionID);
 
-            if (!(*diskp != 0)) {		// sanity check.
-                delete[] buf;
-                throw khmer_file_exception("failed pmap loading sanity check");
-            }
+            assert((*diskp != 0)); // sanity check!
 
             _merge_other(*kmer_p, *diskp, diskp_to_pp);
 
             loaded++;
         }
-        if (!(i == n_bytes)) {
-            delete[] buf;
-            throw khmer_file_exception("unknown error in reading");
-        }
+        assert(i == n_bytes);
         memcpy(buf, buf + n_bytes, remainder);
     }
 
