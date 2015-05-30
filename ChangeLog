@@ -1,3 +1,12 @@
+2015-05-30  Titus Brown  <titus@idyll.org>
+
+   * lib/hashtable.{cc,hh}: add Hashtable::get_kmers()
+   and Hashtable::get_kmer_counts().
+   * khmer/_khmermodule.cc: add CPython functions for get_kmers() and
+   get_kmer_counts(); reorganize hashtable_methods a bit.
+   * tests/test_counting_hash.py: add tests for get_kmers() and
+   get_kmer_counts().
+
 2015-05-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable

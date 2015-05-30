@@ -311,6 +311,69 @@ def test_2_kadian():
     assert x == 1, x
 
 
+def test_get_kmer_counts_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("A")
+    assert len(counts) == 0
+
+
+def test_get_kmer_counts():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("AAAAAA")
+    print counts
+    assert len(counts) == 1
+    assert counts[0] == 1
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("AAAAAA")
+    print counts
+    assert len(counts) == 1
+    assert counts[0] == 2
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 1
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 2
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 3
+
+
+def test_get_kmers_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    kmers = hi.get_kmers("A")
+    assert len(kmers) == 0
+
+
+def test_get_kmers():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    kmers = hi.get_kmers("AAAAAA")
+    assert kmers == ["AAAAAA"]
+
+    kmers = hi.get_kmers("AAAAAAT")
+    assert kmers == ["AAAAAA", "AAAAAT"]
+
+
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')

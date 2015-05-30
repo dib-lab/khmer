@@ -2276,6 +2276,60 @@ hashtable_extract_unique_paths(khmer_KHashtable_Object * me, PyObject * args)
     return x;
 }
 
+
+static
+PyObject *
+hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<std::string> kmers;
+
+    try {
+      hashtable->get_kmers(sequence, kmers);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(kmers.size());
+    for (unsigned int i = 0; i < kmers.size(); i++) {
+       PyObject * obj = PyBytes_FromString(kmers[i].c_str());
+       PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+static
+PyObject *
+hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<BoundedCounterType> counts;
+    hashtable->get_kmer_counts(sequence, counts);
+
+    PyObject * x = PyList_New(counts.size());
+    for (unsigned int i = 0; i <counts.size(); i++) {
+       PyObject * obj = PyInt_FromLong(counts[i]);
+       PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
     //
     // Basic methods
@@ -2327,6 +2381,14 @@ static PyMethodDef khmer_hashtable_methods[] = {
       (PyCFunction)hashtable_get_median_count, METH_VARARGS,
       "Get the median, average, and stddev of the k-mer counts "
       " in the string"
+    },
+    { "get_kmers",
+      (PyCFunction)hashtable_get_kmers, METH_VARARGS,
+      "Generate an ordered list of all substrings of length k in the string."
+    },
+    { "get_kmer_counts",
+      (PyCFunction)hashtable_get_kmer_counts, METH_VARARGS,
+      "Retrieve the counts of all k-mers in the string."
     },
 
     //
