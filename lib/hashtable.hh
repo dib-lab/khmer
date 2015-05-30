@@ -389,6 +389,12 @@ public:
     virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
     virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
+    virtual std::vector<HashIntoType> get_tablesizes() const = 0;
+    virtual const size_t n_tables() const = 0;
+    virtual const HashIntoType n_occupied(HashIntoType start=0,
+                                          HashIntoType stop=0) const = 0;
+    virtual const HashIntoType n_entries() const = 0;
+
     void filter_if_present(const std::string &infilename,
                            const std::string &outputfilename);
 
