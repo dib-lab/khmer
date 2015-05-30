@@ -217,6 +217,17 @@ def test_simple_median():
     assert int(stddev * 100) == 50        # .5
 
 
+def test_median_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    try:
+        hi.get_median_count("A")
+        assert 0, "this should fail"
+    except ValueError:
+        pass
+
+
 def test_simple_kadian():
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
@@ -354,14 +365,6 @@ def test_get_kmer_counts():
     assert len(counts) == 2
     assert counts[0] == 2
     assert counts[1] == 3
-
-
-def test_get_kmers_too_short():
-    hi = khmer.new_counting_hash(6, 1e6, 2)
-
-    hi.consume("AAAAAA")
-    kmers = hi.get_kmers("A")
-    assert len(kmers) == 0
 
 
 def test_get_kmers():

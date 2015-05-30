@@ -2290,12 +2290,7 @@ hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
 
     std::vector<std::string> kmers;
 
-    try {
-      hashtable->get_kmers(sequence, kmers);
-    } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
-        return NULL;
-    }
+    hashtable->get_kmers(sequence, kmers);
 
     PyObject * x = PyList_New(kmers.size());
     for (unsigned int i = 0; i < kmers.size(); i++) {
