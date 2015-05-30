@@ -1842,7 +1842,12 @@ hashtable_load_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashtable->partition->load_partitionmap(filename);
+    try {
+        hashtable->partition->load_partitionmap(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
