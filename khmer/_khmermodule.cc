@@ -668,7 +668,6 @@ static PyTypeObject khmer_KSubsetPartition_Type = {
 };
 
 typedef struct {
-  //PyObject_HEAD
     khmer_KHashtable_Object khashtable;
     Hashbits * hashbits;
 } khmer_KHashbits_Object;
@@ -2406,7 +2405,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 //
 
 typedef struct {
-  //PyObject_HEAD
     khmer_KHashtable_Object khashtable;
     CountingHash * counting;
 } khmer_KCountingHash_Object;
