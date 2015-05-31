@@ -123,6 +123,8 @@ def extract_hashbits_info(filename):
             ksize, = unpack('I', hashbits.read(uint_size))
             n_tables, = unpack('B', hashbits.read(uchar_size))
             table_size, = unpack('Q', hashbits.read(ulonglong_size))
+    except IOError:
+        raise
     except:
         raise ValueError("Presence table '{}' is corrupt ".format(filename))
 
@@ -156,6 +158,8 @@ def extract_countinghash_info(filename):
             ksize, = unpack('I', countinghash.read(uint_size))
             n_tables, = unpack('B', countinghash.read(1))
             table_size, = unpack('Q', countinghash.read(ulonglong_size))
+    except IOError:
+        raise
     except:
         raise ValueError("Counting table '{}' is corrupt ".format(filename))
 

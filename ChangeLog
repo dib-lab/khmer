@@ -1,5 +1,8 @@
 2015-05-31  Titus Brown  <titus@idyll.org>
 
+   * khmer/__init__.py: pass IOError through extract_countinghash_info and
+   extract_hashbits_info so that file-does-not-exist errors are correctly
+   reported.
    * khmer/khmer_args.py: removed environment variable override for hash size
    defaults.
    * oxli/build_graph.py,sandbox/{sweep-files.py,sweep-reads.py},
