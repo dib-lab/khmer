@@ -45,13 +45,12 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--min-tablesize', '-x', type=float,
-                        default=DEFAULT_MIN_TABLESIZE,
-                        help='upper bound on tablesize to use; overrides ' +
-                        '--max-memory-usage/-M.')
+                       default=DEFAULT_MIN_TABLESIZE,
+                       help='upper bound on tablesize to use; overrides ' +
+                       '--max-memory-usage/-M.')
     group.add_argument('-M', '--max-memory-usage', type=float,
-                        help='maximum amount of memory to use for data ' +
-                        'structure.')
-
+                       help='maximum amount of memory to use for data ' +
+                       'structure.')
 
     return parser
 

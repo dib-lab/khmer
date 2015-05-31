@@ -191,7 +191,7 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
         print >>sys.stderr, "** Do not use these results!!"
         print >>sys.stderr, "**"
         print >>sys.stderr, "** (estimated false positive rate of %.3f;" % \
-              fp_all,
+            fp_all,
         print >>sys.stderr, "max allowable %.3f" % max_false_pos
         print >>sys.stderr, "**"
         if not force:
