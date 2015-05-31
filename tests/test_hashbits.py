@@ -78,7 +78,7 @@ def test_update_from_diff_ksize_2():
 
 def test_update_from_diff_tablesize():
     ht = khmer.Hashbits(5, 100, 4)
-    ht2 = khmer.Hashbits(4, 1000, 4)
+    ht2 = khmer.Hashbits(5, 1000, 4)
 
     try:
         ht.update(ht2)
@@ -89,7 +89,7 @@ def test_update_from_diff_tablesize():
 
 def test_update_from_diff_num_tables():
     ht = khmer.Hashbits(5, 1000, 3)
-    ht2 = khmer.Hashbits(4, 1000, 4)
+    ht2 = khmer.Hashbits(5, 1000, 4)
 
     try:
         ht.update(ht2)
