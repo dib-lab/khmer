@@ -19,6 +19,7 @@ import sys
 import threading
 import textwrap
 import khmer
+from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
@@ -95,9 +96,8 @@ def main():
     if os.path.exists(base + '.info'):
         os.remove(base + '.info')
 
-    print >>sys.stderr, 'making k-mer counting table'
-    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables)
+    print >>sys.stderr, 'making countgraph'
+    htable = khmer_args.create_countgraph(args)
     htable.set_use_bigcount(args.bigcount)
 
     filename = None

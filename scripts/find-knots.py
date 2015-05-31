@@ -21,6 +21,7 @@ import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
+from khmer import khmer_args
 from khmer.khmer_args import info
 
 # counting hash parameters.
@@ -119,8 +120,7 @@ def main():
 
     # create counting hash
     ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
-                                       args.n_tables)
+    counting = khmer_args.create_countgraph(args, ksize=ksize)
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):

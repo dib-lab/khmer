@@ -126,14 +126,18 @@ def _calculate_tablesize(args, hashtype):
     return tablesize
 
 
-def create_nodegraph(args):
+def create_nodegraph(args, ksize=None):
+    if ksize is None:
+        ksize = args.ksize
     tablesize = _calculate_tablesize(args, 'nodegraph')
-    return khmer.new_hashbits(args.ksize, tablesize, args.n_tables)
+    return khmer.new_hashbits(ksize, tablesize, args.n_tables)
 
 
-def create_countgraph(args):
+def create_countgraph(args, ksize=None):
+    if ksize is None:
+        ksize = args.ksize
     tablesize = _calculate_tablesize(args, 'countgraph')
-    return khmer.new_counting_hash(args.ksize, tablesize, args.n_tables)
+    return khmer.new_counting_hash(ksize, tablesize, args.n_tables)
 
 
 def report_on_config(args, hashtype='countgraph'):

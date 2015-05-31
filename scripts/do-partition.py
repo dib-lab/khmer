@@ -22,6 +22,7 @@ import gc
 import os.path
 import os
 import textwrap
+from khmer import khmer_args
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
@@ -124,8 +125,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     # load-graph
 
-    print >>sys.stderr, 'making k-mer presence table'
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    print >>sys.stderr, 'making nodegraph'
+    htable = khmer_args.create_nodegraph(args)
 
     for _, filename in enumerate(args.input_filenames):
         print >>sys.stderr, 'consuming input', filename

@@ -303,9 +303,8 @@ file for one of the input files will be generated.)" % filename
         print 'loading k-mer counting table from', args.loadtable
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print >> sys.stderr, 'making k-mer counting table'
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        print >> sys.stderr, 'making countgraph'
+        htable = khmer_args.create_countgraph(args)
 
     input_filename = None
 

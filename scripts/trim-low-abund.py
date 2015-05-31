@@ -24,6 +24,7 @@ import textwrap
 import argparse
 
 from screed.screedRecord import _screed_record_dict
+from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
@@ -126,17 +127,16 @@ def main():
         check_space_for_hashtable(
             args.n_tables * args.min_tablesize, args.force)
 
-    K = args.ksize
-
-    CUTOFF = args.cutoff
-    NORMALIZE_LIMIT = args.normalize_to
-
     if args.loadtable:
-        print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
+        print >>sys.stderr, 'loading countgraph from', args.loadtable
         ct = khmer.load_counting_hash(args.loadtable)
     else:
-        print >>sys.stderr, 'making k-mer counting table'
-        ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
+        print >>sys.stderr, 'making countgraph',
+        ct = khmer_args.create_countgraph(args)
+
+    K = ct.ksize()
+    CUTOFF = args.cutoff
+    NORMALIZE_LIMIT = args.normalize_to
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print >>sys.stderr, 'created temporary directory %s; ' \

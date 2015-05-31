@@ -6,6 +6,10 @@
    * khmer/khmer_args.py: removed environment variable override for hash size
    defaults; added -M/--max_memory_usage, and functions create_nodegraph()
    and create_countgraph().
+   * scripts/{abundance-dist-single.py,count-overlap.py,do-partition.py,
+   filter-abund-single.py,find-knots.py,load-into-counting.py,
+   make-initial-stoptags.py,normalize-by-median.py,trim-low-abund.py}: replaced
+   counting hash/hashbits creation with new khmer_args create* functions.
    * oxli/build_graph.py,sandbox/{sweep-files.py,sweep-reads.py},
    scripts/{count-overlap.py,do-partition.py,},khmer/khmer_args.py:
    changed hashtype over to 'nodegraph' and 'bitgraph' in call to

@@ -22,12 +22,9 @@ import sys
 import csv
 import khmer
 import textwrap
+from khmer import khmer_args
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-
-DEFAULT_K = 32
-DEFAULT_N_HT = 4
-DEFAULT_HASHSIZE = 1e6
 
 
 def get_parser():
@@ -75,7 +72,7 @@ def main():
         # write headers:
         f_curve_obj_csv.writerow(['input_seq', 'overlap_kmer'])
 
-    ht2 = khmer.new_hashbits(kmer_size, args.min_tablesize, args.n_tables)
+    ht2 = khmer_args.create_nodegraph(args, ksize=kmer_size)
 
     (n_unique, n_overlap, list_curve) = ht2.count_overlap(args.fafile, ht1)
 
