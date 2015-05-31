@@ -17,6 +17,7 @@ Use '-h' for parameter help.
 import sys
 
 import khmer
+from khmer import khmer_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
@@ -59,8 +60,8 @@ def main(args):
         print >>sys.stderr, 'We WILL build the tagset', \
                             ' (for partitioning/traversal).'
 
-    print >>sys.stderr, 'making k-mer presence table'
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    print >>sys.stderr, 'making nodegraph'
+    htable = khmer_args.create_nodegraph(args)
 
     functions.build_graph(filenames, htable, args.threads,
                           not args.no_build_tagset)
