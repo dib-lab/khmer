@@ -14,11 +14,6 @@ Many scripts take :option:`-x` and :option:`-N` parameters, which drive khmer's
 memory usage. These parameters depend on details of your data set; for more information
 on how to choose them, see :doc:`choosing-table-sizes`.
 
-You can also override the default values of :option:`--ksize`/:option:`-k`,
-:option:`--n_tables`/:option:`-N`, and :option:`--min-tablesize`/:option:`-x` with
-the environment variables `KHMER_KSIZE`, `KHMER_N_TABLES`, and
-`KHMER_MIN_TABLESIZE` respectively.
-
 1. :ref:`scripts-counting`
 2. :ref:`scripts-partitioning`
 3. :ref:`scripts-diginorm`

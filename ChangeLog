@@ -1,3 +1,12 @@
+2015-05-31  Titus Brown  <titus@idyll.org>
+
+   * khmer/khmer_args.py: removed environment variable override for hash size
+   defaults.
+   * oxli/build_graph.py,sandbox/{sweep-files.py,sweep-reads.py},
+   scripts/{count-overlap.py,do-partition.py,},khmer/khmer_args.py:
+   changed hashtype over to 'nodegraph' and 'bitgraph' in call to
+   report_on_config.
+
 2015-05-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable

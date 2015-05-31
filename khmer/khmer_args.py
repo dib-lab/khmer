@@ -30,24 +30,27 @@ def build_hash_args(descr=None, epilog=None, parser=None):
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
                                          formatter_class=ComboFormatter)
 
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                   DEFAULT_MIN_TABLESIZE)
-
     parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
-    parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
+    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
+
     parser.add_argument('--n_tables', '-N', type=int,
-                        default=env_n_tables,
+                        default=DEFAULT_N_TABLES,
                         help='number of k-mer counting tables to use')
-    parser.add_argument('--min-tablesize', '-x', type=float,
-                        default=env_tablesize,
-                        help='lower bound on tablesize to use')
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--min-tablesize', '-x', type=float,
+                        default=DEFAULT_MIN_TABLESIZE,
+                        help='upper bound on tablesize to use; overrides ' +
+                        '--max-memory-usage/-M.')
+    group.add_argument('-M', '--max-memory-usage', type=float,
+                        help='maximum amount of memory to use for data ' +
+                        'structure.')
+
 
     return parser
 
@@ -76,24 +79,19 @@ def add_loadhash_args(parser):
     class LoadAction(argparse.Action):
 
         def __call__(self, parser, namespace, values, option_string=None):
-            env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-            env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-            env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                           DEFAULT_MIN_TABLESIZE)
-
             from khmer.utils import print_error
 
             setattr(namespace, self.dest, values)
 
-            if getattr(namespace, 'ksize') != env_ksize or \
-               getattr(namespace, 'n_tables') != env_n_tables or \
-               getattr(namespace, 'min_tablesize') != env_tablesize:
+            if getattr(namespace, 'ksize') != DEFAULT_K or \
+               getattr(namespace, 'n_tables') != DEFAULT_N_TABLES or \
+               getattr(namespace, 'min_tablesize') != DEFAULT_MIN_TABLESIZE:
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved k-mer table from
-{hashfile}, but have set k-mer table parameters.
-Your values for ksize, n_tables, and tablesize
-will be ignored.'''.format(hashfile=values))
+** {hashfile}, but have set k-mer table parameters.
+** Your values for ksize, n_tables, and tablesize
+** will be ignored.'''.format(hashfile=values))
 
             if hasattr(parser, 'hashtype'):
                 info = None
