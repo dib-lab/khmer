@@ -719,6 +719,25 @@ def test_tagset_file_version_check():
         print str(e)
 
 
+def test_stop_tags_truncate_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    data = open(inpath, 'rb').read()
+
+    truncpath = utils.get_temp_filename('zzz')
+    for i in range(len(data)):
+        fp = open(truncpath, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            ht.load_stop_tags(truncpath)
+            assert 0, "expect failure of previous command"
+        except IOError as e:
+            print i, str(e)
+
+
 def test_tagset_ksize_check():
     ht = khmer.new_hashbits(31, 1, 1)
 
