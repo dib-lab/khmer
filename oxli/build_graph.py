@@ -41,7 +41,7 @@ def build_parser(parser):
 def main(args):
     info('build-graph.py', ['graph', 'SeqAn'])
 
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, hashtype='nodegraph')
     base = args.output_filename
     filenames = args.input_filenames
 

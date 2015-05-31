@@ -55,7 +55,7 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 def build_counting_args(descr=None, epilog=None):
     """Build an ArgumentParser with args for counting_hash based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
-    parser.hashtype = 'counting'
+    parser.hashtype = 'countgraph'
 
     return parser
 
@@ -64,7 +64,7 @@ def build_hashbits_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for hashbits based scripts."""
 
     parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
-    parser.hashtype = 'hashbits'
+    parser.hashtype = 'nodegraph'
 
     return parser
 
@@ -97,10 +97,10 @@ will be ignored.'''.format(hashfile=values))
 
             if hasattr(parser, 'hashtype'):
                 info = None
-                if parser.hashtype == 'hashbits':
+                if parser.hashtype == 'nodegraph':
                     info = extract_hashbits_info(
                         getattr(namespace, self.dest))
-                elif parser.hashtype == 'counting':
+                elif parser.hashtype == 'countgraph':
                     info = extract_countinghash_info(
                         getattr(namespace, self.dest))
                 if info:
@@ -116,7 +116,7 @@ will be ignored.'''.format(hashfile=values))
                         action=LoadAction)
 
 
-def report_on_config(args, hashtype='counting'):
+def report_on_config(args, hashtype='countgraph'):
     """Print out configuration.
 
     Summarize the configuration produced by the command-line arguments
@@ -134,12 +134,12 @@ def report_on_config(args, hashtype='counting'):
         " - min tablesize = {0:5.2g} \t(-x)".format(args.min_tablesize)
     )
     print_error("")
-    if hashtype == 'counting':
+    if hashtype == 'countgraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x min_tablesize)".format(
                 args.n_tables * args.min_tablesize))
-    elif hashtype == 'hashbits':
+    elif hashtype == 'nodegraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x min_tablesize / 8)".format(args.n_tables *

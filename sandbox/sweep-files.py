@@ -107,7 +107,7 @@ def main():
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, hashtype='nodegraph')
 
     K = args.ksize
     HT_SIZE = args.min_tablesize

@@ -107,7 +107,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
     args = get_parser().parse_args()
 
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, hashtype='nodegraph')
 
     for infile in args.input_filenames:
         check_input_files(infile, args.force)
