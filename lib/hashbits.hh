@@ -252,6 +252,7 @@ public:
         return _tablesizes[0];
     }
 
+    void update_from(const Hashbits &other);
 };
 };
 
