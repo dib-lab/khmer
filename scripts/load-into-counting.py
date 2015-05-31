@@ -84,7 +84,7 @@ def main():
         check_input_files(name, args.force)
 
     check_space(args.input_sequence_filename, args.force)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
+    check_space_for_hashtable(args, 'countgraph', args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
@@ -122,8 +122,6 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args.n_tables * args.min_tablesize,
-                                      args.force)
             print >>sys.stderr, 'mid-save', base
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:

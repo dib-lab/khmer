@@ -6,6 +6,8 @@
    * khmer/khmer_args.py: removed environment variable override for hash size
    defaults; added -M/--max_memory_usage, and functions create_nodegraph()
    and create_countgraph().
+   * khmer/kfile.py: fixed check_space_for_hashtable to depend on args obj.
+   * tests/test_script_arguments.py: updated tests.
    * scripts/{abundance-dist-single.py,count-overlap.py,do-partition.py,
    filter-abund-single.py,find-knots.py,load-into-counting.py,
    make-initial-stoptags.py,normalize-by-median.py,trim-low-abund.py}: replaced

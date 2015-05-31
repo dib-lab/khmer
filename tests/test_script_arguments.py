@@ -12,7 +12,9 @@ import sys
 import cStringIO
 import khmer_tst_utils as utils
 
+import argparse
 import khmer.kfile
+from khmer import khmer_args
 
 
 def test_check_space():
@@ -31,9 +33,13 @@ def test_check_space():
 
 def test_check_tablespace():
     save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+
+    parser = khmer_args.build_counting_args()
+    args = parser.parse_args(['-M', '1e9'])
+
     try:
-        khmer.kfile.check_space_for_hashtable(
-            1e9, force=False, _testhook_free_space=0)
+        khmer.kfile.check_space_for_hashtable(args, 'countgraph', force=False,
+                                              _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
         print str(e)
@@ -57,9 +63,13 @@ def test_check_space_force():
 
 def test_check_tablespace_force():
     save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+
+    parser = khmer_args.build_counting_args()
+    args = parser.parse_args(['-M', '1e9'])
+
     try:
-        khmer.kfile.check_space_for_hashtable(
-            1e9, force=True, _testhook_free_space=0)
+        khmer.kfile.check_space_for_hashtable(args, 'countgraph', True,
+                                              _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
         print str(e)

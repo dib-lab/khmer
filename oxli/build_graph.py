@@ -49,8 +49,7 @@ def main(args):
         check_input_files(fname, args.force)
 
     check_space(args.input_filenames, args.force)
-    check_space_for_hashtable(
-        (float(args.n_tables * args.min_tablesize) / 8.), args.force)
+    check_space_for_hashtable(args, 'nodegraph', args.force)
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)

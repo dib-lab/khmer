@@ -70,8 +70,7 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
     report_on_config(args)
 
     print >>sys.stderr, 'making countgraph'

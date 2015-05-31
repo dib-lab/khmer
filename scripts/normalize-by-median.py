@@ -24,6 +24,7 @@ import os
 import khmer
 import textwrap
 from itertools import izip
+from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -293,8 +294,7 @@ file for one of the input files will be generated.)" % filename
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
 
     # list to save error files along with throwing exceptions
     corrupt_files = []
