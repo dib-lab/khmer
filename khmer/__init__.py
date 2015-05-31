@@ -185,9 +185,14 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     if fp_all > max_false_pos:
         print >>sys.stderr, "**"
         print >>sys.stderr, "** ERROR: the graph structure is too small for "
-        print >>sys.stderr, "this data set.  Increase k-mer presence table "
-        print >>sys.stderr, "size/num of tables."
+        print >>sys.stderr, "** this data set.  Increase data structure size"
+        print >>sys.stderr, "** with --max_memory_usage/-M."
+        print >>sys.stderr, "**"
         print >>sys.stderr, "** Do not use these results!!"
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** (estimated false positive rate of %.3f;" % \
+              fp_all,
+        print >>sys.stderr, "max allowable %.3f" % max_false_pos
         print >>sys.stderr, "**"
         if not force:
             sys.exit(1)
