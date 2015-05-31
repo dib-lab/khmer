@@ -12,6 +12,7 @@ import argparse
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
 import screed
+import khmer
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
@@ -114,6 +115,28 @@ def add_loadhash_args(parser):
                         action=LoadAction)
 
 
+def _calculate_tablesize(args, hashtype):
+    if args.max_memory_usage:
+        if hashtype == 'countgraph':
+            tablesize = args.max_memory_usage / args.n_tables
+        elif hashtype == 'nodegraph':
+            tablesize = 8. * args.max_memory_usage / args.n_tables
+    else:
+        tablesize = args.min_tablesize
+
+    return tablesize
+
+
+def create_nodegraph(args):
+    tablesize = _calculate_tablesize(args, 'nodegraph')
+    return khmer.new_hashbits(args.ksize, tablesize, args.n_tables)
+
+
+def create_countgraph(args):
+    tablesize = _calculate_tablesize(args, 'countgraph')
+    return khmer.new_counting_hash(args.ksize, tablesize, args.n_tables)
+
+
 def report_on_config(args, hashtype='countgraph'):
     """Print out configuration.
 
@@ -125,11 +148,13 @@ def report_on_config(args, hashtype='countgraph'):
     if args.quiet:
         return
 
+    tablesize = _calculate_tablesize(args, hashtype)
+
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
     print_error(" - n tables =     {0} \t\t(-N)".format(args.n_tables))
     print_error(
-        " - min tablesize = {0:5.2g} \t(-x)".format(args.min_tablesize)
+        " - min tablesize = {0:5.2g} \t(-x)".format(tablesize)
     )
     print_error("")
     if hashtype == 'countgraph':
@@ -147,12 +172,13 @@ def report_on_config(args, hashtype='countgraph'):
     print_error("-" * 8)
 
     if DEFAULT_MIN_TABLESIZE == args.min_tablesize and \
-       not hasattr(args, 'loadtable'):
-        print_error(
-            "** WARNING: tablesize is default!  "
-            "You absodefly want to increase this!\n** "
-            "Please read the docs!\n"
-        )
+       not getattr(args, 'loadtable', None):
+        print_error('''\
+
+** WARNING: tablesize is default!
+** You probably want to increase this with -M/--max-memory-usage!
+** Please read the docs!
+''')
 
 
 def add_threading_args(parser):
