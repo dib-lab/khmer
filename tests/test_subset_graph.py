@@ -267,7 +267,6 @@ class Test_SaveLoadPmap(object):
             except IOError as err:
                 print str(err), i
 
-
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 8 + 1)
         filename = utils.get_test_data('random-20-a.fa')
