@@ -2,9 +2,10 @@
 
    * khmer/__init__.py: pass IOError through extract_countinghash_info and
    extract_hashbits_info so that file-does-not-exist errors are correctly
-   reported.
+   reported; fixed FP rate reporting.
    * khmer/khmer_args.py: removed environment variable override for hash size
-   defaults.
+   defaults; added -M/--max_memory_usage, and functions create_nodegraph()
+   and create_countgraph().
    * oxli/build_graph.py,sandbox/{sweep-files.py,sweep-reads.py},
    scripts/{count-overlap.py,do-partition.py,},khmer/khmer_args.py:
    changed hashtype over to 'nodegraph' and 'bitgraph' in call to
