@@ -1,3 +1,11 @@
+2015-05-30  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added error handling to load_partitionmap.
+   * lib/subset.cc: modified partitionmap format to detect truncated files;
+   changed untestable sanity checks to assertions.
+   * tests/{test_counting_hash,test_hashbits,test_subset_graph}.py: added
+   tests to try loading all possible truncations of binary save files.
+
 2015-05-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable
