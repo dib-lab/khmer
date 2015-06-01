@@ -301,7 +301,8 @@ def main():
 
     print >>sys.stderr, 'done consuming input sequence. \
                         added {t} tags and {l} \
-                        labels...'.format(t=ht.n_tags(), l=ht.n_labels())
+                        labels...'.format(t=ht.graph.n_tags(),
+                                          l=ht.n_labels())
 
     label_dict = defaultdict(int)
     label_number_dist = []

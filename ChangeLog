@@ -1,7 +1,30 @@
-2015-05-27  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-06-01  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/normalize-by-median.py: minor refactoring, fixed -R
    * tests/test_scripts.py: added test for normalize's -R arg
+
+2015-05-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable
+   is at base of CountingHash and Hashbits.
+   * lib/hashbits.hh: add n_entries() function from Hashtable::n_entries.
+   * lib/hashtable.hh: add several virtual functions to Hashtable that exist in
+   CountingHash and Hashbits.
+
+2015-05-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/labelhash.{cc,hh},
+   lib/{hashtable,khmer}.hh: changed LabelHash to be a "friend" of Hashtable,
+   rather than a subclass; allowed initialization with either a CountingHash
+   or a Hashbits; added 'graph' attribute to the Python object to store a
+   reference to host object.
+   * lib/labelhash.{cc,hh}: changed TagPtr maps to Tag maps to fix disastrous
+   bug.
+   * lib/labelhash.{cc,hh}: added save/load_tags_and_labels functions for
+   saving and loading labels.
+   * tests/test_labelhash.py: removed unnecessary tests; added tests for save
+   and load.
+   * sandbox/sweep-reads.py: updated with LabelHash changes.
 
 2015-05-26  Kevin Murray  <spam@kdmurray.id.au>
 

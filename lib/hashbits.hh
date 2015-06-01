@@ -246,6 +246,12 @@ public:
         }
         return 1;
     }
+    // accessors to get table info
+    const HashIntoType n_entries() const
+    {
+        return _tablesizes[0];
+    }
+
 };
 };
 
