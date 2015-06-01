@@ -1,3 +1,15 @@
+2015-06-01  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/normalize-by-median.py: major refactoring to use context
+   managers and classes; fixed -R
+   * tests/test_scripts.py: added test for normalize's -R arg
+   
+2015-06-01  Tamer Mansour <drtamermansour@gmail.com>
+
+   * scripts/normalize-by-median.py: changed to count kmers from both PE reads 
+   when either one of them is below the coverage cutoff
+   * tests/test_scripts.py: Added test for new behaviour
+
 2015-05-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: refactor CPython layer so that KHashtable
