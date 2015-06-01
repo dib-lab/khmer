@@ -98,7 +98,7 @@ class Normalizer(object):
 
     def __call__(self, input_filename, force_paired=False):
         seq = ""
-        
+
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
