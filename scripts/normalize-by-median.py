@@ -124,6 +124,7 @@ class Normalizer(object):
 
             if passed_length and passed_filter:
                 for record in batch:
+                    seq = record.sequence.replace('N', 'A')
                     self.htable.consume(seq)
                     yield record
             else:

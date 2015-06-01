@@ -662,22 +662,6 @@ def test_normalize_by_median_count_kmers_PE():
     assert 'kept 2 of 2 or 100%' in err, err
 
 
-def test_normalize_by_median_skip_Nreads():
-    CUTOFF = '1'
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-    # The test file has one pair of identical read except for the last base
-    # The last base is N in the first read and G in the second
-    # The read with N should be kept but does not add up to the unique kmers
-    shutil.copyfile(utils.get_test_data('paired_withN.fa'), infile)
-    script = scriptpath('normalize-by-median.py')
-
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-p', infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert 'Total number of unique k-mers: 98' in err, err
-    assert 'kept 2 of 2 or 100%' in err, err
-
-
 def test_normalize_by_median_double_file_name():
     infile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
