@@ -129,28 +129,6 @@ class Normalizer(object):
                 self.discarded += batch_size
 
 
-# pylint: disable=too-many-locals,too-many-branches
-def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
-                        fail_save, force, report_fp=None):
-
-    norm = Normalizer(cutoff, htable, report_fp)
-
-    with CatchIOErrors(input_filename, outfp, fail_save, htable, force, norm):
-
-        for record in norm(input_filename, paired):
-            write_record(record, outfp)
-
-        total = norm.total
-        discarded = norm.discarded
-
-        if report_fp:
-            print(str(total) + " " + str(total - discarded) + " " +
-                  str(1. - (discarded / float(total))), file=report_fp)
-            report_fp.flush()
-
-    return norm.total, norm.discarded, norm.corrupt_files
-
-
 def handle_error(error, output_name, input_name, fail_save, htable):
     print('** ERROR: ' + str(error), file=sys.stderr)
     print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
@@ -202,7 +180,7 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
 
 
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
-                                  fail_save, paired, cutoff, force,
+                                  fail_save, paired, force, norm,
                                   report_fp=None):
     total = 0
     discarded = 0
@@ -221,11 +199,20 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    total_acc, discarded_acc, corrupt_files = normalize_by_median(
-        input_filename, outfp, htable, paired, cutoff, fail_save, force,
-        report_fp)
+    with CatchIOErrors(input_filename, outfp, fail_save, htable, force, norm):
 
-    return total_acc, discarded_acc, corrupt_files
+        for record in norm(input_filename, paired):
+            write_record(record, outfp)
+
+        total = norm.total
+        discarded = norm.discarded
+
+        if report_fp:
+            print(str(total) + " " + str(total - discarded) + " " +
+                  str(1. - (discarded / float(total))), file=report_fp)
+            report_fp.flush()
+
+    return norm.total, norm.discarded, norm.corrupt_files
 
 
 def get_parser():
@@ -384,13 +371,14 @@ file for one of the input files will be generated.)" % filename,
 
     input_filename = None
 
+    norm = Normalizer(args.cutoff, htable, report_fp)
+
     for f in CheckpointCountingTable(args.input_filenames, args.dump_frequency,
                                      htable, args.savetable):
         total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
-                args.fail_save, args.paired, args.cutoff, args.force,
-                report_fp)
+                args.fail_save, args.paired, args.force, norm, report_fp)
         corrupt_files += corrupt
 
     # Stuff to handle paired and unpaired data
@@ -403,8 +391,7 @@ file for one of the input files will be generated.)" % filename,
         total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 args.unpaired_reads, htable, args.single_output_file,
-                args.fail_save, args.paired, args.cutoff, args.force,
-                report_fp)
+                args.fail_save, args.paired, args.force, norm, report_fp)
         corrupt_files += corrupt
 
     if args.report_total_kmers:
