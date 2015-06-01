@@ -360,7 +360,7 @@ file for one of the input files will be generated.)" % filename,
             args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
-    corrupt_files = []
+    #corrupt_files = []
 
     if args.loadtable:
         print('loading k-mer counting table from ' + args.loadtable,
@@ -381,7 +381,7 @@ file for one of the input files will be generated.)" % filename,
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.force, norm, report_fp)
-        corrupt_files += corrupt
+        #corrupt_files += corrupt
 
     # Stuff to handle paired and unpaired data
     if args.paired and args.unpaired_reads:
@@ -394,7 +394,7 @@ file for one of the input files will be generated.)" % filename,
             normalize_by_median_and_check(
                 args.unpaired_reads, htable, args.single_output_file,
                 args.fail_save, args.paired, args.force, norm, report_fp)
-        corrupt_files += corrupt
+        #corrupt_files += corrupt
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'
@@ -412,10 +412,10 @@ file for one of the input files will be generated.)" % filename,
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
           file=sys.stderr)
 
-    if args.force and len(corrupt_files) > 0:
+    if args.force and len(norm.corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
         print("** IOErrors occurred in the following files:", file=sys.stderr)
-        print("\t", " ".join(corrupt_files), file=sys.stderr)
+        print("\t", " ".join(norm.corrupt_files), file=sys.stderr)
 
 if __name__ == '__main__':
     main()
