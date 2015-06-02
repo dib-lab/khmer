@@ -317,7 +317,7 @@ def main():
                                                          percent_reads_hicov),
               file=sys.stderr)
         print('skipped %d reads/%d bases because of low coverage' %
-              (skipped_n, skipped_bp)
+              (skipped_n, skipped_bp),
               file=sys.stderr)
 
     fp_rate = \

@@ -131,15 +131,16 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        with screed.open(filename, parse_description=False) as screed_iter:
-            for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                    screed_iter,
-                    force_single=args.force_single)):
-                if count % 10000 == 0:
-                    print('...', total, 'reads scanned', file=sys.stderr)
-                    if count >= args.max_reads:
-                        print('reached upper limit of %d reads' %
-                            args.max_reads, '(see -M); exiting', file=sys.stderr)
+        screed_iter = screed.open(filename, parse_description=False)
+
+        for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
+                screed_iter,
+                force_single=args.force_single)):
+            if count % 10000 == 0:
+                print('...', count, 'reads scanned', file=sys.stderr)
+                if count >= args.max_reads:
+                    print('reached upper limit of %d reads' %
+                        args.max_reads, '(see -M); exiting', file=sys.stderr)
                     break
 
             # collect first N reads

@@ -670,12 +670,6 @@ static PyTypeObject khmer_PrePartitionInfo_Type = {
 
 /***********************************************************************/
 
-void free_subset_partition_info(void * p)
-{
-    SubsetPartition * subset_p = (SubsetPartition *) p;
-    delete subset_p;
-}
-
 typedef struct {
     PyObject_HEAD
     Hashtable * hashtable;
@@ -863,9 +857,6 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned int          total_reads   = 0;
     try {
         hashtable->consume_fasta(filename, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
     } catch (khmer_file_exception &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
@@ -894,12 +885,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     unsigned long long  n_consumed  = 0;
     unsigned int    total_reads = 0;
     Py_BEGIN_ALLOW_THREADS
-    try {
-        hashtable->consume_fasta(rparser, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        exc = e.get_message().c_str();
-        exc_raised = true;
-    }
+    hashtable->consume_fasta(rparser, total_reads, n_consumed);
     Py_END_ALLOW_THREADS
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -1054,13 +1040,9 @@ hashtable_consume_and_tag(khmer_KHashtable_Object * me, PyObject * args)
     // call the C++ function, and trap signals => Python
 
     unsigned long long n_consumed = 0;
-    try {
-        // @CTB needs to normalize
-        hashtable->consume_sequence_and_tag(seq, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
-        return NULL;
-    }
+
+    // @CTB needs to normalize
+    hashtable->consume_sequence_and_tag(seq, n_consumed);
 
     return Py_BuildValue("K", n_consumed);
 }
@@ -1165,12 +1147,7 @@ hashtable_consume_fasta_and_tag(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long n_consumed;
     unsigned int total_reads;
 
-    try {
-        hashtable->consume_fasta_and_tag(filename, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
-    }
+    hashtable->consume_fasta_and_tag(filename, total_reads, n_consumed);
 
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
@@ -1468,8 +1445,6 @@ hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
         subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
                                stop_big_traversals);
         Py_END_ALLOW_THREADS
-    } catch (_khmer_signal &e) {
-        return NULL;
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
@@ -1561,8 +1536,6 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
         hashtable->consume_fasta_and_tag(
             rparser, total_reads, n_consumed
         );
-    } catch (_khmer_signal &e) {
-        exc = e.get_message().c_str();
     } catch (khmer::read_parsers::NoMoreReadsAvailable &e) {
         exc = e.what();
     }
@@ -1601,9 +1574,6 @@ hashtable_consume_fasta_and_tag_with_stoptags(khmer_KHashtable_Object * me,
     try {
         hashtable->consume_fasta_and_tag_with_stoptags(filename,
                 total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
     } catch (khmer_file_exception &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
@@ -1632,9 +1602,6 @@ hashtable_consume_partitioned_fasta(khmer_KHashtable_Object * me,
 
     try {
         hashtable->consume_partitioned_fasta(filename, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
     } catch (khmer_file_exception &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
@@ -1661,7 +1628,7 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    _pre_partition_info * ppi = NULL;
+    pre_partition_info * ppi = NULL;
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -1669,7 +1636,7 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
     kmer = _hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
 
     try {
-        ppi = new _pre_partition_info(kmer);
+        ppi = new pre_partition_info(kmer);
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
@@ -1692,16 +1659,6 @@ PyObject *
 hashtable_assign_partition_id(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
-
-    PyObject * ppi_obj;
-    if (!PyArg_ParseTuple(args, "O", &ppi_obj)) {
-        return NULL;
-    }
-
-    if (!PyCObject_Check(ppi_obj)) {
-        PyErr_SetString( PyExc_ValueError, "invalid pre_partition_info");
-        return NULL;
-    }
 
     khmer_PrePartitionInfo_Object * ppi_obj;
     if (!PyArg_ParseTuple(args, "O!", &khmer_PrePartitionInfo_Type, &ppi_obj)) {
@@ -1828,9 +1785,6 @@ hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
         n_partitions = subset_p->output_partitioned_file(filename,
                        output,
                        output_unassigned);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
     } catch (khmer_file_exception &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
@@ -1858,18 +1812,11 @@ hashtable_find_unpart(khmer_KHashtable_Object * me, PyObject * args)
     bool stop_big_traversals = PyObject_IsTrue(stop_big_traversals_o);
     unsigned int n_singletons = 0;
 
-    try {
-        SubsetPartition * subset_p = hashtable->partition;
-        n_singletons = subset_p->find_unpart(filename, traverse,
-                                             stop_big_traversals);
-    } catch (_khmer_signal &e) {
-        return NULL;
-    }
+    SubsetPartition * subset_p = hashtable->partition;
+    n_singletons = subset_p->find_unpart(filename, traverse,
+                                         stop_big_traversals);
 
     return PyLong_FromLong(n_singletons);
-
-    // Py_INCREF(Py_None);
-    // return Py_None;
 }
 
 static
@@ -1885,11 +1832,7 @@ hashtable_filter_if_present(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    try {
-        hashtable->filter_if_present(filename, output);
-    } catch (_khmer_signal &e) {
-        return NULL;
-    }
+    hashtable->filter_if_present(filename, output);
 
     Py_RETURN_NONE;
 }
@@ -1999,7 +1942,6 @@ hashtable_subset_partition_size_distribution(khmer_KHashtable_Object * me,
 
     SubsetPartition * subset_p;
     subset_p = subset_obj->subset;
-    PyObject * subset_obj = NULL;
 
     PartitionCountDistribution d;
 
@@ -2089,14 +2031,14 @@ hashtable_save_subset_partitionmap(khmer_KHashtable_Object * me,
                                    PyObject * args)
 {
     const char * filename = NULL;
-    PyObject * subset_obj = NULL;
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "Os", &subset_obj, &filename)) {
+    if (!PyArg_ParseTuple(args, "O!s", &khmer_KSubsetPartition_Type, &subset_obj, &filename)) {
         return NULL;
     }
 
     SubsetPartition * subset_p;
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    subset_p = subset_obj->subset;
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -2217,6 +2159,8 @@ hashtable_set_partition_id(khmer_KHashtable_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "sI", &kmer, &p)) {
         return NULL;
     }
+
+    hashtable->partition->set_partition_id(kmer, p);
 
     Py_RETURN_NONE;
 }
@@ -2824,8 +2768,13 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
-        PyObject * buf = PyBuffer_FromMemory(table_ptrs[i], sizes[i]);
-        if(!PyBuffer_Check(buf)) {
+        Py_buffer buffer;
+        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i], sizes[i], 0, PyBUF_FULL_RO);
+        if (res == -1) {
+            return NULL;
+        }
+        PyObject * buf = PyMemoryView_FromBuffer(&buffer);
+        if(!PyMemoryView_Check(buf)) {
             return NULL;
         }
         PyList_SET_ITEM(raw_tables, i, buf);
@@ -3109,8 +3058,6 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
                                               break_on_stop_tags,
                                               stop_big_traversals);
         Py_END_ALLOW_THREADS
-    } catch (_khmer_signal &e) {
-        return NULL;
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
@@ -3307,9 +3254,6 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
 
     try {
         hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed);
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-        return NULL;
     } catch (InvalidStreamHandle &e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
@@ -4118,19 +4062,18 @@ hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
                                         PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
-
     khmer_KCountingHash_Object * counting_o = NULL;
     PyObject * subset_o = NULL;
+    SubsetPartition * subset_p;
     unsigned int distance, threshold, frequency;
 
     if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
-                          &counting_o, &distance, &threshold, &frequency)) {
+        &counting_o, &distance, &threshold, &frequency)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
     if (subset_o != Py_None) {
-        subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+        subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
     } else {
         subset_p = hashtable->partition;
     }

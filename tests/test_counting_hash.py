@@ -1385,7 +1385,7 @@ def test_abund_dist_gz_bigcount():
     # check if abundance is > 255
     # if ok  gzipped bigcount was loaded correctly
     for _, i in enumerate(abundances):
-        print _, i
+        print(_, i)
         if _ > 255 and i > 0:
             flag = True
             break
@@ -1396,6 +1396,6 @@ def test_counting_load_bigcount():
     count_table = khmer.new_counting_hash(10, 1e5, 4)
     count_table.set_use_bigcount(True)
     for i in range(500):
-        print i, count_table.count('ATATATATAT')
+        print(i, count_table.count('ATATATATAT'))
     count = count_table.get('ATATATATAT')
     assert count == 500

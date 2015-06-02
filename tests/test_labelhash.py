@@ -40,7 +40,7 @@ def test_error_create():
         lh = _LabelHash(None)
         assert 0, "This should fail."
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_n_labels():
@@ -107,7 +107,7 @@ def test_get_label_dict_save_load_wrong_ksize():
         lb.load_labels_and_tags(savepath)
         assert 0, "this should not succeed - different ksize"
     except IOError as err:
-        print str(err)
+        print(str(err))
         assert "Incorrect k-mer size 19" in str(err)
 
 
@@ -137,7 +137,7 @@ def test_save_load_corrupted():
             lb.load_labels_and_tags(truncated)
             assert 0, "this should not succeed -- truncated file len %d" % (i,)
         except IOError as err:
-            print 'expected failure for', i, ': ', str(err)
+            print('expected failure for', i, ': ', str(err))
 
 
 def test_save_fail_readonly():
@@ -156,7 +156,7 @@ def test_save_fail_readonly():
         lb_pre.save_labels_and_tags(savepath)
         assert 0, "this should fail: read-only file"
     except IOError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_get_tag_labels():
@@ -205,8 +205,8 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     for record in screed.open(filename):
         seq = record.sequence
         labels.update(lb.sweep_label_neighborhood(seq, 0, False, False))
-    # print lb.n_labels()
-    # print labels
+    # print(lb.n_labels())
+    # print(labels)
     assert len(labels) == 1
     assert labels.pop() == 2
     assert lb.n_labels() == 1
@@ -308,11 +308,11 @@ def test_counting_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print lb.sweep_tag_neighborhood(
+    print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
-    print labels
-    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
+    print(labels)
+    print(len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19)
     assert len(labels) == 2
     assert 0 in labels
     assert 1 in labels
@@ -321,7 +321,7 @@ def test_counting_label_tag_correctness():
     labels = lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
-    print labels
+    print(labels)
     assert len(labels) == 3
     assert 0 in labels
     assert 1 in labels
@@ -332,7 +332,7 @@ def test_counting_label_tag_correctness():
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
         'ACAACACATACA')
-    print labels
+    print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
@@ -340,7 +340,7 @@ def test_counting_label_tag_correctness():
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
-    print labels
+    print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
@@ -365,11 +365,11 @@ def test_label_tag_correctness_save_load():
     labels = lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print lb.sweep_tag_neighborhood(
+    print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT')
-    print labels
-    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
+        'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
+    print(labels)
+    print(len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19)
     assert len(labels) == 2
     assert 0 in labels
     assert 1 in labels
@@ -378,7 +378,7 @@ def test_label_tag_correctness_save_load():
     labels = lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
-    print labels
+    print(labels)
     assert len(labels) == 3
     assert 0 in labels
     assert 1 in labels
@@ -389,7 +389,7 @@ def test_label_tag_correctness_save_load():
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
         'ACAACACATACA')
-    print labels
+    print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
@@ -397,7 +397,7 @@ def test_label_tag_correctness_save_load():
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
-    print labels
+    print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
@@ -411,7 +411,7 @@ def test_load_wrong_filetype():
         lb.load_labels_and_tags(filename)
         assert 0, "this should not succeed - bad file type"
     except IOError as err:
-        print str(err)
+        print(str(err))
         assert "Incorrect file format type" in str(err)
 
 
@@ -424,5 +424,5 @@ def test_load_wrong_fileversion():
         lb.load_labels_and_tags(filename)
         assert 0, "this should not succeed - bad file type"
     except IOError as err:
-        print str(err)
+        print(str(err))
         assert "Incorrect file format version" in str(err)
