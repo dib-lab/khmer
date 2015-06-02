@@ -714,8 +714,6 @@ typedef struct {
 static void khmer_hashbits_dealloc(khmer_KHashbits_Object * obj);
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
                                     PyObject * kwds);
-static int khmer_hashbits_init(khmer_KHashbits_Object * self, PyObject * args,
-                               PyObject * kwds);
 
 static PyTypeObject khmer_KHashbits_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
@@ -755,7 +753,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
     0,                       /* tp_descr_get */
     0,                       /* tp_descr_set */
     0,                       /* tp_dictoffset */
-    (initproc)khmer_hashbits_init,   /* tp_init */
+    0,                       /* tp_init */
     0,                       /* tp_alloc */
     khmer_hashbits_new,                  /* tp_new */
 };
@@ -3355,16 +3353,6 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
     return (PyObject *) self;
 }
 
-// there are no attributes that we need at this time, so we'll just return 0
-static int khmer_hashbits_init(khmer_KHashbits_Object * self, PyObject * args,
-                               PyObject * kwds)
-{
-    if (khmer_KHashtable_Type.tp_init((PyObject *)self, args, kwds) < 0) {
-        return -1;
-    }
-    return 0;
-}
-
 #define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KHashbits_Type)
 
 ////////////////////////////////////////////////////////////////////////////
@@ -3596,8 +3584,6 @@ typedef struct {
     LabelHash * labelhash;
 } khmer_KLabelHash_Object;
 
-static int khmer_labelhash_init(khmer_KLabelHash_Object * self, PyObject *args,
-                                PyObject *kwds);
 static PyObject * khmer_labelhash_new(PyTypeObject * type, PyObject *args,
                                       PyObject *kwds);
 
@@ -3652,18 +3638,6 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     }
 
     return (PyObject *) self;
-}
-
-static int khmer_labelhash_init(khmer_KLabelHash_Object * self, PyObject *args,
-                                PyObject *kwds)
-{
-    if (khmer_KHashbits_Type.tp_init((PyObject *)self, args, kwds) < 0) {
-        return -1;
-    }
-    //std::cout << "testing my pointer ref to hashbits: " << self->khashbits.hashbits->n_tags() << std::endl;
-    //std::cout << "hashbits: " << self->khashbits.hashbits << std::endl;
-    //std::cout << "labelhash: " << self->labelhash << std::endl;
-    return 0;
 }
 
 static
@@ -4031,7 +4005,7 @@ static PyTypeObject khmer_KLabelHash_Type = {
     0,                       /* tp_descr_get */
     0,                       /* tp_descr_set */
     0,                       /* tp_dictoffset */
-    (initproc)khmer_labelhash_init,   /* tp_init */
+    0,                       /* tp_init */
     0,                       /* tp_alloc */
     khmer_labelhash_new,      /* tp_new */
 };
@@ -4800,7 +4774,6 @@ MOD_INIT(_khmer)
     }
 
     khmer_KHashbits_Type.tp_base = &khmer_KHashtable_Type;
-    khmer_KHashbits_Type.tp_new = khmer_hashbits_new;
     khmer_KHashbits_Type.tp_methods = khmer_hashbits_methods;
     if (PyType_Ready(&khmer_KHashbits_Type) < 0) {
         return MOD_ERROR_VAL;
