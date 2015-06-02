@@ -22,7 +22,7 @@ def build_graph(ifilenames, graph, num_threads=1, tags=False):
         rparser = khmer.ReadParser(ifile)
         threads = []
 
-        for _ in xrange(num_threads):
+        for _ in range(num_threads):
             cur_thread = threading.Thread(target=eat, args=(rparser,))
             threads.append(cur_thread)
             cur_thread.start()

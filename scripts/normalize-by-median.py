@@ -19,14 +19,11 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function
 
-from __future__ import print_function
-
 import sys
 import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
 from contextlib import contextmanager
 
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
