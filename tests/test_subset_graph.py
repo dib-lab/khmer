@@ -208,6 +208,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print(divvy)
+        assert len(divvy) == 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')

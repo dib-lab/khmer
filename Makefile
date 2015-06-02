@@ -37,7 +37,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install --upgrade $(DEVPKGS)
-	pip install git+https://github.com/ged-lab/screed.git@py3
+	pip install git+https://github.com/ged-lab/screed.git
 
 ## sharedobj   : build khmer shared object file
 sharedobj: khmer/_khmermodule.so
