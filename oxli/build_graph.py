@@ -55,7 +55,8 @@ def main(args):
         (float(args.n_tables * args.min_tablesize) / 8.), args.force)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)
-    print('Loading kmers from sequences in %s' % repr(filenames), file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(filenames), file=sys.stderr)
     if args.no_build_tagset:
         print('We WILL NOT build the tagset.', file=sys.stderr)
     else:
