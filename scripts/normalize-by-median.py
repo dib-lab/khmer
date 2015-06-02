@@ -33,7 +33,7 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
-from khmer.utils import write_record, check_is_pair
+from khmer.utils import write_record, check_is_pair, broken_paired_reader
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -47,7 +47,7 @@ def batchwise(coll, size):
 # Returns true if the pair of records are properly pairs
 
 
-def WithDiagnostics(ifile, batch_size, fp, paired, norm):
+def WithDiagnostics(ifile, fp, paired, single, norm):
     """
     Generator/context manager to do boilerplate output of statistics while
     normalizing data. Also checks for properly paired data.
@@ -55,14 +55,25 @@ def WithDiagnostics(ifile, batch_size, fp, paired, norm):
 
     index = 0
 
-    for index, batch in enumerate(batchwise(
-                                  screed.open(ifile, parse_description=False),
-                                  batch_size)):
+    screed_iter = screed.open(ifile, parse_description=False)
+    reader = broken_paired_reader(screed_iter, force_single=single)
 
-        norm.total += batch_size
+    for index, paired_reads, read0, read1 in reader:
+
+        batch = []
+        batch.append(read0)
+        if read1 is not None:
+            batch.append(read1)
+
+        if paired_reads:
+            assert read1 is not None
+
+        norm.total += len(batch)
         total = norm.total
         discarded = norm.discarded
 
+        # TO-DO: with broken reads it's possible that we'll skip over the
+        # 100000 mark without tripping the diagnostics--should handle this
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
                   .format(kept=total - discarded,
@@ -72,25 +83,32 @@ def WithDiagnostics(ifile, batch_size, fp, paired, norm):
 
             print('... in file ' + input_filename, file=sys.stderr)
 
-            if report_fp:
+            if fp:
                 print(total + " " + total - discarded + " " +
                       1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
         # If in paired mode, check that the reads are properly interleaved
+        if paired and not paired_reads:
+            raise IOError('Error: unpaired reads in input while paired reading'
+                          ' is forced.')
+
+        # TO-DO: obsoleted by broken_paired, to be removed
         if paired:
-            if not check_is_pair(batch[0], batch[1]):
+            if not check_is_pair(read0, read1):
                 raise IOError('Error: Improperly interleaved pairs \
-                    {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
+                    {b0} {b1}'.format(b0=read0.name, b1=read1.name))
 
         yield batch
 
 
 class Normalizer(object):
-    def __init__(self, desired_coverage, htable, report_fp=None):
+    def __init__(self, desired_coverage, htable, report_fp=None,
+                 force_single=False):
         self.htable = htable
         self.desired_coverage = desired_coverage
         self.report_fp = report_fp
+        self.force_single = force_single
 
         self.total = 0
         self.discarded = 0
@@ -102,12 +120,10 @@ class Normalizer(object):
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        batch_size = 1
-        if force_paired:
-            batch_size = 2
-
-        for batch in WithDiagnostics(input_filename, batch_size,
-                                     self.report_fp, force_paired, self):
+        # TO-DO: hacked in a way to not change this logic--BPR would
+        # probably make a lot of it cleaner
+        for batch in WithDiagnostics(input_filename, self.report_fp,
+                                     force_paired, self.force_single, self):
             passed_filter = False
             passed_length = True
 
@@ -128,7 +144,7 @@ class Normalizer(object):
                     self.htable.consume(seq)
                     yield record
             else:
-                self.discarded += batch_size
+                self.discarded += len(batch)
 
 
 def handle_error(error, output_name, input_name, fail_save, htable):
@@ -277,6 +293,8 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
+    parser.add_argument('--force-single', dest='force_single',
+                        action='store_true')
     parser.add_argument('-u', '--unpaired-reads',
                         metavar="unpaired_reads_filename", help='with paired data only,\
                         include an unpaired file')
@@ -339,6 +357,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_on_config(args)
 
     report_fp = args.report
+    force_single = args.force_single
 
     # check for similar filenames
     filenames = []
@@ -359,9 +378,6 @@ file for one of the input files will be generated.)" % filename,
         check_space_for_hashtable(
             args.n_tables * args.min_tablesize, args.force)
 
-    # list to save error files along with throwing exceptions
-    #corrupt_files = []
-
     if args.loadtable:
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
@@ -373,7 +389,7 @@ file for one of the input files will be generated.)" % filename,
 
     input_filename = None
 
-    norm = Normalizer(args.cutoff, htable, report_fp)
+    norm = Normalizer(args.cutoff, htable, report_fp, force_single)
 
     for f in CheckpointCountingTable(args.input_filenames, args.dump_frequency,
                                      htable, args.savetable):
@@ -381,7 +397,6 @@ file for one of the input files will be generated.)" % filename,
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, args.paired, args.force, norm, report_fp)
-        #corrupt_files += corrupt
 
     # Stuff to handle paired and unpaired data
     if args.paired and args.unpaired_reads:
@@ -394,7 +409,6 @@ file for one of the input files will be generated.)" % filename,
             normalize_by_median_and_check(
                 args.unpaired_reads, htable, args.single_output_file,
                 args.fail_save, args.paired, args.force, norm, report_fp)
-        #corrupt_files += corrupt
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'

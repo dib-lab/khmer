@@ -651,7 +651,7 @@ def test_normalize_by_median_count_kmers_PE():
     shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = scriptpath('normalize-by-median.py')
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    args = ['-C', CUTOFF, '-k', '17', '-t', '--force-single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'kept 1 of 2 or 50%' in err, err
@@ -792,7 +792,7 @@ def test_normalize_by_median_impaired():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert '** ERROR: Error: Improperly interleaved pairs ' in err
+    assert 'Error: unpaired reads ' in err, err
 
 
 def test_normalize_by_median_force():
