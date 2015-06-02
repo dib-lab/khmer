@@ -2093,7 +2093,7 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
     } else {
         khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
-	subset_obj->subset = subset_p;
+        subset_obj->subset = subset_p;
         return (PyObject*) subset_obj;
     }
 }
@@ -4826,9 +4826,6 @@ MOD_INIT(_khmer)
                             (PyObject *)&khmer_KCountingHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
-    if (PyModule_AddObject( m, "ReadParser", (PyObject *)&khmer_ReadParser_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     Py_INCREF(&khmer_KHashbits_Type);
     if (PyModule_AddObject(m, "Hashbits", (PyObject *)&khmer_KHashbits_Type) < 0) {
@@ -4842,9 +4839,16 @@ MOD_INIT(_khmer)
     }
 
     Py_INCREF(&khmer_KHLLCounter_Type);
-    PyModule_AddObject(m, "HLLCounter", (PyObject *)&khmer_KHLLCounter_Type);
+    if (PyModule_AddObject(m, "HLLCounter",
+                           (PyObject *)&khmer_KHLLCounter_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_ReadAlignerType);
-    PyModule_AddObject(m, "ReadAligner", (PyObject *)&khmer_ReadAlignerType);
+    if (PyModule_AddObject(m, "ReadAligner",
+                           (PyObject *)&khmer_ReadAlignerType) < 0) {
+        return MOD_ERROR_VAL;
+    }
 
     return MOD_SUCCESS_VAL(m);
 }
