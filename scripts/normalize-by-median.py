@@ -70,8 +70,6 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
         total = norm.total
         discarded = norm.discarded
 
-        # TO-DO: with broken reads it's possible that we'll skip over the
-        # 100000 mark without tripping the diagnostics--should handle this
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
                   .format(kept=total - discarded,
@@ -90,13 +88,6 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
         if paired and not paired_reads:
             raise IOError('Error: unpaired reads in input while paired reading'
                           ' is forced.')
-
-        # TO-DO: obsoleted by the above/BPR, to be removed
-        if paired:
-            if not check_is_pair(read0, read1):
-                raise IOError('Error: Improperly interleaved pairs \
-                    {b0} {b1}'.format(b0=read0.name, b1=read1.name))
-
         yield batch
 
 
@@ -118,8 +109,6 @@ class Normalizer(object):
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        # TO-DO: hacked in a way to not change this logic--BPR 
-        # might make a lot of it cleaner
         for batch in WithDiagnostics(input_filename, self.report_fp,
                                      force_paired, self.force_single, self):
             passed_filter = False
