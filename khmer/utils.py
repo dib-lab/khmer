@@ -89,7 +89,8 @@ def check_is_right(name):
     return False
 
 
-def broken_paired_reader(screed_iter, min_length=None, force_single=False):
+def broken_paired_reader(screed_iter, min_length=None,
+                         force_single=False, require_paired=False):
     """Read pairs from a stream.
 
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
@@ -117,6 +118,9 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     prev_record = None
     n = 0
 
+    if force_single and require_paired:
+        raise ValueError("force_single and require_paired cannot both be set!")
+
     # handle the majority of the stream.
     for record in screed_iter:
         # ignore short reads
@@ -130,6 +134,8 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
                 n += 2
                 record = None
             else:                                   # orphan.
+                if require_paired:
+                    raise ValueError("requiring paired seqs @CTB")
                 yield n, False, prev_record, None
                 n += 1
 
@@ -138,6 +144,8 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
 
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
+        if require_paired:
+            raise ValueError("requiring paired seqs @CTB")
         yield n, False, prev_record, None
 
 

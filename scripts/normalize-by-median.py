@@ -72,11 +72,7 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
                       1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
-        # If in paired mode, check that the reads are properly interleaved
-        if force_paired and not is_paired:
-            raise IOError('Error: unpaired reads in input while paired reading'
-                          ' is forced.')
-        yield read0, read1
+        yield index, is_paired, read0, read1
 
 
 class Normalizer(object):
@@ -99,9 +95,10 @@ class Normalizer(object):
 
         screed_iter = screed.open(input_filename, parse_description=False)
         reader = broken_paired_reader(screed_iter,
-                                      force_single=self.force_single)
+                                      force_single=self.force_single,
+                                      require_paired=force_paired)
 
-        for read0, read1 in WithDiagnostics(input_filename, self.report_fp,
+        for index, is_paired, read0, read1 in WithDiagnostics(input_filename, self.report_fp,
                                             force_paired, self, reader):
             passed_filter = False
             passed_length = True
@@ -156,7 +153,7 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
     caught_error = False
     try:
         yield
-    except IOError as err:
+    except (IOError, ValueError) as err:
         caught_error = True
         handle_error(err, ofile, ifile, save_on_fail, ht)
         if not force:
