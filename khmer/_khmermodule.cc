@@ -1589,18 +1589,13 @@ hashtable_merge_subset(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    PyObject * subset_obj;
-    if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
-    if (!PyCObject_Check(subset_obj)) {
-        PyErr_SetString( PyExc_ValueError, "invalid subset");
-        return NULL;
-    }
-
-    SubsetPartition * subset_p;
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    SubsetPartition * subset_p = subset_obj->subset;
 
     hashtable->partition->merge(subset_p);
 
@@ -2053,7 +2048,8 @@ hashtable_subset_count_partitions(khmer_KHashtable_Object * me, PyObject * args)
 {
     khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "O!", &subset_obj, &khmer_KSubsetPartition_Type)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
@@ -2071,13 +2067,13 @@ PyObject *
 hashtable_subset_partition_size_distribution(khmer_KHashtable_Object * me,
         PyObject * args)
 {
-    PyObject * subset_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    SubsetPartition * subset_p = subset_obj->subset;
 
     PartitionCountDistribution d;
 
@@ -2167,14 +2163,14 @@ hashtable_save_subset_partitionmap(khmer_KHashtable_Object * me,
                                    PyObject * args)
 {
     const char * filename = NULL;
-    PyObject * subset_obj = NULL;
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "Os", &subset_obj, &filename)) {
+    if (!PyArg_ParseTuple(args, "O!s", &khmer_KSubsetPartition_Type,
+                          &subset_obj, &filename)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    SubsetPartition * subset_p = subset_obj->subset;
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -2228,9 +2224,19 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
         PyErr_SetString(PyExc_IOError, err.c_str());
         delete subset_p;
         return NULL;
-    } else {
-        return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
     }
+
+    khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
+            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
+
+    if (subset_obj == NULL) {
+        delete subset_p;
+        return NULL;
+    }
+
+    subset_obj->subset = subset_p;
+
+    return (PyObject *) subset_obj;
 }
 
 static
@@ -2269,14 +2275,15 @@ PyObject *
 hashtable__validate_subset_partitionmap(khmer_KHashtable_Object * me,
                                         PyObject * args)
 {
-    PyObject * subset_obj = NULL;
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    SubsetPartition * subset_p = subset_obj->subset;
+
     subset_p->_validate_pmap();
 
     Py_RETURN_NONE;
@@ -4017,14 +4024,16 @@ hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
     PyObject * subset_o = NULL;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
-                          &counting_o, &distance, &threshold, &frequency)) {
+    if (!PyArg_ParseTuple(args, "OO!III",
+                          &subset_o,
+                          &khmer_KCountingHash_Type, &counting_o,
+                          &distance, &threshold, &frequency)) {
         return NULL;
     }
 
     SubsetPartition * subset_p;
-    if (subset_o != Py_None) {
-        subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+    if (PyObject_TypeCheck(subset_o, &khmer_KSubsetPartition_Type)) {
+        subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
     } else {
         subset_p = hashtable->partition;
     }
