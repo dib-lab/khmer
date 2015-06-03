@@ -294,7 +294,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     SeenSet tagged_kmers;
     unsigned int num_traversed;
     num_traversed = graph->partition->sweep_for_tags(seq, tagged_kmers,
-                                                     graph->all_tags,
+                    graph->all_tags,
                     range, break_on_stoptags, stop_big_traversals);
     traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
@@ -369,19 +369,19 @@ void LabelHash::save_labels_and_tags(std::string filename)
 
     TagLabelPtrMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
-      HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
-      *k_p = pi->first;
-      n_bytes += sizeof(HashIntoType);
+        HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
+        *k_p = pi->first;
+        n_bytes += sizeof(HashIntoType);
 
-      Label * l_p = (Label *) (buf + n_bytes);
-      *l_p = *(pi->second);
-      n_bytes += sizeof(Label);
+        Label * l_p = (Label *) (buf + n_bytes);
+        *l_p = *(pi->second);
+        n_bytes += sizeof(Label);
 
-      // flush to disk
-      if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(Label)) {
-        outfile.write(buf, n_bytes);
-        n_bytes = 0;
-      }
+        // flush to disk
+        if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(Label)) {
+            outfile.write(buf, n_bytes);
+            n_bytes = 0;
+        }
     }
     // save remainder.
     if (n_bytes) {
@@ -503,20 +503,20 @@ void LabelHash::load_labels_and_tags(std::string filename)
             loaded++;
         }
         if (!(i == n_bytes)) {
-          delete[] buf;
-          throw khmer_file_exception("unknown error reading labels and tags");
+            delete[] buf;
+            throw khmer_file_exception("unknown error reading labels and tags");
         }
         memcpy(buf, buf + n_bytes, remainder);
     }
 
     if (remainder != 0) {
-      delete[] buf;
-      throw khmer_file_exception("unknown error reading labels and tags");
+        delete[] buf;
+        throw khmer_file_exception("unknown error reading labels and tags");
     }
 
     if (loaded != n_labeltags) {
-      delete[] buf;
-      throw khmer_file_exception("error loading labels: too few loaded");
+        delete[] buf;
+        throw khmer_file_exception("error loading labels: too few loaded");
     }
 
     delete[] buf;
