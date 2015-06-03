@@ -1,0 +1,2024 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_alignmentgraph" data-page="AlignmentGraph">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>AlignmentGraph - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>AlignmentGraph<div><div>Alignment graph type.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Graph.html" data-lang-entity="class">Graph</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_align.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TStringSet[, typename TCargo[, typename TSpec]]&gt;
+class Graph&lt;Alignment&lt;TStringSet, TCargo, TSpec&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TStringSet</a></code></th>
+        <td>The type of the <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> containing the sequence information. <b>Must be a
+<a href="specialization_DependentStringSet.html" data-lang-entity="specialization">DependentStringSet</a>.</b></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The cargo type that can be attached to edges. Default: <tt>unsigned</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <tt>Default</tt>. Use <tt>WithoutEdgeId</tt> here to omit
+edge ids. NB: if edges do not store ids then external property maps do not work.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23assignStringSet" title="#AlignmentGraph#assignStringSet (interface function)" data-lang-entity="interface_function">void assignStringSet(g, stringSet);</a></code></span>
+    <span class="summary_desc"><div>Assigns a new StringSet to an AlignmentGraph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23convertAlignment" title="#AlignmentGraph#convertAlignment (interface function)" data-lang-entity="interface_function">bool convertAlignment(g, component, order, compLength);, bool convertAlignment(g, matrix);</a></code></span>
+    <span class="summary_desc"><div>Converts an alignment graph into an alignment matrix.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23findVertex" title="#AlignmentGraph#findVertex (interface function)" data-lang-entity="interface_function">TVertexDescriptor findVertex(ag, id, pos);</a></code></span>
+    <span class="summary_desc"><div>Finds a vertx given a sequence id and a position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23fragmentBegin" title="#AlignmentGraph#fragmentBegin (interface function)" data-lang-entity="interface_function">TPos fragmentBegin(ag, v);</a></code></span>
+    <span class="summary_desc"><div>Gets the begin position for this vertex descriptor in the sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23fragmentLength" title="#AlignmentGraph#fragmentLength (interface function)" data-lang-entity="interface_function">TSize fragmentLength(ag, v);</a></code></span>
+    <span class="summary_desc"><div>Gets the length of the fragment for this vertex descriptor in the sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23getDistanceMatrix" title="#AlignmentGraph#getDistanceMatrix (interface function)" data-lang-entity="interface_function">void getDistanceMtarix(graph, mat[, tag]);, void getDistanceMtarix(graph, mat[, kTup][, alphabet], KmerDistance);</a></code></span>
+    <span class="summary_desc"><div>Computes a pairwise distance matrix from an <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23getFirstCoveredPosition" title="#AlignmentGraph#getFirstCoveredPosition (interface function)" data-lang-entity="interface_function">TPos getFirstCoveredPosition(ag, id);</a></code></span>
+    <span class="summary_desc"><div>Finds the first position in a sequence that is not assigned to a nil vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23getLastCoveredPosition" title="#AlignmentGraph#getLastCoveredPosition (interface function)" data-lang-entity="interface_function">TPos getLastCoveredPosition(ag, id);</a></code></span>
+    <span class="summary_desc"><div>Finds the last position in a sequence that is not assigned to a nil vertex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23getProjectedPosition" title="#AlignmentGraph#getProjectedPosition (interface function)" data-lang-entity="interface_function">getProjectedPosition(ag, seqId, pos, seqId2, pos2);</a></code></span>
+    <span class="summary_desc"><div>Projects a position of one sequence taking part in a pairwise match onto the other sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23getStringSet" title="#AlignmentGraph#getStringSet (interface function)" data-lang-entity="interface_function">THost getStringSet(g);</a></code></span>
+    <span class="summary_desc"><div>Gets the StringSet of an AlignmentGraph.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23label" title="#AlignmentGraph#label (interface function)" data-lang-entity="interface_function">TInfix label(ag, v);</a></code></span>
+    <span class="summary_desc"><div>Get the label associated with this vertex descriptor or the sequence that is associated with a fragment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23sequenceId" title="#AlignmentGraph#sequenceId (interface function)" data-lang-entity="interface_function">TId sequenceId(ag, v);</a></code></span>
+    <span class="summary_desc"><div>Gets the sequence id that is associated with this vertex descriptor or with a sequence of a fragment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AlignmentGraph%23stringSet" title="#AlignmentGraph#stringSet (interface function)" data-lang-entity="interface_function">THostRef stringSet(g);</a></code></span>
+    <span class="summary_desc"><div>Return reference to the StringSet of an AlignmentGraph.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdge" data-lang-entity="interface_function">addEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addEdges" data-lang-entity="interface_function">addEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#addVertex" data-lang-entity="interface_function">addVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignEdgeMap" data-lang-entity="interface_function">assignEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#assignVertexMap" data-lang-entity="interface_function">assignVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearEdges" data-lang-entity="interface_function">clearEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#clearVertices" data-lang-entity="interface_function">clearVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#degree" data-lang-entity="interface_function">degree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#findEdge" data-lang-entity="interface_function">findEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getAdjacencyMatrix" data-lang-entity="interface_function">getAdjacencyMatrix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#getNil" data-lang-entity="interface_function">getNil</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#inDegree" data-lang-entity="interface_function">inDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numEdges" data-lang-entity="interface_function">numEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#numVertices" data-lang-entity="interface_function">numVertices</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#outDegree" data-lang-entity="interface_function">outDegree</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeEdge" data-lang-entity="interface_function">removeEdge</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeInEdges" data-lang-entity="interface_function">removeInEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeOutEdges" data-lang-entity="interface_function">removeOutEdges</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#removeVertex" data-lang-entity="interface_function">removeVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeEdgeMap" data-lang-entity="interface_function">resizeEdgeMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#resizeVertexMap" data-lang-entity="interface_function">resizeVertexMap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#sourceVertex" data-lang-entity="interface_function">sourceVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#targetVertex" data-lang-entity="interface_function">targetVertex</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#transpose" data-lang-entity="interface_function">transpose</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Graph.html" data-lang-entity="class">Graph</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Cargo" data-lang-entity="interface_metafunction">Cargo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeDescriptor" data-lang-entity="interface_metafunction">EdgeDescriptor</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeIdHandler" data-lang-entity="interface_metafunction">EdgeIdHandler</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#EdgeType" data-lang-entity="interface_metafunction">EdgeType</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Graph.html#Graph#VertexIdHandler" data-lang-entity="interface_metafunction">VertexIdHandler</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p><img tite="An alignment graph with 3 sequences." src="img/alignmentGraph.png"></img></p><h3>Example</h3><div data-src-path="demos/graph_align/graph_align.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+
+<span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;</span>
+<span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/graph_align.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="p">,</span> <span class="n">Dependent</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="n">TStringSet</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Graph</span><span class="o">&lt;</span><span class="n">Alignment</span><span class="o">&lt;</span><span class="n">TStringSet</span><span class="p">,</span> <span class="kt">void</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TAlignmentGraph</span><span class="p">;</span>
+
+    <span class="c1">// Define scorings scheme.</span>
+    <span class="c1">//</span>
+    <span class="c1">// In this case, affine gap costs with match = 0, mismatch = -1,</span>
+    <span class="c1">// gapextend = -1 and gapopen = -2.</span>
+    <span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">scoringScheme</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+    <span class="c1">// Define the two sequence to be allocated.</span>
+    <span class="n">DnaString</span> <span class="n">seq1</span> <span class="o">=</span> <span class="s">&quot;atcgaatgcgga&quot;</span><span class="p">;</span>
+    <span class="n">DnaString</span> <span class="n">seq2</span> <span class="o">=</span> <span class="s">&quot;actcgttgca&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Create StringSet with these two sequences and construct an</span>
+    <span class="c1">// AlignmentGraph for them.</span>
+    <span class="n">TStringSet</span> <span class="n">stringSet</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="n">seq1</span><span class="p">);</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="n">seq2</span><span class="p">);</span>
+    <span class="n">TAlignmentGraph</span> <span class="n">alignmentGraph</span><span class="p">(</span><span class="n">stringSet</span><span class="p">);</span>
+
+    <span class="c1">// Compute global alignment of seq1 and seq1 using Gotoh&#39;s algorithm and</span>
+    <span class="c1">// print score and alignment graph.</span>
+    <span class="kt">int</span> <span class="n">score</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">alignmentGraph</span><span class="p">,</span> <span class="n">scoringScheme</span><span class="p">,</span> <span class="n">Gotoh</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Score = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">score</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">alignmentGraph</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/graph_align/graph_align.cpp" target="_top">demos/graph_align/graph_align.cpp</a></div></div><pre class="console" data-src-path="None">Score = -8
+Alignment matrix:
+      0     .    :
+        ATCGAATGCGGA
+        |     |||  |
+        ACTCGTTGC--A</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="AlignmentGraph#assignStringSet" class="signature first" data-lang-entity="interface_function">
+      <code>void assignStringSet(g, stringSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a new StringSet to an AlignmentGraph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>An AlignmentGraph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stringSet</code>
+            
+        
+      </th>
+      <td>The <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> to assign to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getStringSet</a></li>
+    
+    <li><a class="error">stringSet</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#convertAlignment" class="signature" data-lang-entity="interface_function">
+      <code>bool convertAlignment(g, component, order, compLength);
+bool convertAlignment(g, matrix);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts an alignment graph into an alignment matrix.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>AlignmentGraph to convert. An alignment graph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">component</code>
+            
+        
+      </th>
+      <td>Vertex to component mapping.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">order</code>
+            
+        
+      </th>
+      <td>The order of the component graph when sorting topologically.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">compLength</code>
+            
+        
+      </th>
+      <td>Component sizes.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">matrix</code>
+            
+        
+      </th>
+      <td>A string that represents an alignment matrix.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true iff the alignment graph is a valid alignment and false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The variant with <tt>component</tt> and <tt>order</tt> computes a topological sorting of connected components.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#findVertex" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor findVertex(ag, id, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Finds a vertx given a sequence id and a position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The AlignmentGraph to search in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>The sequence id to search for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to search for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The vertex covering the given position on the specified sequence,
+<tt>getNil&lt;TVertexDescriptor&gt;()</tt> if none could be found.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#fragmentBegin" class="signature" data-lang-entity="interface_function">
+      <code>TPos fragmentBegin(ag, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the begin position for this vertex descriptor in the sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The AlignmentGraph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The vertex descriptor of the vertex.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The begin position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#fragmentLength" class="signature" data-lang-entity="interface_function">
+      <code>TSize fragmentLength(ag, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the length of the fragment for this vertex descriptor in the sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The AlignmentGraph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The vertex descriptor of the vertex.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The fragment size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#getDistanceMatrix" class="signature" data-lang-entity="interface_function">
+      <code>void getDistanceMtarix(graph, mat[, tag]);
+void getDistanceMtarix(graph, mat[, kTup][, alphabet], KmerDistance);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes a pairwise distance matrix from an <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">graph</code>
+            
+        
+      </th>
+      <td>An <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a> containing the sequences and possible alignment edges.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">mat</code>
+            
+        
+      </th>
+      <td>Pairwise distance matrix.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">kTup</code>
+            
+        
+      </th>
+      <td>For KMerDistance, the length of the k-mers.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">alphabet</code>
+            
+        
+      </th>
+      <td>For KMerDistance, the alphabet to use for k-mer counting (e.g. compressed alphabets).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>See <a href="group_DistanceCalculationTags.html" data-lang-entity="group">DistanceCalculationTags</a>. Default: <tt>KMerDistance</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#getFirstCoveredPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos getFirstCoveredPosition(ag, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Finds the first position in a sequence that is not assigned to a nil vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>An <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>A sequence id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>A sequence position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getLastCoveredPosition</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#getLastCoveredPosition" class="signature" data-lang-entity="interface_function">
+      <code>TPos getLastCoveredPosition(ag, id);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Finds the last position in a sequence that is not assigned to a nil vertex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>An <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">id</code>
+            
+        
+      </th>
+      <td>A sequence id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>A sequence position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getFirstCoveredPosition</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#getProjectedPosition" class="signature" data-lang-entity="interface_function">
+      <code>getProjectedPosition(ag, seqId, pos, seqId2, pos2);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Projects a position of one sequence taking part in a pairwise match onto the other sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">AlignmentGraph</a> to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqId</code>
+            
+        
+      </th>
+      <td>The sequenceId.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to project from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">seqId2</code>
+            
+        
+      </th>
+      <td>The resulting id of the sequence that was projected onto.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">pos2</code>
+            
+        
+      </th>
+      <td>The reuslting position of the sequence was was projected onto.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#getStringSet" class="signature" data-lang-entity="interface_function">
+      <code>THost getStringSet(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the StringSet of an AlignmentGraph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>An AlignmentGraph.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THost</code></th>
+        <td>A const reference to the StringSet's host.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">assignStringSet</a></li>
+    
+    <li><a class="error">stringSet</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#label" class="signature" data-lang-entity="interface_function">
+      <code>TInfix label(ag, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get the label associated with this vertex descriptor or the sequence that is associated with a fragment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The AlignmentGraph to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The vertex descriptor to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TInfix</code></th>
+        <td>An infix representing the sequence label.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#sequenceId" class="signature" data-lang-entity="interface_function">
+      <code>TId sequenceId(ag, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the sequence id that is associated with this vertex descriptor or with a sequence of a fragment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ag</code>
+            
+        
+      </th>
+      <td>The AlignmentGraph.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>Vertex descriptor of the vertex to retrieve sequence id for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TId</code></th>
+        <td>The sequence id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AlignmentGraph#stringSet" class="signature" data-lang-entity="interface_function">
+      <code>THostRef stringSet(g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference to the StringSet of an AlignmentGraph.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>An AlignmentGraph.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THost</code></th>
+        <td>A reference to the StringSet's host.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">assignStringSet</a></li>
+    
+    <li><a class="error">getStringSet</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class AlignmentGraph
+ * 
+ * @extends Graph
+ * 
+ * @headerfile &lt;seqan/graph_align.h&gt;
+ * 
+ * @brief Alignment graph type.
+ * 
+ * @signature template &lt;typename TStringSet[, typename TCargo[, typename
+ *            TSpec]]&gt; class Graph&lt;Alignment&lt;TStringSet, TCargo, TSpec&gt; &gt;;
+ * 
+ * @tparam TStringSet The type of the @link StringSet @endlink containing the
+ *                    sequence information. &lt;b&gt;Must be a @link
+ *                    DependentStringSet @endlink.&lt;/b&gt;
+ * @tparam TCargo The cargo type that can be attached to edges. Default:
+ *                &lt;tt&gt;unsigned&lt;/tt&gt;.
+ * @tparam TSpec The specializing type. Default: &lt;tt&gt;Default&lt;/tt&gt;. Use
+ *               &lt;tt&gt;WithoutEdgeId&lt;/tt&gt; here to omit edge ids. NB: if edges do
+ *               not store ids then external property maps do not work.
+ * 
+ * &lt;img src=&#34;alignmentGraph.png&#34; tite=&#34;An alignment graph with 3 sequences.&#34; /&gt;
+ * 
+ * @section Example
+ * 
+ * @include demos/graph_align/graph_align.cpp
+ * 
+ * @code{.console}
+ * Score = -8
+ * Alignment matrix:
+ *       0     .    :
+ *         ATCGAATGCGGA
+ *         |     |||  |
+ *         ACTCGTTGC--A
+ * @endcode
+ * 
+ * 
+ * @fn AlignmentGraph#assignStringSet
+ * 
+ * @brief Assigns a new StringSet to an AlignmentGraph.
+ * 
+ * @signature void assignStringSet(g, stringSet);
+ * 
+ * @param[in,out] g An AlignmentGraph.
+ * @param[in] stringSet The @link StringSet @endlink to assign to.
+ * 
+ * @see AlignmentGraph#getStringSet
+ * @see AlignmentGraph#stringSet
+ * 
+ * @fn AlignmentGraph#getStringSet
+ * 
+ * @brief Gets the StringSet of an AlignmentGraph.
+ * 
+ * @signature THost getStringSet(g);
+ * 
+ * @param[in,out] g An AlignmentGraph.
+ * 
+ * @return THost A const reference to the StringSet&#39;s host.
+ * 
+ * @see AlignmentGraph#assignStringSet
+ * @see AlignmentGraph#stringSet
+ * 
+ * @fn AlignmentGraph#stringSet
+ * 
+ * @brief Return reference to the StringSet of an AlignmentGraph.
+ * 
+ * @signature THostRef stringSet(g);
+ * 
+ * @param[in,out] g An AlignmentGraph.
+ * 
+ * @return THost A reference to the StringSet&#39;s host.
+ * 
+ * @see AlignmentGraph#assignStringSet
+ * @see AlignmentGraph#getStringSet
+ * 
+ * @fn AlignmentGraph#label
+ * 
+ * @brief Get the label associated with this vertex descriptor or the sequence
+ *        that is associated with a fragment.
+ * 
+ * @signature TInfix label(ag, v);
+ * 
+ * @param[in] ag The AlignmentGraph to query.
+ * @param[in] v The vertex descriptor to query.
+ * 
+ * @return TInfix An infix representing the sequence label.
+ * 
+ * @fn AlignmentGraph#sequenceId
+ * 
+ * @brief Gets the sequence id that is associated with this vertex descriptor or
+ *        with a sequence of a fragment.
+ * 
+ * @signature TId sequenceId(ag, v);
+ * 
+ * @param[in] ag The AlignmentGraph.
+ * @param[in] v Vertex descriptor of the vertex to retrieve sequence id for.
+ * 
+ * @return TId The sequence id.
+ * 
+ * @fn AlignmentGraph#fragmentBegin
+ * 
+ * @brief Gets the begin position for this vertex descriptor in the sequence.
+ * 
+ * @signature TPos fragmentBegin(ag, v);
+ * 
+ * @param[in] ag The AlignmentGraph to query.
+ * @param[in] v The vertex descriptor of the vertex.
+ * 
+ * @return TPos The begin position.
+ * 
+ * @fn AlignmentGraph#fragmentLength
+ * 
+ * @brief Gets the length of the fragment for this vertex descriptor in the
+ *        sequence.
+ * 
+ * @signature TSize fragmentLength(ag, v);
+ * 
+ * @param[in] ag The AlignmentGraph to query.
+ * @param[in] v The vertex descriptor of the vertex.
+ * 
+ * @return TPos The fragment size.
+ * 
+ * @fn AlignmentGraph#findVertex
+ * 
+ * @brief Finds a vertx given a sequence id and a position.
+ * 
+ * @signature TVertexDescriptor findVertex(ag, id, pos);
+ * 
+ * @param[in] ag The AlignmentGraph to search in.
+ * @param[in] id The sequence id to search for.
+ * @param[in] pos The position to search for.
+ * 
+ * @return TVertexDescriptor The vertex covering the given position on the
+ *                           specified sequence,
+ *                           &lt;tt&gt;getNil&amp;lt;TVertexDescriptor&amp;gt;()&lt;/tt&gt; if none
+ *                           could be found.
+ * 
+ * @fn AlignmentGraph#getProjectedPosition
+ * 
+ * @brief Projects a position of one sequence taking part in a pairwise match
+ *        onto the other sequence.
+ * 
+ * @signature getProjectedPosition(ag, seqId, pos, seqId2, pos2);
+ * 
+ * @param[in] ag The @link AlignmentGraph @endlink to query.
+ * @param[in] seqId The sequenceId.
+ * @param[in] pos The position to project from.
+ * @param[out] seqId2 The resulting id of the sequence that was projected onto.
+ * @param[out] pos2 The reuslting position of the sequence was was projected
+ *                  onto.
+ * 
+ * @fn AlignmentGraph#getFirstCoveredPosition
+ * 
+ * @brief Finds the first position in a sequence that is not assigned to a nil
+ *        vertex.
+ * 
+ * @signature TPos getFirstCoveredPosition(ag, id);
+ * 
+ * @param[in] ag An @link AlignmentGraph @endlink.
+ * @param[in] id A sequence id.
+ * 
+ * @return TPos A sequence position.
+ * 
+ * @see AlignmentGraph#getLastCoveredPosition
+ * 
+ * @fn AlignmentGraph#getLastCoveredPosition
+ * 
+ * @brief Finds the last position in a sequence that is not assigned to a nil
+ *        vertex.
+ * 
+ * @signature TPos getLastCoveredPosition(ag, id);
+ * 
+ * @param[in] ag An @link AlignmentGraph @endlink.
+ * @param[in] id A sequence id.
+ * 
+ * @return TPos A sequence position.
+ * 
+ * @see AlignmentGraph#getFirstCoveredPosition
+ * 
+ * @fn AlignmentGraph#convertAlignment
+ * 
+ * @brief Converts an alignment graph into an alignment matrix.
+ * 
+ * @signature bool convertAlignment(g, component, order, compLength);
+ * @signature bool convertAlignment(g, matrix);
+ * 
+ * @param[in] g AlignmentGraph to convert. An alignment graph.
+ * @param[out] component Vertex to component mapping.
+ * @param[out] order The order of the component graph when sorting
+ *                   topologically.
+ * @param[out] compLength Component sizes.
+ * @param[out] matrix A string that represents an alignment matrix.
+ * 
+ * @return bool true iff the alignment graph is a valid alignment and false
+ *              otherwise.
+ * 
+ * @section Remarks
+ * 
+ * The variant with &lt;tt&gt;component&lt;/tt&gt; and &lt;tt&gt;order&lt;/tt&gt; computes a topological
+ * sorting of connected components.
+ * 
+ * @fn AlignmentGraph#getDistanceMatrix
+ * 
+ * @headerfile &lt;seqan/graph_msa.h&gt;
+ * 
+ * @brief Computes a pairwise distance matrix from an @link AlignmentGraph
+ *        @endlink.
+ * 
+ * @signature void getDistanceMtarix(graph, mat[, tag]);
+ * @signature void getDistanceMtarix(graph, mat[, kTup][, alphabet],
+ *            KmerDistance);
+ * 
+ * @param[in] graph An @link AlignmentGraph @endlink containing the sequences
+ *                  and possible alignment edges.
+ * @param[out] mat Pairwise distance matrix.
+ * @param[in] kTup For KMerDistance, the length of the k-mers.
+ * @param[in] alphabet For KMerDistance, the alphabet to use for k-mer counting
+ *                     (e.g. compressed alphabets).
+ * @param[in] tag See @link DistanceCalculationTags @endlink. Default:
+ *                &lt;tt&gt;KMerDistance&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

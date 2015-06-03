@@ -1,0 +1,1224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_sparsestring" data-page="SparseString">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SparseString - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>SparseString<div><div>A string storing only a fraction of the values of the original string.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValueString, typename TSpec&gt;
+class SparseString;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialisation tag. Default: void.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValueString</a></code></th>
+        <td>The type of the <a href="class_String.html" data-lang-entity="class">string</a> containing the values.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23clear" title="#SparseString#clear (interface function)" data-lang-entity="interface_function">void clear(sparseString);</a></code></span>
+    <span class="summary_desc"><div>Resets the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23empty" title="#SparseString#empty (interface function)" data-lang-entity="interface_function">bool empty(sparseString);</a></code></span>
+    <span class="summary_desc"><div>Returns whether or not the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a> is empty.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23getFibre" title="#SparseString#getFibre (interface function)" data-lang-entity="interface_function">TFibre getFibre(sparseString, fibreTag);</a></code></span>
+    <span class="summary_desc"><div>Returns a specific fibre of a <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23getValue" title="#SparseString#getValue (interface function)" data-lang-entity="interface_function">TValue getValue(sparseString, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns the value of a SparseString.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23length" title="#SparseString#length (interface function)" data-lang-entity="interface_function">TSize length(sparseString);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of elements in the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23open" title="#SparseString#open (interface function)" data-lang-entity="interface_function">bool open(string, fileName[, openMode]);</a></code></span>
+    <span class="summary_desc"><div>This functions open a sparse string from disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23resize" title="#SparseString#resize (interface function)" data-lang-entity="interface_function">TSize resize(sparseString, newLength);</a></code></span>
+    <span class="summary_desc"><div>Resets the number of elements in the compressed suffix array.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23save" title="#SparseString#save (interface function)" data-lang-entity="interface_function">bool save(string, fileName[, openMode]);</a></code></span>
+    <span class="summary_desc"><div>This functions saves a sparse string to disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SparseString%23value" title="#SparseString#value (interface function)" data-lang-entity="interface_function">TReference value(sparseString, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns the value of a <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="SparseString#clear" class="signature first" data-lang-entity="interface_function">
+      <code>void clear(sparseString);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resets the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">sparseString</code>
+            
+        
+      </th>
+      <td>The <a href="class_SparseString.html" data-lang-entity="class">SparseString</a> to be cleared.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(sparseString);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether or not the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a> is empty.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sparseString</code>
+            
+        
+      </th>
+      <td>The SparseString to be checked.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if there are no elements in the sparse string and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#getFibre" class="signature" data-lang-entity="interface_function">
+      <code>TFibre getFibre(sparseString, fibreTag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a specific fibre of a <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sparseString</code>
+            
+        
+      </th>
+      <td>The sparseString holding the fibre.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fibreTag</code>
+            
+        
+      </th>
+      <td>A tag that identifies the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>. Types:
+<a href="group_SparseStringFibres.html" data-lang-entity="group">SparseString Fibres</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#getValue" class="signature" data-lang-entity="interface_function">
+      <code>TValue getValue(sparseString, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value of a SparseString.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sparseString</code>
+            
+        
+      </th>
+      <td>The <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position at which a value should be assign to the sparse string.
+Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The type <a href="global_metafunction_GetValue.html" data-lang-entity="global_metafunction">GetValue</a> of <a href="class_SparseString.html" data-lang-entity="class">SparseString</a> is returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(sparseString);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of elements in the <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sparseString</code>
+            
+        
+      </th>
+      <td>The sparse string suffix array.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the sparse string array. Types: The result of <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the
+sparse string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#open" class="signature" data-lang-entity="interface_function">
+      <code>bool open(string, fileName[, openMode]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions open a sparse string from disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">string</code>
+            
+        
+      </th>
+      <td>The string to be opened. Types: SparseString</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">openMode</code>
+            
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened. To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>. To append a file if existing add
+<tt>OPEN_APPEND</tt>. To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#resize" class="signature" data-lang-entity="interface_function">
+      <code>TSize resize(sparseString, newLength);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+  <div class="note note">Note. <div class='inline'>
+      
+      <p>If the new length is smaller than the actual one then the last <tt>x<tt> items of the compressed suffix array
+are deleted with <tt>x = oldLength - newLength</tt>.</tt></tt></p>
+      
+  </div></div>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resets the number of elements in the compressed suffix array.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">sparseString</code>
+            
+        
+      </th>
+      <td>The sparse string.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">newLength</code>
+            
+        
+      </th>
+      <td>The number of elements which should be stored in the sparse string. Types:
+<a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the sparse string. Types: The result of <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the
+sparse string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#save" class="signature" data-lang-entity="interface_function">
+      <code>bool save(string, fileName[, openMode]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions saves a sparse string to disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">string</code>
+            
+        
+      </th>
+      <td>The string to be saved. Types: SparseString</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fileName</code>
+            
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">openMode</code>
+            
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened. To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>. To append a file if existing add
+<tt>OPEN_APPEND</tt>. To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SparseString#value" class="signature" data-lang-entity="interface_function">
+      <code>TReference value(sparseString, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value of a <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">sparseString</code>
+            
+        
+      </th>
+      <td>The <a href="class_SparseString.html" data-lang-entity="class">SparseString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position at which a value should be assign to the sparse string.
+Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>The type <a href="global_metafunction_Reference.html" data-lang-entity="global_metafunction">Reference</a> of <a href="class_SparseString.html" data-lang-entity="class">SparseString</a> is returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class SparseString
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief A string storing only a fraction of the values of the original string.
+ * 
+ * @signature template &lt;typename TValueString, typename TSpec&gt; class
+ *            SparseString;
+ * 
+ * @tparam TSpec The specialisation tag. Default: void.
+ * @tparam TValueString The type of the @link String string @endlink containing
+ *                      the values.
+ * 
+ * @fn SparseString#clear
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Resets the @link SparseString @endlink.
+ * 
+ * @signature void clear(sparseString);
+ * 
+ * @param[in,out] sparseString The @link SparseString @endlink to be cleared.
+ * 
+ * @fn SparseString#empty
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns whether or not the @link SparseString @endlink is empty.
+ * 
+ * @signature bool empty(sparseString);
+ * 
+ * @param[in] sparseString The SparseString to be checked.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if there are no elements in the sparse string and
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn SparseString#getValue
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the value of a SparseString.
+ * 
+ * @signature TValue getValue(sparseString, pos);
+ * 
+ * @param[in] sparseString The @link SparseString @endlink.
+ * @param[in] pos The position at which a value should be assign to the sparse
+ *                string. Types: @link UnsignedIntegerConcept @endlink
+ * 
+ * @return TValue The type @link GetValue @endlink of @link SparseString
+ *                @endlink is returned.
+ * 
+ * @fn SparseString#value
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the value of a @link SparseString @endlink.
+ * 
+ * @signature TReference value(sparseString, pos);
+ * 
+ * @param[in] sparseString The @link SparseString @endlink.
+ * @param[in] pos The position at which a value should be assign to the sparse
+ *                string. Types: @link UnsignedIntegerConcept @endlink
+ * 
+ * @return TReference The type @link Reference @endlink of @link SparseString
+ *                    @endlink is returned.
+ * 
+ * @fn SparseString#getFibre
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns a specific fibre of a @link SparseString @endlink.
+ * 
+ * @signature TFibre getFibre(sparseString, fibreTag);
+ * 
+ * @param[in] sparseString The sparseString holding the fibre.
+ * @param[in] fibreTag A tag that identifies the @link Fibre @endlink. Types:
+ *                     @link SparseStringFibres SparseString Fibres @endlink
+ * 
+ * @return TFibre A reference to the @link Fibre @endlink object.
+ * 
+ * @fn SparseString#length
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of elements in the @link SparseString @endlink.
+ * 
+ * @signature TSize length(sparseString);
+ * 
+ * @param[in] sparseString The sparse string suffix array.
+ * 
+ * @return TSize The number of elements in the sparse string array. Types: The
+ *               result of @link Size @endlink of the sparse string.
+ * 
+ * @fn SparseString#resize
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Resets the number of elements in the compressed suffix array.
+ * 
+ * @note If the new length is smaller than the actual one then the last
+ *       &lt;tt&gt;x&lt;tt&gt; items of the compressed suffix array are deleted with &lt;tt&gt;x =
+ *       oldLength - newLength&lt;/tt&gt;.
+ * 
+ * @signature TSize resize(sparseString, newLength);
+ * 
+ * @param[in,out] sparseString The sparse string.
+ * @param[in] newLength The number of elements which should be stored in the
+ *                      sparse string. Types: @link UnsignedIntegerConcept
+ *                      @endlink.
+ * 
+ * @return TSize The number of elements in the sparse string. Types: The result
+ *               of @link Size @endlink of the sparse string.
+ * 
+ * @fn SparseString#open
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions open a sparse string from disk.
+ * 
+ * @signature bool open(string, fileName[, openMode]);
+ * 
+ * @param[in] string The string to be opened. Types: SparseString
+ * @param[in] fileName C-style character string containing the file name.
+ * @param[in] openMode The combination of flags defining how the file should be
+ *                     opened. To open a file read-only, write-only or to read
+ *                     and write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;,
+ *                     or &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                     &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;. To append a file if existing add
+ *                     &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;. To circumvent problems, files are
+ *                     always opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR |
+ *                     OPEN_CREATE | OPEN_APPEND&lt;/tt&gt;
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success.
+ * 
+ * @fn SparseString#save
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions saves a sparse string to disk.
+ * 
+ * @signature bool save(string, fileName[, openMode]);
+ * 
+ * @param[in] string The string to be saved. Types: SparseString
+ * @param[in] fileName C-style character string containing the file name.
+ * @param[in] openMode The combination of flags defining how the file should be
+ *                     opened. To open a file read-only, write-only or to read
+ *                     and write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;,
+ *                     or &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                     &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;. To append a file if existing add
+ *                     &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;. To circumvent problems, files are
+ *                     always opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR |
+ *                     OPEN_CREATE | OPEN_APPEND&lt;/tt&gt;
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_chainedseed" data-page="ChainedSeed">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ChainedSeed - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>ChainedSeed<div><div>Describes a seed with start and end position2 and diagonal upper and lower bounds.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Seed.html" data-lang-entity="class">Seed</a>
+      
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Seed.html" data-lang-entity="class">Seed</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seeds.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TConfig]&gt;
+class Seed&lt;ChainedSeed, TConfig&gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TConfig</a></code></th>
+        <td>The configuration to use for the chained seed specialization. Defaults to
+<a href="class_DefaultSeedConfig.html" data-lang-entity="class">DefaultSeedConfig</a>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%3A%3ASeed" title="#ChainedSeed::Seed (interface function)" data-lang-entity="member_function">Seed::Seed();, Seed::Seed(beginPosH, beginPosV, length);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23appendDiagonal" title="#ChainedSeed#appendDiagonal (interface function)" data-lang-entity="interface_function">void appendSeed(seed, diagonal);</a></code></span>
+    <span class="summary_desc"><div>Adds a digional to a ChainedSeed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23back" title="#ChainedSeed#back (interface function)" data-lang-entity="interface_function">TReference back(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to the ChainedSeed diagonal.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23begin" title="#ChainedSeed#begin (interface function)" data-lang-entity="interface_function">TIter begin(seed[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator to the beginning of the ChainedSeed's diagonals.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23end" title="#ChainedSeed#end (interface function)" data-lang-entity="interface_function">TIter end(seed[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator to the end of the ChainedSeed's diagonals.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23front" title="#ChainedSeed#front (interface function)" data-lang-entity="interface_function">TReference front(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns a reference to the first ChainedSeed diagonal.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23length" title="#ChainedSeed#length (interface function)" data-lang-entity="interface_function">TSize length(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of diagonals in the ChainedSeed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23truncateDiagonals" title="#ChainedSeed#truncateDiagonals (interface function)" data-lang-entity="interface_function">void truncateDiagonals(seed, first);</a></code></span>
+    <span class="summary_desc"><div>Removes diagonals from the given first one to the end of the seed's diagonals.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Seed.html" data-lang-entity="class">Seed</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#beginDiagonal" data-lang-entity="interface_function">beginDiagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#beginPositionH" data-lang-entity="interface_function">beginPositionH</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#beginPositionV" data-lang-entity="interface_function">beginPositionV</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#endDiagonal" data-lang-entity="interface_function">endDiagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#endPositionH" data-lang-entity="interface_function">endPositionH</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#endPositionV" data-lang-entity="interface_function">endPositionV</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#extendSeed" data-lang-entity="interface_function">extendSeed</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#lowerDiagonal" data-lang-entity="interface_function">lowerDiagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#score" data-lang-entity="interface_function">score</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#seedSize" data-lang-entity="interface_function">seedSize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setBeginPositionH" data-lang-entity="interface_function">setBeginPositionH</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setBeginPositionV" data-lang-entity="interface_function">setBeginPositionV</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setEndPositionH" data-lang-entity="interface_function">setEndPositionH</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setEndPositionV" data-lang-entity="interface_function">setEndPositionV</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setLowerDiagonal" data-lang-entity="interface_function">setLowerDiagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setScore" data-lang-entity="interface_function">setScore</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#setUpperDiagonal" data-lang-entity="interface_function">setUpperDiagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#upperDiagonal" data-lang-entity="interface_function">upperDiagonal</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23Iterator" title="#ChainedSeed#Iterator (interface function)" data-lang-entity="interface_metafunction">Iterator&lt;TChainedSeed[, Tag]&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The type for iterating over the diagonals in a seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23Reference" title="#ChainedSeed#Reference (interface function)" data-lang-entity="interface_metafunction">Reference&lt;TChainedSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Reference to the seed diagonal type.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ChainedSeed%23Value" title="#ChainedSeed#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TChainedSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The type of the diagonals in the ChainedSeed.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Seed.html" data-lang-entity="class">Seed</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#Diagonal" data-lang-entity="interface_metafunction">Diagonal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#SeedScore" data-lang-entity="interface_metafunction">SeedScore</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Seed.html#Seed#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Diagonals are stored as <a href="class_SeedDiagonal.html" data-lang-entity="class">SeedDiagonal</a> objects.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ChainedSeed::Seed" class="signature first" data-lang-entity="member_function">
+      <code>Seed::Seed();
+Seed::Seed(beginPosH, beginPosV, length);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPosH</code>
+            
+        
+      </th>
+      <td>Begin position in dat abase (horizontal).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPosV</code>
+            
+        
+      </th>
+      <td>Begin position in query (vertical).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">length</code>
+            
+        
+      </th>
+      <td>The length of the seed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ChainedSeed#appendDiagonal" class="signature first" data-lang-entity="interface_function">
+      <code>void appendSeed(seed, diagonal);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds a digional to a ChainedSeed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to which the digonal should be added.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">diagonal</code>
+            
+        
+      </th>
+      <td>The SeedDiagional to add to <tt>seed</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#back" class="signature" data-lang-entity="interface_function">
+      <code>TReference back(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to the ChainedSeed diagonal.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>Reference to the last ChainedSeed diagonal. TReference is the reference type of <tt>seed</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#begin" class="signature" data-lang-entity="interface_function">
+      <code>TIter begin(seed[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator to the beginning of the ChainedSeed's diagonals.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to the begin iterator for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>A tag for selecting the type of the iterator, one of <tt>Standard</tt> and <tt>Rooted</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#end" class="signature" data-lang-entity="interface_function">
+      <code>TIter end(seed[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator to the end of the ChainedSeed's diagonals.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to the end iterator for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>A tag for selecting the type of the iterator, one of <tt>Standard</tt> and <tt>Rooted</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#front" class="signature" data-lang-entity="interface_function">
+      <code>TReference front(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a reference to the first ChainedSeed diagonal.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>Reference to first ChainedSeed diagonal. TReference is the reference type of <tt>seed</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of diagonals in the ChainedSeed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to query for its number of diagonals.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of diagonals in the ChainedSeed. TSize is the <a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a> type of
+<tt>seed</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ChainedSeed#truncateDiagonals" class="signature" data-lang-entity="interface_function">
+      <code>void truncateDiagonals(seed, first);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes diagonals from the given first one to the end of the seed's diagonals.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The ChainedSeed to truncate diagonals from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">first</code>
+            
+        
+      </th>
+      <td>An iterator into the ChainedSeed, as returned by <a href="specialization_ChainedSeed.html#ChainedSeed#Iterator" data-lang-entity="interface_metafunction">Iterator</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="ChainedSeed#Iterator" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Iterator&lt;TChainedSeed[, Tag]&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The type for iterating over the diagonals in a seed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TChainedSeed</code></th>
+            <td>The seed to query for the diagonal iterator type.</td>
+        </tr>
+    
+        <tr>
+            <th><code>Tag</code></th>
+            <td>The tag to select the iterator with. One of <tt>Standard</tt> and <tt>Rooted</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Reference to the contained seeds.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ChainedSeed#Reference" class="signature" data-lang-entity="interface_metafunction">
+    <code>Reference&lt;TChainedSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reference to the seed diagonal type.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TChainedSeed</code></th>
+            <td>The seed to query for the reference to diagonal values.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Reference to the contained seeds.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ChainedSeed#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TChainedSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The type of the diagonals in the ChainedSeed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TChainedSeed</code></th>
+            <td>The seed to query for its diagonal object type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting diagonal seed.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ChainedSeed
+ * 
+ * @implements ContainerConcept
+ * 
+ * @extends Seed
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Describes a seed with start and end position2 and diagonal upper and
+ *        lower bounds.
+ * 
+ * @signature template &lt;[typename TConfig]&gt; class Seed&lt;ChainedSeed, TConfig&gt;;
+ * 
+ * @tparam TConfig The configuration to use for the chained seed specialization.
+ *                 Defaults to @link DefaultSeedConfig @endlink.
+ * 
+ * Diagonals are stored as @link SeedDiagonal @endlink objects.
+ * 
+ * @mfn ChainedSeed#Value
+ * 
+ * @brief The type of the diagonals in the ChainedSeed.
+ * 
+ * @signature Value&lt;TChainedSeed&gt;::Type;
+ * 
+ * @tparam TChainedSeed The seed to query for its diagonal object type.
+ * 
+ * @return Type The resulting diagonal seed.
+ * 
+ * @mfn ChainedSeed#Reference
+ * 
+ * @brief Reference to the seed diagonal type.
+ * 
+ * @signature Reference&lt;TChainedSeed&gt;::Type;
+ * 
+ * @tparam TChainedSeed The seed to query for the reference to diagonal values.
+ * 
+ * @return Type Reference to the contained seeds.
+ * 
+ * @mfn ChainedSeed#Iterator
+ * 
+ * @brief The type for iterating over the diagonals in a seed.
+ * 
+ * @signature Iterator&lt;TChainedSeed[, Tag]&gt;::Type;
+ * 
+ * @tparam TChainedSeed The seed to query for the diagonal iterator type.
+ * @tparam Tag The tag to select the iterator with. One of &lt;tt&gt;Standard&lt;/tt&gt; and
+ *             &lt;tt&gt;Rooted&lt;/tt&gt;.
+ * 
+ * @return Type Reference to the contained seeds.
+ * 
+ * @fn ChainedSeed::Seed
+ * 
+ * @brief Constructor
+ * 
+ * @signature Seed::Seed();
+ * @signature Seed::Seed(beginPosH, beginPosV, length);
+ * 
+ * @param[in] beginPosH Begin position in dat abase (horizontal).
+ * @param[in] beginPosV Begin position in query (vertical).
+ * @param[in] length The length of the seed.
+ * 
+ * @fn ChainedSeed#length
+ * 
+ * @brief Returns the number of diagonals in the ChainedSeed.
+ * 
+ * @signature TSize length(seed);
+ * 
+ * @param[in] seed The ChainedSeed to query for its number of diagonals.
+ * 
+ * @return TSize The number of diagonals in the ChainedSeed. TSize is the @link
+ *               ContainerConcept#Size @endlink type of &lt;tt&gt;seed&lt;/tt&gt;
+ * 
+ * @fn ChainedSeed#appendDiagonal
+ * 
+ * @brief Adds a digional to a ChainedSeed.
+ * 
+ * @signature void appendSeed(seed, diagonal);
+ * 
+ * @param[in,out] seed The ChainedSeed to which the digonal should be added.
+ * @param[in] diagonal The SeedDiagional to add to &lt;tt&gt;seed&lt;/tt&gt;.
+ * 
+ * @fn ChainedSeed#truncateDiagonals
+ * 
+ * @brief Removes diagonals from the given first one to the end of the seed&#39;s
+ *        diagonals.
+ * 
+ * @signature void truncateDiagonals(seed, first);
+ * 
+ * @param[in,out] seed The ChainedSeed to truncate diagonals from.
+ * @param[in] first An iterator into the ChainedSeed, as returned by @link
+ *                  ChainedSeed#Iterator @endlink.
+ * 
+ * @fn ChainedSeed#begin
+ * 
+ * @brief Returns an iterator to the beginning of the ChainedSeed&#39;s diagonals.
+ * 
+ * @signature TIter begin(seed[, tag]);
+ * 
+ * @param[in] seed The ChainedSeed to the begin iterator for.
+ * @param[in] tag A tag for selecting the type of the iterator, one of
+ *                &lt;tt&gt;Standard&lt;/tt&gt; and &lt;tt&gt;Rooted&lt;/tt&gt;.
+ * 
+ * @fn ChainedSeed#end
+ * 
+ * @brief Returns an iterator to the end of the ChainedSeed&#39;s diagonals.
+ * 
+ * @signature TIter end(seed[, tag]);
+ * 
+ * @param[in] seed The ChainedSeed to the end iterator for.
+ * @param[in] tag A tag for selecting the type of the iterator, one of
+ *                &lt;tt&gt;Standard&lt;/tt&gt; and &lt;tt&gt;Rooted&lt;/tt&gt;.
+ * 
+ * @fn ChainedSeed#front
+ * 
+ * @brief Returns a reference to the first ChainedSeed diagonal.
+ * 
+ * @signature TReference front(seed);
+ * 
+ * @param[in] seed The ChainedSeed to query.
+ * 
+ * @return TReference Reference to first ChainedSeed diagonal. TReference is the
+ *                    reference type of &lt;tt&gt;seed&lt;/tt&gt;.
+ * 
+ * @fn ChainedSeed#back
+ * 
+ * @brief Returns a reference to the ChainedSeed diagonal.
+ * 
+ * @signature TReference back(seed);
+ * 
+ * @param[in] seed The ChainedSeed to query.
+ * 
+ * @return TReference Reference to the last ChainedSeed diagonal. TReference is
+ *                    the reference type of &lt;tt&gt;seed&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

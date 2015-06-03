@@ -1,0 +1,911 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_genomicregion" data-page="GenomicRegion">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>GenomicRegion - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>GenomicRegion<div><div>Store information about a genomic region.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seq_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class GenomicRegion;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AGenomicRegion" title="#GenomicRegion::GenomicRegion (interface function)" data-lang-entity="member_function">GenomicRegion::GenomicRegion();, GenomicRegion::GenomicRegion(str);</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AtoString" title="#GenomicRegion::toString (interface function)" data-lang-entity="member_function">void GenomicRegion::toString(out);</a></code></span>
+    <span class="summary_desc"><div>Write string representation of interval to out.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#GenomicRegion%23clear" title="#GenomicRegion#clear (interface function)" data-lang-entity="interface_function">void clear(genomicRegion);</a></code></span>
+    <span class="summary_desc"><div>Reset a GenomicRegion object to the same state after default construction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#GenomicRegion%23parse" title="#GenomicRegion#parse (interface function)" data-lang-entity="interface_function">bool parse(genomicRegion, regionString);</a></code></span>
+    <span class="summary_desc"><div>Parse genomic region string store results in <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AbeginPos" title="#GenomicRegion::beginPos (interface function)" data-lang-entity="member_variable">
+        __int32 GenomicRegion::beginPos
+    </a></code></span>
+    <span class="summary_desc"><div>Begin position of the range on the chromosome. Default is <tt>-1</tt>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AendPos" title="#GenomicRegion::endPos (interface function)" data-lang-entity="member_variable">
+        __int32 GenomicRegion::endPos
+    </a></code></span>
+    <span class="summary_desc"><div>End position of the range on the chromosome. Default is <tt>-1</tt>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AINVALID_ID" title="#GenomicRegion::INVALID_ID (interface function)" data-lang-entity="member_variable">
+        __int32 GenomicRegion::INVALID_ID
+    </a></code></span>
+    <span class="summary_desc"><div>Constant for marking a position as invalid (static-const member).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AINVALID_POS" title="#GenomicRegion::INVALID_POS (interface function)" data-lang-entity="member_variable">
+        __int32 GenomicRegion::INVALID_POS
+    </a></code></span>
+    <span class="summary_desc"><div>Constant for marking a position as invalid (static-const member).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3ArID" title="#GenomicRegion::rID (interface function)" data-lang-entity="member_variable">
+        __int32 GenomicRegion::rID
+    </a></code></span>
+    <span class="summary_desc"><div>An optional field storing an integer. Default is <tt>-1</tt>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#GenomicRegion%3A%3AseqName" title="#GenomicRegion::seqName (interface function)" data-lang-entity="member_variable">
+        CharString GenomicRegion::seqName
+    </a></code></span>
+    <span class="summary_desc"><div>Name of the sequence the region lies on, default is the empty string.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>A genomic region is a range on a chromosome. The chromosome is identified by its name (as text in <a href="class_GenomicRegion.html#GenomicRegion::seqName" data-lang-entity="member_variable">seqName</a>, optionally also as an <tt>integer</tt> in <a href="class_GenomicRegion.html#GenomicRegion::rID" data-lang-entity="member_variable">rID</a>). The
+range is stored as a half-open interval [<a href="class_GenomicRegion.html#GenomicRegion::beginPos" data-lang-entity="member_variable">beginPos</a>, <a href="class_GenomicRegion.html#GenomicRegion::endPos" data-lang-entity="member_variable">endPos</a>).
+If <a href="class_GenomicRegion.html#GenomicRegion::beginPos" data-lang-entity="member_variable">beginPos</a> is set to <tt>-1</tt> then the range spans the whole chromosome. If <a href="class_GenomicRegion.html#GenomicRegion::beginPos" data-lang-entity="member_variable">beginPos</a> is set to a value <tt>&gt;= 0</tt> and <a href="class_GenomicRegion.html#GenomicRegion::endPos" data-lang-entity="member_variable">endPos</a> is set ot
+<tt>-1</tt>, then the chromosome is selected from <a href="class_GenomicRegion.html#GenomicRegion::beginPos" data-lang-entity="member_variable">beginPos</a> to the end.</p><p>Examples for genomic regions are <tt>chr1</tt>, <tt>chr1:1,000</tt>, <tt>chr1:1,000-2,000</tt>.</p><p>The textual description of a genomic region has one of the formats <tt>NAME</tt>, <tt>NAME:START</tt>,
+<tt>NAME:START-END</tt>. The positions in the textual representation <tt>START</tt> and <tt>END</tt> are one-based.
+However, the representation in the members of <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a> is zero-based.</p><h3>Examples</h3><p>Construct a <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a> object and fill it from different region strings.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">seqan</span><span class="o">::</span><span class="n">GenomicRegion</span> <span class="n">genomicRegion</span><span class="p">;</span>
+
+<span class="n">parse</span><span class="p">(</span><span class="n">genomicRegion</span><span class="p">,</span> <span class="s">&quot;chr1&quot;</span><span class="p">);</span>
+<span class="c1">// genomicRegion.seqName == &quot;chr1&quot;</span>
+<span class="c1">// genomicRegion.rID == -1, genomicRegion.beginPos == -1, genomicRegion.beginPos == -1</span>
+
+<span class="n">parse</span><span class="p">(</span><span class="n">genomicRegion</span><span class="p">,</span> <span class="s">&quot;chr1:1000&quot;</span><span class="p">);</span>
+<span class="c1">// genomicRegion.seqName == &quot;chr1&quot;</span>
+<span class="c1">// genomicRegion.beginPos == 999</span>
+<span class="c1">// genomicRegion.rID == -1, genomicRegion.beginPos == -1</span>
+
+<span class="n">parse</span><span class="p">(</span><span class="n">genomicRegion</span><span class="p">,</span> <span class="s">&quot;chr1:1000-2000&quot;</span><span class="p">);</span>
+<span class="c1">// genomicRegion.seqName == &quot;chr1&quot;</span>
+<span class="c1">// genomicRegion.beginPos == 999</span>
+<span class="c1">// genomicRegion.beginPos == 2000</span>
+<span class="c1">// genomicRegion.rID == -1</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="GenomicRegion::GenomicRegion" class="signature first" data-lang-entity="member_function">
+      <code>GenomicRegion::GenomicRegion();
+GenomicRegion::GenomicRegion(str);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">str</code>
+            
+        
+      </th>
+      <td>The string to parse region from. Types: CharString</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The default constructor sets all integer members to <tt>INVALID_POS</tt>, the <tt>seqName</tt> member is left empty.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="GenomicRegion::toString" class="signature" data-lang-entity="member_function">
+      <code>void GenomicRegion::toString(out);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write string representation of interval to out.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">out</code>
+            
+        
+      </th>
+      <td>Target to write textual interval description to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="GenomicRegion#clear" class="signature first" data-lang-entity="interface_function">
+      <code>void clear(genomicRegion);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reset a GenomicRegion object to the same state after default construction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">genomicRegion</code>
+            
+        
+      </th>
+      <td>The <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a> object to reset. Types: GenomicRegion</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="GenomicRegion#parse" class="signature" data-lang-entity="interface_function">
+      <code>bool parse(genomicRegion, regionString);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Parse genomic region string store results in <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">regionString</code>
+            
+        
+      </th>
+      <td>The region string to prse. Types: <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">genomicRegion</code>
+            
+        
+      </th>
+      <td>The <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a> object to write the results to.
+Types: GenomicRegion</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true indicates successful parsing.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="GenomicRegion::beginPos" class="signature first" data-lang-entity="member_variable">
+      <code>__int32 GenomicRegion::beginPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Begin position of the range on the chromosome. Default is <tt>-1</tt>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="GenomicRegion::endPos" class="signature" data-lang-entity="member_variable">
+      <code>__int32 GenomicRegion::endPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>End position of the range on the chromosome. Default is <tt>-1</tt>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="GenomicRegion::INVALID_ID" class="signature" data-lang-entity="member_variable">
+      <code>__int32 GenomicRegion::INVALID_ID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Constant for marking a position as invalid (static-const member).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="GenomicRegion::INVALID_POS" class="signature" data-lang-entity="member_variable">
+      <code>__int32 GenomicRegion::INVALID_POS</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Constant for marking a position as invalid (static-const member).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="GenomicRegion::rID" class="signature" data-lang-entity="member_variable">
+      <code>__int32 GenomicRegion::rID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>An optional field storing an integer. Default is <tt>-1</tt>.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="GenomicRegion::seqName" class="signature" data-lang-entity="member_variable">
+      <code>CharString GenomicRegion::seqName</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Name of the sequence the region lies on, default is the empty string.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class GenomicRegion
+ * 
+ * @headerfile &lt;seqan/seq_io.h&gt;
+ * 
+ * @brief Store information about a genomic region.
+ * 
+ * @signature class GenomicRegion;
+ * 
+ * A genomic region is a range on a chromosome. The chromosome is identified by
+ * its name (as text in @link GenomicRegion::seqName @endlink, optionally also
+ * as an &lt;tt&gt;integer&lt;/tt&gt; in @link GenomicRegion::rID @endlink). The range is
+ * stored as a half-open interval [@link GenomicRegion::beginPos @endlink, @link
+ * GenomicRegion::endPos @endlink). If @link GenomicRegion::beginPos @endlink is
+ * set to &lt;tt&gt;-1&lt;/tt&gt; then the range spans the whole chromosome. If @link
+ * GenomicRegion::beginPos @endlink is set to a value &lt;tt&gt;&amp;gt;= 0&lt;/tt&gt; and @link
+ * GenomicRegion::endPos @endlink is set ot &lt;tt&gt;-1&lt;/tt&gt;, then the chromosome is
+ * selected from @link GenomicRegion::beginPos @endlink to the end.
+ * 
+ * Examples for genomic regions are &lt;tt&gt;chr1&lt;/tt&gt;, &lt;tt&gt;chr1:1,000&lt;/tt&gt;,
+ * &lt;tt&gt;chr1:1,000-2,000&lt;/tt&gt;.
+ * 
+ * The textual description of a genomic region has one of the formats
+ * &lt;tt&gt;NAME&lt;/tt&gt;, &lt;tt&gt;NAME:START&lt;/tt&gt;, &lt;tt&gt;NAME:START-END&lt;/tt&gt;. The positions in
+ * the textual representation &lt;tt&gt;START&lt;/tt&gt; and &lt;tt&gt;END&lt;/tt&gt; are one-based.
+ * However, the representation in the members of @link GenomicRegion @endlink is
+ * zero-based.
+ * 
+ * @section Examples
+ * 
+ * Construct a @link GenomicRegion @endlink object and fill it from different
+ * region strings.
+ * 
+ * @code{.cpp}
+ * seqan::GenomicRegion genomicRegion;
+ * 
+ * parse(genomicRegion, &#34;chr1&#34;);
+ * // genomicRegion.seqName == &#34;chr1&#34;
+ * // genomicRegion.rID == -1, genomicRegion.beginPos == -1, genomicRegion.beginPos == -1
+ * 
+ * parse(genomicRegion, &#34;chr1:1000&#34;);
+ * // genomicRegion.seqName == &#34;chr1&#34;
+ * // genomicRegion.beginPos == 999
+ * // genomicRegion.rID == -1, genomicRegion.beginPos == -1
+ * 
+ * parse(genomicRegion, &#34;chr1:1000-2000&#34;);
+ * // genomicRegion.seqName == &#34;chr1&#34;
+ * // genomicRegion.beginPos == 999
+ * // genomicRegion.beginPos == 2000
+ * // genomicRegion.rID == -1
+ * @endcode
+ * 
+ * 
+ * 
+ * 
+ * @fn GenomicRegion::GenomicRegion
+ * 
+ * @brief Constructor.
+ * 
+ * @signature GenomicRegion::GenomicRegion();
+ * @signature GenomicRegion::GenomicRegion(str);
+ * 
+ * @param[in] str The string to parse region from. Types: CharString
+ * 
+ * The default constructor sets all integer members to &lt;tt&gt;INVALID_POS&lt;/tt&gt;, the
+ * &lt;tt&gt;seqName&lt;/tt&gt; member is left empty.
+ * 
+ * @fn GenomicRegion::toString
+ * 
+ * @brief Write string representation of interval to out.
+ * 
+ * @signature void GenomicRegion::toString(out);
+ * 
+ * @param[in,out] out Target to write textual interval description to.
+ * 
+ * @var __int32 GenomicRegion::INVALID_POS;
+ * 
+ * @brief Constant for marking a position as invalid (static-const member).
+ * 
+ * @var __int32 GenomicRegion::INVALID_ID;
+ * 
+ * @brief Constant for marking a position as invalid (static-const member).
+ * 
+ * @var CharString GenomicRegion::seqName;
+ * 
+ * @brief Name of the sequence the region lies on, default is the empty string.
+ * 
+ * @var __int32 GenomicRegion::rID;
+ * 
+ * @brief An optional field storing an integer. Default is &lt;tt&gt;-1&lt;/tt&gt;.
+ * 
+ * @var __int32 GenomicRegion::beginPos;
+ * 
+ * @brief Begin position of the range on the chromosome. Default is &lt;tt&gt;-1&lt;/tt&gt;.
+ * 
+ * @var __int32 GenomicRegion::endPos;
+ * 
+ * @brief End position of the range on the chromosome. Default is &lt;tt&gt;-1&lt;/tt&gt;.
+ * 
+ * @fn GenomicRegion#clear
+ * 
+ * @brief Reset a GenomicRegion object to the same state after default
+ *        construction.
+ * 
+ * @signature void clear(genomicRegion);
+ * 
+ * @param[in,out] genomicRegion The @link GenomicRegion @endlink object to
+ *                              reset. Types: GenomicRegion
+ * 
+ * @fn GenomicRegion#parse
+ * 
+ * @brief Parse genomic region string store results in @link GenomicRegion
+ *        @endlink.
+ * 
+ * @signature bool parse(genomicRegion, regionString);
+ * 
+ * @param[in] regionString The region string to prse. Types: @link CharString
+ *                         @endlink.
+ * @param[out] genomicRegion The @link GenomicRegion @endlink object to write
+ *                           the results to. Types: GenomicRegion
+ * 
+ * @return bool true indicates successful parsing.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,32 @@
+Situation
+
+REF  AGCATGTTAGATAAGATAG-----------CTGTGCTAGTAGGCAGTCAGCGCCAT
+READ AGCATGTTAGATAAGATAGCCCCCCCCCCCCTGTGCTAGTAGGCAGTCAGCGCCAT
+
+Resulting alignments
+
+Left
+      0     .    :    .     
+        AGCATGTTAGATAAGATAG
+        |||||||||||||||||||
+        AGCATGTTAGATAAGATAG
+
+
+Right
+      0     .    :    .    :    .  
+        CTGTGCTAGTAGGCAGTCAGCGCCAT
+        ||||||||||||||||||||||||||
+        CTGTGCTAGTAGGCAGTCAGCGCCAT
+
+
+
+refSplitPosition   == 19
+readSplitLPosition == 19
+readSplitRPosition == 30
+
+Reference Left  AGCATGTTAGATAAGATAG
+Reference Right CTGTGCTAGTAGGCAGTCAGCGCCAT
+
+Read Left       AGCATGTTAGATAAGATAG
+Read Center     CCCCCCCCCCC
+Read Right      CTGTGCTAGTAGGCAGTCAGCGCCAT

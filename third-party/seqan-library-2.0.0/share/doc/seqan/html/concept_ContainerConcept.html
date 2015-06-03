@@ -1,0 +1,2445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="concept_containerconcept" data-page="ContainerConcept">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ContainerConcept - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="concept" data-pimped="true">
+  <a href="page_LanguageEntities.html#concept">Concept</a> <span>ContainerConcept<div><div>A container is an object that stores other objects (<i>elements</i>).</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+      <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="concept_ForwardContainerConcept.html" data-lang-entity="concept">ForwardContainerConcept</a>, 
+    <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a>, 
+    <a href="concept_ReversibleContainerConcept.html" data-lang-entity="concept">ReversibleContainerConcept</a>, 
+    <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a>, 
+    <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>ContainerConcept&lt;T&gt;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Containers store multiple entries of the same type (the <i>element type</i>) and provide means to access these
+items. More specific, each container has an iterator type that is used for accessing its elements.</p><p>There is no guarantee for the elements to be in a particular order (the order can vary between two iterations) and
+no guarantee for the time complexity of element access. Furthermore, there is no guarantee that there can be more
+than one iterator in the container. Modification of a container through an iterator invalidates all other iterators.</p><p>Refinements of the Container concept or specific implementations can provide these guarantees, however.</p><p>A container owns its elements and the elements are destructed when their owning container is destructed. The
+elements must fulfill the concepts <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a> and <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23append" title="#ContainerConcept#append (interface function)" data-lang-entity="interface_function">void append(target, source);</a></code></span>
+    <span class="summary_desc"><div>Concatenate a container to another.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23appendValue" title="#ContainerConcept#appendValue (interface function)" data-lang-entity="interface_function">void appendValue(target, val[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Append a value to a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23begin" title="#ContainerConcept#begin (interface function)" data-lang-entity="interface_function">TIterator begin(c[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator to the beginning of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23directionIterator" title="#ContainerConcept#directionIterator (interface function)" data-lang-entity="interface_function">TDirIter directionIterator(streamBuf, dirTag);</a></code></span>
+    <span class="summary_desc"><div>Returns direction iterator for a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23empty" title="#ContainerConcept#empty (interface function)" data-lang-entity="interface_function">bool empty(c);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the container is empty.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23end" title="#ContainerConcept#end (interface function)" data-lang-entity="interface_function">TIterator end(c[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator to the end of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23getObjectId" title="#ContainerConcept#getObjectId (interface function)" data-lang-entity="interface_function">TVoidPtr getObjectId(cont);</a></code></span>
+    <span class="summary_desc"><div>A value that identifies the underlying sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23length" title="#ContainerConcept#length (interface function)" data-lang-entity="interface_function">TSize length(c);</a></code></span>
+    <span class="summary_desc"><div>Returns the size of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23moveValue" title="#ContainerConcept#moveValue (interface function)" data-lang-entity="interface_function">void moveValue(container, pos, value);</a></code></span>
+    <span class="summary_desc"><div>Move a value into a container at a given position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23shrinkToFit" title="#ContainerConcept#shrinkToFit (interface function)" data-lang-entity="interface_function">void shrinkToFit(cont);</a></code></span>
+    <span class="summary_desc"><div>Resizes container to minimum capacity.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23swap" title="#ContainerConcept#swap (interface function)" data-lang-entity="interface_function">void swap(c1, c2);</a></code></span>
+    <span class="summary_desc"><div>Swap the contents of two containers.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23write" title="#ContainerConcept#write (interface function)" data-lang-entity="interface_function">void write(container, iter, n);</a></code></span>
+    <span class="summary_desc"><div>Write to a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23writeValue" title="#ContainerConcept#writeValue (interface function)" data-lang-entity="interface_function">void writeValue(container, val);</a></code></span>
+    <span class="summary_desc"><div>Write a value at the end of a container.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23DefaultGetIteratorSpec" title="#ContainerConcept#DefaultGetIteratorSpec (interface function)" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the default iterator specialization for functions.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23DefaultIteratorSpec" title="#ContainerConcept#DefaultIteratorSpec (interface function)" data-lang-entity="interface_metafunction">DefaultIteratorSpec&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the default iterator specialization.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Difference" title="#ContainerConcept#Difference (interface function)" data-lang-entity="interface_metafunction">Size&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the type for distances between two iterators.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23DirectionIterator" title="#ContainerConcept#DirectionIterator (interface function)" data-lang-entity="interface_metafunction">DirectionIterator&lt;TContainer&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the direction iterator for the given direction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23GetValue" title="#ContainerConcept#GetValue (interface function)" data-lang-entity="interface_metafunction">GetValue&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the get-value type of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Iterator" title="#ContainerConcept#Iterator (interface function)" data-lang-entity="interface_metafunction">Iterator&lt;TContainer[, TSpec]&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the iterator type of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Position" title="#ContainerConcept#Position (interface function)" data-lang-entity="interface_metafunction">Positin&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the position type of a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Reference" title="#ContainerConcept#Reference (interface function)" data-lang-entity="interface_metafunction">Reference&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the reference type of the container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Size" title="#ContainerConcept#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the size type of a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ContainerConcept%23Value" title="#ContainerConcept#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TContainer&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the value type of the container.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ContainerConcept#append" class="signature first" data-lang-entity="interface_function">
+      <code>void append(target, source);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Concatenate a container to another.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">target</code>
+            
+        
+      </th>
+      <td>The <a href="concept_ContainerConcept.html" data-lang-entity="concept">container</a> to append <tt>source</tt> to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>This <a href="concept_ContainerConcept.html" data-lang-entity="concept">container</a> will be appended to <tt>source</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#appendValue" class="signature" data-lang-entity="interface_function">
+      <code>void appendValue(target, val[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a value to a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">target</code>
+            
+        
+      </th>
+      <td>The container to append <tt>val</tt> to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The value to append to <tt>target</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The resize tag to use. Defaults to What DefaultOverflowImplicit returns for the type of
+<tt>target</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#begin" class="signature" data-lang-entity="interface_function">
+      <code>TIterator begin(c[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator to the beginning of the container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>The container to get the begin iterator for (type <tt>TContainer</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>An optional tag for selecting the type of the iterator. One of <tt>Standard</tt> and <tt>Rooted</tt>.
+When left out, <a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a> of <tt>TContainer</tt> is used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>Iterator to the beginning of the container, the type is selected by <a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a> with
+the given (or default) tag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>When empty, <tt>begin(c) == end(c)</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#directionIterator" class="signature" data-lang-entity="interface_function">
+      <code>TDirIter directionIterator(streamBuf, dirTag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns direction iterator for a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">streamBuf</code>
+            
+        
+      </th>
+      <td>The <a href="concept_ContainerConcept.html" data-lang-entity="concept">container</a> object to compute iterator for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dirTag</code>
+            
+        
+      </th>
+      <td>Direction tag, one of the <a href="group_DirectionTags.html" data-lang-entity="group">DirectionTags</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDirIter</code></th>
+        <td>The resulting <a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(c);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the container is empty.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>The container to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Whether or not the container is empty.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#end" class="signature" data-lang-entity="interface_function">
+      <code>TIterator end(c[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator to the end of the container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>The container to get the end iterator for (type <tt>TContainer</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>An optional tag for selecting the type of the iterator. One of <tt>Standard</tt> and <tt>Rooted</tt>.
+When left out, <a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a> of <tt>TContainer</tt> is used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>Iterator to the end of the container, the type is selected by <a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a> with
+the given (or default) tag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>When empty, <tt>begin(c) == end(c)</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#getObjectId" class="signature" data-lang-entity="interface_function">
+      <code>TVoidPtr getObjectId(cont);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>A value that identifies the underlying sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cont</code>
+            
+        
+      </th>
+      <td>The object for which to determine the id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVoidPtr</code></th>
+        <td>a <tt>void const *</tt> value identying the object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Two sequences should have the same id, if they share the same resource, e.g. the same memory buffer.</p><p>The exact semantic of the returned id can vary for different classes. Typically, the id of a string is a <tt>void
+const *</tt> to the end of the string.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;hallo seqan&quot;</span><span class="p">;</span>
+<span class="kt">bool</span> <span class="n">b1</span> <span class="o">=</span> <span class="p">(</span><span class="n">getObjectId</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="o">==</span> <span class="n">getObjectId</span><span class="p">(</span><span class="n">infix</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">));</span>   <span class="c1">//true</span>
+<span class="kt">bool</span> <span class="n">b2</span> <span class="o">=</span> <span class="p">(</span><span class="n">getObjectId</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="o">==</span> <span class="n">getObjectId</span><span class="p">(</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">str</span><span class="p">)));</span> <span class="c1">//false</span>
+<span class="kt">bool</span> <span class="n">b3</span> <span class="o">=</span> <span class="p">(</span><span class="n">getObjectId</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="o">==</span> <span class="n">getObjectId</span><span class="p">(</span><span class="n">toCString</span><span class="p">(</span><span class="n">str</span><span class="p">)));</span>
+</pre></div>
+</div><p>In this example, <tt>b1</tt> is <tt>true&lt;/tt., since the segment object returned by <tt>infix()</tt> is just a filter
+and uses the buffer of it's host object str.</tt></p><p><tt>String&lt;char&gt;(str)</tt> constructs a temporary copy of <tt>str</tt>, so these two strings have different id values.</p><p>The result of the last comparison depends on the implementation of <tt>toCString</tt> and cannot be predicted at
+compile time.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(c);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the size of the container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">c</code>
+            
+        
+      </th>
+      <td>The container to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the container.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#moveValue" class="signature" data-lang-entity="interface_function">
+      <code>void moveValue(container, pos, value);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move a value into a container at a given position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">container</code>
+            
+        
+      </th>
+      <td>The container to manipulate.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the item in the container to manipulate.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">value</code>
+            
+        
+      </th>
+      <td>The value to move to <tt>container[pos]</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#shrinkToFit" class="signature" data-lang-entity="interface_function">
+      <code>void shrinkToFit(cont);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resizes container to minimum capacity.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cont</code>
+            
+        
+      </th>
+      <td>The container to shrink.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#swap" class="signature" data-lang-entity="interface_function">
+      <code>void swap(c1, c2);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Swap the contents of two containers.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">c1</code>
+            
+        
+      </th>
+      <td>The first container.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">c2</code>
+            
+        
+      </th>
+      <td>The second container.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Swaps the contents of <tt>c1</tt> and <tt>c2</tt>. The <tt>swap</tt> function must be defined in the same
+namespace as the container for Koenig lookup to work. In the heart of sorting algorithms, for example,
+the swap function is properly used as follows. This way, both the generic <tt>std::swap</tt> and the specialized
+<tt>swap</tt> function of the container are available:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">TContainer</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">;</span> <span class="c1">// ...</span>
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">swap</span><span class="p">;</span>
+<span class="n">swap</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">);</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#write" class="signature" data-lang-entity="interface_function">
+      <code>void write(container, iter, n);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write to a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">container</code>
+            
+        
+      </th>
+      <td>The container to append to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">iter</code>
+            
+        
+      </th>
+      <td>The <a href="concept_ForwardIteratorConcept.html" data-lang-entity="concept">forward iterator</a> to take the values from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">n</code>
+            
+        
+      </th>
+      <td>Number of elements to write from <tt>iter</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function reads <tt>n</tt> values from <tt>iter</tt> and appends them to the back of <tt>container</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ContainerConcept#writeValue" class="signature" data-lang-entity="interface_function">
+      <code>void writeValue(container, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Write a value at the end of a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">container</code>
+            
+        
+      </th>
+      <td>to append to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The value to append.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">appendValue</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="ContainerConcept#DefaultGetIteratorSpec" class="signature first" data-lang-entity="interface_metafunction">
+    <code>DefaultGetIteratorSpec&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the default iterator specialization for functions.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The iterator specialization tag type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Used by functions such as <a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a> and <a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a> for the <tt>TSpec</tt>
+parameter.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#DefaultIteratorSpec" class="signature" data-lang-entity="interface_metafunction">
+    <code>DefaultIteratorSpec&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the default iterator specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The iterator specialization tag type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Used by <a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a> to select the default value for <tt>TSpec</tt>.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Difference" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the type for distances between two iterators.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The type to use for storing iterator distances sizes.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This must be the same type as the distance type of the containers iterators.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#DirectionIterator" class="signature" data-lang-entity="interface_metafunction">
+    <code>DirectionIterator&lt;TContainer&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the direction iterator for the given direction.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The container to query for its direction iterator.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting direction iterator.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#GetValue" class="signature" data-lang-entity="interface_metafunction">
+    <code>GetValue&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the get-value type of the container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The get-value type of the container.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The get-value type of the container is a type for efficient read-only access to the elements in the container.
+For small types (e.g. <tt>int</tt>), this can be a copy (thus <tt>int</tt>), for larger types, this can be
+a const reference to the value type.</p><h4>Valid Expressions</h4><p>The variable v has the get-value type of the container TContainer whereas it is an iterator into the container.
+Thus, we can store a get-value in v.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">GetValue</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">v</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Iterator" class="signature" data-lang-entity="interface_metafunction">
+    <code>Iterator&lt;TContainer[, TSpec]&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the iterator type of the container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TSpec</code></th>
+            <td>Optionally, a tag for selecting the kind of iterator. If not given, then
+<a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a> of TContainer is used. When given, one of
+<tt>Standard</tt> and <tt>Rooted</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The iterator type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Different from the STL the <tt>const</tt> attribute of <tt>TContainer</tt> determines whether the resturned
+iterator is a const iterator or a non-const iterator.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Position" class="signature" data-lang-entity="interface_metafunction">
+    <code>Positin&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the position type of a container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The type to use for storing container positions.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Reference" class="signature" data-lang-entity="interface_metafunction">
+    <code>Reference&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the reference type of the container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The reference type of the container.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Different from STL containers, the const-ness of <tt>TContainer</tt> decides whether the returned type is a
+const reference or a reference for modifying elements.</p><p>Note that the reference type is not guaranteed to be <tt>TValue &amp;</tt> if the value type of the container
+is <tt>TValue</tt>. The reference can be implemented as a proxy, similar to <tt>std::vector&lt;bool&gt;</tt>.</p><h4>Valid Expressions</h4><p>The variable r has the reference type of the container TContainer whereas it is an iterator into the container.
+Thus, we can store a reference to a value in the container in r. Then, we can assign the value of v, a value
+of the container.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Reference</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">r</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>  <span class="c1">// reference into container</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>  <span class="c1">// updates value in container, thus also *it</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the size type of a container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The type to use for storing container sizes.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="ContainerConcept#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TContainer&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value type of the container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TContainer</code></th>
+            <td>The Container to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The element type of the container.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The value type is the type that can be used for storing copies of the elements in the container.</p><h4>Valid Expressions</h4><p>The variable v has the value type of the container TContainer whereas it is an iterator into the container. Thus,
+copies of values from TContainer (*it) ca be stored in v.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Value</span><span class="o">&lt;</span><span class="n">TContainer</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">v</span> <span class="o">=</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @concept ContainerConcept
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @extends AssignableConcept
+ * @extends DestructibleConcept
+ * 
+ * @brief A container is an object that stores other objects (&lt;i&gt;elements&lt;/i&gt;).
+ * 
+ * @signature ContainerConcept&lt;T&gt;
+ * 
+ * Containers store multiple entries of the same type (the &lt;i&gt;element type&lt;/i&gt;)
+ * and provide means to access these items. More specific, each container has an
+ * iterator type that is used for accessing its elements.
+ * 
+ * There is no guarantee for the elements to be in a particular order (the order
+ * can vary between two iterations) and no guarantee for the time complexity of
+ * element access. Furthermore, there is no guarantee that there can be more
+ * than one iterator in the container. Modification of a container through an
+ * iterator invalidates all other iterators.
+ * 
+ * Refinements of the Container concept or specific implementations can provide
+ * these guarantees, however.
+ * 
+ * A container owns its elements and the elements are destructed when their
+ * owning container is destructed. The elements must fulfill the concepts @link
+ * AssignableConcept @endlink and @link DestructibleConcept @endlink.
+ * 
+ * @mfn ContainerConcept#DirectionIterator
+ * 
+ * @brief Return the direction iterator for the given direction.
+ * 
+ * @signature DirectionIterator&lt;TContainer&gt;::Type;
+ * 
+ * @tparam TContainer The container to query for its direction iterator.
+ * 
+ * @return Type The resulting direction iterator.
+ * 
+ * @mfn ContainerConcept#Value
+ * 
+ * @brief Returns the value type of the container.
+ * 
+ * @signature Value&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container to query.
+ * 
+ * @return Type The element type of the container.
+ * 
+ * The value type is the type that can be used for storing copies of the
+ * elements in the container.
+ * 
+ * @section Valid Expressions
+ * 
+ * The variable v has the value type of the container TContainer whereas it is
+ * an iterator into the container. Thus, copies of values from TContainer (*it)
+ * ca be stored in v.
+ * 
+ * @code{.cpp}
+ * Value&lt;TContainer&gt;::Type v = *it;
+ * @endcode
+ * 
+ * 
+ * @mfn ContainerConcept#GetValue
+ * 
+ * @brief Returns the get-value type of the container.
+ * 
+ * @signature GetValue&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container to query.
+ * 
+ * @return Type The get-value type of the container.
+ * 
+ * The get-value type of the container is a type for efficient read-only access
+ * to the elements in the container. For small types (e.g. &lt;tt&gt;int&lt;/tt&gt;), this
+ * can be a copy (thus &lt;tt&gt;int&lt;/tt&gt;), for larger types, this can be a const
+ * reference to the value type.
+ * 
+ * @section Valid Expressions
+ * 
+ * The variable v has the get-value type of the container TContainer whereas it
+ * is an iterator into the container. Thus, we can store a get-value in v.
+ * 
+ * @code{.cpp}
+ * GetValue&lt;TContainer&gt;::Type v = *it;
+ * @endcode
+ * 
+ * 
+ * @mfn ContainerConcept#Reference
+ * 
+ * @brief Returns the reference type of the container.
+ * 
+ * @signature Reference&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container to query.
+ * 
+ * @return Type The reference type of the container.
+ * 
+ * Different from STL containers, the const-ness of &lt;tt&gt;TContainer&lt;/tt&gt; decides
+ * whether the returned type is a const reference or a reference for modifying
+ * elements.
+ * 
+ * Note that the reference type is not guaranteed to be &lt;tt&gt;TValue &amp;amp;&lt;/tt&gt; if
+ * the value type of the container is &lt;tt&gt;TValue&lt;/tt&gt;. The reference can be
+ * implemented as a proxy, similar to &lt;tt&gt;std::vector&amp;lt;bool&amp;gt;&lt;/tt&gt;.
+ * 
+ * @section Valid Expressions
+ * 
+ * The variable r has the reference type of the container TContainer whereas it
+ * is an iterator into the container. Thus, we can store a reference to a value
+ * in the container in r. Then, we can assign the value of v, a value of the
+ * container.
+ * 
+ * @code{.cpp}
+ * Reference&lt;TContainer&gt;::Type r = *it;  // reference into container
+ * r = v;  // updates value in container, thus also *it
+ * @endcode
+ * 
+ * 
+ * @mfn ContainerConcept#Iterator
+ * 
+ * @brief Returns the iterator type of the container.
+ * 
+ * @signature Iterator&lt;TContainer[, TSpec]&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * @tparam TSpec Optionally, a tag for selecting the kind of iterator. If not
+ *               given, then @link ContainerConcept#DefaultIteratorSpec @endlink
+ *               of TContainer is used. When given, one of &lt;tt&gt;Standard&lt;/tt&gt; and
+ *               &lt;tt&gt;Rooted&lt;/tt&gt;.
+ * 
+ * @return Type The iterator type.
+ * 
+ * Different from the STL the &lt;tt&gt;const&lt;/tt&gt; attribute of &lt;tt&gt;TContainer&lt;/tt&gt;
+ * determines whether the resturned iterator is a const iterator or a non-const
+ * iterator.
+ * 
+ * @see ContainerIteratorTags
+ * 
+ * @mfn ContainerConcept#Size
+ * 
+ * @brief Returns the size type of a container.
+ * 
+ * @signature Size&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * 
+ * @return Type The type to use for storing container sizes.
+ * 
+ * @mfn ContainerConcept#Position
+ * 
+ * @brief Returns the position type of a container.
+ * 
+ * @signature Positin&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * 
+ * @return Type The type to use for storing container positions.
+ * 
+ * @mfn ContainerConcept#Difference
+ * 
+ * @brief Returns the type for distances between two iterators.
+ * 
+ * @signature Size&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * 
+ * @return Type The type to use for storing iterator distances sizes.
+ * 
+ * This must be the same type as the distance type of the containers iterators.
+ * 
+ * @mfn ContainerConcept#DefaultIteratorSpec
+ * 
+ * @brief Returns the default iterator specialization.
+ * 
+ * @signature DefaultIteratorSpec&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * 
+ * @return Type The iterator specialization tag type.
+ * 
+ * Used by @link ContainerConcept#Iterator @endlink to select the default value
+ * for &lt;tt&gt;TSpec&lt;/tt&gt;.
+ * 
+ * @see ContainerConcept#Iterator
+ * 
+ * @mfn ContainerConcept#DefaultGetIteratorSpec
+ * 
+ * @brief Returns the default iterator specialization for functions.
+ * 
+ * @signature DefaultGetIteratorSpec&lt;TContainer&gt;::Type
+ * 
+ * @tparam TContainer The Container type to query.
+ * 
+ * @return Type The iterator specialization tag type.
+ * 
+ * Used by functions such as @link ContainerConcept#begin @endlink and @link
+ * ContainerConcept#end @endlink for the &lt;tt&gt;TSpec&lt;/tt&gt; parameter.
+ * 
+ * @see ContainerConcept#Iterator
+ * 
+ * @fn ContainerConcept#writeValue
+ * 
+ * @brief Write a value at the end of a container.
+ * 
+ * @signature void writeValue(container, val);
+ * 
+ * @param[in,out] container to append to.
+ * @param[in] val The value to append.
+ * 
+ * @see ContainerConcept#appendValue
+ * 
+ * @fn ContainerConcept#write
+ * 
+ * @brief Write to a container.
+ * 
+ * @signature void write(container, iter, n);
+ * 
+ * @param[in,out] container The container to append to.
+ * @param[in,out] iter The @link ForwardIteratorConcept forward iterator
+ *                     @endlink to take the values from.
+ * @param[in] n Number of elements to write from &lt;tt&gt;iter&lt;/tt&gt;.
+ * 
+ * This function reads &lt;tt&gt;n&lt;/tt&gt; values from &lt;tt&gt;iter&lt;/tt&gt; and appends them to
+ * the back of &lt;tt&gt;container&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#begin
+ * 
+ * @brief Returns an iterator to the beginning of the container.
+ * 
+ * @signature TIterator begin(c[, tag]);
+ * 
+ * @param[in] c The container to get the begin iterator for (type
+ *              &lt;tt&gt;TContainer&lt;/tt&gt;).
+ * @param[in] tag An optional tag for selecting the type of the iterator. One of
+ *                &lt;tt&gt;Standard&lt;/tt&gt; and &lt;tt&gt;Rooted&lt;/tt&gt;. When left out, @link
+ *                ContainerConcept#DefaultGetIteratorSpec @endlink of
+ *                &lt;tt&gt;TContainer&lt;/tt&gt; is used.
+ * 
+ * @return TIterator Iterator to the beginning of the container, the type is
+ *                   selected by @link ContainerConcept#Iterator @endlink with
+ *                   the given (or default) tag.
+ * 
+ * When empty, &lt;tt&gt;begin(c) == end(c)&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#end
+ * 
+ * @brief Returns an iterator to the end of the container.
+ * 
+ * @signature TIterator end(c[, tag]);
+ * 
+ * @param[in] c The container to get the end iterator for (type
+ *              &lt;tt&gt;TContainer&lt;/tt&gt;).
+ * @param[in] tag An optional tag for selecting the type of the iterator. One of
+ *                &lt;tt&gt;Standard&lt;/tt&gt; and &lt;tt&gt;Rooted&lt;/tt&gt;. When left out, @link
+ *                ContainerConcept#DefaultGetIteratorSpec @endlink of
+ *                &lt;tt&gt;TContainer&lt;/tt&gt; is used.
+ * 
+ * @return TIterator Iterator to the end of the container, the type is selected
+ *                   by @link ContainerConcept#Iterator @endlink with the given
+ *                   (or default) tag.
+ * 
+ * When empty, &lt;tt&gt;begin(c) == end(c)&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#length
+ * 
+ * @brief Returns the size of the container.
+ * 
+ * @signature TSize length(c);
+ * 
+ * @param[in] c The container to query for its size.
+ * 
+ * @return TSize The number of elements in the container.
+ * 
+ * @fn ContainerConcept#empty
+ * 
+ * @brief Returns whether the container is empty.
+ * 
+ * @signature bool empty(c);
+ * 
+ * @param[in] c The container to query.
+ * 
+ * @return bool Whether or not the container is empty.
+ * 
+ * @fn ContainerConcept#swap
+ * 
+ * @brief Swap the contents of two containers.
+ * 
+ * @signature void swap(c1, c2);
+ * 
+ * @param[in,out] c1 The first container.
+ * @param[in,out] c2 The second container.
+ * 
+ * Swaps the contents of &lt;tt&gt;c1&lt;/tt&gt; and &lt;tt&gt;c2&lt;/tt&gt;. The &lt;tt&gt;swap&lt;/tt&gt; function
+ * must be defined in the same namespace as the container for Koenig lookup to
+ * work. In the heart of sorting algorithms, for example, the swap function is
+ * properly used as follows. This way, both the generic &lt;tt&gt;std::swap&lt;/tt&gt; and
+ * the specialized &lt;tt&gt;swap&lt;/tt&gt; function of the container are available:
+ * 
+ * @code{.cpp}
+ * TContainer c1, c2; // ...
+ * using std::swap;
+ * swap(c1, c2);
+ * @endcode
+ * 
+ * 
+ * @fn ContainerConcept#getObjectId
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief A value that identifies the underlying sequence.
+ * 
+ * @signature TVoidPtr getObjectId(cont);
+ * 
+ * @param[in] cont The object for which to determine the id.
+ * 
+ * @return TVoidPtr a &lt;tt&gt;void const *&lt;/tt&gt; value identying the object.
+ * 
+ * Two sequences should have the same id, if they share the same resource, e.g.
+ * the same memory buffer.
+ * 
+ * The exact semantic of the returned id can vary for different classes.
+ * Typically, the id of a string is a &lt;tt&gt;void const *&lt;/tt&gt; to the end of the
+ * string.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * String&lt;char&gt; str = &#34;hallo seqan&#34;;
+ * bool b1 = (getObjectId(str) == getObjectId(infix(str, 3, 7));   //true
+ * bool b2 = (getObjectId(str) == getObjectId(String&lt;char&gt;(str))); //false
+ * bool b3 = (getObjectId(str) == getObjectId(toCString(str)));
+ * @endcode
+ * 
+ * 
+ * In this example, &lt;tt&gt;b1&lt;/tt&gt; is &lt;tt&gt;true&lt;/tt., since the segment object
+ * returned by &lt;tt&gt;infix()&lt;/tt&gt; is just a filter and uses the buffer of it&#39;s
+ * host object str.
+ * 
+ * &lt;tt&gt;String&amp;lt;char&amp;gt;(str)&lt;/tt&gt; constructs a temporary copy of &lt;tt&gt;str&lt;/tt&gt;,
+ * so these two strings have different id values.
+ * 
+ * The result of the last comparison depends on the implementation of
+ * &lt;tt&gt;toCString&lt;/tt&gt; and cannot be predicted at compile time.
+ * 
+ * @fn ContainerConcept#moveValue
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Move a value into a container at a given position.
+ * 
+ * @signature void moveValue(container, pos, value);
+ * 
+ * @param[in,out] container The container to manipulate.
+ * @param[in] pos The position of the item in the container to manipulate.
+ * @param[in,out] value The value to move to &lt;tt&gt;container[pos]&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#append
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Concatenate a container to another.
+ * 
+ * @signature void append(target, source);
+ * 
+ * @param[in,out] target The @link ContainerConcept container @endlink to append
+ *                       &lt;tt&gt;source&lt;/tt&gt; to.
+ * @param[in] source This @link ContainerConcept container @endlink will be
+ *                   appended to &lt;tt&gt;source&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#appendValue
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Append a value to a container.
+ * 
+ * @signature void appendValue(target, val[, tag]);
+ * 
+ * @param[in,out] target The container to append &lt;tt&gt;val&lt;/tt&gt; to.
+ * @param[in] val The value to append to &lt;tt&gt;target&lt;/tt&gt;.
+ * @param[in] tag The resize tag to use. Defaults to What
+ *                DefaultOverflowImplicit returns for the type of
+ *                &lt;tt&gt;target&lt;/tt&gt;.
+ * 
+ * @fn ContainerConcept#shrinkToFit
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Resizes container to minimum capacity.
+ * 
+ * @signature void shrinkToFit(cont);
+ * 
+ * @param[in] cont The container to shrink.
+ * 
+ * @fn ContainerConcept#directionIterator
+ * 
+ * @brief Returns direction iterator for a container.
+ * 
+ * @signature TDirIter directionIterator(streamBuf, dirTag);
+ * 
+ * @param[in] streamBuf The @link ContainerConcept container @endlink object to
+ *                      compute iterator for.
+ * @param[in] dirTag Direction tag, one of the @link DirectionTags @endlink.
+ * 
+ * @return TDirIter The resulting @link ContainerConcept#DirectionIterator
+ *                  @endlink.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

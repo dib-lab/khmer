@@ -1,0 +1,802 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_modcyclicshapemodifiedstring" data-page="ModCyclicShapeModifiedString">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ModCyclicShape ModifiedString - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>ModCyclicShape ModifiedString<div><div>A string leaving out don't-care-positions defined in CyclicShape.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_ModifiedString.html" data-lang-entity="class">ModifiedString</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_ModifiedString.html" data-lang-entity="class">ModifiedString</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/modifier.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename THost, typename TSpec&gt;
+class ModifiedString&lt;THost, ModCyclicShape&lt;CyclicShape&lt;TSpec&gt; &gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">THost</a></code></th>
+        <td>The host string.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialization of CyclicShape.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ModCyclicShapeModifiedString%23end" title="#ModCyclicShapeModifiedString#end (interface function)" data-lang-entity="interface_function">TIterator end(modStr[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator to the end of the container.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ModCyclicShapeModifiedString%23Cargo" title="#ModCyclicShapeModifiedString#Cargo (interface function)" data-lang-entity="interface_metafunction">Cargo&lt;ModifiedString&lt;THost, ModCyclicShape&lt;CyclicShape&lt;TSpec&gt; &gt; &gt; &gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Cargo of ModCyclicShape ModCyclicShape Modified Iterator and ModCyclicShape Modified String.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+        
+        <div class="note info"><strong>Note:</strong> <div class='inline'>
+            <p>ModCyclicShape Modifier should only be used to <b>view/read a sequence</b>,
+never to change the underlying sequence. Some operations will work, e.g.
+you can use the <tt>operator*()</tt> of the ModifiedIterator to change
+a character, but other operations like <tt>replace</tt> or <tt>append</tt>
+are unsafe or even conceptionally wrong.</p>
+         </div></div>
+        
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Applies a CyclicShape to a string. The resulting modified string skips don't-care positions
+and can thus be shorter than the original string. Of course the underlying string is not changed
+by the modifier.</p><h3>Examples</h3><p>Use case for GenericCyclicShapes:</p><div data-src-path="demos/cyclic_shape_snippets.cpp"><div class="highlight"><pre>        <span class="k">typedef</span> <span class="n">ModifiedString</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">ModCyclicShape</span><span class="o">&lt;</span><span class="n">TShape</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TModString</span><span class="p">;</span>
+
+        <span class="n">CharString</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;das ist das Haus vom Nikolaus&quot;</span><span class="p">;</span>
+        <span class="n">TModString</span> <span class="nf">modStr</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">);</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; =&gt; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">modStr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/cyclic_shape_snippets.cpp" target="_top">demos/cyclic_shape_snippets.cpp</a></div></div><p>Use case for FixedCyclicShapes:</p><div data-src-path="demos/cyclic_shape_snippets.cpp"><div class="highlight"><pre>        <span class="k">typedef</span> <span class="n">ModifiedString</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">ModCyclicShape</span><span class="o">&lt;</span><span class="n">TShape</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TModString</span><span class="p">;</span>
+
+        <span class="n">CharString</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;das ist das Haus vom Nikolaus&quot;</span><span class="p">;</span>
+        <span class="n">TModString</span> <span class="nf">modStr</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; =&gt; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">modStr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/cyclic_shape_snippets.cpp" target="_top">demos/cyclic_shape_snippets.cpp</a></div></div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a></li>
+  
+  <li><a href="specialization_ModCyclicShapeModifiedIterator.html" data-lang-entity="specialization">ModCyclicShapeModifiedIterator</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ModCyclicShapeModifiedString#end" class="signature first" data-lang-entity="interface_function">
+      <code>TIterator end(modStr[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator to the end of the container.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>ModCyclicShape Modified Iterator to be returned.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">modStr</code>
+            
+        
+      </th>
+      <td>ModCyclicShape Modified String.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">An</code>
+            
+        
+      </th>
+      <td>optional tag for selecting the type of the iterator.
+One of Standard and Rooted. When left out,
+<a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a> of <tt>modStr</tt> is used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>Iterator</code></th>
+        <td>to the end of the container, the type is selected by #Fn&lt;&gt;ContainerConcept#Iterator
+with the given (or default) tag.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The end iterator is not guaranteed to be at position <tt>length(modStr)</tt>, where
+a standard iterator ends. Due to the jumping-tequniche of ModCyclicShape
+Modified Iterator, the end iterator is set to the first care position after
+the end of the string. The invariant is: <tt>host(end(modStr)) &gt;= end(host(modStr))<tt>
+where the the larger or equal operator refers to the position in the sequence.</tt></tt></p><p>If for some reason you use the host iterator to check an end condition, make sure
+you use <tt> for(...; host(modIter) &gt;= end(host(modStr)); ...) </tt> instead of
+<tt> for(...; host(modIter) != end(host(modStr)); ...) </tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="ModCyclicShapeModifiedString#Cargo" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Cargo&lt;ModifiedString&lt;THost, ModCyclicShape&lt;CyclicShape&lt;TSpec&gt; &gt; &gt; &gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Cargo of ModCyclicShape ModCyclicShape Modified Iterator and ModCyclicShape Modified String.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>THost</code></th>
+            <td>Host container of ModifiedString.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TSpec</code></th>
+            <td>Specialization of CyclicShape.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Cargo</code></th>
+            <td>type of ModCyclicShape Modified String is the CyclicShape itself.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ModCyclicShapeModifiedString ModCyclicShape ModifiedString
+ * 
+ * @extends ModifiedString
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief A string leaving out don&#39;t-care-positions defined in CyclicShape.
+ * 
+ * @note ModCyclicShape Modifier should only be used to &lt;b&gt;view/read a
+ *       sequence&lt;/b&gt;, never to change the underlying sequence. Some operations
+ *       will work, e.g. you can use the &lt;tt&gt;operator*()&lt;/tt&gt; of the
+ *       ModifiedIterator to change a character, but other operations like
+ *       &lt;tt&gt;replace&lt;/tt&gt; or &lt;tt&gt;append&lt;/tt&gt; are unsafe or even conceptionally
+ *       wrong.
+ * 
+ * @signature template &lt;typename THost, typename TSpec&gt; class
+ *            ModifiedString&lt;THost, ModCyclicShape&lt;CyclicShape&lt;TSpec&gt; &gt; &gt;;
+ * 
+ * @tparam THost The host string.
+ * @tparam TSpec The specialization of CyclicShape.
+ * 
+ * Applies a CyclicShape to a string. The resulting modified string skips
+ * don&#39;t-care positions and can thus be shorter than the original string. Of
+ * course the underlying string is not changed by the modifier.
+ * 
+ * @section Examples
+ * 
+ * Use case for GenericCyclicShapes:
+ * 
+ * @snippet demos/cyclic_shape_snippets.cpp Define GenericCyclicShape Modified String
+ * 
+ * Use case for FixedCyclicShapes:
+ * 
+ * @snippet demos/cyclic_shape_snippets.cpp Define FixedCyclicShape Modified String
+ * 
+ * @see CyclicShape
+ * @see ModCyclicShapeModifiedIterator
+ * 
+ * @mfn ModCyclicShapeModifiedString#Cargo
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief Cargo of ModCyclicShape ModCyclicShape Modified Iterator and
+ *        ModCyclicShape Modified String.
+ * 
+ * @signature Cargo&lt;ModifiedString&lt;THost, ModCyclicShape&lt;CyclicShape&lt;TSpec&gt; &gt; &gt;
+ *            &gt;::Type;
+ * 
+ * @tparam THost Host container of ModifiedString.
+ * @tparam TSpec Specialization of CyclicShape.
+ * 
+ * @return Cargo type of ModCyclicShape Modified String is the CyclicShape
+ *               itself.
+ * 
+ * @fn ModCyclicShapeModifiedString#end
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief Returns an iterator to the end of the container.
+ * 
+ * @signature TIterator end(modStr[, tag]);
+ * 
+ * @tparam TIterator ModCyclicShape Modified Iterator to be returned.
+ * 
+ * @param[in] modStr ModCyclicShape Modified String.
+ * @param[in] An optional tag for selecting the type of the iterator. One of
+ *               Standard and Rooted. When left out, @link
+ *               ContainerConcept#DefaultGetIteratorSpec @endlink of
+ *               &lt;tt&gt;modStr&lt;/tt&gt; is used.
+ * 
+ * @return Iterator to the end of the container, the type is selected by
+ *                  #Fn&lt;&gt;ContainerConcept#Iterator with the given (or default)
+ *                  tag.
+ * 
+ * The end iterator is not guaranteed to be at position &lt;tt&gt;length(modStr)&lt;/tt&gt;,
+ * where a standard iterator ends. Due to the jumping-tequniche of
+ * ModCyclicShape Modified Iterator, the end iterator is set to the first care
+ * position after the end of the string. The invariant is: &lt;tt&gt;host(end(modStr))
+ * &gt;= end(host(modStr))&lt;tt&gt; where the the larger or equal operator refers to the
+ * position in the sequence.
+ * 
+ * If for some reason you use the host iterator to check an end condition, make
+ * sure you use &lt;tt&gt; for(...; host(modIter) &gt;= end(host(modStr)); ...) &lt;/tt&gt;
+ * instead of &lt;tt&gt; for(...; host(modIter) != end(host(modStr)); ...) &lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

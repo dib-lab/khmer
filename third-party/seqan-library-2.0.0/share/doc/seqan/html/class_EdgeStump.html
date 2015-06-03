@@ -1,0 +1,1645 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_edgestump" data-page="EdgeStump">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>EdgeStump - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>EdgeStump<div><div>Encapsulate information for a single edge.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_types.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TCargo, bool IS_LIST, bool STORE_SOURCE, bool STORE_ID, typename TSpec&gt;
+class EdgeStump;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The cargo type of an edge. The cargo can be used to store arbitrary information with an
+edge or be <tt>void</tt>. Default: <tt>void</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">IS_LIST</a></code></th>
+        <td>A bool value that indicates whether it is a list or not. Default: <tt>true</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">STORE_SOURCE</a></code></th>
+        <td>A bool value that indicates whether the source is stored in the EdgeStump or not.
+Default: <tt>false</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">STORE_ID</a></code></th>
+        <td>A bool value that indictes whether the id is tored in the EdgeStump or not. Note: Without edge
+ids, external property maps do not work for edges! Default: <tt>true</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <tt>Default</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23assignCargo" title="#EdgeStump#assignCargo (interface function)" data-lang-entity="interface_function">void assignCargo(stump, cargo);</a></code></span>
+    <span class="summary_desc"><div>Assigns a new cargo to the edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23assignNextS" title="#EdgeStump#assignNextS (interface function)" data-lang-entity="interface_function">void assignNextS(es, es2);</a></code></span>
+    <span class="summary_desc"><div>Assigns another EdgeStump to the next source pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23assignNextT" title="#EdgeStump#assignNextT (interface function)" data-lang-entity="interface_function">void assignNextT(es, es2);</a></code></span>
+    <span class="summary_desc"><div>Assigns another EdgeStump to the next target pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23assignSource" title="#EdgeStump#assignSource (interface function)" data-lang-entity="interface_function">void assignSource(stump, t);</a></code></span>
+    <span class="summary_desc"><div>Assigns a source vertex to an edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23assignTarget" title="#EdgeStump#assignTarget (interface function)" data-lang-entity="interface_function">void assignTarget(stump, t);</a></code></span>
+    <span class="summary_desc"><div>Assigns a target vertex to an edge.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23cargo" title="#EdgeStump#cargo (interface function)" data-lang-entity="interface_function">TCargo cargo(stump);</a></code></span>
+    <span class="summary_desc"><div>Return cargo for an EdgeStump.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23getCargo" title="#EdgeStump#getCargo (interface function)" data-lang-entity="interface_function">TCargo getCargo(stump);</a></code></span>
+    <span class="summary_desc"><div>Return cargo for an EdgeStump.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23getNextS" title="#EdgeStump#getNextS (interface function)" data-lang-entity="interface_function">TEdgeStump getNextS(es);</a></code></span>
+    <span class="summary_desc"><div>Accesses the next source pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23getNextT" title="#EdgeStump#getNextT (interface function)" data-lang-entity="interface_function">TEdgeStump getNextT(es);</a></code></span>
+    <span class="summary_desc"><div>Get method for the next target pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23getSource" title="#EdgeStump#getSource (interface function)" data-lang-entity="interface_function">TVertexDescriptor getSource(stump);</a></code></span>
+    <span class="summary_desc"><div>Get method for the source.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23getTarget" title="#EdgeStump#getTarget (interface function)" data-lang-entity="interface_function">TVertexDescriptor getTarget(stump);</a></code></span>
+    <span class="summary_desc"><div>Get method for the target.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23nextS" title="#EdgeStump#nextS (interface function)" data-lang-entity="interface_function">TEdgeStump nextS(es);</a></code></span>
+    <span class="summary_desc"><div>Accesses the next source pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23nextT" title="#EdgeStump#nextT (interface function)" data-lang-entity="interface_function">TEdgeStump nextT(es);</a></code></span>
+    <span class="summary_desc"><div>Accesses the next target pointer.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23source" title="#EdgeStump#source (interface function)" data-lang-entity="interface_function">TVertexDescriptor source(stump);</a></code></span>
+    <span class="summary_desc"><div>Access to the source of an EdgeStump.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EdgeStump%23target" title="#EdgeStump#target (interface function)" data-lang-entity="interface_function">TVertexDescriptor target(stump);</a></code></span>
+    <span class="summary_desc"><div>Access to the target of an EdgeStump.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The EdgeStump either represents a list entry in the adjacency of a graph or an array field if edges are stored in an
+array.</p><h3>Remarks</h3><p>The default EdgeStump in all graph types does not consider a cargo. However, ni default usage every graph does store
+an edge id. Edge ids are used to append additional properties to edges with the help of external property maps.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="EdgeStump#assignCargo" class="signature first" data-lang-entity="interface_function">
+      <code>void assignCargo(stump, cargo);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a new cargo to the edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to set the cargo of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Reference to the cargo of the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Calling assignCargo on EdgeStump objects without cargo does nothing.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#assignNextS" class="signature" data-lang-entity="interface_function">
+      <code>void assignNextS(es, es2);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns another EdgeStump to the next source pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">es2</code>
+            
+        
+      </th>
+      <td>Pointer to the following EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Edge Stumps can be configured to have no source. In this case, there is no next source pointer.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#assignNextT" class="signature" data-lang-entity="interface_function">
+      <code>void assignNextT(es, es2);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns another EdgeStump to the next target pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">es2</code>
+            
+        
+      </th>
+      <td>Pointer to the following EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#assignSource" class="signature" data-lang-entity="interface_function">
+      <code>void assignSource(stump, t);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a source vertex to an edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">t</code>
+            
+        
+      </th>
+      <td>Vertex descriptor to assign as the source.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>A source vertex is not required in an edge stump. However, EdgeStump objects can be configured to contain a source
+vertex, as in undirected graphs.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#assignTarget" class="signature" data-lang-entity="interface_function">
+      <code>void assignTarget(stump, t);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a target vertex to an edge.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">t</code>
+            
+        
+      </th>
+      <td>Vertex descriptor to assign as the target.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#cargo" class="signature" data-lang-entity="interface_function">
+      <code>TCargo cargo(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return cargo for an EdgeStump.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to query for its cargo.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Reference to the cargo of the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#getCargo" class="signature" data-lang-entity="interface_function">
+      <code>TCargo getCargo(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return cargo for an EdgeStump.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to query for its cargo.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCargo</code></th>
+        <td>Reference to the cargo of the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#getNextS" class="signature" data-lang-entity="interface_function">
+      <code>TEdgeStump getNextS(es);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Accesses the next source pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>Reference</code></th>
+        <td>to the next source pointer.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Edge Stumps can be configured to have no source. In this case, there is no next source pointer.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#getNextT" class="signature" data-lang-entity="interface_function">
+      <code>TEdgeStump getNextT(es);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get method for the next target pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TEdgeStump</code></th>
+        <td>Reference to the next target pointer.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#getSource" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getSource(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get method for the source.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to get the source of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The vetex descriptor stored in stump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>A source vertex is not required in an edge stump. However, EdgeStump objects can be configured to contain a source
+vertex, as in undirected graphs.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#getTarget" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor getTarget(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get method for the target.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to get the target of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>The vetex descriptor stored in stump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#nextS" class="signature" data-lang-entity="interface_function">
+      <code>TEdgeStump nextS(es);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Accesses the next source pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>Reference</code></th>
+        <td>to the next source pointer.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Edge Stumps can be configured to have no source. In this case, there is no next source pointer.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#nextT" class="signature" data-lang-entity="interface_function">
+      <code>TEdgeStump nextT(es);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Accesses the next target pointer.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">es</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TEdgeStump</code></th>
+        <td>Reference to the next target pointer.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#source" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor source(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to the source of an EdgeStump.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to access the source of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>Reference to the source vertex descriptor of stump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>A source vertex is not required in an edge stump. However, EdgeStump objects can be configured to contain a source
+vertex, as in undirected graphs.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="EdgeStump#target" class="signature" data-lang-entity="interface_function">
+      <code>TVertexDescriptor target(stump);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Access to the target of an EdgeStump.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stump</code>
+            
+        
+      </th>
+      <td>Pointer to the EdgeStump to access the target of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TVertexDescriptor</code></th>
+        <td>Reference to the target vertex descriptor of stump.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class EdgeStump
+ * 
+ * @headerfile &lt;seqan/graph_types.h&gt;
+ * 
+ * @brief Encapsulate information for a single edge.
+ * 
+ * @signature template &lt;typename TCargo, bool IS_LIST, bool STORE_SOURCE, bool
+ *            STORE_ID, typename TSpec&gt; class EdgeStump;
+ * 
+ * @tparam TCargo The cargo type of an edge. The cargo can be used to store
+ *                arbitrary information with an edge or be &lt;tt&gt;void&lt;/tt&gt;.
+ *                Default: &lt;tt&gt;void&lt;/tt&gt;.
+ * @tparam IS_LIST A bool value that indicates whether it is a list or not.
+ *                 Default: &lt;tt&gt;true&lt;/tt&gt;.
+ * @tparam STORE_SOURCE A bool value that indicates whether the source is stored
+ *                      in the EdgeStump or not. Default: &lt;tt&gt;false&lt;/tt&gt;.
+ * @tparam STORE_ID A bool value that indictes whether the id is tored in the
+ *                  EdgeStump or not. Note: Without edge ids, external property
+ *                  maps do not work for edges! Default: &lt;tt&gt;true&lt;/tt&gt;.
+ * @tparam TSpec The specializing type. Default: &lt;tt&gt;Default&lt;/tt&gt;.
+ * 
+ * The EdgeStump either represents a list entry in the adjacency of a graph or
+ * an array field if edges are stored in an array.
+ * 
+ * @section Remarks
+ * 
+ * The default EdgeStump in all graph types does not consider a cargo. However,
+ * ni default usage every graph does store an edge id. Edge ids are used to
+ * append additional properties to edges with the help of external property
+ * maps.
+ * 
+ * @fn EdgeStump#getCargo
+ * 
+ * @brief Return cargo for an EdgeStump.
+ * 
+ * @signature TCargo getCargo(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to query for its cargo.
+ * 
+ * @return TCargo Reference to the cargo of the EdgeStump.
+ * 
+ * @fn EdgeStump#cargo
+ * 
+ * @brief Return cargo for an EdgeStump.
+ * 
+ * @signature TCargo cargo(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to query for its cargo.
+ * 
+ * @return TCargo Reference to the cargo of the EdgeStump.
+ * 
+ * @fn EdgeStump#assignCargo
+ * 
+ * @brief Assigns a new cargo to the edge.
+ * 
+ * @signature void assignCargo(stump, cargo);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to set the cargo of.
+ * 
+ * @return TCargo Reference to the cargo of the EdgeStump.
+ * 
+ * Calling assignCargo on EdgeStump objects without cargo does nothing.
+ * 
+ * @fn EdgeStump#assignTarget
+ * 
+ * @brief Assigns a target vertex to an edge.
+ * 
+ * @signature void assignTarget(stump, t);
+ * 
+ * @param[in,out] stump Pointer to the EdgeStump.
+ * @param[in] t Vertex descriptor to assign as the target.
+ * 
+ * @fn EdgeStump#target
+ * 
+ * @brief Access to the target of an EdgeStump.
+ * 
+ * @signature TVertexDescriptor target(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to access the target of.
+ * 
+ * @return TVertexDescriptor Reference to the target vertex descriptor of stump.
+ * 
+ * @fn EdgeStump#getTarget
+ * 
+ * @brief Get method for the target.
+ * 
+ * @signature TVertexDescriptor getTarget(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to get the target of.
+ * 
+ * @return TVertexDescriptor The vetex descriptor stored in stump.
+ * 
+ * @fn EdgeStump#assignSource
+ * 
+ * @brief Assigns a source vertex to an edge.
+ * 
+ * @signature void assignSource(stump, t);
+ * 
+ * @param[in,out] stump Pointer to the EdgeStump.
+ * @param[in] t Vertex descriptor to assign as the source.
+ * 
+ * @section Remarks
+ * 
+ * A source vertex is not required in an edge stump. However, EdgeStump objects
+ * can be configured to contain a source vertex, as in undirected graphs.
+ * 
+ * @fn EdgeStump#source
+ * 
+ * @brief Access to the source of an EdgeStump.
+ * 
+ * @signature TVertexDescriptor source(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to access the source of.
+ * 
+ * @return TVertexDescriptor Reference to the source vertex descriptor of stump.
+ * 
+ * @section Remarks
+ * 
+ * A source vertex is not required in an edge stump. However, EdgeStump objects
+ * can be configured to contain a source vertex, as in undirected graphs.
+ * 
+ * @fn EdgeStump#getSource
+ * 
+ * @brief Get method for the source.
+ * 
+ * @signature TVertexDescriptor getSource(stump);
+ * 
+ * @param[in] stump Pointer to the EdgeStump to get the source of.
+ * 
+ * @return TVertexDescriptor The vetex descriptor stored in stump.
+ * 
+ * @section Remarks
+ * 
+ * A source vertex is not required in an edge stump. However, EdgeStump objects
+ * can be configured to contain a source vertex, as in undirected graphs.
+ * 
+ * @fn EdgeStump#assignNextT
+ * 
+ * @brief Assigns another EdgeStump to the next target pointer.
+ * 
+ * @signature void assignNextT(es, es2);
+ * 
+ * @param[in,out] es Pointer to the EdgeStump.
+ * @param[in] es2 Pointer to the following EdgeStump.
+ * 
+ * @fn EdgeStump#nextT
+ * 
+ * @brief Accesses the next target pointer.
+ * 
+ * @signature TEdgeStump nextT(es);
+ * 
+ * @param[in] es Pointer to the EdgeStump.
+ * 
+ * @return TEdgeStump Reference to the next target pointer.
+ * 
+ * @fn EdgeStump#getNextT
+ * 
+ * @brief Get method for the next target pointer.
+ * 
+ * @signature TEdgeStump getNextT(es);
+ * 
+ * @param[in] es Pointer to the EdgeStump.
+ * 
+ * @return TEdgeStump Reference to the next target pointer.
+ * 
+ * @fn EdgeStump#assignNextS
+ * 
+ * @brief Assigns another EdgeStump to the next source pointer.
+ * 
+ * @signature void assignNextS(es, es2);
+ * 
+ * @param[in,out] es Pointer to the EdgeStump.
+ * @param[in] es2 Pointer to the following EdgeStump.
+ * 
+ * Edge Stumps can be configured to have no source. In this case, there is no
+ * next source pointer.
+ * 
+ * @fn EdgeStump#nextS
+ * 
+ * @brief Accesses the next source pointer.
+ * 
+ * @signature TEdgeStump nextS(es);
+ * 
+ * @param[in,out] es Pointer to the EdgeStump.
+ * 
+ * @return Reference to the next source pointer.
+ * 
+ * Edge Stumps can be configured to have no source. In this case, there is no
+ * next source pointer.
+ * 
+ * @fn EdgeStump#getNextS
+ * 
+ * @brief Accesses the next source pointer.
+ * 
+ * @signature TEdgeStump getNextS(es);
+ * 
+ * @param[in,out] es Pointer to the EdgeStump.
+ * 
+ * @return Reference to the next source pointer.
+ * 
+ * Edge Stumps can be configured to have no source. In this case, there is no
+ * next source pointer.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

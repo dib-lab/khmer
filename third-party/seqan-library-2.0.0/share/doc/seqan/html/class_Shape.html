@@ -1,0 +1,2361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_shape" data-page="Shape">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Shape - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Shape<div><div>Stores hash value and shape for an ungapped or gapped q-gram.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_GappedShape.html" data-lang-entity="specialization">GappedShape</a>, 
+    <a href="specialization_GenericShape.html" data-lang-entity="specialization">GenericShape</a>, 
+    <a href="specialization_HardwiredShape.html" data-lang-entity="specialization">HardwiredShape</a>, 
+    <a href="specialization_OneGappedShape.html" data-lang-entity="specialization">OneGappedShape</a>, 
+    <a href="specialization_SimpleShape.html" data-lang-entity="specialization">SimpleShape</a>, 
+    <a href="specialization_UngappedShape.html" data-lang-entity="specialization">UngappedShape</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue, typename TSpec&gt;
+class Shape;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: <a href="specialization_SimpleShape.html" data-lang-entity="specialization">SimpleShape</a>, for
+ungapped q-grams.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The <a href="global_metafunction_Value.html" data-lang-entity="global_metafunction">Value</a> type of the string the shape is
+applied to (e.g. <tt>Dna</tt>).</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hash" title="#Shape#hash (interface function)" data-lang-entity="interface_function">TValue hash(shape, it[, charsLeft]);</a></code></span>
+    <span class="summary_desc"><div>Computes a (lower) hash value for a shape applied to a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hash2" title="#Shape#hash2 (interface function)" data-lang-entity="interface_function">TValue hash2(shape, it, charsLeft);</a></code></span>
+    <span class="summary_desc"><div>Computes an unique hash value of a shape applied to a sequence, even if the sequence is shorter than
+the shape span.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hash2Next" title="#Shape#hash2Next (interface function)" data-lang-entity="interface_function">TValue hash2Next(shape, it);</a></code></span>
+    <span class="summary_desc"><div>Computes a unique hash value for the adjacent shape, even if it is shorter than q.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hash2Upper" title="#Shape#hash2Upper (interface function)" data-lang-entity="interface_function">TValue hash2Upper(shape, it, charsLeft);</a></code></span>
+    <span class="summary_desc"><div>Computes an upper unique hash value of a shape applied to a sequence,
+even if the sequence is shorter than the shape span.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hashInit" title="#Shape#hashInit (interface function)" data-lang-entity="interface_function">void hashInit(shape, it);</a></code></span>
+    <span class="summary_desc"><div>Preprocessing step of a pure <a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> loop.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hashNext" title="#Shape#hashNext (interface function)" data-lang-entity="interface_function">TValue hashNext(shape, it);</a></code></span>
+    <span class="summary_desc"><div>Computes the hash value for the adjacent shape.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23hashUpper" title="#Shape#hashUpper (interface function)" data-lang-entity="interface_function">TValue hashUpper(shape, it, charsLeft);</a></code></span>
+    <span class="summary_desc"><div>Computes an upper hash value for a shape applied to a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23length" title="#Shape#length (interface function)" data-lang-entity="interface_function">TSize length(shape);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of elements of the shape (span).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23resize" title="#Shape#resize (interface function)" data-lang-entity="interface_function">TSize resize(shape, length)</a></code></span>
+    <span class="summary_desc"><div>Resize a shape to a specified span.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23shapeToString" title="#Shape#shapeToString (interface function)" data-lang-entity="interface_function">void shapeToString(bitmap, shape);</a></code></span>
+    <span class="summary_desc"><div>Converts a given shape into a sequence of '1' (relevant position) and '0' (irrelevant position).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23stringToShape" title="#Shape#stringToShape (interface function)" data-lang-entity="interface_function">bool stringToShape(shape, bitmap);</a></code></span>
+    <span class="summary_desc"><div>Takes a shape given as a string of '1' (relevant position) and '0'
+(irrelevant position) and converts it into a Shape object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23unhash" title="#Shape#unhash (interface function)" data-lang-entity="interface_function">void unhash(result, hash, q);</a></code></span>
+    <span class="summary_desc"><div>Inverse of the <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> function; for ungapped shapes.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23value" title="#Shape#value (interface function)" data-lang-entity="interface_function">TValue value(shape);</a></code></span>
+    <span class="summary_desc"><div>Returns the current hash value of the Shape.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23weight" title="#Shape#weight (interface function)" data-lang-entity="interface_function">TSize weight(shape);</a></code></span>
+    <span class="summary_desc"><div>Number of relevant positions in a shape.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23Host" title="#Shape#Host (interface function)" data-lang-entity="interface_metafunction">Host&lt;TShape&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the host (= value) type to use.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23LENGTH" title="#Shape#LENGTH (interface function)" data-lang-entity="interface_metafunction">LENGTH&lt;TShape&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Returns the length (span) of a shape.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23Size" title="#Shape#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TShape&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the size type for a shape.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23Value" title="#Shape#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TShape&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the value type for a shape.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23ValueSize" title="#Shape#ValueSize (interface function)" data-lang-entity="interface_metafunction">ValueSize&lt;TShape&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Returns the type to use for the value size.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Shape%23WEIGHT" title="#Shape#WEIGHT (interface function)" data-lang-entity="interface_metafunction">WEIGHT&lt;TShape&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Returns the weight (number of 1's) of a shape.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The <a href="concept_FiniteOrderedAlphabetConcept.html#FiniteOrderedAlphabetConcept#ValueSize" data-lang-entity="interface_metafunction">ValueSize</a> of Shape is the ValueSize of TValue which is the
+alphabet size.</p><p>To get the span or the weight of a shape call <a href="class_Shape.html#Shape#length" data-lang-entity="interface_function">length</a> or <a href="class_Shape.html#Shape#weight" data-lang-entity="interface_function">weight</a>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Shape#hash" class="signature first" data-lang-entity="interface_function">
+      <code>TValue hash(shape, it[, charsLeft]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes a (lower) hash value for a shape applied to a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the shape.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">charsLeft</code>
+            
+        
+      </th>
+      <td>The distance of <tt>it</tt> to the string end. If
+<tt>charsLeft</tt> is smaller than the shape's span, the
+hash value corresponds to the smallest shape beginning with
+<tt>charsLeft</tt> characters.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Hash value of the shape (Metafunction: <a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash2</a></li>
+    
+    <li><a class="error">hashNext</a></li>
+    
+    <li><a class="error">hashUpper</a></li>
+    
+    <li><a class="error">unhash</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hash2" class="signature" data-lang-entity="interface_function">
+      <code>TValue hash2(shape, it, charsLeft);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes an unique hash value of a shape applied to a sequence, even if the sequence is shorter than
+the shape span.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the shape.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">charsLeft</code>
+            
+        
+      </th>
+      <td>The distance of <tt>it</tt> to the string end.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Hash value of the shape (Metafunction: <a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash</a></li>
+    
+    <li><a class="error">hash2Next</a></li>
+    
+    <li><a class="error">hash2Upper</a></li>
+    
+    <li><a class="error">unhash</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hash2Next" class="signature" data-lang-entity="interface_function">
+      <code>TValue hash2Next(shape, it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes a unique hash value for the adjacent shape, even if it is shorter than q.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing the q-gram. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the adjacent shape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Hash value of the shape (Metafunction: <a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> has to be called before with <tt>shape</tt> on the left adjacent q-gram.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash2</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hash2Upper" class="signature" data-lang-entity="interface_function">
+      <code>TValue hash2Upper(shape, it, charsLeft);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes an upper unique hash value of a shape applied to a sequence,
+even if the sequence is shorter than the shape span.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the shape.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">charsLeft</code>
+            
+        
+      </th>
+      <td>The distance of <tt>it</tt> to the string end.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Upper hash value of the shape. The hash value corresponds to
+the maximal <a href="class_Shape.html#Shape#hash2" data-lang-entity="interface_function">hash2</a> value of a shape beginning
+with the <tt>min(charsLeft,length(shape))</tt> characters + 1
+(Metafunction: <a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function in conjunction with <a href="class_Shape.html#Shape#hash2" data-lang-entity="interface_function">hash2</a> is useful to search a
+q-gram index for p-grams with <i>p &lt; q</i>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash2</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hashInit" class="signature" data-lang-entity="interface_function">
+      <code>void hashInit(shape, it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Preprocessing step of a pure <a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> loop.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hasing.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">iterator</a> to use for initializing the shape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Overlapping q-grams can efficiently be hashed by calling <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> on the first text position and <a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> on succeeding, adjacent positions.
+One drawback of this scenario is that for-loops cannot start with the first position directly and become more complicated.
+As a remedy, <a href="class_Shape.html#Shape#hashInit" data-lang-entity="interface_function">hashInit</a> was introduced which initializes the Shape to be used with <a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> on the first position directly.</p><h4>Example</h4><p>Two hash loop examples.
+The first loop uses <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a>/<a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> while the second use <a href="class_Shape.html#Shape#hashInit" data-lang-entity="interface_function">hashInit</a>/<a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a> and can process all hashes within the loop.</p><div data-src-path="demos/index/shape_hash_init.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">DnaString</span> <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;AAAACACAGTTTGA&quot;</span><span class="p">;</span>
+    <span class="n">Shape</span><span class="o">&lt;</span><span class="n">Dna</span><span class="p">,</span> <span class="n">UngappedShape</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">myShape</span><span class="p">;</span>
+
+    <span class="c1">// loop using hash() and hashNext() starts at position 1</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hash</span><span class="p">(</span><span class="n">myShape</span><span class="p">,</span> <span class="n">begin</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\t&#39;</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="n">length</span><span class="p">(</span><span class="n">myShape</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hashNext</span><span class="p">(</span><span class="n">myShape</span><span class="p">,</span> <span class="n">begin</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\t&#39;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// loop using hashInit() and hashNext() starts at position 0</span>
+    <span class="n">hashInit</span><span class="p">(</span><span class="n">myShape</span><span class="p">,</span> <span class="n">begin</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="n">length</span><span class="p">(</span><span class="n">myShape</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hashNext</span><span class="p">(</span><span class="n">myShape</span><span class="p">,</span> <span class="n">begin</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\t&#39;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/shape_hash_init.cpp" target="_top">demos/index/shape_hash_init.cpp</a></div></div><pre class="console" data-src-path="None">0    0    1    4    17    4    18    11    47    63    62    56
+0    0    1    4    17    4    18    11    47    63    62    56</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hashNext" class="signature" data-lang-entity="interface_function">
+      <code>TValue hashNext(shape, it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes the hash value for the adjacent shape.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the adjacent shape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Hash value of the q-gram (Metafunction: <a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> has to be called before.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#hashUpper" class="signature" data-lang-entity="interface_function">
+      <code>TValue hashUpper(shape, it, charsLeft);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Computes an upper hash value for a shape applied to a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape to be used for hashing. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>Sequence iterator pointing to the first character of the shape.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">charsLeft</code>
+            
+        
+      </th>
+      <td>The distance of <tt>it</tt> to the string end.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Upper hash value of the shape. The hash value corresponds to
+the maximal <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> value of a shape beginning
+with <tt>min(charsLeft,length(shape))</tt> characters + 1 (Metafunction:
+<a href="class_Shape.html#Shape#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function in conjunction with <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> is useful to search a q-gram index for p-grams with
+p &lt; q.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of elements of the shape (span).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>Shape object for which the number of relevant positions is determined.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements of the shape (span) (Metafunction: <a href="class_Shape.html#Shape#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#resize" class="signature" data-lang-entity="interface_function">
+      <code>TSize resize(shape, length)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resize a shape to a specified span.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape object for which the number of relevant positions is determined</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">length</code>
+            
+        
+      </th>
+      <td>The new length (span) of the shape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The new span of type (Metafunction: <a href="class_Shape.html#Shape#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#shapeToString" class="signature" data-lang-entity="interface_function">
+      <code>void shapeToString(bitmap, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Converts a given shape into a sequence of '1' (relevant position) and '0' (irrelevant position).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">bitmap</code>
+            
+        
+      </th>
+      <td>The resulting sequence object. Types: <a href="class_String.html" data-lang-entity="class">String</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>Shape object. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">stringToShape</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#stringToShape" class="signature" data-lang-entity="interface_function">
+      <code>bool stringToShape(shape, bitmap);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Takes a shape given as a string of '1' (relevant position) and '0'
+(irrelevant position) and converts it into a Shape object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">shape</code>
+            
+        
+      </th>
+      <td>Shape object that is manipulated.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">bitmap</code>
+            
+        
+      </th>
+      <td>A character string of '1' and '0' representing relevant and irrelevant positions (blanks)
+respectively. This string must begin with a '1'. Trailing '0's are ignored. If <tt>shape</tt>
+is a <a href="specialization_SimpleShape.html" data-lang-entity="specialization">SimpleShape</a> at most one contiguous sequences of <tt>1</tt>s is allowed. If
+<tt>shape</tt> is a <a href="specialization_OneGappedShape.html" data-lang-entity="specialization">OneGappedShape</a> at most two contiguous sequences of '1's are
+allowed (<a href="class_String.html" data-lang-entity="class">String</a> of <tt>char</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the conversion was successful.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="global_function_reverse.html" data-lang-entity="global_function">reverse</a></li>
+    
+    <li><a class="error">shapeToString</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#unhash" class="signature" data-lang-entity="interface_function">
+      <code>void unhash(result, hash, q);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Inverse of the <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> function; for ungapped shapes.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">result</code>
+            
+        
+      </th>
+      <td><a href="class_String.html" data-lang-entity="class">String</a> to write the result to. Types: <a href="class_String.html" data-lang-entity="class">String</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hash</code>
+            
+        
+      </th>
+      <td>The hash value previously computed with <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">q</code>
+            
+        
+      </th>
+      <td>The <tt>q</tt>-gram length. Types: <tt>unsigned</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">hash</a></li>
+    
+    <li><a class="error">hash2</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#value" class="signature" data-lang-entity="interface_function">
+      <code>TValue value(shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the current hash value of the Shape.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The Shape to query for its value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The hash value of the shape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Shape#weight" class="signature" data-lang-entity="interface_function">
+      <code>TSize weight(shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Number of relevant positions in a shape.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>Shape object for which the number of relevant positions is determined.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>Number of relevant positions (Metafunction: <a href="class_Shape.html#Shape#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>For ungapped shapes the return value is the result of the <a href="class_Shape.html#Shape#length" data-lang-entity="interface_function">length</a> function. For gapped shapes this is the number of '1's.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Shape#Host" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Host&lt;TShape&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the host (= value) type to use.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for host (= value) type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Type to use for the host (= value) size.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Shape#LENGTH" class="signature" data-lang-entity="interface_metafunction">
+    <code>LENGTH&lt;TShape&gt;::VALUE;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the length (span) of a shape.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for its length (span).</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>The length (span) of the shape.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Shape#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TShape&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the size type for a shape.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for its size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The size type of the shape.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Shape#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TShape&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value type for a shape.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for its value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The value type of the shape.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Shape#ValueSize" class="signature" data-lang-entity="interface_metafunction">
+    <code>ValueSize&lt;TShape&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the type to use for the value size.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for value size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Type to use for the value size.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Shape#WEIGHT" class="signature" data-lang-entity="interface_metafunction">
+    <code>WEIGHT&lt;TShape&gt;::VALUE;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the weight (number of 1's) of a shape.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TShape</code></th>
+            <td>The Shape to query for its weight (number of 1's).</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>The weight (number of 1's) of the shape.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Shape
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Stores hash value and shape for an ungapped or gapped q-gram.
+ * 
+ * @signature template &lt;typename TValue, typename TSpec&gt; class Shape;
+ * 
+ * @tparam TSpec The specializing type. Default: @link SimpleShape @endlink, for
+ *               ungapped q-grams.
+ * @tparam TValue The @link Value @endlink type of the string the shape is
+ *                applied to (e.g. &lt;tt&gt;Dna&lt;/tt&gt;).
+ * 
+ * The @link FiniteOrderedAlphabetConcept#ValueSize @endlink of Shape is the
+ * ValueSize of TValue which is the alphabet size.
+ * 
+ * To get the span or the weight of a shape call @link Shape#length @endlink or
+ * @link Shape#weight @endlink.
+ * 
+ * @mfn Shape#Value
+ * 
+ * @brief Returns the value type for a shape.
+ * 
+ * @signature Value&lt;TShape&gt;::Type;
+ * 
+ * @tparam TShape The Shape to query for its value type.
+ * 
+ * @return Type The value type of the shape.
+ * 
+ * @mfn Shape#Size
+ * 
+ * @brief Returns the size type for a shape.
+ * 
+ * @signature Size&lt;TShape&gt;::Type;
+ * 
+ * @tparam TShape The Shape to query for its size type.
+ * 
+ * @return Type The size type of the shape.
+ * 
+ * @mfn Shape#LENGTH
+ * 
+ * @brief Returns the length (span) of a shape.
+ * 
+ * @signature LENGTH&lt;TShape&gt;::VALUE;
+ * 
+ * @tparam TShape The Shape to query for its length (span).
+ * 
+ * @return VALUE The length (span) of the shape.
+ * 
+ * @mfn Shape#WEIGHT
+ * 
+ * @brief Returns the weight (number of 1&#39;s) of a shape.
+ * 
+ * @signature WEIGHT&lt;TShape&gt;::VALUE;
+ * 
+ * @tparam TShape The Shape to query for its weight (number of 1&#39;s).
+ * 
+ * @return VALUE The weight (number of 1&#39;s) of the shape.
+ * 
+ * @mfn Shape#ValueSize
+ * 
+ * @brief Returns the type to use for the value size.
+ * 
+ * @signature ValueSize&lt;TShape&gt;::Type;
+ * 
+ * @tparam TShape The Shape to query for value size type.
+ * 
+ * @return Type Type to use for the value size.
+ * 
+ * @mfn Shape#Host
+ * 
+ * @brief Returns the host (= value) type to use.
+ * 
+ * @signature Host&lt;TShape&gt;::Type;
+ * 
+ * @tparam TShape The Shape to query for host (= value) type.
+ * 
+ * @return Type Type to use for the host (= value) size.
+ * 
+ * @fn Shape#value
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the current hash value of the Shape.
+ * 
+ * @signature TValue value(shape);
+ * 
+ * @param[in] shape The Shape to query for its value.
+ * 
+ * @return TValue The hash value of the shape.
+ * 
+ * @fn Shape#length
+ * 
+ * @brief Returns the number of elements of the shape (span).
+ * 
+ * @signature TSize length(shape);
+ * 
+ * @param[in] shape Shape object for which the number of relevant positions is
+ *                  determined.
+ * 
+ * @return TSize The number of elements of the shape (span) (Metafunction: @link
+ *               Shape#Size @endlink).
+ * 
+ * @fn Shape#weight
+ * 
+ * @brief Number of relevant positions in a shape.
+ * 
+ * @signature TSize weight(shape);
+ * 
+ * @param[in] shape Shape object for which the number of relevant positions is
+ *                  determined.
+ * 
+ * @return TSize Number of relevant positions (Metafunction: @link Shape#Size
+ *               @endlink).
+ * 
+ * For ungapped shapes the return value is the result of the @link Shape#length
+ * @endlink function. For gapped shapes this is the number of &#39;1&#39;s.
+ * 
+ * @fn Shape#resize
+ * 
+ * @brief Resize a shape to a specified span.
+ * 
+ * @signature TSize resize(shape, length)
+ * 
+ * @param[in,out] shape Shape object for which the number of relevant positions
+ *                      is determined
+ * @param[in] length The new length (span) of the shape.
+ * 
+ * @return TSize The new span of type (Metafunction: @link Shape#Size @endlink).
+ * 
+ * @fn Shape#hash
+ * 
+ * @brief Computes a (lower) hash value for a shape applied to a sequence.
+ * 
+ * @signature TValue hash(shape, it[, charsLeft]);
+ * 
+ * @param[in,out] shape Shape to be used for hashing. Types: @link Shape
+ *                      @endlink
+ * @param[in] it Sequence iterator pointing to the first character of the shape.
+ * @param[in] charsLeft The distance of &lt;tt&gt;it&lt;/tt&gt; to the string end. If
+ *                      &lt;tt&gt;charsLeft&lt;/tt&gt; is smaller than the shape&#39;s span, the
+ *                      hash value corresponds to the smallest shape beginning
+ *                      with &lt;tt&gt;charsLeft&lt;/tt&gt; characters.
+ * 
+ * @return TValue Hash value of the shape (Metafunction: @link Shape#Value
+ *                @endlink).
+ * 
+ * @see Shape#hashNext
+ * @see Shape#hashUpper
+ * @see Shape#hash2
+ * @see Shape#unhash
+ * 
+ * @fn Shape#hashInit
+ * 
+ * @brief Preprocessing step of a pure @link Shape#hashNext @endlink loop.
+ * 
+ * @signature void hashInit(shape, it);
+ * 
+ * @param[in,out] shape Shape to be used for hasing.
+ * @param[in] it The @link IteratorAssociatedTypesConcept iterator @endlink to
+ *               use for initializing the shape.
+ * 
+ * Overlapping q-grams can efficiently be hashed by calling @link Shape#hash
+ * @endlink on the first text position and @link Shape#hashNext @endlink on
+ * succeeding, adjacent positions. One drawback of this scenario is that for-
+ * loops cannot start with the first position directly and become more
+ * complicated. As a remedy, @link Shape#hashInit @endlink was introduced which
+ * initializes the Shape to be used with @link Shape#hashNext @endlink on the
+ * first position directly.
+ * 
+ * @section Example
+ * 
+ * Two hash loop examples. The first loop uses @link Shape#hash @endlink/@link
+ * Shape#hashNext @endlink while the second use @link Shape#hashInit
+ * @endlink/@link Shape#hashNext @endlink and can process all hashes within the
+ * loop.
+ * 
+ * @include demos/index/shape_hash_init.cpp
+ * 
+ * @code{.stdout}
+ * 0    0    1    4    17    4    18    11    47    63    62    56
+ * 0    0    1    4    17    4    18    11    47    63    62    56
+ * @endcode
+ * 
+ * 
+ * @fn Shape#hashUpper
+ * 
+ * @brief Computes an upper hash value for a shape applied to a sequence.
+ * 
+ * @signature TValue hashUpper(shape, it, charsLeft);
+ * 
+ * @param[in,out] shape Shape to be used for hashing. Types: @link Shape
+ *                      @endlink
+ * @param[in] it Sequence iterator pointing to the first character of the shape.
+ * @param[in] charsLeft The distance of &lt;tt&gt;it&lt;/tt&gt; to the string end.
+ * 
+ * @return TValue Upper hash value of the shape. The hash value corresponds to
+ *                the maximal @link Shape#hash @endlink value of a shape
+ *                beginning with &lt;tt&gt;min(charsLeft,length(shape))&lt;/tt&gt;
+ *                characters + 1 (Metafunction: @link Shape#Value @endlink).
+ * 
+ * This function in conjunction with @link Shape#hash @endlink is useful to
+ * search a q-gram index for p-grams with p &amp;lt; q.
+ * 
+ * @see Shape#hash
+ * 
+ * @fn Shape#hashNext
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Computes the hash value for the adjacent shape.
+ * 
+ * @signature TValue hashNext(shape, it);
+ * 
+ * @param[in,out] shape Shape to be used for hashing. Types: @link Shape
+ *                      @endlink
+ * @param[in] it Sequence iterator pointing to the first character of the
+ *               adjacent shape.
+ * 
+ * @return TValue Hash value of the q-gram (Metafunction: @link Shape#Value
+ *                @endlink).
+ * 
+ * @link Shape#hash @endlink has to be called before.
+ * 
+ * @see Shape#hash
+ * 
+ * @fn Shape#hash2
+ * 
+ * @brief Computes an unique hash value of a shape applied to a sequence, even
+ *        if the sequence is shorter than the shape span.
+ * 
+ * @signature TValue hash2(shape, it, charsLeft);
+ * 
+ * @param[in,out] shape Shape to be used for hashing. Types: @link Shape
+ *                      @endlink
+ * @param[in] it Sequence iterator pointing to the first character of the shape.
+ * @param[in] charsLeft The distance of &lt;tt&gt;it&lt;/tt&gt; to the string end.
+ * 
+ * @return TValue Hash value of the shape (Metafunction: @link Shape#Value
+ *                @endlink).
+ * 
+ * @see Shape#hash2Next
+ * @see Shape#hash2Upper
+ * @see Shape#unhash
+ * @see Shape#hash
+ * 
+ * @fn Shape#hash2Upper
+ * 
+ * @brief Computes an upper unique hash value of a shape applied to a sequence,
+ *        even if the sequence is shorter than the shape span.
+ * 
+ * @signature TValue hash2Upper(shape, it, charsLeft);
+ * 
+ * @param[in] shape Shape to be used for hashing. Types: @link Shape @endlink
+ * @param[in] it Sequence iterator pointing to the first character of the shape.
+ * @param[in] charsLeft The distance of &lt;tt&gt;it&lt;/tt&gt; to the string end.
+ * 
+ * @return TValue Upper hash value of the shape. The hash value corresponds to
+ *                the maximal @link Shape#hash2 @endlink value of a shape
+ *                beginning with the &lt;tt&gt;min(charsLeft,length(shape))&lt;/tt&gt;
+ *                characters + 1 (Metafunction: @link Shape#Value @endlink).
+ * 
+ * This function in conjunction with @link Shape#hash2 @endlink is useful to
+ * search a q-gram index for p-grams with &lt;i&gt;p &amp;lt; q&lt;/i&gt;.
+ * 
+ * @see Shape#hash2
+ * 
+ * @fn Shape#hash2Next
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Computes a unique hash value for the adjacent shape, even if it is
+ *        shorter than q.
+ * 
+ * @signature TValue hash2Next(shape, it);
+ * 
+ * @param[in,out] shape Shape to be used for hashing the q-gram. Types: @link
+ *                      Shape @endlink
+ * @param[in,out] it Sequence iterator pointing to the first character of the
+ *                   adjacent shape.
+ * 
+ * @return TValue Hash value of the shape (Metafunction: @link Shape#Value
+ *                @endlink).
+ * 
+ * @link Shape#hash @endlink has to be called before with &lt;tt&gt;shape&lt;/tt&gt; on the
+ * left adjacent q-gram.
+ * 
+ * @see Shape#hash2
+ * 
+ * @fn Shape#unhash
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Inverse of the @link Shape#hash @endlink function; for ungapped
+ *        shapes.
+ * 
+ * @signature void unhash(result, hash, q);
+ * 
+ * @param[out] result @link String @endlink to write the result to. Types: @link
+ *                    String @endlink.
+ * @param[in] hash The hash value previously computed with @link Shape#hash
+ *                 @endlink.
+ * @param[in] q The &lt;tt&gt;q&lt;/tt&gt;-gram length. Types: &lt;tt&gt;unsigned&lt;/tt&gt;
+ * 
+ * @see Shape#hash
+ * @see Shape#hash2
+ * 
+ * @fn Shape#stringToShape
+ * 
+ * @brief Takes a shape given as a string of &#39;1&#39; (relevant position) and &#39;0&#39;
+ *        (irrelevant position) and converts it into a Shape object.
+ * 
+ * @signature bool stringToShape(shape, bitmap);
+ * 
+ * @param[in,out] shape Shape object that is manipulated.
+ * @param[in] bitmap A character string of &#39;1&#39; and &#39;0&#39; representing relevant and
+ *                   irrelevant positions (blanks) respectively. This string
+ *                   must begin with a &#39;1&#39;. Trailing &#39;0&#39;s are ignored. If
+ *                   &lt;tt&gt;shape&lt;/tt&gt; is a @link SimpleShape @endlink at most one
+ *                   contiguous sequences of &lt;tt&gt;1&lt;/tt&gt;s is allowed. If
+ *                   &lt;tt&gt;shape&lt;/tt&gt; is a @link OneGappedShape @endlink at most
+ *                   two contiguous sequences of &#39;1&#39;s are allowed (@link String
+ *                   @endlink of &lt;tt&gt;char&lt;/tt&gt;).
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the conversion was successful.
+ * 
+ * @see Shape#shapeToString
+ * @see reverse
+ * 
+ * @fn Shape#shapeToString
+ * 
+ * @brief Converts a given shape into a sequence of &#39;1&#39; (relevant position) and
+ *        &#39;0&#39; (irrelevant position).
+ * 
+ * @signature void shapeToString(bitmap, shape);
+ * 
+ * @param[in,out] bitmap The resulting sequence object. Types: @link String
+ *                       @endlink
+ * @param[in] shape Shape object. Types: @link Shape @endlink
+ * 
+ * @see Shape#stringToShape
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

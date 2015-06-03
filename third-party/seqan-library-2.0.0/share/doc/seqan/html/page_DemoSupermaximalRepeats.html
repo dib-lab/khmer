@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="page_demosupermaximalrepeats" data-page="DemoSupermaximalRepeats">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Supermaximal Repeats - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<div id="filecontents">
+<h1 data-lang-entity="page" data-pimped="true">
+  <a href="page_LanguageEntities.html#page">Page</a> <span>Supermaximal Repeats</span>
+</h1>
+
+<div class="docstring">
+  <div class="discussion">
+    <!-- @brief -->
+    <div>Example for using the <a href="specialization_SuperMaxRepeatsIterator.html" data-lang-entity="specialization">SuperMaxRepeatsIterator</a>.</div>
+    
+    <!-- paragraphs -->
+    
+<div><p>Given a sequences, a repeat is a substring that occurs at at least 2
+different positions. A supermaximal repeat is a repeat that is not part
+of any longer repeat. The following example demonstrates how to iterate
+over all supermaximal repeats and output them.</p><p>We start by including the required headers and using the namespace seqan.</p><div data-src-path="demos/index/index_supermaxrepeats.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_supermaxrepeats.cpp" target="_top">demos/index/index_supermaxrepeats.cpp</a></div></div><p>Afterwards we initialize a stirng with the sequence and build an index over it</p><div data-src-path="demos/index/index_supermaxrepeats.cpp"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">myString</span> <span class="o">=</span> <span class="s">&quot;How many wood would a woodchuck chuck.&quot;</span><span class="p">;</span>
+
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TMyIndex</span><span class="p">;</span>
+    <span class="n">TMyIndex</span> <span class="n">myIndex</span><span class="p">(</span><span class="n">myString</span><span class="p">);</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_supermaxrepeats.cpp" target="_top">demos/index/index_supermaxrepeats.cpp</a></div></div><p>To find supermaximal repeats, we use SeqAn's <a href="specialization_SuperMaxRepeatsIterator.html" data-lang-entity="specialization">SuperMaxRepeats Iterator</a> and set the minimum repeat length to 3.</p><div data-src-path="demos/index/index_supermaxrepeats.cpp"><div class="highlight"><pre>    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="p">,</span> <span class="n">SuperMaxRepeats</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">myRepeatIterator</span><span class="p">(</span><span class="n">myIndex</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">myRepeatIterator</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="c1">// A repeat can be represented by its length and positions it occurs at.</span>
+        <span class="c1">// Function getOccurrences returns an unordered sequence of these positions</span>
+        <span class="c1">// The length of this sequence, i.e. the repeat abundance can be obtained</span>
+        <span class="c1">// from countOccurrences.</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">countOccurrences</span><span class="p">(</span><span class="n">myRepeatIterator</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">getOccurrences</span><span class="p">(</span><span class="n">myRepeatIterator</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span><span class="p">;</span>
+
+        <span class="c1">// Function repLength returns the length of the repeat string.</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">repLength</span><span class="p">(</span><span class="n">myRepeatIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;   &quot;</span><span class="p">;</span>
+
+        <span class="c1">// The repeat string itself can be determined with function representative.</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t\&quot;</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">myRepeatIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\&quot;&#39;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="o">++</span><span class="n">myRepeatIterator</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_supermaxrepeats.cpp" target="_top">demos/index/index_supermaxrepeats.cpp</a></div></div><p>The only supermaximal repeats of "How many wood would a woodchuck chuck." of length at least 3 are " wood" and
+"chuck". There are repeats of " wo" which are maximal (see Maximal Repeats), ut not supermaximal, as " wo" is part of
+the longer repeat " wood".</p><pre class="console" data-src-path="None">weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_supermaxrepeats
+weese@tanne:~/seqan/demos$ ./index_supermaxrepeats
+8, 21, 5        " wood"
+26, 32, 5       "chuck"
+weese@tanne:~/seqan/demos$*</pre></div>
+
+  </div>
+</div>
+
+<!-- @see -->
+
+</div>
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>@page DemoSupermaximalRepeats Supermaximal Repeats
+
+@brief Example for using the @link SuperMaxRepeatsIterator @endlink.
+
+Given a sequences, a repeat is a substring that occurs at at least 2
+different positions. A supermaximal repeat is a repeat that is not part of
+any longer repeat. The following example demonstrates how to iterate over all
+supermaximal repeats and output them.
+
+We start by including the required headers and using the namespace seqan.
+
+@snippet demos/index/index_supermaxrepeats.cpp includes
+
+Afterwards we initialize a stirng with the sequence and build an index over
+it
+
+@snippet demos/index/index_supermaxrepeats.cpp init
+
+To find supermaximal repeats, we use SeqAn&#39;s @link SuperMaxRepeatsIterator
+SuperMaxRepeats Iterator @endlink and set the minimum repeat length to 3.
+
+@snippet demos/index/index_supermaxrepeats.cpp iteration
+
+The only supermaximal repeats of &#34;How many wood would a woodchuck chuck.&#34; of
+length at least 3 are &#34; wood&#34; and &#34;chuck&#34;. There are repeats of &#34; wo&#34; which
+are maximal (see Maximal Repeats), ut not supermaximal, as &#34; wo&#34; is part of
+the longer repeat &#34; wood&#34;.
+
+@code{.console}
+weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_supermaxrepeats
+weese@tanne:~/seqan/demos$ ./index_supermaxrepeats
+8, 21, 5        &#34; wood&#34;
+26, 32, 5       &#34;chuck&#34;
+weese@tanne:~/seqan/demos$*
+@endcode
+
+
+</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

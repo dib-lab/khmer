@@ -1,0 +1,1853 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="concept_stringconcept" data-page="StringConcept">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>StringConcept - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="concept" data-pimped="true">
+  <a href="page_LanguageEntities.html#concept">Concept</a> <span>StringConcept<div><div>Sequences are dense linear containers that have positions.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>, 
+    <a href="concept_ForwardContainerConcept.html" data-lang-entity="concept">ForwardContainerConcept</a>, 
+    <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a>, 
+    <a href="concept_ReversibleContainerConcept.html" data-lang-entity="concept">ReversibleContainerConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>StringConcept&lt;T&gt;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept::operator[]" data-lang-entity="member_function">operator[]</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23append" title="#StringConcept#append (interface function)" data-lang-entity="interface_function">void append(seq, other);</a></code></span>
+    <span class="summary_desc"><div>Append a sequence to another one.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23appendValue" title="#StringConcept#appendValue (interface function)" data-lang-entity="interface_function">void appendValue(seq, val);</a></code></span>
+    <span class="summary_desc"><div>Append a value to a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23back" title="#StringConcept#back (interface function)" data-lang-entity="interface_function">TReference back(seq);</a></code></span>
+    <span class="summary_desc"><div>Return reference to the last element.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23capacity" title="#StringConcept#capacity (interface function)" data-lang-entity="interface_function">TSize capacity(seq);</a></code></span>
+    <span class="summary_desc"><div>Returns the capacity of a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23clear" title="#StringConcept#clear (interface function)" data-lang-entity="interface_function">void clear(seq);</a></code></span>
+    <span class="summary_desc"><div>Remove all elements from the sequences.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23computeGenerousCapacity" title="#StringConcept#computeGenerousCapacity (interface function)" data-lang-entity="interface_function">TSize computeGenerousCapacity(seq, capacity);</a></code></span>
+    <span class="summary_desc"><div>Capacity for generous expansion.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23erase" title="#StringConcept#erase (interface function)" data-lang-entity="interface_function">void erase(seq, pos[, posEnd)</a></code></span>
+    <span class="summary_desc"><div>Erase an element or a range of elements from a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23eraseBack" title="#StringConcept#eraseBack (interface function)" data-lang-entity="interface_function">void eraseBack(seq);</a></code></span>
+    <span class="summary_desc"><div>Erase last element in a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23eraseFront" title="#StringConcept#eraseFront (interface function)" data-lang-entity="interface_function">void eraseFront(seq);</a></code></span>
+    <span class="summary_desc"><div>Erase first element in a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23front" title="#StringConcept#front (interface function)" data-lang-entity="interface_function">TReference front(seq);</a></code></span>
+    <span class="summary_desc"><div>Return reference to the first element.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23insert" title="#StringConcept#insert (interface function)" data-lang-entity="interface_function">void insert(seq, pos, src[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Inserts a sequence into another sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23insertValue" title="#StringConcept#insertValue (interface function)" data-lang-entity="interface_function">void insertValue(seq, pos, val[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Inserts an element into a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23iter" title="#StringConcept#iter (interface function)" data-lang-entity="interface_function">TIterator iter(seq, pos[, tag]);</a></code></span>
+    <span class="summary_desc"><div>Iterator to the item at the given position in a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23replace" title="#StringConcept#replace (interface function)" data-lang-entity="interface_function">void replace(target, posBegin, posEnd, source[, limit][, resizeTag]);</a></code></span>
+    <span class="summary_desc"><div>Replaces a part of a sequence with another sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#StringConcept%23resize" title="#StringConcept#resize (interface function)" data-lang-entity="interface_function">void resize(seq, len[, val]);</a></code></span>
+    <span class="summary_desc"><div>Resize a sequence.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#assignValue" data-lang-entity="interface_function">assignValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="StringConcept#append" class="signature first" data-lang-entity="interface_function">
+      <code>void append(seq, other);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a sequence to another one.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to append the other sequence to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>The other sequence to append to <tt>seq</tt>. Of same type as <tt>seq</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#appendValue" class="signature" data-lang-entity="interface_function">
+      <code>void appendValue(seq, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a value to a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to append a value to (type <tt>TSequence</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>A value to append to the sequence. Convertible to <tt>Value&lt;TSequence&gt;::Type</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#back" class="signature" data-lang-entity="interface_function">
+      <code>TReference back(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference to the last element.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The sequence to get the last element of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>A reference to the last element of <tt>seq</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#capacity" class="signature" data-lang-entity="interface_function">
+      <code>TSize capacity(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the capacity of a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The sequence to query for its capacity.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>Returns the capacity of the sequence. <tt>TSize</tt> is the result of
+<tt>Size&lt;TSequence&gt;::type</tt> where <tt>TSequence</tt> is the type of <tt>seq</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The size of a sequence can never exceed its capacity but some container support resizing of the capacity. Some
+functions do that implicitely if they are called with a suitable <a href="group_OverflowStrategyTags.html" data-lang-entity="group">tag</a>. The
+function reserve can be used to change the capacity explicitely.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove all elements from the sequences.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>Sequence to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#computeGenerousCapacity" class="signature" data-lang-entity="interface_function">
+      <code>TSize computeGenerousCapacity(seq, capacity);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Capacity for generous expansion.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to compute the generous capacity for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">capacity</code>
+            
+        
+      </th>
+      <td>The minimal required capacity.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>A value larger than <tt>capacity</tt> that should be used as the new capacity for <tt>container</tt>
+when it is expanded using the <tt>Generous</tt> overflow strategy.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#erase" class="signature" data-lang-entity="interface_function">
+      <code>void erase(seq, pos[, posEnd)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Erase an element or a range of elements from a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>Sequence to remove range from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>Begin position of the range to remove.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">posEnd</code>
+            
+        
+      </th>
+      <td>Optional end position of the range to remove. If omitted, <tt>pos + 1</tt> is used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#eraseBack" class="signature" data-lang-entity="interface_function">
+      <code>void eraseBack(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Erase last element in a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to remove the last element from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#eraseFront" class="signature" data-lang-entity="interface_function">
+      <code>void eraseFront(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Erase first element in a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to remove the first element from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#front" class="signature" data-lang-entity="interface_function">
+      <code>TReference front(seq);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference to the first element.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The sequence to get the first element of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>A reference to the first element of <tt>seq</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#insert" class="signature" data-lang-entity="interface_function">
+      <code>void insert(seq, pos, src[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Inserts a sequence into another sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The sequence to insert element sinto.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to start inserting at.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">src</code>
+            
+        
+      </th>
+      <td>The sequence to insert at pos.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The resize tag, defaults to what <tt>OverflowStrategyImplicit</tt> returns.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#insertValue" class="signature" data-lang-entity="interface_function">
+      <code>void insertValue(seq, pos, val[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Inserts an element into a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StringConcept.html" data-lang-entity="concept">sequence</a> to insert element into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to insert at.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The value to insert at <tt>pos</tt> into <tt>seq<tt></tt>.</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The resize tag, defaults to what <tt>OverflowStrategyImplicit</tt> returns.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#iter" class="signature" data-lang-entity="interface_function">
+      <code>TIterator iter(seq, pos[, tag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Iterator to the item at the given position in a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seq</code>
+            
+        
+      </th>
+      <td>The sequence to get the iterator for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position to get the iterator for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag to pick the type of the iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>The resulting iterator. If <tt>TTag</tt> is the type of <tt>tag</tt> and <tt>TSequence</tt> the
+type of <tt>seq</tt> then TIterator is of the type <tt>Iterator&lt;TSequence,
+TTag&gt;::Type</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>If <tt>pos</tt> is out of range then the iterator is invalid.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#replace" class="signature" data-lang-entity="interface_function">
+      <code>void replace(target, posBegin, posEnd, source[, limit][, resizeTag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Replaces a part of a sequence with another sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">target</code>
+            
+        
+      </th>
+      <td>The sequence to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">posBegin</code>
+            
+        
+      </th>
+      <td>The begin position of the range to replace.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">posEnd</code>
+            
+        
+      </th>
+      <td>The end position of the range to replace.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>The source sequence to replace <tt>[posBegin, posEnd)</tt> with.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limit</code>
+            
+        
+      </th>
+      <td>Largest size of <tt>target</tt> after the operation.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">resizeTag</code>
+            
+        
+      </th>
+      <td>Specify the resizing behaviour. Defaults to what <tt>DefaultOverflowImplicit</tt>
+returns.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="StringConcept#resize" class="signature" data-lang-entity="interface_function">
+      <code>void resize(seq, len[, val]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resize a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seq</code>
+            
+        
+      </th>
+      <td>Sequence to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">len</code>
+            
+        
+      </th>
+      <td>Length to resize <tt>seq</tt> to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>When increasing the size, <tt>val</tt> is used to fill new entries. When omitted,
+<tt>TValue()</tt> is used where <tt>TValue</tt> is the <a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a>
+type of the sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @concept StringConcept
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @extends RandomAccessContainerConcept
+ * 
+ * @brief Sequences are dense linear containers that have positions.
+ * 
+ * @signature StringConcept&lt;T&gt;
+ * 
+ * @fn StringConcept#iter
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Iterator to the item at the given position in a container.
+ * 
+ * @signature TIterator iter(seq, pos[, tag]);
+ * 
+ * @param[in] seq The sequence to get the iterator for.
+ * @param[in] pos The position to get the iterator for.
+ * @param[in] tag The tag to pick the type of the iterator.
+ * 
+ * @return TIterator The resulting iterator. If &lt;tt&gt;TTag&lt;/tt&gt; is the type of
+ *                   &lt;tt&gt;tag&lt;/tt&gt; and &lt;tt&gt;TSequence&lt;/tt&gt; the type of
+ *                   &lt;tt&gt;seq&lt;/tt&gt; then TIterator is of the type
+ *                   &lt;tt&gt;Iterator&amp;lt;TSequence, TTag&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * @section Remarks
+ * 
+ * If &lt;tt&gt;pos&lt;/tt&gt; is out of range then the iterator is invalid.
+ * 
+ * @fn StringConcept#append
+ * 
+ * @brief Append a sequence to another one.
+ * 
+ * @signature void append(seq, other);
+ * 
+ * @param[in,out] seq The sequence to append the other sequence to.
+ * @param[in] other The other sequence to append to &lt;tt&gt;seq&lt;/tt&gt;. Of same type
+ *                  as &lt;tt&gt;seq&lt;/tt&gt;.
+ * 
+ * @fn StringConcept#appendValue
+ * 
+ * @brief Append a value to a sequence.
+ * 
+ * @signature void appendValue(seq, val);
+ * 
+ * @param[in,out] seq The sequence to append a value to (type
+ *                    &lt;tt&gt;TSequence&lt;/tt&gt;).
+ * @param[in] val A value to append to the sequence. Convertible to
+ *                &lt;tt&gt;Value&amp;lt;TSequence&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * @fn StringConcept#front
+ * 
+ * @brief Return reference to the first element.
+ * 
+ * @signature TReference front(seq);
+ * 
+ * @param[in] seq The sequence to get the first element of.
+ * 
+ * @return TReference A reference to the first element of &lt;tt&gt;seq&lt;/tt&gt;.
+ * 
+ * @fn StringConcept#back
+ * 
+ * @brief Return reference to the last element.
+ * 
+ * @signature TReference back(seq);
+ * 
+ * @param[in] seq The sequence to get the last element of.
+ * 
+ * @return TReference A reference to the last element of &lt;tt&gt;seq&lt;/tt&gt;.
+ * 
+ * @fn StringConcept#resize
+ * 
+ * @brief Resize a sequence.
+ * 
+ * @signature void resize(seq, len[, val]);
+ * 
+ * @param[in,out] seq Sequence to resize.
+ * @param[in] len Length to resize &lt;tt&gt;seq&lt;/tt&gt; to.
+ * @param[in] val When increasing the size, &lt;tt&gt;val&lt;/tt&gt; is used to fill new
+ *                entries. When omitted, &lt;tt&gt;TValue()&lt;/tt&gt; is used where
+ *                &lt;tt&gt;TValue&lt;/tt&gt; is the @link ContainerConcept#Value @endlink
+ *                type of the sequence.
+ * 
+ * @fn StringConcept#clear
+ * 
+ * @brief Remove all elements from the sequences.
+ * 
+ * @signature void clear(seq);
+ * 
+ * @param[in,out] seq Sequence to clear.
+ * 
+ * @fn StringConcept#erase
+ * 
+ * @brief Erase an element or a range of elements from a sequence.
+ * 
+ * @signature void erase(seq, pos[, posEnd)
+ * 
+ * @param[in,out] seq Sequence to remove range from.
+ * @param[in] pos Begin position of the range to remove.
+ * @param[in] posEnd Optional end position of the range to remove. If omitted,
+ *                   &lt;tt&gt;pos + 1&lt;/tt&gt; is used.
+ * 
+ * @fn StringConcept#eraseFront
+ * 
+ * @brief Erase first element in a sequence.
+ * 
+ * @signature void eraseFront(seq);
+ * 
+ * @param[in,out] seq The sequence to remove the first element from.
+ * 
+ * @fn StringConcept#eraseBack
+ * 
+ * @brief Erase last element in a sequence.
+ * 
+ * @signature void eraseBack(seq);
+ * 
+ * @param[in,out] seq The sequence to remove the last element from.
+ * 
+ * @fn StringConcept#capacity
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns the capacity of a sequence.
+ * 
+ * @signature TSize capacity(seq);
+ * 
+ * @param[in] seq The sequence to query for its capacity.
+ * 
+ * @return TSize Returns the capacity of the sequence. &lt;tt&gt;TSize&lt;/tt&gt; is the
+ *               result of &lt;tt&gt;Size&amp;lt;TSequence&amp;gt;::type&lt;/tt&gt; where
+ *               &lt;tt&gt;TSequence&lt;/tt&gt; is the type of &lt;tt&gt;seq&lt;/tt&gt;.
+ * 
+ * The size of a sequence can never exceed its capacity but some container
+ * support resizing of the capacity. Some functions do that implicitely if they
+ * are called with a suitable @link OverflowStrategyTags tag @endlink. The
+ * function reserve can be used to change the capacity explicitely.
+ * 
+ * @fn StringConcept#computeGenerousCapacity
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Capacity for generous expansion.
+ * 
+ * @signature TSize computeGenerousCapacity(seq, capacity);
+ * 
+ * @param[in,out] seq The sequence to compute the generous capacity for.
+ * @param[in] capacity The minimal required capacity.
+ * 
+ * @return TSize A value larger than &lt;tt&gt;capacity&lt;/tt&gt; that should be used as
+ *               the new capacity for &lt;tt&gt;container&lt;/tt&gt; when it is expanded
+ *               using the &lt;tt&gt;Generous&lt;/tt&gt; overflow strategy.
+ * 
+ * @fn StringConcept#insert
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Inserts a sequence into another sequence.
+ * 
+ * @signature void insert(seq, pos, src[, tag]);
+ * 
+ * @param[in,out] seq The sequence to insert element sinto.
+ * @param[in] pos The position to start inserting at.
+ * @param[in] src The sequence to insert at pos.
+ * @param[in] tag The resize tag, defaults to what
+ *                &lt;tt&gt;OverflowStrategyImplicit&lt;/tt&gt; returns.
+ * 
+ * @fn StringConcept#insertValue
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Inserts an element into a sequence.
+ * 
+ * @signature void insertValue(seq, pos, val[, tag]);
+ * 
+ * @param[in,out] seq The @link StringConcept sequence @endlink to insert
+ *                    element into.
+ * @param[in] pos The position to insert at.
+ * @param[in] val The value to insert at &lt;tt&gt;pos&lt;/tt&gt; into &lt;tt&gt;seq&lt;tt/&gt;.
+ * @param[in] tag The resize tag, defaults to what
+ *                &lt;tt&gt;OverflowStrategyImplicit&lt;/tt&gt; returns.
+ * 
+ * @fn StringConcept#replace
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Replaces a part of a sequence with another sequence.
+ * 
+ * @signature void replace(target, posBegin, posEnd, source[, limit][,
+ *            resizeTag]);
+ * 
+ * @param[in,out] target The sequence to modify.
+ * @param[in] posBegin The begin position of the range to replace.
+ * @param[in] posEnd The end position of the range to replace.
+ * @param[in] source The source sequence to replace &lt;tt&gt;[posBegin, posEnd)&lt;/tt&gt;
+ *                   with.
+ * @param[in] limit Largest size of &lt;tt&gt;target&lt;/tt&gt; after the operation.
+ * @param[in] resizeTag Specify the resizing behaviour. Defaults to what
+ *                      &lt;tt&gt;DefaultOverflowImplicit&lt;/tt&gt; returns.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="page_demomummy" data-page="DemoMummy">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Mummy - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<div id="filecontents">
+<h1 data-lang-entity="page" data-pimped="true">
+  <a href="page_LanguageEntities.html#page">Page</a> <span>Mummy</span>
+</h1>
+
+<div class="docstring">
+  <div class="discussion">
+    <!-- @brief -->
+    <div>Simple MUMmer clone.</div>
+    
+    <!-- paragraphs -->
+    
+<div><p>MUMmer is a tool to search for multiple exact matches (MUMs) between 2 given sequences. MUMs can be used as a
+starting point for a multiple genome alignment algorithm. This example shows how to implement a simple version of
+MUMer to find multiple exact matches of n sequences (n&gt;=2) in SeqAn.</p><div data-src-path="demos/index/index_mummy.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+<span class="cp">#include &lt;seqan/seq_io.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TIndex</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">findMUMs</span><span class="p">(</span><span class="n">TIndex</span> <span class="o">&amp;</span> <span class="n">esa</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">minLen</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">typename</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">Mums</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">(</span><span class="n">esa</span><span class="p">,</span> <span class="n">minLen</span><span class="p">);</span>  <span class="c1">// set minimum MUM length</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">SAValue</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="o">&gt;::</span><span class="n">Type</span><span class="o">&gt;</span> <span class="n">occs</span><span class="p">;</span>            <span class="c1">// temp. string storing the hit positions</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">resetiosflags</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">left</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">occs</span> <span class="o">=</span> <span class="n">getOccurrences</span><span class="p">(</span><span class="n">it</span><span class="p">);</span>                          <span class="c1">// gives hit positions (seqNo,seqOfs)</span>
+        <span class="n">orderOccurrences</span><span class="p">(</span><span class="n">occs</span><span class="p">);</span>                             <span class="c1">// order them by seqNo</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">occs</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+                      <span class="o">&lt;&lt;</span> <span class="n">getValueI2</span><span class="p">(</span><span class="n">occs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>            <span class="c1">// output them in MUMmer&#39;s output format</span>
+                      <span class="o">&lt;&lt;</span> <span class="s">&quot;  &quot;</span><span class="p">;</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+                  <span class="o">&lt;&lt;</span> <span class="n">repLength</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+                  <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+        <span class="o">++</span><span class="n">it</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setiosflags</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">left</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">runMummy</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[],</span> <span class="kt">unsigned</span> <span class="n">seqCount</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">minLen</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">String</span><span class="o">&lt;</span><span class="n">Dna5</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="n">TString</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">TString</span><span class="o">&gt;</span>  <span class="n">TStringSet</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">TStringSet</span><span class="o">&gt;</span>   <span class="n">TIndex</span><span class="p">;</span>
+
+    <span class="n">TIndex</span>  <span class="n">index</span><span class="p">;</span>
+
+    <span class="c1">// import sequences</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">meta</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seq</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="o">++</span><span class="n">arg</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// skip two argument options</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;-p&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;--profile&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span>
+            <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;-l&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;--minlen&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="o">++</span><span class="n">arg</span><span class="p">;</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;-&#39;</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">SeqFileIn</span> <span class="n">file</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">]))</span>
+            <span class="p">{</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Import of sequence &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">readRecords</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">indexText</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="n">file</span><span class="p">);</span>
+            <span class="n">clear</span><span class="p">(</span><span class="n">meta</span><span class="p">);</span>
+            <span class="n">close</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+            <span class="o">++</span><span class="n">seq</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">lengthSum</span><span class="p">(</span><span class="n">indexText</span><span class="p">(</span><span class="n">index</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; bps sequence imported.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="n">findMUMs</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">minLen</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">printHelp</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">[],</span> <span class="kt">bool</span> <span class="n">longHelp</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;***************************************</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;***        Simple MUM finder        ***</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;*** written by David Weese (c) 2007 ***</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;***************************************</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Usage: mummy [OPTION]... &lt;SEQUENCE FILE&gt; ... &lt;SEQUENCE FILE&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">longHelp</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Options:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;  -e, --extern          </span><span class="se">\t</span><span class="s">use external memory (for large datasets)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;  -l, --minlen          </span><span class="se">\t</span><span class="s">set minimum MUM length</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;                        </span><span class="se">\t</span><span class="s">if not set, default value is 20</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;  -h, --help            </span><span class="se">\t</span><span class="s">print this help</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Try &#39;mummy --help&#39; for more information.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">printHelp</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">unsigned</span> <span class="n">optMinLen</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+    <span class="kt">bool</span>     <span class="n">optExtern</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
+    <span class="kt">unsigned</span> <span class="n">seqCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="o">++</span><span class="n">arg</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;-&#39;</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// parse option</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;-e&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;--extern&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// use external memory algorithms</span>
+                <span class="n">optExtern</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;-l&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;--minlen&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// minimum match length</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">arg</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">argc</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">printHelp</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+                    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="o">++</span><span class="n">arg</span><span class="p">;</span>
+                <span class="n">optMinLen</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">]);</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;-h&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="s">&quot;--help&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// print help</span>
+                <span class="n">printHelp</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="c1">// parse sequence file</span>
+            <span class="o">++</span><span class="n">seqCount</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">optExtern</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">runMummy</span><span class="o">&lt;</span><span class="n">External</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">seqCount</span><span class="p">,</span> <span class="n">optMinLen</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">runMummy</span><span class="o">&lt;</span><span class="n">Alloc</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">seqCount</span><span class="p">,</span> <span class="n">optMinLen</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_mummy.cpp" target="_top">demos/index/index_mummy.cpp</a></div></div><p>If you run the tool on 2 sequences it outputs exactly the same matches as MUMmer (called with -mum option), it only
+differs in the * order of outputted matches. To get matches with increasing positions at the first sequence we
+piped
+the output to sort.</p><p>As an example data set we used 3 strains of chlamydia bacterium
+(NC_002620.fna, NC_000117.fna, NC_007429.fna) and saved the Fasta files
+to the demos directory.</p><pre class="console" data-src-path="None">weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_mummy
+weese@tanne:~/seqan/demos$ ./index_mummy -h
+***************************************
+***        Simple MUM finder        ***
+*** written by David Weese (c) 2007 ***
+***************************************
+
+Usage: mummy [OPTION]... &lt;SEQUENCE FILE&gt; ... &lt;SEQUENCE FILE&gt;
+
+Options:
+  -e, --extern                  use external memory (for large datasets)
+  -l, --minlen                  set minimum MUM length
+                                if not set, default value is 20
+  -h, --help                    print this help
+weese@tanne:~/seqan/demos$ ./index_mummy NC*.fna |sort &gt; mums.txt
+3159928 bps sequence imported.
+weese@tanne:~/seqan/demos$ head mums.txt
+    1565    323805      2159        48
+    1646    323886      2240        27
+    1722    323962      2316        37
+    1774    324014      2368        26
+    1941    324181      2535        23
+    2061    324301      2655        35
+    2102    324342      2696        29
+    2132    324372      2726        20
+    2183    324423      2777        24
+weese@tanne:~/seqan/demos$</pre></div>
+
+  </div>
+</div>
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_Index.html" data-lang-entity="class">Index</a></li>
+  
+  <li><a href="specialization_MumsIterator.html" data-lang-entity="specialization">MumsIterator</a></li>
+  
+  </ul>
+
+</div>
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>@page DemoMummy Mummy
+
+@brief Simple MUMmer clone.
+
+MUMmer is a tool to search for multiple exact matches (MUMs) between 2 given
+sequences. MUMs can be used as a starting point for a multiple genome
+alignment algorithm. This example shows how to implement a simple version of
+MUMer to find multiple exact matches of n sequences (n&gt;=2) in SeqAn.
+
+@include demos/index/index_mummy.cpp
+
+If you run the tool on 2 sequences it outputs exactly the same matches as
+MUMmer (called with -mum option), it only differs in the * order of outputted
+matches. To get matches with increasing positions at the first sequence we
+piped the output to sort.
+
+As an example data set we used 3 strains of chlamydia bacterium
+(NC_002620.fna, NC_000117.fna, NC_007429.fna) and saved the Fasta files to
+the demos directory.
+
+@code{.console}
+weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_mummy
+weese@tanne:~/seqan/demos$ ./index_mummy -h
+***************************************
+***        Simple MUM finder        ***
+*** written by David Weese (c) 2007 ***
+***************************************
+
+Usage: mummy [OPTION]... &lt;SEQUENCE FILE&gt; ... &lt;SEQUENCE FILE&gt;
+
+Options:
+  -e, --extern                  use external memory (for large datasets)
+  -l, --minlen                  set minimum MUM length
+                                if not set, default value is 20
+  -h, --help                    print this help
+weese@tanne:~/seqan/demos$ ./index_mummy NC*.fna |sort &gt; mums.txt
+3159928 bps sequence imported.
+weese@tanne:~/seqan/demos$ head mums.txt
+    1565    323805      2159        48
+    1646    323886      2240        27
+    1722    323962      2316        37
+    1774    324014      2368        26
+    1941    324181      2535        23
+    2061    324301      2655        35
+    2102    324342      2696        29
+    2132    324372      2726        20
+    2183    324423      2777        24
+weese@tanne:~/seqan/demos$
+@endcode
+
+
+@see Index
+@see MumsIterator
+
+</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

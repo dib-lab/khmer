@@ -1,0 +1,772 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_fmindex" data-page="FMIndex">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>FMIndex - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>FMIndex<div><div>An index based on the Burrows-Wheeler transform.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Index.html" data-lang-entity="class">Index</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Index.html" data-lang-entity="class">Index</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TText[, typename TSpec[, typename TConfig]]&gt;
+class Index&lt;TText, FMIndex&lt;TSpec, TConfig&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TText</a></code></th>
+        <td>The text type. Types: <a href="class_String.html" data-lang-entity="class">String</a>, <a href="class_StringSet.html" data-lang-entity="class">StringSet</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>FM index specialisation, defaults to <tt>void</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TConfig</a></code></th>
+        <td>A config object which determines the data types of the different fibres, defaults to
+<tt>FMIndexConfig&lt;TSpec&gt;</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FMIndex%23begin" title="#FMIndex#begin (interface function)" data-lang-entity="interface_function">TIterator begin(index, tag);</a></code></span>
+    <span class="summary_desc"><div>Returns an iterator pointing to the root node of the virtual prefix trie of the reversed text of the index.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FMIndex%23indexLF" title="#FMIndex#indexLF (interface function)" data-lang-entity="interface_function">TFibre indexLF(index);</a></code></span>
+    <span class="summary_desc"><div>A shortcut for <tt>getFibre(index, FibreLF())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FMIndex%23toSuffixPosition" title="#FMIndex#toSuffixPosition (interface function)" data-lang-entity="interface_function">TSAValue toSuffixPosition(index, pos, offset);</a></code></span>
+    <span class="summary_desc"><div>This function computes the position of a specified position in the compressed suffix array (additionally
+containing entries for the sentinels). The returned position corresponds to the suffix array of the original
+text without sentinels.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Index.html" data-lang-entity="class">Index</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#countSequences" data-lang-entity="interface_function">countSequences</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#getFibre" data-lang-entity="interface_function">getFibre</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexRawText" data-lang-entity="interface_function">indexRawText</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexSupplied" data-lang-entity="interface_function">indexSupplied</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexText" data-lang-entity="interface_function">indexText</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#open" data-lang-entity="interface_function">open</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#rawtextAt" data-lang-entity="interface_function">rawtextAt</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#save" data-lang-entity="interface_function">save</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Index.html" data-lang-entity="class">Index</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexCreator" data-lang-entity="interface_metafunction">DefaultIndexCreator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexSpec" data-lang-entity="interface_metafunction">DefaultIndexSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexStringSpec" data-lang-entity="interface_metafunction">DefaultIndexStringSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#GetVSTreeIteratorTraits" data-lang-entity="interface_metafunction">GetVSTreeIteratorTraits</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Structure</h3><p>The FM index consists of various <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> of which the most important ones are the compressed
+suffix array and the LF table, which provides all necessary information for the LF mapping.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FMIndex#begin" class="signature first" data-lang-entity="interface_function">
+      <code>TIterator begin(index, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an iterator pointing to the root node of the virtual prefix trie of the reversed text of the index.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The index to be traversed.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The specialisation of the iterator to be returned by the function. Types: VSTree Iterator</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIterator</code></th>
+        <td>Returns an iterator pointing to the root node of the virtual prefix trie of the reversed text
+of the the index. Types: <tt>The result of Iterator&lt;Index&lt;TText, TIndexSpec&gt;,
+TSpec&gt;::Type</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FMIndex#indexLF" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexLF(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>A shortcut for <tt>getFibre(index, FibreLF())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The FM index.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_FMIndexFibres.html#FMIndexFibres#FibreLF" data-lang-entity="grouped_tag">FibreLF</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FMIndex#toSuffixPosition" class="signature" data-lang-entity="interface_function">
+      <code>TSAValue toSuffixPosition(index, pos, offset);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This function computes the position of a specified position in the compressed suffix array (additionally
+containing entries for the sentinels). The returned position corresponds to the suffix array of the original
+text without sentinels.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The FM index.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position in the suffix array of the FM index (with sentinels).
+Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">offset</code>
+            
+        
+      </th>
+      <td>The number of sequences in the original text. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSAValue</code></th>
+        <td>The function function computes the position of a specified position in the compressed suffix array
+(additionally containing entries for the sentinels). The returned position corresponds to the
+suffix array of the original text without sentinels. The return type is <a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a>&lt;<a href="class_Index.html" data-lang-entity="class">Index</a>&lt;TText, FMIndex&lt;TSpec, TConfig&gt; &gt; &gt;::Type</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FMIndex
+ * 
+ * @extends Index
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief An index based on the Burrows-Wheeler transform.
+ * 
+ * @signature template &lt;typename TText[, typename TSpec[, typename TConfig]]&gt;
+ *            class Index&lt;TText, FMIndex&lt;TSpec, TConfig&gt; &gt;;
+ * 
+ * @tparam TText The text type. Types: @link String @endlink, @link StringSet
+ *               @endlink
+ * @tparam TSpec FM index specialisation, defaults to &lt;tt&gt;void&lt;/tt&gt;.
+ * @tparam TConfig A config object which determines the data types of the
+ *                 different fibres, defaults to
+ *                 &lt;tt&gt;FMIndexConfig&amp;lt;TSpec&amp;gt;&lt;/tt&gt;.
+ * 
+ * @section Structure
+ * 
+ * The FM index consists of various @link Fibre @endlink of which the most
+ * important ones are the compressed suffix array and the LF table, which
+ * provides all necessary information for the LF mapping.
+ * 
+ * @fn FMIndex#indexLF
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief A shortcut for &lt;tt&gt;getFibre(index, FibreLF())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexLF(index);
+ * 
+ * @param[in] index The FM index.
+ * 
+ * @return TFibre A reference to the @link FMIndexFibres#FibreLF @endlink.
+ * 
+ * @fn FMIndex#toSuffixPosition
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This function computes the position of a specified position in the
+ *        compressed suffix array (additionally containing entries for the
+ *        sentinels). The returned position corresponds to the suffix array of
+ *        the original text without sentinels.
+ * 
+ * @signature TSAValue toSuffixPosition(index, pos, offset);
+ * 
+ * @param[in] index The FM index.
+ * @param[in] pos The position in the suffix array of the FM index (with
+ *                sentinels). Types: @link UnsignedIntegerConcept @endlink
+ * @param[in] offset The number of sequences in the original text. Types: @link
+ *                   UnsignedIntegerConcept @endlink
+ * 
+ * @return TSAValue The function function computes the position of a specified
+ *                  position in the compressed suffix array (additionally
+ *                  containing entries for the sentinels). The returned position
+ *                  corresponds to the suffix array of the original text without
+ *                  sentinels. The return type is @link SAValue
+ *                  @endlink&amp;lt;@link Index @endlink&amp;lt;TText, FMIndex&amp;lt;TSpec,
+ *                  TConfig&amp;gt; &amp;gt; &amp;gt;::Type
+ * 
+ * @fn FMIndex#begin
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns an iterator pointing to the root node of the virtual prefix
+ *        trie of the reversed text of the index.
+ * 
+ * @signature TIterator begin(index, tag);
+ * 
+ * @param[in] index The index to be traversed.
+ * @param[in] tag The specialisation of the iterator to be returned by the
+ *                function. Types: VSTree Iterator
+ * 
+ * @return TIterator Returns an iterator pointing to the root node of the
+ *                   virtual prefix trie of the reversed text of the the index.
+ *                   Types: &lt;tt&gt;The result of Iterator&amp;lt;Index&amp;lt;TText,
+ *                   TIndexSpec&amp;gt;, TSpec&amp;gt;::Type&lt;/tt&gt;
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_argparseoption" data-page="ArgParseOption">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ArgParseOption - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>ArgParseOption<div><div>Store information for a specific command line option.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/arg_parse.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class ArgParseOption : ArgParseArgument;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%3A%3AArgParseOption" title="#ArgParseOption::ArgParseOption (interface function)" data-lang-entity="member_function">ArgParseOption::ArgParseOption(shortName, longName, helpText, argumentType[, argumentLabel[, isList[, numValues]]]);</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument::ArgParseArgument" data-lang-entity="member_function">ArgParseArgument</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23addDefaultValue" title="#ArgParseOption#addDefaultValue (interface function)" data-lang-entity="interface_function">void setDefaultValue(option, v);</a></code></span>
+    <span class="summary_desc"><div>Adds/appends a new value to the list of default values.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23getArgumentLabel" title="#ArgParseOption#getArgumentLabel (interface function)" data-lang-entity="interface_function">std::string getArgumentLabel(option);</a></code></span>
+    <span class="summary_desc"><div>Returns the argument label.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23getOptionName" title="#ArgParseOption#getOptionName (interface function)" data-lang-entity="interface_function">std::string getOptionName(option);</a></code></span>
+    <span class="summary_desc"><div>Returns the name of the ArgParseOption in a well-formatted way.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23hideOption" title="#ArgParseOption#hideOption (interface function)" data-lang-entity="interface_function">void hideOption(option[, hide]);</a></code></span>
+    <span class="summary_desc"><div>Hides the ArgParseOption from the help screen (or shows it again).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23isBooleanOption" title="#ArgParseOption#isBooleanOption (interface function)" data-lang-entity="interface_function">bool isBooleanOption(option);</a></code></span>
+    <span class="summary_desc"><div>Returns whether an option is a switch.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23isHidden" title="#ArgParseOption#isHidden (interface function)" data-lang-entity="interface_function">bool isHidden(option);</a></code></span>
+    <span class="summary_desc"><div>Return whether an option is hidden on the help screen.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23isRequired" title="#ArgParseOption#isRequired (interface function)" data-lang-entity="interface_function">bool isRequired(option);</a></code></span>
+    <span class="summary_desc"><div>Returns whether the option is mandatory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23setDefaultValue" title="#ArgParseOption#setDefaultValue (interface function)" data-lang-entity="interface_function">void setDefaultValue(option, v);</a></code></span>
+    <span class="summary_desc"><div>Set the default value for the given option.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23setRequired" title="#ArgParseOption#setRequired (interface function)" data-lang-entity="interface_function">void setRequired(option, required);</a></code></span>
+    <span class="summary_desc"><div>Sets whether or not the option is mandatory.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ArgParseOption%23write" title="#ArgParseOption#write (interface function)" data-lang-entity="interface_function">void write(stream, option);</a></code></span>
+    <span class="summary_desc"><div>Writes the basic informationa bout the ArgParseOption to the provided stream.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_ArgParseArgument.html" data-lang-entity="class">ArgParseArgument</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#getArgumentLabel" data-lang-entity="interface_function">getArgumentLabel</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#getArgumentValue" data-lang-entity="interface_function">getArgumentValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#getArgumentValues" data-lang-entity="interface_function">getArgumentValues</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#getFileExtension" data-lang-entity="interface_function">getFileExtension</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#hasArgumentValue" data-lang-entity="interface_function">hasArgumentValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#hasDefault" data-lang-entity="interface_function">hasDefault</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isDoubleArgument" data-lang-entity="interface_function">isDoubleArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isInputFileArgument" data-lang-entity="interface_function">isInputFileArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isInputPrefixArgument" data-lang-entity="interface_function">isInputPrefixArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isInt64Argument" data-lang-entity="interface_function">isInt64Argument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isIntegerArgument" data-lang-entity="interface_function">isIntegerArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isListArgument" data-lang-entity="interface_function">isListArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isOutputFileArgument" data-lang-entity="interface_function">isOutputFileArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isOutputPrefixArgument" data-lang-entity="interface_function">isOutputPrefixArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isSet" data-lang-entity="interface_function">isSet</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#isStringArgument" data-lang-entity="interface_function">isStringArgument</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#numberOfAllowedValues" data-lang-entity="interface_function">numberOfAllowedValues</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#setHelpText" data-lang-entity="interface_function">setHelpText</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#setMaxValue" data-lang-entity="interface_function">setMaxValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#setMinValue" data-lang-entity="interface_function">setMinValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_ArgParseArgument.html#ArgParseArgument#setValidValues" data-lang-entity="interface_function">setValidValues</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>You can use the shortcut <a href="class_ArgumentParser.html#ArgumentParser#addOption" data-lang-entity="interface_function">addOption</a> for adding options to <a href="class_ArgumentParser.html" data-lang-entity="class">ArgumentParser</a>
+object.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgParseOption::ArgParseOption" class="signature first" data-lang-entity="member_function">
+      <code>ArgParseOption::ArgParseOption(shortName, longName, helpText, argumentType[, argumentLabel[, isList[, numValues]]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shortName</code>
+            
+        
+      </th>
+      <td>The short name of the argument.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">longName</code>
+            
+        
+      </th>
+      <td>The long name of the argument (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">helpText</code>
+            
+        
+      </th>
+      <td>The text to display as help (<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argumentType</code>
+            
+        
+      </th>
+      <td>The type of the argument (<a href="enum_ArgParseArgument_58_58ArgumentType.html" data-lang-entity="enum">ArgParseArgument::ArgumentType</a>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">argumentLabel</code>
+            
+        
+      </th>
+      <td>The label for the value to use in the help display, e.g. 'INT' in '--value INT'
+(<tt>std::string</tt>).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">isList</code>
+            
+        
+      </th>
+      <td>Flag for whether this option can be given multiple times (<tt>bool</tt>, <tt>true</tt> for
+allowing multiple values).</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">numValues</code>
+            
+        
+      </th>
+      <td>Number of command line arguments that each option should bind (<tt>unsigned</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Short and Long Option Names</h4><p>Short option names are passed to the program following one dash (e.g. '-i', '-e'). Long optiongs are passed
+following two dashes (e.g. '--num-threads', '--error-rate'). The leading one or two dashes are not passed to the
+constructor of ArgParseOption, however.</p><h4>Naming Conventions</h4><p><ul>
+<li>Keep the short name short, ideally to one character.</li>
+<li>Only use lower-case characters in the long name, use dashes to separate words, only use alphanumeric characters
+and dashes, no underline characters</li>.
+</ul></p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ArgParseOption#addDefaultValue" class="signature first" data-lang-entity="interface_function">
+      <code>void setDefaultValue(option, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds/appends a new value to the list of default values.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption to appen the default value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The value to append, (any type that can be streamed into an <tt>std::stringstream</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function does not check any length restrictions for this value.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#getArgumentLabel" class="signature" data-lang-entity="interface_function">
+      <code>std::string getArgumentLabel(option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the argument label.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The argument label string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#getOptionName" class="signature" data-lang-entity="interface_function">
+      <code>std::string getOptionName(option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the name of the ArgParseOption in a well-formatted way.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>std::string</code></th>
+        <td>The option name string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#hideOption" class="signature" data-lang-entity="interface_function">
+      <code>void hideOption(option[, hide]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Hides the ArgParseOption from the help screen (or shows it again).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to set the hidden flag of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">hide</code>
+            
+        
+      </th>
+      <td><tt>bool</tt> that indicates whether to hide the flag (default: <tt>true</tt>)</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#isBooleanOption" class="signature" data-lang-entity="interface_function">
+      <code>bool isBooleanOption(option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether an option is a switch.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>option</tt> is a switch and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Flags are given without arguments, e.g. the <tt>-l</tt> flag in the Unix <tt>ls</tt> command.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#isHidden" class="signature" data-lang-entity="interface_function">
+      <code>bool isHidden(option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return whether an option is hidden on the help screen.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if it is hidden, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By default, options are not hidden.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#isRequired" class="signature" data-lang-entity="interface_function">
+      <code>bool isRequired(option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the option is mandatory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the option is mandatory and <tt>false</tt> if it not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By default, options are not mandatory.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#setDefaultValue" class="signature" data-lang-entity="interface_function">
+      <code>void setDefaultValue(option, v);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the default value for the given option.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption to set the default value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">v</code>
+            
+        
+      </th>
+      <td>The value to set, (any type that can be streamed into an <tt>std::stringstream</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#setRequired" class="signature" data-lang-entity="interface_function">
+      <code>void setRequired(option, required);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets whether or not the option is mandatory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">required</code>
+            
+        
+      </th>
+      <td>Flag whether the option is mandatory (<tt>bool</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By default, options are not mandatory.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="ArgParseOption#write" class="signature" data-lang-entity="interface_function">
+      <code>void write(stream, option);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Writes the basic informationa bout the ArgParseOption to the provided stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td>The <a href="concept_StreamConcept.html" data-lang-entity="concept">stream</a> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">option</code>
+            
+        
+      </th>
+      <td>The ArgParseOption object to write to <tt>stream</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ArgParseOption
+ * 
+ * @extends ArgParseArgument
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Store information for a specific command line option.
+ * 
+ * @signature class ArgParseOption : ArgParseArgument;
+ * 
+ * You can use the shortcut @link ArgumentParser#addOption @endlink for adding
+ * options to @link ArgumentParser @endlink object.
+ * 
+ * @fn ArgParseOption::ArgParseOption
+ * 
+ * @brief Constructor.
+ * 
+ * @signature ArgParseOption::ArgParseOption(shortName, longName, helpText,
+ *            argumentType[, argumentLabel[, isList[, numValues]]]);
+ * 
+ * @param[in] shortName The short name of the argument.
+ * @param[in] longName The long name of the argument (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] helpText The text to display as help (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] argumentType The type of the argument (@link
+ *                         ArgParseArgument::ArgumentType @endlink).
+ * @param[in] argumentLabel The label for the value to use in the help display,
+ *                          e.g. &#39;INT&#39; in &#39;--value INT&#39; (&lt;tt&gt;std::string&lt;/tt&gt;).
+ * @param[in] isList Flag for whether this option can be given multiple times
+ *                   (&lt;tt&gt;bool&lt;/tt&gt;, &lt;tt&gt;true&lt;/tt&gt; for allowing multiple
+ *                   values).
+ * @param[in] numValues Number of command line arguments that each option should
+ *                      bind (&lt;tt&gt;unsigned&lt;/tt&gt;).
+ * 
+ * @section Short and Long Option Names
+ * 
+ * Short option names are passed to the program following one dash (e.g. &#39;-i&#39;,
+ * &#39;-e&#39;). Long optiongs are passed following two dashes (e.g. &#39;--num-threads&#39;,
+ * &#39;--error-rate&#39;). The leading one or two dashes are not passed to the
+ * constructor of ArgParseOption, however.
+ * 
+ * @section Naming Conventions
+ * 
+ * &lt;ul&gt; &lt;li&gt;Keep the short name short, ideally to one character.&lt;/li&gt; &lt;li&gt;Only
+ * use lower-case characters in the long name, use dashes to separate words,
+ * only use alphanumeric characters and dashes, no underline characters&lt;/li&gt;.
+ * &lt;/ul&gt;
+ * 
+ * @fn ArgParseOption#isBooleanOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether an option is a switch.
+ * 
+ * @signature bool isBooleanOption(option);
+ * 
+ * @param[in] option The ArgParseOption object to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;option&lt;/tt&gt; is a switch and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * Flags are given without arguments, e.g. the &lt;tt&gt;-l&lt;/tt&gt; flag in the Unix
+ * &lt;tt&gt;ls&lt;/tt&gt; command.
+ * 
+ * @fn ArgParseOption#isHidden
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Return whether an option is hidden on the help screen.
+ * 
+ * @signature bool isHidden(option);
+ * 
+ * @param[in] option The ArgParseOption object to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if it is hidden, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * By default, options are not hidden.
+ * 
+ * @fn ArgParseOption#hideOption
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Hides the ArgParseOption from the help screen (or shows it again).
+ * 
+ * @signature void hideOption(option[, hide]);
+ * 
+ * @param[in,out] option The ArgParseOption object to set the hidden flag of.
+ * @param[in] hide &lt;tt&gt;bool&lt;/tt&gt; that indicates whether to hide the flag
+ *                 (default: &lt;tt&gt;true&lt;/tt&gt;)
+ * 
+ * @fn ArgParseOption#isRequired
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns whether the option is mandatory.
+ * 
+ * @signature bool isRequired(option);
+ * 
+ * @param[in] option The ArgParseOption object to query.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the option is mandatory and &lt;tt&gt;false&lt;/tt&gt; if
+ *              it not.
+ * 
+ * By default, options are not mandatory.
+ * 
+ * @fn ArgParseOption#setDefaultValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Set the default value for the given option.
+ * 
+ * @signature void setDefaultValue(option, v);
+ * 
+ * @param[in,out] option The ArgParseOption to set the default value for.
+ * @param[in] v The value to set, (any type that can be streamed into an
+ *              &lt;tt&gt;std::stringstream&lt;/tt&gt;).
+ * 
+ * @fn ArgParseOption#addDefaultValue
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Adds/appends a new value to the list of default values.
+ * 
+ * @signature void setDefaultValue(option, v);
+ * 
+ * @param[in,out] option The ArgParseOption to appen the default value for.
+ * @param[in] v The value to append, (any type that can be streamed into an
+ *              &lt;tt&gt;std::stringstream&lt;/tt&gt;).
+ * 
+ * @section Remarks
+ * 
+ * This function does not check any length restrictions for this value.
+ * 
+ * @fn ArgParseOption#setRequired
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Sets whether or not the option is mandatory.
+ * 
+ * @signature void setRequired(option, required);
+ * 
+ * @param[in,out] option The ArgParseOption to modify.
+ * @param[in] required Flag whether the option is mandatory (&lt;tt&gt;bool&lt;/tt&gt;).
+ * 
+ * By default, options are not mandatory.
+ * 
+ * @fn ArgParseOption#getArgumentLabel
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns the argument label.
+ * 
+ * @signature std::string getArgumentLabel(option);
+ * 
+ * @param[in] option The ArgParseOption object to query.
+ * 
+ * @return std::string The argument label string.
+ * 
+ * @fn ArgParseOption#getOptionName
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Returns the name of the ArgParseOption in a well-formatted way.
+ * 
+ * @signature std::string getOptionName(option);
+ * 
+ * @param[in] option The ArgParseOption object to query.
+ * 
+ * @return std::string The option name string.
+ * 
+ * @fn ArgParseOption#write
+ * 
+ * @headerfile &lt;seqan/arg_parse.h&gt;
+ * 
+ * @brief Writes the basic informationa bout the ArgParseOption to the provided
+ *        stream.
+ * 
+ * @signature void write(stream, option);
+ * 
+ * @param[in,out] stream The @link StreamConcept stream @endlink to write to.
+ * @param[out] option The ArgParseOption object to write to &lt;tt&gt;stream&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

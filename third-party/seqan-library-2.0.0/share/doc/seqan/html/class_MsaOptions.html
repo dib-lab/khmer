@@ -1,0 +1,545 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_msaoptions" data-page="MsaOptions">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>MsaOptions - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>MsaOptions<div><div>Configuration for <a href="global_function_globalMsaAlignment.html" data-lang-entity="global_function">globalMsaAlignment</a></div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/graph_msa.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TAlphabet, typename TScore&gt;
+struct MsaOptions;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TAlphabet</a></code></th>
+        <td>The alphabet type to use.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TScore</a></code></th>
+        <td>The <a href="class_Score.html" data-lang-entity="class">Score</a> type to use.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3AMsaOptions" title="#MsaOptions::MsaOptions (interface function)" data-lang-entity="member_function">MsaOptions::MsaOptions();</a></code></span>
+    <span class="summary_desc"><div>Default constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3Abuild" title="#MsaOptions::build (interface function)" data-lang-entity="member_variable">
+        unsigned MsaOptions::build
+    </a></code></span>
+    <span class="summary_desc"><div>Methods for computing guide tre.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3Amethod" title="#MsaOptions::method (interface function)" data-lang-entity="member_variable">
+        TUnsignedString MsaOptions::method
+    </a></code></span>
+    <span class="summary_desc"><div>All methods to compute segment matches, of Type <tt>String&lt;unsigned&gt;</tt>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3AoutputFormat" title="#MsaOptions::outputFormat (interface function)" data-lang-entity="member_variable">
+        unsigned MsaOptions::outputFormat
+    </a></code></span>
+    <span class="summary_desc"><div>Output Format (<tt>0</tt> - FASTA, <tt>1</tt> MSF, default: <tt>0</tt>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3Arescore" title="#MsaOptions::rescore (interface function)" data-lang-entity="member_variable">
+        bool MsaOptions::rescore
+    </a></code></span>
+    <span class="summary_desc"><div>Whether or not to rescore segment matches after refinment (default: <tt>true</tt>).</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#MsaOptions%3A%3Asc" title="#MsaOptions::sc (interface function)" data-lang-entity="member_variable">
+        TScore MsaOptions::sc
+    </a></code></span>
+    <span class="summary_desc"><div>The <a href="class_Score.html" data-lang-entity="class">Score</a> object to use.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="MsaOptions::MsaOptions" class="signature first" data-lang-entity="member_function">
+      <code>MsaOptions::MsaOptions();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Default constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="MsaOptions::build" class="signature first" data-lang-entity="member_variable">
+      <code>unsigned MsaOptions::build</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Methods for computing guide tre.</div>
+        
+<div><p>0 Neighbor-joining, 1 UPGMA single linkage, 2 UPGMA complete linkage,
+3 UPGMA average linkage, 4 UPGMA weighted average linkage.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MsaOptions::method" class="signature" data-lang-entity="member_variable">
+      <code>TUnsignedString MsaOptions::method</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>All methods to compute segment matches, of Type <tt>String&lt;unsigned&gt;</tt>.</div>
+        
+<div><p>0 global alignment, 1 local alignments, 2 overlap alignments, 3 longest common subsequence</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MsaOptions::outputFormat" class="signature" data-lang-entity="member_variable">
+      <code>unsigned MsaOptions::outputFormat</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Output Format (<tt>0</tt> - FASTA, <tt>1</tt> MSF, default: <tt>0</tt>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MsaOptions::rescore" class="signature" data-lang-entity="member_variable">
+      <code>bool MsaOptions::rescore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Whether or not to rescore segment matches after refinment (default: <tt>true</tt>).</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="MsaOptions::sc" class="signature" data-lang-entity="member_variable">
+      <code>TScore MsaOptions::sc</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The <a href="class_Score.html" data-lang-entity="class">Score</a> object to use.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class MsaOptions
+ * 
+ * @headerfile &lt;seqan/graph_msa.h&gt;
+ * 
+ * @brief Configuration for @link globalMsaAlignment @endlink
+ * 
+ * @signature template &lt;typename TAlphabet, typename TScore&gt; struct MsaOptions;
+ * 
+ * @tparam TAlphabet The alphabet type to use.
+ * @tparam TScore The @link Score @endlink type to use.
+ * 
+ * @fn MsaOptions::MsaOptions
+ * 
+ * @brief Default constructor.
+ * 
+ * @signature MsaOptions::MsaOptions();
+ * 
+ * @var bool MsaOptions::rescore;
+ * 
+ * @brief Whether or not to rescore segment matches after refinment (default:
+ *        &lt;tt&gt;true&lt;/tt&gt;).
+ * 
+ * @var unsigned MsaOptions::outputFormat;
+ * 
+ * @brief Output Format (&lt;tt&gt;0&lt;/tt&gt; - FASTA, &lt;tt&gt;1&lt;/tt&gt; MSF, default:
+ *        &lt;tt&gt;0&lt;/tt&gt;).
+ * 
+ * @var TScore MsaOptions::sc;
+ * 
+ * @brief The @link Score @endlink object to use.
+ * 
+ * @var unsigned MsaOptions::build;
+ * 
+ * @brief Methods for computing guide tre.
+ * 
+ * 0 Neighbor-joining, 1 UPGMA single linkage, 2 UPGMA complete linkage, 3 UPGMA
+ * average linkage, 4 UPGMA weighted average linkage.
+ * 
+ * @var TUnsignedString MsaOptions::method;
+ * 
+ * @brief All methods to compute segment matches, of Type
+ *        &lt;tt&gt;String&amp;lt;unsigned&amp;gt;&lt;/tt&gt;.
+ * 
+ * 0 global alignment, 1 local alignments, 2 overlap alignments, 3 longest
+ * common subsequence
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_integratealign" data-page="integrateAlign">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>integrateAlign - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>integrateAlign<div><div>Integrates an alignment into another by copying the gaps.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>void integrateAlign(align1, align2[, positions]);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align1</code>
+            
+        
+        </th>
+        <td>Target Alignment object into which align2 is to be integrated.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align2</code>
+            
+        
+        </th>
+        <td>Alignment object that is to be integrated into align1.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">positions</code>
+            
+        
+        </th>
+        <td>The integration positions in align1 for all rows (view positions), String of positions.</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Examples</h3><div data-src-path="demos/align/integrate_align.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+
+<span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// We will create the following alignment between the subject and the</span>
+    <span class="c1">// query (with clipping in subject).</span>
+    <span class="c1">//</span>
+    <span class="c1">//                    1    1    2    2</span>
+    <span class="c1">//          0    5    0    5    0    5</span>
+    <span class="c1">//          :    .    :    .    :    .</span>
+    <span class="c1">// subject  CPISRTW-SIFRCWALLKAMEAALL</span>
+    <span class="c1">//             |||| | |||||</span>
+    <span class="c1">// query       SRTWAS-FRCWA</span>
+    <span class="c1">//</span>
+    <span class="c1">//             | clipping |</span>
+    <span class="c1">//             &#39;----------&#39;</span>
+
+    <span class="n">Peptide</span> <span class="n">subject</span> <span class="o">=</span> <span class="s">&quot;CPISRTWSIFRCWALLKAMEAALL&quot;</span><span class="p">;</span>
+    <span class="n">Peptide</span> <span class="n">query</span>   <span class="o">=</span> <span class="s">&quot;SRTWASFRCWA&quot;</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;subject: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">subject</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;query:   &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">query</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Build initial alignment.  Note that the resulting alignment does not</span>
+    <span class="c1">// make sense yet since the row size is different.</span>
+    <span class="n">Align</span><span class="o">&lt;</span><span class="n">Peptide</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">;</span>
+    <span class="n">resize</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">align</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">setSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">subject</span><span class="p">);</span>
+    <span class="n">setSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">query</span><span class="p">);</span>
+
+    <span class="c1">// Build the alignment that is to be integrated into align.</span>
+    <span class="n">Infix</span><span class="o">&lt;</span><span class="n">Peptide</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">subjectInfix</span> <span class="o">=</span> <span class="n">infix</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">);</span>
+    <span class="n">Infix</span><span class="o">&lt;</span><span class="n">Peptide</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">queryInfix</span> <span class="o">=</span> <span class="n">infix</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;subject infix: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">subjectInfix</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;query infix:   &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">queryInfix</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="n">Align</span><span class="o">&lt;</span><span class="n">Infix</span><span class="o">&lt;</span><span class="n">Peptide</span><span class="o">&gt;::</span><span class="n">Type</span><span class="o">&gt;</span> <span class="n">infixAlign</span><span class="p">;</span>
+    <span class="n">resize</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">infixAlign</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">setSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">infixAlign</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">subjectInfix</span><span class="p">);</span>
+    <span class="n">setSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">infixAlign</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">queryInfix</span><span class="p">);</span>
+
+    <span class="n">globalAlignment</span><span class="p">(</span><span class="n">infixAlign</span><span class="p">,</span> <span class="n">Blosum62</span><span class="p">());</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;infix alignment</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">infixAlign</span><span class="p">;</span>
+
+    <span class="c1">// Now integrate infixAlign into align.  Note that the alignment itself</span>
+    <span class="c1">// does not make sense yet either: the whole query is aligned to a part of</span>
+    <span class="c1">// the subject and we have to limit/clip the subject row of align.</span>
+    <span class="n">integrateAlign</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">infixAlign</span><span class="p">);</span>
+
+    <span class="c1">// For the clipping, we have to transform the alignment begin position in</span>
+    <span class="c1">// sequence space of subject into the view space of row(align, 0) since</span>
+    <span class="c1">// there are (and generally can be) gaps in row(align, 0);</span>
+    <span class="kt">int</span> <span class="n">beginSourcePos</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">endSourcePos</span> <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">beginViewPos</span> <span class="o">=</span> <span class="n">toViewPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">beginSourcePos</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">endViewPos</span> <span class="o">=</span> <span class="n">toViewPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">endSourcePos</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;clipping row(align, 0) to source range (&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">beginSourcePos</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endSourcePos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;).  This is the view range (&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">beginViewPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endViewPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">setClippedBeginPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">beginViewPos</span><span class="p">);</span>
+    <span class="n">setClippedEndPosition</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">endViewPos</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;align with clipping</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">align</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/align/integrate_align.cpp" target="_top">demos/align/integrate_align.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/align/integrate_align.cpp.stdout">subject: CPISRTWSIFRCWALLKAMEAALL
+query:   SRTWASFRCWA
+
+subject infix: SRTWSI
+query infix:   SRTWAS
+
+infix alignment
+      0     .   
+        SRTW-SI
+        |||| | 
+        SRTWAS-
+
+
+clipping row(align, 0) to source range (3, 14).  This is the view range (3, 15)
+align with clipping
+      0     .    :   
+        SRTW-SIFRCWA
+        |||| | |||||
+        SRTWAS-FRCWA
+
+
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn integrateAlign
+ * 
+ * @headerfile &lt;seqan/align.h&gt;
+ * 
+ * @brief Integrates an alignment into another by copying the gaps.
+ * 
+ * @signature void integrateAlign(align1, align2[, positions]);
+ * 
+ * @param[in,out] align1 Target Alignment object into which align2 is to be
+ *                       integrated.
+ * @param[in] align2 Alignment object that is to be integrated into align1.
+ * @param[in] positions The integration positions in align1 for all rows (view
+ *                      positions), String of positions.
+ * 
+ * @section Examples
+ * 
+ * @include demos/align/integrate_align.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/align/integrate_align.cpp.stdout
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

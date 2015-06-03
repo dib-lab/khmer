@@ -1,0 +1,1281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_pipe" data-page="Pipe">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Pipe - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Pipe<div><div>Pipes are pop-passive pipeline modules.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_Caster.html" data-lang-entity="specialization">Caster</a>, 
+    <a href="specialization_Counter.html" data-lang-entity="specialization">Counter</a>, 
+    <a href="specialization_Echoer.html" data-lang-entity="specialization">Echoer</a>, 
+    <a href="specialization_EditEnvironment.html" data-lang-entity="specialization">EditEnvironment</a>, 
+    <a href="specialization_Filter.html" data-lang-entity="specialization">Filter</a>, 
+    <a href="specialization_Joiner.html" data-lang-entity="specialization">Joiner</a>, 
+    <a href="specialization_Namer.html" data-lang-entity="specialization">Namer</a>, 
+    <a href="specialization_Sampler.html" data-lang-entity="specialization">Sampler</a>, 
+    <a href="specialization_Shifter.html" data-lang-entity="specialization">Shifter</a>, 
+    <a href="specialization_Source.html" data-lang-entity="specialization">Source</a>, 
+    <a href="specialization_Tupler.html" data-lang-entity="specialization">Tupler</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/pipe.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TInput, typename TSpec&gt;
+class Pipe;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TInput</a></code></th>
+        <td>The type of the pipeline module this module reads from. Use Bundle2, Bundle3, etc. to read
+from more than one module.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%3A%3APipe" title="#Pipe::Pipe (interface function)" data-lang-entity="member_function">Pipe::Pipe(in);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23assign" title="#Pipe#assign (interface function)" data-lang-entity="interface_function">void assign(target, source);</a></code></span>
+    <span class="summary_desc"><div>Assigns one object to another object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23atEnd" title="#Pipe#atEnd (interface function)" data-lang-entity="interface_function">bool atEnd(pipe);</a></code></span>
+    <span class="summary_desc"><div>Check whether the <a href="class_Pipe.html" data-lang-entity="class">Pipe</a> object is at end.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23beginRead" title="#Pipe#beginRead (interface function)" data-lang-entity="interface_function">bool beginRead(object);</a></code></span>
+    <span class="summary_desc"><div>Initiates a read process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23endRead" title="#Pipe#endRead (interface function)" data-lang-entity="interface_function">bool endRead(object);</a></code></span>
+    <span class="summary_desc"><div>Terminates a read process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23front" title="#Pipe#front (interface function)" data-lang-entity="interface_function">TValue front(object);</a></code></span>
+    <span class="summary_desc"><div>Gets the first element of the remaining stream.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23length" title="#Pipe#length (interface function)" data-lang-entity="interface_function">TSize length(pipe);</a></code></span>
+    <span class="summary_desc"><div>Length of the pipe.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23pop" title="#Pipe#pop (interface function)" data-lang-entity="interface_function">void pop(pipe[, ref]);</a></code></span>
+    <span class="summary_desc"><div>Pops the first element of the remaining stream.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23Size" title="#Pipe#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TPipe&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return size type of the Pipe specialization.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pipe%23Value" title="#Pipe#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TPipe&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return value type of the Pipe specialization.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Use <a href="class_Pipe.html#Pipe#Value" data-lang-entity="interface_metafunction">Value</a> to get the output type of a given Pipe (returns <tt>Value&lt;TInput&gt;::Type</tt> by
+default).</p><p>Use Size to get the size type of a given Pipe (returns <tt>Size&lt;TInput&gt;::Type</tt> by default).</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Pipe::Pipe" class="signature first" data-lang-entity="member_function">
+      <code>Pipe::Pipe(in);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">in</code>
+            
+        
+      </th>
+      <td>Reference to an input pipe.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Pipe#assign" class="signature first" data-lang-entity="interface_function">
+      <code>void assign(target, source);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns one object to another object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">target</code>
+            
+        
+      </th>
+      <td>Reference to assign to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>Value to assign.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Assign value of source to target.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#atEnd" class="signature" data-lang-entity="interface_function">
+      <code>bool atEnd(pipe);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Check whether the <a href="class_Pipe.html" data-lang-entity="class">Pipe</a> object is at end.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pipe</code>
+            
+        
+      </th>
+      <td>The <a href="class_Pipe.html" data-lang-entity="class">Pipe</a> object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of the pipe being at the end, false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#beginRead" class="signature" data-lang-entity="interface_function">
+      <code>bool beginRead(object);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initiates a read process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">object</code>
+            
+        
+      </th>
+      <td>A pop-passive pipeline module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>beginRead</tt> rewinds the output stream, prepares <tt>object</tt> for succeeding reads, and typically calls
+<tt>beginRead</tt> of the input pipeline modules.</p><p>A read process must be terminated with endRead. Nested read processes are not allowed.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">endRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#endRead" class="signature" data-lang-entity="interface_function">
+      <code>bool endRead(object);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Terminates a read process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">object</code>
+            
+        
+      </th>
+      <td>A pop-passive pipeline module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>endRead</tt> closes the output stream, frees resources possibly allocated by beginRead, and typically calls
+<tt>endRead</tt> of the input pipeline modules.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">beginRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#front" class="signature" data-lang-entity="interface_function">
+      <code>TValue front(object);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Gets the first element of the remaining stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">object</code>
+            
+        
+      </th>
+      <td>A pop-passive pipeline module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>The first element of the remaining input stream. Return type is <tt>Value&lt;TObject&gt;::Type</tt>
+for <tt>object</tt> type <tt>TObject</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Pipe#front or Pipe#pop can only be called within a read process surrounded by beginRead and endRead.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">pop</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(pipe);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Length of the pipe.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pipe</code>
+            
+        
+      </th>
+      <td>The Pipe to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The size of the pipe.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pipe#pop" class="signature" data-lang-entity="interface_function">
+      <code>void pop(pipe[, ref]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Pops the first element of the remaining stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pipe</code>
+            
+        
+      </th>
+      <td>A pop-passive pipeline module.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">ref</code>
+            
+        
+      </th>
+      <td>Reference to the result. Result type is <tt>Value&lt;TObject&gt;::Type</tt> for <tt>object</tt>
+type <tt>TObject</tt>. Returns the first element of the remaining input stream.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>In contrast to Pipe#front this function also steps one element further.</p><p>Pipe#front or Pipe#pop can only be called within a read process surrounded by beginRead and endRead.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Pipe#Size" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TPipe&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return size type of the Pipe specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPipe</code></th>
+            <td>The Pipe specialization to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Pipe#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TPipe&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return value type of the Pipe specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TPipe</code></th>
+            <td>The Pipe specialization to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Pipe
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Pipes are pop-passive pipeline modules.
+ * 
+ * @signature template &lt;typename TInput, typename TSpec&gt; class Pipe;
+ * 
+ * @tparam TSpec The specializing type.
+ * @tparam TInput The type of the pipeline module this module reads from. Use
+ *                Bundle2, Bundle3, etc. to read from more than one module.
+ * 
+ * Use @link Pipe#Value @endlink to get the output type of a given Pipe (returns
+ * &lt;tt&gt;Value&amp;lt;TInput&amp;gt;::Type&lt;/tt&gt; by default).
+ * 
+ * Use Size to get the size type of a given Pipe (returns
+ * &lt;tt&gt;Size&amp;lt;TInput&amp;gt;::Type&lt;/tt&gt; by default).
+ * 
+ * @mfn Pipe#Value
+ * 
+ * @brief Return value type of the Pipe specialization.
+ * 
+ * @signature Value&lt;TPipe&gt;::Type;
+ * 
+ * @tparam TPipe The Pipe specialization to query.
+ * 
+ * @return Type The resulting value type.
+ * 
+ * @mfn Pipe#Size
+ * 
+ * @brief Return size type of the Pipe specialization.
+ * 
+ * @signature Size&lt;TPipe&gt;::Type;
+ * 
+ * @tparam TPipe The Pipe specialization to query.
+ * 
+ * @return Type The resulting size type.
+ * 
+ * @fn Pipe::Pipe
+ * 
+ * @brief Constructor
+ * 
+ * @signature Pipe::Pipe(in);
+ * 
+ * @param[in] in Reference to an input pipe.
+ * 
+ * @fn Pipe#length
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Length of the pipe.
+ * 
+ * @signature TSize length(pipe);
+ * 
+ * @param[in] pipe The Pipe to query for its size.
+ * 
+ * @return TSize The size of the pipe.
+ * 
+ * @fn Pipe#front
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Gets the first element of the remaining stream.
+ * 
+ * @signature TValue front(object);
+ * 
+ * @param[in] object A pop-passive pipeline module.
+ * 
+ * @return TValue The first element of the remaining input stream. Return type
+ *                is &lt;tt&gt;Value&amp;lt;TObject&amp;gt;::Type&lt;/tt&gt; for &lt;tt&gt;object&lt;/tt&gt;
+ *                type &lt;tt&gt;TObject&lt;/tt&gt;.
+ * 
+ * Pipe#front or Pipe#pop can only be called within a read process surrounded by
+ * beginRead and endRead.
+ * 
+ * @see Pipe#pop
+ * 
+ * @fn Pipe#pop
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Pops the first element of the remaining stream.
+ * 
+ * @signature void pop(pipe[, ref]);
+ * 
+ * @param[in,out] pipe A pop-passive pipeline module.
+ * @param[out] ref Reference to the result. Result type is
+ *                 &lt;tt&gt;Value&amp;lt;TObject&amp;gt;::Type&lt;/tt&gt; for &lt;tt&gt;object&lt;/tt&gt; type
+ *                 &lt;tt&gt;TObject&lt;/tt&gt;. Returns the first element of the remaining
+ *                 input stream.
+ * 
+ * In contrast to Pipe#front this function also steps one element further.
+ * 
+ * Pipe#front or Pipe#pop can only be called within a read process surrounded by
+ * beginRead and endRead.
+ * 
+ * @fn Pipe#atEnd
+ * 
+ * @brief Check whether the @link Pipe @endlink object is at end.
+ * 
+ * @signature bool atEnd(pipe);
+ * 
+ * @param[in] pipe The @link Pipe @endlink object to query.
+ * 
+ * @return bool true in case of the pipe being at the end, false otherwise.
+ * 
+ * @fn Pipe#beginRead
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Initiates a read process.
+ * 
+ * @signature bool beginRead(object);
+ * 
+ * @param[in,out] object A pop-passive pipeline module.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * &lt;tt&gt;beginRead&lt;/tt&gt; rewinds the output stream, prepares &lt;tt&gt;object&lt;/tt&gt; for
+ * succeeding reads, and typically calls &lt;tt&gt;beginRead&lt;/tt&gt; of the input
+ * pipeline modules.
+ * 
+ * A read process must be terminated with endRead. Nested read processes are not
+ * allowed.
+ * 
+ * @see Pipe#endRead
+ * 
+ * @fn Pipe#endRead
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Terminates a read process.
+ * 
+ * @signature bool endRead(object);
+ * 
+ * @param[in,out] object A pop-passive pipeline module.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * &lt;tt&gt;endRead&lt;/tt&gt; closes the output stream, frees resources possibly allocated
+ * by beginRead, and typically calls &lt;tt&gt;endRead&lt;/tt&gt; of the input pipeline
+ * modules.
+ * 
+ * @see Pipe#beginRead
+ * 
+ * @fn Pipe#assign
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Assigns one object to another object.
+ * 
+ * @signature void assign(target, source);
+ * 
+ * @param[out] target Reference to assign to.
+ * @param[in] source Value to assign.
+ * 
+ * Assign value of source to target.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_localalignment" data-page="localAlignment">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>localAlignment - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>localAlignment<div><div>Computes the best pairwise local alignment using the Smith-Waterman algorithm.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>TScoreVal localAlignment(align, scoringScheme, [lowerDiag, upperDiag]);
+TScoreVal localAlignment(gapsH, gapsV, scoringScheme, [lowerDiag, upperDiag]);
+TScoreVal localAlignment(fragmentString, scoringScheme, [lowerDiag, upperDiag]);
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gapsH</code>
+            
+        
+        </th>
+        <td>Horizontal gapped sequence in alignment matrix. Types: <a href="class_Gaps.html" data-lang-entity="class">Gaps</a></td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">gapsV</code>
+            
+        
+        </th>
+        <td>Vertical gapped sequence in alignment matrix. Types: <a href="class_Gaps.html" data-lang-entity="class">Gaps</a></td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align</code>
+            
+        
+        </th>
+        <td>An <a href="class_Align.html" data-lang-entity="class">Align</a> object that stores the alignment. The
+number of rows must be 2 and the sequences must have already
+been set. <tt>align[0]</tt> is the horizontal one in the
+alignment matrix alignment, <tt>align[1]</tt> is the vertical
+one.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">fragmentString</code>
+            
+        
+        </th>
+        <td>String of <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> objects. The sequence
+with id <tt>0</tt> is the horizontal one, the sequence
+with id <tt>1</tt> is the vertical one.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme</code>
+            
+        
+        </th>
+        <td>The <a href="class_Score.html" data-lang-entity="class">scoring scheme</a> to use for the alignment.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">lowerDiag</code>
+            
+        
+        </th>
+        <td>Optional lower diagonal (<tt>int</tt>).</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">upperDiag</code>
+            
+        
+        </th>
+        <td>Optional upper diagonal (<tt>int</tt>).</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+<h2>Return Values</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>TScoreVal</code></th>
+        <td>Score value of the resulting alignment (Metafunction <a href="class_Score.html#Score#Value" data-lang-entity="interface_metafunction">Value</a> of the type of
+<tt>scoringScheme</tt>).</td>
+    </tr>
+
+</table>
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The Waterman-Eggert algorithm (local alignment with declumping) is available through the <a href="class_LocalAlignmentEnumerator.html" data-lang-entity="class">LocalAlignmentEnumerator</a> class.</p><p>When using <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> and <a href="class_Align.html" data-lang-entity="class">Align</a> objects, only parts (i.e. one infix) of each sequence will be
+aligned. This will be presented to the user by setting the clipping begin and end position of the gaps (the rows in
+the case of <a href="class_Align.html" data-lang-entity="class">Align</a> objects). When using <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> strings, these parts of the sequences
+will not appear in any fragment.</p><p>There exist multiple overloads for this function with two configuration dimensions.</p><p>First, you can select the type of the target storing the alignment. This can be either an <a href="class_Align.html" data-lang-entity="class">Align</a>
+object, two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects, or a string of <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> objects. <a href="class_Align.html" data-lang-entity="class">Align</a> objects
+provide an interface to tabular alignments with the restriction of all rows having the same type. Using two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects has the advantage that you an align sequences with different types, for example <a href="global_typedef_DnaString.html" data-lang-entity="global_typedef">DnaString</a> and <a href="global_typedef_Dna5String.html" data-lang-entity="global_typedef">Dna5String</a>. Using <a href="class_Fragment.html" data-lang-entity="class">Fragment</a> strings is useful for collecting many pairwise
+alignments, for example in the construction of <a href="specialization_AlignmentGraph.html" data-lang-entity="specialization">Alignment Graphs</a> for multiple- sequence
+alignments (MSA).</p><p>Second, you can optionally give a band for the alignment using <tt>lowerDiag</tt> and <tt>upperDiag</tt>. The center
+diagonal has index <tt>0</tt>, the <tt>i</tt>th diagonal below has index <tt>-i</tt>, the <tt>i</tt>th above has
+index <tt>i</tt>.</p><p>The examples below show some common use cases.</p><h3>Examples</h3><p>Local alignment of two sequences using an <a href="class_Align.html" data-lang-entity="class">Align</a> object.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Dna5String</span> <span class="n">seqH</span> <span class="o">=</span> <span class="s">&quot;CGATT&quot;</span><span class="p">;</span>
+<span class="n">Dna5String</span> <span class="n">seqV</span> <span class="o">=</span> <span class="s">&quot;CGAAATT&quot;</span><span class="p">;</span>
+
+<span class="n">Align</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">;</span>
+<span class="n">resize</span><span class="p">(</span><span class="n">rows</span><span class="p">(</span><span class="n">align</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+<span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">seqH</span><span class="p">);</span>
+<span class="n">assignSource</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">seqV</span><span class="p">);</span>
+<span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoringScheme</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">localAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">scoringScheme</span><span class="p">);</span>
+</pre></div>
+</div><p>Local banded alignment of two sequences using two <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects.</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Dna5String</span> <span class="n">seqH</span> <span class="o">=</span> <span class="s">&quot;CGATT&quot;</span><span class="p">;</span>
+<span class="n">Gaps</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="p">,</span> <span class="n">ArrayGaps</span><span class="o">&gt;</span> <span class="n">gapsH</span><span class="p">(</span><span class="n">seqH</span><span class="p">);</span>
+<span class="n">DnaString</span> <span class="n">seqV</span> <span class="o">=</span> <span class="s">&quot;CGAAATT&quot;</span><span class="p">;</span>
+<span class="n">Gaps</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="p">,</span> <span class="n">AnchorGaps</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="n">gapsV</span><span class="p">(</span><span class="n">seqV</span><span class="p">);</span>
+
+<span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">Simple</span><span class="o">&gt;</span> <span class="n">scoringScheme</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">localAlignment</span><span class="p">(</span><span class="n">gapsH</span><span class="p">,</span> <span class="n">gapsV</span><span class="p">,</span> <span class="n">scoringScheme</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div><p>http://seqan.readthedocs.org/en/develop/Tutorial/PairwiseSequenceAlignment.html</p><h3>References</h3><p><ul>
+<li>Smith TF, Waterman, MS: Identification of Common Molecular Subsequences. J Mol Biol 1981, 147(1):195-7.</li>
+</ul></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_LocalAlignmentEnumerator.html" data-lang-entity="class">LocalAlignmentEnumerator</a></li>
+  
+  <li><a href="group_PairwiseLocalAlignmentAlgorithms.html" data-lang-entity="group">PairwiseLocalAlignmentAlgorithms</a></li>
+  
+  <li><a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn localAlignment
+ * 
+ * @headerfile &lt;seqan/align.h&gt;
+ * 
+ * @brief Computes the best pairwise local alignment using the Smith-Waterman
+ *        algorithm.
+ * 
+ * @signature TScoreVal localAlignment(align, scoringScheme, [lowerDiag,
+ *            upperDiag]);
+ * @signature TScoreVal localAlignment(gapsH, gapsV, scoringScheme, [lowerDiag,
+ *            upperDiag]);
+ * @signature TScoreVal localAlignment(fragmentString, scoringScheme,
+ *            [lowerDiag, upperDiag]);
+ * 
+ * @param[in,out] gapsH Horizontal gapped sequence in alignment matrix. Types:
+ *                      @link Gaps @endlink
+ * @param[in,out] gapsV Vertical gapped sequence in alignment matrix. Types:
+ *                      @link Gaps @endlink
+ * @param[in,out] align An @link Align @endlink object that stores the
+ *                      alignment. The number of rows must be 2 and the
+ *                      sequences must have already been set. &lt;tt&gt;align[0]&lt;/tt&gt;
+ *                      is the horizontal one in the alignment matrix alignment,
+ *                      &lt;tt&gt;align[1]&lt;/tt&gt; is the vertical one.
+ * @param[in,out] fragmentString  String of @link Fragment @endlink objects. The
+ *                               sequence with id &lt;tt&gt;0&lt;/tt&gt; is the horizontal
+ *                               one, the sequence with id &lt;tt&gt;1&lt;/tt&gt; is the
+ *                               vertical one.
+ * @param[in] scoringScheme  The @link Score scoring scheme @endlink to use for
+ *                          the alignment.
+ * @param[in] lowerDiag Optional lower diagonal (&lt;tt&gt;int&lt;/tt&gt;).
+ * @param[in] upperDiag Optional upper diagonal (&lt;tt&gt;int&lt;/tt&gt;).
+ * 
+ * @return TScoreVal Score value of the resulting alignment (Metafunction @link
+ *                   Score#Value @endlink of the type of
+ *                   &lt;tt&gt;scoringScheme&lt;/tt&gt;).
+ * 
+ * The Waterman-Eggert algorithm (local alignment with declumping) is available
+ * through the @link LocalAlignmentEnumerator @endlink class.
+ * 
+ * When using @link Gaps @endlink and @link Align @endlink objects, only parts
+ * (i.e. one infix) of each sequence will be aligned. This will be presented to
+ * the user by setting the clipping begin and end position of the gaps (the rows
+ * in the case of @link Align @endlink objects). When using @link Fragment
+ * @endlink strings, these parts of the sequences will not appear in any
+ * fragment.
+ * 
+ * There exist multiple overloads for this function with two configuration
+ * dimensions.
+ * 
+ * First, you can select the type of the target storing the alignment. This can
+ * be either an @link Align @endlink object, two @link Gaps @endlink objects, or
+ * a string of @link Fragment @endlink objects. @link Align @endlink objects
+ * provide an interface to tabular alignments with the restriction of all rows
+ * having the same type. Using two @link Gaps @endlink objects has the advantage
+ * that you an align sequences with different types, for example @link DnaString
+ * @endlink and @link Dna5String @endlink. Using @link Fragment @endlink strings
+ * is useful for collecting many pairwise alignments, for example in the
+ * construction of @link AlignmentGraph Alignment Graphs @endlink for multiple-
+ * sequence alignments (MSA).
+ * 
+ * Second, you can optionally give a band for the alignment using
+ * &lt;tt&gt;lowerDiag&lt;/tt&gt; and &lt;tt&gt;upperDiag&lt;/tt&gt;. The center diagonal has index
+ * &lt;tt&gt;0&lt;/tt&gt;, the &lt;tt&gt;i&lt;/tt&gt;th diagonal below has index &lt;tt&gt;-i&lt;/tt&gt;, the
+ * &lt;tt&gt;i&lt;/tt&gt;th above has index &lt;tt&gt;i&lt;/tt&gt;.
+ * 
+ * The examples below show some common use cases.
+ * 
+ * @section Examples
+ * 
+ * Local alignment of two sequences using an @link Align @endlink object.
+ * 
+ * @code{.cpp}
+ * Dna5String seqH = &#34;CGATT&#34;;
+ * Dna5String seqV = &#34;CGAAATT&#34;;
+ * 
+ * Align&lt;Dna5String&gt; align;
+ * resize(rows(align), 2);
+ * assignSource(row(align, 0), seqH);
+ * assignSource(row(align, 0), seqV);
+ * Score&lt;int, Simple&gt; scoringScheme(2, -1, -2);
+ * 
+ * int result = localAlignment(align, scoringScheme);
+ * @endcode
+ * 
+ * 
+ * Local banded alignment of two sequences using two @link Gaps @endlink
+ * objects.
+ * 
+ * @code{.cpp}
+ * Dna5String seqH = &#34;CGATT&#34;;
+ * Gaps&lt;Dna5String, ArrayGaps&gt; gapsH(seqH);
+ * DnaString seqV = &#34;CGAAATT&#34;;
+ * Gaps&lt;Dna5String, AnchorGaps&lt;&gt; &gt; gapsV(seqV);
+ * 
+ * Score&lt;int, Simple&gt; scoringScheme(5, -3, -1, -5);
+ * 
+ * int result = localAlignment(gapsH, gapsV, scoringScheme, -2, 2);
+ * @endcode
+ * 
+ * 
+ * http://seqan.readthedocs.org/en/develop/Tutorial/PairwiseSequenceAlignment.ht
+ * ml
+ * 
+ * @section References
+ * 
+ * &lt;ul&gt; &lt;li&gt;Smith TF, Waterman, MS: Identification of Common Molecular
+ * Subsequences. J Mol Biol 1981, 147(1):195-7.&lt;/li&gt; &lt;/ul&gt;
+ * 
+ * @see globalAlignment
+ * @see LocalAlignmentEnumerator
+ * @see PairwiseLocalAlignmentAlgorithms
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

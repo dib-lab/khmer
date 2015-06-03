@@ -1,0 +1,1223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_unionfind" data-page="UnionFind">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>UnionFind - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>UnionFind<div><div>Union-Find data structure.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/misc/union_find.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename T&gt;
+class UnionFind;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">T</a></code></th>
+        <td>The integer type the data structure operates on.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23clear" title="#UnionFind#clear (interface function)" data-lang-entity="interface_function">void clear(uf);</a></code></span>
+    <span class="summary_desc"><div>Clear the Union-Find data structure.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23findSet" title="#UnionFind#findSet (interface function)" data-lang-entity="interface_function">TValue findSet(uf, q);</a></code></span>
+    <span class="summary_desc"><div>Return set identifier, given an element identifier.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23joinSets" title="#UnionFind#joinSets (interface function)" data-lang-entity="interface_function">void joinSets(uf, left, right);</a></code></span>
+    <span class="summary_desc"><div>UNION() operation for Union-Find data structure.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23length" title="#UnionFind#length (interface function)" data-lang-entity="interface_function">TSize length(uf);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of entries in the Union-Find object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23resize" title="#UnionFind#resize (interface function)" data-lang-entity="interface_function">TSize resize(uf, size, tag);</a></code></span>
+    <span class="summary_desc"><div>Allocate number of elements for the Union-Find object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23resizeVertexMap" title="#UnionFind#resizeVertexMap (interface function)" data-lang-entity="interface_function">TSize resizeVertexMap(uf, g);</a></code></span>
+    <span class="summary_desc"><div>Resize Union-Find data structure to appropriate size for a vertex map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23reverse" title="#UnionFind#reverse (interface function)" data-lang-entity="interface_function">void reserve(uf, size, tag);</a></code></span>
+    <span class="summary_desc"><div>Reserve memory for the Union-Find object.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23GetValue" title="#UnionFind#GetValue (interface function)" data-lang-entity="interface_metafunction">GetValue&lt;TUnionFind&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the get-value type for the given UnionFind specialization.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23Size" title="#UnionFind#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TUnionFind&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the size type for the given UnionFind specialization.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#UnionFind%23Value" title="#UnionFind#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TUnionFind&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Returns the value type for the given UnionFind specialization.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The data structure uses union by rank and path compresison to achieve almost linear running time.</p><p>Note that internally T is used as signed, so not the whole range is available if T is unsigned.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="UnionFind#clear" class="signature first" data-lang-entity="interface_function">
+      <code>void clear(uf);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear the Union-Find data structure.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to clear</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#findSet" class="signature" data-lang-entity="interface_function">
+      <code>TValue findSet(uf, q);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return set identifier, given an element identifier.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">q</code>
+            
+        
+      </th>
+      <td>The value to get the set identifier for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Identifier of the set that <tt>q</tt> is in (Metafunction: <a href="class_UnionFind.html#UnionFind#Value" data-lang-entity="interface_metafunction">Value</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">joinSets</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#joinSets" class="signature" data-lang-entity="interface_function">
+      <code>void joinSets(uf, left, right);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>UNION() operation for Union-Find data structure.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">uf</code>
+            
+        
+      </th>
+      <td>The type the data structure operates on.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>Representant of the left set to union.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>Representant of the right set to union.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function is called <tt>join</tt> and not <tt>union</tt> since <tt>union</tt> is a reserved keyword in the
+C and C++ programming languages.</p><p>Note that you most likely want to put return values of <tt>findSet()</tt> as the values for <tt>left</tt> and
+<tt>right</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">findSet</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(uf);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of entries in the Union-Find object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The length of the Union-Find object (Metafunction: <a href="class_UnionFind.html#UnionFind#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#resize" class="signature" data-lang-entity="interface_function">
+      <code>TSize resize(uf, size, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Allocate number of elements for the Union-Find object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The number of elements to reserve.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag to use for reserving (defaults to <tt>Generous()</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The new length of the Union-Find object (Metafunction: <a href="class_UnionFind.html#UnionFind#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The UF dat structure is resized to the given <tt>size</tt>, the value for each element is set to -1, i.e. they
+are singletons by default.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#resizeVertexMap" class="signature" data-lang-entity="interface_function">
+      <code>TSize resizeVertexMap(uf, g);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resize Union-Find data structure to appropriate size for a vertex map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">g</code>
+            
+        
+      </th>
+      <td>The graph to use for getting the vertex number.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>New size of the vertex map (Metafunction: <a href="class_UnionFind.html#UnionFind#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="UnionFind#reverse" class="signature" data-lang-entity="interface_function">
+      <code>void reserve(uf, size, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reserve memory for the Union-Find object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">uf</code>
+            
+        
+      </th>
+      <td>The Union-Find object to reserve memory in.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">size</code>
+            
+        
+      </th>
+      <td>The number of elements to reserve.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag to use for reserving (defaults to <tt>Generous()</tt>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="UnionFind#GetValue" class="signature first" data-lang-entity="interface_metafunction">
+    <code>GetValue&lt;TUnionFind&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the get-value type for the given UnionFind specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TUnionFind</code></th>
+            <td>The UnionFind specialization to query for its get-value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="UnionFind#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TUnionFind&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the size type for the given UnionFind specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TUnionFind</code></th>
+            <td>The UnionFind specialization to query for its size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="UnionFind#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TUnionFind&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the value type for the given UnionFind specialization.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TUnionFind</code></th>
+            <td>The UnionFind specialization to query for its value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class UnionFind
+ * 
+ * @headerfile &lt;seqan/misc/union_find.h&gt;
+ * 
+ * @brief Union-Find data structure.
+ * 
+ * @signature template &lt;typename T&gt; class UnionFind;
+ * 
+ * @tparam T The integer type the data structure operates on.
+ * 
+ * The data structure uses union by rank and path compresison to achieve almost
+ * linear running time.
+ * 
+ * Note that internally T is used as signed, so not the whole range is available
+ * if T is unsigned.
+ * 
+ * @mfn UnionFind#Value
+ * 
+ * @brief Returns the value type for the given UnionFind specialization.
+ * 
+ * @signature Value&lt;TUnionFind&gt;::Type
+ * 
+ * @tparam TUnionFind The UnionFind specialization to query for its value type.
+ * 
+ * @mfn UnionFind#GetValue
+ * 
+ * @brief Returns the get-value type for the given UnionFind specialization.
+ * 
+ * @signature GetValue&lt;TUnionFind&gt;::Type
+ * 
+ * @tparam TUnionFind The UnionFind specialization to query for its get-value
+ *                    type.
+ * 
+ * @mfn UnionFind#Size
+ * 
+ * @brief Returns the size type for the given UnionFind specialization.
+ * 
+ * @signature Size&lt;TUnionFind&gt;::Type
+ * 
+ * @tparam TUnionFind The UnionFind specialization to query for its size type.
+ * 
+ * @fn UnionFind#clear
+ * 
+ * @brief Clear the Union-Find data structure.
+ * 
+ * @signature void clear(uf);
+ * 
+ * @param[in,out] uf The Union-Find object to clear
+ * 
+ * @fn UnionFind#length
+ * 
+ * @brief Returns the number of entries in the Union-Find object.
+ * 
+ * @signature TSize length(uf);
+ * 
+ * @param[in] uf The Union-Find object to query.
+ * 
+ * @return TSize The length of the Union-Find object (Metafunction: @link
+ *               UnionFind#Size @endlink).
+ * 
+ * @fn UnionFind#reverse
+ * 
+ * @brief Reserve memory for the Union-Find object.
+ * 
+ * @signature void reserve(uf, size, tag);
+ * 
+ * @param[in,out] uf The Union-Find object to reserve memory in.
+ * @param[in] size The number of elements to reserve.
+ * @param[in] tag The tag to use for reserving (defaults to
+ *                &lt;tt&gt;Generous()&lt;/tt&gt;).
+ * 
+ * @fn UnionFind#resize
+ * 
+ * @brief Allocate number of elements for the Union-Find object.
+ * 
+ * @signature TSize resize(uf, size, tag);
+ * 
+ * @param[in,out] uf The Union-Find object to resize.
+ * @param[in] size The number of elements to reserve.
+ * @param[in] tag The tag to use for reserving (defaults to
+ *                &lt;tt&gt;Generous()&lt;/tt&gt;).
+ * 
+ * @return TSize The new length of the Union-Find object (Metafunction: @link
+ *               UnionFind#Size @endlink).
+ * 
+ * The UF dat structure is resized to the given &lt;tt&gt;size&lt;/tt&gt;, the value for
+ * each element is set to -1, i.e. they are singletons by default.
+ * 
+ * @fn UnionFind#resizeVertexMap
+ * 
+ * @brief Resize Union-Find data structure to appropriate size for a vertex map.
+ * 
+ * @signature TSize resizeVertexMap(uf, g);
+ * 
+ * @param[in,out] uf The Union-Find object to resize.
+ * @param[in] g The graph to use for getting the vertex number.
+ * 
+ * @return TSize New size of the vertex map (Metafunction: @link UnionFind#Size
+ *               @endlink).
+ * 
+ * @fn UnionFind#findSet
+ * 
+ * @brief Return set identifier, given an element identifier.
+ * 
+ * @signature TValue findSet(uf, q);
+ * 
+ * @param[in] uf The Union-Find object to query.
+ * @param[in] q The value to get the set identifier for.
+ * 
+ * @return TValue Identifier of the set that &lt;tt&gt;q&lt;/tt&gt; is in (Metafunction:
+ *                @link UnionFind#Value @endlink).
+ * 
+ * @see UnionFind#joinSets
+ * 
+ * @fn UnionFind#joinSets
+ * 
+ * @brief UNION() operation for Union-Find data structure.
+ * 
+ * @signature void joinSets(uf, left, right);
+ * 
+ * @param[in,out] uf The type the data structure operates on.
+ * @param[in] left Representant of the left set to union.
+ * @param[in] right Representant of the right set to union.
+ * 
+ * This function is called &lt;tt&gt;join&lt;/tt&gt; and not &lt;tt&gt;union&lt;/tt&gt; since
+ * &lt;tt&gt;union&lt;/tt&gt; is a reserved keyword in the C and C++ programming languages.
+ * 
+ * Note that you most likely want to put return values of &lt;tt&gt;findSet()&lt;/tt&gt; as
+ * the values for &lt;tt&gt;left&lt;/tt&gt; and &lt;tt&gt;right&lt;/tt&gt;.
+ * 
+ * @see UnionFind#findSet
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

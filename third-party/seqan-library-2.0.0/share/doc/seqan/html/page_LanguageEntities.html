@@ -1,0 +1,729 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="page_languageentities" data-page="LanguageEntities">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Language Entity Types - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<div id="filecontents">
+<h1 data-lang-entity="page" data-pimped="true">
+  <a href="page_LanguageEntities.html#page">Page</a> <span>Language Entity Types</span>
+</h1>
+
+<div class="docstring">
+  <div class="discussion">
+    <!-- @brief -->
+    
+    
+    <!-- paragraphs -->
+    
+<div><p>SeqAn is a C++ template library that relies on template metaprogramming to achieve good performance and maintainability. Our way of using C++ template metaprogramming introduces some approaches that might be unfamiliar to you.</p><p>For example, functions that would to be member functions in OOP are technically implemented as global functions. For this reason we semantically annotated all variables, functions, metafunctions, classes, etc. throughout the whole online documentation with a <span class="data-lang-entity-example"><span>small label</span></span> to tell you with what you're semantically dealing - although there sometimes is no technical counterpart.</p><p>We call the above mentioned things like variables, functions, metafunctions, classes, etc. <acronym title="Imagine you're trying to understand some piece of code. The code consists of units normally separated by white-spaces or the like. Those units can hold a value (variable), group a sequence of commands (function) or represent a template for some object (class). All of these units we call language entity type.">language entity type</acronym>s. This page serves as a reference for the language entity types used in SeqAn and answers the following questions:</p><p><ul>
+<li>What is each language entity type originally <b>meant to do</b>?</li>
+<li>How is each language entity type <b>used in SeqAn</b>?</li>
+<li>What <b>variants</b> of each language entity type exist?</li>
+</ul></p> <h2 data-lang-entity="typedef" id="typedef">Typedef</h2> <p><strong>Typedefs are a common, standardized C++ language feature that allows to give custom names to arbitrary types.</strong></p><p>When programming SeqAn, they are often used for giving short names to complicated, nested template instantiations or to the result of a <a href="#metafunction">metafunction</a>.</p> <h3 data-toc="hidden">Example</h3> <p>The following example shows you how the lengthy type <code>Iterator&lt;String&lt;char, Alloc&lt;&gt; &gt;::Type</code> is shortened to <code>TIt</code>.
+(<a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a> is a <a href="#metafunction">metafunction</a> that returns the iterator type of a container).</p><div data-src-path="None"><div class="highlight"><pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">typename</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="n">Alloc</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">TIt</span><span class="p">;</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">TIt</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+</pre></div>
+</div> <h2 data-lang-entity="concept" id="concept">Concept</h2> <p><strong>Concepts are a rarely used, not yet standardized C++ language feature. They are <u>informal interfaces</u> that define a set of requirements for a type.</strong></p><p>In contrast to Java interfaces, C++ concepts can be added to custom types and built-in types without having access to the source code of the type. You might know the typical (Java) interface limitation if you ever tried to make a built-in type implement a custom interface.</p><p>Concepts are currently still a proposal for a future C++ language release and thus not respected by IDEs and compilers. As a consequence, your IDE can't tell you if a concept's function is actually implemented for a given <a href="#class">class</a> or not. You may still expect the implementation to exist for an implementing <a href="#class">class</a> because this is what the SeqAn library guarantees. Functions and metafunctions that are part of a concept are called <a href="#interface_function">interface functions</a> respectively <a href="#interface_metafunction">interface metafunctions</a>.</p> <h3 data-toc="hidden">Example</h3> <p>You can expect the globally implemented interface functions <a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a>, <a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a>, <a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#assignValue" data-lang-entity="interface_function">assignValue</a> and many others to work with <a href="class_String.html" data-lang-entity="class">String</a> because they are part of <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a> which is implemented by <a href="class_String.html" data-lang-entity="class">String</a>.</p> <h3 data-toc="hidden">External Resources</h3> <p>See the <a href="http://en.cppreference.com/w/cpp/concept">concepts chapter at cppreference.com</a>.</p> <h2 data-lang-entity="class" id="class">Class</h2> <p><strong>Classes are a common, standardized C++ language feature. It allows the definition of custom types using classes that basically encapsulate variables and functions.</strong></p><p>In SeqAn, classes usually have few or no technical member functions. Instead, their <a href="#member_function">member functions</a> are implemented globally and typically expect the class instance as the first argument.</p><p>SeqAn provides many class templates that are roughly comparable to Java Generic.</p> <h3 data-toc="hidden">Example</h3> <p>The following example shows a class template for objects that can hold two values of the same type.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">template</span> <span class="n">class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">Pair</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">T</span> <span class="n">values</span> <span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+    <span class="n">Pair</span> <span class="p">(</span><span class="n">T</span> <span class="n">first</span><span class="p">,</span> <span class="n">T</span> <span class="n">second</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span><span class="p">;</span>
+      <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">second</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div><p><code>Pair</code> can now be instantiated using <code>Pair&lt;int&gt; myPair1(42, 115);</code> or <code>Pair&lt;float&gt;(3.141, 2.72);</code>.</p> <h3 data-toc="hidden">Variants</h3> <p><dl>
+<dt id="specialization" data-lang-entity="specialization">specialization</dt>
+<dd><p>Specializations are similar to subclasses but the mechanism uses template specialization instead of C++ subclassing.</p>
+<p>In SeqAn, this is widely used in containers such as strings or indices to achieve good performance.</p>
+</dd>
+<dt id="struct">struct</dt>
+<dd><p>C++ inherited <code>struct</code>s from C. Structs and classes are very similar, the main difference is that all members of structs are declared with public visibility by default.</p>
+<p>In SeqAn, structs are used instead of classes for simple record types that only store data and do not provide any major logic through interface or member functions.</p>
+</dd>
+</dl></p> <h3 data-toc="hidden">Example</h3> <p>The following shows a class <code>Klass</code> that is specialized two times using the tags <code>OneKlass</code> and <code>AnotherKlass</code>.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">struct</span> <span class="n">OneKlass_</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="n">seqan</span><span class="o">::</span><span class="n">Tag</span><span class="o">&lt;</span><span class="n">OneKlass_</span><span class="o">&gt;</span> <span class="n">OneKlass</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">OtherKlass_</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="n">seqan</span><span class="o">::</span><span class="n">Tag</span><span class="o">&lt;</span><span class="n">OtherKlass_</span><span class="o">&gt;</span> <span class="n">OtherKlass</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">Klass</span><span class="p">;</span>
+<span class="c1">// Note that the body here is optional.  In this case, we create this class &quot;abstract&quot;.</span>
+
+<span class="k">template</span> <span class="o">&lt;&gt;</span>
+<span class="k">class</span> <span class="nc">Klass</span><span class="o">&lt;</span><span class="n">OneKlass</span><span class="o">&gt;</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">template</span> <span class="o">&lt;&gt;</span>
+<span class="k">class</span> <span class="nc">Klass</span><span class="o">&lt;</span><span class="n">OtherKlass</span><span class="o">&gt;</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">double</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div><p><h2 id="enum" data-lang-entity="enum">Enum</h2></p><p><strong>Enums are a common, standardized C++ feature that allow the definition of a set of named, <u>enum</u>erable integral constants.</strong></p><p>In SeqAn, they are mainly used to define the integral value of the <code>VALUE</code> member of a metafunction, e.g. <code>Log2&lt;32&gt;::VALUE</code>.</p> <h3 data-toc="hidden">Example</h3> <p>In the following example, the enum <code>MyEnum</code> with the constants <code>ENUM_VALUE1</code> and <code>ENUM_VALUE2</code> is defined.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">enum</span> <span class="n">MyEnum</span>
+<span class="p">{</span>
+     <span class="n">ENUM_VALUE1</span><span class="p">,</span>
+     <span class="n">ENUM_VALUE2</span>
+<span class="p">};</span>
+</pre></div>
+</div><p>You may later write <code>MyEnum x = ENUM_VALUE2</code>.</p><p>The following example defines the <a href="#metafunction">metafunction</a> <code>QualityValueSize</code> using a template struct.
+The struct contains an unnamed enum with a single integral constant named <code>VALUE</code> that has the value <code>63</code>.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;&gt;</span>
+<span class="k">struct</span> <span class="n">QualityValueSize</span><span class="o">&lt;</span><span class="n">Dna5Q</span><span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="k">enum</span> <span class="p">{</span> <span class="n">VALUE</span> <span class="o">=</span> <span class="mi">63</span> <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div><p>Later you may write <code>int x = QualityValueSize&lt;Dna5Q&gt;::VALUE</code> whichs results in <code>63</code> and is calculated at compile-time.</p><p>If the enum was named (e.g. <code>MyEnum</code>) you would have to write <code>int x = QualityValueSize&lt;Dna5Q&gt;::MyEnum::VALUE (TODO: How is the correct syntax?!?!?!)</code>.&lt;</p> <h2 data-lang-entity="metafunction" id="metafunction">Metafunction</h2> <p><strong>Metafunctions are a rarely used, not yet standardized C++ language feature that allows for compile-time evaluated functions.</strong></p><p>In contrast to standard <a href="#function">functions</a> that use objects as arguments and optionally return an object, metafunctions use types as arguments and return a type or an integral value.</p><p>In SeqAn, they are mainly used to retrieve the appropriate type for a specific task, such as the iteration over a <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</p><p>See the <a href="http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Metafunction">Metafunctions in the More C++ Idioms Wikibook</a> for more information.</p> <h3 data-toc="hidden">Example</h3> <p>The following two examples iterate over each character of <code>str</code> and print it.
+The first example is not recommended but purely demonstrates the use of a metafunction.
+The second example shows the recommended use of metafunctions in combination with a <a href="#typedef">typedef</a>.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">typename</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="n">Alloc</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</pre></div>
+</div><div data-src-path="None"><div class="highlight"><pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">typename</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="n">Alloc</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">TIt</span><span class="p">;</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">TIt</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">Standard</span><span class="p">());</span> <span class="o">++</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">it</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</pre></div>
+</div> <h3 data-toc="hidden">Variants</h3> <p><dl>
+<dt id="global_metafunction" data-lang-entity="global_metafunction">Global Metafunction</dt>
+<dd><p>Global metafunctions are technically and semantically implemented globally.</p></dd>
+<dd><p>A typical global metafunctions is <a href="group_MetaprogrammingMath.html#MetaprogrammingMath#Log2" data-lang-entity="interface_metafunction">Log2</a>.</p></dd>
+<dt id="interface_metafunction" data-lang-entity="interface_metafunction">Interface Metafunction</dt>
+<dd><p>Interface metafunctions semantically belong to one or more <a href="#concept">concepts</a>.
+Types that implement a specific concept are guaranteed to work with all interface functions belonging to this specific concept.</p>
+<p>Example: <span data-pimped="true" data-lang-entity="class"><a href="page_LanguageEntities.html#class">Class</a><a href="class_String.html">String</a></span> implement <span data-pimped="true" data-lang-entity="concept"><a href="page_LanguageEntities.html#concept">Concept</a><a href="concept_StringConcept.html">StringConcept</a></span>. Since the metafunction <span data-pimped="true" data-lang-entity="global_function"><a href="page_LanguageEntities.html#global_function">fn()</a><a href="global_function_append.html">append</a></span> is part of <span data-pimped="true" data-lang-entity="concept"><a href="page_LanguageEntities.html#concept">Concept</a><a href="concept_StringConcept.html">StringConcept</a></span>, <span data-pimped="true" data-lang-entity="global_function"><a href="page_LanguageEntities.html#global_function">fn()</a><a href="global_function_append.html">append</a></span> accepts <span data-pimped="true" data-lang-entity="class"><a href="page_LanguageEntities.html#class">Class</a><a href="class_String.html">String</a></span> as an argument.</p></dd>
+<dd><p>Although <a href="#concept">concepts</a> are formally specified they are not yet part of the C++ language and thus ignored by compilers. As a consequence your IDE will pretty certainly not stop you from using a metafunction with a type that does not implements one of the metafunction's concepts.</p></dd>
+</dl></p> <h2 data-lang-entity="function" id="function">Function</h2> <p><strong>Functions are a common, fundamental C++ feature and the basic building block for programs.</strong></p> <h3 data-toc="hidden">Example</h3> <p>A runnable C++ program always contains a <code>main</code> function.</p><div data-src-path="None"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div><p><h3 data-toc="hidden">Variants</h3></p><p><dl>
+<dt id="global_function" data-lang-entity="global_function">Global Function</dt>
+<dd><p>Global functions are defined outside any class and not directly connected to one class.
+They might be in a namespace (such as the <code>seqan</code> namespace).</p>
+</dd>
+<dd>Examples are the functions for the global and local alignment, e.g. <a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a> and <a href="global_function_localAlignment.html" data-lang-entity="global_function">localAlignment</a>. These functions use many classes to realize their behaviour but do not directly belong to any of the signature's data types.</dd>
+<dt id="interface_function" data-lang-entity="interface_function">Interface Function</dt>
+<dd><p>SeqAn uses global interface functions instead of member functions.
+This allows (1) to extend types without access to their source code and (2) to use template-based inheritance and static type dispatching.</p>
+</dd>
+<dt id="member_function" data-lang-entity="member_function">Member Function</dt>
+<dd><p>Member functions are a standard C++ function. They are defined in classes or structs.</p></dd>
+<dd><p>In SeqAn, few member functions are used in the interface of types. Of course, the constructor, and destructor are always implemented as member functions.</p></dd>
+</dl></p> <h2 data-lang-entity="tag" id="tag">Tag</h2> <p>Tags are classes that are only used for their type. They are often used for tag-based dispatching.</p> <h2 data-lang-entity="variable" id="variable">Variable</h2> <p>Variables are a standard C++ feature.</p> <h2 data-lang-entity="adaption" id="adaption">Adaption</h2> <p>Adaptions are collections of functions and metafunctions that make a type <b>T</b> follow an interface <b>C</b>. This can be used to make a class from an external library follow a SeqAn concept.</p> <h3 data-toc="hidden">Example</h3> <p>The following shows a small part of the adaption of <code>std::string</code> to the <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>: the implementation of the length functions.</p><div data-src-path="None"><div class="highlight"><pre><span class="cp">#include &lt;string&gt;</span>
+
+<span class="k">namespace</span> <span class="n">seqan</span>
+<span class="p">{</span>
+
+<span class="kt">size_t</span> <span class="n">length</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">str</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="p">};</span>  <span class="c1">// namespace seqan</span>
+</pre></div>
+</div> <h2 data-lang-entity="macro" id="macro">Macro</h2> <p>Macros are pieces of code evaluated by the C preprocessor.</p><p>All SeqAn macros are prefixed with <tt>SEQAN_</tt>.</p> <h3 data-toc="hidden">Example</h3> <div data-src-path="None"><div class="highlight"><pre><span class="c1">// If SeqAn would provide a macro to compute the square of a number, it would</span>
+<span class="c1">// look as follows.</span>
+<span class="cp">#define SEQAN_SQUARE(x) (x * x)</span>
+
+<span class="c1">// In applications and user code, it could be used as follows:</span>
+<span class="cp">#define SQUARE(x) (x * x)</span>
+
+<span class="c1">// The SeqAn library defines the SEQAN_ASSERT* macros, for example:</span>
+<span class="n">SEQAN_ASSERT_EQ</span><span class="p">(</span><span class="n">SQUARE</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">100</span><span class="p">);</span>
+</pre></div>
+</div> <h2 data-lang-entity="template_parameter" id="template_parameter">Template Parameter</h2> <p>Templates can take types or constant integral values as parameters.</p></div>
+
+  </div>
+</div>
+
+<!-- @see -->
+
+</div>
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>@page LanguageEntities Language Entity Types
+
+SeqAn is a C++ template library that relies on template metaprogramming to
+achieve good performance and maintainability. Our way of using C++ template
+metaprogramming introduces some approaches that might be unfamiliar to you.
+
+For example, functions that would to be member functions in OOP are
+technically implemented as global functions. For this reason we semantically
+annotated all variables, functions, metafunctions, classes, etc. throughout
+the whole online documentation with a &lt;span class=&#34;data-lang-entity-
+example&#34;&gt;&lt;span&gt;small label&lt;/span&gt;&lt;/span&gt; to tell you with what you&#39;re
+semantically dealing - although there sometimes is no technical counterpart.
+
+We call the above mentioned things like variables, functions, metafunctions,
+classes, etc. &lt;acronym title=&#34;Imagine you&#39;re trying to understand some piece
+of code. The code consists of units normally separated by white-spaces or the
+like. Those units can hold a value (variable), group a sequence of commands
+(function) or represent a template for some object (class). All of these
+units we call language entity type.&#34;&gt;language entity type&lt;/acronym&gt;s. This
+page serves as a reference for the language entity types used in SeqAn and
+answers the following questions:
+
+&lt;ul&gt; &lt;li&gt;What is each language entity type originally &lt;b&gt;meant to
+do&lt;/b&gt;?&lt;/li&gt; &lt;li&gt;How is each language entity type &lt;b&gt;used in SeqAn&lt;/b&gt;?&lt;/li&gt;
+&lt;li&gt;What &lt;b&gt;variants&lt;/b&gt; of each language entity type exist?&lt;/li&gt; &lt;/ul&gt;
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;typedef&#34; id=&#34;typedef&#34;&gt;Typedef&lt;/h2&gt; @endhtmlonly
+
+
+&lt;strong&gt;Typedefs are a common, standardized C++ language feature that allows
+to give custom names to arbitrary types.&lt;/strong&gt;
+
+When programming SeqAn, they are often used for giving short names to
+complicated, nested template instantiations or to the result of a &lt;a
+href=&#34;#metafunction&#34;&gt;metafunction&lt;/a&gt;.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+The following example shows you how the lengthy type
+&lt;code&gt;Iterator&amp;lt;String&amp;lt;char, Alloc&amp;lt;&amp;gt; &amp;gt;::Type&lt;/code&gt; is
+shortened to &lt;code&gt;TIt&lt;/code&gt;. (@link ContainerConcept#Iterator @endlink is a
+&lt;a href=&#34;#metafunction&#34;&gt;metafunction&lt;/a&gt; that returns the iterator type of a
+container).
+
+@code{.cpp}
+using namespace seqan;
+
+typedef typename Iterator&lt;String&lt;char, Alloc&lt;&gt; &gt;::Type TIt;
+
+for (TIt it = begin(str, Standard()); it != end(str, Standard()); ++it)
+    std::cout &lt;&lt; *it;
+@endcode
+
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;concept&#34; id=&#34;concept&#34;&gt;Concept&lt;/h2&gt; @endhtmlonly
+
+
+&lt;strong&gt;Concepts are a rarely used, not yet standardized C++ language
+feature. They are &lt;u&gt;informal interfaces&lt;/u&gt; that define a set of
+requirements for a type.&lt;/strong&gt;
+
+In contrast to Java interfaces, C++ concepts can be added to custom types and
+built-in types without having access to the source code of the type. You
+might know the typical (Java) interface limitation if you ever tried to make
+a built-in type implement a custom interface.
+
+Concepts are currently still a proposal for a future C++ language release and
+thus not respected by IDEs and compilers. As a consequence, your IDE can&#39;t
+tell you if a concept&#39;s function is actually implemented for a given &lt;a
+href=&#34;#class&#34;&gt;class&lt;/a&gt; or not. You may still expect the implementation to
+exist for an implementing &lt;a href=&#34;#class&#34;&gt;class&lt;/a&gt; because this is what the
+SeqAn library guarantees. Functions and metafunctions that are part of a
+concept are called &lt;a href=&#34;#interface_function&#34;&gt;interface functions&lt;/a&gt;
+respectively &lt;a href=&#34;#interface_metafunction&#34;&gt;interface metafunctions&lt;/a&gt;.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+You can expect the globally implemented interface functions @link
+ContainerConcept#appendValue @endlink, @link ContainerConcept#append
+@endlink, @link RandomAccessContainerConcept#assignValue @endlink and many
+others to work with @link String @endlink because they are part of @link
+StringConcept @endlink which is implemented by @link String @endlink.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;External Resources&lt;/h3&gt; @endhtmlonly
+
+
+See the &lt;a href=&#34;http://en.cppreference.com/w/cpp/concept&#34;&gt;concepts chapter
+at cppreference.com&lt;/a&gt;.
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;class&#34; id=&#34;class&#34;&gt;Class&lt;/h2&gt; @endhtmlonly
+
+
+&lt;strong&gt;Classes are a common, standardized C++ language feature. It allows
+the definition of custom types using classes that basically encapsulate
+variables and functions.&lt;/strong&gt;
+
+In SeqAn, classes usually have few or no technical member functions. Instead,
+their &lt;a href=&#34;#member_function&#34;&gt;member functions&lt;/a&gt; are implemented
+globally and typically expect the class instance as the first argument.
+
+SeqAn provides many class templates that are roughly comparable to Java
+Generic.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+The following example shows a class template for objects that can hold two
+values of the same type.
+
+@code{.cpp}
+template class&lt;T&gt;
+class Pair
+{
+public:
+    T values [2];
+
+    Pair (T first, T second)
+    {
+      values[0] = first;
+      values[1] = second;
+    }
+};
+@endcode
+
+
+&lt;code&gt;Pair&lt;/code&gt; can now be instantiated using &lt;code&gt;Pair&amp;lt;int&amp;gt;
+myPair1(42, 115);&lt;/code&gt; or &lt;code&gt;Pair&amp;lt;float&amp;gt;(3.141, 2.72);&lt;/code&gt;.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Variants&lt;/h3&gt; @endhtmlonly
+
+
+&lt;dl&gt; &lt;dt data-lang-entity=&#34;specialization&#34;
+id=&#34;specialization&#34;&gt;specialization&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;Specializations are similar to
+subclasses but the mechanism uses template specialization instead of C++
+subclassing.&lt;/p&gt; &lt;p&gt;In SeqAn, this is widely used in containers such as
+strings or indices to achieve good performance.&lt;/p&gt; &lt;/dd&gt; &lt;dt
+id=&#34;struct&#34;&gt;struct&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;C++ inherited &lt;code&gt;struct&lt;/code&gt;s from C.
+Structs and classes are very similar, the main difference is that all members
+of structs are declared with public visibility by default.&lt;/p&gt; &lt;p&gt;In SeqAn,
+structs are used instead of classes for simple record types that only store
+data and do not provide any major logic through interface or member
+functions.&lt;/p&gt; &lt;/dd&gt; &lt;/dl&gt;
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+The following shows a class &lt;code&gt;Klass&lt;/code&gt; that is specialized two times
+using the tags &lt;code&gt;OneKlass&lt;/code&gt; and &lt;code&gt;AnotherKlass&lt;/code&gt;.
+
+@code{.cpp}
+struct OneKlass_;
+typedef seqan::Tag&lt;OneKlass_&gt; OneKlass;
+
+struct OtherKlass_;
+typedef seqan::Tag&lt;OtherKlass_&gt; OtherKlass;
+
+template &lt;typename TSpec&gt;
+class Klass;
+// Note that the body here is optional.  In this case, we create this class &#34;abstract&#34;.
+
+template &lt;&gt;
+class Klass&lt;OneKlass&gt;
+{
+public:
+    int x;
+};
+
+template &lt;&gt;
+class Klass&lt;OtherKlass&gt;
+{
+public:
+    double x;
+};
+@endcode
+
+
+&lt;h2 data-lang-entity=&#34;enum&#34; id=&#34;enum&#34;&gt;Enum&lt;/h2&gt;
+
+&lt;strong&gt;Enums are a common, standardized C++ feature that allow the
+definition of a set of named, &lt;u&gt;enum&lt;/u&gt;erable integral constants.&lt;/strong&gt;
+
+In SeqAn, they are mainly used to define the integral value of the
+&lt;code&gt;VALUE&lt;/code&gt; member of a metafunction, e.g.
+&lt;code&gt;Log2&amp;lt;32&amp;gt;::VALUE&lt;/code&gt;.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+In the following example, the enum &lt;code&gt;MyEnum&lt;/code&gt; with the constants
+&lt;code&gt;ENUM_VALUE1&lt;/code&gt; and &lt;code&gt;ENUM_VALUE2&lt;/code&gt; is defined.
+
+@code{.cpp}
+enum MyEnum
+{
+     ENUM_VALUE1,
+     ENUM_VALUE2
+};
+@endcode
+
+
+You may later write &lt;code&gt;MyEnum x = ENUM_VALUE2&lt;/code&gt;.
+
+The following example defines the &lt;a href=&#34;#metafunction&#34;&gt;metafunction&lt;/a&gt;
+&lt;code&gt;QualityValueSize&lt;/code&gt; using a template struct. The struct contains an
+unnamed enum with a single integral constant named &lt;code&gt;VALUE&lt;/code&gt; that
+has the value &lt;code&gt;63&lt;/code&gt;.
+
+@code{.cpp}
+template &lt;&gt;
+struct QualityValueSize&lt;Dna5Q&gt;
+{
+    enum { VALUE = 63 };
+};
+@endcode
+
+
+Later you may write &lt;code&gt;int x = QualityValueSize&amp;lt;Dna5Q&amp;gt;::VALUE&lt;/code&gt;
+whichs results in &lt;code&gt;63&lt;/code&gt; and is calculated at compile-time.
+
+If the enum was named (e.g. &lt;code&gt;MyEnum&lt;/code&gt;) you would have to write
+&lt;code&gt;int x = QualityValueSize&amp;lt;Dna5Q&amp;gt;::MyEnum::VALUE (TODO: How is the
+correct syntax?!?!?!)&lt;/code&gt;.&lt;
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;metafunction&#34; id=&#34;metafunction&#34;&gt;Metafunction&lt;/h2&gt; @endhtmlonly
+
+
+&lt;strong&gt;Metafunctions are a rarely used, not yet standardized C++ language
+feature that allows for compile-time evaluated functions.&lt;/strong&gt;
+
+In contrast to standard &lt;a href=&#34;#function&#34;&gt;functions&lt;/a&gt; that use objects as
+arguments and optionally return an object, metafunctions use types as
+arguments and return a type or an integral value.
+
+In SeqAn, they are mainly used to retrieve the appropriate type for a
+specific task, such as the iteration over a @link ContainerConcept @endlink.
+
+See the &lt;a href=&#34;http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Metafunctio
+n&#34;&gt;Metafunctions in the More C++ Idioms Wikibook&lt;/a&gt; for more information.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+The following two examples iterate over each character of &lt;code&gt;str&lt;/code&gt;
+and print it. The first example is not recommended but purely demonstrates
+the use of a metafunction. The second example shows the recommended use of
+metafunctions in combination with a &lt;a href=&#34;#typedef&#34;&gt;typedef&lt;/a&gt;.
+
+@code{.cpp}
+using namespace seqan;
+
+for (typename Iterator&lt;String&lt;char, Alloc&lt;&gt; &gt;::Type it = begin(str, Standard()); it != end(str, Standard()); ++it)
+    std::cout &lt;&lt; *it;
+std::cout &lt;&lt; &#34;\n&#34;;
+@endcode
+
+
+@code{.cpp}
+using namespace seqan;
+
+typedef typename Iterator&lt;String&lt;char, Alloc&lt;&gt; &gt;::Type TIt;
+
+for (TIt it = begin(str, Standard()); it != end(str, Standard()); ++it)
+    std::cout &lt;&lt; *it;
+std::cout &lt;&lt; &#34;\n&#34;;
+@endcode
+
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Variants&lt;/h3&gt; @endhtmlonly
+
+
+&lt;dl&gt; &lt;dt data-lang-entity=&#34;global_metafunction&#34;
+id=&#34;global_metafunction&#34;&gt;Global Metafunction&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;Global metafunctions
+are technically and semantically implemented globally.&lt;/p&gt;&lt;/dd&gt; &lt;dd&gt;&lt;p&gt;A
+typical global metafunctions is @link MetaprogrammingMath#Log2
+@endlink.&lt;/p&gt;&lt;/dd&gt; &lt;dt data-lang-entity=&#34;interface_metafunction&#34;
+id=&#34;interface_metafunction&#34;&gt;Interface Metafunction&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;Interface
+metafunctions semantically belong to one or more &lt;a
+href=&#34;#concept&#34;&gt;concepts&lt;/a&gt;. Types that implement a specific concept are
+guaranteed to work with all interface functions belonging to this specific
+concept.&lt;/p&gt; &lt;p&gt;Example: &lt;span data-lang-entity=&#34;class&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#class&#34;&gt;Class&lt;/a&gt;&lt;a
+href=&#34;class_String.html&#34;&gt;String&lt;/a&gt;&lt;/span&gt; implement &lt;span data-lang-
+entity=&#34;concept&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#concept&#34;&gt;Concept&lt;/a&gt;&lt;a
+href=&#34;concept_StringConcept.html&#34;&gt;StringConcept&lt;/a&gt;&lt;/span&gt;. Since the
+metafunction &lt;span data-lang-entity=&#34;global_function&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#global_function&#34;&gt;fn()&lt;/a&gt;&lt;a
+href=&#34;global_function_append.html&#34;&gt;append&lt;/a&gt;&lt;/span&gt; is part of &lt;span data-
+lang-entity=&#34;concept&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#concept&#34;&gt;Concept&lt;/a&gt;&lt;a
+href=&#34;concept_StringConcept.html&#34;&gt;StringConcept&lt;/a&gt;&lt;/span&gt;, &lt;span data-lang-
+entity=&#34;global_function&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#global_function&#34;&gt;fn()&lt;/a&gt;&lt;a
+href=&#34;global_function_append.html&#34;&gt;append&lt;/a&gt;&lt;/span&gt; accepts &lt;span data-lang-
+entity=&#34;class&#34; data-pimped=&#34;true&#34;&gt;&lt;a
+href=&#34;page_LanguageEntities.html#class&#34;&gt;Class&lt;/a&gt;&lt;a
+href=&#34;class_String.html&#34;&gt;String&lt;/a&gt;&lt;/span&gt; as an argument.&lt;/p&gt;&lt;/dd&gt;
+&lt;dd&gt;&lt;p&gt;Although &lt;a href=&#34;#concept&#34;&gt;concepts&lt;/a&gt; are formally specified they
+are not yet part of the C++ language and thus ignored by compilers. As a
+consequence your IDE will pretty certainly not stop you from using a
+metafunction with a type that does not implements one of the metafunction&#39;s
+concepts.&lt;/p&gt;&lt;/dd&gt; &lt;/dl&gt;
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;function&#34; id=&#34;function&#34;&gt;Function&lt;/h2&gt; @endhtmlonly
+
+
+&lt;strong&gt;Functions are a common, fundamental C++ feature and the basic
+building block for programs.&lt;/strong&gt;
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+A runnable C++ program always contains a &lt;code&gt;main&lt;/code&gt; function.
+
+@code{.cpp}
+int main()
+{
+  return 0;
+}
+@endcode
+
+
+&lt;h3 data-toc=&#34;hidden&#34;&gt;Variants&lt;/h3&gt;
+
+&lt;dl&gt; &lt;dt data-lang-entity=&#34;global_function&#34; id=&#34;global_function&#34;&gt;Global
+Function&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;Global functions are defined outside any class and not
+directly connected to one class. They might be in a namespace (such as the
+&lt;code&gt;seqan&lt;/code&gt; namespace).&lt;/p&gt; &lt;/dd&gt; &lt;dd&gt;Examples are the functions for
+the global and local alignment, e.g. @link globalAlignment @endlink and @link
+localAlignment @endlink. These functions use many classes to realize their
+behaviour but do not directly belong to any of the signature&#39;s data
+types.&lt;/dd&gt; &lt;dt data-lang-entity=&#34;interface_function&#34;
+id=&#34;interface_function&#34;&gt;Interface Function&lt;/dt&gt; &lt;dd&gt;&lt;p&gt;SeqAn uses global
+interface functions instead of member functions. This allows (1) to extend
+types without access to their source code and (2) to use template-based
+inheritance and static type dispatching.&lt;/p&gt; &lt;/dd&gt; &lt;dt data-lang-
+entity=&#34;member_function&#34; id=&#34;member_function&#34;&gt;Member Function&lt;/dt&gt;
+&lt;dd&gt;&lt;p&gt;Member functions are a standard C++ function. They are defined in
+classes or structs.&lt;/p&gt;&lt;/dd&gt; &lt;dd&gt;&lt;p&gt;In SeqAn, few member functions are used
+in the interface of types. Of course, the constructor, and destructor are
+always implemented as member functions.&lt;/p&gt;&lt;/dd&gt; &lt;/dl&gt;
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;tag&#34; id=&#34;tag&#34;&gt;Tag&lt;/h2&gt; @endhtmlonly
+
+
+Tags are classes that are only used for their type. They are often used for
+tag-based dispatching.
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;variable&#34; id=&#34;variable&#34;&gt;Variable&lt;/h2&gt; @endhtmlonly
+
+
+Variables are a standard C++ feature.
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;adaption&#34; id=&#34;adaption&#34;&gt;Adaption&lt;/h2&gt; @endhtmlonly
+
+
+Adaptions are collections of functions and metafunctions that make a type
+&lt;b&gt;T&lt;/b&gt; follow an interface &lt;b&gt;C&lt;/b&gt;. This can be used to make a class from
+an external library follow a SeqAn concept.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+The following shows a small part of the adaption of &lt;code&gt;std::string&lt;/code&gt;
+to the @link ContainerConcept @endlink: the implementation of the length
+functions.
+
+@code{.cpp}
+#include &lt;string&gt;
+
+namespace seqan
+{
+
+size_t length(std::string const &amp; str)
+{
+    return str.size();
+}
+
+};  // namespace seqan
+@endcode
+
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;macro&#34; id=&#34;macro&#34;&gt;Macro&lt;/h2&gt; @endhtmlonly
+
+
+Macros are pieces of code evaluated by the C preprocessor.
+
+All SeqAn macros are prefixed with &lt;tt&gt;SEQAN_&lt;/tt&gt;.
+
+@endhtmlonly &lt;h3 data-toc=&#34;hidden&#34;&gt;Example&lt;/h3&gt; @endhtmlonly
+
+
+@code{.cpp}
+// If SeqAn would provide a macro to compute the square of a number, it would
+// look as follows.
+#define SEQAN_SQUARE(x) (x * x)
+
+// In applications and user code, it could be used as follows:
+#define SQUARE(x) (x * x)
+
+// The SeqAn library defines the SEQAN_ASSERT* macros, for example:
+SEQAN_ASSERT_EQ(SQUARE(10), 100);
+@endcode
+
+
+@endhtmlonly &lt;h2 data-lang-entity=&#34;template_parameter&#34; id=&#34;template_parameter&#34;&gt;Template Parameter&lt;/h2&gt; @endhtmlonly
+
+
+Templates can take types or constant integral values as parameters.
+
+
+
+</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

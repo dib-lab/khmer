@@ -1,0 +1,2904 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_annotationtreeiterator" data-page="AnnotationTreeIterator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>AnnotationTreeIterator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>AnnotationTreeIterator<div><div>Iterator of the annotation tree represetned by a <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a>.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/store.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TFragmentStore&gt;
+class Iter&lt;TFragmentStore, AnnotationTree&lt;&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TFragmentStore</a></code></th>
+        <td>The FragmentStore to iterate over.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%3A%3AAnnotationTreeIterator" title="#AnnotationTreeIterator::AnnotationTreeIterator (interface function)" data-lang-entity="member_function">Iter::Iter();, Iter::Iter(store[, startInNode]);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter::Iter" data-lang-entity="member_function">Iter</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23assignValueByKey" title="#AnnotationTreeIterator#assignValueByKey (interface function)" data-lang-entity="interface_function">void assignValueByKey(it, key, value);</a></code></span>
+    <span class="summary_desc"><div>Add or update a key-value pair of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23clearValues" title="#AnnotationTreeIterator#clearValues (interface function)" data-lang-entity="interface_function">void clearValues(it);</a></code></span>
+    <span class="summary_desc"><div>Clear all key-value pairs of a given annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23createLeftChild" title="#AnnotationTreeIterator#createLeftChild (interface function)" data-lang-entity="interface_function">TIter createLeftChild(it);</a></code></span>
+    <span class="summary_desc"><div>Create a new leftmost child of the current node and returns an iterator to it.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23createRightChild" title="#AnnotationTreeIterator#createRightChild (interface function)" data-lang-entity="interface_function">TIter createRightChild(it);</a></code></span>
+    <span class="summary_desc"><div>Creates a new rightmost child of the current node and returns an iterator to it.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23createSibling" title="#AnnotationTreeIterator#createSibling (interface function)" data-lang-entity="interface_function">TIter createSibling(it);</a></code></span>
+    <span class="summary_desc"><div>Creates a new right sibling of the current node and return an iterator to it.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getAnnotation" title="#AnnotationTreeIterator#getAnnotation (interface function)" data-lang-entity="interface_function">TAnnotation getAnnotation(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getName" title="#AnnotationTreeIterator#getName (interface function)" data-lang-entity="interface_function">TName getName(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the identifier of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getParentName" title="#AnnotationTreeIterator#getParentName (interface function)" data-lang-entity="interface_function">TName getParentName(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the identifier of the parent node in the annotationt ree of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getType" title="#AnnotationTreeIterator#getType (interface function)" data-lang-entity="interface_function">TSeq getType(it);</a></code></span>
+    <span class="summary_desc"><div>Returns the type name of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getUniqueName" title="#AnnotationTreeIterator#getUniqueName (interface function)" data-lang-entity="interface_function">CharString getUniqueName(it);</a></code></span>
+    <span class="summary_desc"><div>Returns a unique name of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23getValueByKey" title="#AnnotationTreeIterator#getValueByKey (interface function)" data-lang-entity="interface_function">bool getValueByKey(it, key);, bool getValueByKey(value, it, key);</a></code></span>
+    <span class="summary_desc"><div>Retrieve a key's value in the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goDown" title="#AnnotationTreeIterator#goDown (interface function)" data-lang-entity="interface_function">bool goDown(it);</a></code></span>
+    <span class="summary_desc"><div>Move the iterator down to the leftmost child in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goNextRight" title="#AnnotationTreeIterator#goNextRight (interface function)" data-lang-entity="interface_function">void goNextUp(it);</a></code></span>
+    <span class="summary_desc"><div>Go to the next node in preorder DFS skipping the current node's subtree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goNextUp" title="#AnnotationTreeIterator#goNextUp (interface function)" data-lang-entity="interface_function">void goNextUp(it);</a></code></span>
+    <span class="summary_desc"><div>Go to the next node in preorder DFS skipping the subtrees of the current node and all of its siblings.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goRight" title="#AnnotationTreeIterator#goRight (interface function)" data-lang-entity="interface_function">bool goRight(it);</a></code></span>
+    <span class="summary_desc"><div>Move the iterator right to the next sibling in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goRoot" title="#AnnotationTreeIterator#goRoot (interface function)" data-lang-entity="interface_function">void goRoot(it);</a></code></span>
+    <span class="summary_desc"><div>Move the iterator down to the tree root.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goTo" title="#AnnotationTreeIterator#goTo (interface function)" data-lang-entity="interface_function">void goTo(it, annoId);</a></code></span>
+    <span class="summary_desc"><div>Moves the iterator to an arbitrary node giving its annotationId.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23goUp" title="#AnnotationTreeIterator#goUp (interface function)" data-lang-entity="interface_function">bool goUp(it);</a></code></span>
+    <span class="summary_desc"><div>Move the iterator down to the parent in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23isLastChild" title="#AnnotationTreeIterator#isLastChild (interface function)" data-lang-entity="interface_function">bool isLastChild(it);</a></code></span>
+    <span class="summary_desc"><div>Returns a boolean value that indicates whether the current node is the last child.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23isLeaf" title="#AnnotationTreeIterator#isLeaf (interface function)" data-lang-entity="interface_function">bool isLeaf(it);</a></code></span>
+    <span class="summary_desc"><div>Return a boolean indicating whether the annotation is a leaf.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23isRoot" title="#AnnotationTreeIterator#isRoot (interface function)" data-lang-entity="interface_function">bool isRoot(it);</a></code></span>
+    <span class="summary_desc"><div>Return a boolean indicating whether the annotation is the root.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23nodeDown" title="#AnnotationTreeIterator#nodeDown (interface function)" data-lang-entity="interface_function">TIter nodeDown(it);</a></code></span>
+    <span class="summary_desc"><div>Returns a new iterator to the first child node of the current annotation in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23nodeRight" title="#AnnotationTreeIterator#nodeRight (interface function)" data-lang-entity="interface_function">TIter nodeRight(it);</a></code></span>
+    <span class="summary_desc"><div>Returns a new iterator to the right sibling of the current annotation in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23nodeUp" title="#AnnotationTreeIterator#nodeUp (interface function)" data-lang-entity="interface_function">TIter nodeUp(it);</a></code></span>
+    <span class="summary_desc"><div>Returns a new iterator to the parent node of the current annotation in the annotation tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23setName" title="#AnnotationTreeIterator#setName (interface function)" data-lang-entity="interface_function">void setName(it, name);</a></code></span>
+    <span class="summary_desc"><div>Sets the identifier of the current annotation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationTreeIterator%23setType" title="#AnnotationTreeIterator#setType (interface function)" data-lang-entity="interface_function">void setType(it, typeName);</a></code></span>
+    <span class="summary_desc"><div>Sets the type name of the current annotation.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#operator*" data-lang-entity="interface_function">operator*</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Container" data-lang-entity="interface_metafunction">Container</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterComplementConst" data-lang-entity="interface_metafunction">IterComplementConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterMakeConst" data-lang-entity="interface_metafunction">IterMakeConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Spec" data-lang-entity="interface_metafunction">Spec</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Pointer" data-lang-entity="interface_metafunction">Pointer</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This iterator can move <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#goDown" data-lang-entity="interface_function">down</a>, <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#goRight" data-lang-entity="interface_function">right</a>, and <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#goUp" data-lang-entity="interface_function">up</a> in the tree and supports a preorder DFS traversal using
+the functions <a href="concept_RootedRandomAccessIteratorConcept.html#RootedRandomAccessIteratorConcept#goBegin" data-lang-entity="interface_function">goBegin</a>, <a href="concept_InputIteratorConcept.html#InputIteratorConcept#goNext" data-lang-entity="interface_function">goNext</a>,
+and <a href="concept_RootedIteratorConcept.html#RootedIteratorConcept#atEnd" data-lang-entity="interface_function">atEnd</a>.</p><p>Preorder means that the iterator visits the node befor it visits its children.</p><p>To obtain the type of the AnnotationTreeIterator for a FragmentStore specializiation <tt>TFragmentStore</tt>, you can
+use the metafunction <a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a> as follows:
+<tt>Iterator&lt;TFragmentStore&gt;::Type</tt>.</p><h3>Remarks</h3><p>To access the annotation, the iterator points to, use <a href="specialization_AnnotationTreeIterator.html#AnnotationTreeIterator#getAnnotation" data-lang-entity="interface_function">getAnnotation</a>. The
+annotation id is returned by <a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#value" data-lang-entity="interface_function">value</a>.</p><h3>Example</h3><p><img src="img/AnnotationTree.png" title="Typical annotation tree hierarchy."></img></p><p>A new annotation iterator can be instantiated as follows:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span> <span class="n">store</span><span class="p">;</span>
+<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span><span class="p">,</span> <span class="n">AnnotationTree</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">;</span>
+<span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">AnnotationTree</span><span class="o">&lt;&gt;</span><span class="p">());</span>
+</pre></div>
+</div><p>Or shorter:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span> <span class="n">store</span><span class="p">;</span>
+<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span><span class="p">,</span> <span class="n">AnnotationTree</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">(</span><span class="n">store</span><span class="p">);</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator::AnnotationTreeIterator" class="signature first" data-lang-entity="member_function">
+      <code>Iter::Iter();
+Iter::Iter(store[, startInNode]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">store</code>
+            
+        
+      </th>
+      <td>The FragmentStore with the annotation tree to iterate.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">startInNode</code>
+            
+        
+      </th>
+      <td>Annotation id of the ndoe the iterator should start at. Default: 0, the root node id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The <a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a> function can also be used to create a tree iterator that starts in the root
+node:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span> <span class="n">store</span><span class="p">;</span>
+<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">FragmentStore</span><span class="o">&lt;&gt;</span><span class="p">,</span> <span class="n">AnnotationTree</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">;</span>
+<span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">AnnotationTree</span><span class="o">&lt;&gt;</span><span class="p">());</span>
+</pre></div>
+</div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#assignValueByKey" class="signature first" data-lang-entity="interface_function">
+      <code>void assignValueByKey(it, key, value);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Add or update a key-value pair of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key whose value should be changed. Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">value</code>
+            
+        
+      </th>
+      <td>The value that should be assigned. Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">clearValues</a></li>
+    
+    <li><a class="error">getValueByKey</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#clearValues" class="signature" data-lang-entity="interface_function">
+      <code>void clearValues(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear all key-value pairs of a given annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to clear all key-value pairs of the current annotation.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">assignValueByKey</a></li>
+    
+    <li><a class="error">getValueByKey</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#createLeftChild" class="signature" data-lang-entity="interface_function">
+      <code>TIter createLeftChild(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Create a new leftmost child of the current node and returns an iterator to it.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to create a left child for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the new child.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createRightChild</a></li>
+    
+    <li><a class="error">createSibling</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#createRightChild" class="signature" data-lang-entity="interface_function">
+      <code>TIter createRightChild(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a new rightmost child of the current node and returns an iterator to it.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator that was just created.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the new child.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createLeftChild</a></li>
+    
+    <li><a class="error">createSibling</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#createSibling" class="signature" data-lang-entity="interface_function">
+      <code>TIter createSibling(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a new right sibling of the current node and return an iterator to it.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to create the sibling for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the new sibling.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">createLeftChild</a></li>
+    
+    <li><a class="error">createRightChild</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getAnnotation" class="signature" data-lang-entity="interface_function">
+      <code>TAnnotation getAnnotation(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query for its annotation.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TAnnotation</code></th>
+        <td>A reference to the AnnotationStoreElement the iterator points to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getName" class="signature" data-lang-entity="interface_function">
+      <code>TName getName(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the identifier of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>An AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TName</code></th>
+        <td>The name of the current annotation. This is a reference to the corresponding position in <a href="class_FragmentStore.html#FragmentStore::annotationNameStore" data-lang-entity="member_variable">annotationNameStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">setName</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getParentName" class="signature" data-lang-entity="interface_function">
+      <code>TName getParentName(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the identifier of the parent node in the annotationt ree of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to get the name for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TName</code></th>
+        <td>The name of the parent of the current annotation. This is a reference to the corresponding value in
+<a href="class_FragmentStore.html#FragmentStore::annotationNameStore" data-lang-entity="member_variable">annotationNameStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getType" class="signature" data-lang-entity="interface_function">
+      <code>TSeq getType(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the type name of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query for its type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>The</code></th>
+        <td>name of the current annotation, e.g. "exon" or "mRNA". This is a reference to an entry in <a href="class_FragmentStore.html#FragmentStore::annotationTypeStore" data-lang-entity="member_variable">annotationTypeStore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">setType</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getUniqueName" class="signature" data-lang-entity="interface_function">
+      <code>CharString getUniqueName(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a unique name of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>A unique name of the current annotation.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Some annotation file formats do not require that every annotation has a non-empty name. This function returns the
+name if non-emtpy and otherwise generates one using the type an id.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getName</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#getValueByKey" class="signature" data-lang-entity="interface_function">
+      <code>bool getValueByKey(it, key);
+bool getValueByKey(value, it, key);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Retrieve a key's value in the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator for which to retrieve the key.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">key</code>
+            
+        
+      </th>
+      <td>The key to get the value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">value</code>
+            
+        
+      </th>
+      <td>The resulting value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">assignValueByKey</a></li>
+    
+    <li><a class="error">clearValues</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goDown" class="signature" data-lang-entity="interface_function">
+      <code>bool goDown(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move the iterator down to the leftmost child in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to move.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the iterator could be moved and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">goRight</a></li>
+    
+    <li><a class="error">goUp</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goNextRight" class="signature" data-lang-entity="interface_function">
+      <code>void goNextUp(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Go to the next node in preorder DFS skipping the current node's subtree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goNextUp" class="signature" data-lang-entity="interface_function">
+      <code>void goNextUp(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Go to the next node in preorder DFS skipping the subtrees of the current node and all of its siblings.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goRight" class="signature" data-lang-entity="interface_function">
+      <code>bool goRight(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move the iterator right to the next sibling in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to move.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the iterator could be moved and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">goDown</a></li>
+    
+    <li><a class="error">goUp</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goRoot" class="signature" data-lang-entity="interface_function">
+      <code>void goRoot(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move the iterator down to the tree root.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to move.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goTo" class="signature" data-lang-entity="interface_function">
+      <code>void goTo(it, annoId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Moves the iterator to an arbitrary node giving its annotationId.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to move.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">annoId</code>
+            
+        
+      </th>
+      <td>The id of the annotation to move to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#goUp" class="signature" data-lang-entity="interface_function">
+      <code>bool goUp(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move the iterator down to the parent in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to move.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if the iterator could be moved and <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">goDown</a></li>
+    
+    <li><a class="error">goRight</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#isLastChild" class="signature" data-lang-entity="interface_function">
+      <code>bool isLastChild(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a boolean value that indicates whether the current node is the last child.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#isLeaf" class="signature" data-lang-entity="interface_function">
+      <code>bool isLeaf(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return a boolean indicating whether the annotation is a leaf.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#isRoot" class="signature" data-lang-entity="interface_function">
+      <code>bool isRoot(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return a boolean indicating whether the annotation is the root.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#nodeDown" class="signature" data-lang-entity="interface_function">
+      <code>TIter nodeDown(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a new iterator to the first child node of the current annotation in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the first child node of it.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">nodeRight</a></li>
+    
+    <li><a class="error">nodeUp</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#nodeRight" class="signature" data-lang-entity="interface_function">
+      <code>TIter nodeRight(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a new iterator to the right sibling of the current annotation in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the right sibling of it.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">nodeDown</a></li>
+    
+    <li><a class="error">nodeUp</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#nodeUp" class="signature" data-lang-entity="interface_function">
+      <code>TIter nodeUp(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a new iterator to the parent node of the current annotation in the annotation tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">it</code>
+            
+        
+      </th>
+      <td>The AnnotationTreeIterator to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TIter</code></th>
+        <td>Iterator to the parent node.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">nodeDown</a></li>
+    
+    <li><a class="error">nodeRight</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#setName" class="signature" data-lang-entity="interface_function">
+      <code>void setName(it, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the identifier of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>Iterator to the annotation to set the name for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The new identifier of the annotation pointed to by it.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getName</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="AnnotationTreeIterator#setType" class="signature" data-lang-entity="interface_function">
+      <code>void setType(it, typeName);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the type name of the current annotation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>The iterator to the annotation to set the type name for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">typeName</code>
+            
+        
+      </th>
+      <td>The name of the type (e.g. "exon" or "mRNA"). Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getType</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class AnnotationTreeIterator
+ * 
+ * @extends Iter
+ * 
+ * @headerfile &lt;seqan/store.h&gt;
+ * 
+ * @brief Iterator of the annotation tree represetned by a @link FragmentStore
+ *        @endlink.
+ * 
+ * @signature template &lt;typename TFragmentStore&gt; class Iter&lt;TFragmentStore,
+ *            AnnotationTree&lt;&gt; &gt;;
+ * 
+ * @tparam TFragmentStore The FragmentStore to iterate over.
+ * 
+ * This iterator can move @link AnnotationTreeIterator#goDown down @endlink,
+ * @link AnnotationTreeIterator#goRight right @endlink, and @link
+ * AnnotationTreeIterator#goUp up @endlink in the tree and supports a preorder
+ * DFS traversal using the functions @link
+ * RootedRandomAccessIteratorConcept#goBegin @endlink, @link
+ * InputIteratorConcept#goNext @endlink, and @link RootedIteratorConcept#atEnd
+ * @endlink.
+ * 
+ * Preorder means that the iterator visits the node befor it visits its
+ * children.
+ * 
+ * To obtain the type of the AnnotationTreeIterator for a FragmentStore
+ * specializiation &lt;tt&gt;TFragmentStore&lt;/tt&gt;, you can use the metafunction @link
+ * ContainerConcept#Iterator Iterator @endlink as follows:
+ * &lt;tt&gt;Iterator&amp;lt;TFragmentStore&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * @section Remarks
+ * 
+ * To access the annotation, the iterator points to, use @link
+ * AnnotationTreeIterator#getAnnotation @endlink. The annotation id is returned
+ * by @link IteratorAssociatedTypesConcept#value @endlink.
+ * 
+ * @section Example
+ * 
+ * &lt;img src=&#34;AnnotationTree.png&#34; title=&#34;Typical annotation tree hierarchy.&#34; /&gt;
+ * 
+ * A new annotation iterator can be instantiated as follows:
+ * 
+ * @code{.cpp}
+ * FragmentStore&lt;&gt; store;
+ * Iterator&lt;FragmentStore&lt;&gt;, AnnotationTree&lt;&gt; &gt;::Type it;
+ * it = begin(store, AnnotationTree&lt;&gt;());
+ * @endcode
+ * 
+ * 
+ * Or shorter:
+ * 
+ * @code{.cpp}
+ * FragmentStore&lt;&gt; store;
+ * Iterator&lt;FragmentStore&lt;&gt;, AnnotationTree&lt;&gt; &gt;::Type it(store);
+ * @endcode
+ * 
+ * 
+ * @fn AnnotationTreeIterator::AnnotationTreeIterator
+ * 
+ * @brief Constructor
+ * 
+ * @signature Iter::Iter();
+ * @signature Iter::Iter(store[, startInNode]);
+ * 
+ * @param[in] store The FragmentStore with the annotation tree to iterate.
+ * @param[in] startInNode Annotation id of the ndoe the iterator should start
+ *                        at. Default: 0, the root node id.
+ * 
+ * The @link ContainerConcept#begin @endlink function can also be used to create
+ * a tree iterator that starts in the root node:
+ * 
+ * @code{.cpp}
+ * FragmentStore&lt;&gt; store;
+ * Iterator&lt;FragmentStore&lt;&gt;, AnnotationTree&lt;&gt; &gt;::Type it;
+ * it = begin(store, AnnotationTree&lt;&gt;());
+ * @endcode
+ * 
+ * 
+ * @fn AnnotationTreeIterator#getAnnotation
+ * 
+ * @brief Returns the current annotation.
+ * 
+ * @signature TAnnotation getAnnotation(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query for its annotation.
+ * 
+ * @return TAnnotation A reference to the AnnotationStoreElement the iterator
+ *                     points to.
+ * 
+ * @fn AnnotationTreeIterator#getName
+ * 
+ * @brief Returns the identifier of the current annotation.
+ * 
+ * @signature TName getName(it);
+ * 
+ * @param[in] it An AnnotationTreeIterator to query.
+ * 
+ * @return TName The name of the current annotation. This is a reference to the
+ *               corresponding position in @link
+ *               FragmentStore::annotationNameStore @endlink.
+ * 
+ * @see AnnotationTreeIterator#setName
+ * 
+ * @fn AnnotationTreeIterator#setName
+ * 
+ * @brief Sets the identifier of the current annotation.
+ * 
+ * @signature void setName(it, name);
+ * 
+ * @param[in,out] it Iterator to the annotation to set the name for.
+ * @param[in] name The new identifier of the annotation pointed to by it.
+ * 
+ * @see AnnotationTreeIterator#getName
+ * 
+ * @fn AnnotationTreeIterator#getParentName
+ * 
+ * @brief Returns the identifier of the parent node in the annotationt ree of
+ *        the current annotation.
+ * 
+ * @signature TName getParentName(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to get the name for.
+ * 
+ * @return TName The name of the parent of the current annotation. This is a
+ *               reference to the corresponding value in @link
+ *               FragmentStore::annotationNameStore @endlink.
+ * 
+ * @fn AnnotationTreeIterator#getType
+ * 
+ * @brief Returns the type name of the current annotation.
+ * 
+ * @signature TSeq getType(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query for its type.
+ * 
+ * @return The name of the current annotation, e.g. &#34;exon&#34; or &#34;mRNA&#34;. This is a
+ *             reference to an entry in @link FragmentStore::annotationTypeStore
+ *             @endlink.
+ * 
+ * @see AnnotationTreeIterator#setType
+ * 
+ * @fn AnnotationTreeIterator#setType
+ * 
+ * @brief Sets the type name of the current annotation.
+ * 
+ * @signature void setType(it, typeName);
+ * 
+ * @param[in,out] it The iterator to the annotation to set the type name for.
+ * @param[in] typeName The name of the type (e.g. &#34;exon&#34; or &#34;mRNA&#34;). Type: @link
+ *                     ContainerConcept @endlink.
+ * 
+ * @see AnnotationTreeIterator#getType
+ * 
+ * @fn AnnotationTreeIterator#getUniqueName
+ * 
+ * @brief Returns a unique name of the current annotation.
+ * 
+ * @signature CharString getUniqueName(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @return CharString A unique name of the current annotation.
+ * 
+ * Some annotation file formats do not require that every annotation has a non-
+ * empty name. This function returns the name if non-emtpy and otherwise
+ * generates one using the type an id.
+ * 
+ * @see AnnotationTreeIterator#getName
+ * 
+ * @fn AnnotationTreeIterator#clearValues
+ * 
+ * @brief Clear all key-value pairs of a given annotation.
+ * 
+ * @signature void clearValues(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to clear all key-value pairs of
+ *                   the current annotation.
+ * 
+ * @see AnnotationTreeIterator#assignValueByKey
+ * @see AnnotationTreeIterator#getValueByKey
+ * 
+ * @fn AnnotationTreeIterator#assignValueByKey
+ * 
+ * @brief Add or update a key-value pair of the current annotation.
+ * 
+ * @signature void assignValueByKey(it, key, value);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to
+ * @param[in] key The key whose value should be changed. Type: @link
+ *                ContainerConcept @endlink.
+ * @param[in] value The value that should be assigned. Type: @link
+ *                  ContainerConcept @endlink.
+ * 
+ * @see AnnotationTreeIterator#clearValues
+ * @see AnnotationTreeIterator#getValueByKey
+ * 
+ * @fn AnnotationTreeIterator#getValueByKey
+ * 
+ * @brief Retrieve a key&#39;s value in the current annotation.
+ * 
+ * @signature bool getValueByKey(it, key);
+ * @signature bool getValueByKey(value, it, key);
+ * 
+ * @param[in] it The AnnotationTreeIterator for which to retrieve the key.
+ * @param[in] key The key to get the value for.
+ * @param[out] value The resulting value.
+ * 
+ * @see AnnotationTreeIterator#clearValues
+ * @see AnnotationTreeIterator#assignValueByKey
+ * 
+ * @fn AnnotationTreeIterator#goTo
+ * 
+ * @brief Moves the iterator to an arbitrary node giving its annotationId.
+ * 
+ * @signature void goTo(it, annoId);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to move.
+ * @param[in] annoId The id of the annotation to move to.
+ * 
+ * @fn AnnotationTreeIterator#goNextRight
+ * 
+ * @brief Go to the next node in preorder DFS skipping the current node&#39;s
+ *        subtree.
+ * 
+ * @signature void goNextUp(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to
+ * 
+ * @fn AnnotationTreeIterator#goNextUp
+ * 
+ * @brief Go to the next node in preorder DFS skipping the subtrees of the
+ *        current node and all of its siblings.
+ * 
+ * @signature void goNextUp(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to
+ * 
+ * @fn AnnotationTreeIterator#goRoot
+ * 
+ * @brief Move the iterator down to the tree root.
+ * 
+ * @signature void goRoot(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to move.
+ * 
+ * @fn AnnotationTreeIterator#goUp
+ * 
+ * @brief Move the iterator down to the parent in the annotation tree.
+ * 
+ * @signature bool goUp(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to move.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the iterator could be moved and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @see AnnotationTreeIterator#goDown
+ * @see AnnotationTreeIterator#goRight
+ * 
+ * @fn AnnotationTreeIterator#goDown
+ * 
+ * @brief Move the iterator down to the leftmost child in the annotation tree.
+ * 
+ * @signature bool goDown(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to move.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the iterator could be moved and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @see AnnotationTreeIterator#goUp
+ * @see AnnotationTreeIterator#goRight
+ * 
+ * @fn AnnotationTreeIterator#goRight
+ * 
+ * @brief Move the iterator right to the next sibling in the annotation tree.
+ * 
+ * @signature bool goRight(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to move.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if the iterator could be moved and &lt;tt&gt;false&lt;/tt&gt;
+ *              otherwise.
+ * 
+ * @see AnnotationTreeIterator#goUp
+ * @see AnnotationTreeIterator#goDown
+ * 
+ * @fn AnnotationTreeIterator#nodeUp
+ * 
+ * @brief Returns a new iterator to the parent node of the current annotation in
+ *        the annotation tree.
+ * 
+ * @signature TIter nodeUp(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @return TIter Iterator to the parent node.
+ * 
+ * @see AnnotationTreeIterator#nodeDown
+ * @see AnnotationTreeIterator#nodeRight
+ * 
+ * @fn AnnotationTreeIterator#nodeDown
+ * 
+ * @brief Returns a new iterator to the first child node of the current
+ *        annotation in the annotation tree.
+ * 
+ * @signature TIter nodeDown(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @return TIter Iterator to the first child node of it.
+ * 
+ * @see AnnotationTreeIterator#nodeUp
+ * @see AnnotationTreeIterator#nodeRight
+ * 
+ * @fn AnnotationTreeIterator#nodeRight
+ * 
+ * @brief Returns a new iterator to the right sibling of the current annotation
+ *        in the annotation tree.
+ * 
+ * @signature TIter nodeRight(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @return TIter Iterator to the right sibling of it.
+ * 
+ * @see AnnotationTreeIterator#nodeUp
+ * @see AnnotationTreeIterator#nodeDown
+ * 
+ * @fn AnnotationTreeIterator#createLeftChild
+ * 
+ * @brief Create a new leftmost child of the current node and returns an
+ *        iterator to it.
+ * 
+ * @signature TIter createLeftChild(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator to create a left child for.
+ * 
+ * @return TIter Iterator to the new child.
+ * 
+ * @see AnnotationTreeIterator#createRightChild
+ * @see AnnotationTreeIterator#createSibling
+ * 
+ * @fn AnnotationTreeIterator#createRightChild
+ * 
+ * @brief Creates a new rightmost child of the current node and returns an
+ *        iterator to it.
+ * 
+ * @signature TIter createRightChild(it);
+ * 
+ * @param[in,out] it The AnnotationTreeIterator that was just created.
+ * 
+ * @return TIter Iterator to the new child.
+ * 
+ * @see AnnotationTreeIterator#createLeftChild
+ * @see AnnotationTreeIterator#createSibling
+ * 
+ * @fn AnnotationTreeIterator#createSibling
+ * 
+ * @brief Creates a new right sibling of the current node and return an iterator
+ *        to it.
+ * 
+ * @signature TIter createSibling(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to create the sibling for.
+ * 
+ * @return TIter Iterator to the new sibling.
+ * 
+ * @see AnnotationTreeIterator#createLeftChild
+ * @see AnnotationTreeIterator#createRightChild
+ * 
+ * @fn AnnotationTreeIterator#isRoot
+ * 
+ * @brief Return a boolean indicating whether the annotation is the root.
+ * 
+ * @signature bool isRoot(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @fn AnnotationTreeIterator#isLeaf
+ * 
+ * @brief Return a boolean indicating whether the annotation is a leaf.
+ * 
+ * @signature bool isLeaf(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ * 
+ * @fn AnnotationTreeIterator#isLastChild
+ * 
+ * @brief Returns a boolean value that indicates whether the current node is the
+ *        last child.
+ * 
+ * @signature bool isLastChild(it);
+ * 
+ * @param[in] it The AnnotationTreeIterator to query.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_intervaltree" data-page="IntervalTree">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>IntervalTree - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>IntervalTree<div><div>Data structure for efficient interval storage.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/misc/interval_tree.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TValue[, typename TCargo]]&gt;
+class IntervalTree;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The type to use for coordinates. Default: <tt>int</tt>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TCargo</a></code></th>
+        <td>The type to use for cargo. Default: <tt>unsigned</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%3A%3AIntervalTree" title="#IntervalTree::IntervalTree (interface function)" data-lang-entity="member_function">IntervalTree::IntervalTree();, IntervalTree::IntervalTree(intervals);, IntervalTree::IntervalTree(intervals[, center]);, IntervalTree::IntervalTree(intervals[, tag]);, IntervalTree::IntervalTree(intervalBegins, intervalEnds, [intervalCargos,] len);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%23addInterval" title="#IntervalTree#addInterval (interface function)" data-lang-entity="interface_function">void addInterval(intervalTree, interval);, void addInterval(intervalTree, begin, end[, cargo]);, void addInterval(graph, propertyMap, interval);</a></code></span>
+    <span class="summary_desc"><div>Adds an interval to an interval tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%23createIntervalTree" title="#IntervalTree#createIntervalTree (interface function)" data-lang-entity="interface_function">void createIntervalTree(intervalTree, intervals[, tag]);, void createIntervalTree(g, pm, intervals[, tag]);, void createIntervalTree(g, pm, intervals, center[, tag]]);</a></code></span>
+    <span class="summary_desc"><div>Create an interval tree.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%23findIntervals" title="#IntervalTree#findIntervals (interface function)" data-lang-entity="interface_function">void findIntervals(result, intervalTree, query);, void findIntervals(result, intervalTree, queryBegin, queryEnd);, void findIntervals(result, graph, propertyMap, query);</a></code></span>
+    <span class="summary_desc"><div>Find all intervals that contain the query point or overlap with the query interval.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%23findIntervalsExcludeTouching" title="#IntervalTree#findIntervalsExcludeTouching (interface function)" data-lang-entity="interface_function">void findIntervalsExcludeTouching(result, intervalTree, query);, void findIntervalsExcludeTouching(result, graph, propertyMap, query,);</a></code></span>
+    <span class="summary_desc"><div>Find all intervals that contain the query point, exclude intervals that touch the query, i.e. where the query
+point equals the start or end point.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IntervalTree%23removeInterval" title="#IntervalTree#removeInterval (interface function)" data-lang-entity="interface_function">bool removeInterval(intervalTree, iBegin, iEnd, iId);</a></code></span>
+    <span class="summary_desc"><div>Removes an interval from the interval tree.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>If the intervals are not associated with cargos/IDs, they will be numbered consecutively.</p><h3>Example</h3><p>The following example creates an integer interval tree with string keys. This tree is quired for keys of intervals
+that overlap the interval <tt>[550, 990)</tt>.</p><div data-src-path="demos/misc/interval_tree_example.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/misc/interval_tree.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// fill a string of intervals and keys</span>
+    <span class="k">typedef</span> <span class="n">IntervalAndCargo</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">CharString</span><span class="o">&gt;</span> <span class="n">TInterval</span><span class="p">;</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="n">TInterval</span><span class="o">&gt;</span> <span class="n">intervals</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">TInterval</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="s">&quot;gene&quot;</span><span class="p">));</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">TInterval</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="s">&quot;exon1&quot;</span><span class="p">));</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">TInterval</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="s">&quot;coding1&quot;</span><span class="p">));</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">TInterval</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="s">&quot;exon2&quot;</span><span class="p">));</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">TInterval</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">700</span><span class="p">,</span> <span class="s">&quot;coding2&quot;</span><span class="p">));</span>
+
+    <span class="c1">// create IntervalTree of that string</span>
+    <span class="n">IntervalTree</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">CharString</span><span class="o">&gt;</span> <span class="n">tree</span><span class="p">(</span><span class="n">intervals</span><span class="p">);</span>
+
+    <span class="c1">// find intervals that overlap the query interval [550,900)</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">results</span><span class="p">;</span>
+    <span class="n">findIntervals</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="mi">550</span><span class="p">,</span> <span class="mi">900</span><span class="p">);</span>
+
+    <span class="c1">// output corresponding keys</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">results</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/misc/interval_tree_example.cpp" target="_top">demos/misc/interval_tree_example.cpp</a></div></div><p>The resulting keys are:</p><pre class="console" data-src-path="None">gene
+exon2
+coding2</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="IntervalTree::IntervalTree" class="signature first" data-lang-entity="member_function">
+      <code>IntervalTree::IntervalTree();
+IntervalTree::IntervalTree(intervals);
+IntervalTree::IntervalTree(intervals[, center]);
+IntervalTree::IntervalTree(intervals[, tag]);
+IntervalTree::IntervalTree(intervalBegins, intervalEnds, [intervalCargos,] len);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervals</code>
+            
+        
+      </th>
+      <td>Container of intervals. A strin gof <tt>IntervalAndCargo&lt;Value, TCargo&gt;</tt>
+objects, see <a href="class_IntervalAndCargo.html" data-lang-entity="class">IntervalAndCargo</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervalBegins</code>
+            
+        
+      </th>
+      <td>Iterator pointing to begin position of first interval.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervalEnds</code>
+            
+        
+      </th>
+      <td>Iterator pointing to end position of first interval.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervalCargos</code>
+            
+        
+      </th>
+      <td>Iterator pointing to cargo/ids for intervals.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">len</code>
+            
+        
+      </th>
+      <td>Number of intervals to store in tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>Tag for tree construction method.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="IntervalTree#addInterval" class="signature first" data-lang-entity="interface_function">
+      <code>void addInterval(intervalTree, interval);
+void addInterval(intervalTree, begin, end[, cargo]);
+void addInterval(graph, propertyMap, interval);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Adds an interval to an interval tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">intervalTree</code>
+            
+        
+      </th>
+      <td>The interval tree to add the interval to. Types: <a href="class_IntervalTree.html" data-lang-entity="class">IntervalTree</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">interval</code>
+            
+        
+      </th>
+      <td>The interval to be added to the interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">begin</code>
+            
+        
+      </th>
+      <td>Begin position of interval of type TValue.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">end</code>
+            
+        
+      </th>
+      <td>End position of interval of type TValue.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cargo</code>
+            
+        
+      </th>
+      <td>Cargo to attach to the interval. Types: <a href="class_IntervalAndCargo.html" data-lang-entity="class">IntervalAndCargo</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">graph</code>
+            
+        
+      </th>
+      <td>The directed graph that contains the topography of the interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">propertyMap</code>
+            
+        
+      </th>
+      <td>The property map containing the node properties of the interval tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IntervalTree#createIntervalTree" class="signature" data-lang-entity="interface_function">
+      <code>void createIntervalTree(intervalTree, intervals[, tag]);
+void createIntervalTree(g, pm, intervals[, tag]);
+void createIntervalTree(g, pm, intervals, center[, tag]]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Create an interval tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">intervalTree</code>
+            
+        
+      </th>
+      <td>An interval tree Types: IntervalTree</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">g</code>
+            
+        
+      </th>
+      <td>DirectedGraph to create interval tree in. Types: <a href="class_Graph.html" data-lang-entity="class">Graph</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>Property map to use for the created interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>Tag for tree construction method;</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervals</code>
+            
+        
+      </th>
+      <td>Container of intervals. A string of <tt>IntervalAndCargo&lt;TValue, TCargo&gt;</tt>
+objects, see <a href="class_IntervalAndCargo.html" data-lang-entity="class">IntervalAndCargo</a>. Types: <a href="specialization_AllocString.html" data-lang-entity="specialization">AllocString</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IntervalTree#findIntervals" class="signature" data-lang-entity="interface_function">
+      <code>void findIntervals(result, intervalTree, query);
+void findIntervals(result, intervalTree, queryBegin, queryEnd);
+void findIntervals(result, graph, propertyMap, query);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Find all intervals that contain the query point or overlap with the query interval.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">result</code>
+            
+        
+      </th>
+      <td>A reference to the result string of <tt>TCargo</tt> objects. Types: <a href="class_String.html" data-lang-entity="class">String</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervalTree</code>
+            
+        
+      </th>
+      <td>An IntervalTree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">graph</code>
+            
+        
+      </th>
+      <td>The directed <a href="class_Graph.html" data-lang-entity="class">graph</a> that contains the topography of the interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">propertyMap</code>
+            
+        
+      </th>
+      <td>The property map containing the node properties of the interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">query</code>
+            
+        
+      </th>
+      <td>A query point.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryBegin</code>
+            
+        
+      </th>
+      <td>The begin position of the query interval.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryEnd</code>
+            
+        
+      </th>
+      <td>The end position of the query interval.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IntervalTree#findIntervalsExcludeTouching" class="signature" data-lang-entity="interface_function">
+      <code>void findIntervalsExcludeTouching(result, intervalTree, query);
+void findIntervalsExcludeTouching(result, graph, propertyMap, query,);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Find all intervals that contain the query point, exclude intervals that touch the query, i.e. where the query
+point equals the start or end point.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">result</code>
+            
+        
+      </th>
+      <td>The resulting string of cargos/ids of the intervals that contain the query point. Should
+be a string of TCargo. Types: String</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">intervalTree</code>
+            
+        
+      </th>
+      <td>An interval tree Types: IntervalTree</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">graph</code>
+            
+        
+      </th>
+      <td>The directed graph that contains the topography of the interval tree.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">query</code>
+            
+        
+      </th>
+      <td>The TValue to query here.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">propertyMap</code>
+            
+        
+      </th>
+      <td>The property map containing the node properties of the interval tree</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IntervalTree#removeInterval" class="signature" data-lang-entity="interface_function">
+      <code>bool removeInterval(intervalTree, iBegin, iEnd, iId);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Removes an interval from the interval tree.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">intervalTree</code>
+            
+        
+      </th>
+      <td>An interval tree Types: IntervalTree</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iBegin</code>
+            
+        
+      </th>
+      <td>The begin position of the interval to be removed.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iEnd</code>
+            
+        
+      </th>
+      <td>The end position of the interval to be removed.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iId</code>
+            
+        
+      </th>
+      <td>The ID of the interval to be removed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class IntervalTree
+ * 
+ * @headerfile &lt;seqan/misc/interval_tree.h&gt;
+ * 
+ * @brief Data structure for efficient interval storage.
+ * 
+ * @signature template &lt;[typename TValue[, typename TCargo]]&gt; class
+ *            IntervalTree;
+ * 
+ * @tparam TValue The type to use for coordinates. Default: &lt;tt&gt;int&lt;/tt&gt;.
+ * @tparam TCargo The type to use for cargo. Default: &lt;tt&gt;unsigned&lt;/tt&gt;.
+ * 
+ * @section Remarks
+ * 
+ * If the intervals are not associated with cargos/IDs, they will be numbered
+ * consecutively.
+ * 
+ * @section Example
+ * 
+ * The following example creates an integer interval tree with string keys. This
+ * tree is quired for keys of intervals that overlap the interval &lt;tt&gt;[550,
+ * 990)&lt;/tt&gt;.
+ * 
+ * @include demos/misc/interval_tree_example.cpp
+ * 
+ * The resulting keys are:
+ * 
+ * @code{.console}
+ * gene
+ * exon2
+ * coding2
+ * @endcode
+ * 
+ * 
+ * @fn IntervalTree::IntervalTree
+ * 
+ * @brief Constructor
+ * 
+ * @signature IntervalTree::IntervalTree();
+ * @signature IntervalTree::IntervalTree(intervals);
+ * @signature IntervalTree::IntervalTree(intervals[, center]);
+ * @signature IntervalTree::IntervalTree(intervals[, tag]);
+ * @signature IntervalTree::IntervalTree(intervalBegins, intervalEnds,
+ *            [intervalCargos,] len);
+ * 
+ * @param[in] intervals Container of intervals. A strin gof
+ *                      &lt;tt&gt;IntervalAndCargo&amp;lt;Value, TCargo&amp;gt;&lt;/tt&gt; objects,
+ *                      see @link IntervalAndCargo @endlink.
+ * @param[in] intervalBegins  Iterator pointing to begin position of first
+ *                           interval.
+ * @param[in] intervalEnds  Iterator pointing to end position of first interval.
+ * @param[in] intervalCargos  Iterator pointing to cargo/ids for intervals.
+ * @param[in] len Number of intervals to store in tree.
+ * @param[in] tag Tag for tree construction method.
+ * 
+ * @fn IntervalTree#createIntervalTree
+ * 
+ * @brief Create an interval tree.
+ * 
+ * @signature void createIntervalTree(intervalTree, intervals[, tag]);
+ * @signature void createIntervalTree(g, pm, intervals[, tag]);
+ * @signature void createIntervalTree(g, pm, intervals, center[, tag]]);
+ * 
+ * @param[in,out] intervalTree An interval tree Types: IntervalTree
+ * @param[in,out] g DirectedGraph to create interval tree in. Types: @link Graph
+ *                  @endlink.
+ * @param[in,out] pm Property map to use for the created interval tree.
+ * @param[in] tag Tag for tree construction method;
+ * @param[in] intervals Container of intervals. A string of
+ *                      &lt;tt&gt;IntervalAndCargo&amp;lt;TValue, TCargo&amp;gt;&lt;/tt&gt; objects,
+ *                      see @link IntervalAndCargo @endlink. Types: @link
+ *                      AllocString @endlink.
+ * 
+ * @fn IntervalTree#addInterval
+ * 
+ * @headerfile &lt;seqan/misc/interval_tree.h&gt;
+ * 
+ * @brief Adds an interval to an interval tree.
+ * 
+ * @signature void addInterval(intervalTree, interval);
+ * @signature void addInterval(intervalTree, begin, end[, cargo]);
+ * @signature void addInterval(graph, propertyMap, interval);
+ * 
+ * @param[in,out] intervalTree The interval tree to add the interval to. Types:
+ *                             @link IntervalTree @endlink.
+ * @param[in] interval The interval to be added to the interval tree.
+ * @param[in] begin Begin position of interval of type TValue.
+ * @param[in] end End position of interval of type TValue.
+ * @param[in] cargo Cargo to attach to the interval. Types: @link
+ *                  IntervalAndCargo @endlink.
+ * @param[in,out] graph The directed graph that contains the topography of the
+ *                      interval tree.
+ * @param[in,out] propertyMap The property map containing the node properties of
+ *                            the interval tree.
+ * 
+ * @fn IntervalTree#findIntervals
+ * 
+ * @brief Find all intervals that contain the query point or overlap with the
+ *        query interval.
+ * 
+ * @signature void findIntervals(result, intervalTree, query);
+ * @signature void findIntervals(result, intervalTree, queryBegin, queryEnd);
+ * @signature void findIntervals(result, graph, propertyMap, query);
+ * 
+ * @param[out] result A reference to the result string of &lt;tt&gt;TCargo&lt;/tt&gt;
+ *                    objects. Types: @link String @endlink.
+ * @param[in] intervalTree An IntervalTree.
+ * @param[in] graph The directed @link Graph graph @endlink that contains the
+ *                  topography of the interval tree.
+ * @param[in] propertyMap The property map containing the node properties of the
+ *                        interval tree.
+ * @param[in] query A query point.
+ * @param[in] queryBegin The begin position of the query interval.
+ * @param[in] queryEnd The end position of the query interval.
+ * 
+ * @fn IntervalTree#findIntervalsExcludeTouching
+ * 
+ * @brief Find all intervals that contain the query point, exclude intervals
+ *        that touch the query, i.e. where the query point equals the start or
+ *        end point.
+ * 
+ * @signature void findIntervalsExcludeTouching(result, intervalTree, query);
+ * @signature void findIntervalsExcludeTouching(result, graph, propertyMap,
+ *            query,);
+ * 
+ * @param[out] result The resulting string of cargos/ids of the intervals that
+ *                    contain the query point. Should be a string of TCargo.
+ *                    Types: String
+ * @param[in] intervalTree An interval tree Types: IntervalTree
+ * @param[in] graph The directed graph that contains the topography of the
+ *                  interval tree.
+ * @param[in] query The TValue to query here.
+ * @param[in] propertyMap The property map containing the node properties of the
+ *                        interval tree
+ * 
+ * @fn IntervalTree#removeInterval
+ * 
+ * @brief Removes an interval from the interval tree.
+ * 
+ * @signature bool removeInterval(intervalTree, iBegin, iEnd, iId);
+ * 
+ * @param[in,out] intervalTree An interval tree Types: IntervalTree
+ * @param[in] iBegin The begin position of the interval to be removed.
+ * @param[in] iEnd The end position of the interval to be removed.
+ * @param[in] iId The ID of the interval to be removed.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; on failure.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

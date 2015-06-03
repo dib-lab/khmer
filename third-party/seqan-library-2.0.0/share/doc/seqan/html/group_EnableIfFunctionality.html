@@ -1,0 +1,1122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_enableiffunctionality" data-page="EnableIfFunctionality">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Enable-If Functionality - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Enable-If Functionality
+  <div><div>The metafunctions and macros for enabling/disabling of functions.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+<div class="overview grouped_macros" data-lang-entity-container="macro">
+<h2 data-lang-entity="macro">Grouped Macros Overview</h2>
+
+<table width="100%">
+  
+  <tr>
+    
+    <td><code><a href="#EnableIfFunctionality%23SEQAN_CTOR_DISABLE_IF"><div>SEQAN_CTOR_DISABLE_IF(TCondition);</div></a></code> <div>Bind the visibility of a constructor to an expression.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#EnableIfFunctionality%23SEQAN_CTOR_ENABLE_IF"><div>SEQAN_CTOR_ENABLE_IF(TCondition);</div></a></code> <div>Bind the visibility of a constructor to an expression.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#EnableIfFunctionality%23SEQAN_FUNC_DISABLE_IF"><div>SEQAN_FUNC_DISABLE_IF(TCondition, TResult);</div></a></code> <div>Bind the visibility of a function to an expression.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#EnableIfFunctionality%23SEQAN_FUNC_ENABLE_IF"><div>SEQAN_FUNC_ENABLE_IF(TCondition, TResult);</div></a></code> <div>Bind the visibility of a function to an expression.</div></td>
+    
+  </tr>
+  
+</table>
+</div>
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Grouped  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EnableIfFunctionality%23DisableIf" title="#EnableIfFunctionality#DisableIf (interface function)" data-lang-entity="interface_metafunction">DisableIf&lt;TBool, T = void&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metafunction to use for conditionally disabling code.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EnableIfFunctionality%23DisableIf2" title="#EnableIfFunctionality#DisableIf2 (interface function)" data-lang-entity="interface_metafunction">DisableIf2&lt;BOOL, T = void&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metafunction to use for conditionally disabling code, bool version.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EnableIfFunctionality%23EnableIf" title="#EnableIfFunctionality#EnableIf (interface function)" data-lang-entity="interface_metafunction">EnableIf&lt;TBool, T = void&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metafunction to use for conditionally enabling code.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#EnableIfFunctionality%23EnableIf2" title="#EnableIfFunctionality#EnableIf2 (interface function)" data-lang-entity="interface_metafunction">EnableIf2&lt;BOOL, T = void&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metafunction to use for conditionally enabling code, bool version.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The <tt>EnableIf</tt> metafunctions also support the shortcut to <tt>::Type</tt> members as described for the <a href="group_LogicMetaprogramming.html" data-lang-entity="group">logical metaprogramming metafunctions</a>.</p><p><b>Enable-if is an advanced technique and mostly interesting if you want to extend the SeqAn library with generic
+algorithms. The average developer does not have to know about this technique.</b>.</p></div>
+
+  </div>
+</div>
+
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="group_LogicMetaprogramming.html" data-lang-entity="group">LogicMetaprogramming</a></li>
+  
+  <li><a href="group_LogicalValuesTags.html" data-lang-entity="group">LogicalValuesTags</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+
+
+
+<!-- Grouped macros Details -->
+
+<div class="details grouped_macros" data-lang-entity-container="grouped_macro">
+<h2 data-lang-entity="grouped_macro">Grouped Macros Detail</h2>
+
+
+<h3 data-toc="hidden" id="EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF">
+  EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CTOR_DISABLE_IF(TCondition);
+</code>
+
+<div class="brief"><div>Bind the visibility of a constructor to an expression.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>TCondition</code>
+     -
+    Boolean type, one of <tt>True</tt> and <tt>False</tt> or a metafunction returning such a tag
+type. If <tt>False</tt> then the constructor is visible, otherwise, it is not.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>This macro allows to bind the visibility of a construtor to a boolean expression by using the <a href="http://en.wikipedia.org/wiki/Substitution_failure_is_not_an_error">SFINAE</a> principle for an optional argument with default value. The macro call must be used as the last dummy-argument of a constructor.</p><p>To avoid an unused argument warning, call <tt>ignoreUnusedVariableWarning(dummy)</tt> in the constructor's body.</p><p><b>Important:</b> The constructor to disable must be a function template and <tt>TCondition</tt> must include at
+least one template parameter of the function template.</p><h4>Example</h4><p>The following shows an example on how to properly use <tt>SEQAN_CTOR_DISABLE_IF</tt> as the last argument to the
+constructor and suppressing the unused variable warning for the dummy parameter.</p><div data-src-path="demos/basic/enable_if.cpp"><div class="highlight"><pre>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="n">EnableIfExample</span><span class="p">(</span><span class="n">T</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">n</span><span class="p">,</span> <span class="n">SEQAN_CTOR_DISABLE_IF</span><span class="p">(</span><span class="n">Is</span><span class="o">&lt;</span><span class="n">IntegerConcept</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">))</span> <span class="o">:</span>
+        <span class="n">num</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ignoreUnusedVariableWarning</span><span class="p">(</span><span class="n">dummy</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/enable_if.cpp" target="_top">demos/basic/enable_if.cpp</a></div></div></div>
+
+
+
+<h3 data-toc="hidden" id="EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF">
+  EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CTOR_ENABLE_IF(TCondition);
+</code>
+
+<div class="brief"><div>Bind the visibility of a constructor to an expression.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>TCondition</code>
+     -
+    Boolean type, one of <tt>True</tt> and <tt>False</tt> or a metafunction returning such a tag
+type. If <tt>True</tt> then the constructor is visible, otherwise, it is not.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>This macro allows to bind the visibility of a construtor to a boolean expression by using the <a href="http://en.wikipedia.org/wiki/Substitution_failure_is_not_an_error">SFINAE</a> principle for an optional argument with default value. The macro call must be used as the last dummy-argument of a constructor.</p><p>To avoid an unused argument warning, call <tt>ignoreUnusedVariableWarning(dummy)</tt> in the constructor's body.</p><p><b>Important:</b> The constructor to enable must be a function template and <tt>TCondition</tt> must include at
+least one template parameter of the function template.</p><h4>Example</h4><p>The following shows an example on how to properly use <tt>SEQAN_CTOR_ENABLE_IF</tt> as the last argument to the
+constructor and suppressing the unused variable warning for the dummy parameter.</p><div data-src-path="demos/basic/enable_if.cpp"><div class="highlight"><pre>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="n">EnableIfExample</span><span class="p">(</span><span class="n">T</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">n</span><span class="p">,</span> <span class="n">SEQAN_CTOR_ENABLE_IF</span><span class="p">(</span><span class="n">Is</span><span class="o">&lt;</span><span class="n">IntegerConcept</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">))</span> <span class="o">:</span>
+        <span class="n">num</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ignoreUnusedVariableWarning</span><span class="p">(</span><span class="n">dummy</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/enable_if.cpp" target="_top">demos/basic/enable_if.cpp</a></div></div></div>
+
+
+
+<h3 data-toc="hidden" id="EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF">
+  EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_FUNC_DISABLE_IF(TCondition, TResult);
+</code>
+
+<div class="brief"><div>Bind the visibility of a function to an expression.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>TCondition</code>
+     -
+    Boolean type, one of <tt>True</tt> and <tt>False</tt> or a metafunction returning such a tag
+type. If <tt>False</tt> then the function is visible, otherwise, it is not.
+  </dd>
+  
+  <dd>
+    <code>TResult</code>
+     -
+    The type that the function should have as the return type in case it is enabled.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>This macro allows to bind the visibility of a construtor to a boolean expression by using the <a href="http://en.wikipedia.org/wiki/Substitution_failure_is_not_an_error">SFINAE</a> principle for an optional argument with default value. The macro call must occur as the return type definition of the function.</p><p>To avoid an unused argument warning, call <tt>ignoreUnusedVariableWarning(dummy)</tt> in the constructor's body.</p><p><b>Important:</b> The function to disable must be a function template and <tt>TCondition</tt> must include at least
+one template parameter of the function template.</p><h4>Example</h4><p>The following shows an example on how to properly use <tt>SEQAN_FUNC_DISABLE_IF</tt> as the last argument to the
+constructor and suppressing the unused variable warning for the dummy parameter.</p><div data-src-path="demos/basic/enable_if.cpp"><div class="highlight"><pre>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="n">SEQAN_FUNC_DISABLE_IF</span><span class="p">(</span><span class="n">Is</span><span class="o">&lt;</span><span class="n">IntegerConcept</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">(</span><span class="n">T</span> <span class="cm">/* x */</span><span class="p">)</span>
+    <span class="p">{</span> <span class="cm">/* ... */</span><span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/enable_if.cpp" target="_top">demos/basic/enable_if.cpp</a></div></div></div>
+
+
+
+<h3 data-toc="hidden" id="EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF">
+  EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_FUNC_ENABLE_IF(TCondition, TResult);
+</code>
+
+<div class="brief"><div>Bind the visibility of a function to an expression.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>TCondition</code>
+     -
+    Boolean type, one of <tt>True</tt> and <tt>False</tt> or a metafunction returning such a tag
+type. If <tt>True</tt> then the function is visible, otherwise, it is not.
+  </dd>
+  
+  <dd>
+    <code>TResult</code>
+     -
+    The type that the function should have as the return type in case it is enabled.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>This macro allows to bind the visibility of a construtor to a boolean expression by using the <a href="http://en.wikipedia.org/wiki/Substitution_failure_is_not_an_error">SFINAE</a> principle for an optional argument with default value. The macro call must occur as the return type definition of the function.</p><p>To avoid an unused argument warning, call <tt>ignoreUnusedVariableWarning(dummy)</tt> in the constructor's body.</p><p><b>Important:</b> The function to enable must be a function template and <tt>TCondition</tt> must include at
+least one template parameter of the function template.</p><h4>Example</h4><p>The following shows an example on how to properly use <tt>SEQAN_FUNC_ENABLE_IF</tt> as the last argument to the
+constructor and suppressing the unused variable warning for the dummy parameter.</p><div data-src-path="demos/basic/enable_if.cpp"><div class="highlight"><pre>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="n">SEQAN_FUNC_ENABLE_IF</span><span class="p">(</span><span class="n">Is</span><span class="o">&lt;</span><span class="n">IntegerConcept</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">(</span><span class="n">T</span> <span class="cm">/* x */</span><span class="p">)</span>
+    <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/enable_if.cpp" target="_top">demos/basic/enable_if.cpp</a></div></div></div>
+
+
+
+
+</div>
+
+
+
+<!-- Grouped Functions Details -->
+
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Grouped Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="EnableIfFunctionality#DisableIf" class="signature first" data-lang-entity="interface_metafunction">
+    <code>DisableIf&lt;TBool, T = void&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metafunction to use for conditionally disabling code.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TBool</code></th>
+            <td>The Tag <tt>True</tt> or <tt>False</tt> to use for enabling/disabling.</td>
+        </tr>
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>Dummy, do not set.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Set to <tt>T</tt>. Only defined if <tt>TBool</tt> is <tt>False</tt>. This triggers the SFINAE behaviour
+in C++ which can be used to enable/disable functions.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Do not use directly but use through the enable if/disable if macros.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="EnableIfFunctionality#DisableIf2" class="signature" data-lang-entity="interface_metafunction">
+    <code>DisableIf2&lt;BOOL, T = void&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+  <div class="note deprecated">Deprecated. <div class='inline'>
+      
+      <p>Will be renamed to DisableIfC.</p>
+      
+  </div></div>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metafunction to use for conditionally disabling code, bool version.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>BOOL</code></th>
+            <td>The <tt>bool</tt> constant to evaluate for enabling/disabling.</td>
+        </tr>
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>Dummy, do not set.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Set to <tt>T</tt>. Only defined if <tt>BOOL</tt> is <tt>false</tt>. This triggers the SFINAE behaviour
+in C++ which can be used to enable/disable functions.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Do not use directly but use through the enable if/disable if macros.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="EnableIfFunctionality#EnableIf" class="signature" data-lang-entity="interface_metafunction">
+    <code>EnableIf&lt;TBool, T = void&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metafunction to use for conditionally enabling code.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TBool</code></th>
+            <td>The Tag <tt>True</tt> or <tt>False</tt> to use for enabling/disabling.</td>
+        </tr>
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>Dummy, do not set.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Set to <tt>T</tt>. Only defined if <tt>TBool</tt> is <tt>True</tt>. This triggers the SFINAE behaviour
+in C++ which can be used to enable/disable functions.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Do not use directly but use through the enable if/disable if macros.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="EnableIfFunctionality#EnableIf2" class="signature" data-lang-entity="interface_metafunction">
+    <code>EnableIf2&lt;BOOL, T = void&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+  <div class="note deprecated">Deprecated. <div class='inline'>
+      
+      <p>Will be renamed to EnableIfC.</p>
+      
+  </div></div>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metafunction to use for conditionally enabling code, bool version.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>BOOL</code></th>
+            <td>The <tt>bool</tt> constant to evaluate for enabling/disabling.</td>
+        </tr>
+    
+        <tr>
+            <th><code>T</code></th>
+            <td>Dummy, do not set.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>Set to <tt>T</tt>. Only defined if <tt>BOOL</tt> is <tt>true</tt>. This triggers the SFINAE behaviour
+in C++ which can be used to enable/disable functions.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Do not use directly but use through the enable if/disable if macros.</p></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup EnableIfFunctionality Enable-If Functionality
+ * 
+ * @brief The metafunctions and macros for enabling/disabling of functions.
+ * 
+ * The &lt;tt&gt;EnableIf&lt;/tt&gt; metafunctions also support the shortcut to
+ * &lt;tt&gt;::Type&lt;/tt&gt; members as described for the @link LogicMetaprogramming
+ * logical metaprogramming metafunctions @endlink.
+ * 
+ * &lt;b&gt;Enable-if is an advanced technique and mostly interesting if you want to
+ * extend the SeqAn library with generic algorithms. The average developer does
+ * not have to know about this technique.&lt;/b&gt;.
+ * 
+ * @see LogicalValuesTags
+ * @see LogicMetaprogramming
+ * 
+ * @mfn EnableIfFunctionality#EnableIf
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metafunction to use for conditionally enabling code.
+ * 
+ * @signature EnableIf&lt;TBool, T = void&gt;::Type
+ * 
+ * @tparam TBool The Tag &lt;tt&gt;True&lt;/tt&gt; or &lt;tt&gt;False&lt;/tt&gt; to use for
+ *               enabling/disabling.
+ * @tparam T Dummy, do not set.
+ * 
+ * @return Type Set to &lt;tt&gt;T&lt;/tt&gt;. Only defined if &lt;tt&gt;TBool&lt;/tt&gt; is
+ *              &lt;tt&gt;True&lt;/tt&gt;. This triggers the SFINAE behaviour in C++ which
+ *              can be used to enable/disable functions.
+ * 
+ * Do not use directly but use through the enable if/disable if macros.
+ * 
+ * @see EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+ * 
+ * @mfn EnableIfFunctionality#DisableIf
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metafunction to use for conditionally disabling code.
+ * 
+ * @signature DisableIf&lt;TBool, T = void&gt;::Type
+ * 
+ * @tparam TBool The Tag &lt;tt&gt;True&lt;/tt&gt; or &lt;tt&gt;False&lt;/tt&gt; to use for
+ *               enabling/disabling.
+ * @tparam T Dummy, do not set.
+ * 
+ * @return Type Set to &lt;tt&gt;T&lt;/tt&gt;. Only defined if &lt;tt&gt;TBool&lt;/tt&gt; is
+ *              &lt;tt&gt;False&lt;/tt&gt;. This triggers the SFINAE behaviour in C++ which
+ *              can be used to enable/disable functions.
+ * 
+ * Do not use directly but use through the enable if/disable if macros.
+ * 
+ * @see EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+ * 
+ * @mfn EnableIfFunctionality#EnableIf2
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metafunction to use for conditionally enabling code, bool version.
+ * 
+ * @deprecated Will be renamed to EnableIfC.
+ * 
+ * @signature EnableIf2&lt;BOOL, T = void&gt;::Type
+ * 
+ * @tparam BOOL The &lt;tt&gt;bool&lt;/tt&gt; constant to evaluate for enabling/disabling.
+ * @tparam T Dummy, do not set.
+ * 
+ * @return Type Set to &lt;tt&gt;T&lt;/tt&gt;. Only defined if &lt;tt&gt;BOOL&lt;/tt&gt; is
+ *              &lt;tt&gt;true&lt;/tt&gt;. This triggers the SFINAE behaviour in C++ which
+ *              can be used to enable/disable functions.
+ * 
+ * Do not use directly but use through the enable if/disable if macros.
+ * 
+ * @see EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+ * 
+ * @mfn EnableIfFunctionality#DisableIf2
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metafunction to use for conditionally disabling code, bool version.
+ * 
+ * @deprecated Will be renamed to DisableIfC.
+ * 
+ * @signature DisableIf2&lt;BOOL, T = void&gt;::Type
+ * 
+ * @tparam BOOL The &lt;tt&gt;bool&lt;/tt&gt; constant to evaluate for enabling/disabling.
+ * @tparam T Dummy, do not set.
+ * 
+ * @return Type Set to &lt;tt&gt;T&lt;/tt&gt;. Only defined if &lt;tt&gt;BOOL&lt;/tt&gt; is
+ *              &lt;tt&gt;false&lt;/tt&gt;. This triggers the SFINAE behaviour in C++ which
+ *              can be used to enable/disable functions.
+ * 
+ * Do not use directly but use through the enable if/disable if macros.
+ * 
+ * @see EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+ * @see EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+ * 
+ * @macro EnableIfFunctionality#SEQAN_CTOR_ENABLE_IF
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Bind the visibility of a constructor to an expression.
+ * 
+ * @signature SEQAN_CTOR_ENABLE_IF(TCondition);
+ * 
+ * @param TCondition Boolean type, one of &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt; or a
+ *                   metafunction returning such a tag type. If &lt;tt&gt;True&lt;/tt&gt;
+ *                   then the constructor is visible, otherwise, it is not.
+ * 
+ * This macro allows to bind the visibility of a construtor to a boolean
+ * expression by using the &lt;a href=&#34;http://en.wikipedia.org/wiki/Substitution_fa
+ * ilure_is_not_an_error&#34;&gt;SFINAE&lt;/a&gt; principle for an optional argument with
+ * default value. The macro call must be used as the last dummy-argument of a
+ * constructor.
+ * 
+ * To avoid an unused argument warning, call
+ * &lt;tt&gt;ignoreUnusedVariableWarning(dummy)&lt;/tt&gt; in the constructor&#39;s body.
+ * 
+ * &lt;b&gt;Important:&lt;/b&gt; The constructor to enable must be a function template and
+ * &lt;tt&gt;TCondition&lt;/tt&gt; must include at least one template parameter of the
+ * function template.
+ * 
+ * @section Example
+ * 
+ * The following shows an example on how to properly use
+ * &lt;tt&gt;SEQAN_CTOR_ENABLE_IF&lt;/tt&gt; as the last argument to the constructor and
+ * suppressing the unused variable warning for the dummy parameter.
+ * 
+ * @snippet demos/basic/enable_if.cpp enable if example constructor
+ * 
+ * 
+ * 
+ * @macro EnableIfFunctionality#SEQAN_CTOR_DISABLE_IF
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Bind the visibility of a constructor to an expression.
+ * 
+ * @signature SEQAN_CTOR_DISABLE_IF(TCondition);
+ * 
+ * @param TCondition Boolean type, one of &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt; or a
+ *                   metafunction returning such a tag type. If &lt;tt&gt;False&lt;/tt&gt;
+ *                   then the constructor is visible, otherwise, it is not.
+ * 
+ * This macro allows to bind the visibility of a construtor to a boolean
+ * expression by using the &lt;a href=&#34;http://en.wikipedia.org/wiki/Substitution_fa
+ * ilure_is_not_an_error&#34;&gt;SFINAE&lt;/a&gt; principle for an optional argument with
+ * default value. The macro call must be used as the last dummy-argument of a
+ * constructor.
+ * 
+ * To avoid an unused argument warning, call
+ * &lt;tt&gt;ignoreUnusedVariableWarning(dummy)&lt;/tt&gt; in the constructor&#39;s body.
+ * 
+ * &lt;b&gt;Important:&lt;/b&gt; The constructor to disable must be a function template and
+ * &lt;tt&gt;TCondition&lt;/tt&gt; must include at least one template parameter of the
+ * function template.
+ * 
+ * @section Example
+ * 
+ * The following shows an example on how to properly use
+ * &lt;tt&gt;SEQAN_CTOR_DISABLE_IF&lt;/tt&gt; as the last argument to the constructor and
+ * suppressing the unused variable warning for the dummy parameter.
+ * 
+ * @snippet demos/basic/enable_if.cpp disable if example constructor
+ * 
+ * 
+ * 
+ * @macro EnableIfFunctionality#SEQAN_FUNC_ENABLE_IF
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Bind the visibility of a function to an expression.
+ * 
+ * @signature SEQAN_FUNC_ENABLE_IF(TCondition, TResult);
+ * 
+ * @param TCondition Boolean type, one of &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt; or a
+ *                   metafunction returning such a tag type. If &lt;tt&gt;True&lt;/tt&gt;
+ *                   then the function is visible, otherwise, it is not.
+ * @param TResult The type that the function should have as the return type in
+ *                case it is enabled.
+ * 
+ * This macro allows to bind the visibility of a construtor to a boolean
+ * expression by using the &lt;a href=&#34;http://en.wikipedia.org/wiki/Substitution_fa
+ * ilure_is_not_an_error&#34;&gt;SFINAE&lt;/a&gt; principle for an optional argument with
+ * default value. The macro call must occur as the return type definition of the
+ * function.
+ * 
+ * To avoid an unused argument warning, call
+ * &lt;tt&gt;ignoreUnusedVariableWarning(dummy)&lt;/tt&gt; in the constructor&#39;s body.
+ * 
+ * &lt;b&gt;Important:&lt;/b&gt; The function to enable must be a function template and
+ * &lt;tt&gt;TCondition&lt;/tt&gt; must include at least one template parameter of the
+ * function template.
+ * 
+ * @section Example
+ * 
+ * The following shows an example on how to properly use
+ * &lt;tt&gt;SEQAN_FUNC_ENABLE_IF&lt;/tt&gt; as the last argument to the constructor and
+ * suppressing the unused variable warning for the dummy parameter.
+ * 
+ * @snippet demos/basic/enable_if.cpp enable if example function
+ * 
+ * 
+ * 
+ * @macro EnableIfFunctionality#SEQAN_FUNC_DISABLE_IF
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Bind the visibility of a function to an expression.
+ * 
+ * @signature SEQAN_FUNC_DISABLE_IF(TCondition, TResult);
+ * 
+ * @param TCondition Boolean type, one of &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt; or a
+ *                   metafunction returning such a tag type. If &lt;tt&gt;False&lt;/tt&gt;
+ *                   then the function is visible, otherwise, it is not.
+ * @param TResult The type that the function should have as the return type in
+ *                case it is enabled.
+ * 
+ * This macro allows to bind the visibility of a construtor to a boolean
+ * expression by using the &lt;a href=&#34;http://en.wikipedia.org/wiki/Substitution_fa
+ * ilure_is_not_an_error&#34;&gt;SFINAE&lt;/a&gt; principle for an optional argument with
+ * default value. The macro call must occur as the return type definition of the
+ * function.
+ * 
+ * To avoid an unused argument warning, call
+ * &lt;tt&gt;ignoreUnusedVariableWarning(dummy)&lt;/tt&gt; in the constructor&#39;s body.
+ * 
+ * &lt;b&gt;Important:&lt;/b&gt; The function to disable must be a function template and
+ * &lt;tt&gt;TCondition&lt;/tt&gt; must include at least one template parameter of the
+ * function template.
+ * 
+ * @section Example
+ * 
+ * The following shows an example on how to properly use
+ * &lt;tt&gt;SEQAN_FUNC_DISABLE_IF&lt;/tt&gt; as the last argument to the constructor and
+ * suppressing the unused variable warning for the dummy parameter.
+ * 
+ * @snippet demos/basic/enable_if.cpp disable if example function
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

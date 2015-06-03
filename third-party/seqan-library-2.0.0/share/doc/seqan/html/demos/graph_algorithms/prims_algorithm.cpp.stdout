@@ -1,0 +1,36 @@
+Adjacency list:
+0 -> 6,1,
+1 -> 6,2,0,
+2 -> 8,4,3,1,
+3 -> 8,5,2,
+4 -> 7,6,2,
+5 -> 8,3,
+6 -> 7,4,1,0,
+7 -> 8,6,4,
+8 -> 7,5,3,2,
+Edge list:
+Source: 0,Target: 6 (Id: 1)
+Source: 0,Target: 1 (Id: 0)
+Source: 1,Target: 6 (Id: 3)
+Source: 1,Target: 2 (Id: 2)
+Source: 2,Target: 8 (Id: 6)
+Source: 2,Target: 4 (Id: 5)
+Source: 2,Target: 3 (Id: 4)
+Source: 3,Target: 8 (Id: 8)
+Source: 3,Target: 5 (Id: 7)
+Source: 4,Target: 7 (Id: 10)
+Source: 4,Target: 6 (Id: 9)
+Source: 5,Target: 8 (Id: 11)
+Source: 6,Target: 7 (Id: 12)
+Source: 7,Target: 8 (Id: 13)
+
+Minimum Spanning Tree (Prim's algorithm): 
+Path from a to a: a
+Path from a to b: a,b
+Path from a to c: a,b,c
+Path from a to d: a,b,c,d
+Path from a to i: a,b,c,i
+Path from a to e: a,b,c,d,e
+Path from a to h: a,b,c,f,g,h
+Path from a to g: a,b,c,f,g
+Path from a to f: a,b,c,f

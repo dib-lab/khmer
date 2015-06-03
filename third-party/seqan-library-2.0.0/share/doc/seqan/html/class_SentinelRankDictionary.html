@@ -1,0 +1,1376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_sentinelrankdictionary" data-page="SentinelRankDictionary">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SentinelRankDictionary - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>SentinelRankDictionary<div><div>A rank dictionary, additional storing sentinel character which are not
+accounted for in a rank query.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TRankDictionary, typename TSpec&gt;
+class SentinelRankDictionary;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specialisation</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TRankDictionary</a></code></th>
+        <td>The rank dictionary of a text.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23clear" title="#SentinelRankDictionary#clear (interface function)" data-lang-entity="interface_function">clear(dictionary)</a></code></span>
+    <span class="summary_desc"><div>Clears the dictionary.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23countOccurrences" title="#SentinelRankDictionary#countOccurrences (interface function)" data-lang-entity="interface_function">TSize countOccurrences(dictionary, character, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of occurrences of a specified character from the start to a specified position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23createSentinelRankDictionary" title="#SentinelRankDictionary#createSentinelRankDictionary (interface function)" data-lang-entity="interface_function">void createSentinelRankDictionary(dictionary, text)</a></code></span>
+    <span class="summary_desc"><div>This functions creates the dictionary structure.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23empty" title="#SentinelRankDictionary#empty (interface function)" data-lang-entity="interface_function">empty(dictionary)</a></code></span>
+    <span class="summary_desc"><div>Returns whether or not the dictionary is empty.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23getFibre" title="#SentinelRankDictionary#getFibre (interface function)" data-lang-entity="interface_function">getFibre(dictionary, fibreTag)</a></code></span>
+    <span class="summary_desc"><div>Returns a specific fibre of a dictionary.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23getSentinelSubstitute" title="#SentinelRankDictionary#getSentinelSubstitute (interface function)" data-lang-entity="interface_function">getSentinelSubstitute(dictionary)</a></code></span>
+    <span class="summary_desc"><div>Returns the character used to substitute the sentinel sign.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23getValue" title="#SentinelRankDictionary#getValue (interface function)" data-lang-entity="interface_function">getCharacter(dictionary, pos)</a></code></span>
+    <span class="summary_desc"><div>Returns the character of a specified position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23open" title="#SentinelRankDictionary#open (interface function)" data-lang-entity="interface_function">open(dictionary, fileName [, openMode])</a></code></span>
+    <span class="summary_desc"><div>This functions loads a dictionary from disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23save" title="#SentinelRankDictionary#save (interface function)" data-lang-entity="interface_function">save(dictionary, fileName [, openMode])</a></code></span>
+    <span class="summary_desc"><div>This functions saves a dictionary to disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23sentinelPosition" title="#SentinelRankDictionary#sentinelPosition (interface function)" data-lang-entity="interface_function">sentinelPosition(dictionary, pos)</a></code></span>
+    <span class="summary_desc"><div>Returns whether a specified position is a sentinel position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23setSentinelPosition" title="#SentinelRankDictionary#setSentinelPosition (interface function)" data-lang-entity="interface_function">setSentinelPosition(dictionary, pos)</a></code></span>
+    <span class="summary_desc"><div>Sets the sentinel position..</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SentinelRankDictionary%23setSentinelSubstitute" title="#SentinelRankDictionary#setSentinelSubstitute (interface function)" data-lang-entity="interface_function">setSentinelSubstitute(dictionary, character)</a></code></span>
+    <span class="summary_desc"><div>Sets the character used to substitute the sentinel sign.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#clear" class="signature first" data-lang-entity="interface_function">
+      <code>clear(dictionary)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clears the dictionary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The rank dictionary to be cleared.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#countOccurrences" class="signature" data-lang-entity="interface_function">
+      <code>TSize countOccurrences(dictionary, character, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of occurrences of a specified character from the start to a specified position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">dictionary</code>
+            
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">character</code>
+            
+        
+      </th>
+      <td>The character.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position (which is included in the counting).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of occurences (Metafunction: <a href="class_Index.html#Index#Size" data-lang-entity="interface_metafunction">Size</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#createSentinelRankDictionary" class="signature" data-lang-entity="interface_function">
+      <code>void createSentinelRankDictionary(dictionary, text)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions creates the dictionary structure.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>text</code>
+        
+      </th>
+      <td>A text to be transfered into a dictionary. Types: <a href="class_String.html" data-lang-entity="class">String</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#empty" class="signature" data-lang-entity="interface_function">
+      <code>empty(dictionary)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether or not the dictionary is empty.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The rank dictionary to be checked.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#getFibre" class="signature" data-lang-entity="interface_function">
+      <code>getFibre(dictionary, fibreTag)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a specific fibre of a dictionary.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>fibreTag</code>
+        
+      </th>
+      <td>A tag that identifies the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>. Types:
+<a href="group_SentinelRankDictionaryFibres.html" data-lang-entity="group">SentinelRankDictionary Fibres</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A reference to the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#getSentinelSubstitute" class="signature" data-lang-entity="interface_function">
+      <code>getSentinelSubstitute(dictionary)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the character used to substitute the sentinel sign.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#getValue" class="signature" data-lang-entity="interface_function">
+      <code>getCharacter(dictionary, pos)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the character of a specified position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>The position</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The rank dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#open" class="signature" data-lang-entity="interface_function">
+      <code>open(dictionary, fileName [, openMode])</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions loads a dictionary from disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>openMode</code>
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened.To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>.To append a file if existing add
+<tt>OPEN_APPEND</tt>.To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary. Types: SentinelRankDictionary</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>fileName</code>
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A <tt>bool</tt> which is <tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#save" class="signature" data-lang-entity="interface_function">
+      <code>save(dictionary, fileName [, openMode])</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions saves a dictionary to disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>openMode</code>
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened.To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>.To append a file if existing add
+<tt>OPEN_APPEND</tt>.To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary. Types: SentinelRankDictionary</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>fileName</code>
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A <tt>bool</tt> which is <tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#sentinelPosition" class="signature" data-lang-entity="interface_function">
+      <code>sentinelPosition(dictionary, pos)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether a specified position is a sentinel position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>The position. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#setSentinelPosition" class="signature" data-lang-entity="interface_function">
+      <code>setSentinelPosition(dictionary, pos)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the sentinel position..</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>The sentinel position. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="SentinelRankDictionary#setSentinelSubstitute" class="signature" data-lang-entity="interface_function">
+      <code>setSentinelSubstitute(dictionary, character)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the character used to substitute the sentinel sign.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>character</code>
+        
+      </th>
+      <td>The sentinel substitute.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>dictionary</code>
+        
+      </th>
+      <td>The dictionary.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class SentinelRankDictionary
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief A rank dictionary, additional storing sentinel character which are not
+ *        accounted for in a rank query.
+ * 
+ * @signature template &lt;typename TRankDictionary, typename TSpec&gt; class
+ *            SentinelRankDictionary;
+ * 
+ * @tparam TSpec Specialisation
+ * @tparam TRankDictionary The rank dictionary of a text.
+ * 
+ * @fn SentinelRankDictionary#clear
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Clears the dictionary.
+ * 
+ * @signature clear(dictionary)
+ * 
+ * @param dictionary The rank dictionary to be cleared.
+ * 
+ * @fn SentinelRankDictionary#sentinelPosition
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns whether a specified position is a sentinel position.
+ * 
+ * @signature sentinelPosition(dictionary, pos)
+ * 
+ * @param pos The position. Types: @link UnsignedIntegerConcept @endlink
+ * @param dictionary The dictionary.
+ * 
+ * @fn SentinelRankDictionary#empty
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns whether or not the dictionary is empty.
+ * 
+ * @signature empty(dictionary)
+ * 
+ * @param dictionary The rank dictionary to be checked.
+ * 
+ * @fn SentinelRankDictionary#getValue
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the character of a specified position.
+ * 
+ * @signature getCharacter(dictionary, pos)
+ * 
+ * @param pos The position
+ * @param dictionary The rank dictionary.
+ * 
+ * @fn SentinelRankDictionary#getFibre
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns a specific fibre of a dictionary.
+ * 
+ * @signature getFibre(dictionary, fibreTag)
+ * 
+ * @param fibreTag A tag that identifies the @link Fibre @endlink. Types: @link
+ *                 SentinelRankDictionaryFibres SentinelRankDictionary Fibres
+ *                 @endlink.
+ * @param dictionary The dictionary holding the fibre.
+ * 
+ * @return TReturn A reference to the @link Fibre @endlink object.
+ * 
+ * @fn SentinelRankDictionary#countOccurrences
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of occurrences of a specified character from the
+ *        start to a specified position.
+ * 
+ * @signature TSize countOccurrences(dictionary, character, pos);
+ * 
+ * @param[in] dictionary The dictionary.
+ * @param[in] character The character.
+ * @param[in] pos The position (which is included in the counting).
+ * 
+ * @return TSize The number of occurences (Metafunction: @link Index#Size
+ *               @endlink).
+ * 
+ * @fn SentinelRankDictionary#getSentinelSubstitute
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the character used to substitute the sentinel sign.
+ * 
+ * @signature getSentinelSubstitute(dictionary)
+ * 
+ * @param dictionary The dictionary.
+ * 
+ * @fn SentinelRankDictionary#setSentinelSubstitute
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Sets the character used to substitute the sentinel sign.
+ * 
+ * @signature setSentinelSubstitute(dictionary, character)
+ * 
+ * @param character The sentinel substitute.
+ * @param dictionary The dictionary.
+ * 
+ * @fn SentinelRankDictionary#setSentinelPosition
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Sets the sentinel position..
+ * 
+ * @signature setSentinelPosition(dictionary, pos)
+ * 
+ * @param pos The sentinel position. Types: @link UnsignedIntegerConcept
+ *            @endlink
+ * @param dictionary The dictionary.
+ * 
+ * @fn SentinelRankDictionary#createSentinelRankDictionary
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions creates the dictionary structure.
+ * 
+ * @signature void createSentinelRankDictionary(dictionary, text)
+ * 
+ * @param text A text to be transfered into a dictionary. Types: @link String
+ *             @endlink
+ * @param dictionary The dictionary.
+ * 
+ * @fn SentinelRankDictionary#save
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions saves a dictionary to disk.
+ * 
+ * @signature save(dictionary, fileName [, openMode])
+ * 
+ * @param openMode The combination of flags defining how the file should be
+ *                 opened.To open a file read-only, write-only or to read and
+ *                 write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;, or
+ *                 &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                 &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;.To append a file if existing add
+ *                 &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;.To circumvent problems, files are always
+ *                 opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE |
+ *                 OPEN_APPEND&lt;/tt&gt;
+ * @param dictionary The dictionary. Types: SentinelRankDictionary
+ * @param fileName C-style character string containing the file name.
+ * 
+ * @return TReturn A &lt;tt&gt;bool&lt;/tt&gt; which is &lt;tt&gt;true&lt;/tt&gt; on success.
+ * 
+ * @fn SentinelRankDictionary#open
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions loads a dictionary from disk.
+ * 
+ * @signature open(dictionary, fileName [, openMode])
+ * 
+ * @param openMode The combination of flags defining how the file should be
+ *                 opened.To open a file read-only, write-only or to read and
+ *                 write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;, or
+ *                 &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                 &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;.To append a file if existing add
+ *                 &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;.To circumvent problems, files are always
+ *                 opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE |
+ *                 OPEN_APPEND&lt;/tt&gt;
+ * @param dictionary The dictionary. Types: SentinelRankDictionary
+ * @param fileName C-style character string containing the file name.
+ * 
+ * @return TReturn A &lt;tt&gt;bool&lt;/tt&gt; which is &lt;tt&gt;true&lt;/tt&gt; on success.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_simpletype" data-page="SimpleType">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>SimpleType - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>SimpleType<div><div>Implementation for "simple" types.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_FiniteOrderedAlphabetConcept.html" data-lang-entity="concept">FiniteOrderedAlphabetConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_AminoAcid.html" data-lang-entity="specialization">AminoAcid</a>, 
+    <a href="specialization_Dna.html" data-lang-entity="specialization">Dna</a>, 
+    <a href="specialization_Dna5.html" data-lang-entity="specialization">Dna5</a>, 
+    <a href="specialization_Dna5Q.html" data-lang-entity="specialization">Dna5Q</a>, 
+    <a href="specialization_DnaQ.html" data-lang-entity="specialization">DnaQ</a>, 
+    <a href="specialization_Finite.html" data-lang-entity="specialization">Finite</a>, 
+    <a href="specialization_Iupac.html" data-lang-entity="specialization">Iupac</a>, 
+    <a href="specialization_ReducedAminoAcid.html" data-lang-entity="specialization">ReducedAminoAcid</a>, 
+    <a href="specialization_Rna.html" data-lang-entity="specialization">Rna</a>, 
+    <a href="specialization_Rna5.html" data-lang-entity="specialization">Rna5</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AlphabetConcept.html" data-lang-entity="concept">AlphabetConcept</a>, 
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a>, 
+    <a href="concept_CopyConstructibleConcept.html" data-lang-entity="concept">CopyConstructibleConcept</a>, 
+    <a href="concept_DefaultConstructibleConcept.html" data-lang-entity="concept">DefaultConstructibleConcept</a>, 
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>, 
+    <a href="concept_FiniteOrderedAlphabetConcept.html" data-lang-entity="concept">FiniteOrderedAlphabetConcept</a>, 
+    <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a>, 
+    <a href="concept_OrderedAlphabetConcept.html" data-lang-entity="concept">OrderedAlphabetConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue, typename TSpec&gt;
+class SimpleType;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specialization tag.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>Type that stores the values of an instance. TValue must be a simple type.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#SimpleType%3A%3ASimpleType" title="#SimpleType::SimpleType (interface function)" data-lang-entity="member_function">SimpleType::SimpleType();, SimpleType::SimpleType(other);, template &lt;typename TParam&gt; SimpleType::SimpleType(param);</a></code></span>
+    <span class="summary_desc"><div>Constructor of SimpleType type.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept::operator>" data-lang-entity="member_function">operator&gt;</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator!=" data-lang-entity="member_function">operator!=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator==" data-lang-entity="member_function">operator==</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_LessThanComparableConcept.html" data-lang-entity="concept">LessThanComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_LessThanComparableConcept.html#LessThanComparableConcept::operator<" data-lang-entity="member_function">operator&lt;</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_OrderedAlphabetConcept.html" data-lang-entity="concept">OrderedAlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept::operator<" data-lang-entity="member_function">operator&lt;</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ComparableConcept.html" data-lang-entity="concept">ComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator<=" data-lang-entity="interface_function">operator&lt;=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ComparableConcept.html#ComparableConcept#operator>=" data-lang-entity="interface_function">operator&gt;=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_FiniteOrderedAlphabetConcept.html" data-lang-entity="concept">FiniteOrderedAlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_FiniteOrderedAlphabetConcept.html#FiniteOrderedAlphabetConcept#ordValue" data-lang-entity="interface_function">ordValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_FiniteOrderedAlphabetConcept.html#FiniteOrderedAlphabetConcept#valueSize" data-lang-entity="interface_function">valueSize</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_OrderedAlphabetConcept.html" data-lang-entity="concept">OrderedAlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#supremumValueImpl" data-lang-entity="interface_function">supremumValueImpl</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#maxValue" data-lang-entity="interface_function">maxValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#infimumValueImpl" data-lang-entity="interface_function">infimumValueImpl</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#minValue" data-lang-entity="interface_function">minValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_AlphabetConcept.html" data-lang-entity="concept">AlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AlphabetConcept.html#AlphabetConcept#BitsPerValue" data-lang-entity="interface_metafunction">BitsPerValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_FiniteOrderedAlphabetConcept.html" data-lang-entity="concept">FiniteOrderedAlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_FiniteOrderedAlphabetConcept.html#FiniteOrderedAlphabetConcept#ValueSize" data-lang-entity="interface_metafunction">ValueSize</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_OrderedAlphabetConcept.html" data-lang-entity="concept">OrderedAlphabetConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#MaxValue" data-lang-entity="interface_metafunction">MaxValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_OrderedAlphabetConcept.html#OrderedAlphabetConcept#MinValue" data-lang-entity="interface_metafunction">MinValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#SimpleType%3A%3Avalue" title="#SimpleType::value (interface function)" data-lang-entity="member_variable">
+        TValue SimpleType::value
+    </a></code></span>
+    <span class="summary_desc"><div>The internal value storage of the SimpleType object.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>A "simple type" is a C++ type that can be constructed without constructor, destructed without destructor and copied
+without copy constructor or assignment operator. All basic types (like <tt>char</tt>, <tt>int</tt> or
+<tt>float</tt>) are simple. Pointers, references and arrays of simple types are simple. POD types ("plain old data
+types"), that are - simplified spoken - C++-types that already existed in C, are simple too.</p><p>Arrays of simple types can be copied very fast by memory manipulation routines, but the default implementation of
+functions like arrayCopyForward and arrayCopy are not optimized for simple types this way. But for classes derived
+from <tt>SimpleType</tt>, optimized variants of array manipulation functions are applied.</p><p>Note that simple types need not to be derived or specialized from <tt>SimpleType</tt>, but it could be convenient to
+do so.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="global_metafunction_IsSimple.html" data-lang-entity="global_metafunction">IsSimple</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="SimpleType::SimpleType" class="signature first" data-lang-entity="member_function">
+      <code>SimpleType::SimpleType();
+SimpleType::SimpleType(other);
+template &lt;typename TParam&gt; SimpleType::SimpleType(param);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor of SimpleType type.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">other</code>
+            
+        
+      </th>
+      <td>Other SimpleType to copy construct with.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">param</code>
+            
+        
+      </th>
+      <td>Any value of type <tt>TParam</tt> that can be assigned to the SimpleType object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The default constructor initializes the SimpleType object with the value <tt>0</tt> and the copy constructor copies
+over the value of the SimpleType.</p><p>When constructing with a <tt>param</tt> that is not a SimpleType then <tt>param</tt> is assigned to the SimpleType
+object, using <a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a>. This function can be overloaded differently for each
+type. You can expect the following behaviour for all SimpleType objects, however:</p><p><ul>
+<li>If <tt>param</tt> is a builtin integer then this value is directly assigned to the <a href="class_SimpleType.html#SimpleType::value" data-lang-entity="member_variable">value</a> member of the SimpleType object. Note that this can allow an invalid assignment, e.g., when assigning
+<tt>42</tt> to a <a href="specialization_Dna.html" data-lang-entity="specialization">Dna</a> object.</li>
+<li>If <tt>param</tt> is a <tt>char</tt> then this character value is converted to the appropriate value and written
+to the <a href="class_SimpleType.html#SimpleType::value" data-lang-entity="member_variable">value</a> member. For example, assigning <tt>'A'</tt> or <tt>'a'</tt> to
+a SimpleType object assigns <tt>0</tt> to the <a href="class_SimpleType.html#SimpleType::value" data-lang-entity="member_variable">value</a> member.</li>
+</ul></p><h4>Example</h4><p>The following example shows construction of a <a href="specialization_Dna.html" data-lang-entity="specialization">Dna</a> (specialization of SimpleType) object with from
+<tt>char</tt> and integer values.</p><div data-src-path="demos/basic/simple_type_construction.cpp"><div class="highlight"><pre>    <span class="n">Dna</span> <span class="nf">a</span><span class="p">(</span><span class="sc">&#39;C&#39;</span><span class="p">);</span>  <span class="c1">// =&gt; a.value == 1</span>
+    <span class="n">Dna</span> <span class="nf">b</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>    <span class="c1">// =&gt; b.value == 3</span>
+    <span class="n">Dna</span> <span class="nf">c</span><span class="p">(</span><span class="sc">&#39;T&#39;</span><span class="p">);</span>  <span class="c1">// =&gt; c.value == 3</span>
+    <span class="n">Dna</span> <span class="nf">d</span><span class="p">(</span><span class="sc">&#39;t&#39;</span><span class="p">);</span>  <span class="c1">// =&gt; d.value == 3</span>
+
+    <span class="n">Dna</span> <span class="n">e</span><span class="p">;</span>  <span class="c1">// =&gt; e.value == 0</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="sc">&#39;N&#39;</span><span class="p">;</span>       <span class="c1">// =&gt; e.value == 0</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="sc">&#39;c&#39;</span><span class="p">;</span>       <span class="c1">// =&gt; e.value == c</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/simple_type_construction.cpp" target="_top">demos/basic/simple_type_construction.cpp</a></div></div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="SimpleType::value" class="signature first" data-lang-entity="member_variable">
+      <code>TValue SimpleType::value</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The internal value storage of the SimpleType object.</div>
+        
+<div><p>@important Do not modify this value directly. SimpleType implements conversion operators for all numeric types, so
+you can simply assign and cast the SimpleType to all built-in numeric types.</p><p>Stores the value of the SimpleType, is of type <tt>TValue</tt>. Valid values are from <tt>0</tt> to <a href="concept_FiniteOrderedAlphabetConcept.html#FiniteOrderedAlphabetConcept#ValueSize" data-lang-entity="interface_metafunction">ValueSize</a> minus one.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class SimpleType
+ * 
+ * @implements FiniteOrderedAlphabetConcept
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Implementation for &#34;simple&#34; types.
+ * 
+ * @signature template &lt;typename TValue, typename TSpec&gt; class SimpleType;
+ * 
+ * @tparam TSpec Specialization tag.
+ * @tparam TValue Type that stores the values of an instance. TValue must be a
+ *                simple type.
+ * 
+ * A &#34;simple type&#34; is a C++ type that can be constructed without constructor,
+ * destructed without destructor and copied without copy constructor or
+ * assignment operator. All basic types (like &lt;tt&gt;char&lt;/tt&gt;, &lt;tt&gt;int&lt;/tt&gt; or
+ * &lt;tt&gt;float&lt;/tt&gt;) are simple. Pointers, references and arrays of simple types
+ * are simple. POD types (&#34;plain old data types&#34;), that are - simplified spoken
+ * - C++-types that already existed in C, are simple too.
+ * 
+ * Arrays of simple types can be copied very fast by memory manipulation
+ * routines, but the default implementation of functions like arrayCopyForward
+ * and arrayCopy are not optimized for simple types this way. But for classes
+ * derived from &lt;tt&gt;SimpleType&lt;/tt&gt;, optimized variants of array manipulation
+ * functions are applied.
+ * 
+ * Note that simple types need not to be derived or specialized from
+ * &lt;tt&gt;SimpleType&lt;/tt&gt;, but it could be convenient to do so.
+ * 
+ * @see IsSimple
+ * 
+ * @fn SimpleType::SimpleType
+ * 
+ * @brief Constructor of SimpleType type.
+ * 
+ * @signature SimpleType::SimpleType();
+ * @signature SimpleType::SimpleType(other);
+ * @signature template &lt;typename TParam&gt; SimpleType::SimpleType(param);
+ * 
+ * @param[in] other Other SimpleType to copy construct with.
+ * @param[in] param Any value of type &lt;tt&gt;TParam&lt;/tt&gt; that can be assigned to
+ *                  the SimpleType object.
+ * 
+ * The default constructor initializes the SimpleType object with the value
+ * &lt;tt&gt;0&lt;/tt&gt; and the copy constructor copies over the value of the SimpleType.
+ * 
+ * When constructing with a &lt;tt&gt;param&lt;/tt&gt; that is not a SimpleType then
+ * &lt;tt&gt;param&lt;/tt&gt; is assigned to the SimpleType object, using @link
+ * AssignableConcept#assign assign @endlink. This function can be overloaded
+ * differently for each type. You can expect the following behaviour for all
+ * SimpleType objects, however:
+ * 
+ * &lt;ul&gt; &lt;li&gt;If &lt;tt&gt;param&lt;/tt&gt; is a builtin integer then this value is directly
+ * assigned to the @link SimpleType::value value @endlink member of the
+ * SimpleType object. Note that this can allow an invalid assignment, e.g., when
+ * assigning &lt;tt&gt;42&lt;/tt&gt; to a @link Dna @endlink object.&lt;/li&gt; &lt;li&gt;If
+ * &lt;tt&gt;param&lt;/tt&gt; is a &lt;tt&gt;char&lt;/tt&gt; then this character value is converted to
+ * the appropriate value and written to the @link SimpleType::value value
+ * @endlink member. For example, assigning &lt;tt&gt;&#39;A&#39;&lt;/tt&gt; or &lt;tt&gt;&#39;a&#39;&lt;/tt&gt; to a
+ * SimpleType object assigns &lt;tt&gt;0&lt;/tt&gt; to the @link SimpleType::value value
+ * @endlink member.&lt;/li&gt; &lt;/ul&gt;
+ * 
+ * @section Example
+ * 
+ * The following example shows construction of a @link Dna @endlink
+ * (specialization of SimpleType) object with from &lt;tt&gt;char&lt;/tt&gt; and integer
+ * values.
+ * 
+ * @snippet demos/basic/simple_type_construction.cpp simple type construction and assignment
+ * 
+ * 
+ * 
+ * @var TValue SimpleType::value;
+ * 
+ * @brief The internal value storage of the SimpleType object.
+ * 
+ * @important Do not modify this value directly. SimpleType implements
+ * conversion operators for all numeric types, so you can simply assign and cast
+ * the SimpleType to all built-in numeric types.
+ * 
+ * Stores the value of the SimpleType, is of type &lt;tt&gt;TValue&lt;/tt&gt;. Valid values
+ * are from &lt;tt&gt;0&lt;/tt&gt; to @link FiniteOrderedAlphabetConcept#ValueSize @endlink
+ * minus one.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

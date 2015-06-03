@@ -1,0 +1,2340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_seed" data-page="Seed">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Seed - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Seed<div><div>Stores the start and end positions in the horizonal and vertical dimension.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_ChainedSeed.html" data-lang-entity="specialization">ChainedSeed</a>, 
+    <a href="specialization_SimpleSeed.html" data-lang-entity="specialization">SimpleSeed</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seeds.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSpec[, typename TConfig]&gt;
+class Seed;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The seed specialization type.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TConfig</a></code></th>
+        <td>The configuration object to use for this seed, defaults to <a href="class_DefaultSeedConfig.html" data-lang-entity="class">DefaultSeedConfig</a>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23beginDiagonal" title="#Seed#beginDiagonal (interface function)" data-lang-entity="interface_function">TDiagonal beginDiagonal(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the begin diagonal of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23beginPositionH" title="#Seed#beginPositionH (interface function)" data-lang-entity="interface_function">TPosition beginPositionH(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the begin position of the seed in the database (horizontal direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23beginPositionV" title="#Seed#beginPositionV (interface function)" data-lang-entity="interface_function">TPosition beginPositionV(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the begin position of the seed in the query (vertical direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23endDiagonal" title="#Seed#endDiagonal (interface function)" data-lang-entity="interface_function">TDiagonal endDiagonal(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the end diagonal of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23endPositionH" title="#Seed#endPositionH (interface function)" data-lang-entity="interface_function">TPosition endPositionH(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the end position of the seed in the database (horizontal direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23endPositionV" title="#Seed#endPositionV (interface function)" data-lang-entity="interface_function">TPosition endPositionV(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the end position of the seed in the query (vertical direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23extendSeed" title="#Seed#extendSeed (interface function)" data-lang-entity="interface_function">void extendSeed(seed, database, query, direction, MatchExtend);, void extendSeed(seed, database, query, direction, scoringScheme, scoreDropOff, xDropTag);</a></code></span>
+    <span class="summary_desc"><div>Extends a seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23lowerDiagonal" title="#Seed#lowerDiagonal (interface function)" data-lang-entity="interface_function">TDiagonal lowerDiagonal(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the leftmost diagonal of the seed (minimum diagonal value).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23score" title="#Seed#score (interface function)" data-lang-entity="interface_function">TSeedScore score(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the score of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23seedSize" title="#Seed#seedSize (interface function)" data-lang-entity="interface_function">TSize seedSize(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of matches and mismatches of the seed. This is the longest true diagonal fitting into
+its dimensions.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setBeginPositionH" title="#Seed#setBeginPositionH (interface function)" data-lang-entity="interface_function">void setBeginPositionH(seed, pos);</a></code></span>
+    <span class="summary_desc"><div>Sets the begin position of the seed in the database (horizontal direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setBeginPositionV" title="#Seed#setBeginPositionV (interface function)" data-lang-entity="interface_function">void setBeginPositionV(seed, pos);</a></code></span>
+    <span class="summary_desc"><div>Sets the begin position of the seed in the query (vertical direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setEndPositionH" title="#Seed#setEndPositionH (interface function)" data-lang-entity="interface_function">void setEndPositionH(seed, pos);</a></code></span>
+    <span class="summary_desc"><div>Sets the end position of the seed in the database (horizontal direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setEndPositionV" title="#Seed#setEndPositionV (interface function)" data-lang-entity="interface_function">void setEndPositionV(seed, pos);</a></code></span>
+    <span class="summary_desc"><div>Sets the end position of the seed in the query (vertical direction).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setLowerDiagonal" title="#Seed#setLowerDiagonal (interface function)" data-lang-entity="interface_function">void setLowerDigonal(seed, diag);</a></code></span>
+    <span class="summary_desc"><div>Sets a new value for the leftmost diagonal of a seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setScore" title="#Seed#setScore (interface function)" data-lang-entity="interface_function">void setScore(seed, scoreVal);</a></code></span>
+    <span class="summary_desc"><div>Sets the Seed score value.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23setUpperDiagonal" title="#Seed#setUpperDiagonal (interface function)" data-lang-entity="interface_function">void setUpperDigonal(seed, diag);</a></code></span>
+    <span class="summary_desc"><div>Sets a new value for the rightmost diagonal of a seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23upperDiagonal" title="#Seed#upperDiagonal (interface function)" data-lang-entity="interface_function">TDiagonal upperDiagonal(seed);</a></code></span>
+    <span class="summary_desc"><div>Returns the rightmost diagonal of the seed (maximum diagonal value).</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23Diagonal" title="#Seed#Diagonal (interface function)" data-lang-entity="interface_metafunction">Diagonal&lt;TSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The diagonal type of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23Position" title="#Seed#Position (interface function)" data-lang-entity="interface_metafunction">Position&lt;TSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The position type of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23SeedScore" title="#Seed#SeedScore (interface function)" data-lang-entity="interface_metafunction">SeedScore&lt;TSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The seed score type of a Seed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Seed%23Size" title="#Seed#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;TSeed&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>The size type of a Seed.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Examples</h3><p>The following example shows the usage of three seed extension algorithms using the tags <tt>MaxExtend</tt>,
+<tt>UnGappedXDrop</tt>, and <tt>GappedXDrop</tt>.</p><div data-src-path="demos/seeds/seeds_extension.cpp"><div class="highlight"><pre><span class="c1">//Examples for three seed extension algorithms.</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/seeds.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="s">&quot;SEEDabXcdXefXXX&quot;</span><span class="p">;</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="s">&quot;SEEDabYcdefYYYY&quot;</span><span class="p">;</span>
+
+    <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">seed1</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>          <span class="c1">//left=0; length=4</span>
+    <span class="n">extendSeed</span><span class="p">(</span><span class="n">seed1</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">EXTEND_BOTH</span><span class="p">,</span> <span class="n">MatchExtend</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionH(seed1) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionH</span><span class="p">(</span><span class="n">seed1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionV(seed1) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionV</span><span class="p">(</span><span class="n">seed1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">seed2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>          <span class="c1">//left=0; length=4</span>
+    <span class="n">Score</span><span class="o">&lt;&gt;</span> <span class="n">scoring</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">extendSeed</span><span class="p">(</span><span class="n">seed2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">EXTEND_BOTH</span><span class="p">,</span> <span class="n">scoring</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">UnGappedXDrop</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionH(seed2) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionH</span><span class="p">(</span><span class="n">seed2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionV(seed2) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionV</span><span class="p">(</span><span class="n">seed2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">seed3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>          <span class="c1">//left=0; length=4</span>
+    <span class="n">extendSeed</span><span class="p">(</span><span class="n">seed3</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">EXTEND_BOTH</span><span class="p">,</span> <span class="n">scoring</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">GappedXDrop</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionH(seed3) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionH</span><span class="p">(</span><span class="n">seed3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;endPositionV(seed3) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionV</span><span class="p">(</span><span class="n">seed3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/seeds/seeds_extension.cpp" target="_top">demos/seeds/seeds_extension.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/seeds/seeds_extension.cpp.stdout">endPositionH(seed1) = 6
+endPositionV(seed1) = 6
+endPositionH(seed2) = 9
+endPositionV(seed2) = 9
+endPositionH(seed3) = 14
+endPositionV(seed3) = 13
+</pre><p>Here is an example for global seed chaining:</p><div data-src-path="demos/seeds/seeds_chaining.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/seeds.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Build SeedSet.</span>
+    <span class="n">SeedSet</span><span class="o">&lt;</span><span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Unordered</span><span class="o">&gt;</span> <span class="n">seedSet</span><span class="p">;</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">93</span><span class="p">,</span> <span class="mi">281</span><span class="p">,</span> <span class="mi">342</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">237</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">364</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">284</span><span class="p">,</span> <span class="mi">86</span><span class="p">,</span> <span class="mi">368</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">239</span><span class="p">,</span> <span class="mi">374</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+    <span class="n">addSeed</span><span class="p">(</span><span class="n">seedSet</span><span class="p">,</span> <span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">299</span><span class="p">,</span> <span class="mi">352</span><span class="p">,</span> <span class="mi">405</span><span class="p">,</span> <span class="mi">460</span><span class="p">),</span> <span class="n">Single</span><span class="p">());</span>
+
+    <span class="c1">// Perform sparse chaining, uses time O(n log n).</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="n">Seed</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">chain</span><span class="p">;</span>
+    <span class="n">chainSeedsGlobally</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">seedSet</span><span class="p">,</span> <span class="n">SparseChaining</span><span class="p">());</span>
+
+    <span class="c1">// Print results to stdout.</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">chain</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Seed(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">beginPositionH</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span>
+                  <span class="o">&lt;&lt;</span> <span class="n">beginPositionV</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionH</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                  <span class="o">&lt;&lt;</span> <span class="s">&quot;, &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endPositionV</span><span class="p">(</span><span class="n">chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/seeds/seeds_chaining.cpp" target="_top">demos/seeds/seeds_chaining.cpp</a></div></div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Seed#beginDiagonal" class="signature first" data-lang-entity="interface_function">
+      <code>TDiagonal beginDiagonal(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the begin diagonal of a Seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The Seed to query for its begin diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDiagonal</code></th>
+        <td>The diagonal of the Seed's begin position of type <a href="class_Seed.html#Seed#Diagonal" data-lang-entity="interface_metafunction">Diagonal</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#beginPositionH" class="signature" data-lang-entity="interface_function">
+      <code>TPosition beginPositionH(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the begin position of the seed in the database (horizontal direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The horizontal begin position of type <a href="class_Seed.html#Seed#Position" data-lang-entity="interface_metafunction">Position</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#beginPositionV" class="signature" data-lang-entity="interface_function">
+      <code>TPosition beginPositionV(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the begin position of the seed in the query (vertical direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The vertical begin position of type <a href="class_Seed.html#Seed#Position" data-lang-entity="interface_metafunction">Position</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#endDiagonal" class="signature" data-lang-entity="interface_function">
+      <code>TDiagonal endDiagonal(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the end diagonal of a Seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The Seed to query for its end diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDiagonal</code></th>
+        <td>The diagonal of the Seed's end position of type <a href="class_Seed.html#Seed#Diagonal" data-lang-entity="interface_metafunction">Diagonal</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#endPositionH" class="signature" data-lang-entity="interface_function">
+      <code>TPosition endPositionH(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the end position of the seed in the database (horizontal direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The horizontal end position of type <a href="class_Seed.html#Seed#Position" data-lang-entity="interface_metafunction">Position</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#endPositionV" class="signature" data-lang-entity="interface_function">
+      <code>TPosition endPositionV(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the end position of the seed in the query (vertical direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPosition</code></th>
+        <td>The vertical end position of type <a href="class_Seed.html#Seed#Position" data-lang-entity="interface_metafunction">Position</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#extendSeed" class="signature" data-lang-entity="interface_function">
+      <code>void extendSeed(seed, database, query, direction, MatchExtend);
+void extendSeed(seed, database, query, direction, scoringScheme, scoreDropOff, xDropTag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Extends a seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to extend.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">database</code>
+            
+        
+      </th>
+      <td>The database (horizontal) <a href="concept_ContainerConcept.html" data-lang-entity="concept">sequence</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">query</code>
+            
+        
+      </th>
+      <td>The query (vertical) <a href="concept_ContainerConcept.html" data-lang-entity="concept">sequence</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">direction</code>
+            
+        
+      </th>
+      <td>The extension direction. Type: <a href="enum_ExtensionDirection.html" data-lang-entity="enum">ExtensionDirection</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoringScheme</code>
+            
+        
+      </th>
+      <td>The <a href="class_Score.html" data-lang-entity="class">Score</a> object to use for scoring alignments and gaps.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoreDropOff</code>
+            
+        
+      </th>
+      <td>The score drop after which the extension should stop. The extension stops if this
+value is exceeded. Only given for when using an x-drop algorithm.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">xDropTag</code>
+            
+        
+      </th>
+      <td>Tag for selecting x-drop method, one of <tt>UnGappedXDrop</tt> and
+<tt>GappedXDrop</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>You can use the tags, <tt>MatchExtend</tt>, <tt>UnGappedXDrop</tt>, and <tt>GappedXDrop</tt>.</p><p>Note that the diagonals updated in <tt>seed</tt> do not necessarily reflect the diagonals for the optimal extension
+but the diagonals used in all traces of the extension. However, they are guaranteed to include the optimal
+extension's trace.</p><h4>Examples</h4><p>The documentation of the class <a href="class_Seed.html" data-lang-entity="class">Seed</a> contains an example for
+seed extension.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="enum_ExtensionDirection.html" data-lang-entity="enum">ExtensionDirection</a></li>
+    
+    <li><a href="group_SeedExtensionTags.html" data-lang-entity="group">SeedExtensionTags</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#lowerDiagonal" class="signature" data-lang-entity="interface_function">
+      <code>TDiagonal lowerDiagonal(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the leftmost diagonal of the seed (minimum diagonal value).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query for its lower diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDiagonal</code></th>
+        <td>The lower diagonal value of type <a href="class_Seed.html#Seed#Diagonal" data-lang-entity="interface_metafunction">Diagonal</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#score" class="signature" data-lang-entity="interface_function">
+      <code>TSeedScore score(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the score of a Seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The Seed to query for its score.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSeedScore</code></th>
+        <td>The score value of the seed of type <a href="class_Seed.html#Seed#SeedScore" data-lang-entity="interface_metafunction">SeedScore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#seedSize" class="signature" data-lang-entity="interface_function">
+      <code>TSize seedSize(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of matches and mismatches of the seed. This is the longest true diagonal fitting into
+its dimensions.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The Seed to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The size of the type <a href="class_Seed.html#Seed#Size" data-lang-entity="interface_metafunction">Size</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setBeginPositionH" class="signature" data-lang-entity="interface_function">
+      <code>void setBeginPositionH(seed, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the begin position of the seed in the database (horizontal direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the horizontal begin position for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The value to set for the horizontal begin position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setBeginPositionV" class="signature" data-lang-entity="interface_function">
+      <code>void setBeginPositionV(seed, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the begin position of the seed in the query (vertical direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the vertical begin position for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The value to set for the vertical begin position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setEndPositionH" class="signature" data-lang-entity="interface_function">
+      <code>void setEndPositionH(seed, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the end position of the seed in the database (horizontal direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the horizontal end position for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The value to set for the horizontal end position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setEndPositionV" class="signature" data-lang-entity="interface_function">
+      <code>void setEndPositionV(seed, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the end position of the seed in the query (vertical direction).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the vertical end position for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The value to set for the vertical end position.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setLowerDiagonal" class="signature" data-lang-entity="interface_function">
+      <code>void setLowerDigonal(seed, diag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets a new value for the leftmost diagonal of a seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the diagonal value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">diag</code>
+            
+        
+      </th>
+      <td>The value to set for the diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setScore" class="signature" data-lang-entity="interface_function">
+      <code>void setScore(seed, scoreVal);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the Seed score value.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the score value of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">scoreVal</code>
+            
+        
+      </th>
+      <td>The score value to set. The type can queried from the type of <tt>seed</tt> using
+<a href="class_Seed.html#Seed#SeedScore" data-lang-entity="interface_metafunction">SeedScore</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#setUpperDiagonal" class="signature" data-lang-entity="interface_function">
+      <code>void setUpperDigonal(seed, diag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets a new value for the rightmost diagonal of a seed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">seed</code>
+            
+        
+      </th>
+      <td>The Seed to set the diagonal value for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">diag</code>
+            
+        
+      </th>
+      <td>The value to set for the diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Seed#upperDiagonal" class="signature" data-lang-entity="interface_function">
+      <code>TDiagonal upperDiagonal(seed);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the rightmost diagonal of the seed (maximum diagonal value).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seed</code>
+            
+        
+      </th>
+      <td>The seed to query for its upper diagonal.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDiagonal</code></th>
+        <td>The upper diagonal value of type <a href="class_Seed.html#Seed#Diagonal" data-lang-entity="interface_metafunction">Diagonal</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Seed#Diagonal" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Diagonal&lt;TSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The diagonal type of a Seed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSeed</code></th>
+            <td>The Seed to query for its diagonal type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The diagonal type of <tt>TSeed</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Seed#Position" class="signature" data-lang-entity="interface_metafunction">
+    <code>Position&lt;TSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The position type of a Seed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSeed</code></th>
+            <td>The Seed type to query.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The position type of <tt>TSeed</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Seed#SeedScore" class="signature" data-lang-entity="interface_metafunction">
+    <code>SeedScore&lt;TSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The seed score type of a Seed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSeed</code></th>
+            <td>The Seed to query for its seed score type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The score type of <tt>TSeed</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Seed#Size" class="signature" data-lang-entity="interface_metafunction">
+    <code>Size&lt;TSeed&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The size type of a Seed.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSeed</code></th>
+            <td>The Seed to query for its size type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The size type of <tt>TSeed</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Seed
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Stores the start and end positions in the horizonal and vertical
+ *        dimension.
+ * 
+ * @signature template &lt;typename TSpec[, typename TConfig]&gt; class Seed;
+ * 
+ * @tparam TSpec The seed specialization type.
+ * @tparam TConfig The configuration object to use for this seed, defaults to
+ *                 @link DefaultSeedConfig @endlink.
+ * 
+ * @section Examples
+ * 
+ * The following example shows the usage of three seed extension algorithms
+ * using the tags &lt;tt&gt;MaxExtend&lt;/tt&gt;, &lt;tt&gt;UnGappedXDrop&lt;/tt&gt;, and
+ * &lt;tt&gt;GappedXDrop&lt;/tt&gt;.
+ * 
+ * @include demos/seeds/seeds_extension.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/seeds/seeds_extension.cpp.stdout
+ * 
+ * Here is an example for global seed chaining:
+ * 
+ * @include demos/seeds/seeds_chaining.cpp
+ * 
+ * 
+ * 
+ * @mfn Seed#Position
+ * 
+ * @brief The position type of a Seed.
+ * 
+ * @signature Position&lt;TSeed&gt;::Type;
+ * 
+ * @tparam TSeed The Seed type to query.
+ * 
+ * @return Type The position type of &lt;tt&gt;TSeed&lt;/tt&gt;.
+ * 
+ * @mfn Seed#Size
+ * 
+ * @brief The size type of a Seed.
+ * 
+ * @signature Size&lt;TSeed&gt;::Type;
+ * 
+ * @tparam TSeed The Seed to query for its size type.
+ * 
+ * @return Type The size type of &lt;tt&gt;TSeed&lt;/tt&gt;.
+ * 
+ * @mfn Seed#Diagonal
+ * 
+ * @brief The diagonal type of a Seed.
+ * 
+ * @signature Diagonal&lt;TSeed&gt;::Type;
+ * 
+ * @tparam TSeed The Seed to query for its diagonal type.
+ * 
+ * @return Type The diagonal type of &lt;tt&gt;TSeed&lt;/tt&gt;.
+ * 
+ * @mfn Seed#SeedScore
+ * 
+ * @brief The seed score type of a Seed.
+ * 
+ * @signature SeedScore&lt;TSeed&gt;::Type;
+ * 
+ * @tparam TSeed The Seed to query for its seed score type.
+ * 
+ * @return Type The score type of &lt;tt&gt;TSeed&lt;/tt&gt;.
+ * 
+ * @fn Seed#extendSeed
+ * 
+ * @headerfile &lt;seqan/seeds.h&gt;
+ * 
+ * @brief Extends a seed.
+ * 
+ * @signature void extendSeed(seed, database, query, direction, MatchExtend);
+ * @signature void extendSeed(seed, database, query, direction, scoringScheme,
+ *            scoreDropOff, xDropTag);
+ * 
+ * @param[in,out] seed The Seed to extend.
+ * @param[in] database The database (horizontal) @link ContainerConcept sequence
+ *                     @endlink.
+ * @param[in] query The query (vertical) @link ContainerConcept sequence
+ *                  @endlink.
+ * @param[in] direction The extension direction. Type: @link ExtensionDirection
+ *                      @endlink.
+ * @param[in] scoringScheme The @link Score @endlink object to use for scoring
+ *                          alignments and gaps.
+ * @param[in] scoreDropOff The score drop after which the extension should stop.
+ *                         The extension stops if this value is exceeded. Only
+ *                         given for when using an x-drop algorithm.
+ * @param[in] xDropTag Tag for selecting x-drop method, one of
+ *                     &lt;tt&gt;UnGappedXDrop&lt;/tt&gt; and &lt;tt&gt;GappedXDrop&lt;/tt&gt;.
+ * 
+ * You can use the tags, &lt;tt&gt;MatchExtend&lt;/tt&gt;, &lt;tt&gt;UnGappedXDrop&lt;/tt&gt;, and
+ * &lt;tt&gt;GappedXDrop&lt;/tt&gt;.
+ * 
+ * Note that the diagonals updated in &lt;tt&gt;seed&lt;/tt&gt; do not necessarily reflect
+ * the diagonals for the optimal extension but the diagonals used in all traces
+ * of the extension. However, they are guaranteed to include the optimal
+ * extension&#39;s trace.
+ * 
+ * @section Examples
+ * 
+ * The documentation of the class @link Seed @endlink contains an example for
+ * seed extension.
+ * 
+ * @see ExtensionDirection
+ * @see SeedExtensionTags
+ * 
+ * @fn Seed#beginPositionH
+ * 
+ * @brief Returns the begin position of the seed in the database (horizontal
+ *        direction).
+ * 
+ * @signature TPosition beginPositionH(seed);
+ * 
+ * @param[in] seed The seed to query.
+ * 
+ * @return TPosition The horizontal begin position of type @link Seed#Position
+ *                   @endlink.
+ * 
+ * @fn Seed#endPositionH
+ * 
+ * @brief Returns the end position of the seed in the database (horizontal
+ *        direction).
+ * 
+ * @signature TPosition endPositionH(seed);
+ * 
+ * @param[in] seed The seed to query.
+ * 
+ * @return TPosition The horizontal end position of type @link Seed#Position
+ *                   @endlink.
+ * 
+ * @fn Seed#setBeginPositionH
+ * 
+ * @brief Sets the begin position of the seed in the database (horizontal
+ *        direction).
+ * 
+ * @signature void setBeginPositionH(seed, pos);
+ * 
+ * @param[in,out] seed The Seed to set the horizontal begin position for.
+ * @param[in] pos The value to set for the horizontal begin position.
+ * 
+ * @fn Seed#setEndPositionH
+ * 
+ * @brief Sets the end position of the seed in the database (horizontal
+ *        direction).
+ * 
+ * @signature void setEndPositionH(seed, pos);
+ * 
+ * @param[in,out] seed The Seed to set the horizontal end position for.
+ * @param[in] pos The value to set for the horizontal end position.
+ * 
+ * @fn Seed#beginPositionV
+ * 
+ * @brief Returns the begin position of the seed in the query (vertical
+ *        direction).
+ * 
+ * @signature TPosition beginPositionV(seed);
+ * 
+ * @param[in] seed The seed to query.
+ * 
+ * @return TPosition The vertical begin position of type @link Seed#Position
+ *                   @endlink.
+ * 
+ * @fn Seed#endPositionV
+ * 
+ * @brief Returns the end position of the seed in the query (vertical
+ *        direction).
+ * 
+ * @signature TPosition endPositionV(seed);
+ * 
+ * @param[in] seed The seed to query.
+ * 
+ * @return TPosition The vertical end position of type @link Seed#Position
+ *                   @endlink.
+ * 
+ * @fn Seed#setBeginPositionV
+ * 
+ * @brief Sets the begin position of the seed in the query (vertical direction).
+ * 
+ * @signature void setBeginPositionV(seed, pos);
+ * 
+ * @param[in,out] seed The Seed to set the vertical begin position for.
+ * @param[in] pos The value to set for the vertical begin position.
+ * 
+ * @fn Seed#setEndPositionV
+ * 
+ * @brief Sets the end position of the seed in the query (vertical direction).
+ * 
+ * @signature void setEndPositionV(seed, pos);
+ * 
+ * @param[in,out] seed The Seed to set the vertical end position for.
+ * @param[in] pos The value to set for the vertical end position.
+ * 
+ * @fn Seed#lowerDiagonal
+ * 
+ * @brief Returns the leftmost diagonal of the seed (minimum diagonal value).
+ * 
+ * @signature TDiagonal lowerDiagonal(seed);
+ * 
+ * @param[in] seed The seed to query for its lower diagonal.
+ * 
+ * @return TDiagonal The lower diagonal value of type @link Seed#Diagonal
+ *                   @endlink.
+ * 
+ * @fn Seed#setLowerDiagonal
+ * 
+ * @brief Sets a new value for the leftmost diagonal of a seed.
+ * 
+ * @signature void setLowerDigonal(seed, diag);
+ * 
+ * @param[in,out] seed The Seed to set the diagonal value for.
+ * @param[in] diag The value to set for the diagonal.
+ * 
+ * @fn Seed#upperDiagonal
+ * 
+ * @brief Returns the rightmost diagonal of the seed (maximum diagonal value).
+ * 
+ * @signature TDiagonal upperDiagonal(seed);
+ * 
+ * @param[in] seed The seed to query for its upper diagonal.
+ * 
+ * @return TDiagonal The upper diagonal value of type @link Seed#Diagonal
+ *                   @endlink.
+ * 
+ * @fn Seed#setUpperDiagonal
+ * 
+ * @brief Sets a new value for the rightmost diagonal of a seed.
+ * 
+ * @signature void setUpperDigonal(seed, diag);
+ * 
+ * @param[in,out] seed The Seed to set the diagonal value for.
+ * @param[in] diag The value to set for the diagonal.
+ * 
+ * @fn Seed#seedSize
+ * 
+ * @brief Returns the number of matches and mismatches of the seed. This is the
+ *        longest true diagonal fitting into its dimensions.
+ * 
+ * @signature TSize seedSize(seed);
+ * 
+ * @param[in] seed The Seed to query for its size.
+ * 
+ * @return TSize The size of the type @link Seed#Size @endlink.
+ * 
+ * @fn Seed#beginDiagonal
+ * 
+ * @brief Returns the begin diagonal of a Seed.
+ * 
+ * @signature TDiagonal beginDiagonal(seed);
+ * 
+ * @param[in] seed The Seed to query for its begin diagonal.
+ * 
+ * @return TDiagonal The diagonal of the Seed&#39;s begin position of type @link
+ *                   Seed#Diagonal @endlink.
+ * 
+ * @fn Seed#endDiagonal
+ * 
+ * @brief Returns the end diagonal of a Seed.
+ * 
+ * @signature TDiagonal endDiagonal(seed);
+ * 
+ * @param[in] seed The Seed to query for its end diagonal.
+ * 
+ * @return TDiagonal The diagonal of the Seed&#39;s end position of type @link
+ *                   Seed#Diagonal @endlink.
+ * 
+ * @fn Seed#score
+ * 
+ * @brief Returns the score of a Seed.
+ * 
+ * @signature TSeedScore score(seed);
+ * 
+ * @param[in] seed The Seed to query for its score.
+ * 
+ * @return TSeedScore The score value of the seed of type @link Seed#SeedScore
+ *                    @endlink.
+ * 
+ * @fn Seed#setScore
+ * 
+ * @brief Sets the Seed score value.
+ * 
+ * @signature void setScore(seed, scoreVal);
+ * 
+ * @param[in,out] seed The Seed to set the score value of.
+ * @param[in] scoreVal The score value to set. The type can queried from the
+ *                     type of &lt;tt&gt;seed&lt;/tt&gt; using @link Seed#SeedScore
+ *                     @endlink.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,138 @@
+@import '../lib/font-awesome/less/font-awesome';
+
+
+
+@tablet: ~"only screen and (min-device-width : 768px) and (max-device-width : 1024px)";
+@small-window: ~"only screen and (max-width: 1024px)";
+@small-list: ~"only screen and (max-width: 341px)";
+@highres: ~"(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)";
+
+
+
+@dotted: 1px dotted @anthrazit;
+
+
+
+.bg-gradient(@color-start, @color-end, @color-default) {
+    .diagonal-gradient (@color-start, @color-end, @color-default);
+}
+
+.bg-gradient(@color, @lightenBy) {
+    .diagonal-gradient (lighten(@color, @lightenBy + 3%), lighten(@color, @lightenBy - 3%), lighten(@color, @lightenBy));
+}
+
+.bg-gradient() {
+    .bg-gradient(@primary, 49%);
+}
+
+
+/**
+ * Gives lists a custom bullet point
+ */
+.bullet-icon() {
+    .bullet-icon("\e080");
+}
+.bullet-icon(@content) {
+    .bullet-icon(@content, before, auto, auto, auto, -1.5em);
+}
+.bullet-icon(@content, before, @topPos, @rightPos, @bottomPos, @leftPos) {
+    position: relative;
+    &:before {
+        .bullet-icon-content(@content, @topPos, @rightPos, @bottomPos, @leftPos);
+    }
+}
+.bullet-icon(@content, after, @topPos, @rightPos, @bottomPos, @leftPos) {
+    position: relative;
+    &:after {
+        .bullet-icon-content(@content, @topPos, @rightPos, @bottomPos, @leftPos);
+    }
+}
+.bullet-icon-content(@content, @topPos, @rightPos, @bottomPos, @leftPos) {
+    position: absolute;
+    top: @topPos;
+    left: @leftPos;
+    right: @rightPos;
+    bottom: @bottomPos;
+    font-family: 'Glyphicons Halflings';
+    content: @content;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    display: block;
+    font-size: .8em;
+}
+
+
+/**
+ * used for less and more links (especially collapsed search result lists and code examples
+ */
+.anim-link(@symbol) {
+	font-size: 1.5em;
+	line-height: .65em;
+	padding: 0 0 0.65em 0;
+
+	text-align: center;
+	.bullet-icon("@{symbol}", before, 1em, auto, auto, 5em);
+	.bullet-icon("@{symbol}", after, 1em, 5em, auto, auto);
+	&:before, &:after {
+		opacity: 0;			        
+		font-size: 0.3em;
+		.transition(opacity .5s);
+	}
+
+	&:hover {
+		text-decoration: none;
+		&:before, &:after { opacity: 1; .animation(animation2 .3s linear 0s infinite alternate); }
+	}
+}
+
+.more-link() {
+	.anim-link("\e114");
+	&:before, &:after { margin-top: .8em; }
+}
+
+.less-link() {
+	.anim-link("\e113");
+	&:before, &:after { margin-top: -.8em; }
+}
+
+
+
+.box {
+	border: 1px solid rgba(0,0,0,.2);
+	.bg-gradient(@anthrazit, 85%);
+	.border-radius(4px);
+	.box-shadow(inset 0 1px 2px rgba(0, 0, 0, .05));
+}
+
+
+
+.glyphicon() {
+	.glyphicon("\e107");
+}
+
+.glyphicon(@content) {
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+    -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: @content;
+}
+
+
+
+.fontAwesome() {
+    .fontAwesome("\f071");
+}
+
+.fontAwesome(@content) {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: @content;
+}

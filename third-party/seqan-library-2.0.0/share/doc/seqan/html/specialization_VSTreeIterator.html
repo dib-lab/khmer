@@ -1,0 +1,3432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_vstreeiterator" data-page="VSTreeIterator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>VSTree Iterator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>VSTree Iterator<div><div>Abstract iterator for string trees, where string trees are trees constructed from a string.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Iter.html" data-lang-entity="class">Iter</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_BottomUpIterator.html" data-lang-entity="specialization">BottomUpIterator</a>, 
+    <a href="specialization_MaxRepeatsIterator.html" data-lang-entity="specialization">MaxRepeatsIterator</a>, 
+    <a href="specialization_MultiMemsIterator.html" data-lang-entity="specialization">MultiMemsIterator</a>, 
+    <a href="specialization_MumsIterator.html" data-lang-entity="specialization">MumsIterator</a>, 
+    <a href="specialization_SuperMaxRepeatsFastIterator.html" data-lang-entity="specialization">SuperMaxRepeatsFastIterator</a>, 
+    <a href="specialization_SuperMaxRepeatsIterator.html" data-lang-entity="specialization">SuperMaxRepeatsIterator</a>, 
+    <a href="specialization_TopDownHistoryIterator.html" data-lang-entity="specialization">TopDownHistoryIterator</a>, 
+    <a href="specialization_TopDownIterator.html" data-lang-entity="specialization">TopDownIterator</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TContainer, typename TSpec&gt;
+class Iter&lt;TContainer, VSTree&lt;TSpec&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specialization type.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TContainer</a></code></th>
+        <td>Type of the container that can be iterated. Types: <a href="specialization_IndexDfi.html" data-lang-entity="specialization">IndexDfi</a>,
+<a href="specialization_IndexEsa.html" data-lang-entity="specialization">IndexEsa</a>, <a href="specialization_IndexWotd.html" data-lang-entity="specialization">IndexWotd</a>, <a href="specialization_FMIndex.html" data-lang-entity="specialization">FMIndex</a></td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter::Iter" data-lang-entity="member_function">Iter</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23alignment" title="#VSTreeIterator#alignment (interface function)" data-lang-entity="interface_function">TAlign alignment(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns an alignment of the occurrences of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23assignProperty" title="#VSTreeIterator#assignProperty (interface function)" data-lang-entity="interface_function">void assignProperty(pm, value(iterator), val)</a></code></span>
+    <span class="summary_desc"><div>Assigns a property to an item in the property map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23atEnd" title="#VSTreeIterator#atEnd (interface function)" data-lang-entity="interface_function">bool atEnd(iterator);</a></code></span>
+    <span class="summary_desc"><div>Determines whether an virtual string tree iterator is at the end position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23childrenAreLeaves" title="#VSTreeIterator#childrenAreLeaves (interface function)" data-lang-entity="interface_function">bool childrenAreLeaves(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether iterator points to a node with only leaf-children.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23countChildren" title="#VSTreeIterator#countChildren (interface function)" data-lang-entity="interface_function">TSize countChildren(iterator);</a></code></span>
+    <span class="summary_desc"><div>Count the number of children of a tree node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23countOccurrences" title="#VSTreeIterator#countOccurrences (interface function)" data-lang-entity="interface_function">TSize countOccurrences(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a>
+substring in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23getFrequency" title="#VSTreeIterator#getFrequency (interface function)" data-lang-entity="interface_function">int getFrequency(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of sequences, which contain the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> as a substring.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23getOccurrence" title="#VSTreeIterator#getOccurrence (interface function)" data-lang-entity="interface_function">TSAValue getOccurrence(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns an occurrence of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23getOccurrences" title="#VSTreeIterator#getOccurrences (interface function)" data-lang-entity="interface_function">TInfix getOccurrences(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns all occurrences of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23getOccurrencesBwt" title="#VSTreeIterator#getOccurrencesBwt (interface function)" data-lang-entity="interface_function">TReturn getOccurrencesBwt(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the characters left beside all occurrence of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23getProperty" title="#VSTreeIterator#getProperty (interface function)" data-lang-entity="interface_function">TValue getProperty(pm, value(iterator))</a></code></span>
+    <span class="summary_desc"><div>Get method for an item's property.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23goBegin" title="#VSTreeIterator#goBegin (interface function)" data-lang-entity="interface_function">void goBegin(iterator);</a></code></span>
+    <span class="summary_desc"><div>Iterates to the first position of a container.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23goNext" title="#VSTreeIterator#goNext (interface function)" data-lang-entity="interface_function">void goNext(it);</a></code></span>
+    <span class="summary_desc"><div>Go to next tree node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23goRoot" title="#VSTreeIterator#goRoot (interface function)" data-lang-entity="interface_function">void goRoot(iterator);</a></code></span>
+    <span class="summary_desc"><div>Move iterator to the root node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isLeaf" title="#VSTreeIterator#isLeaf (interface function)" data-lang-entity="interface_function">bool isLeaf(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether a tree iterator points to a leaf.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isLeftMaximal" title="#VSTreeIterator#isLeftMaximal (interface function)" data-lang-entity="interface_function">bool isLeftMaximal(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether the occurrences of an iterator's <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> mutually differ in the character
+left of the hits.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isPartiallyLeftExtensible" title="#VSTreeIterator#isPartiallyLeftExtensible (interface function)" data-lang-entity="interface_function">bool isPartiallyLeftExtensible(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether the characters left of the two occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> are equal.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isRightTerminal" title="#VSTreeIterator#isRightTerminal (interface function)" data-lang-entity="interface_function">bool isRightTerminal(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether iterator points to a suffix.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isRoot" title="#VSTreeIterator#isRoot (interface function)" data-lang-entity="interface_function">bool isRoot(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether a tree iterator points to the root node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23isUnique" title="#VSTreeIterator#isUnique (interface function)" data-lang-entity="interface_function">bool isUnique(iterator);</a></code></span>
+    <span class="summary_desc"><div>Test whether the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> occurs only once in every sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23nodeHullPredicate" title="#VSTreeIterator#nodeHullPredicate (interface function)" data-lang-entity="interface_function">bool nodeHullPredicate(iterator);</a></code></span>
+    <span class="summary_desc"><div>If <tt>false</tt> this node and its subtree is concealed.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23nodePredicate" title="#VSTreeIterator#nodePredicate (interface function)" data-lang-entity="interface_function">bool nodePredicate(iterator);</a></code></span>
+    <span class="summary_desc"><div>If <tt>false</tt> this node will be skipped during the bottom-up traversal.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23property" title="#VSTreeIterator#property (interface function)" data-lang-entity="interface_function">TRef property(pm, value(iterator))</a></code></span>
+    <span class="summary_desc"><div>Accesses the property of an item in the property map.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23range" title="#VSTreeIterator#range (interface function)" data-lang-entity="interface_function">TPair range(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the suffix array interval borders of occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the
+index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23repLength" title="#VSTreeIterator#repLength (interface function)" data-lang-entity="interface_function">TSize repLength(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns the length of the substring representing the path from root to <tt>iterator</tt> node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23representative" title="#VSTreeIterator#representative (interface function)" data-lang-entity="interface_function">TInfix representative(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns a substring representing the path from root to <tt>iterator</tt> node.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23value" title="#VSTreeIterator#value (interface function)" data-lang-entity="interface_function">TDesc value(iterator);</a></code></span>
+    <span class="summary_desc"><div>Returns a vertex descriptor of the current node.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#operator*" data-lang-entity="interface_function">operator*</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#VSTreeIterator%23EdgeLabel" title="#VSTreeIterator#EdgeLabel (interface function)" data-lang-entity="interface_metafunction">EdgeLabel&lt;TSpec&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Type of a string representing the characters of edges.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Iter.html" data-lang-entity="class">Iter</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Container" data-lang-entity="interface_metafunction">Container</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterComplementConst" data-lang-entity="interface_metafunction">IterComplementConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#IterMakeConst" data-lang-entity="interface_metafunction">IterMakeConst</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Iter.html#Iter#Spec" data-lang-entity="interface_metafunction">Spec</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_IteratorAssociatedTypesConcept.html" data-lang-entity="concept">IteratorAssociatedTypesConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Pointer" data-lang-entity="interface_metafunction">Pointer</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_IteratorAssociatedTypesConcept.html#IteratorAssociatedTypesConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This iterator is a pointer to a node in the string tree of a given text. Depending on the index this can either be a
+suffix or prefix tree/trie. Every node can uniquely be mapped to an interval of suffices or prefixes.</p><p>Default virtual string tree iterators depending on the <a href="class_Index.html" data-lang-entity="class">Index</a></p><p><table border="1">
+<tr>
+<td>IndexSa</td>
+<td>Virtual suffix trie iterator</td>
+</tr>
+<tr>
+<td>IndexEsa</td>
+<td>Virtual suffix tree iterator</td>
+</tr>
+<tr>
+<td>IndexWotd</td>
+<td>Virtual suffix tree iterator</td>
+</tr>
+<tr>
+<td>IndexDfi</td>
+<td>Virtual suffix tree iterator</td>
+</tr>
+<tr>
+<td>FMIndex</td>
+<td>Virtual prefix trie iterator</td>
+</tr>
+</table></p><h3>Examples</h3><p>This code shows how an index can be used with iterators to achieve a pre-order tree like traversal
+in DFS of the text "tobeornottobe". In order to do so a Top-Down History iterator is used.</p><div data-src-path="demos/index/index_iterator.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">TIndex</span><span class="p">;</span>
+
+    <span class="n">TIndex</span> <span class="n">index</span><span class="p">(</span><span class="s">&quot;tobeornottobe&quot;</span><span class="p">);</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="c1">// Print the letters from the root to the current node</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">goDown</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">goRight</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">goUp</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">goRight</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+                <span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">isRoot</span><span class="p">(</span><span class="n">it</span><span class="p">));</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_iterator.cpp" target="_top">demos/index/index_iterator.cpp</a></div></div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="VSTreeIterator#alignment" class="signature first" data-lang-entity="interface_function">
+      <code>TAlign alignment(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+  <div class="note note">Note. <div class='inline'>
+      
+      <p>Internal function.</p>
+      
+  </div></div>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an alignment of the occurrences of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TAlign</code></th>
+        <td>A local alignment corresponding to the seed of the <tt>iterator<tt>.</tt></tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The function <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> must uniquely occur in every sequence (e.g. in Mums),
+otherwise the seed returned is one many. The return type is a <a href="class_Align.html" data-lang-entity="class">Align</a> object.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#assignProperty" class="signature" data-lang-entity="interface_function">
+      <code>void assignProperty(pm, value(iterator), val)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns a property to an item in the property map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>An <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">PropertyMapConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>The new value, where the type of the new value must match the value type of the property map.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#atEnd" class="signature" data-lang-entity="interface_function">
+      <code>bool atEnd(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Determines whether an virtual string tree iterator is at the end position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points behind the last item of the container, otherwise
+<tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><p>The following example shows the usage of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#atEnd" data-lang-entity="interface_function">atEnd</a> function.</p><div data-src-path="demos/index/index_begin_atEnd_representative.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">TIndex</span><span class="p">;</span>
+    <span class="n">TIndex</span> <span class="n">index</span><span class="p">(</span><span class="s">&quot;TATAA&quot;</span><span class="p">);</span>
+
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">itDefault</span><span class="p">;</span>
+    <span class="n">itDefault</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span><span class="p">());</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">itDefault</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">itDefault</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="n">goNext</span><span class="p">(</span><span class="n">itDefault</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;--------------------------------&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;</span><span class="n">Postorder</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">itPostOrder</span><span class="p">;</span>
+    <span class="n">itPostOrder</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;</span><span class="n">Postorder</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">());</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">itPostOrder</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">itPostOrder</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="n">goNext</span><span class="p">(</span><span class="n">itPostOrder</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_begin_atEnd_representative.cpp" target="_top">demos/index/index_begin_atEnd_representative.cpp</a></div></div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#childrenAreLeaves" class="signature" data-lang-entity="interface_function">
+      <code>bool childrenAreLeaves(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether iterator points to a node with only leaf-children.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points to an inner node of the tree, whose children are leaves.
+Otherwise it is <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#countChildren" class="signature" data-lang-entity="interface_function">
+      <code>TSize countChildren(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Count the number of children of a tree node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of children of a tree node. The type is the result of <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the index type
+of the iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="c1">// this code is in seqan/index/index_esa_stree.h</span>
+
+ <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span> <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TMyIndex</span><span class="p">;</span>
+ <span class="n">TMyIndex</span> <span class="nf">myIndex</span><span class="p">(</span><span class="n">myString</span><span class="p">);</span>
+
+ <span class="n">Iterator</span><span class="o">&lt;</span> <span class="n">TMyIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;</span><span class="n">PreorderEmptyEdges</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">tdIterator</span><span class="p">(</span><span class="n">myIndex</span><span class="p">);</span>
+ <span class="n">Size</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">count</span><span class="p">;</span>
+
+ <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">))</span> <span class="p">{</span>
+ <span class="c1">// We print out the representatives of all nodes that have more than 3 children and the number of occurrences.</span>
+ <span class="n">count</span> <span class="o">=</span> <span class="n">countChildren</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">);</span>
+ <span class="k">if</span> <span class="p">(</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
+ <span class="p">{</span>
+     <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Representative &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; has &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">count</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; children  and &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">countOccurrences</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; Occurrences &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+     <span class="o">++</span><span class="n">tdIterator</span><span class="p">;</span>
+ <span class="p">}</span>
+</pre></div>
+</div><p><a href="page_DemoIndexCountChildren.html" data-lang-entity="page">DemoIndexCountChildren</a></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#countOccurrences" class="signature" data-lang-entity="interface_function">
+      <code>TSize countOccurrences(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a>
+substring in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of positions where the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> of <tt>iterator</tt> occurs in the
+text. The return type is the result of the metafunction <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the index type of the
+iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p><h4>Examples</h4><div data-src-path="demos/index/index_counting.cpp"><div class="highlight"><pre><span class="c1">///An example to demonstrate  the functions countChildren and countOccurrences</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">//We begin with a String to store our sequence.</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">myString</span> <span class="o">=</span> <span class="s">&quot;How many wood would a woodchuck chuck. A woodchuck chucks as much wood as a woodchuck could&quot;</span><span class="p">;</span>
+
+    <span class="c1">//Then we create an Index of this StringSet.</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TMyIndex</span><span class="p">;</span>
+    <span class="n">TMyIndex</span> <span class="n">myIndex</span><span class="p">(</span><span class="n">myString</span><span class="p">);</span>
+
+    <span class="c1">// We will use a TopDown Iterator that supports parent links, ommits</span>
+    <span class="c1">// empty edges and traverses the index in preorder to print out the number of</span>
+    <span class="c1">// children at each node (not the number of leafs in the subtree).</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;</span><span class="n">PreorderEmptyEdges</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">tdIterator</span><span class="p">(</span><span class="n">myIndex</span><span class="p">);</span>
+    <span class="n">Size</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;::</span><span class="n">Type</span> <span class="n">count</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="c1">//We print out the representatives of all nodes that have more than 3</span>
+        <span class="c1">//children and the number of occurrences. Also, we print a message if a node</span>
+        <span class="c1">//is a leaf.</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">countChildren</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Representative &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; has &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">count</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; children and &quot;</span><span class="p">;</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">countOccurrences</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; occurrences &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">isLeaf</span><span class="p">(</span><span class="n">tdIterator</span><span class="p">))</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;The node is a leaf &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="n">tdIterator</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_counting.cpp" target="_top">demos/index/index_counting.cpp</a></div></div><p>The result is as follows:</p><pre class="console" data-src-path="demos/index/index_counting.cpp.stdout">Representative  has 17 children and 91 occurrences 
+Representative   has 5 children and 16 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative a has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative c has 3 children and 12 occurrences 
+The node is a leaf 
+Representative chuck has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative ck has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative d has 3 children and 7 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative huck has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative k has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative o has 4 children and 13 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+Representative uck has 3 children and 5 occurrences 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+The node is a leaf 
+</pre></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#getFrequency" class="signature" data-lang-entity="interface_function">
+      <code>int getFrequency(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of sequences, which contain the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> as a substring.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>int</code></th>
+        <td>The number of different sequences containing the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>The following code how <a href="specialization_VSTreeIterator.html#VSTreeIterator#getFrequency" data-lang-entity="interface_function">getFrequency</a> is used. Note that the result of alternative 1 and 2 is the same,
+however alternative one copies a string which requires more memory.</p><div data-src-path="demos/index/index_getOccurrences_getFrequency_range_getFibre.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="o">&gt;</span>    <span class="n">TText</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">TText</span><span class="o">&gt;</span>                <span class="n">TIndex</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">SAValue</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="o">&gt;::</span><span class="n">Type</span>       <span class="n">TSAValue</span><span class="p">;</span>
+
+    <span class="n">TText</span> <span class="n">text</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s">&quot;MISSISSIPPI&quot;</span><span class="p">);</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s">&quot;MYMISSISAHAPPY&quot;</span><span class="p">);</span>
+
+    <span class="n">TIndex</span> <span class="n">index</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">it</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+
+    <span class="n">goDown</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="s">&quot;SSI&quot;</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;SSI occurs in &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">getFrequency</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; sequences.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// 1 alternative to print the location of hits</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="n">TSAValue</span><span class="o">&gt;</span> <span class="n">saPositions</span> <span class="o">=</span> <span class="n">getOccurrences</span><span class="p">(</span><span class="n">it</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">saPositions</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit in sequence &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">saPositions</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">i1</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; at position &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">saPositions</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">i2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;----------------------------&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// 2 alternative to print the location of hits</span>
+    <span class="n">Pair</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="o">&gt;</span> <span class="n">hitInterval</span> <span class="o">=</span> <span class="n">range</span><span class="p">(</span><span class="n">it</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">hitInterval</span><span class="p">.</span><span class="n">i1</span> <span class="o">&lt;</span> <span class="n">hitInterval</span><span class="p">.</span><span class="n">i2</span><span class="p">;</span> <span class="o">++</span><span class="n">hitInterval</span><span class="p">.</span><span class="n">i1</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hit in sequence &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">getFibre</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">FibreSA</span><span class="p">())[</span><span class="n">hitInterval</span><span class="p">.</span><span class="n">i1</span><span class="p">].</span><span class="n">i1</span> <span class="o">&lt;&lt;</span>
+        <span class="s">&quot; at position &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">getFibre</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">FibreSA</span><span class="p">())[</span><span class="n">hitInterval</span><span class="p">.</span><span class="n">i1</span><span class="p">].</span><span class="n">i2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_getOccurrences_getFrequency_range_getFibre.cpp" target="_top">demos/index/index_getOccurrences_getFrequency_range_getFibre.cpp</a></div></div><pre class="code" data-src-path="None">SSI occurs in 2 sequences.
+Hit in sequence 0 at position 5
+Hit in sequence 1 at position 4
+Hit in sequence 0 at position 2
+----------------------------
+Hit in sequence 0 at position 5
+Hit in sequence 1 at position 4
+Hit in sequence 0 at position 2</pre></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#getOccurrence" class="signature" data-lang-entity="interface_function">
+      <code>TSAValue getOccurrence(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an occurrence of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSAValue</code></th>
+        <td>A position where the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> of <tt>iterator</tt> occurs in
+the text. The return type is the result of the metafunction <a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a> of the index type of
+the iterator.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#getOccurrences" class="signature" data-lang-entity="interface_function">
+      <code>TInfix getOccurrences(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns all occurrences of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TInfix</code></th>
+        <td>All positions where the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> of <tt>iterator</tt> occurs in the text.
+Type <a href="concept_SegmentableConcept.html#SegmentableConcept#Infix" data-lang-entity="interface_metafunction">Infix</a>&lt;<a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>&lt;TIndex, FibreSA&gt;::Type&gt;.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p><h4>Example</h4><p><a href="page_DemoMummy.html" data-lang-entity="page">DemoMummy</a>
+<a href="page_DemoSupermaximalRepeats.html" data-lang-entity="page">DemoSupermaximalRepeats</a>
+<a href="page_DemoMaximalUniqueMatches.html" data-lang-entity="page">DemoMaximalUniqueMatches</a></p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getFrequency</a></li>
+    
+    <li><a class="error">isLeftMaximal</a></li>
+    
+    <li><a class="error">isPartiallyLeftExtensible</a></li>
+    
+    <li><a class="error">isUnique</a></li>
+    
+    <li><a href="global_function_orderOccurrences.html" data-lang-entity="global_function">orderOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#getOccurrencesBwt" class="signature" data-lang-entity="interface_function">
+      <code>TReturn getOccurrencesBwt(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the characters left beside all occurrence of the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>All positions where the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> of
+<tt>iterator</tt> occurs in the text.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>If <tt>iterator</tt>'s container type is <tt>TIndex</tt> the return type is
+<tt>Infix&lt;Fibre&lt;TIndex, EsaBwt&gt;::Type const&gt;::Type</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#getProperty" class="signature" data-lang-entity="interface_function">
+      <code>TValue getProperty(pm, value(iterator))</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Get method for an item's property.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>An <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">PropertyMapConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>Reference to the item in the property map of type <a href="global_metafunction_GetValue.html" data-lang-entity="global_metafunction">GetValue</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#goBegin" class="signature" data-lang-entity="interface_function">
+      <code>void goBegin(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Iterates to the first position of a container.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">iterator</code>
+            
+        
+      </th>
+      <td>Object that iterates through</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function is equivalent to <tt>iterator = begin(container)</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">begin</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#goNext" class="signature" data-lang-entity="interface_function">
+      <code>void goNext(it);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Go to next tree node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">it</code>
+            
+        
+      </th>
+      <td>VSTreeIterator to advance.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#goRoot" class="signature" data-lang-entity="interface_function">
+      <code>void goRoot(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Move iterator to the root node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isLeaf" class="signature" data-lang-entity="interface_function">
+      <code>bool isLeaf(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether a tree iterator points to a leaf.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points to a leaf of the tree, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><a href="page_DemoIndexCountChildren.html" data-lang-entity="page">DemoIndexCountChildren</a></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isLeftMaximal" class="signature" data-lang-entity="interface_function">
+      <code>bool isLeftMaximal(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether the occurrences of an iterator's <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> mutually differ in the character
+left of the hits.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if there are at least two different characters left of the occurrences, otherwise
+<tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isPartiallyLeftExtensible" class="signature" data-lang-entity="interface_function">
+      <code>bool isPartiallyLeftExtensible(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether the characters left of the two occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> are equal.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if there are at least two different characters left of the occurrences, otherwise
+<tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isRightTerminal" class="signature" data-lang-entity="interface_function">
+      <code>bool isRightTerminal(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether iterator points to a suffix.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points to the node representing a suffix, otherwise
+<tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Every leaf is also a right terminal (see <a href="specialization_VSTreeIterator.html#VSTreeIterator#isLeaf" data-lang-entity="interface_function">isLeaf</a>), but not vice versa.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isRoot" class="signature" data-lang-entity="interface_function">
+      <code>bool isRoot(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether a tree iterator points to the root node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>iterator</tt> points to the root of the tree, otherwise <tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>The following example shows the usage of the @Function.isRoot@ function.</p><div data-src-path="demos/index/index_begin_atEnd_representative_bottomUp.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">CharString</span><span class="o">&gt;</span> <span class="n">TIndex</span><span class="p">;</span>
+    <span class="n">TIndex</span> <span class="n">index</span><span class="p">(</span><span class="s">&quot;TATAA&quot;</span><span class="p">);</span>
+
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TIndex</span><span class="p">,</span> <span class="n">BottomUp</span><span class="o">&lt;</span><span class="n">Postorder</span><span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">itDefault</span><span class="p">;</span>
+    <span class="n">itDefault</span> <span class="o">=</span> <span class="n">begin</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">BottomUp</span><span class="o">&lt;</span><span class="n">Postorder</span><span class="o">&gt;</span><span class="p">());</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">isRoot</span><span class="p">(</span><span class="n">itDefault</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">itDefault</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="n">goNext</span><span class="p">(</span><span class="n">itDefault</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/index/index_begin_atEnd_representative_bottomUp.cpp" target="_top">demos/index/index_begin_atEnd_representative_bottomUp.cpp</a></div></div><p>code{.output}
+output:AA
+ATAA
+A
+TAA
+TATAA
+TA
+@endcode</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#isUnique" class="signature" data-lang-entity="interface_function">
+      <code>bool isUnique(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether the <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> occurs only once in every sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a suffix tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if there are at least two different characters left of the occurrences, otherwise
+<tt>false</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#nodeHullPredicate" class="signature" data-lang-entity="interface_function">
+      <code>bool nodeHullPredicate(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>If <tt>false</tt> this node and its subtree is concealed.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Returns whether or not a subtree is concealed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><a href="page_DemoConstraintIterator.html" data-lang-entity="page">DemoConstraintIterator</a></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#nodePredicate" class="signature" data-lang-entity="interface_function">
+      <code>bool nodePredicate(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>If <tt>false</tt> this node will be skipped during the bottom-up traversal.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Returns whether or not the node will be skipped.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="page_DemoConstraintIterator.html" data-lang-entity="page">DemoConstraintIterator</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#property" class="signature" data-lang-entity="interface_function">
+      <code>TRef property(pm, value(iterator))</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Accesses the property of an item in the property map.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pm</code>
+            
+        
+      </th>
+      <td>An <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">PropertyMapConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TRef</code></th>
+        <td>Reference to the item in the property map of type <a href="global_metafunction_Reference.html" data-lang-entity="global_metafunction">Reference</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#range" class="signature" data-lang-entity="interface_function">
+      <code>TPair range(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the suffix array interval borders of occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> substring in the
+index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree/trie.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPair</code></th>
+        <td>All positions where a substring occurs in the text are stored in a contiguous range of the suffix
+array. <tt>range</tt> returns begin and end position of this range for occurrences of <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a>. The type is <a href="class_Pair.html" data-lang-entity="class">Pair</a>&lt;<a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a>&lt; <tt>TIndex<tt> &gt; &gt;
+with TIndex being the index type of the iterator.</tt></tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#repLength" class="signature" data-lang-entity="interface_function">
+      <code>TSize repLength(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the length of the substring representing the path from root to <tt>iterator</tt> node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The length of the sequence returned by <a href="specialization_VSTreeIterator.html#VSTreeIterator#representative" data-lang-entity="interface_function">representative</a> The return type is the result of the metafunction <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the underlying
+index.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><a href="page_DemoMummy.html" data-lang-entity="page">DemoMummy</a>
+<a href="page_DemoSupermaximalRepeats.html" data-lang-entity="page">DemoSupermaximalRepeats</a>
+<a href="page_DemoMaximalUniqueMatches.html" data-lang-entity="page">DemoMaximalUniqueMatches</a></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#representative" class="signature" data-lang-entity="interface_function">
+      <code>TInfix representative(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a substring representing the path from root to <tt>iterator</tt> node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TInfix</code></th>
+        <td>Infix&lt;TSting&gt; An <a href="specialization_InfixSegment.html" data-lang-entity="specialization">InfixSegment</a> of the text of an index. The type is <tt>Infix&lt;Fibre&lt;TIndex, FibreText&gt;::Type&gt;::Type</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><p><a href="page_DemoMummy.html" data-lang-entity="page">DemoMummy</a>
+<a href="page_DemoSupermaximalRepeats.html" data-lang-entity="page">DemoSupermaximalRepeats</a>
+<a href="page_DemoConstraintIterator.html" data-lang-entity="page">DemoConstraintIterator</a>
+<a href="page_DemoMaximalRepeats.html" data-lang-entity="page">DemoMaximalRepeats</a>
+<a href="page_DemoMaximalUniqueMatches.html" data-lang-entity="page">DemoMaximalUniqueMatches</a></p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="VSTreeIterator#value" class="signature" data-lang-entity="interface_function">
+      <code>TDesc value(iterator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a vertex descriptor of the current node.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">iterator</code>
+            
+        
+      </th>
+      <td>An iterator of a string tree. Types: <a href="specialization_VSTreeIterator.html" data-lang-entity="specialization">VSTreeIterator</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TDesc</code></th>
+        <td>An object of type <a href="concept_StringTreeConcept.html#StringTreeConcept#VertexDescriptor" data-lang-entity="interface_metafunction">VertexDescriptor</a> that
+uniquely identifies the current node. The vertex descriptor can be used to
+store node specific values in an <a href="concept_PropertyMapConcept.html" data-lang-entity="concept">PropertyMapConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="VSTreeIterator#EdgeLabel" class="signature first" data-lang-entity="interface_metafunction">
+    <code>EdgeLabel&lt;TSpec&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Type of a string representing the characters of edges.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSpec</code></th>
+            <td>Tag to specify the object of which the type of the edge labels is requested.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>of a string representing the characters of edges.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class VSTreeIterator VSTree Iterator
+ * 
+ * @extends Iter
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Abstract iterator for string trees, where string trees are trees
+ *        constructed from a string.
+ * 
+ * @signature template &lt;typename TContainer, typename TSpec&gt; class
+ *            Iter&lt;TContainer, VSTree&lt;TSpec&gt; &gt;;
+ * 
+ * @tparam TSpec The specialization type.
+ * @tparam TContainer Type of the container that can be iterated. Types: @link
+ *                    IndexDfi @endlink, @link IndexEsa @endlink, @link
+ *                    IndexWotd @endlink, @link FMIndex @endlink
+ * 
+ * This iterator is a pointer to a node in the string tree of a given text.
+ * Depending on the index this can either be a suffix or prefix tree/trie. Every
+ * node can uniquely be mapped to an interval of suffices or prefixes.
+ * 
+ * Default virtual string tree iterators depending on the @link Index @endlink
+ * 
+ * &lt;table border=&#34;1&#34;&gt; &lt;tr&gt; &lt;td&gt;IndexSa&lt;/td&gt; &lt;td&gt;Virtual suffix trie
+ * iterator&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;IndexEsa&lt;/td&gt; &lt;td&gt;Virtual suffix tree
+ * iterator&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;IndexWotd&lt;/td&gt; &lt;td&gt;Virtual suffix tree
+ * iterator&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;IndexDfi&lt;/td&gt; &lt;td&gt;Virtual suffix tree
+ * iterator&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;FMIndex&lt;/td&gt; &lt;td&gt;Virtual prefix trie
+ * iterator&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
+ * 
+ * @section Examples
+ * 
+ * This code shows how an index can be used with iterators to achieve a pre-
+ * order tree like traversal in DFS of the text &#34;tobeornottobe&#34;. In order to do
+ * so a Top-Down History iterator is used.
+ * 
+ * @include demos/index/index_iterator.cpp
+ * 
+ * @mfn VSTreeIterator#EdgeLabel
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Type of a string representing the characters of edges.
+ * 
+ * @signature EdgeLabel&lt;TSpec&gt;::Type;
+ * 
+ * @tparam TSpec Tag to specify the object of which the type of the edge labels
+ *               is requested.
+ * 
+ * @return Type of a string representing the characters of edges.
+ * 
+ * @fn VSTreeIterator#repLength
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the length of the substring representing the path from root to
+ *        &lt;tt&gt;iterator&lt;/tt&gt; node.
+ * 
+ * @signature TSize repLength(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * 
+ * @return TSize The length of the sequence returned by @link
+ *               VSTreeIterator#representative @endlink The return type is the
+ *               result of the metafunction @link Size @endlink of the
+ *               underlying index.
+ * 
+ * @link DemoMummy @endlink @link DemoSupermaximalRepeats @endlink @link
+ * DemoMaximalUniqueMatches @endlink
+ * 
+ * @fn VSTreeIterator#value
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns a vertex descriptor of the current node.
+ * 
+ * @signature TDesc value(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * 
+ * @return TDesc An object of type @link StringTreeConcept#VertexDescriptor
+ *               @endlink that uniquely identifies the current node. The vertex
+ *               descriptor can be used to store node specific values in an
+ *               @link PropertyMapConcept @endlink.
+ * 
+ * @fn VSTreeIterator#assignProperty
+ * 
+ * @brief Assigns a property to an item in the property map.
+ * 
+ * @signature void assignProperty(pm, value(iterator), val)
+ * 
+ * @param[in,out] pm An @link PropertyMapConcept @endlink.
+ * @param[in] iterator An iterator of a string tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * @param[in] val The new value, where the type of the new value must match the
+ *                value type of the property map.
+ * 
+ * @fn VSTreeIterator#property
+ * 
+ * @brief Accesses the property of an item in the property map.
+ * 
+ * @signature TRef property(pm, value(iterator))
+ * 
+ * @param[in,out] pm An @link PropertyMapConcept @endlink.
+ * @param[in] iterator An iterator of a string tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * 
+ * @return TRef Reference to the item in the property map of type @link
+ *              Reference @endlink.
+ * 
+ * @fn VSTreeIterator#getProperty
+ * 
+ * @brief Get method for an item&#39;s property.
+ * 
+ * @signature TValue getProperty(pm, value(iterator))
+ * 
+ * @param[in,out] pm An @link PropertyMapConcept @endlink.
+ * @param[in] iterator An iterator of a string tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * 
+ * @return TValue Reference to the item in the property map of type @link
+ *                GetValue @endlink.
+ * 
+ * @fn VSTreeIterator#getOccurrence
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns an occurrence of the @link VSTreeIterator#representative
+ *        @endlink substring in the index text.
+ * 
+ * @signature TSAValue getOccurrence(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TSAValue A position where the @link VSTreeIterator#representative
+ *                  @endlink of &lt;tt&gt;iterator&lt;/tt&gt; occurs in the text. The return
+ *                  type is the result of the metafunction @link SAValue
+ *                  @endlink of the index type of the iterator.
+ * 
+ * @fn VSTreeIterator#countOccurrences
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of occurrences of @link
+ *        VSTreeIterator#representative @endlink substring in the index text.
+ * 
+ * @signature TSize countOccurrences(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TSize The number of positions where the @link
+ *               VSTreeIterator#representative @endlink of &lt;tt&gt;iterator&lt;/tt&gt;
+ *               occurs in the text. The return type is the result of the
+ *               metafunction @link Size @endlink of the index type of the
+ *               iterator.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * @include demos/index/index_counting.cpp
+ * 
+ * The result is as follows:
+ * 
+ * @include demos/index/index_counting.cpp.stdout
+ * 
+ * 
+ * 
+ * @fn VSTreeIterator#range
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the suffix array interval borders of occurrences of @link
+ *        VSTreeIterator#representative @endlink substring in the index text.
+ * 
+ * @signature TPair range(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree/trie.
+ * 
+ * @return TPair All positions where a substring occurs in the text are stored
+ *               in a contiguous range of the suffix array. &lt;tt&gt;range&lt;/tt&gt;
+ *               returns begin and end position of this range for occurrences of
+ *               @link VSTreeIterator#representative @endlink. The type is @link
+ *               Pair @endlink&lt;@link Size @endlink&lt; &lt;tt&gt;TIndex&lt;tt&gt; &gt; &gt; with
+ *               TIndex being the index type of the iterator.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @fn VSTreeIterator#getOccurrences
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns all occurrences of the @link VSTreeIterator#representative
+ *        @endlink substring in the index text.
+ * 
+ * @signature TInfix getOccurrences(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TInfix All positions where the @link VSTreeIterator#representative
+ *                @endlink of &lt;tt&gt;iterator&lt;/tt&gt; occurs in the text. Type @link
+ *                SegmentableConcept#Infix @endlink&amp;lt;@link Fibre
+ *                @endlink&amp;lt;TIndex, FibreSA&amp;gt;::Type&amp;gt;.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * @link DemoMummy @endlink @link DemoSupermaximalRepeats @endlink @link
+ * DemoMaximalUniqueMatches @endlink
+ * 
+ * @see VSTreeIterator#isUnique
+ * @see VSTreeIterator#getFrequency
+ * @see VSTreeIterator#isPartiallyLeftExtensible
+ * @see VSTreeIterator#isLeftMaximal
+ * @see orderOccurrences
+ * 
+ * @fn VSTreeIterator#alignment
+ * 
+ * @brief Returns an alignment of the occurrences of the @link
+ *        VSTreeIterator#representative @endlink substring in the index text.
+ * 
+ * @note Internal function.
+ * 
+ * @signature TAlign alignment(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TAlign A local alignment corresponding to the seed of the
+ *                &lt;tt&gt;iterator&lt;tt&gt;.
+ * 
+ * The function @link VSTreeIterator#representative @endlink must uniquely occur
+ * in every sequence (e.g. in Mums), otherwise the seed returned is one many.
+ * The return type is a @link Align @endlink object.
+ * 
+ * @fn VSTreeIterator#getOccurrencesBwt
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the characters left beside all occurrence of the @link
+ *        VSTreeIterator#representative @endlink substring in the index text.
+ * 
+ * @signature TReturn getOccurrencesBwt(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return TReturn All positions where the @link VSTreeIterator#representative
+ *                 @endlink of &lt;tt&gt;iterator&lt;/tt&gt; occurs in the text.
+ * 
+ * If &lt;tt&gt;iterator&lt;/tt&gt;&#39;s container type is &lt;tt&gt;TIndex&lt;/tt&gt; the return type is
+ * &lt;tt&gt;Infix&lt;Fibre&lt;TIndex, EsaBwt&gt;::Type const&gt;::Type&lt;/tt&gt;.
+ * 
+ * @fn VSTreeIterator#representative
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns a substring representing the path from root to
+ *        &lt;tt&gt;iterator&lt;/tt&gt; node.
+ * 
+ * @signature TInfix representative(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TInfix Infix&amp;lt;TSting&amp;gt; An @link InfixSegment @endlink of the text
+ *                of an index. The type is &lt;tt&gt;Infix&amp;lt;Fibre&amp;lt;TIndex,
+ *                FibreText&amp;gt;::Type&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * @link DemoMummy @endlink @link DemoSupermaximalRepeats @endlink @link
+ * DemoConstraintIterator @endlink @link DemoMaximalRepeats @endlink @link
+ * DemoMaximalUniqueMatches @endlink
+ * 
+ * @fn VSTreeIterator#countChildren
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Count the number of children of a tree node.
+ * 
+ * @signature TSize countChildren(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return TSize The number of children of a tree node. The type is the result
+ *               of @link Size @endlink of the index type of the iterator.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * // this code is in seqan/index/index_esa_stree.h
+ * 
+ *  typedef Index&lt; String&lt;char&gt; &gt; TMyIndex;
+ *  TMyIndex myIndex(myString);
+ * 
+ *  Iterator&lt; TMyIndex, TopDown&lt;ParentLinks&lt;PreorderEmptyEdges&gt; &gt; &gt;::Type tdIterator(myIndex);
+ *  Size&lt;TMyIndex&gt;::Type count;
+ * 
+ *  while (!atEnd(tdIterator)) {
+ *  // We print out the representatives of all nodes that have more than 3 children and the number of occurrences.
+ *  count = countChildren(tdIterator);
+ *  if (count &gt;= 3)
+ *  {
+ *      std::cout &lt;&lt; &#34;Representative &#34; &lt;&lt; representative(tdIterator) &lt;&lt; &#34; has &#34; &lt;&lt;  count &lt;&lt; &#34; children  and &#34; &lt;&lt; countOccurrences(tdIterator) &lt;&lt; &#34; Occurrences &#34; &lt;&lt; std::endl;
+ * 
+ *      ++tdIterator;
+ *  }
+ * @endcode
+ * 
+ * 
+ * @link DemoIndexCountChildren @endlink
+ * 
+ * @fn VSTreeIterator#nodePredicate
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief If &lt;tt&gt;false&lt;/tt&gt; this node will be skipped during the bottom-up
+ *        traversal.
+ * 
+ * @signature bool nodePredicate(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return bool Returns whether or not the node will be skipped.
+ * 
+ * @see DemoConstraintIterator
+ * 
+ * @fn VSTreeIterator#nodeHullPredicate
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief If &lt;tt&gt;false&lt;/tt&gt; this node and its subtree is concealed.
+ * 
+ * @signature bool nodeHullPredicate(iterator);
+ * 
+ * @param[in] iterator An iterator of a string tree.
+ * 
+ * @return bool Returns whether or not a subtree is concealed.
+ * 
+ * @link DemoConstraintIterator @endlink
+ * 
+ * @fn VSTreeIterator#goRoot
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Move iterator to the root node.
+ * 
+ * @signature void goRoot(iterator);
+ * 
+ * @param[in,out] iterator An iterator of a suffix tree.
+ * 
+ * @fn VSTreeIterator#goBegin
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Iterates to the first position of a container.
+ * 
+ * @signature void goBegin(iterator);
+ * 
+ * @param[in,out] iterator Object that iterates through
+ * 
+ * This function is equivalent to &lt;tt&gt;iterator = begin(container)&lt;/tt&gt;.
+ * 
+ * @see StringTreeConcept#begin
+ * 
+ * @fn VSTreeIterator#goNext
+ * 
+ * @brief Go to next tree node.
+ * 
+ * @signature void goNext(it);
+ * 
+ * @param[in,out] it VSTreeIterator to advance.
+ * 
+ * @fn VSTreeIterator#atEnd
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Determines whether an virtual string tree iterator is at the end
+ *        position.
+ * 
+ * @signature bool atEnd(iterator);
+ * 
+ * @param[in] iterator An iterator.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points behind the last item
+ *              of the container, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * The following example shows the usage of the @link VSTreeIterator#atEnd
+ * @endlink function.
+ * 
+ * @include demos/index/index_begin_atEnd_representative.cpp
+ * 
+ * @fn VSTreeIterator#isRoot
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether a tree iterator points to the root node.
+ * 
+ * @signature bool isRoot(iterator);
+ * 
+ * @param[in] iterator An iterator of a tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points to the root of the
+ *              tree, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * The following example shows the usage of the @Function.isRoot@ function.
+ * 
+ * @include demos/index/index_begin_atEnd_representative_bottomUp.cpp
+ * 
+ * code{.output} output:AA ATAA A TAA TATAA TA @endcode
+ * 
+ * @fn VSTreeIterator#isRightTerminal
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether iterator points to a suffix.
+ * 
+ * @signature bool isRightTerminal(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points to the node
+ *              representing a suffix, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * Every leaf is also a right terminal (see @link VSTreeIterator#isLeaf
+ * @endlink), but not vice versa.
+ * 
+ * @fn VSTreeIterator#isLeftMaximal
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether the occurrences of an iterator&#39;s @link
+ *        VSTreeIterator#representative @endlink mutually differ in the
+ *        character left of the hits.
+ * 
+ * @signature bool isLeftMaximal(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if there are at least two different characters
+ *              left of the occurrences, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @see VSTreeIterator#getOccurrences
+ * 
+ * @fn VSTreeIterator#isPartiallyLeftExtensible
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether the characters left of the two occurrences of @link
+ *        VSTreeIterator#representative @endlink are equal.
+ * 
+ * @signature bool isPartiallyLeftExtensible(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if there are at least two different characters
+ *              left of the occurrences, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @see VSTreeIterator#getOccurrences
+ * 
+ * @fn VSTreeIterator#isUnique
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether the @link VSTreeIterator#representative @endlink occurs
+ *        only once in every sequence.
+ * 
+ * @signature bool isUnique(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if there are at least two different characters
+ *              left of the occurrences, otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @see VSTreeIterator#getOccurrences
+ * 
+ * @fn VSTreeIterator#getFrequency
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of sequences, which contain the @link
+ *        VSTreeIterator#representative @endlink as a substring.
+ * 
+ * @signature int getFrequency(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree. Types: @link VSTreeIterator
+ *                     @endlink
+ * 
+ * @return int The number of different sequences containing the @link
+ *             VSTreeIterator#representative @endlink.
+ * 
+ * @section Example
+ * 
+ * The following code how @link VSTreeIterator#getFrequency @endlink is used.
+ * Note that the result of alternative 1 and 2 is the same, however alternative
+ * one copies a string which requires more memory.
+ * 
+ * @include demos/index/index_getOccurrences_getFrequency_range_getFibre.cpp
+ * 
+ * @code{.output}
+ * SSI occurs in 2 sequences.
+ * Hit in sequence 0 at position 5
+ * Hit in sequence 1 at position 4
+ * Hit in sequence 0 at position 2
+ * ----------------------------
+ * Hit in sequence 0 at position 5
+ * Hit in sequence 1 at position 4
+ * Hit in sequence 0 at position 2
+ * @endcode
+ * 
+ * 
+ * @see VSTreeIterator#getOccurrences
+ * 
+ * @fn VSTreeIterator#childrenAreLeaves
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether iterator points to a node with only leaf-children.
+ * 
+ * @signature bool childrenAreLeaves(iterator);
+ * 
+ * @param[in] iterator An iterator of a suffix tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points to an inner node of
+ *              the tree, whose children are leaves. Otherwise it is
+ *              &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @fn VSTreeIterator#isLeaf
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Test whether a tree iterator points to a leaf.
+ * 
+ * @signature bool isLeaf(iterator);
+ * 
+ * @param[in] iterator An iterator of a tree.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;iterator&lt;/tt&gt; points to a leaf of the tree,
+ *              otherwise &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @link DemoIndexCountChildren @endlink
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1623 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_assertmacros" data-page="AssertMacros">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Assertion and Check Macros - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Assertion and Check Macros
+  <div><div>The assertion and check macros provided by SeqAn.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+<div class="overview grouped_macros" data-lang-entity-container="macro">
+<h2 data-lang-entity="macro">Grouped Macros Overview</h2>
+
+<table width="100%">
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT"><div>SEQAN_ASSERT(expression);</div></a></code> <div>Test that the given expression can be coerced to <tt>true</tt>.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_EQ"><div>SEQAN_ASSERT_EQ(expression1, expression2);</div></a></code> <div>Test that two given expressions are equal, as defined by the matching call to the <tt>operator=(,)</tt>.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_GEQ"><div>SEQAN_ASSERT_GEQ(expression1, expression2);</div></a></code> <div>Test that the two given expressions are in the greater-than-or-equal
+relation as defined by the matching call to operator&gt;=(,).</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_GT"><div>SEQAN_ASSERT_GT(expression1, expression2);</div></a></code> <div>Test that the two given expressions are in the greather-than relation
+as defined by the matching call to operator&gt;(,).</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_IN_DELTA"><div>SEQAN_ASSERT_IN_DELTA(x, y, delta);</div></a></code> <div>Test that a value <tt>y</tt> lies within an <tt>delta</tt> environment of a value <tt>x</tt>.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_LEQ"><div>SEQAN_ASSERT_LEQ(expression1, expression2)</div></a></code> <div>Test that the two given expressions are in the less-than-or-equal
+relation as defined by the matching call to operator&lt;=(,).</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_LT"><div>SEQAN_ASSERT_LT(expression1, expression2);</div></a></code> <div>Test that the two given expressions are in the less-than relation as defined by the matching call to
+operator&lt;(,).</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_NEQ"><div>SEQAN_ASSERT_NEQ(expression1, expression2);</div></a></code> <div>Test that two given expressions are not equal, as defined by the matching call to the <tt>operator!=(,)</tt>.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_ASSERT_NOT"><div>SEQAN_ASSERT_NOT(expression)</div></a></code> <div>Test that the given expression can be coerced to <tt>false</tt>.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_CHECK"><div>SEQAN_CHECK(condition, msg[, args]);</div></a></code> <div>Force abortion of program if a condition is not met, regardless of debugging settings.</div></td>
+    
+  </tr>
+  
+  <tr>
+    
+    <td><code><a href="#AssertMacros%23SEQAN_FAIL"><div>SEQAN_FAIL(msg[, args]);</div></a></code> <div>Force abortion of program, regardless of debugging settings.</div></td>
+    
+  </tr>
+  
+</table>
+</div>
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Assertions are checks performed at runtime when debugging is enabled. Debugging is enabled by defining the
+preprocessor symbol <tt>SEQAN_ENABLE_DEBUG</tt> as <tt>1</tt> (the default is to set it to <tt>0</tt> if the common C
+macro <tt>NDEBUG</tt> is defined and to set it to <tt>1</tt> otherwise. When using the SeqAn build system or the
+CMake FindSeqAn.cmake module, this is automatically set appropriately.</p><p>The SEQAN_CHECK and SEQAN_FAIL macro always lead to an exit of the program with a non-0 return value.</p></div>
+
+  </div>
+</div>
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+
+
+
+<!-- Grouped macros Details -->
+
+<div class="details grouped_macros" data-lang-entity-container="grouped_macro">
+<h2 data-lang-entity="grouped_macro">Grouped Macros Detail</h2>
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT">
+  AssertMacros#SEQAN_ASSERT
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_ASSERT(expression);
+SEQAN_ASSERT_MSG(expression, message[, parameters]);
+</code>
+
+<div class="brief"><div>Test that the given expression can be coerced to <tt>true</tt>.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression</code>
+    
+    (in)
+     -
+    An expression to check for being true.
+  </dd>
+  
+  <dd>
+    <code>message</code>
+    
+    (in)
+     -
+    A format string.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional list of parameters.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><h4>Remarks</h4><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT @call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>  <span class="c1">// will fail</span>
+<span class="n">SEQAN_ASSERT</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_MSG</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;message %d&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>  <span class="c1">// Will fail with message.</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_EQ">
+  AssertMacros#SEQAN_ASSERT_EQ
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_ASSERT_EQ(expression1, expression2);
+SEQAN_ASSERT_EQ_MSG(expression1, expression2, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that two given expressions are equal, as defined by the matching call to the <tt>operator=(,)</tt>.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_EQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>  <span class="c1">// will fail</span>
+<span class="n">SEQAN_ASSERT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;foo&quot;</span><span class="p">);</span>  <span class="c1">// will not compile</span>
+<span class="n">SEQAN_ASSERT_EQ_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_GEQ">
+  AssertMacros#SEQAN_ASSERT_GEQ
+</h3>
+
+
+
+<code>SEQAN_ASSERT_GEQ(expression1, expression2);
+SEQAN_ASSERT_GEQ_MSG(expression1, expression2, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that the two given expressions are in the greater-than-or-equal
+relation as defined by the matching call to operator&gt;=(,).</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_GEQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_GEQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will not run through</span>
+<span class="n">SEQAN_ASSERT_GEQ_MSG</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_GT">
+  AssertMacros#SEQAN_ASSERT_GT
+</h3>
+
+
+
+<code>SEQAN_ASSERT_GT(expression1, expression2);
+SEQAN_ASSERT_GT_MSG(expression1, expression2, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that the two given expressions are in the greather-than relation
+as defined by the matching call to operator&gt;(,).</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument
+on failures. Note that the <tt>operator&lt;&lt;</tt> to the type of
+<tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT
+call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for
+(conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_GT</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_GT</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will not run through</span>
+<span class="n">SEQAN_ASSERT_GT_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_IN_DELTA">
+  AssertMacros#SEQAN_ASSERT_IN_DELTA
+</h3>
+
+
+
+<code>SEQAN_ASSERT_IN_DELTA(x, y, delta);
+SEQAN_ASSERT_IN_DELTA_MSG(x, y, delta, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that a value <tt>y</tt> lies within an <tt>delta</tt> environment of a value <tt>x</tt>.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>x</code>
+    
+    (in)
+     -
+    The value to center the environment in.
+  </dd>
+  
+  <dd>
+    <code>y</code>
+    
+    (in)
+     -
+    The value to check whether it falls within the environment.
+  </dd>
+  
+  <dd>
+    <code>delta</code>
+    
+    (in)
+     -
+    The environment size.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_IN_DELTA</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_IN_DELTA</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will fail</span>
+<span class="n">SEQAN_ASSERT_IN_DELTA</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;foo&quot;</span><span class="p">);</span>  <span class="c1">// will not compile</span>
+<span class="n">SEQAN_ASSERT_IN_DELTA_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_LEQ">
+  AssertMacros#SEQAN_ASSERT_LEQ
+</h3>
+
+
+
+<code>SEQAN_ASSERT_LEQ(expression1, expression2)
+SEQAN_ASSERT_LEQ_MSG(expression1, expression2, comment[,
+parameters])
+</code>
+
+<div class="brief"><div>Test that the two given expressions are in the less-than-or-equal
+relation as defined by the matching call to operator&lt;=(,).</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument
+on failures. Note that the <tt>operator&lt;&lt;</tt> to the type of
+<tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT
+call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for
+(conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_LEQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_LEQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>  <span class="c1">// will not run through</span>
+<span class="n">SEQAN_ASSERT_LEQ_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_LT">
+  AssertMacros#SEQAN_ASSERT_LT
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_ASSERT_LT(expression1, expression2);
+SEQAN_ASSERT_LT(expression1, expression2, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that the two given expressions are in the less-than relation as defined by the matching call to
+operator&lt;(,).</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_LT</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_LT</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// will not run through</span>
+<span class="n">SEQAN_ASSERT_LT_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_NEQ">
+  AssertMacros#SEQAN_ASSERT_NEQ
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_ASSERT_NEQ(expression1, expression2);
+SEQAN_ASSERT_NEQ_MSG(expression1, expression2, comment[, parameters]);
+</code>
+
+<div class="brief"><div>Test that two given expressions are not equal, as defined by the matching call to the <tt>operator!=(,)</tt>.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression1</code>
+    
+    (in)
+     -
+    The first expression.
+  </dd>
+  
+  <dd>
+    <code>expression2</code>
+    
+    (in)
+     -
+    The second expression.
+  </dd>
+  
+  <dd>
+    <code>comment</code>
+    
+    (in)
+     -
+    A C-string (<tt>char const *</tt>) to use as a format string for printing a message
+on failure.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional parameter that is put into <tt>printf()</tt> with format string
+<tt>comment</tt>.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_NEQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>  <span class="c1">// will fail</span>
+<span class="n">SEQAN_ASSERT_NEQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_NEQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;foo&quot;</span><span class="p">);</span>  <span class="c1">// will not compile</span>
+<span class="n">SEQAN_ASSERT_NEQ_MSG</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="s">&quot;msg&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_ASSERT_NOT">
+  AssertMacros#SEQAN_ASSERT_NOT
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_ASSERT_NOT(expression)
+SEQAN_ASSERT_NOT_MSG(expression, message[, parameters])
+</code>
+
+<div class="brief"><div>Test that the given expression can be coerced to <tt>false</tt>.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>expression</code>
+    
+    (in)
+     -
+    An expression to check for being false.
+  </dd>
+  
+  <dd>
+    <code>message</code>
+    
+    (in)
+     -
+    A format string.
+  </dd>
+  
+  <dd>
+    <code>parameters</code>
+    
+    (in)
+     -
+    An optional list of parameters.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><h4>Remarks</h4><p>The main advantage of this macro is that it prints the values of its argument on failures. Note that the
+<tt>operator&lt;&lt;</tt> to the type of <tt>std::cerr</tt> has to be defined for the type of both expression
+parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.</p><p>See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program regardless of debug settings.</p><h4>Examples</h4><div data-src-path="None"><div class="highlight"><pre><span class="n">SEQAN_ASSERT_NOT</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>  <span class="c1">// will run through</span>
+<span class="n">SEQAN_ASSERT_NOT</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>  <span class="c1">// will fail</span>
+<span class="n">SEQAN_ASSERT_NOT_MSG</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;msg %s&quot;</span><span class="p">,</span> <span class="s">&quot;test&quot;</span><span class="p">);</span>  <span class="c1">// will fail with message</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_CHECK">
+  AssertMacros#SEQAN_CHECK
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_CHECK(condition, msg[, args]);
+</code>
+
+<div class="brief"><div>Force abortion of program if a condition is not met, regardless of debugging settings.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>condition</code>
+    
+    (in)
+     -
+    An expression that is checked.
+  </dd>
+  
+  <dd>
+    <code>msg</code>
+    
+    (in)
+     -
+    A format string.
+  </dd>
+  
+  <dd>
+    <code>args</code>
+    
+    (in)
+     -
+    An optional list of arguments.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><h4>Remarks</h4><p>Use this if something really unexpected happens inside your functions and there is no way to report this through the
+API. A good example would be logic errors, e.g. invalid values.</p><h4>Examples</h4><p>In the following example, the <tt>SEQAN_CHECK</tt> stops program execution if a value is added to <tt>MyEnum</tt> but
+the function <tt>foo</tt> is not updated accordingly.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">enum</span> <span class="n">MyEnum</span>
+<span class="p">{</span>
+  <span class="n">VALUE_ONE</span><span class="p">,</span>
+  <span class="n">VALUE_TWO</span>
+<span class="p">};</span>
+
+<span class="kt">bool</span> <span class="nf">foo</span><span class="p">(</span><span class="n">MyEnum</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">SEQAN_CHECK</span><span class="p">((</span><span class="n">x</span> <span class="o">==</span> <span class="n">VALUE_ONE</span> <span class="o">||</span> <span class="n">x</span> <span class="o">==</span> <span class="n">VALUE_TWO</span><span class="p">),</span> <span class="s">&quot;Invalid value for x == %d.&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="k">case</span> <span class="n">VALUE_ONE</span>:
+        <span class="c1">// do something</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">VALUE_TWO</span>:
+        <span class="c1">// do something</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>  <span class="c1">// Should never reach here, checked above with SEQAN_CHECK.</span>
+<span class="p">}</span>
+</pre></div>
+</div></div>
+
+
+
+<h3 data-toc="hidden" id="AssertMacros#SEQAN_FAIL">
+  AssertMacros#SEQAN_FAIL
+</h3>
+
+
+<dl>
+  <dt>Defined in</dt>
+  <dd>
+    &lt;seqan/basic.h&gt;
+    
+  </dd>
+</dl>
+
+
+<code>SEQAN_FAIL(msg[, args]);
+</code>
+
+<div class="brief"><div>Force abortion of program, regardless of debugging settings.</div></div>
+
+<dl>
+
+  <dt>Parameters</dt>
+
+  
+  <dd>
+    <code>msg</code>
+    
+    (in)
+     -
+    A format string.
+  </dd>
+  
+  <dd>
+    <code>args</code>
+    
+    (in)
+     -
+    An optional list of arguments that are used for filling msg.
+  </dd>
+  
+
+
+
+
+
+
+
+
+
+</dl>
+
+
+<div><h4>Remarks</h4><p>Use this if something really unexpected happens inside your functions and there is no way to report this through the
+API. A good example would be logic errors, e.g. invalid values.</p><h4>Examples</h4><p>In the following example, the <tt>SEQAN_FAIL</tt> is there if a possible value is added to <tt>MyEnum</tt> but the
+function <tt>foo</tt> is not updated accordingly.</p><div data-src-path="None"><div class="highlight"><pre><span class="k">enum</span> <span class="n">MyEnum</span>
+<span class="p">{</span>
+  <span class="n">VALUE_ONE</span><span class="p">,</span>
+  <span class="n">VALUE_TWO</span>
+<span class="p">};</span>
+
+<span class="kt">bool</span> <span class="nf">foo</span><span class="p">(</span><span class="n">MyEnum</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="k">case</span> <span class="n">VALUE_ONE</span>:
+        <span class="c1">// do something</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">VALUE_TWO</span>:
+        <span class="c1">// do something</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">SEQAN_FAIL</span><span class="p">(</span><span class="s">&quot;Logic error. Should never reach here. x == %d.&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div></div>
+
+
+
+
+</div>
+
+
+
+<!-- Grouped Functions Details -->
+
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup AssertMacros Assertion and Check Macros
+ * 
+ * @brief The assertion and check macros provided by SeqAn.
+ * 
+ * Assertions are checks performed at runtime when debugging is enabled.
+ * Debugging is enabled by defining the preprocessor symbol
+ * &lt;tt&gt;SEQAN_ENABLE_DEBUG&lt;/tt&gt; as &lt;tt&gt;1&lt;/tt&gt; (the default is to set it to
+ * &lt;tt&gt;0&lt;/tt&gt; if the common C macro &lt;tt&gt;NDEBUG&lt;/tt&gt; is defined and to set it to
+ * &lt;tt&gt;1&lt;/tt&gt; otherwise. When using the SeqAn build system or the CMake
+ * FindSeqAn.cmake module, this is automatically set appropriately.
+ * 
+ * The SEQAN_CHECK and SEQAN_FAIL macro always lead to an exit of the program
+ * with a non-0 return value.
+ * 
+ * @macro AssertMacros#SEQAN_FAIL
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Force abortion of program, regardless of debugging settings.
+ * 
+ * @signature SEQAN_FAIL(msg[, args]);
+ * 
+ * @param[in] msg A format string.
+ * @param[in] args An optional list of arguments that are used for filling msg.
+ * 
+ * @section Remarks
+ * 
+ * Use this if something really unexpected happens inside your functions and
+ * there is no way to report this through the API. A good example would be logic
+ * errors, e.g. invalid values.
+ * 
+ * @section Examples
+ * 
+ * In the following example, the &lt;tt&gt;SEQAN_FAIL&lt;/tt&gt; is there if a possible
+ * value is added to &lt;tt&gt;MyEnum&lt;/tt&gt; but the function &lt;tt&gt;foo&lt;/tt&gt; is not
+ * updated accordingly.
+ * 
+ * @code{.cpp}
+ * enum MyEnum
+ * {
+ *   VALUE_ONE,
+ *   VALUE_TWO
+ * };
+ * 
+ * bool foo(MyEnum x)
+ * {
+ *     switch (x)
+ *     {
+ *     case VALUE_ONE:
+ *         // do something
+ *         return true;
+ *     case VALUE_TWO:
+ *         // do something
+ *         return true;
+ *     }
+ * 
+ *     SEQAN_FAIL(&#34;Logic error. Should never reach here. x == %d.&#34;, x);
+ *     return false;
+ * }
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_CHECK
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Force abortion of program if a condition is not met, regardless of
+ *        debugging settings.
+ * 
+ * @signature SEQAN_CHECK(condition, msg[, args]);
+ * 
+ * @param[in] condition An expression that is checked.
+ * @param[in] msg A format string.
+ * @param[in] args An optional list of arguments.
+ * 
+ * @section Remarks
+ * 
+ * Use this if something really unexpected happens inside your functions and
+ * there is no way to report this through the API. A good example would be logic
+ * errors, e.g. invalid values.
+ * 
+ * @section Examples
+ * 
+ * In the following example, the &lt;tt&gt;SEQAN_CHECK&lt;/tt&gt; stops program execution if
+ * a value is added to &lt;tt&gt;MyEnum&lt;/tt&gt; but the function &lt;tt&gt;foo&lt;/tt&gt; is not
+ * updated accordingly.
+ * 
+ * @code{.cpp}
+ * enum MyEnum
+ * {
+ *   VALUE_ONE,
+ *   VALUE_TWO
+ * };
+ * 
+ * bool foo(MyEnum x)
+ * {
+ *     SEQAN_CHECK((x == VALUE_ONE || x == VALUE_TWO), &#34;Invalid value for x == %d.&#34;, x);
+ * 
+ *     switch (x)
+ *     {
+ *     case VALUE_ONE:
+ *         // do something
+ *         return true;
+ *     case VALUE_TWO:
+ *         // do something
+ *         return true;
+ *     }
+ * 
+ *     return false;  // Should never reach here, checked above with SEQAN_CHECK.
+ * }
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Test that the given expression can be coerced to &lt;tt&gt;true&lt;/tt&gt;.
+ * 
+ * @signature SEQAN_ASSERT(expression);
+ * @signature SEQAN_ASSERT_MSG(expression, message[, parameters]);
+ * 
+ * @param[in] expression An expression to check for being true.
+ * @param[in] message A format string.
+ * @param[in] parameters An optional list of parameters.
+ * 
+ * @section Remarks
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT @call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT(0);  // will fail
+ * SEQAN_ASSERT(1);  // will run through
+ * SEQAN_ASSERT_MSG(0, &#34;message %d&#34;, 2);  // Will fail with message.
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_NOT
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Test that the given expression can be coerced to &lt;tt&gt;false&lt;/tt&gt;.
+ * 
+ * @signature SEQAN_ASSERT_NOT(expression)
+ * @signature SEQAN_ASSERT_NOT_MSG(expression, message[, parameters])
+ * 
+ * @param[in] expression An expression to check for being false.
+ * @param[in] message A format string.
+ * @param[in] parameters An optional list of parameters.
+ * 
+ * @section Remarks
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_NOT(0);  // will run through
+ * SEQAN_ASSERT_NOT(1);  // will fail
+ * SEQAN_ASSERT_NOT_MSG(0, &#34;msg %s&#34;, &#34;test&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_EQ
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Test that two given expressions are equal, as defined by the matching
+ *        call to the &lt;tt&gt;operator=(,)&lt;/tt&gt;.
+ * 
+ * @signature SEQAN_ASSERT_EQ(expression1, expression2);
+ * @signature SEQAN_ASSERT_EQ_MSG(expression1, expression2, comment[,
+ *            parameters]);
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_EQ(0, false);  // will run through
+ * SEQAN_ASSERT_EQ(1, false);  // will fail
+ * SEQAN_ASSERT_EQ(1, &#34;foo&#34;);  // will not compile
+ * SEQAN_ASSERT_EQ_MSG(1, false, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_NEQ
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Test that two given expressions are not equal, as defined by the
+ *        matching call to the &lt;tt&gt;operator!=(,)&lt;/tt&gt;.
+ * 
+ * @signature SEQAN_ASSERT_NEQ(expression1, expression2);
+ * @signature SEQAN_ASSERT_NEQ_MSG(expression1, expression2, comment[,
+ *            parameters]);
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_NEQ(0, false);  // will fail
+ * SEQAN_ASSERT_NEQ(1, false);  // will run through
+ * SEQAN_ASSERT_NEQ(1, &#34;foo&#34;);  // will not compile
+ * SEQAN_ASSERT_NEQ_MSG(1, false, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_LT
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Test that the two given expressions are in the less-than relation as
+ *        defined by the matching call to operator&lt;(,).
+ * 
+ * @signature SEQAN_ASSERT_LT(expression1, expression2);
+ * @signature SEQAN_ASSERT_LT(expression1, expression2, comment[, parameters]);
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_LT(0, 1);  // will run through
+ * SEQAN_ASSERT_LT(1, 1);  // will not run through
+ * SEQAN_ASSERT_LT_MSG(1, 1, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_LEQ
+ * 
+ * @brief Test that the two given expressions are in the less-than-or-equal
+ *        relation as defined by the matching call to operator&lt;=(,).
+ * 
+ * @signature SEQAN_ASSERT_LEQ(expression1, expression2)
+ * @signature SEQAN_ASSERT_LEQ_MSG(expression1, expression2, comment[,
+ *            parameters])
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_LEQ(1, 1);  // will run through
+ * SEQAN_ASSERT_LEQ(1, 2);  // will not run through
+ * SEQAN_ASSERT_LEQ_MSG(1, 2, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_GT
+ * 
+ * @brief Test that the two given expressions are in the greather-than relation
+ *        as defined by the matching call to operator&gt;(,).
+ * 
+ * @signature SEQAN_ASSERT_GT(expression1, expression2);
+ * @signature SEQAN_ASSERT_GT_MSG(expression1, expression2, comment[,
+ *            parameters]);
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_GT(2, 1);  // will run through
+ * SEQAN_ASSERT_GT(1, 1);  // will not run through
+ * SEQAN_ASSERT_GT_MSG(1, 1, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_GEQ
+ * 
+ * @brief Test that the two given expressions are in the greater-than-or-equal
+ *        relation as defined by the matching call to operator&gt;=(,).
+ * 
+ * @signature SEQAN_ASSERT_GEQ(expression1, expression2);
+ * @signature SEQAN_ASSERT_GEQ_MSG(expression1, expression2, comment[,
+ *            parameters]);
+ * 
+ * @param[in] expression1 The first expression.
+ * @param[in] expression2 The second expression.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_GEQ(1, 1);  // will run through
+ * SEQAN_ASSERT_GEQ(0, 1);  // will not run through
+ * SEQAN_ASSERT_GEQ_MSG(0, 1, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ * 
+ * 
+ * @macro AssertMacros#SEQAN_ASSERT_IN_DELTA
+ * 
+ * @brief Test that a value &lt;tt&gt;y&lt;/tt&gt; lies within an &lt;tt&gt;delta&lt;/tt&gt; environment
+ *        of a value &lt;tt&gt;x&lt;/tt&gt;.
+ * 
+ * @signature SEQAN_ASSERT_IN_DELTA(x, y, delta);
+ * @signature SEQAN_ASSERT_IN_DELTA_MSG(x, y, delta, comment[, parameters]);
+ * 
+ * @param[in] x The value to center the environment in.
+ * @param[in] y The value to check whether it falls within the environment.
+ * @param[in] delta The environment size.
+ * @param[in] comment A C-string (&lt;tt&gt;char const *&lt;/tt&gt;) to use as a format
+ *                    string for printing a message on failure.
+ * @param[in] parameters An optional parameter that is put into
+ *                       &lt;tt&gt;printf()&lt;/tt&gt; with format string &lt;tt&gt;comment&lt;/tt&gt;.
+ * 
+ * The main advantage of this macro is that it prints the values of its argument
+ * on failures. Note that the &lt;tt&gt;operator&amp;lt;&amp;lt;&lt;/tt&gt; to the type of
+ * &lt;tt&gt;std::cerr&lt;/tt&gt; has to be defined for the type of both expression
+ * parameters. Otherwise, simply use the equivalent SEQAN_ASSERT call.
+ * 
+ * See SEQAN_CHECK and SEQAN_FAIL for (conditionally) aborting your program
+ * regardless of debug settings.
+ * 
+ * @section Examples
+ * 
+ * @code{.cpp}
+ * SEQAN_ASSERT_IN_DELTA(0, 0, 0.1);  // will run through
+ * SEQAN_ASSERT_IN_DELTA(1, -2, 1);  // will fail
+ * SEQAN_ASSERT_IN_DELTA(1, &#34;foo&#34;);  // will not compile
+ * SEQAN_ASSERT_IN_DELTA_MSG(1, 0, 0.1, &#34;msg&#34;);  // will fail with message
+ * @endcode
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

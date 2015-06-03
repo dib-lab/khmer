@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="page_democonstraintiterator" data-page="DemoConstraintIterator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Constraint Iterator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<div id="filecontents">
+<h1 data-lang-entity="page" data-pimped="true">
+  <a href="page_LanguageEntities.html#page">Page</a> <span>Constraint Iterator</span>
+</h1>
+
+<div class="docstring">
+  <div class="discussion">
+    <!-- @brief -->
+    <div>Example for using node predicates on a deferred suffix tree.</div>
+    
+    <!-- paragraphs -->
+    
+<div><p>Given a sequences, we want to find all substrings s that fulfill certain constraints. The relative probabilty to see s
+should be at least p_min. s should also be not longer than replen_max. The latter constraint is a anti-monotonic pattern
+predicate and can be used in conjunction with the first constraint to cut of the trunk of a suffix tree. Only the top of
+the suffix tree contains candidates that might fulfill both predicates, so we can use an Index based on a deferred
+suffix tree (see IndexWotd). The following example demonstrates how to iterate over all suffix tree nodes fulfilling the
+constraints and output them.</p><p>We start by including the necessary headers and use the namespace seqan;</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/index.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><p>Afterwards we create a struct containing the constraints.</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre><span class="k">struct</span> <span class="n">TMyConstraints</span>
+<span class="p">{</span>
+    <span class="kt">double</span> <span class="n">p_min</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">replen_max</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">_cachedPred</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><p>In the following we do the requiered extensions.</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">seqan</span> <span class="p">{</span>
+<span class="c1">// custom TSpec for our customized wotd-Index</span>
+<span class="k">struct</span> <span class="n">TMyIndex</span><span class="p">;</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TText</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">Cargo</span><span class="o">&lt;</span><span class="n">Index</span><span class="o">&lt;</span><span class="n">TText</span><span class="p">,</span> <span class="n">IndexWotd</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">TMyConstraints</span> <span class="n">Type</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// node predicate</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TText</span><span class="p">,</span> <span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="kt">bool</span> <span class="n">nodePredicate</span><span class="p">(</span><span class="n">Iter</span><span class="o">&lt;</span><span class="n">Index</span><span class="o">&lt;</span><span class="n">TText</span><span class="p">,</span> <span class="n">IndexWotd</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&amp;</span> <span class="n">it</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">TMyConstraints</span> <span class="o">&amp;</span> <span class="n">cons</span> <span class="o">=</span> <span class="n">cargo</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">));</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">countSequences</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">))</span> <span class="o">*</span> <span class="n">repLength</span><span class="p">(</span><span class="n">it</span><span class="p">);</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">textLen</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">));</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">textLen</span> <span class="o">&lt;=</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cons</span><span class="p">.</span><span class="n">_cachedPred</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">cons</span><span class="p">.</span><span class="n">_cachedPred</span> <span class="o">=</span>
+        <span class="p">((</span><span class="kt">double</span><span class="p">)</span><span class="n">countOccurrences</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="n">textLen</span> <span class="o">-</span> <span class="n">delta</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">cons</span><span class="p">.</span><span class="n">p_min</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// monotonic hull</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">TText</span><span class="p">,</span> <span class="k">typename</span> <span class="n">TSpec</span><span class="o">&gt;</span>
+<span class="kt">bool</span> <span class="n">nodeHullPredicate</span><span class="p">(</span><span class="n">Iter</span><span class="o">&lt;</span><span class="n">Index</span><span class="o">&lt;</span><span class="n">TText</span><span class="p">,</span> <span class="n">IndexWotd</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;</span> <span class="o">&gt;</span><span class="p">,</span> <span class="n">TSpec</span><span class="o">&gt;</span> <span class="o">&amp;</span> <span class="n">it</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">TMyConstraints</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">cons</span> <span class="o">=</span> <span class="n">cargo</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">));</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">textLen</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">));</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">repLength</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">cons</span><span class="p">.</span><span class="n">replen_max</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">countSequences</span><span class="p">(</span><span class="n">container</span><span class="p">(</span><span class="n">it</span><span class="p">))</span> <span class="o">*</span> <span class="n">cons</span><span class="p">.</span><span class="n">replen_max</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">textLen</span> <span class="o">&lt;=</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="p">((</span><span class="kt">double</span><span class="p">)</span><span class="n">countOccurrences</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">/</span>
+            <span class="p">(</span><span class="kt">double</span><span class="p">)(</span><span class="n">textLen</span> <span class="o">-</span> <span class="n">delta</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">cons</span><span class="p">.</span><span class="n">p_min</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><p>Now we start the main program with a sequence initialization.</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">myString</span> <span class="o">=</span> <span class="s">&quot;How many wood would a woodchuck chuck.&quot;</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><p>Then we create our customized index which is a specialization of the deferred @Class.Index.wotd-Index@</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre>    <span class="k">typedef</span> <span class="n">Index</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">IndexWotd</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TMyIndex</span><span class="p">;</span>
+    <span class="n">TMyIndex</span> <span class="nf">myIndex</span><span class="p">(</span><span class="n">myString</span><span class="p">);</span>
+
+    <span class="n">cargo</span><span class="p">(</span><span class="n">myIndex</span><span class="p">).</span><span class="n">replen_max</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">cargo</span><span class="p">(</span><span class="n">myIndex</span><span class="p">).</span><span class="n">p_min</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><p>And finaly we search by traversing a string tree. To find all strings that fulfill our constraints, we simply do a
+dfs-traversal via @Function.goBegin@ and @Function.goNext@.</p><div data-src-path="demos/index/index_node_predicate.cpp"><div class="highlight"><pre>    <span class="k">typedef</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">TMyIndex</span><span class="p">,</span> <span class="n">TopDown</span><span class="o">&lt;</span><span class="n">ParentLinks</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;::</span><span class="n">Type</span> <span class="n">TConstrainedIterator</span><span class="p">;</span>
+    <span class="n">TConstrainedIterator</span> <span class="nf">myConstrainedIterator</span><span class="p">(</span><span class="n">myIndex</span><span class="p">);</span>
+
+    <span class="n">goBegin</span><span class="p">(</span><span class="n">myConstrainedIterator</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">myConstrainedIterator</span><span class="p">))</span>
+    <span class="p">{</span>
+
+        <span class="c1">//@Function.countOccurrences@ returns the number of hits of the representative.</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">countOccurrences</span><span class="p">(</span><span class="n">myConstrainedIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;x  &quot;</span><span class="p">;</span>
+
+        <span class="c1">//The representative string can be determined with @Function.representative@</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t\&quot;</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">representative</span><span class="p">(</span><span class="n">myConstrainedIterator</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\&quot;&#39;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="n">goNext</span><span class="p">(</span><span class="n">myConstrainedIterator</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/index/index_node_predicate.cpp" target="_top">demos/index/index_node_predicate.cpp</a></div></div><pre class="console" data-src-path="None">weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_node_predicate
+weese@tanne:~/seqan/demos$ ./index_node_predicate
+38x     ""
+6x      " "
+3x      " wo"
+2x      " wood"
+2x      "a"
+4x      "c"
+2x      "chuck"
+2x      "ck"
+3x      "d"
+2x      "d "
+2x      "huck"
+2x      "k"
+6x      "o"
+2x      "od"
+2x      "ood"
+3x      "u"
+2x      "uck"
+4x      "w"
+3x      "wo"
+2x      "wood"
+weese@tanne:~/seqan/demos$</pre></div>
+
+  </div>
+</div>
+
+<!-- @see -->
+
+</div>
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>@page DemoConstraintIterator Constraint Iterator
+
+@brief Example for using node predicates on a deferred suffix tree.
+
+Given a sequences, we want to find all substrings s that fulfill certain
+constraints. The relative probabilty to see s should be at least p_min. s
+should also be not longer than replen_max. The latter constraint is a anti-
+monotonic pattern predicate and can be used in conjunction with the first
+constraint to cut of the trunk of a suffix tree. Only the top of the suffix
+tree contains candidates that might fulfill both predicates, so we can use an
+Index based on a deferred suffix tree (see IndexWotd). The following example
+demonstrates how to iterate over all suffix tree nodes fulfilling the
+constraints and output them.
+
+We start by including the necessary headers and use the namespace seqan;
+
+@snippet demos/index/index_node_predicate.cpp includes
+
+Afterwards we create a struct containing the constraints.
+
+@snippet demos/index/index_node_predicate.cpp constraints
+
+In the following we do the requiered extensions.
+
+@snippet demos/index/index_node_predicate.cpp extensions
+
+Now we start the main program with a sequence initialization.
+
+@snippet demos/index/index_node_predicate.cpp main
+
+Then we create our customized index which is a specialization of the deferred
+@Class.Index.wotd-Index@
+
+@snippet demos/index/index_node_predicate.cpp specialisation
+
+And finaly we search by traversing a string tree. To find all strings that
+fulfill our constraints, we simply do a dfs-traversal via @Function.goBegin@
+and @Function.goNext@.
+
+@snippet demos/index/index_node_predicate.cpp traversal
+
+@code{.console}
+weese@tanne:~/seqan$ cd demos
+weese@tanne:~/seqan/demos$ make index_node_predicate
+weese@tanne:~/seqan/demos$ ./index_node_predicate
+38x     &#34;&#34;
+6x      &#34; &#34;
+3x      &#34; wo&#34;
+2x      &#34; wood&#34;
+2x      &#34;a&#34;
+4x      &#34;c&#34;
+2x      &#34;chuck&#34;
+2x      &#34;ck&#34;
+3x      &#34;d&#34;
+2x      &#34;d &#34;
+2x      &#34;huck&#34;
+2x      &#34;k&#34;
+6x      &#34;o&#34;
+2x      &#34;od&#34;
+2x      &#34;ood&#34;
+3x      &#34;u&#34;
+2x      &#34;uck&#34;
+4x      &#34;w&#34;
+3x      &#34;wo&#34;
+2x      &#34;wood&#34;
+weese@tanne:~/seqan/demos$
+@endcode
+
+
+</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

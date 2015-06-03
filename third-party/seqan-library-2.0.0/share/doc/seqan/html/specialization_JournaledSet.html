@@ -1,0 +1,1081 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_journaledset" data-page="JournaledSet">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>JournaledSet - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>JournaledSet<div><div>A <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> storing the strings as members. It can store a global reference sequence to which all members can
+be journaled if they are of type <a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a>.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a>, 
+    <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>, 
+    <a href="concept_DestructibleConcept.html" data-lang-entity="concept">DestructibleConcept</a>, 
+    <a href="concept_ForwardContainerConcept.html" data-lang-entity="concept">ForwardContainerConcept</a>, 
+    <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a>, 
+    <a href="concept_ReversibleContainerConcept.html" data-lang-entity="concept">ReversibleContainerConcept</a>, 
+    <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a>, 
+    <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a>, 
+    <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/journaled_set.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TString&gt;
+class StringSet&lt;TString, Owner&lt;JournaledSet&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TString</a></code></th>
+        <td>The string type. Types: <a href="class_String.html" data-lang-entity="class">String</a>, <a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a></td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept::operator=" data-lang-entity="member_function">operator=</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept::operator[]" data-lang-entity="member_function">operator[]</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#JournaledSet%23createHost" title="#JournaledSet#createHost (interface function)" data-lang-entity="interface_function">void createHost(stringSet, ref);</a></code></span>
+    <span class="summary_desc"><div>Creates the global reference of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#JournaledSet%23host" title="#JournaledSet#host (interface function)" data-lang-entity="interface_function">THost host(stringSet);</a></code></span>
+    <span class="summary_desc"><div>Returns the global reference sequence of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#JournaledSet%23join" title="#JournaledSet#join (interface function)" data-lang-entity="interface_function">void join(stringSet, pos, joinConfig);</a></code></span>
+    <span class="summary_desc"><div>Joins a <a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a> to a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a> by computing and journaling
+differences to the global reference sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#JournaledSet%23setHost" title="#JournaledSet#setHost (interface function)" data-lang-entity="interface_function">void setHost(stringSet, ref);</a></code></span>
+    <span class="summary_desc"><div>Sets the global reference of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_StringSet.html" data-lang-entity="class">StringSet</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#assignValueById" data-lang-entity="interface_function">assignValueById</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#concat" data-lang-entity="interface_function">concat</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#getValueById" data-lang-entity="interface_function">getValueById</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#idToPosition" data-lang-entity="interface_function">idToPosition</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#lengthSum" data-lang-entity="interface_function">lengthSum</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#positionToId" data-lang-entity="interface_function">positionToId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#removeValueById" data-lang-entity="interface_function">removeValueById</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#reserve" data-lang-entity="interface_function">reserve</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#strSplit" data-lang-entity="interface_function">strSplit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#valueById" data-lang-entity="interface_function">valueById</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_AssignableConcept.html" data-lang-entity="concept">AssignableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#assign" data-lang-entity="interface_function">assign</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#set" data-lang-entity="interface_function">set</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_AssignableConcept.html#AssignableConcept#move" data-lang-entity="interface_function">move</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#writeValue" data-lang-entity="interface_function">writeValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#write" data-lang-entity="interface_function">write</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#begin" data-lang-entity="interface_function">begin</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#end" data-lang-entity="interface_function">end</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#empty" data-lang-entity="interface_function">empty</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#swap" data-lang-entity="interface_function">swap</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#getObjectId" data-lang-entity="interface_function">getObjectId</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#moveValue" data-lang-entity="interface_function">moveValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#shrinkToFit" data-lang-entity="interface_function">shrinkToFit</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#directionIterator" data-lang-entity="interface_function">directionIterator</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_RandomAccessContainerConcept.html" data-lang-entity="concept">RandomAccessContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#value" data-lang-entity="interface_function">value</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#assignValue" data-lang-entity="interface_function">assignValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_RandomAccessContainerConcept.html#RandomAccessContainerConcept#getValue" data-lang-entity="interface_function">getValue</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#prefix" data-lang-entity="interface_function">prefix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#infixWithLength" data-lang-entity="interface_function">infixWithLength</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#infix" data-lang-entity="interface_function">infix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#suffix" data-lang-entity="interface_function">suffix</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_StringConcept.html" data-lang-entity="concept">StringConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#iter" data-lang-entity="interface_function">iter</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#append" data-lang-entity="interface_function">append</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#appendValue" data-lang-entity="interface_function">appendValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#front" data-lang-entity="interface_function">front</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#back" data-lang-entity="interface_function">back</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#resize" data-lang-entity="interface_function">resize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#erase" data-lang-entity="interface_function">erase</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#eraseFront" data-lang-entity="interface_function">eraseFront</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#eraseBack" data-lang-entity="interface_function">eraseBack</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#capacity" data-lang-entity="interface_function">capacity</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#computeGenerousCapacity" data-lang-entity="interface_function">computeGenerousCapacity</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#insert" data-lang-entity="interface_function">insert</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#insertValue" data-lang-entity="interface_function">insertValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_StringConcept.html#StringConcept#replace" data-lang-entity="interface_function">replace</a></code></span></li>
+  
+</ul>
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#stringSetLimits" data-lang-entity="interface_function">stringSetLimits</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posLocalToX" data-lang-entity="interface_function">posLocalToX</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posLocalize" data-lang-entity="interface_function">posLocalize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#posGlobalize" data-lang-entity="interface_function">posGlobalize</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#getSeqNo" data-lang-entity="interface_function">getSeqNo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#getSeqOffset" data-lang-entity="interface_function">getSeqOffset</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_StringSet.html" data-lang-entity="class">StringSet</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#Concatenator" data-lang-entity="interface_metafunction">Concatenator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#GetSequenceByNo" data-lang-entity="interface_metafunction">GetSequenceByNo</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#Id" data-lang-entity="interface_metafunction">Id</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#LengthSum" data-lang-entity="interface_metafunction">LengthSum</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_StringSet.html#StringSet#StringSetPosition" data-lang-entity="interface_metafunction">StringSetPosition</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultGetIteratorSpec" data-lang-entity="interface_metafunction">DefaultGetIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DefaultIteratorSpec" data-lang-entity="interface_metafunction">DefaultIteratorSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#DirectionIterator" data-lang-entity="interface_metafunction">DirectionIterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#GetValue" data-lang-entity="interface_metafunction">GetValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Iterator" data-lang-entity="interface_metafunction">Iterator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Reference" data-lang-entity="interface_metafunction">Reference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_ContainerConcept.html#ContainerConcept#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_SegmentableConcept.html" data-lang-entity="concept">SegmentableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Infix" data-lang-entity="interface_metafunction">Infix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Prefix" data-lang-entity="interface_metafunction">Prefix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_SegmentableConcept.html#SegmentableConcept#Suffix" data-lang-entity="interface_metafunction">Suffix</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#SAValue" data-lang-entity="interface_metafunction">SAValue</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_TextConcept.html#TextConcept#StringSetLimits" data-lang-entity="interface_metafunction">StringSetLimits</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The strings are internally stored in a <tt>String&lt;TString&gt;</tt> object and the character position type is a <a href="class_Pair.html" data-lang-entity="class">Pair</a> <tt>(seqNo, seqOfs)</tt> where seqNo identifies the string within the string set and seqOfs identifies
+the position within this string.</p><p>The global reference is of type <tt>Host&lt;TString&gt;</tt>. Only strings of type <a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a> or
+<tt>Host&lt;</tt><a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a><tt>&gt;</tt> can be used for the advanced functionality supported by
+this string set.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="JournaledSet#createHost" class="signature first" data-lang-entity="interface_function">
+      <code>void createHost(stringSet, ref);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates the global reference of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stringSet</code>
+            
+        
+      </th>
+      <td>The JournaledStringSet that stores the sequences.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ref</code>
+            
+        
+      </th>
+      <td>The new reference sequence of the JournaledSet. Stores a copy of the passed global
+reference sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="JournaledSet#host" class="signature" data-lang-entity="interface_function">
+      <code>THost host(stringSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the global reference sequence of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stringSet</code>
+            
+        
+      </th>
+      <td>The JournaledStringSet that stores the sequences. Types: <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>THost</code></th>
+        <td>Reference to the host.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="JournaledSet#join" class="signature" data-lang-entity="interface_function">
+      <code>void join(stringSet, pos, joinConfig);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Joins a <a href="specialization_JournaledString.html" data-lang-entity="specialization">JournaledString</a> to a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a> by computing and journaling
+differences to the global reference sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stringSet</code>
+            
+        
+      </th>
+      <td>The JournaledSet to join to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The position of the JournaledString within the string set.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">joinConfig</code>
+            
+        
+      </th>
+      <td>A <a href="class_JoinConfig.html" data-lang-entity="class">JoinConfig</a> object that specifies the method and the method's strategy
+to compute the differences.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="JournaledSet#setHost" class="signature" data-lang-entity="interface_function">
+      <code>void setHost(stringSet, ref);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Sets the global reference of a <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stringSet</code>
+            
+        
+      </th>
+      <td>The string set that stores the sequences. Types: <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">ref</code>
+            
+        
+      </th>
+      <td>The new reference sequence of the <a href="specialization_JournaledSet.html" data-lang-entity="specialization">JournaledSet</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>Uses an <a href="class_Holder.html" data-lang-entity="class">Holder</a> to store a reference to the new global reference sequence instead of copying it.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class JournaledSet
+ * 
+ * @extends StringSet
+ * 
+ * @headerfile &lt;seqan/journaled_set.h&gt;
+ * 
+ * @brief A @link StringSet @endlink storing the strings as members. It can
+ *        store a global reference sequence to which all members can be
+ *        journaled if they are of type @link JournaledString @endlink.
+ * 
+ * @signature template &lt;typename TString&gt; class StringSet&lt;TString,
+ *            Owner&lt;JournaledSet&gt; &gt;;
+ * 
+ * @tparam TString The string type. Types: @link String @endlink, @link
+ *                 JournaledString @endlink
+ * 
+ * The strings are internally stored in a &lt;tt&gt;String&amp;lt;TString&amp;gt;&lt;/tt&gt; object
+ * and the character position type is a @link Pair @endlink &lt;tt&gt;(seqNo,
+ * seqOfs)&lt;/tt&gt; where seqNo identifies the string within the string set and
+ * seqOfs identifies the position within this string.
+ * 
+ * The global reference is of type &lt;tt&gt;Host&amp;lt;TString&amp;gt;&lt;/tt&gt;. Only strings of
+ * type @link JournaledString @endlink or &lt;tt&gt;Host&amp;lt;&lt;/tt&gt;@link JournaledString
+ * @endlink&lt;tt&gt;&amp;gt;&lt;/tt&gt; can be used for the advanced functionality supported by
+ * this string set.
+ * 
+ * @fn JournaledSet#host
+ * 
+ * @brief Returns the global reference sequence of a @link JournaledSet
+ *        @endlink.
+ * 
+ * @signature THost host(stringSet);
+ * 
+ * @param[in] stringSet The JournaledStringSet that stores the sequences. Types:
+ *                      @link JournaledSet @endlink
+ * 
+ * @return THost Reference to the host.
+ * 
+ * @fn JournaledSet#setHost
+ * 
+ * @brief Sets the global reference of a @link JournaledSet @endlink.
+ * 
+ * @signature void setHost(stringSet, ref);
+ * 
+ * @param[in,out] stringSet The string set that stores the sequences. Types:
+ *                          @link JournaledSet @endlink
+ * @param[in] ref The new reference sequence of the @link JournaledSet @endlink.
+ * 
+ * @section Remarks
+ * 
+ * Uses an @link Holder @endlink to store a reference to the new global
+ * reference sequence instead of copying it.
+ * 
+ * @fn JournaledSet#createHost
+ * 
+ * @brief Creates the global reference of a @link JournaledSet @endlink.
+ * 
+ * @signature void createHost(stringSet, ref);
+ * 
+ * @param[in,out] stringSet The JournaledStringSet that stores the sequences.
+ * @param[in] ref The new reference sequence of the JournaledSet. Stores a copy
+ *                of the passed global reference sequence.
+ * 
+ * @fn JournaledSet#join
+ * 
+ * @brief Joins a @link JournaledString @endlink to a @link JournaledSet
+ *        @endlink by computing and journaling differences to the global
+ *        reference sequence.
+ * 
+ * @signature void join(stringSet, pos, joinConfig);
+ * 
+ * @param[in,out] stringSet The JournaledSet to join to.
+ * @param[in] pos The position of the JournaledString within the string set.
+ * @param[in] joinConfig A @link JoinConfig @endlink object that specifies the
+ *                       method and the method&#39;s strategy to compute the
+ *                       differences.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

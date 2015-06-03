@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  font-family: "Open Sans", "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+  font-size: 13px;
+  height: 101%;
+  overflow-x: hidden;
+}
+
+h1 { padding: 12px 10px; padding-bottom: 0; margin: 0; font-size: 1.4em; }
+.clear { clear: both; }
+#noresults { padding: 7px 12px; }
+#content.insearch #noresults { margin-left: 7px; }
+.frames #nav span:after { content: ' | '; }
+.frames #nav span:last-child:after { content: ''; }
+
+.frames #content h1 { margin-top: 0; }
+.frames li { white-space: nowrap; cursor: normal; }
+.frames li small { display: block; font-size: 0.8em; }
+.frames li small:before { content: ""; }
+.frames li small:after { content: ""; }
+.frames li small.search_info { display: none; }
+.frames #nav { display: block; }

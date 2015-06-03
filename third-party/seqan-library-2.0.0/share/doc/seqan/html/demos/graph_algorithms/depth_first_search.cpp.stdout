@@ -1,0 +1,24 @@
+Adjacency list:
+0 -> 1,3,
+1 -> 4,
+2 -> 5,4,
+3 -> 1,
+4 -> 3,
+5 -> 5,
+Edge list:
+Source: 0,Target: 1 (Id: 1)
+Source: 0,Target: 3 (Id: 0)
+Source: 1,Target: 4 (Id: 2)
+Source: 2,Target: 5 (Id: 4)
+Source: 2,Target: 4 (Id: 3)
+Source: 3,Target: 1 (Id: 5)
+Source: 4,Target: 3 (Id: 6)
+Source: 5,Target: 5 (Id: 7)
+
+Depth-First search: 
+Vertex u: Discovery time = 1,Finishing time = 8,Predecessor = nil
+Vertex v: Discovery time = 2,Finishing time = 7,Predecessor = u
+Vertex w: Discovery time = 9,Finishing time = 12,Predecessor = nil
+Vertex x: Discovery time = 4,Finishing time = 5,Predecessor = y
+Vertex y: Discovery time = 3,Finishing time = 6,Predecessor = v
+Vertex z: Discovery time = 10,Finishing time = 11,Predecessor = w

@@ -1,0 +1,829 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_localmatchstore" data-page="LocalMatchStore">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>LocalMatchStore - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>LocalMatchStore<div><div>Stores information about local matches.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/parse_lm.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSpec = void, TConfig = LocalMatchStoreConfig&lt;TSpec&gt; &gt;
+struct LocalMatchStore;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specialization tag.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TConfig</a></code></th>
+        <td>Configuration class.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LocalMatchStore%23appendLocalMatch" title="#LocalMatchStore#appendLocalMatch (interface function)" data-lang-entity="interface_function">void appendLocalMatchStore(store, subjectId, subjectBeginPos, subjectEndPos, queryId, queryBeginPos, queryEndPos);, void appendLocalMatchStore(store, subjectName, subjectBeginPos, subjectEndPos, queryName, queryBeginPos, queryEndPos, cigarStringBuffer);</a></code></span>
+    <span class="summary_desc"><div>Append a new local match to a <a href="class_LocalMatchStore.html" data-lang-entity="class">LocalMatchStore</a></div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LocalMatchStore%23readRecord" title="#LocalMatchStore#readRecord (interface function)" data-lang-entity="interface_function">int readRecord(store, reader, tag);</a></code></span>
+    <span class="summary_desc"><div>Read Lastz "general" format record.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#LocalMatchStore%3A%3AcigarStore" title="#LocalMatchStore::cigarStore (interface function)" data-lang-entity="member_variable">
+        TCigarString LocalMatchStore::cigarStore
+    </a></code></span>
+    <span class="summary_desc"><div>String storing the CIGAR strings.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#LocalMatchStore%3A%3AmatchStore" title="#LocalMatchStore::matchStore (interface function)" data-lang-entity="member_variable">
+        TMatchStore LocalMatchStore::matchStore
+    </a></code></span>
+    <span class="summary_desc"><div>String storing the LocalMatch local matches.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#LocalMatchStore%3A%3AsequenceNameStore" title="#LocalMatchStore::sequenceNameStore (interface function)" data-lang-entity="member_variable">
+        TStringSet LocalMatchStore::sequenceNameStore
+    </a></code></span>
+    <span class="summary_desc"><div>StringSet storing the sequence names.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The LocalMatchStore provides information about matches. Similar to the <a href="class_FragmentStore.html" data-lang-entity="class">FragmentStore</a>, the
+information is split into multiple sub stores. Each sub store stores a part of the information.</p><p>The LocalMatchStore#matchStore stores the information about a match. The LocalMatchStore#sequenceNameStore stores
+the sequence names. These both sub stores are "core stores", they are filled with consistent information, i.e. for
+each sequence id in the matchStore, there has to be a valid entry in the sequenceNameStore.</p><p>The LocalMatchStore#cigarStore optionally stores CIGAR strings for the matches. Its entries are referenced by
+<tt>matchStore[i].id</tt>.</p><h3>Examples</h3><p>Read Lastz matches from a link RecordReader and then print them to stdout.</p><div data-src-path="None"><div class="highlight"><pre><span class="c1">// Read local alignments from record reader.  Note that in real-world code,</span>
+<span class="c1">// you should have error handling.</span>
+<span class="n">LocalMatchStore</span><span class="o">&lt;&gt;</span> <span class="n">lmStore</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">atEnd</span><span class="p">(</span><span class="n">recordReader</span><span class="p">))</span>
+    <span class="n">readRecord</span><span class="p">(</span><span class="n">lmStore</span><span class="p">,</span> <span class="n">recordReader</span><span class="p">,</span> <span class="n">StellarGff</span><span class="p">());</span>
+
+<span class="c1">// Print local alignment information to stdout.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;# Reverse strandness is indicated by end &lt; begin</span><span class="se">\n</span><span class="s">&quot;</span>
+          <span class="o">&lt;&lt;</span> <span class="s">&quot;#db</span><span class="se">\t</span><span class="s">db_beg</span><span class="se">\t</span><span class="s">db_end</span><span class="se">\t</span><span class="s">query</span><span class="se">\t</span><span class="s">q_beg</span><span class="se">\t</span><span class="s">q_end</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">sequenceNameStore</span><span class="p">[</span><span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">queryId</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">queryBeginPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">queryEndPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">sequenceNameStore</span><span class="p">[</span><span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">subjectId</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">subjectBeginPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="n">lmStore</span><span class="p">.</span><span class="n">matchStore</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">subjectEndPos</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_LocalMatch.html" data-lang-entity="class">LocalMatch</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="LocalMatchStore#appendLocalMatch" class="signature first" data-lang-entity="interface_function">
+      <code>void appendLocalMatchStore(store, subjectId, subjectBeginPos, subjectEndPos, queryId, queryBeginPos, queryEndPos);
+void appendLocalMatchStore(store, subjectName, subjectBeginPos, subjectEndPos, queryName, queryBeginPos, queryEndPos, cigarStringBuffer);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Append a new local match to a <a href="class_LocalMatchStore.html" data-lang-entity="class">LocalMatchStore</a></div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>The LocalMatchStore to add the local match to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">subjectId</code>
+            
+        
+      </th>
+      <td>Numeric subject sequence identifier, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">subjectName</code>
+            
+        
+      </th>
+      <td>The textual name of the query sequence, <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">subjectBegin</code>
+            
+        
+      </th>
+      <td>The begin position of the match in the subject, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">subjectEnd</code>
+            
+        
+      </th>
+      <td>The end position of the match in the subject, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryId</code>
+            
+        
+      </th>
+      <td>Numeric query sequence identifier, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryName</code>
+            
+        
+      </th>
+      <td>The textual name of the query sequence, <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryBegin</code>
+            
+        
+      </th>
+      <td>The begin position of the match in the query, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">queryEnd</code>
+            
+        
+      </th>
+      <td>The end position of the match in the query, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cigarStringBuffer</code>
+            
+        
+      </th>
+      <td>Buffer with the cigar string of the local alignment, <a href="global_typedef_CharString.html" data-lang-entity="global_typedef">CharString</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Matches on the reverse-complement are encoded by the begin position being greater than the begin position.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="LocalMatchStore#readRecord" class="signature" data-lang-entity="interface_function">
+      <code>int readRecord(store, reader, tag);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read Lastz "general" format record.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">store</code>
+            
+        
+      </th>
+      <td>LocalMatchStore object to read into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td>SinglePassRecordReader to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">tag</code>
+            
+        
+      </th>
+      <td>The tag for selecting the format, one of BlastnTabular, LastzGeneral, and StellarGff.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>int</code></th>
+        <td>0 on success, non-0 on errors and EOF</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="LocalMatchStore::cigarStore" class="signature first" data-lang-entity="member_variable">
+      <code>TCigarString LocalMatchStore::cigarStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>String storing the CIGAR strings.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="LocalMatchStore::matchStore" class="signature" data-lang-entity="member_variable">
+      <code>TMatchStore LocalMatchStore::matchStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>String storing the LocalMatch local matches.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="LocalMatchStore::sequenceNameStore" class="signature" data-lang-entity="member_variable">
+      <code>TStringSet LocalMatchStore::sequenceNameStore</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>StringSet storing the sequence names.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class LocalMatchStore
+ * 
+ * @headerfile &lt;seqan/parse_lm.h&gt;
+ * 
+ * @brief Stores information about local matches.
+ * 
+ * @signature template &lt;typename TSpec = void, TConfig =
+ *            LocalMatchStoreConfig&lt;TSpec&gt; &gt; struct LocalMatchStore;
+ * 
+ * @tparam TSpec Specialization tag.
+ * @tparam TConfig Configuration class.
+ * 
+ * The LocalMatchStore provides information about matches. Similar to the @link
+ * FragmentStore @endlink, the information is split into multiple sub stores.
+ * Each sub store stores a part of the information.
+ * 
+ * The LocalMatchStore#matchStore stores the information about a match. The
+ * LocalMatchStore#sequenceNameStore stores the sequence names. These both sub
+ * stores are &#34;core stores&#34;, they are filled with consistent information, i.e.
+ * for each sequence id in the matchStore, there has to be a valid entry in the
+ * sequenceNameStore.
+ * 
+ * The LocalMatchStore#cigarStore optionally stores CIGAR strings for the
+ * matches. Its entries are referenced by &lt;tt&gt;matchStore[i].id&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * Read Lastz matches from a link RecordReader and then print them to stdout.
+ * 
+ * @code{.cpp}
+ * // Read local alignments from record reader.  Note that in real-world code,
+ * // you should have error handling.
+ * LocalMatchStore&lt;&gt; lmStore;
+ * while (!atEnd(recordReader))
+ *     readRecord(lmStore, recordReader, StellarGff());
+ * 
+ * // Print local alignment information to stdout.
+ * std::cout &lt;&lt; &#34;# Reverse strandness is indicated by end &lt; begin\n&#34;
+ *           &lt;&lt; &#34;#db\tdb_beg\tdb_end\tquery\tq_beg\tq_end\n&#34;;
+ * for (unsigned i = 0; i &lt; length(lmStore.matchStore); ++i)
+ *     std::cout &lt;&lt; lmStore.sequenceNameStore[lmStore.matchStore[i].queryId] &lt;&lt; &#34;\t&#34;
+ *               &lt;&lt; lmStore.matchStore[i].queryBeginPos &lt;&lt; &#34;\t&#34;
+ *               &lt;&lt; lmStore.matchStore[i].queryEndPos &lt;&lt; &#34;\t&#34;
+ *               &lt;&lt; lmStore.sequenceNameStore[lmStore.matchStore[i].subjectId] &lt;&lt; &#34;\t&#34;
+ *               &lt;&lt; lmStore.matchStore[i].subjectBeginPos &lt;&lt; &#34;\t&#34;
+ *               &lt;&lt; lmStore.matchStore[i].subjectEndPos &lt;&lt; &#34;\n&#34;;
+ * @endcode
+ * 
+ * 
+ * @see LocalMatch
+ * 
+ * @var TMatchStore LocalMatchStore::matchStore;
+ * 
+ * @brief String storing the LocalMatch local matches.
+ * 
+ * @var TStringSet LocalMatchStore::sequenceNameStore;
+ * 
+ * @brief StringSet storing the sequence names.
+ * 
+ * @var TCigarString LocalMatchStore::cigarStore;
+ * 
+ * @brief String storing the CIGAR strings.
+ * 
+ * @fn LocalMatchStore#readRecord
+ * 
+ * @headerfile &lt;seqan/parse_lm.h&gt;
+ * 
+ * @brief Read Lastz &#34;general&#34; format record.
+ * 
+ * @signature int readRecord(store, reader, tag);
+ * 
+ * @param[in,out] store LocalMatchStore object to read into.
+ * @param[in,out] stream SinglePassRecordReader to read from.
+ * @param[in] tag The tag for selecting the format, one of BlastnTabular,
+ *                LastzGeneral, and StellarGff.
+ * 
+ * @return int 0 on success, non-0 on errors and EOF
+ * 
+ * @fn LocalMatchStore#appendLocalMatch
+ * 
+ * @brief Append a new local match to a @link LocalMatchStore @endlink
+ * 
+ * @signature void appendLocalMatchStore(store, subjectId, subjectBeginPos,
+ *            subjectEndPos, queryId, queryBeginPos, queryEndPos);
+ * @signature void appendLocalMatchStore(store, subjectName, subjectBeginPos,
+ *            subjectEndPos, queryName, queryBeginPos, queryEndPos,
+ *            cigarStringBuffer);
+ * 
+ * @param[in,out] store The LocalMatchStore to add the local match to.
+ * @param[in] subjectId Numeric subject sequence identifier, @link
+ *                      IntegerConcept @endlink.
+ * @param[in] subjectName The textual name of the query sequence, @link
+ *                        CharString @endlink.
+ * @param[in] subjectBegin The begin position of the match in the subject, @link
+ *                         IntegerConcept @endlink.
+ * @param[in] subjectEnd The end position of the match in the subject, @link
+ *                       IntegerConcept @endlink.
+ * @param[in] queryId Numeric query sequence identifier, @link IntegerConcept
+ *                    @endlink.
+ * @param[in] queryName The textual name of the query sequence, @link CharString
+ *                      @endlink.
+ * @param[in] queryBegin The begin position of the match in the query, @link
+ *                       IntegerConcept @endlink.
+ * @param[in] queryEnd The end position of the match in the query, @link
+ *                     IntegerConcept @endlink.
+ * @param[in] cigarStringBuffer Buffer with the cigar string of the local
+ *                              alignment, @link CharString @endlink.
+ * 
+ * Matches on the reverse-complement are encoded by the begin position being
+ * greater than the begin position.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

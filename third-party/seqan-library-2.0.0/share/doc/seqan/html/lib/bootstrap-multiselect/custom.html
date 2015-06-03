@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>Bootstrap Multiselect</title>
+		<meta name="robots" content="noindex, nofollow" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="copyright" content="David Stutz" />
+
+		<link rel="stylesheet" href="css/bootstrap-3.0.0.min.css" type="text/css">
+		<link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
+
+		<script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-3.0.0.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+	</head>
+	<body>
+		<a href="https://github.com/davidstutz/bootstrap-multiselect"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+		<div class="jumbotron">
+		  <div class="container">
+		    <h1>Bootstrap Multiselect</h1>
+		    <p>Bootstrap Multiselect is a JQuery based plugin to provide an intuitive user interface for using select inputs with the multiple attribute present. Instead of a select a bootstrap button will be shown as dropdown menu containing the single options as checkboxes.</p>
+		  </div>
+		</div>
+        
+	    <div class="container">
+
+			<script type="text/javascript">
+ 				/**
+				 * Gets whether all the options are selected
+				 * @param {jQuery} $el
+				 * @returns {bool}
+				 */
+			    function multiselect_selected($el) {
+			        var ret = true;
+			        $('option', $el).each(function(element) {
+			            if (!!!$(this).attr('selected')) {
+			                ret = false;
+			            }
+			        });
+			        return ret;
+			    }
+				 
+			    /**
+				 * Selects all the options
+				 * @param {jQuery} $el
+				 * @returns {undefined}
+				 */
+			    function multiselect_selectAll($el) {
+			        $('option', $el).each(function(element) {
+			            $el.multiselect('select', $(this).val());
+			        });
+			    }
+			    
+			    /**
+				 * Deselects all the options
+				 * @param {jQuery} $el
+				 * @returns {undefined}
+				 */
+			    function multiselect_deselectAll($el) {
+			        $('option', $el).each(function(element) {
+			            $el.multiselect('deselect', $(this).val());
+			        });
+			        console.log($('option[selected]', $el).length)
+			    }
+				 
+			    /**
+				 * Clears all the selected options
+				 * @param {jQuery} $el
+				 * @returns {undefined}
+				 */
+			    function multiselect_toggle($el, $btn) {
+			        if (multiselect_selected($el)) {
+			            multiselect_deselectAll($el);
+			            $btn.text("Select All");
+			        }
+			        else {
+			            multiselect_selectAll($el);
+			            $btn.text("Deselect All");
+			        }
+			    }
+				 
+			    $(document).ready(function() {
+                    $('#example21').multiselect();
+			        $("#example21-toggle").click(function(e) {
+			            e.preventDefault();
+			            multiselect_toggle($("#example21"), $(this));
+			        });
+			    });
+			</script>
+
+
+							<div class="btn-group">
+								<select id="example21" multiple="multiple">
+									<option value="cheese">Cheese</option>
+									<option value="tomatoes">Tomatoes</option>
+									<option value="mozarella">Mozzarella</option>
+									<option value="mushrooms">Mushrooms</option>
+									<option value="pepperoni">Pepperoni</option>
+									<option value="onions">Onions</option>
+								</select>
+								<button id="example21-toggle" class="btn btn-primary">Select All</button>
+							</div>
+			</div>
+			</p>
+		</div>
+		<div class="container">
+			<hr>
+			<p>
+				&copy; 2012, 2013
+				<a href="http://davidstutz.de">David Stutz</a> - dual licensed: <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>, <a href="http://opensource.org/licenses/BSD-3-Clause">BSD 3-Clause License</a>
+			</p>
+		</div>
+	</body>
+</html>

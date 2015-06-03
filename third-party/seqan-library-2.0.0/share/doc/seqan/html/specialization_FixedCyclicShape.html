@@ -1,0 +1,731 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_fixedcyclicshape" data-page="FixedCyclicShape">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Fixed CyclicShape - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>Fixed CyclicShape<div><div>CyclicShape defined at compile time.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/modifier.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;unsigned L, typename THardwiredShape, unsigned R&gt;
+class CycledShape&lt;FixedShape&lt;L, GappedShape&lt;THardwiredShape&gt;, R&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">L</a></code></th>
+        <td>Left offset. Number of leading zeros of the Shape.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">R</a></code></th>
+        <td>Right offset. Number of trailing zeros of the Shape.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">THardwiredShape</a></code></th>
+        <td>A specialization of <a href="specialization_HardwiredShape.html" data-lang-entity="specialization">HardwiredShape</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSize</a></code></th>
+        <td>Size type of the CyclicShape</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FixedCyclicShape%3A%3ACyclicShape" title="#FixedCyclicShape::CyclicShape (interface function)" data-lang-entity="member_function">CyclicShape();, CyclicShape(shape);</a></code></span>
+    <span class="summary_desc"><div>The constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape#carePositions" data-lang-entity="interface_function">carePositions</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape#cyclicShapeToString" data-lang-entity="interface_function">cyclicShapeToString</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape#cyclicShapeToSuffixLengths" data-lang-entity="interface_function">cyclicShapeToSuffixLengths</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape#weight" data-lang-entity="interface_function">weight</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FixedCyclicShape%23WEIGHT" title="#FixedCyclicShape#WEIGHT (interface function)" data-lang-entity="interface_metafunction">WEIGHT&lt;CyclicShape&lt;FixedShape&lt;L, TInnerShape, R&gt; &gt; &gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Weight (number of care-positions) of Fixed CyclicShapes</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#FixedCyclicShape%3A%3Adiffs" title="#FixedCyclicShape::diffs (interface function)" data-lang-entity="member_variable">
+        TSize[] FixedCyclicShape::diffs
+    </a></code></span>
+    <span class="summary_desc"><div>Distances between care positions.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Member Variables Inherited From <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape::loffset" data-lang-entity="member_variable">loffset</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_CyclicShape.html#CyclicShape::span" data-lang-entity="member_variable">span</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Fixed CylcicShapes contain their information at compile time, so in
+most cases no object must be created.
+The notation is similar to the one of <a href="specialization_HardwiredShape.html" data-lang-entity="specialization">HardwiredShape</a>: Template
+paramters code for the distance between ones. Additionally you have to specify
+the number of leading and trailing zeros.</p><p>The notation is chosen in such a way that predefined Shapes like
+PatternHunter can be plugged into a CyclicShape. Like
+HardwiredShapes, Fixed CyclicShapes are limited to a weight of 21.</p><p>See <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a> for an example on how to use a CyclicShape.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="specialization_ModCyclicShapeModifiedIterator.html" data-lang-entity="specialization">ModCyclicShapeModifiedIterator</a></li>
+  
+  <li><a href="specialization_ModCyclicShapeModifiedString.html" data-lang-entity="specialization">ModCyclicShapeModifiedString</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FixedCyclicShape::CyclicShape" class="signature first" data-lang-entity="member_function">
+      <code>CyclicShape();
+CyclicShape(shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>A FixedCyclicShape of this type</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This constructor does not do anything, the FixedCyclicShape is defined by its type alone.
+See the example on how to create a CyclicShape:</p><div data-src-path="demos/cyclic_shape_snippets.cpp"><div class="highlight"><pre>        <span class="k">typedef</span> <span class="n">GappedShape</span><span class="o">&lt;</span><span class="n">HardwiredShape</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="o">&gt;</span>       <span class="n">TInnerShape</span><span class="p">;</span> <span class="c1">// 11100101</span>
+        <span class="c1">// ^--You can also use predefied Shapes here, e.g. Patternhunter</span>
+
+        <span class="k">typedef</span> <span class="n">CyclicShape</span><span class="o">&lt;</span><span class="n">FixedShape</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="n">TInnerShape</span><span class="p">,</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">TShape</span><span class="p">;</span>     <span class="c1">// 00111001010</span>
+        <span class="n">TShape</span> <span class="n">shape</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/cyclic_shape_snippets.cpp" target="_top">demos/cyclic_shape_snippets.cpp</a></div></div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="FixedCyclicShape#WEIGHT" class="signature first" data-lang-entity="interface_metafunction">
+    <code>WEIGHT&lt;CyclicShape&lt;FixedShape&lt;L, TInnerShape, R&gt; &gt; &gt;::VALUE;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Weight (number of care-positions) of Fixed CyclicShapes</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>L</code></th>
+            <td>left offset</td>
+        </tr>
+    
+        <tr>
+            <th><code>R</code></th>
+            <td>right offset</td>
+        </tr>
+    
+        <tr>
+            <th><code>TInnerShape</code></th>
+            <td>specialization of a hardwired GappedShape</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Weight</code></th>
+            <td>of a fixed CyclicShape (enum).</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="FixedCyclicShape::diffs" class="signature first" data-lang-entity="member_variable">
+      <code>TSize[] FixedCyclicShape::diffs</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Distances between care positions.</div>
+        
+<div><p><tt>static const TSize diffs[]</tt> has <i>weight</i> many non-zero entries
+in the beginning, the remaining ones are zero. An additional entry at position
+<i>weight1</i> holds the cyclic distance from the last "1" to the first one.
+During the iteration with a <a href="specialization_ModCyclicShapeModifiedIterator.html" data-lang-entity="specialization">ModCyclicShapeModifiedIterator</a>
+an index position keeps track of the position inside <tt>diffs</tt>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FixedCyclicShape Fixed CyclicShape
+ * 
+ * @extends CyclicShape
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief CyclicShape defined at compile time.
+ * 
+ * @signature template &lt;unsigned L, typename THardwiredShape, unsigned R&gt; class
+ *            CycledShape&lt;FixedShape&lt;L, GappedShape&lt;THardwiredShape&gt;, R&gt; &gt;;
+ * 
+ * @tparam L Left offset. Number of leading zeros of the Shape.
+ * @tparam R Right offset. Number of trailing zeros of the Shape.
+ * @tparam THardwiredShape A specialization of @link HardwiredShape @endlink
+ * @tparam TSize Size type of the CyclicShape
+ * 
+ * Fixed CylcicShapes contain their information at compile time, so in most
+ * cases no object must be created. The notation is similar to the one of @link
+ * HardwiredShape @endlink: Template paramters code for the distance between
+ * ones. Additionally you have to specify the number of leading and trailing
+ * zeros.
+ * 
+ * The notation is chosen in such a way that predefined Shapes like
+ * PatternHunter can be plugged into a CyclicShape. Like HardwiredShapes, Fixed
+ * CyclicShapes are limited to a weight of 21.
+ * 
+ * See @link CyclicShape @endlink for an example on how to use a CyclicShape.
+ * 
+ * @see ModCyclicShapeModifiedString
+ * @see ModCyclicShapeModifiedIterator
+ * 
+ * @mfn FixedCyclicShape#WEIGHT
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief Weight (number of care-positions) of Fixed CyclicShapes
+ * 
+ * @signature WEIGHT&lt;CyclicShape&lt;FixedShape&lt;L, TInnerShape, R&gt; &gt; &gt;::VALUE;
+ * 
+ * @tparam L left offset
+ * @tparam R right offset
+ * @tparam TInnerShape specialization of a hardwired GappedShape
+ * 
+ * @return Weight of a fixed CyclicShape (enum).
+ * 
+ * @see CyclicShape#weight
+ * 
+ * @fn FixedCyclicShape::CyclicShape
+ * 
+ * @brief The constructor
+ * 
+ * @signature CyclicShape();
+ * @signature CyclicShape(shape);
+ * 
+ * @param[in] shape A FixedCyclicShape of this type
+ * 
+ * This constructor does not do anything, the FixedCyclicShape is defined by its
+ * type alone. See the example on how to create a CyclicShape:
+ * 
+ * @snippet demos/cyclic_shape_snippets.cpp Define FixedCyclicShape
+ * 
+ * 
+ * 
+ * @var TSize[] FixedCyclicShape::diffs;
+ * 
+ * @brief Distances between care positions.
+ * 
+ * &lt;tt&gt;static const TSize diffs[]&lt;/tt&gt; has &lt;i&gt;weight&lt;/i&gt; many non-zero entries
+ * in the beginning, the remaining ones are zero. An additional entry at
+ * position &lt;i&gt;weight1&lt;/i&gt; holds the cyclic distance from the last &#34;1&#34; to the
+ * first one. During the iteration with a @link ModCyclicShapeModifiedIterator
+ * @endlink an index position keeps track of the position inside &lt;tt&gt;diffs&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

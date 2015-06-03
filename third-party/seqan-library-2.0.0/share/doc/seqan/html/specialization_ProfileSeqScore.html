@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_profileseqscore" data-page="ProfileSeqScore">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>ProfileSeq Score - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>ProfileSeq Score<div><div>Score for sequence-to-profile alignments.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Score.html" data-lang-entity="class">Score</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Score.html" data-lang-entity="class">Score</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align_profile.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue&gt;
+class Score&lt;TValue, ProfileSeqScore&gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The integer type to use for representing scores.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ProfileSeqScore%3A%3AScore" title="#ProfileSeqScore::Score (interface function)" data-lang-entity="member_function">Score::Score();, Score::Score(profile);</a></code></span>
+    <span class="summary_desc"><div>Constructor</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#ProfileSeqScore%23assignProfile" title="#ProfileSeqScore#assignProfile (interface function)" data-lang-entity="interface_function">void assignProfile(score, profile);</a></code></span>
+    <span class="summary_desc"><div>Assign profile to ProfileSeqScore.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Score.html" data-lang-entity="class">Score</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#loadScoreMatrix" data-lang-entity="interface_function">loadScoreMatrix</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#score" data-lang-entity="interface_function">score</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapExtendHorizontal" data-lang-entity="interface_function">scoreGapExtendHorizontal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapExtendVertical" data-lang-entity="interface_function">scoreGapExtendVertical</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapHorizontal" data-lang-entity="interface_function">scoreGapHorizontal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapOpenHorizontal" data-lang-entity="interface_function">scoreGapOpenHorizontal</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapOpenVertical" data-lang-entity="interface_function">scoreGapOpenVertical</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#scoreGapVertical" data-lang-entity="interface_function">scoreGapVertical</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#sequenceEntryForScore" data-lang-entity="interface_function">sequenceEntryForScore</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Score.html" data-lang-entity="class">Score</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#SequenceEntryForScore" data-lang-entity="interface_metafunction">SequenceEntryForScore</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Score.html#Score#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Using this class, you can align sequences to profiles. The profile is assumed to be in the horizontal direction
+(first row), the sequence in the vertical direction (second row).</p><p>Scoring works as follows.</p><p>The integer <tt>SEQAN_CONSENSUS_UNITY</tt> and fractions thereof are used to express scores. Gap opens in the
+profile are scored proportional to the number of gaps in the profile with two times unity, gap extends with one times
+unity at the position.</p><p>Gap opens in the sequence are scored with two times unity, gap extends in the sequence with unity. Alignments of
+profile characters to sequence characters are scored with the fraction of profile characters that match the sequence
+characters times unity.</p><h3>Examples</h3><p>The following example uses the ProfileSeq Score to align a sequence against a profile.
+Note that we print the gap state for each position since profiles cannot be printed to one stdout character.</p><div data-src-path="demos/align_profile/profile_seq_score.cpp"><div class="highlight"><pre><span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;seqan/align_profile.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">typedef</span> <span class="n">ProfileChar</span><span class="o">&lt;</span><span class="n">Dna</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="n">TDnaProfile</span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">String</span><span class="o">&lt;</span><span class="n">TDnaProfile</span><span class="o">&gt;</span> <span class="n">TProfileString</span><span class="p">;</span>
+
+    <span class="n">TProfileString</span> <span class="n">profile</span> <span class="o">=</span> <span class="s">&quot;CGAT&quot;</span><span class="p">;</span>
+    <span class="n">DnaString</span> <span class="n">seq</span> <span class="o">=</span> <span class="s">&quot;CGGAAT&quot;</span><span class="p">;</span>
+
+    <span class="n">Gaps</span><span class="o">&lt;</span><span class="n">TProfileString</span><span class="o">&gt;</span> <span class="n">gapsH</span><span class="p">(</span><span class="n">profile</span><span class="p">);</span>
+    <span class="n">Gaps</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">gapsV</span><span class="p">(</span><span class="n">seq</span><span class="p">);</span>
+
+    <span class="n">Score</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">ProfileSeqScore</span><span class="o">&gt;</span> <span class="n">sScheme</span><span class="p">(</span><span class="n">profile</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">val</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">gapsH</span><span class="p">,</span> <span class="n">gapsV</span><span class="p">,</span> <span class="n">sScheme</span><span class="p">,</span> <span class="n">NeedlemanWunsch</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;score value = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;gaps in profile/sequence</span><span class="se">\n</span><span class="s">&quot;</span>
+              <span class="o">&lt;&lt;</span> <span class="s">&quot;pos</span><span class="se">\t</span><span class="s">G</span><span class="se">\t</span><span class="s">S</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">gapsH</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">isGap</span><span class="p">(</span><span class="n">gapsH</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">isGap</span><span class="p">(</span><span class="n">gapsV</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/align_profile/profile_seq_score.cpp" target="_top">demos/align_profile/profile_seq_score.cpp</a></div></div><p>The output is as follows:</p><pre class="code" data-src-path="None">score value = -2097152
+gaps in profile/sequence
+pos G   S
+0   0   0
+1   1   0
+2   0   0
+3   1   0
+4   0   0
+5   0   0</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ProfileSeqScore::Score" class="signature first" data-lang-entity="member_function">
+      <code>Score::Score();
+Score::Score(profile);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">profile</code>
+            
+        
+      </th>
+      <td>The profile to copy from (<a href="specialization_AllocString.html" data-lang-entity="specialization">AllocString</a> of <a href="class_ProfileChar.html" data-lang-entity="class">ProfileChar</a> objects).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>When providing <tt>profile</tt>, the function <a href="specialization_ProfileSeqScore.html#ProfileSeqScore#assignProfile" data-lang-entity="interface_function">assignProfile</a> is automatically used to
+assign the profile to this class.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="ProfileSeqScore#assignProfile" class="signature first" data-lang-entity="interface_function">
+      <code>void assignProfile(score, profile);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assign profile to ProfileSeqScore.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">score</code>
+            
+        
+      </th>
+      <td>The ProfileSeqScore object to assign the profile for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">profile</code>
+            
+        
+      </th>
+      <td>The profile to assign to the score. <a href="specialization_AllocString.html" data-lang-entity="specialization">AllocString</a> of <a href="class_ProfileChar.html" data-lang-entity="class">ProfileChar</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class ProfileSeqScore ProfileSeq Score
+ * 
+ * @extends Score
+ * 
+ * @headerfile &lt;seqan/align_profile.h&gt;
+ * 
+ * @brief Score for sequence-to-profile alignments.
+ * 
+ * @signature template &lt;typename TValue&gt; class Score&lt;TValue, ProfileSeqScore&gt;;
+ * 
+ * @tparam TValue The integer type to use for representing scores.
+ * 
+ * Using this class, you can align sequences to profiles. The profile is assumed
+ * to be in the horizontal direction (first row), the sequence in the vertical
+ * direction (second row).
+ * 
+ * Scoring works as follows.
+ * 
+ * The integer &lt;tt&gt;SEQAN_CONSENSUS_UNITY&lt;/tt&gt; and fractions thereof are used to
+ * express scores. Gap opens in the profile are scored proportional to the
+ * number of gaps in the profile with two times unity, gap extends with one
+ * times unity at the position.
+ * 
+ * Gap opens in the sequence are scored with two times unity, gap extends in the
+ * sequence with unity. Alignments of profile characters to sequence characters
+ * are scored with the fraction of profile characters that match the sequence
+ * characters times unity.
+ * 
+ * @section Examples
+ * 
+ * The following example uses the ProfileSeq Score to align a sequence against a
+ * profile. Note that we print the gap state for each position since profiles
+ * cannot be printed to one stdout character.
+ * 
+ * @include demos/align_profile/profile_seq_score.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @code{.output}
+ * score value = -2097152
+ * gaps in profile/sequence
+ * pos G   S
+ * 0   0   0
+ * 1   1   0
+ * 2   0   0
+ * 3   1   0
+ * 4   0   0
+ * 5   0   0
+ * @endcode
+ * 
+ * 
+ * @fn ProfileSeqScore::Score
+ * 
+ * @brief Constructor
+ * 
+ * @signature Score::Score();
+ * @signature Score::Score(profile);
+ * 
+ * @param[in] profile The profile to copy from (@link AllocString @endlink of
+ *                    @link ProfileChar @endlink objects).
+ * 
+ * When providing &lt;tt&gt;profile&lt;/tt&gt;, the function @link
+ * ProfileSeqScore#assignProfile @endlink is automatically used to assign the
+ * profile to this class.
+ * 
+ * @fn ProfileSeqScore#assignProfile
+ * 
+ * @brief Assign profile to ProfileSeqScore.
+ * 
+ * @signature void assignProfile(score, profile);
+ * 
+ * @param[out] score The ProfileSeqScore object to assign the profile for.
+ * @param[in] profile The profile to assign to the score. @link AllocString
+ *                    @endlink of @link ProfileChar @endlink.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

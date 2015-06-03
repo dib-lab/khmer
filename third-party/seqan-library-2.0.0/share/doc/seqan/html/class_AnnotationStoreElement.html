@@ -1,0 +1,833 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_annotationstoreelement" data-page="AnnotationStoreElement">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>AnnotationStoreElement - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>AnnotationStoreElement<div><div>Represents an annotation of a genomic feature.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/store.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TPos[, typename TSpec]&gt;
+struct AnnotationStoreElement;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TPos</a></code></th>
+        <td>The position type to use.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AAnnotationStoreElement%28%29" title="#AnnotationStoreElement::AnnotationStoreElement() (interface function)" data-lang-entity="member_function">AnnotationStoreElement::AnnotationStoreElement();</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+
+
+<div data-lang-entity-container="member_typedef">
+<h2 data-lang-entity="member_typedef">Member Typedef Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3ATId" title="#AnnotationStoreElement::TId (member typedef)" data-lang-entity="member_typedef">typedef (...) TAnnotationStoreElement::TId;</a></code></span>
+    <span class="summary_desc"><div>Type of annotationId and contigId.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3ATPos" title="#AnnotationStoreElement::TPos (member typedef)" data-lang-entity="member_typedef">typedef (...) TAnnotationStoreElement::TPos;</a></code></span>
+    <span class="summary_desc"><div>Type of the <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::beginPos" data-lang-entity="member_variable">beginPos</a> and <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::endPos" data-lang-entity="member_variable">endPos</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3ATValues" title="#AnnotationStoreElement::TValues (member typedef)" data-lang-entity="member_typedef">typedef (...) TAnnotationStoreElement::TValues;</a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> type of the <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::values" data-lang-entity="member_variable">values</a> member.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AbeginPos" title="#AnnotationStoreElement::beginPos (interface function)" data-lang-entity="member_variable">
+        TPos AnnotationStoreElement::beginPos
+    </a></code></span>
+    <span class="summary_desc"><div>Begin position of the annotation in gap space.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AcontigId" title="#AnnotationStoreElement::contigId (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::contigId
+    </a></code></span>
+    <span class="summary_desc"><div>Refers to the contig in <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> that the annotation is part of.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AendPos" title="#AnnotationStoreElement::endPos (interface function)" data-lang-entity="member_variable">
+        TPos AnnotationStoreElement::endPos
+    </a></code></span>
+    <span class="summary_desc"><div>End position of the annotation in gap space.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AINVALID_ID" title="#AnnotationStoreElement::INVALID_ID (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::INVALID_ID
+    </a></code></span>
+    <span class="summary_desc"><div>Constant to represent an invalid id.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AINVALID_POS" title="#AnnotationStoreElement::INVALID_POS (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::INVALID_POS
+    </a></code></span>
+    <span class="summary_desc"><div>Constant to represent an invalid position.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AlastChildId" title="#AnnotationStoreElement::lastChildId (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::lastChildId
+    </a></code></span>
+    <span class="summary_desc"><div>The id of the parent annotation.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AnextSiblingId" title="#AnnotationStoreElement::nextSiblingId (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::nextSiblingId
+    </a></code></span>
+    <span class="summary_desc"><div>The id of the right sibling annotation.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AparentId" title="#AnnotationStoreElement::parentId (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::parentId
+    </a></code></span>
+    <span class="summary_desc"><div>The id of the parent annotation.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3AtypeId" title="#AnnotationStoreElement::typeId (interface function)" data-lang-entity="member_variable">
+        TId AnnotationStoreElement::typeId
+    </a></code></span>
+    <span class="summary_desc"><div>Refers to an entry in the <a href="class_FragmentStore.html#FragmentStore::annotationTypeStore" data-lang-entity="member_variable">annotationTypeStore</a>.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#AnnotationStoreElement%3A%3Avalues" title="#AnnotationStoreElement::values (interface function)" data-lang-entity="member_variable">
+        TValues AnnotationStoreElement::values
+    </a></code></span>
+    <span class="summary_desc"><div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that stores additional values addressed by keyId.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Value type of the <a href="class_FragmentStore.html#FragmentStore::annotationStore" data-lang-entity="member_variable">annotationStore</a> stirng. The id of an annotation (aka annotationId)
+is not stored explicitly as it is implicitly given byt he position in the <a href="class_FragmentStore.html#FragmentStore::annotationStore" data-lang-entity="member_variable">annotationStore</a>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::AnnotationStoreElement()" class="signature first" data-lang-entity="member_function">
+      <code>AnnotationStoreElement::AnnotationStoreElement();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The default constructor sets all members to <tt>INVALID_ID</tt> and beginPos and endPos to <tt>INVALID_POS</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+
+
+
+<!-- Member Typedefs Details -->
+
+<div class="member_typedef_defails" data-lang-entity-container="member_typedef">
+  <h2 data-lang-entity="member_typedef">Member Typedef Detail</h2>
+
+  
+      <div class="method_details first">
+        <h3 data-toc="hidden" id="AnnotationStoreElement::TId" class="signature first" data-lang-entity="member_typedef">
+          <code>typedef (...) TAnnotationStoreElement::TId;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of annotationId and contigId.</div>
+          
+<div><p>TId is the result of <tt>Id&lt;AnnotationStoreElement&lt;&gt; &gt;::Type</tt>, see <a href="global_metafunction_Id.html" data-lang-entity="global_metafunction">Id</a>.</p></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="AnnotationStoreElement::TPos" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (...) TAnnotationStoreElement::TPos;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div>Type of the <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::beginPos" data-lang-entity="member_variable">beginPos</a> and <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::endPos" data-lang-entity="member_variable">endPos</a>.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+      <div class="method_details">
+        <h3 data-toc="hidden" id="AnnotationStoreElement::TValues" class="signature" data-lang-entity="member_typedef">
+          <code>typedef (...) TAnnotationStoreElement::TValues;</code>
+        </h3>
+      </div>
+      <div class="docstring">
+        <div class="discussion">
+          <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> type of the <a href="class_AnnotationStoreElement.html#AnnotationStoreElement::values" data-lang-entity="member_variable">values</a> member.</div>
+          
+<div></div>
+
+        </div>
+      </div>
+
+      
+  
+  
+</div>
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::beginPos" class="signature first" data-lang-entity="member_variable">
+      <code>TPos AnnotationStoreElement::beginPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Begin position of the annotation in gap space.</div>
+        
+<div><p>If endPos &lt; beginPos then the annotation feature is located on the reverse strand where beginPos and endPos are
+the corresponding positions on the forward strand.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::contigId" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::contigId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Refers to the contig in <a href="class_FragmentStore.html#FragmentStore::contigStore" data-lang-entity="member_variable">contigStore</a> that the annotation is part of.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::endPos" class="signature" data-lang-entity="member_variable">
+      <code>TPos AnnotationStoreElement::endPos</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>End position of the annotation in gap space.</div>
+        
+<div><p>If endPos &lt; beginPos then the annotation feature is located on the reverse strand where beginPos and endPos are
+the corresponding positions on the forward strand.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::INVALID_ID" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::INVALID_ID</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Constant to represent an invalid id.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::INVALID_POS" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::INVALID_POS</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Constant to represent an invalid position.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::lastChildId" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::lastChildId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The id of the parent annotation.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::nextSiblingId" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::nextSiblingId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The id of the right sibling annotation.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::parentId" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::parentId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>The id of the parent annotation.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::typeId" class="signature" data-lang-entity="member_variable">
+      <code>TId AnnotationStoreElement::typeId</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>Refers to an entry in the <a href="class_FragmentStore.html#FragmentStore::annotationTypeStore" data-lang-entity="member_variable">annotationTypeStore</a>.</div>
+        
+<div><p>There are some type ids predefined for commonly used types, e.g. $ANNO_GENE$. See <a href="enum_FragmentStore_58_58PredefinedAnnotationTypes.html" data-lang-entity="enum">FragmentStore::PredefinedAnnotationTypes</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="AnnotationStoreElement::values" class="signature" data-lang-entity="member_variable">
+      <code>TValues AnnotationStoreElement::values</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div><a href="class_StringSet.html" data-lang-entity="class">StringSet</a> that stores additional values addressed by keyId.</div>
+        
+<div><p>The GFF and FTF file formats allow to define user-specific key-value pairs. The set of all keys addressed by keyId
+are stored in <a href="class_FragmentStore.html#FragmentStore::annotationKeyStore" data-lang-entity="member_variable">annotationKeyStore</a>.</p></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class AnnotationStoreElement
+ * 
+ * @headerfile &lt;seqan/store.h&gt;
+ * 
+ * @brief Represents an annotation of a genomic feature.
+ * 
+ * @signature template &lt;typename TPos[, typename TSpec]&gt; struct
+ *            AnnotationStoreElement;
+ * 
+ * @tparam TPos The position type to use.
+ * @tparam TSpec The specializing type.
+ * 
+ * Value type of the @link FragmentStore::annotationStore @endlink stirng. The
+ * id of an annotation (aka annotationId) is not stored explicitly as it is
+ * implicitly given byt he position in the @link FragmentStore::annotationStore
+ * @endlink.
+ * 
+ * @fn AnnotationStoreElement::AnnotationStoreElement()
+ * 
+ * @brief Constructor.
+ * 
+ * @signature AnnotationStoreElement::AnnotationStoreElement();
+ * 
+ * The default constructor sets all members to &lt;tt&gt;INVALID_ID&lt;/tt&gt; and beginPos
+ * and endPos to &lt;tt&gt;INVALID_POS&lt;/tt&gt;.
+ * 
+ * @typedef AnnotationStoreElement::TId
+ * 
+ * @brief Type of annotationId and contigId.
+ * 
+ * @signature typedef (...) TAnnotationStoreElement::TId;
+ * 
+ * TId is the result of &lt;tt&gt;Id&amp;lt;AnnotationStoreElement&amp;lt;&amp;gt;
+ * &amp;gt;::Type&lt;/tt&gt;, see @link Id @endlink.
+ * 
+ * @typedef AnnotationStoreElement::TPos
+ * 
+ * @brief Type of the @link AnnotationStoreElement::beginPos @endlink and @link
+ *        AnnotationStoreElement::endPos @endlink.
+ * 
+ * @signature typedef (...) TAnnotationStoreElement::TPos;
+ * 
+ * @typedef AnnotationStoreElement::TValues
+ * 
+ * @brief @link StringSet @endlink type of the @link
+ *        AnnotationStoreElement::values @endlink member.
+ * 
+ * @signature typedef (...) TAnnotationStoreElement::TValues;
+ * 
+ * @var TId AnnotationStoreElement::INVALID_ID;
+ * 
+ * @brief Constant to represent an invalid id.
+ * 
+ * @var TId AnnotationStoreElement::INVALID_POS;
+ * 
+ * @brief Constant to represent an invalid position.
+ * 
+ * @var TId AnnotationStoreElement::contigId;
+ * 
+ * @brief Refers to the contig in @link FragmentStore::contigStore @endlink that
+ *        the annotation is part of.
+ * 
+ * @var TId AnnotationStoreElement::typeId;
+ * 
+ * @brief Refers to an entry in the @link FragmentStore::annotationTypeStore
+ *        @endlink.
+ * 
+ * There are some type ids predefined for commonly used types, e.g. $ANNO_GENE$.
+ * See @link FragmentStore::PredefinedAnnotationTypes @endlink.
+ * 
+ * @var TPos AnnotationStoreElement::beginPos;
+ * 
+ * @brief Begin position of the annotation in gap space.
+ * 
+ * If endPos &amp;lt; beginPos then the annotation feature is located on the reverse
+ * strand where beginPos and endPos are the corresponding positions on the
+ * forward strand.
+ * 
+ * @var TPos AnnotationStoreElement::endPos;
+ * 
+ * @brief End position of the annotation in gap space.
+ * 
+ * If endPos &amp;lt; beginPos then the annotation feature is located on the reverse
+ * strand where beginPos and endPos are the corresponding positions on the
+ * forward strand.
+ * 
+ * @var TValues AnnotationStoreElement::values;
+ * 
+ * @brief @link StringSet @endlink that stores additional values addressed by
+ *        keyId.
+ * 
+ * The GFF and FTF file formats allow to define user-specific key-value pairs.
+ * The set of all keys addressed by keyId are stored in @link
+ * FragmentStore::annotationKeyStore @endlink.
+ * 
+ * @var TId AnnotationStoreElement::parentId;
+ * 
+ * @brief The id of the parent annotation.
+ * 
+ * @var TId AnnotationStoreElement::nextSiblingId;
+ * 
+ * @brief The id of the right sibling annotation.
+ * 
+ * @var TId AnnotationStoreElement::lastChildId;
+ * 
+ * @brief The id of the parent annotation.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

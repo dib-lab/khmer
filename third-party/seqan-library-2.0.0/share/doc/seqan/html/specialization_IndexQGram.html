@@ -1,0 +1,2655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_indexqgram" data-page="IndexQGram">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>IndexQGram - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>IndexQGram<div><div>An index based on an array of sorted q-grams.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Index.html" data-lang-entity="class">Index</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Index.html" data-lang-entity="class">Index</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_OpenAddressingQGramIndex.html" data-lang-entity="specialization">OpenAddressingQGramIndex</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TIndex, typename TShapeSpec, typename TSpec&gt;
+class Index&lt;TText, IndexQGram&lt;TShapeSpec[, TSpec]&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Types: <a href="group_OpenAdressingTags.html#OpenAdressingTags#OpenAdressing" data-lang-entity="grouped_tag">OpenAdressing</a>, Default: void</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TText</a></code></th>
+        <td>The text type. Types: <a href="class_String.html" data-lang-entity="class">String</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TShapeSpec</a></code></th>
+        <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> specialization type.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23countOccurrences" title="#IndexQGram#countOccurrences (interface function)" data-lang-entity="interface_function">TSize countOccurrences(index, shape);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of occurrences of a q-gram in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23countOccurrencesMultiple" title="#IndexQGram#countOccurrencesMultiple (interface function)" data-lang-entity="interface_function">TCountInfix countOccurrencesMultiple(index, shape);</a></code></span>
+    <span class="summary_desc"><div>Returns the number of occurrences of a q-gram for every sequence of a <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> .</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23createCountArray" title="#IndexQGram#createCountArray (interface function)" data-lang-entity="interface_function">void createCountsArray(counts, dir, bucketMap, stringSet, shape, stepSize);</a></code></span>
+    <span class="summary_desc"><div>Builds an index on a StringSet storing how often a <i>q</i>-gram occurs in each sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23createQGramIndex" title="#IndexQGram#createQGramIndex (interface function)" data-lang-entity="interface_function">void createQGramIndex(index);, void createQGramIndex(sa, dir, bucketMap, text, shape, stepSize); [DEPRECATED]</a></code></span>
+    <span class="summary_desc"><div>Builds a <i>q</i>-gram index on a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23createQGramIndexDirOnly" title="#IndexQGram#createQGramIndexDirOnly (interface function)" data-lang-entity="interface_function">void createQGramIndexDirOnly(dir, bucketMap, text, shape, stepSize);</a></code></span>
+    <span class="summary_desc"><div>Builds the directory of a <i>q</i>-gram index on a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23createQGramIndexSAOnly" title="#IndexQGram#createQGramIndexSAOnly (interface function)" data-lang-entity="interface_function">void createQGramIndexSAOnly(sa, text, shape, stepSize)</a></code></span>
+    <span class="summary_desc"><div>Builds the suffix array of a q-gram index on a sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23dirAt" title="#IndexQGram#dirAt (interface function)" data-lang-entity="interface_function">TFibre dirAt(position, index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>value(indexDir(index), position)</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23getKmerSimilarityMatrix" title="#IndexQGram#getKmerSimilarityMatrix (interface function)" data-lang-entity="interface_function">void getKmerSimilarityMatrix(index, distMat[, seqSet]);</a></code></span>
+    <span class="summary_desc"><div>Creates a matrix storing the number of common q-grams between all pairs of sequences.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23getOccurrence" title="#IndexQGram#getOccurrence (interface function)" data-lang-entity="interface_function">TSAValue getOccurrence(index, shape);</a></code></span>
+    <span class="summary_desc"><div>Returns an occurrence a q-gram in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23getOccurrences" title="#IndexQGram#getOccurrences (interface function)" data-lang-entity="interface_function">TSAInfix getOccurrences(index, shape);</a></code></span>
+    <span class="summary_desc"><div>Returns all occurrences of a q-gram in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23getStepSize" title="#IndexQGram#getStepSize (interface function)" data-lang-entity="interface_function">TSize getStepSize(index);</a></code></span>
+    <span class="summary_desc"><div>Return the <i>q</i>-gram step size used for index creation.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexBucketMap" title="#IndexQGram#indexBucketMap (interface function)" data-lang-entity="interface_function">TFibre indexBucketMap(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(index, QGramBucketMap())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexCounts" title="#IndexQGram#indexCounts (interface function)" data-lang-entity="interface_function">TFibre indexCounts(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(index, QGramCounts())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexCountsDir" title="#IndexQGram#indexCountsDir (interface function)" data-lang-entity="interface_function">TFibre indexCountsDir(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(index, QGramCountsDir())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexDir" title="#IndexQGram#indexDir (interface function)" data-lang-entity="interface_function">TFibre indexDir(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(.., QGramDir())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexSA" title="#IndexQGram#indexSA (interface function)" data-lang-entity="interface_function">TSa indexSA(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(.., QGramSA)</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23indexShape" title="#IndexQGram#indexShape (interface function)" data-lang-entity="interface_function">TFibre indexShape(index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>getFibre(index, QGramShape())</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23range" title="#IndexQGram#range (interface function)" data-lang-entity="interface_function">TPair range(index, shape);</a></code></span>
+    <span class="summary_desc"><div>Returns the suffix array interval borders of a q-gram in the index text.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23saAt" title="#IndexQGram#saAt (interface function)" data-lang-entity="interface_function">TValue saAt(position, index);</a></code></span>
+    <span class="summary_desc"><div>Shortcut for <tt>value(indexSA(..), ..)</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#IndexQGram%23setStepSize" title="#IndexQGram#setStepSize (interface function)" data-lang-entity="interface_function">void setStepSize(index, stepSize);</a></code></span>
+    <span class="summary_desc"><div>Change the <i>q</i>-gram step size used for index creation.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Index.html" data-lang-entity="class">Index</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#clear" data-lang-entity="interface_function">clear</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#countSequences" data-lang-entity="interface_function">countSequences</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#getFibre" data-lang-entity="interface_function">getFibre</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexRawText" data-lang-entity="interface_function">indexRawText</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexSupplied" data-lang-entity="interface_function">indexSupplied</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#indexText" data-lang-entity="interface_function">indexText</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#length" data-lang-entity="interface_function">length</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#open" data-lang-entity="interface_function">open</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#rawtextAt" data-lang-entity="interface_function">rawtextAt</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#save" data-lang-entity="interface_function">save</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Index.html" data-lang-entity="class">Index</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexCreator" data-lang-entity="interface_metafunction">DefaultIndexCreator</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexSpec" data-lang-entity="interface_metafunction">DefaultIndexSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#DefaultIndexStringSpec" data-lang-entity="interface_metafunction">DefaultIndexStringSpec</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#GetVSTreeIteratorTraits" data-lang-entity="interface_metafunction">GetVSTreeIteratorTraits</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Index.html#Index#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The fibres (see <a href="class_Index.html" data-lang-entity="class">Index</a> and <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>) of this index are a suffix array sorted by the first
+<i>q</i> characters (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramSA" data-lang-entity="grouped_tag">QGramSA</a>) and a <i>q</i>-gram directory (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramDir" data-lang-entity="grouped_tag">QGramDir</a>).</p><p>The size of the q-gram directory is <i>&Sigma;<sup>q</sup></i>. On a 32 bit system the <i>q</i>-gram length is
+limited to 3 for <tt>char</tt> alphabets or 13-14 for <a href="specialization_Dna.html" data-lang-entity="specialization">Dna</a> alphabets.</p><p>Consider to use the <a href="specialization_OpenAddressingQGramIndex.html" data-lang-entity="specialization">OpenAddressingQGramIndex</a> for longer <i>q</i>-grams if you don't need
+<i>q</i>-grams to be sorted.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="group_QGramIndexFibres.html" data-lang-entity="group">QGramIndexFibres</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="IndexQGram#countOccurrences" class="signature first" data-lang-entity="interface_function">
+      <code>TSize countOccurrences(index, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of occurrences of a q-gram in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>IndexQGram object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>A <a href="class_Shape.html" data-lang-entity="class">Shape</a> object to use for the query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of positions where the q-gram stored in <tt>shape</tt> occurs in the text (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramText" data-lang-entity="grouped_tag">QGramText</a>). Metafunction: <a href="class_Index.html#Index#Size" data-lang-entity="interface_metafunction">Size</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p><p>Demo: Demo.Supermaximal Repeats</p><p>Demo: Demo.Index countChildren</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#countOccurrencesMultiple" class="signature" data-lang-entity="interface_function">
+      <code>TCountInfix countOccurrencesMultiple(index, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of occurrences of a q-gram for every sequence of a <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> .</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>A IndexQGram of a <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>A <a href="class_Shape.html" data-lang-entity="class">Shape</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCountInfix</code></th>
+        <td>A sequence of <a href="class_Pair.html" data-lang-entity="class">pairs</a> (seqNo,count), count &gt; 0. For every <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> sequence the q-gram occurs in, seqNo is the sequence number and count the number of
+occurrences. If the type of <tt>index</tt> is <tt>TIndex</tt> the return type is
+<tt>Infix&lt;Fibre&lt;TIndex, QGramCounts&gt;::Type const&gt;::Type</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">countOccurrences</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#createCountArray" class="signature" data-lang-entity="interface_function">
+      <code>void createCountsArray(counts, dir, bucketMap, stringSet, shape, stepSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+  <div class="note warnings">Warning. <div class='inline'>
+      
+      <p>This function should not be called directly. Please use <a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a> or <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a>. The resulting tables must have appropriate size before calling this function.</p>
+      
+  </div></div>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Builds an index on a StringSet storing how often a <i>q</i>-gram occurs in each sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">counts</code>
+            
+        
+      </th>
+      <td>The resulting <a href="class_String.html" data-lang-entity="class">String</a> of pairs <i>(seqNo, count)</i>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">dir</code>
+            
+        
+      </th>
+      <td>The resulting array that indicates at which position in the count
+table the corresponding a certain q-gram can be found.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">bucketMap</code>
+            
+        
+      </th>
+      <td>Stores the q-gram hashes for the openaddressing hash maps,
+see <a href="specialization_IndexQGram.html#IndexQGram#indexBucketMap" data-lang-entity="interface_function">indexBucketMap</a>. If bucketMap is of the
+type <a href="tag_Nothing.html" data-lang-entity="tag">Nothing</a> the q-gram hash determines the
+bucket address in the index.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stringSet</code>
+            
+        
+      </th>
+      <td>The <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> to be used.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stepSize</code>
+            
+        
+      </th>
+      <td>Store every <tt>stepSize</tt><sup>th</sup> <i>q</i>-gram in the index,
+<a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#createQGramIndex" class="signature" data-lang-entity="interface_function">
+      <code>void createQGramIndex(index);
+void createQGramIndex(sa, dir, bucketMap, text, shape, stepSize); [DEPRECATED]</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+  <div class="note warnings">Warning. <div class='inline'>
+      
+      <p>This function should not be called directly. Please use <a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a> or <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a>. The resulting tables must have appropriate size before calling this function.</p>
+      
+  </div></div>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Builds a <i>q</i>-gram index on a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram to create.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">sa</code>
+            
+        
+      </th>
+      <td>The resulting list in which all <i>q</i>-grams are sorted alphabetically.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">dir</code>
+            
+        
+      </th>
+      <td>The resulting array that indicates at which position in index the corresponding <i>q</i>-grams</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">bucketMap</code>
+            
+        
+      </th>
+      <td>Stores the <i>q</i>-gram hashes for the openaddressing hash maps, see
+<a href="specialization_IndexQGram.html#IndexQGram#indexBucketMap" data-lang-entity="interface_function">indexBucketMap</a>. If bucketMap is of the type <a href="tag_Nothing.html" data-lang-entity="tag">Nothing</a>
+the <i>q</i>-gram hash determines the bucket address in the index.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a> object to build the index for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The shape to be used. Types: <a href="class_Shape.html" data-lang-entity="class">Shape</a>
+can be found.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stepSize</code>
+            
+        
+      </th>
+      <td>Store every <tt>stepSize</tt>'th <i>q</i>-gram in the index, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The resulting <i>q</i>-gram <tt>index</tt> contains the sorted list of qgrams. For each <i>q</i>-gram <tt>dir</tt> contains the
+first position in index that corresponds to this <i>q</i>-gram.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#createQGramIndexDirOnly" class="signature" data-lang-entity="interface_function">
+      <code>void createQGramIndexDirOnly(dir, bucketMap, text, shape, stepSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+  <div class="note warnings">Warning. <div class='inline'>
+      
+      <p>This function should not be called directly. Please use <a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a> or <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a>. The resulting tables must have appropriate size before calling this function.</p>
+      
+  </div></div>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Builds the directory of a <i>q</i>-gram index on a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">dir</code>
+            
+        
+      </th>
+      <td>The resulting array that indicates at which position in index the corresponding q-grams can be
+found.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">bucketMap</code>
+            
+        
+      </th>
+      <td>Stores the q-gram hashes for the openaddressing hash maps, see <a href="specialization_IndexQGram.html#IndexQGram#indexBucketMap" data-lang-entity="interface_function">indexBucketMap</a>. If bucketMap is of the type <a href="tag_Nothing.html" data-lang-entity="tag">Nothing</a> the q-gram hash determines the
+bucket address in the index.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The sequence, <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stepSize</code>
+            
+        
+      </th>
+      <td>Store every <tt>stepSize</tt>'th q-gram in the index, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> to be used.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The resulting <tt>index</tt> contains the sorted list of qgrams. For each possible q-gram pos contains the first
+position in index that corresponds to this q-gram.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#createQGramIndexSAOnly" class="signature" data-lang-entity="interface_function">
+      <code>void createQGramIndexSAOnly(sa, text, shape, stepSize)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+  <div class="note warnings">Warning. <div class='inline'>
+      
+      <p>This function should not be called directly. Please use <a href="class_Index.html#Index#indexCreate" data-lang-entity="interface_function">indexCreate</a> or <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a>. The resulting tables must have appropriate size before calling this function.</p>
+      
+  </div></div>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Builds the suffix array of a q-gram index on a sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">sa</code>
+            
+        
+      </th>
+      <td>The resulting list in which all q-grams are sorted alphabetically, <a href="class_String.html" data-lang-entity="class">String</a>
+object of <a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a> of the underlying <a href="concept_TextConcept.html" data-lang-entity="concept">text</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The sequence, a <a href="concept_TextConcept.html" data-lang-entity="concept">TextConcept</a> object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> to be used. q is the length of this shape.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stepSize</code>
+            
+        
+      </th>
+      <td>Store every <tt>stepSize</tt>'th q-gram in the index, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#dirAt" class="signature" data-lang-entity="interface_function">
+      <code>TFibre dirAt(position, index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>value(indexDir(index), position)</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram object holding the fibre.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">position</code>
+            
+        
+      </th>
+      <td>A position in the array on which the value should be accessed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramDir" data-lang-entity="grouped_tag">QGramDir</a> fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#getKmerSimilarityMatrix" class="signature" data-lang-entity="interface_function">
+      <code>void getKmerSimilarityMatrix(index, distMat[, seqSet]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Creates a matrix storing the number of common q-grams between all pairs of sequences.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">distMat</code>
+            
+        
+      </th>
+      <td>The resulting q-gram similarity matrix. Types: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqSet</code>
+            
+        
+      </th>
+      <td>Contains sequence numbers if only a subset of sequences should be compared. Types: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a> to use.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>distMat</tt> need to be a container of a floating point type and will be resized to <tt>seqCount * seqCount</tt>,
+where <tt>seqCount</tt> is the number of sequences in the index/in <tt>seqSet</tt>. The fraction of common q-grams
+between sequence <tt>i</tt> and <tt>j</tt> is stored at position <tt>i*seqCount + j</tt>. It sums up the minimum
+number of q-gram occurrences between both sequences for each q-gram and normalizes it.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#getOccurrence" class="signature" data-lang-entity="interface_function">
+      <code>TSAValue getOccurrence(index, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns an occurrence a q-gram in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> object to use for the query. The shape stores the <i>q</i>-gram of the
+last call ot <a href="class_Shape.html#Shape#hash" data-lang-entity="interface_function">hash</a> or <a href="class_Shape.html#Shape#hashNext" data-lang-entity="interface_function">hashNext</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSAValue</code></th>
+        <td>A position where the <i>q</i>-gram stored in <tt>shape</tt> occurs in the text (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramText" data-lang-entity="grouped_tag">QGramText</a>). Type: <a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a> of the index type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#getOccurrences" class="signature" data-lang-entity="interface_function">
+      <code>TSAInfix getOccurrences(index, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns all occurrences of a q-gram in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>A IndexQGram to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>A <a href="class_Shape.html" data-lang-entity="class">Shape</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSAInfix</code></th>
+        <td>All positions where the q-gram stored in <tt>shape</tt> occurs in the text (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramText" data-lang-entity="grouped_tag">QGramText</a>). Tupes: <a href="concept_SegmentableConcept.html#SegmentableConcept#Infix" data-lang-entity="interface_metafunction">Infix</a>&lt;<a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>&lt;TIndex, QGramSA&gt;::Type&gt;::Type&gt;.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="page_DemoMaximalUniqueMatches.html" data-lang-entity="page">DemoMaximalUniqueMatches</a></li>
+    
+    <li><a href="page_DemoMummy.html" data-lang-entity="page">DemoMummy</a></li>
+    
+    <li><a href="page_DemoSupermaximalRepeats.html" data-lang-entity="page">DemoSupermaximalRepeats</a></li>
+    
+    <li><a class="error">getFrequency</a></li>
+    
+    <li><a class="error">isLeftMaximal</a></li>
+    
+    <li><a class="error">isPartiallyLeftExtensible</a></li>
+    
+    <li><a class="error">isUnique</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#getStepSize" class="signature" data-lang-entity="interface_function">
+      <code>TSize getStepSize(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the <i>q</i>-gram step size used for index creation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>A IndexQGram object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The step size of type <a href="class_Index.html#Index#Size" data-lang-entity="interface_metafunction">Size</a>. If <i>x</i> is returned every <i>x</i><sup>th</sup>
+<i>q</i>-gram is stored in the index.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">setStepSize</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexBucketMap" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexBucketMap(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(index, QGramBucketMap())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram object holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramBucketMap" data-lang-entity="grouped_tag">QGramBucketMap</a> fibre (maps q-gram hashes to
+buckets).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexCounts" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexCounts(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(index, QGramCounts())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a> object holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramCounts" data-lang-entity="grouped_tag">QGramCounts</a> fibre (counts array).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexCountsDir" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexCountsDir(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(index, QGramCountsDir())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram object holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramCountsDir" data-lang-entity="grouped_tag">QGramCountsDir</a> fibre (counts directory).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexDir" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexDir(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(.., QGramDir())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a> object holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramDir" data-lang-entity="grouped_tag">QGramDir</a> fibre (q-gram directory).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexSA" class="signature" data-lang-entity="interface_function">
+      <code>TSa indexSA(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(.., QGramSA)</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a> object holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSa</code></th>
+        <td>A reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramSA" data-lang-entity="grouped_tag">QGramSA</a> fibre (q-gram positions).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#indexShape" class="signature" data-lang-entity="interface_function">
+      <code>TFibre indexShape(index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>getFibre(index, QGramShape())</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="class_Index.html" data-lang-entity="class">Index</a> object holding the fibre. Types: <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TFibre</code></th>
+        <td>Returns a reference to the <a href="class_Shape.html" data-lang-entity="class">Shape</a> object of a q-gram index. Formally, this is a
+reference to the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramShape" data-lang-entity="grouped_tag">QGramShape</a> fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#range" class="signature" data-lang-entity="interface_function">
+      <code>TPair range(index, shape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the suffix array interval borders of a q-gram in the index text.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram object to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">shape</code>
+            
+        
+      </th>
+      <td>The <a href="class_Shape.html" data-lang-entity="class">Shape</a> object to use for the query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPair</code></th>
+        <td>All positions where the q-gram stored in <tt>shape</tt> occurs in the text (see <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramText" data-lang-entity="grouped_tag">QGramText</a>) are stored in a contiguous range of the suffix
+array. <tt>range</tt> returns begin and end position of this range. If the type of <tt>index</tt> is
+<tt>TIndex</tt> the return type is <tt>Pair&lt;Size&lt;TIndex&gt;::Type&gt;</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The necessary index tables are built on-demand via <a href="class_Index.html#Index#indexRequire" data-lang-entity="interface_function">indexRequire</a> if index is not <tt>const</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#saAt" class="signature" data-lang-entity="interface_function">
+      <code>TValue saAt(position, index);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+  <div class="note note">Note. <div class='inline'>
+      
+      <p>Advanced functionality, not commonly used.</p>
+      
+  </div></div>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Shortcut for <tt>value(indexSA(..), ..)</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">index</code>
+            
+        
+      </th>
+      <td>The <a href="specialization_IndexQGram.html" data-lang-entity="specialization">IndexQGram</a> object holding the fibre.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">position</code>
+            
+        
+      </th>
+      <td>A position in the array on which the value should be accessed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TValue</code></th>
+        <td>A reference or proxy to the value in the <a href="group_QGramIndexFibres.html#QGramIndexFibres#QGramSA" data-lang-entity="grouped_tag">QGramSA</a> fibre.
+To be more precise, a reference to a position containing a value of type
+<a href="global_metafunction_SAValue.html" data-lang-entity="global_metafunction">SAValue</a> is returned (or a proxy).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="IndexQGram#setStepSize" class="signature" data-lang-entity="interface_function">
+      <code>void setStepSize(index, stepSize);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Change the <i>q</i>-gram step size used for index creation.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">index</code>
+            
+        
+      </th>
+      <td>The IndexQGram to modify.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stepSize</code>
+            
+        
+      </th>
+      <td>The step size, <a href="concept_IntegerConcept.html" data-lang-entity="concept">IntegerConcept</a>; Each <tt>stepSize</tt><sup>th</sup>
+<i>q</i>-gram will be stored.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The default step size of a <i>q</i>-gram index is 1, which corresponds to all overlapping <i>q</i>-grams. To take
+effect of changing the <tt>stepSize</tt> the <i>q</i>-gram index should be empty or recreated.</p><p>A <tt>stepSize</tt> of 0 corresponds to <tt>stepSize = length(indexShape(index))</tt>, i.e. all non-overlapping
+q-grams.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">getStepSize</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class IndexQGram
+ * 
+ * @extends Index
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief An index based on an array of sorted q-grams.
+ * 
+ * @signature template &lt;typename TIndex, typename TShapeSpec, typename TSpec&gt;
+ *            class Index&lt;TText, IndexQGram&lt;TShapeSpec[, TSpec]&gt; &gt;;
+ * 
+ * @tparam TSpec The specializing type. Types: @link
+ *               OpenAdressingTags#OpenAdressing @endlink, Default: void
+ * @tparam TText The text type. Types: @link String @endlink
+ * @tparam TShapeSpec The @link Shape @endlink specialization type.
+ * 
+ * The fibres (see @link Index @endlink and @link Fibre @endlink) of this index
+ * are a suffix array sorted by the first &lt;i&gt;q&lt;/i&gt; characters (see @link
+ * QGramIndexFibres#QGramSA @endlink) and a &lt;i&gt;q&lt;/i&gt;-gram directory (see @link
+ * QGramIndexFibres#QGramDir @endlink).
+ * 
+ * The size of the q-gram directory is &lt;i&gt;&amp;Sigma;&lt;sup&gt;q&lt;/sup&gt;&lt;/i&gt;. On a 32 bit
+ * system the &lt;i&gt;q&lt;/i&gt;-gram length is limited to 3 for &lt;tt&gt;char&lt;/tt&gt; alphabets
+ * or 13-14 for @link Dna @endlink alphabets.
+ * 
+ * Consider to use the @link OpenAddressingQGramIndex @endlink for longer
+ * &lt;i&gt;q&lt;/i&gt;-grams if you don&#39;t need &lt;i&gt;q&lt;/i&gt;-grams to be sorted.
+ * 
+ * @see QGramIndexFibres
+ * 
+ * @fn IndexQGram#indexSA
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(.., QGramSA)&lt;/tt&gt;.
+ * 
+ * @signature TSa indexSA(index);
+ * 
+ * @param[in] index The @link IndexQGram @endlink object holding the fibre.
+ * 
+ * @return TSa A reference to the @link QGramIndexFibres#QGramSA @endlink fibre
+ *             (q-gram positions).
+ * 
+ * @fn IndexQGram#saAt
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;value(indexSA(..), ..)&lt;/tt&gt;.
+ * 
+ * @note Advanced functionality, not commonly used.
+ * 
+ * @signature TValue saAt(position, index);
+ * 
+ * @param[in] index The @link IndexQGram @endlink object holding the fibre.
+ * @param[in] position A position in the array on which the value should be
+ *                     accessed.
+ * 
+ * @return TValue A reference or proxy to the value in the @link
+ *                QGramIndexFibres#QGramSA @endlink fibre. To be more precise, a
+ *                reference to a position containing a value of type @link
+ *                SAValue @endlink is returned (or a proxy).
+ * 
+ * @fn IndexQGram#indexDir
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(.., QGramDir())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexDir(index);
+ * 
+ * @param[in] index The @link IndexQGram @endlink object holding the fibre.
+ * 
+ * @return TFibre A reference to the @link QGramIndexFibres#QGramDir @endlink
+ *                fibre (q-gram directory).
+ * 
+ * @fn IndexQGram#dirAt
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;value(indexDir(index), position)&lt;/tt&gt;.
+ * 
+ * @signature TFibre dirAt(position, index);
+ * 
+ * @param[in] index The IndexQGram object holding the fibre.
+ * @param[in] position A position in the array on which the value should be
+ *                     accessed.
+ * 
+ * @return TFibre A reference to the @link QGramIndexFibres#QGramDir @endlink
+ *                fibre.
+ * 
+ * @fn IndexQGram#indexCounts
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(index, QGramCounts())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexCounts(index);
+ * 
+ * @param[in] index The @link IndexQGram @endlink object holding the fibre.
+ * 
+ * @return TFibre A reference to the @link QGramIndexFibres#QGramCounts @endlink
+ *                fibre (counts array).
+ * 
+ * @fn IndexQGram#indexCountsDir
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(index, QGramCountsDir())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexCountsDir(index);
+ * 
+ * @param[in] index The IndexQGram object holding the fibre.
+ * 
+ * @return TFibre A reference to the @link QGramIndexFibres#QGramCountsDir
+ *                @endlink fibre (counts directory).
+ * 
+ * @fn IndexQGram#indexBucketMap
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(index, QGramBucketMap())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexBucketMap(index);
+ * 
+ * @param[in] index The IndexQGram object holding the fibre.
+ * 
+ * @return TFibre A reference to the @link QGramIndexFibres#QGramBucketMap
+ *                @endlink fibre (maps q-gram hashes to buckets).
+ * 
+ * @fn IndexQGram#indexShape
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Shortcut for &lt;tt&gt;getFibre(index, QGramShape())&lt;/tt&gt;.
+ * 
+ * @signature TFibre indexShape(index);
+ * 
+ * @param[in] index The @link Index @endlink object holding the fibre. Types:
+ *                  @link IndexQGram @endlink
+ * 
+ * @return TFibre Returns a reference to the @link Shape @endlink object of a
+ *                q-gram index. Formally, this is a reference to the @link
+ *                QGramIndexFibres#QGramShape @endlink fibre.
+ * 
+ * @fn IndexQGram#getStepSize
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Return the &lt;i&gt;q&lt;/i&gt;-gram step size used for index creation.
+ * 
+ * @signature TSize getStepSize(index);
+ * 
+ * @param[in] index A IndexQGram object.
+ * 
+ * @return TSize The step size of type @link Index#Size @endlink. If &lt;i&gt;x&lt;/i&gt; is
+ *               returned every &lt;i&gt;x&lt;/i&gt;&lt;sup&gt;th&lt;/sup&gt; &lt;i&gt;q&lt;/i&gt;-gram is stored in
+ *               the index.
+ * 
+ * @see IndexQGram#setStepSize
+ * 
+ * @fn IndexQGram#setStepSize
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Change the &lt;i&gt;q&lt;/i&gt;-gram step size used for index creation.
+ * 
+ * @signature void setStepSize(index, stepSize);
+ * 
+ * @param[in,out] index The IndexQGram to modify.
+ * @param[in] stepSize The step size, @link IntegerConcept @endlink; Each
+ *                     &lt;tt&gt;stepSize&lt;/tt&gt;&lt;sup&gt;th&lt;/sup&gt; &lt;i&gt;q&lt;/i&gt;-gram will be
+ *                     stored.
+ * 
+ * The default step size of a &lt;i&gt;q&lt;/i&gt;-gram index is 1, which corresponds to all
+ * overlapping &lt;i&gt;q&lt;/i&gt;-grams. To take effect of changing the &lt;tt&gt;stepSize&lt;/tt&gt;
+ * the &lt;i&gt;q&lt;/i&gt;-gram index should be empty or recreated.
+ * 
+ * A &lt;tt&gt;stepSize&lt;/tt&gt; of 0 corresponds to &lt;tt&gt;stepSize =
+ * length(indexShape(index))&lt;/tt&gt;, i.e. all non-overlapping q-grams.
+ * 
+ * @see IndexQGram#getStepSize
+ * 
+ * @fn IndexQGram#createQGramIndex
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Builds a &lt;i&gt;q&lt;/i&gt;-gram index on a sequence.
+ * 
+ * @warning This function should not be called directly. Please use @link
+ *          Index#indexCreate @endlink or @link Index#indexRequire @endlink. The
+ *          resulting tables must have appropriate size before calling this
+ *          function.
+ * 
+ * @signature void createQGramIndex(index);
+ * @signature void createQGramIndex(sa, dir, bucketMap, text, shape, stepSize);
+ *            [DEPRECATED]
+ * 
+ * @param[out] index The IndexQGram to create.
+ * @param[out] sa The resulting list in which all &lt;i&gt;q&lt;/i&gt;-grams are sorted
+ *                alphabetically.
+ * @param[out] dir The resulting array that indicates at which position in index
+ *                 the corresponding &lt;i&gt;q&lt;/i&gt;-grams
+ * @param[in] bucketMap Stores the &lt;i&gt;q&lt;/i&gt;-gram hashes for the openaddressing
+ *                      hash maps, see @link IndexQGram#indexBucketMap @endlink.
+ *                      If bucketMap is of the type @link Nothing @endlink the
+ *                      &lt;i&gt;q&lt;/i&gt;-gram hash determines the bucket address in the
+ *                      index.
+ * @param[in] text The @link TextConcept @endlink object to build the index for.
+ * @param[in] shape The shape to be used. Types: @link Shape @endlink can be
+ *                  found.
+ * @param[in] stepSize Store every &lt;tt&gt;stepSize&lt;/tt&gt;&#39;th &lt;i&gt;q&lt;/i&gt;-gram in the
+ *                     index, @link IntegerConcept @endlink.
+ * 
+ * The resulting &lt;i&gt;q&lt;/i&gt;-gram &lt;tt&gt;index&lt;/tt&gt; contains the sorted list of
+ * qgrams. For each &lt;i&gt;q&lt;/i&gt;-gram &lt;tt&gt;dir&lt;/tt&gt; contains the first position in
+ * index that corresponds to this &lt;i&gt;q&lt;/i&gt;-gram.
+ * 
+ * @fn IndexQGram#createQGramIndexSAOnly
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Builds the suffix array of a q-gram index on a sequence.
+ * 
+ * @warning This function should not be called directly. Please use @link
+ *          Index#indexCreate @endlink or @link Index#indexRequire @endlink. The
+ *          resulting tables must have appropriate size before calling this
+ *          function.
+ * 
+ * @signature void createQGramIndexSAOnly(sa, text, shape, stepSize)
+ * 
+ * @param[out] sa The resulting list in which all q-grams are sorted
+ *                alphabetically, @link String @endlink object of @link SAValue
+ *                @endlink of the underlying @link TextConcept text @endlink.
+ * @param[in] text The sequence, a @link TextConcept @endlink object.
+ * @param[in] shape The @link Shape @endlink to be used. q is the length of this
+ *                  shape.
+ * @param[in] stepSize Store every &lt;tt&gt;stepSize&lt;/tt&gt;&#39;th q-gram in the index,
+ *                     @link IntegerConcept @endlink.
+ * 
+ * @fn IndexQGram#createQGramIndexDirOnly
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Builds the directory of a &lt;i&gt;q&lt;/i&gt;-gram index on a sequence.
+ * 
+ * @warning This function should not be called directly. Please use @link
+ *          Index#indexCreate @endlink or @link Index#indexRequire @endlink. The
+ *          resulting tables must have appropriate size before calling this
+ *          function.
+ * 
+ * @signature void createQGramIndexDirOnly(dir, bucketMap, text, shape,
+ *            stepSize);
+ * 
+ * @param[out] dir The resulting array that indicates at which position in index
+ *                 the corresponding q-grams can be found.
+ * @param[out] bucketMap Stores the q-gram hashes for the openaddressing hash
+ *                       maps, see @link IndexQGram#indexBucketMap @endlink. If
+ *                       bucketMap is of the type @link Nothing @endlink the
+ *                       q-gram hash determines the bucket address in the index.
+ * @param[in] text The sequence, @link TextConcept @endlink.
+ * @param[in] stepSize Store every &lt;tt&gt;stepSize&lt;/tt&gt;&#39;th q-gram in the index,
+ *                     @link IntegerConcept @endlink.
+ * @param[in] shape The @link Shape @endlink to be used.
+ * 
+ * The resulting &lt;tt&gt;index&lt;/tt&gt; contains the sorted list of qgrams. For each
+ * possible q-gram pos contains the first position in index that corresponds to
+ * this q-gram.
+ * 
+ * @fn IndexQGram#createCountArray
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Builds an index on a StringSet storing how often a &lt;i&gt;q&lt;/i&gt;-gram
+ *        occurs in each sequence.
+ * 
+ * @warning This function should not be called directly. Please use @link
+ *          Index#indexCreate @endlink or @link Index#indexRequire @endlink. The
+ *          resulting tables must have appropriate size before calling this
+ *          function.
+ * 
+ * @signature void createCountsArray(counts, dir, bucketMap, stringSet, shape,
+ *            stepSize);
+ * 
+ * @param[out] counts The resulting @link String @endlink of pairs &lt;i&gt;(seqNo,
+ *                    count)&lt;/i&gt;.
+ * @param[out] dir The resulting array that indicates at which position in the
+ *                 count table the corresponding a certain q-gram can be found.
+ * @param[out] bucketMap Stores the q-gram hashes for the openaddressing hash
+ *                       maps, see @link IndexQGram#indexBucketMap @endlink. If
+ *                       bucketMap is of the type @link Nothing @endlink the
+ *                       q-gram hash determines the bucket address in the index.
+ * @param[in] stringSet The @link StringSet @endlink.
+ * @param[in] shape The @link Shape @endlink to be used.
+ * @param[in] stepSize Store every &lt;tt&gt;stepSize&lt;/tt&gt;&lt;sup&gt;th&lt;/sup&gt; &lt;i&gt;q&lt;/i&gt;-gram
+ *                     in the index, @link IntegerConcept @endlink.
+ * 
+ * @fn IndexQGram#getKmerSimilarityMatrix
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Creates a matrix storing the number of common q-grams between all
+ *        pairs of sequences.
+ * 
+ * @signature void getKmerSimilarityMatrix(index, distMat[, seqSet]);
+ * 
+ * @param[out] distMat The resulting q-gram similarity matrix. Types: @link
+ *                     ContainerConcept @endlink
+ * @param[in] seqSet Contains sequence numbers if only a subset of sequences
+ *                   should be compared. Types: @link ContainerConcept @endlink
+ * @param[in] index The @link IndexQGram @endlink to use.
+ * 
+ * &lt;tt&gt;distMat&lt;/tt&gt; need to be a container of a floating point type and will be
+ * resized to &lt;tt&gt;seqCount * seqCount&lt;/tt&gt;, where &lt;tt&gt;seqCount&lt;/tt&gt; is the
+ * number of sequences in the index/in &lt;tt&gt;seqSet&lt;/tt&gt;. The fraction of common
+ * q-grams between sequence &lt;tt&gt;i&lt;/tt&gt; and &lt;tt&gt;j&lt;/tt&gt; is stored at position
+ * &lt;tt&gt;i*seqCount + j&lt;/tt&gt;. It sums up the minimum number of q-gram occurrences
+ * between both sequences for each q-gram and normalizes it.
+ * 
+ * @fn IndexQGram#range
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the suffix array interval borders of a q-gram in the index
+ *        text.
+ * 
+ * @signature TPair range(index, shape);
+ * 
+ * @param[in] index The IndexQGram object to query.
+ * @param[in] shape The @link Shape @endlink object to use for the query.
+ * 
+ * @return TPair All positions where the q-gram stored in &lt;tt&gt;shape&lt;/tt&gt; occurs
+ *               in the text (see @link QGramIndexFibres#QGramText @endlink) are
+ *               stored in a contiguous range of the suffix array.
+ *               &lt;tt&gt;range&lt;/tt&gt; returns begin and end position of this range. If
+ *               the type of &lt;tt&gt;index&lt;/tt&gt; is &lt;tt&gt;TIndex&lt;/tt&gt; the return type
+ *               is &lt;tt&gt;Pair&amp;lt;Size&amp;lt;TIndex&amp;gt;::Type&amp;gt;&lt;/tt&gt;.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @fn IndexQGram#getOccurrence
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns an occurrence a q-gram in the index text.
+ * 
+ * @signature TSAValue getOccurrence(index, shape);
+ * 
+ * @param[in] index The IndexQGram object to query.
+ * @param[in] shape The @link Shape @endlink object to use for the query. The
+ *                  shape stores the &lt;i&gt;q&lt;/i&gt;-gram of the last call ot @link
+ *                  Shape#hash @endlink or @link Shape#hashNext @endlink.
+ * 
+ * @return TSAValue A position where the &lt;i&gt;q&lt;/i&gt;-gram stored in &lt;tt&gt;shape&lt;/tt&gt;
+ *                  occurs in the text (see @link QGramIndexFibres#QGramText
+ *                  @endlink). Type: @link SAValue @endlink of the index type.
+ * 
+ * @fn IndexQGram#getOccurrences
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns all occurrences of a q-gram in the index text.
+ * 
+ * @signature TSAInfix getOccurrences(index, shape);
+ * 
+ * @param[in] index A IndexQGram to query.
+ * @param[in] shape A @link Shape @endlink object.
+ * 
+ * @return TSAInfix All positions where the q-gram stored in &lt;tt&gt;shape&lt;/tt&gt;
+ *                  occurs in the text (see @link QGramIndexFibres#QGramText
+ *                  @endlink). Tupes: @link SegmentableConcept#Infix
+ *                  @endlink&lt;@link Fibre @endlink&lt;TIndex,
+ *                  QGramSA&gt;::Type&gt;::Type&gt;.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @see DemoMummy
+ * @see DemoSupermaximalRepeats
+ * @see DemoMaximalUniqueMatches
+ * @see VSTreeIterator#isUnique
+ * @see VSTreeIterator#getFrequency
+ * @see VSTreeIterator#isPartiallyLeftExtensible
+ * @see VSTreeIterator#isLeftMaximal
+ * 
+ * @fn IndexQGram#countOccurrences
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of occurrences of a q-gram in the index text.
+ * 
+ * @signature TSize countOccurrences(index, shape);
+ * 
+ * @param[in] index IndexQGram object to query.
+ * @param[in] shape A @link Shape @endlink object to use for the query.
+ * 
+ * @return TSize The number of positions where the q-gram stored in
+ *               &lt;tt&gt;shape&lt;/tt&gt; occurs in the text (see @link
+ *               QGramIndexFibres#QGramText @endlink). Metafunction: @link
+ *               Index#Size @endlink.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * Demo: Demo.Supermaximal Repeats
+ * 
+ * Demo: Demo.Index countChildren
+ * 
+ * @fn IndexQGram#countOccurrencesMultiple
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of occurrences of a q-gram for every sequence of a
+ *        @link StringSet @endlink .
+ * 
+ * @signature TCountInfix countOccurrencesMultiple(index, shape);
+ * 
+ * @param[in] index A IndexQGram of a @link StringSet @endlink.
+ * @param[in] shape A @link Shape @endlink.
+ * 
+ * @return TCountInfix A sequence of @link Pair pairs @endlink (seqNo,count),
+ *                     count &amp;gt; 0. For every @link StringSet @endlink sequence
+ *                     the q-gram occurs in, seqNo is the sequence number and
+ *                     count the number of occurrences. If the type of
+ *                     &lt;tt&gt;index&lt;/tt&gt; is &lt;tt&gt;TIndex&lt;/tt&gt; the return type is
+ *                     &lt;tt&gt;Infix&amp;lt;Fibre&amp;lt;TIndex, QGramCounts&amp;gt;::Type
+ *                     const&amp;gt;::Type&lt;/tt&gt;.
+ * 
+ * The necessary index tables are built on-demand via @link Index#indexRequire
+ * @endlink if index is not &lt;tt&gt;const&lt;/tt&gt;.
+ * 
+ * @see VSTreeIterator#countOccurrences
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

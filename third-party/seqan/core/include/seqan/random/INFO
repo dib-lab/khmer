@@ -1,8 +1,0 @@
-Name: seqan-random
-Author: Manuel Holtgrewe <manuel.holtgrewe@fu-berlin.de>
-Maintainer: Manuel Holtgrewe <manuel.holtgrewe@fu-berlin.de>
-License: BSD 3-clause
-Copyright: 2006-2013, FU Berlin
-Status: mature
-Description: Pseudo random number generation.
- This module contains code for the generation of pseudo random numbers.

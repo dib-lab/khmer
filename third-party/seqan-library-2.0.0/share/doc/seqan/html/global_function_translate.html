@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="global_function_translate" data-page="translate">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>translate - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="function" data-pimped="true">
+  <a href="page_LanguageEntities.html#function">fn()</a> <span>translate<div><div>translate sequences of Dna or Rna into amino acid alphabet, optionally with frames</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/translation.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>int translate(target, source[, frames][, geneticCode][, TParallelism])
+int translate(target, source[, frames][, geneticCodeSpec][, TParallelism])
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- @param -->
+
+
+
+<h2>Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">target</code>
+            
+        
+        </th>
+        <td>The amino acid sequence(s). <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> of <a href="specialization_AminoAcid.html" data-lang-entity="specialization">AminoAcid</a>
+or <a href="class_String.html" data-lang-entity="class">String</a> of <a href="specialization_AminoAcid.html" data-lang-entity="specialization">AminoAcid</a> if source is a single string
+and frames is <tt>SINGLE_FRAME</tt>.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+        </th>
+        <td>Source sequences <a href="class_String.html" data-lang-entity="class">String</a> or <a href="class_StringSet.html" data-lang-entity="class">StringSet</a>.
+If the value type is not Dna, Dna5, Rna, Rna5 then it is converted
+to Dna5.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">frame</code>
+            
+        
+        </th>
+        <td>The <a href="enum_TranslationFrames.html" data-lang-entity="enum">TranslationFrames</a>, defaults to SINGLE_FRAME.</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">geneticCode</code>
+            
+        
+        </th>
+        <td>The <a href="tag_GeneticCode.html" data-lang-entity="tag">GeneticCode</a> to use, defaults
+to <tt>GeneticCode&lt;CANONICAL&gt;</tt>
+(use to specify GeneticCode at compile-time)</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">geneticCodeSpec</code>
+            
+        
+        </th>
+        <td>The <a href="enum_GeneticCodeSpec.html" data-lang-entity="enum">GeneticCodeSpec</a> to use
+(use to specify GenetiCode at run-time)</td>
+    </tr>
+
+    <tr>
+        <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">TParallelism</code>
+            
+        
+        </th>
+        <td>Whether to use SMP or not, see <a href="group_ParallelismTags.html" data-lang-entity="group">ParallelismTags</a> .</td>
+    </tr>
+
+</table>
+
+
+
+
+<!-- @tparam -->
+
+
+
+
+
+<!-- @returns -->
+
+
+<h2>Return Values</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code>int</code></th>
+        <td>0 on success, and -1 on incompatible parameters (e.g. multiple frames but target type not StringSet).</td>
+    </tr>
+
+</table>
+
+
+
+<!-- @throw -->
+
+
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>If OpenMP is supported by platform and TParallelism is not specified as
+"Serial", translation will be parallelized. The only exception is when doing
+single-frame translation of a single string -- which is never parallelized.</p><p>The translation process is fastest when using ConcatDirect-StringSets for
+both input and output StringSets and when not having to convert the alphabet
+of the source, i.e. feeding AminoAcid-Strings, not CharStrings (although
+the latter is possible).</p><p>Please note that specifying the GeneticCode at compile time avoids having
+unrequired conversion tables in memory. The implementation profits slightly
+from having SEQAN_CXX11_STANDARD defined.</p><h3>Example</h3><div data-src-path="None"><div class="highlight"><pre><span class="n">StringSet</span><span class="o">&lt;</span><span class="n">Dna5String</span><span class="o">&gt;</span> <span class="n">dnaSeqs</span><span class="p">;</span>
+
+<span class="c1">// do something that fills up dnaSeqs, e.g. read from file or assign</span>
+
+<span class="n">StringSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&lt;</span><span class="n">AminoAcid</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Owner</span><span class="o">&lt;</span><span class="n">ConcatDirect</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">aaSeqs</span><span class="p">;</span>
+
+<span class="n">translate</span><span class="p">(</span><span class="n">aaSeqs</span><span class="p">,</span> <span class="n">dnaSeqs</span><span class="p">,</span> <span class="n">SIX_FRAME</span><span class="p">);</span>
+
+<span class="c1">// do something with the aaSeqs</span>
+</pre></div>
+</div></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="tag_GeneticCode.html" data-lang-entity="tag">GeneticCode</a></li>
+  
+  <li><a href="enum_TranslationFrames.html" data-lang-entity="enum">TranslationFrames</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @fn translate
+ * 
+ * @headerfile &lt;seqan/translation.h&gt;
+ * 
+ * @brief translate sequences of Dna or Rna into amino acid alphabet, optionally
+ *        with frames
+ * 
+ * @signature int translate(target, source[, frames][, geneticCode][,
+ *            TParallelism])
+ * @signature int translate(target, source[, frames][, geneticCodeSpec][,
+ *            TParallelism])
+ * 
+ * @param[out] target The amino acid sequence(s). @link StringSet @endlink of
+ *                    @link AminoAcid @endlink or @link String @endlink of @link
+ *                    AminoAcid @endlink if source is a single string and frames
+ *                    is &lt;tt&gt;SINGLE_FRAME&lt;/tt&gt;.
+ * @param[in] source Source sequences @link String @endlink or @link StringSet
+ *                   @endlink. If the value type is not Dna, Dna5, Rna, Rna5
+ *                   then it is converted to Dna5.
+ * @param[in] frame The @link TranslationFrames @endlink, defaults to
+ *                  SINGLE_FRAME.
+ * @param[in] geneticCode The @link GeneticCode @endlink to use, defaults to
+ *                        &lt;tt&gt;GeneticCode&amp;lt;CANONICAL&amp;gt;&lt;/tt&gt; (use to specify
+ *                        GeneticCode at compile-time)
+ * @param[in] geneticCodeSpec The @link GeneticCodeSpec @endlink to use (use to
+ *                            specify GenetiCode at run-time)
+ * @param[in] TParallelism Whether to use SMP or not, see @link ParallelismTags
+ *                         @endlink .
+ * 
+ * @return int 0 on success, and -1 on incompatible parameters (e.g. multiple
+ *             frames but target type not StringSet).
+ * 
+ * If OpenMP is supported by platform and TParallelism is not specified as
+ * &#34;Serial&#34;, translation will be parallelized. The only exception is when doing
+ * single-frame translation of a single string -- which is never parallelized.
+ * 
+ * The translation process is fastest when using ConcatDirect-StringSets for
+ * both input and output StringSets and when not having to convert the alphabet
+ * of the source, i.e. feeding AminoAcid-Strings, not CharStrings (although the
+ * latter is possible).
+ * 
+ * Please note that specifying the GeneticCode at compile time avoids having
+ * unrequired conversion tables in memory. The implementation profits slightly
+ * from having SEQAN_CXX11_STANDARD defined.
+ * 
+ * @section Example
+ * 
+ * @code{.cpp}
+ * StringSet&lt;Dna5String&gt; dnaSeqs;
+ * 
+ * // do something that fills up dnaSeqs, e.g. read from file or assign
+ * 
+ * StringSet&lt;String&lt;AminoAcid&gt;, Owner&lt;ConcatDirect&lt;&gt; &gt; &gt; aaSeqs;
+ * 
+ * translate(aaSeqs, dnaSeqs, SIX_FRAME);
+ * 
+ * // do something with the aaSeqs
+ * @endcode
+ * 
+ * 
+ * @see TranslationFrames
+ * @see GeneticCode
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

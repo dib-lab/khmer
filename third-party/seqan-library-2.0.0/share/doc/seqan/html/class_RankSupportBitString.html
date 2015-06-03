@@ -1,0 +1,1409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_ranksupportbitstring" data-page="RankSupportBitString">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>RankSupportBitString - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>RankSupportBitString<div><div>A bit string supporting rank queries in constant time.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/index.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSpec&gt;
+class RankSupportBitString;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>Specialisation tag. Default: void</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23appendValue" title="#RankSupportBitString#appendValue (interface function)" data-lang-entity="interface_function">appendValue(bitString, bit)</a></code></span>
+    <span class="summary_desc"><div>Appends a bit to a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23clear" title="#RankSupportBitString#clear (interface function)" data-lang-entity="interface_function">clear(bitString)</a></code></span>
+    <span class="summary_desc"><div>Resets an rank-support-bit string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23empty" title="#RankSupportBitString#empty (interface function)" data-lang-entity="interface_function">bool empty(bitString)</a></code></span>
+    <span class="summary_desc"><div>Checks whether or not a rank-support-bit string contains any elements.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23getFibre" title="#RankSupportBitString#getFibre (interface function)" data-lang-entity="interface_function">getFibre(bitString, fibreTag)</a></code></span>
+    <span class="summary_desc"><div>Returns a specific fibre of a rank-support-bit string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23getRank" title="#RankSupportBitString#getRank (interface function)" data-lang-entity="interface_function">getRank(bitString, pos)</a></code></span>
+    <span class="summary_desc"><div>Returns the rank (the number of bits set from the start of the bit
+string) of a specified position.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23isBitSet" title="#RankSupportBitString#isBitSet (interface function)" data-lang-entity="interface_function">isSetBit(bitString, pos)</a></code></span>
+    <span class="summary_desc"><div>Returns whether the bit with the given index is set to 1.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23length" title="#RankSupportBitString#length (interface function)" data-lang-entity="interface_function">length(bitString)</a></code></span>
+    <span class="summary_desc"><div>Returns the number of bits in the rank-support-bit string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23open" title="#RankSupportBitString#open (interface function)" data-lang-entity="interface_function">open(bitString, fileName [, openMode])</a></code></span>
+    <span class="summary_desc"><div>This functions opens a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a> from disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23resize" title="#RankSupportBitString#resize (interface function)" data-lang-entity="interface_function">TSize resize(bitString, newLenght)</a></code></span>
+    <span class="summary_desc"><div>Resets the number of bits in the rank-support-bit string.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23save" title="#RankSupportBitString#save (interface function)" data-lang-entity="interface_function">save(bitString, fileName [, openMode])</a></code></span>
+    <span class="summary_desc"><div>This functions saves a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a> to disk.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#RankSupportBitString%23setBitTo" title="#RankSupportBitString#setBitTo (interface function)" data-lang-entity="interface_function">setBitTo(bitString, pos, value)</a></code></span>
+    <span class="summary_desc"><div>Set the bit with the given position to the given value.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The constant rank query time is achieved by evaluating precomputed
+subsolutions. In order to do so, the bit string is divided into blocks of
+length l. A super block string stores for each block of l blocks the number
+of bits set from the beginning. In addition a block string stores the number
+of bits set in each block from the start of the last super block block.
+Therefore it is possible to compute the result of a rank query in constant
+time by adding information from the bit, block and super block string.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="RankSupportBitString#appendValue" class="signature first" data-lang-entity="interface_function">
+      <code>appendValue(bitString, bit)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends a bit to a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>target</code>
+        
+      </th>
+      <td>A container. Types: RankSupportBitString</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bit</code>
+        
+      </th>
+      <td>Value that is appended to <tt>target</tt>.If the value is
+different from 0 it is interpreted as 1. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a>, bool</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#clear" class="signature" data-lang-entity="interface_function">
+      <code>clear(bitString)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resets an rank-support-bit string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string to be cleared.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#empty" class="signature" data-lang-entity="interface_function">
+      <code>bool empty(bitString)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Checks whether or not a rank-support-bit string contains any elements.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The rank-support-bit string to be checked.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>Returns true if the rank-support-bit string is empty and false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#getFibre" class="signature" data-lang-entity="interface_function">
+      <code>getFibre(bitString, fibreTag)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a specific fibre of a rank-support-bit string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>fibreTag</code>
+        
+      </th>
+      <td>A tag that identifies the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a>. Types:
+<a href="group_RankSupportBitStringFibres.html" data-lang-entity="group">RankSupportBitString Fibres</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The rank-support-bit string holding the fibre.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A reference to the <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#getRank" class="signature" data-lang-entity="interface_function">
+      <code>getRank(bitString, pos)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the rank (the number of bits set from the start of the bit
+string) of a specified position.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string. Types: <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>Position of a bit.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td><a href="global_metafunction_Value.html" data-lang-entity="global_metafunction">Value</a> of <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> of the rank-support-bit string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#isBitSet" class="signature" data-lang-entity="interface_function">
+      <code>isSetBit(bitString, pos)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns whether the bit with the given index is set to 1.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>Position of the bit. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>Returns whether a specified bit is set or not.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#length" class="signature" data-lang-entity="interface_function">
+      <code>length(bitString)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the number of bits in the rank-support-bit string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The rank-support-bit string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>Types: <a href="global_metafunction_Value.html" data-lang-entity="global_metafunction">Value</a> of <a href="global_metafunction_Fibre.html" data-lang-entity="global_metafunction">Fibre</a> of the rank-support-bit string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#open" class="signature" data-lang-entity="interface_function">
+      <code>open(bitString, fileName [, openMode])</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions opens a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a> from disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>openMode</code>
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened.To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>.To append a file if existing add
+<tt>OPEN_APPEND</tt>.To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string to be opened.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>fileName</code>
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A <tt>bool</tt> which is <tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#resize" class="signature" data-lang-entity="interface_function">
+      <code>TSize resize(bitString, newLenght)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resets the number of bits in the rank-support-bit string.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The rank-support-bit string.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>newLength</code>
+        
+      </th>
+      <td>The number of elements which should be stored in the compressed suffix array. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the rank-support-bit string. Types: The result of <a href="global_metafunction_Size.html" data-lang-entity="global_metafunction">Size</a> of the
+rank-support-bit string.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Note If the new length is smaller than the actual one then the last <tt>x<tt> items of the rank-support-bit string
+are deleted with x = oldLength - newLength.</tt></tt></h4></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#save" class="signature" data-lang-entity="interface_function">
+      <code>save(bitString, fileName [, openMode])</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>This functions saves a <a href="class_RankSupportBitString.html" data-lang-entity="class">RankSupportBitString</a> to disk.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>openMode</code>
+        
+      </th>
+      <td>The combination of flags defining how the file should be
+opened.To open a file read-only, write-only or to read and
+write use <tt>OPEN_RDONLY</tt>, <tt>OPEN_WRONLY</tt>, or
+<tt>OPEN_RDWR</tt>.To create or overwrite a file add
+<tt>OPEN_CREATE</tt>.To append a file if existing add
+<tt>OPEN_APPEND</tt>.To circumvent problems, files are always
+opened in binary mode. Default: <tt>OPEN_RDWR | OPEN_CREATE |
+OPEN_APPEND</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string to be saved.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>fileName</code>
+        
+      </th>
+      <td>C-style character string containing the file name.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td>A <tt>bool</tt> which is <tt>true</tt> on success.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="RankSupportBitString#setBitTo" class="signature" data-lang-entity="interface_function">
+      <code>setBitTo(bitString, pos, value)</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the bit with the given position to the given value.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            <code>pos</code>
+        
+      </th>
+      <td>Position of the bit. Types: <a href="concept_UnsignedIntegerConcept.html" data-lang-entity="concept">UnsignedIntegerConcept</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bitString</code>
+        
+      </th>
+      <td>The bit string.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            <code>bit</code>
+        
+      </th>
+      <td>The value of the bit. Note that values different from 0 are
+interpreted as 1.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReturn</code></th>
+        <td><tt>void</tt></td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="global_function_isBitSet.html" data-lang-entity="global_function">isBitSet</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class RankSupportBitString
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief A bit string supporting rank queries in constant time.
+ * 
+ * @signature template &lt;typename TSpec&gt; class RankSupportBitString;
+ * 
+ * @tparam TSpec Specialisation tag. Default: void
+ * 
+ * The constant rank query time is achieved by evaluating precomputed
+ * subsolutions. In order to do so, the bit string is divided into blocks of
+ * length l. A super block string stores for each block of l blocks the number
+ * of bits set from the beginning. In addition a block string stores the number
+ * of bits set in each block from the start of the last super block block.
+ * Therefore it is possible to compute the result of a rank query in constant
+ * time by adding information from the bit, block and super block string.
+ * 
+ * @fn RankSupportBitString#appendValue
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Appends a bit to a @link RankSupportBitString @endlink.
+ * 
+ * @signature appendValue(bitString, bit)
+ * 
+ * @param target A container. Types: RankSupportBitString
+ * @param bit Value that is appended to &lt;tt&gt;target&lt;/tt&gt;.If the value is
+ *            different from 0 it is interpreted as 1. Types: @link
+ *            UnsignedIntegerConcept @endlink, bool
+ * 
+ * @fn RankSupportBitString#clear
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Resets an rank-support-bit string.
+ * 
+ * @signature clear(bitString)
+ * 
+ * @param bitString The bit string to be cleared.
+ * 
+ * @fn RankSupportBitString#getRank
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the rank (the number of bits set from the start of the bit
+ *        string) of a specified position.
+ * 
+ * @signature getRank(bitString, pos)
+ * 
+ * @param bitString The bit string. Types: @link RankSupportBitString @endlink
+ * @param pos Position of a bit.
+ * 
+ * @return TReturn @link Value @endlink of @link Fibre @endlink of the rank-
+ *                 support-bit string.
+ * 
+ * @fn RankSupportBitString#empty
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Checks whether or not a rank-support-bit string contains any elements.
+ * 
+ * @signature bool empty(bitString)
+ * 
+ * @param bitString The rank-support-bit string to be checked.
+ * 
+ * @return bool Returns true if the rank-support-bit string is empty and false
+ *              otherwise.
+ * 
+ * @fn RankSupportBitString#isBitSet
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns whether the bit with the given index is set to 1.
+ * 
+ * @signature isSetBit(bitString, pos)
+ * 
+ * @param bitString The bit string.
+ * @param pos Position of the bit. Types: @link UnsignedIntegerConcept @endlink
+ * 
+ * @return TReturn Returns whether a specified bit is set or not.
+ * 
+ * @fn RankSupportBitString#getFibre
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns a specific fibre of a rank-support-bit string.
+ * 
+ * @signature getFibre(bitString, fibreTag)
+ * 
+ * @param fibreTag A tag that identifies the @link Fibre @endlink. Types: @link
+ *                 RankSupportBitStringFibres RankSupportBitString Fibres
+ *                 @endlink.
+ * @param bitString The rank-support-bit string holding the fibre.
+ * 
+ * @return TReturn A reference to the @link Fibre @endlink object.
+ * 
+ * @fn RankSupportBitString#length
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Returns the number of bits in the rank-support-bit string.
+ * 
+ * @signature length(bitString)
+ * 
+ * @param bitString The rank-support-bit string.
+ * 
+ * @return TReturn Types: @link Value @endlink of @link Fibre @endlink of the
+ *                 rank-support-bit string.
+ * 
+ * @fn RankSupportBitString#resize
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Resets the number of bits in the rank-support-bit string.
+ * 
+ * @signature TSize resize(bitString, newLenght)
+ * 
+ * @param bitString The rank-support-bit string.
+ * @param newLength The number of elements which should be stored in the
+ *                  compressed suffix array. Types: @link UnsignedIntegerConcept
+ *                  @endlink.
+ * 
+ * @return TSize The number of elements in the rank-support-bit string. Types:
+ *               The result of @link Size @endlink of the rank-support-bit
+ *               string.
+ * 
+ * @section Note If the new length is smaller than the actual one then the last
+ *          &lt;tt&gt;x&lt;tt&gt; items of the rank-support-bit string are deleted with x =
+ *          oldLength - newLength.
+ * 
+ * @fn RankSupportBitString#setBitTo
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief Set the bit with the given position to the given value.
+ * 
+ * @signature setBitTo(bitString, pos, value)
+ * 
+ * @param pos Position of the bit. Types: @link UnsignedIntegerConcept @endlink
+ * @param bitString The bit string.
+ * @param bit The value of the bit. Note that values different from 0 are
+ *            interpreted as 1.
+ * 
+ * @return TReturn &lt;tt&gt;void&lt;/tt&gt;
+ * 
+ * @section Examples
+ * 
+ * @see RankSupportBitString#isBitSet
+ * 
+ * @fn RankSupportBitString#open
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions opens a @link RankSupportBitString @endlink from disk.
+ * 
+ * @signature open(bitString, fileName [, openMode])
+ * 
+ * @param openMode The combination of flags defining how the file should be
+ *                 opened.To open a file read-only, write-only or to read and
+ *                 write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;, or
+ *                 &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                 &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;.To append a file if existing add
+ *                 &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;.To circumvent problems, files are always
+ *                 opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE |
+ *                 OPEN_APPEND&lt;/tt&gt;
+ * @param bitString The bit string to be opened.
+ * @param fileName C-style character string containing the file name.
+ * 
+ * @return TReturn A &lt;tt&gt;bool&lt;/tt&gt; which is &lt;tt&gt;true&lt;/tt&gt; on success.
+ * 
+ * @fn RankSupportBitString#save
+ * 
+ * @headerfile &lt;seqan/index.h&gt;
+ * 
+ * @brief This functions saves a @link RankSupportBitString @endlink to disk.
+ * 
+ * @signature save(bitString, fileName [, openMode])
+ * 
+ * @param openMode The combination of flags defining how the file should be
+ *                 opened.To open a file read-only, write-only or to read and
+ *                 write use &lt;tt&gt;OPEN_RDONLY&lt;/tt&gt;, &lt;tt&gt;OPEN_WRONLY&lt;/tt&gt;, or
+ *                 &lt;tt&gt;OPEN_RDWR&lt;/tt&gt;.To create or overwrite a file add
+ *                 &lt;tt&gt;OPEN_CREATE&lt;/tt&gt;.To append a file if existing add
+ *                 &lt;tt&gt;OPEN_APPEND&lt;/tt&gt;.To circumvent problems, files are always
+ *                 opened in binary mode. Default: &lt;tt&gt;OPEN_RDWR | OPEN_CREATE |
+ *                 OPEN_APPEND&lt;/tt&gt;
+ * @param bitString The bit string to be saved.
+ * @param fileName C-style character string containing the file name.
+ * 
+ * @return TReturn A &lt;tt&gt;bool&lt;/tt&gt; which is &lt;tt&gt;true&lt;/tt&gt; on success.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

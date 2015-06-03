@@ -1,0 +1,1381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_logicmetaprogramming" data-page="LogicMetaprogramming">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Logic Metaprogramming - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Logic Metaprogramming
+  <div><div>Logic Metaprogramming operations.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Grouped  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23And" title="#LogicMetaprogramming#And (interface function)" data-lang-entity="interface_metafunction">And&lt;TLhs, TRhs&gt;::Type;, And&lt;TLhs, TRhs&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming "and" operatand.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23AndC" title="#LogicMetaprogramming#AndC (interface function)" data-lang-entity="interface_metafunction">AndC&lt;LHS, RHS&gt;::Type;, AndC&lt;LHS, RHS&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming boolean "and" operator.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23Eval" title="#LogicMetaprogramming#Eval (interface function)" data-lang-entity="interface_metafunction">Eval&lt;VALUE&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Conversion from <tt>bool</tt> to tags <tt>True</tt> and <tt>False</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23If" title="#LogicMetaprogramming#If (interface function)" data-lang-entity="interface_metafunction">If&lt;TCondition, TResultTrue, TResultFalse&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metaprogramming implication.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23IfC" title="#LogicMetaprogramming#IfC (interface function)" data-lang-entity="interface_metafunction">If&lt;CONDITION, TResultTrue, TResultFalse&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Metaprogramming boolean, implication.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23Not" title="#LogicMetaprogramming#Not (interface function)" data-lang-entity="interface_metafunction">Not&lt;TBool&gt;::Type;, Not&lt;TBool&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming boolean "not" operator.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23NotC" title="#LogicMetaprogramming#NotC (interface function)" data-lang-entity="interface_metafunction">NotC&lt;BOOL&gt;::Type;, NotC&lt;BOOL&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming boolean "not" operator for values.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23Or" title="#LogicMetaprogramming#Or (interface function)" data-lang-entity="interface_metafunction">Or&lt;TLhs, TRhs&gt;::Type;, Or&lt;TLhs, TRhs&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming "or" operator.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#LogicMetaprogramming%23OrC" title="#LogicMetaprogramming#OrC (interface function)" data-lang-entity="interface_metafunction">OrC&lt;LHS, RHS&gt;::Type;, OrC&lt;LHS, RHS&gt;::VALUE;</a></code></span>
+    <span class="summary_desc"><div>Metaprograming boolean "or" operator.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This group contains metafunctions for logical operations.</p><p>For each boolean operation, there is one metafunction called <tt>Operation</tt> and one called <tt>OperationC</tt>
+(i.e. having a suffix <tt>C</tt>. The first one works on boolean tag types <tt>True</tt> and <tt>False</tt>. The second one takes <tt>bool</tt> constant parameters.</p><p>The metafunctions allow a shortcut using the SFNAE (substitution failure is not an error) feature of the C++
+programming language. When passing metafunctions returning <tt>True</tt> and <tt>False</tt> in their <tt>Type</tt>
+member typedef, you can ommit the <tt>::Type</tt>.</p><p>Here is an example for this:</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="k">typedef</span> <span class="n">And</span><span class="o">&lt;</span><span class="n">Or</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;</span> <span class="n">TResult</span><span class="p">;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">TResult</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;true&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+  </div>
+</div>
+
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="group_LogicalValuesTags.html#LogicalValuesTags#False" data-lang-entity="grouped_tag">False</a></li>
+  
+  <li><a href="group_LogicalValuesTags.html#LogicalValuesTags#True" data-lang-entity="grouped_tag">True</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+
+
+
+<!-- Grouped macros Details -->
+
+
+
+
+<!-- Grouped Functions Details -->
+
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Grouped Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#And" class="signature first" data-lang-entity="interface_metafunction">
+    <code>And&lt;TLhs, TRhs&gt;::Type;
+And&lt;TLhs, TRhs&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming "and" operatand.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TLhs</code></th>
+            <td>The left hand side logical value tag.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TRhs</code></th>
+            <td>The right hand side logical value tag.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The logical value tag result fand the and operation.</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shandtcut fand <tt>And&lt;TLhs, TRhs&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using And.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">And</span><span class="o">&lt;</span><span class="n">False</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;false&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">And</span><span class="o">&lt;</span><span class="n">False</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">And</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">And</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>    <span class="c1">// =&gt; &quot;true&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#AndC" class="signature" data-lang-entity="interface_metafunction">
+    <code>AndC&lt;LHS, RHS&gt;::Type;
+AndC&lt;LHS, RHS&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming boolean "and" operator.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>LHS</code></th>
+            <td>Left hand side <tt>bool</tt> constant.</td>
+        </tr>
+    
+        <tr>
+            <th><code>RHS</code></th>
+            <td>Right hand side <tt>bool</tt> constant.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The logical value tag result for the or operation.</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shortcut for <tt>AndC&lt;LHS, RHS&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using AndC.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">AndC</span><span class="o">&lt;</span><span class="nb">false</span><span class="p">,</span> <span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;false&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">AndC</span><span class="o">&lt;</span><span class="nb">false</span><span class="p">,</span> <span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">AndC</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">AndC</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>    <span class="c1">// =&gt; &quot;true&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#Eval" class="signature" data-lang-entity="interface_metafunction">
+    <code>Eval&lt;VALUE&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Conversion from <tt>bool</tt> to tags <tt>True</tt> and <tt>False</tt>.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>A <tt>bool</tt> to convert to <tt>True</tt>/<tt>False</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting tag, one of <tt>True</tt> and <tt>False</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Examples</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code and achieve the following output:</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Eval</span><span class="o">&lt;</span><span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Eval</span><span class="o">&lt;</span><span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span> <span class="c1">// =&gt; &quot;false&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#If" class="signature" data-lang-entity="interface_metafunction">
+    <code>If&lt;TCondition, TResultTrue, TResultFalse&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprogramming implication.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TCondition</code></th>
+            <td>The condition.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TResultTrue</code></th>
+            <td>Result if TCondition evaluates to <tt>True</tt>.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TResultFalse</code></th>
+            <td>Result if TCondition evaluates to <tt>False</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using If.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">If</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">If</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;false&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#IfC" class="signature" data-lang-entity="interface_metafunction">
+    <code>If&lt;CONDITION, TResultTrue, TResultFalse&gt;::Type</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprogramming boolean, implication.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>CONDITION</code></th>
+            <td>The condition, <tt>bool</tt>.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TResultTrue</code></th>
+            <td>Result if TCondition evaluates to <tt>True</tt>.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TResultFalse</code></th>
+            <td>Result if TCondition evaluates to <tt>False</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using If.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">If</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">If</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;false&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#Not" class="signature" data-lang-entity="interface_metafunction">
+    <code>Not&lt;TBool&gt;::Type;
+Not&lt;TBool&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming boolean "not" operator.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TBool</code></th>
+            <td>The tag to negate.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The inverted TBool.</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shortcut for <tt>Not&lt;TBool&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using Not.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Not</span><span class="o">&lt;</span><span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Not</span><span class="o">&lt;</span><span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;false&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#NotC" class="signature" data-lang-entity="interface_metafunction">
+    <code>NotC&lt;BOOL&gt;::Type;
+NotC&lt;BOOL&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming boolean "not" operator for values.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>BOOL</code></th>
+            <td>The <tt>bool</tt> value to negate.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The corresponding Tag for <tt>!BOOL</tt> (<tt>True</tt>/<tt>False</tt>).</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shortcut for <tt>NotC&lt;BOOL&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using NotC.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">NotC</span><span class="o">&lt;</span><span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">NotC</span><span class="o">&lt;</span><span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;false&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#Or" class="signature" data-lang-entity="interface_metafunction">
+    <code>Or&lt;TLhs, TRhs&gt;::Type;
+Or&lt;TLhs, TRhs&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming "or" operator.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TLhs</code></th>
+            <td>The left hand side logical value tag.</td>
+        </tr>
+    
+        <tr>
+            <th><code>TRhs</code></th>
+            <td>The right hand side logical value tag.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The logical value tag result for the or operation.</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shortcut for <tt>Or&lt;TLhs, TRhs&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using Or.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Or</span><span class="o">&lt;</span><span class="n">False</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;false&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Or</span><span class="o">&lt;</span><span class="n">False</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Or</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">False</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">Or</span><span class="o">&lt;</span><span class="n">True</span><span class="p">,</span> <span class="n">True</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>    <span class="c1">// =&gt; &quot;true&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="LogicMetaprogramming#OrC" class="signature" data-lang-entity="interface_metafunction">
+    <code>OrC&lt;LHS, RHS&gt;::Type;
+OrC&lt;LHS, RHS&gt;::VALUE;</code>
+  </h3>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Metaprograming boolean "or" operator.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>LHS</code></th>
+            <td>Left hand side <tt>bool</tt> constant.</td>
+        </tr>
+    
+        <tr>
+            <th><code>RHS</code></th>
+            <td>Right hand side <tt>bool</tt> constant.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The logical value tag result for the or operation.</td>
+        </tr>
+    
+        <tr>
+            <th><code>VALUE</code></th>
+            <td>Shortcut for <tt>OrC&lt;LHS, RHS&gt;::Type::VALUE</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Example</h4><p>We define the following two helper functions.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">True</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;true&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">printBoolType</span><span class="p">(</span><span class="n">False</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="cm">/*tag*/</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;false&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div><p>Now, we can write the following code using OrC.</p><div data-src-path="demos/basic/metaprogramming_logic.cpp"><div class="highlight"><pre>    <span class="n">printBoolType</span><span class="p">(</span><span class="n">OrC</span><span class="o">&lt;</span><span class="nb">false</span><span class="p">,</span> <span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>  <span class="c1">// =&gt; &quot;false&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">OrC</span><span class="o">&lt;</span><span class="nb">false</span><span class="p">,</span> <span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">OrC</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="nb">false</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>   <span class="c1">// =&gt; &quot;true&quot;</span>
+    <span class="n">printBoolType</span><span class="p">(</span><span class="n">OrC</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="nb">true</span><span class="o">&gt;::</span><span class="n">Type</span><span class="p">());</span>    <span class="c1">// =&gt; &quot;true&quot;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/basic/metaprogramming_logic.cpp" target="_top">demos/basic/metaprogramming_logic.cpp</a></div></div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup LogicMetaprogramming Logic Metaprogramming
+ * 
+ * @brief Logic Metaprogramming operations.
+ * 
+ * This group contains metafunctions for logical operations.
+ * 
+ * For each boolean operation, there is one metafunction called
+ * &lt;tt&gt;Operation&lt;/tt&gt; and one called &lt;tt&gt;OperationC&lt;/tt&gt; (i.e. having a suffix
+ * &lt;tt&gt;C&lt;/tt&gt;. The first one works on boolean tag types &lt;tt&gt;True&lt;/tt&gt; and
+ * &lt;tt&gt;False&lt;/tt&gt;. The second one takes &lt;tt&gt;bool&lt;/tt&gt; constant parameters.
+ * 
+ * The metafunctions allow a shortcut using the SFNAE (substitution failure is
+ * not an error) feature of the C++ programming language. When passing
+ * metafunctions returning &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt; in their
+ * &lt;tt&gt;Type&lt;/tt&gt; member typedef, you can ommit the &lt;tt&gt;::Type&lt;/tt&gt;.
+ * 
+ * Here is an example for this:
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp shortcut to type feature
+ * 
+ * @see LogicalValuesTags#True
+ * @see LogicalValuesTags#False
+ * 
+ * @mfn LogicMetaprogramming#Eval
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Conversion from &lt;tt&gt;bool&lt;/tt&gt; to tags &lt;tt&gt;True&lt;/tt&gt; and
+ *        &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @signature Eval&lt;VALUE&gt;::Type
+ * 
+ * @tparam VALUE A &lt;tt&gt;bool&lt;/tt&gt; to convert to &lt;tt&gt;True&lt;/tt&gt;/&lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @return Type The resulting tag, one of &lt;tt&gt;True&lt;/tt&gt; and &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @section Examples
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code and achieve the following output:
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type eval
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#Not
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming boolean &#34;not&#34; operator.
+ * 
+ * @signature Not&lt;TBool&gt;::Type;
+ * @signature Not&lt;TBool&gt;::VALUE;
+ * 
+ * @tparam TBool The tag to negate.
+ * 
+ * @return Type The inverted TBool.
+ * @return VALUE Shortcut for &lt;tt&gt;Not&amp;lt;TBool&amp;gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using Not.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type not
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#NotC
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming boolean &#34;not&#34; operator for values.
+ * 
+ * @signature NotC&lt;BOOL&gt;::Type;
+ * @signature NotC&lt;BOOL&gt;::VALUE;
+ * 
+ * @tparam BOOL The &lt;tt&gt;bool&lt;/tt&gt; value to negate.
+ * 
+ * @return Type The corresponding Tag for &lt;tt&gt;!BOOL&lt;/tt&gt;
+ *              (&lt;tt&gt;True&lt;/tt&gt;/&lt;tt&gt;False&lt;/tt&gt;).
+ * @return VALUE Shortcut for &lt;tt&gt;NotC&amp;lt;BOOL&amp;gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using NotC.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type notc
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#Or
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming &#34;or&#34; operator.
+ * 
+ * @signature Or&lt;TLhs, TRhs&gt;::Type;
+ * @signature Or&lt;TLhs, TRhs&gt;::VALUE;
+ * 
+ * @tparam TLhs The left hand side logical value tag.
+ * @tparam TRhs The right hand side logical value tag.
+ * 
+ * @return Type The logical value tag result for the or operation.
+ * @return VALUE Shortcut for &lt;tt&gt;Or&lt;TLhs, TRhs&gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using Or.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type or
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#OrC
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming boolean &#34;or&#34; operator.
+ * 
+ * @signature OrC&lt;LHS, RHS&gt;::Type;
+ * @signature OrC&lt;LHS, RHS&gt;::VALUE;
+ * 
+ * @tparam LHS Left hand side &lt;tt&gt;bool&lt;/tt&gt; constant.
+ * @tparam RHS Right hand side &lt;tt&gt;bool&lt;/tt&gt; constant.
+ * 
+ * @return Type The logical value tag result for the or operation.
+ * @return VALUE Shortcut for &lt;tt&gt;OrC&lt;LHS, RHS&gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using OrC.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type orc
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#And
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming &#34;and&#34; operatand.
+ * 
+ * @signature And&lt;TLhs, TRhs&gt;::Type;
+ * @signature And&lt;TLhs, TRhs&gt;::VALUE;
+ * 
+ * @tparam TLhs The left hand side logical value tag.
+ * @tparam TRhs The right hand side logical value tag.
+ * 
+ * @return Type The logical value tag result fand the and operation.
+ * @return VALUE Shandtcut fand &lt;tt&gt;And&lt;TLhs, TRhs&gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using And.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type and
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#AndC
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprograming boolean &#34;and&#34; operator.
+ * 
+ * @signature AndC&lt;LHS, RHS&gt;::Type;
+ * @signature AndC&lt;LHS, RHS&gt;::VALUE;
+ * 
+ * @tparam LHS Left hand side &lt;tt&gt;bool&lt;/tt&gt; constant.
+ * @tparam RHS Right hand side &lt;tt&gt;bool&lt;/tt&gt; constant.
+ * 
+ * @return Type The logical value tag result for the or operation.
+ * @return VALUE Shortcut for &lt;tt&gt;AndC&lt;LHS, RHS&gt;::Type::VALUE&lt;/tt&gt;.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using AndC.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type andc
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#If
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprogramming implication.
+ * 
+ * @signature If&lt;TCondition, TResultTrue, TResultFalse&gt;::Type
+ * 
+ * @tparam TCondition The condition.
+ * @tparam TResultTrue Result if TCondition evaluates to &lt;tt&gt;True&lt;/tt&gt;.
+ * @tparam TResultFalse Result if TCondition evaluates to &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @return Type The resulting type.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using If.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type if
+ * 
+ * 
+ * 
+ * @mfn LogicMetaprogramming#IfC
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Metaprogramming boolean, implication.
+ * 
+ * @signature If&lt;CONDITION, TResultTrue, TResultFalse&gt;::Type
+ * 
+ * @tparam CONDITION The condition, &lt;tt&gt;bool&lt;/tt&gt;.
+ * @tparam TResultTrue Result if TCondition evaluates to &lt;tt&gt;True&lt;/tt&gt;.
+ * @tparam TResultFalse Result if TCondition evaluates to &lt;tt&gt;False&lt;/tt&gt;.
+ * 
+ * @return Type The resulting type.
+ * 
+ * @section Example
+ * 
+ * We define the following two helper functions.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp true false print helpers
+ * 
+ * Now, we can write the following code using If.
+ * 
+ * @snippet demos/basic/metaprogramming_logic.cpp print bool type if
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

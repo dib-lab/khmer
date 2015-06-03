@@ -1,0 +1,1039 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_cyclicshape" data-page="CyclicShape">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>CyclicShape - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>CyclicShape<div><div>A pattern of zeros and ones to mark "don't care"-positions in a text.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_FixedCyclicShape.html" data-lang-entity="specialization">FixedCyclicShape</a>, 
+    <a href="specialization_GenericCyclicShape.html" data-lang-entity="specialization">GenericCyclicShape</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/modifier.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TShapeSpec&gt;
+class CyclicShape&lt;TShapeSpec&gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TShapeSpec</a></code></th>
+        <td>The specializing type. Default is <a href="specialization_GenericCyclicShape.html" data-lang-entity="specialization">GenericShape</a>, another option is <a href="specialization_FixedCyclicShape.html" data-lang-entity="specialization">FixedShape</a>.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSize</a></code></th>
+        <td>Size type of the CyclicShape</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#CyclicShape%23carePositions" title="#CyclicShape#carePositions (interface function)" data-lang-entity="interface_function">void carePositions(positions, cyclicShape);</a></code></span>
+    <span class="summary_desc"><div>Determine the indices of care positions in the range <i>[0,span)</i></div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#CyclicShape%23cyclicShapeToString" title="#CyclicShape#cyclicShapeToString (interface function)" data-lang-entity="interface_function">void cyclicShapeToString(bitmap, cyclicShape);</a></code></span>
+    <span class="summary_desc"><div>Print a given cyclic shape as a sequence of '1' (care position) and
+'0' (don't-care position).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#CyclicShape%23cyclicShapeToSuffixLengths" title="#CyclicShape#cyclicShapeToSuffixLengths (interface function)" data-lang-entity="interface_function">void cyclicShapeToSuffixLengths(TString suffLengths, cyclicShape);</a></code></span>
+    <span class="summary_desc"><div>Calculates the number of characters of modified Strings
+shorter than the Shape's span.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#CyclicShape%23weight" title="#CyclicShape#weight (interface function)" data-lang-entity="interface_function">TSize weight(const & cyclicShape);</a></code></span>
+    <span class="summary_desc"><div>Return the weight of a CyclicShape</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#CyclicShape%23Size" title="#CyclicShape#Size (interface function)" data-lang-entity="interface_metafunction">Size&lt;CyclicShape&lt;TSpec&gt; &gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Size type for parameters used in CyclicShape.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+
+
+<div data-lang-entity-container="member_variable">
+<h2 data-lang-entity="member_variable">Member Variable Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#CyclicShape%3A%3Aloffset" title="#CyclicShape::loffset (interface function)" data-lang-entity="member_variable">
+        TSize CyclicShape::loffset
+    </a></code></span>
+    <span class="summary_desc"><div>left offset (number of leading zeros) of the CyclicShape.</div></span>
+  </li>
+  
+  <li class="public">
+    <span class="summary_signature"><code><a href="#CyclicShape%3A%3Aspan" title="#CyclicShape::span (interface function)" data-lang-entity="member_variable">
+        TSize CyclicShape::span
+    </a></code></span>
+    <span class="summary_desc"><div>span of the CyclicShape.</div></span>
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>CyclicShapes store a pattern like <tt>11010100110</tt> that mark
+care (match) positions and don't-care positions.
+Unlike <a href="class_Shape.html" data-lang-entity="class">Shape</a>, the CyclicShape does not perform hashing of q-grams.
+It is instead useful to modify a text in such a way that zero
+position are ignored. The pattern is applied repeatedly on the whole
+text, as the example shows.</p><p>Note that CyclicShapes can start and end with zero characters, which
+is not allowed in <a href="class_Shape.html" data-lang-entity="class">Shape</a>.</p><h3>Examples</h3><div data-src-path="demos/cyclic_shape.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/modifier.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">**</span> <span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// create a (generic) CyclicShape</span>
+    <span class="k">typedef</span> <span class="n">CyclicShape</span><span class="o">&lt;</span><span class="n">GenericShape</span><span class="o">&gt;</span> <span class="n">TShape</span><span class="p">;</span>
+    <span class="n">TShape</span> <span class="n">shape</span><span class="p">;</span>
+    <span class="n">stringToCyclicShape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="s">&quot;1110010&quot;</span><span class="p">);</span>
+
+    <span class="c1">// print cyclic Shape</span>
+    <span class="n">CharString</span> <span class="n">out</span><span class="p">;</span>
+    <span class="n">cyclicShapeToString</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">shape</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;shape: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// determine weight and span</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;weight: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">weight</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;, span: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">shape</span><span class="p">.</span><span class="n">span</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// modify a text to leave out characters</span>
+    <span class="n">CharString</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;this is an original string&quot;</span><span class="p">;</span>
+    <span class="n">ModifiedString</span><span class="o">&lt;</span><span class="n">CharString</span><span class="p">,</span> <span class="n">ModCyclicShape</span><span class="o">&lt;</span><span class="n">TShape</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">modStr</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">);</span>
+
+    <span class="c1">// modStr can be used like a normal String</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; =&gt; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">modStr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;length: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; =&gt; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length</span><span class="p">(</span><span class="n">modStr</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/cyclic_shape.cpp" target="_top">demos/cyclic_shape.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/cyclic_shape.cpp.stdout">shape: 1110010
+weight: 4, span: 7
+this is an original string =&gt; thii anrgin tri
+length: 26 =&gt; 15</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="specialization_ModCyclicShapeModifiedIterator.html" data-lang-entity="specialization">ModCyclicShapeModifiedIterator</a></li>
+  
+  <li><a href="specialization_ModCyclicShapeModifiedString.html" data-lang-entity="specialization">ModCyclicShapeModifiedString</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="CyclicShape#carePositions" class="signature first" data-lang-entity="interface_function">
+      <code>void carePositions(positions, cyclicShape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Determine the indices of care positions in the range <i>[0,span)</i></div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TString</code></th>
+        <td>String or array. Value type should be an integral size type.</td>
+    </tr>
+    
+    <tr>
+        <th><code>TSpec</code></th>
+        <td>Specialization of CyclicShape.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cyclicShape</code>
+            
+        
+      </th>
+      <td>CyclicShape object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">positions</code>
+            
+        
+      </th>
+      <td>The resulting <a href="class_String.html" data-lang-entity="class">String</a> to store the care-positions in. Type TString.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>This function can be used to convert <tt>CyclicShape.diffs</tt>, which stores
+the distances between care positions, to a <tt>positions</tt> string directly
+containing the care positions. See the example:</p><div data-src-path="demos/cyclic_shape_snippets.cpp"><div class="highlight"><pre>        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;relative care positions: &quot;</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">weight</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">shape</span><span class="p">.</span><span class="n">diffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;,&quot;</span><span class="p">;</span>    <span class="c1">// output: 1,1,3,2,4,</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;absolute care positions: &quot;</span><span class="p">;</span>
+        <span class="n">String</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">carePos</span><span class="p">;</span>
+        <span class="n">carePositions</span><span class="p">(</span><span class="n">carePos</span><span class="p">,</span> <span class="n">shape</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">weight</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">carePos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;,&quot;</span><span class="p">;</span>             <span class="c1">// output: 2,3,4,7,9,</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+<div class="path_label"><span class="label">Snippet from:</span> <a href="demos/cyclic_shape_snippets.cpp" target="_top">demos/cyclic_shape_snippets.cpp</a></div></div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="CyclicShape#cyclicShapeToString" class="signature" data-lang-entity="interface_function">
+      <code>void cyclicShapeToString(bitmap, cyclicShape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Print a given cyclic shape as a sequence of '1' (care position) and
+'0' (don't-care position).</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cyclicShape</code>
+            
+        
+      </th>
+      <td>CyclicShape object. Types: <a href="class_CyclicShape.html" data-lang-entity="class">CyclicShape</a></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">bitmap</code>
+            
+        
+      </th>
+      <td>The resulting sequence object. Type: <a href="class_String.html" data-lang-entity="class">String</a>,
+e.g. CharString</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">stringToCyclicShape</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="CyclicShape#cyclicShapeToSuffixLengths" class="signature" data-lang-entity="interface_function">
+      <code>void cyclicShapeToSuffixLengths(TString suffLengths, cyclicShape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Calculates the number of characters of modified Strings
+shorter than the Shape's span.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TString</code></th>
+        <td>String type or array with an integral value type, i.e. unsigned or int.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cyclicShape</code>
+            
+        
+      </th>
+      <td>CyclicShape object.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">suffLengths</code>
+            
+        
+      </th>
+      <td>String to be filled. Must be resized beforehands.
+Fixed length arrays also work.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Given a CyclicShape, this function calculates a how many characters a String of length
+<i>x</i> contains after the CyclicShape is applied to it. This is done for all <tt>0 &lt;= x &lt; span</tt>.
+<tt>suffLengths</tt> therefore must be resized to the shape's span beforehands.
+The resizing is not done in this function so that it can be applied to arrays, too.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="CyclicShape#weight" class="signature" data-lang-entity="interface_function">
+      <code>TSize weight(const & cyclicShape);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the weight of a CyclicShape</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSpec</code></th>
+        <td>Specialisation of the CyclicShape.</td>
+    </tr>
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>Size type of CyclicShape</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">cyclicShape</code>
+            
+        
+      </th>
+      <td>CyclicShape object</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>weight</code></th>
+        <td>of the CyclicShape (number of care positions)</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="CyclicShape#Size" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Size&lt;CyclicShape&lt;TSpec&gt; &gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Size type for parameters used in CyclicShape.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TSpec</code></th>
+            <td>The CyclicShape specialization.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TReturn</code></th>
+            <td>Currently the return type <tt>unsigned char</tt>.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+<div class="member_variable_details" data-lang-entity-container="member_variable">
+  <h2 data-lang-entity="member_variable">Member Variables Detail</h2>
+
+  
+  <div class="member_variable_details first">
+    <h3 data-toc="hidden" id="CyclicShape::loffset" class="signature first" data-lang-entity="member_variable">
+      <code>TSize CyclicShape::loffset</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>left offset (number of leading zeros) of the CyclicShape.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="member_variable_details">
+    <h3 data-toc="hidden" id="CyclicShape::span" class="signature" data-lang-entity="member_variable">
+      <code>TSize CyclicShape::span</code>
+    </h3>
+    <div class="docstring">
+      <div class="discussion">
+        <div>span of the CyclicShape.</div>
+        
+<div></div>
+
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class CyclicShape
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief A pattern of zeros and ones to mark &#34;don&#39;t care&#34;-positions in a text.
+ * 
+ * @signature template &lt;typename TShapeSpec&gt; class CyclicShape&lt;TShapeSpec&gt;;
+ * 
+ * @tparam TShapeSpec The specializing type. Default is @link GenericCyclicShape
+ *                    GenericShape @endlink, another option is @link
+ *                    FixedCyclicShape FixedShape @endlink.
+ * @tparam TSize Size type of the CyclicShape
+ * 
+ * CyclicShapes store a pattern like &lt;tt&gt;11010100110&lt;/tt&gt; that mark care (match)
+ * positions and don&#39;t-care positions. Unlike @link Shape @endlink, the
+ * CyclicShape does not perform hashing of q-grams. It is instead useful to
+ * modify a text in such a way that zero position are ignored. The pattern is
+ * applied repeatedly on the whole text, as the example shows.
+ * 
+ * Note that CyclicShapes can start and end with zero characters, which is not
+ * allowed in @link Shape @endlink.
+ * 
+ * @section Examples
+ * 
+ * @include demos/cyclic_shape.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/cyclic_shape.cpp.stdout
+ * 
+ * @see ModCyclicShapeModifiedString
+ * @see ModCyclicShapeModifiedIterator
+ * 
+ * @mfn CyclicShape#Size
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief Size type for parameters used in CyclicShape.
+ * 
+ * @signature Size&lt;CyclicShape&lt;TSpec&gt; &gt;::Type;
+ * 
+ * @tparam TSpec The CyclicShape specialization.
+ * 
+ * @return TReturn Currently the return type &lt;tt&gt;unsigned char&lt;/tt&gt;.
+ * 
+ * @section Remarks
+ * 
+ * @var TSize CyclicShape::span;
+ * 
+ * @brief span of the CyclicShape.
+ * 
+ * @var TSize CyclicShape::loffset;
+ * 
+ * @brief left offset (number of leading zeros) of the CyclicShape.
+ * 
+ * @fn CyclicShape#weight
+ * 
+ * @headerfile &lt;seqan/modifier.h&gt;
+ * 
+ * @brief Return the weight of a CyclicShape
+ * 
+ * @signature TSize weight(const &amp; cyclicShape);
+ * 
+ * @tparam TSpec Specialisation of the CyclicShape.
+ * @tparam TSize Size type of CyclicShape
+ * 
+ * @param[in] cyclicShape CyclicShape object
+ * 
+ * @return weight of the CyclicShape (number of care positions)
+ * 
+ * @fn CyclicShape#cyclicShapeToString
+ * 
+ * @brief Print a given cyclic shape as a sequence of &#39;1&#39; (care position) and
+ *        &#39;0&#39; (don&#39;t-care position).
+ * 
+ * @signature void cyclicShapeToString(bitmap, cyclicShape);
+ * 
+ * @param[in] cyclicShape CyclicShape object. Types: @link CyclicShape @endlink
+ * @param[out] bitmap The resulting sequence object. Type: @link String
+ *                    @endlink, e.g. CharString
+ * 
+ * @see GenericCyclicShape#stringToCyclicShape
+ * 
+ * @fn CyclicShape#carePositions
+ * 
+ * @brief Determine the indices of care positions in the range &lt;i&gt;[0,span)&lt;/i&gt;
+ * 
+ * @signature void carePositions(positions, cyclicShape);
+ * 
+ * @tparam TString String or array. Value type should be an integral size type.
+ * @tparam TSpec Specialization of CyclicShape.
+ * 
+ * @param[in] cyclicShape CyclicShape object.
+ * @param[out] positions The resulting @link String @endlink to store the care-
+ *                       positions in. Type TString.
+ * 
+ * This function can be used to convert &lt;tt&gt;CyclicShape.diffs&lt;/tt&gt;, which stores
+ * the distances between care positions, to a &lt;tt&gt;positions&lt;/tt&gt; string directly
+ * containing the care positions. See the example:
+ * 
+ * @snippet demos/cyclic_shape_snippets.cpp CyclicShape Care Positions
+ * 
+ * 
+ * 
+ * @fn CyclicShape#cyclicShapeToSuffixLengths
+ * 
+ * @brief Calculates the number of characters of modified Strings shorter than
+ *        the Shape&#39;s span.
+ * 
+ * @signature void cyclicShapeToSuffixLengths(TString suffLengths, cyclicShape);
+ * 
+ * @tparam TString String type or array with an integral value type, i.e.
+ *                 unsigned or int.
+ * 
+ * @param[in] cyclicShape CyclicShape object.
+ * @param[in,out] suffLengths String to be filled. Must be resized beforehands.
+ *                            Fixed length arrays also work.
+ * 
+ * Given a CyclicShape, this function calculates a how many characters a String
+ * of length &lt;i&gt;x&lt;/i&gt; contains after the CyclicShape is applied to it. This is
+ * done for all &lt;tt&gt;0 &lt;= x &lt; span&lt;/tt&gt;. &lt;tt&gt;suffLengths&lt;/tt&gt; therefore must be
+ * resized to the shape&#39;s span beforehands. The resizing is not done in this
+ * function so that it can be applied to arrays, too.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

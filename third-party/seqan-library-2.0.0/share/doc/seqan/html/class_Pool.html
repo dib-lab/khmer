@@ -1,0 +1,1416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_pool" data-page="Pool">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Pool - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Pool<div><div>Pools are push- and pop-passive pipeline modules.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_MapperConfig.html" data-lang-entity="specialization">MapperConfig</a>, 
+    <a href="specialization_MapperConfigSize.html" data-lang-entity="specialization">MapperConfigSize</a>, 
+    <a href="specialization_MapperSpec.html" data-lang-entity="specialization">MapperSpec</a>, 
+    <a href="specialization_PoolConfig.html" data-lang-entity="specialization">PoolConfig</a>, 
+    <a href="specialization_PoolConfigSize.html" data-lang-entity="specialization">PoolConfigSize</a>, 
+    <a href="specialization_PoolSpec.html" data-lang-entity="specialization">PoolSpec</a>, 
+    <a href="specialization_SorterConfig.html" data-lang-entity="specialization">SorterConfig</a>, 
+    <a href="specialization_SorterConfigSize.html" data-lang-entity="specialization">SorterConfigSize</a>, 
+    <a href="specialization_SorterSpec.html" data-lang-entity="specialization">SorterSpec</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/pipe.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TValue[, typename TSpec]&gt;
+class Pool;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type. Default: PoolSpec&lt;&gt;, see PoolSpec.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TValue</a></code></th>
+        <td>The value type, that is the type of the stream elements.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23assign" title="#Pool#assign (interface function)" data-lang-entity="interface_function">void assign(target, source);</a></code></span>
+    <span class="summary_desc"><div>Assigns one object to another object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23atEnd" title="#Pool#atEnd (interface function)" data-lang-entity="interface_function">bool atEnd(pool);</a></code></span>
+    <span class="summary_desc"><div>Check whether the <a href="class_Pool.html" data-lang-entity="class">Pool</a> object is at end.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23beginRead" title="#Pool#beginRead (interface function)" data-lang-entity="interface_function">bool beginRead(pool);</a></code></span>
+    <span class="summary_desc"><div>Initiates a read process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23beginWrite" title="#Pool#beginWrite (interface function)" data-lang-entity="interface_function">bool beginWrite(pool);</a></code></span>
+    <span class="summary_desc"><div>Initiates a write process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23clear" title="#Pool#clear (interface function)" data-lang-entity="interface_function">void clear(pool);</a></code></span>
+    <span class="summary_desc"><div>Remove all elements from the pool.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23endRead" title="#Pool#endRead (interface function)" data-lang-entity="interface_function">bool endRead(pool);</a></code></span>
+    <span class="summary_desc"><div>Terminates a read process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23endWrite" title="#Pool#endWrite (interface function)" data-lang-entity="interface_function">bool endWrite(pool);</a></code></span>
+    <span class="summary_desc"><div>Terminates a write process.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23front" title="#Pool#front (interface function)" data-lang-entity="interface_function">TReference front(pool);</a></code></span>
+    <span class="summary_desc"><div>Return reference to the first element.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23length" title="#Pool#length (interface function)" data-lang-entity="interface_function">TSize length(pool);</a></code></span>
+    <span class="summary_desc"><div>Length of the pool.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23pop" title="#Pool#pop (interface function)" data-lang-entity="interface_function">void pop(pool[, ref]);</a></code></span>
+    <span class="summary_desc"><div>Pops the first element of the remaining stream.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23push" title="#Pool#push (interface function)" data-lang-entity="interface_function">void push(pool, val);</a></code></span>
+    <span class="summary_desc"><div>Appends an item at the end of an input stream.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Pool%23resize" title="#Pool#resize (interface function)" data-lang-entity="interface_function">void resize(pool, len);</a></code></span>
+    <span class="summary_desc"><div>Resize a pool.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>Use Value to get the output type of a given Pipe (returns <tt>Value&lt;TInput&gt;::Type</tt> by default).</p><p>Use Size to get the size type of a given Pipe (returns <tt>Size&lt;TInput&gt;::Type</tt> by default).</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Pool#assign" class="signature first" data-lang-entity="interface_function">
+      <code>void assign(target, source);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Assigns one object to another object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">target</code>
+            
+        
+      </th>
+      <td>Reference to assign to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">source</code>
+            
+        
+      </th>
+      <td>Value to assign.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>Assign value of source to target.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#atEnd" class="signature" data-lang-entity="interface_function">
+      <code>bool atEnd(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Check whether the <a href="class_Pool.html" data-lang-entity="class">Pool</a> object is at end.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pool</code>
+            
+        
+      </th>
+      <td>The <a href="class_Pool.html" data-lang-entity="class">Pool</a> object to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true in case of the pool being at the end, false otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#beginRead" class="signature" data-lang-entity="interface_function">
+      <code>bool beginRead(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initiates a read process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A pool module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>A read process must be terminated with endRead. Nested read processes are not allowed.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">endRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#beginWrite" class="signature" data-lang-entity="interface_function">
+      <code>bool beginWrite(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Initiates a write process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A pool module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>beginWrite</tt> prepares a pool for succeeding writes.</p><p>A write process must be terminated with endWrite. Nested write processes are not allowed.</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">endWrite</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Remove all elements from the pool.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>Pool to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#endRead" class="signature" data-lang-entity="interface_function">
+      <code>bool endRead(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Terminates a read process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A pool module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">beginRead</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#endWrite" class="signature" data-lang-entity="interface_function">
+      <code>bool endWrite(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Terminates a write process.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A push-passive pipeline module.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td>true on success, false on failure.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p><tt>endWrite</tt> closes the input stream and frees resources possibly allocated by beginWrite</p></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">beginWrite</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#front" class="signature" data-lang-entity="interface_function">
+      <code>TReference front(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference to the first element.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pool</code>
+            
+        
+      </th>
+      <td>The pool to get the first element of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TReference</code></th>
+        <td>A reference to the first element of <tt>seq</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#length" class="signature" data-lang-entity="interface_function">
+      <code>TSize length(pool);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Length of the pool.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pool</code>
+            
+        
+      </th>
+      <td>The Pool to query for its size.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The number of elements in the pool.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#pop" class="signature" data-lang-entity="interface_function">
+      <code>void pop(pool[, ref]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Pops the first element of the remaining stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A pop-passive pipeline module.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">ref</code>
+            
+        
+      </th>
+      <td>Reference to the result. Result type is <tt>Value&lt;TObject&gt;::Type</tt> for <tt>object</tt>
+type <tt>TObject</tt>. Returns the first element of the remaining input stream.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>In contrast to Pool#front this function also steps one element further.</p><p>Pool#front or Pool#pop can only be called within a read process surrounded by beginRead and endRead.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#push" class="signature" data-lang-entity="interface_function">
+      <code>void push(pool, val);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Appends an item at the end of an input stream.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>A pool module.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">val</code>
+            
+        
+      </th>
+      <td>Item to be pushed.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The function <tt>push</tt> can only be called within a write process surrounded by beginWrite and endWrite.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Pool#resize" class="signature" data-lang-entity="interface_function">
+      <code>void resize(pool, len);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Resize a pool.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pool</code>
+            
+        
+      </th>
+      <td>Pool to resize.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">len</code>
+            
+        
+      </th>
+      <td>Length to resize <tt>pool</tt> to.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Pool
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Pools are push- and pop-passive pipeline modules.
+ * 
+ * @signature template &lt;typename TValue[, typename TSpec]&gt; class Pool;
+ * 
+ * @tparam TSpec The specializing type. Default: PoolSpec&amp;lt;&amp;gt;, see PoolSpec.
+ * @tparam TValue The value type, that is the type of the stream elements.
+ * 
+ * Use Value to get the output type of a given Pipe (returns
+ * &lt;tt&gt;Value&amp;lt;TInput&amp;gt;::Type&lt;/tt&gt; by default).
+ * 
+ * Use Size to get the size type of a given Pipe (returns
+ * &lt;tt&gt;Size&amp;lt;TInput&amp;gt;::Type&lt;/tt&gt; by default).
+ * 
+ * @fn Pool#clear
+ * 
+ * @brief Remove all elements from the pool.
+ * 
+ * @signature void clear(pool);
+ * 
+ * @param[in,out] pool Pool to clear.
+ * 
+ * @fn Pool#length
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Length of the pool.
+ * 
+ * @signature TSize length(pool);
+ * 
+ * @param[in] pool The Pool to query for its size.
+ * 
+ * @return TSize The number of elements in the pool.
+ * 
+ * @fn Pool#resize
+ * 
+ * @brief Resize a pool.
+ * 
+ * @signature void resize(pool, len);
+ * 
+ * @param[in,out] pool Pool to resize.
+ * @param[in] len Length to resize &lt;tt&gt;pool&lt;/tt&gt; to.
+ * 
+ * @fn Pool#front
+ * 
+ * @brief Return reference to the first element.
+ * 
+ * @signature TReference front(pool);
+ * 
+ * @param[in] pool The pool to get the first element of.
+ * 
+ * @return TReference A reference to the first element of &lt;tt&gt;seq&lt;/tt&gt;.
+ * 
+ * @fn Pool#pop
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Pops the first element of the remaining stream.
+ * 
+ * @signature void pop(pool[, ref]);
+ * 
+ * @param[in,out] pool A pop-passive pipeline module.
+ * @param[out] ref Reference to the result. Result type is
+ *                 &lt;tt&gt;Value&amp;lt;TObject&amp;gt;::Type&lt;/tt&gt; for &lt;tt&gt;object&lt;/tt&gt; type
+ *                 &lt;tt&gt;TObject&lt;/tt&gt;. Returns the first element of the remaining
+ *                 input stream.
+ * 
+ * In contrast to Pool#front this function also steps one element further.
+ * 
+ * Pool#front or Pool#pop can only be called within a read process surrounded by
+ * beginRead and endRead.
+ * 
+ * @fn Pool#push
+ * 
+ * @brief Appends an item at the end of an input stream.
+ * 
+ * @signature void push(pool, val);
+ * 
+ * @param[in,out] pool A pool module.
+ * @param[in] val Item to be pushed.
+ * 
+ * The function &lt;tt&gt;push&lt;/tt&gt; can only be called within a write process
+ * surrounded by beginWrite and endWrite.
+ * 
+ * @fn Pool#beginWrite
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Initiates a write process.
+ * 
+ * @signature bool beginWrite(pool);
+ * 
+ * @param[in,out] pool A pool module.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, false on failure.
+ * 
+ * &lt;tt&gt;beginWrite&lt;/tt&gt; prepares a pool for succeeding writes.
+ * 
+ * A write process must be terminated with endWrite. Nested write processes are
+ * not allowed.
+ * 
+ * @see Pool#endWrite
+ * 
+ * @fn Pool#endWrite
+ * 
+ * @brief Terminates a write process.
+ * 
+ * @signature bool endWrite(pool);
+ * 
+ * @param[in,out] pool A push-passive pipeline module.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * &lt;tt&gt;endWrite&lt;/tt&gt; closes the input stream and frees resources possibly
+ * allocated by beginWrite
+ * 
+ * @see Pool#beginWrite
+ * 
+ * @fn Pool#atEnd
+ * 
+ * @brief Check whether the @link Pool @endlink object is at end.
+ * 
+ * @signature bool atEnd(pool);
+ * 
+ * @param[in] pool The @link Pool @endlink object to query.
+ * 
+ * @return bool true in case of the pool being at the end, false otherwise.
+ * 
+ * @fn Pool#beginRead
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Initiates a read process.
+ * 
+ * @signature bool beginRead(pool);
+ * 
+ * @param[in,out] pool A pool module.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * A read process must be terminated with endRead. Nested read processes are not
+ * allowed.
+ * 
+ * @see Pool#endRead
+ * 
+ * @fn Pool#endRead
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Terminates a read process.
+ * 
+ * @signature bool endRead(pool);
+ * 
+ * @param[in,out] pool A pool module.
+ * 
+ * @return bool true on success, false on failure.
+ * 
+ * @see Pool#beginRead
+ * 
+ * @fn Pool#assign
+ * 
+ * @headerfile &lt;seqan/pipe.h&gt;
+ * 
+ * @brief Assigns one object to another object.
+ * 
+ * @signature void assign(target, source);
+ * 
+ * @param[out] target Reference to assign to.
+ * @param[in] source Value to assign.
+ * 
+ * Assign value of source to target.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

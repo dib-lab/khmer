@@ -8,7 +8,6 @@
 # Tests for the ReadParser and Read classes.
 
 
-import khmer
 from khmer import ReadParser
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
@@ -102,8 +101,8 @@ def test_gzip_decompression():
 
 def test_gzip_decompression_truncated():
 
-    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
+        rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
         for read in rparser:
             pass
         assert 0, "this should fail"
@@ -113,8 +112,8 @@ def test_gzip_decompression_truncated():
 
 def test_gzip_decompression_truncated_pairiter():
 
-    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
+        rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
@@ -134,8 +133,8 @@ def test_bzip2_decompression():
 
 def test_bzip2_decompression_truncated():
 
-    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
+        rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
         for read in rparser:
             pass
         assert 0, "this should fail"
@@ -145,8 +144,8 @@ def test_bzip2_decompression_truncated():
 
 def test_bzip2_decompression_truncated_pairiter():
 
-    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
+        rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
@@ -196,7 +195,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         t.join()
 
     assert reads_count_1thr == sum(reads_counts_per_thread), \
-        reads_counts_per_thread
+        (reads_count_1thr, reads_counts_per_thread)
 
 
 @attr('multithread')
@@ -325,7 +324,7 @@ def test_read_pair_iterator_in_error_mode_xfail():
         for rpair in rparser.iter_read_pairs():
             pass
         failed = False
-    except IOError as exc:
+    except IOError:
         pass
     assert failed
 
@@ -349,15 +348,15 @@ def test_constructor():
 
     # Note: Using a data file with only one read.
     try:
-        rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
+        ReadParser(utils.get_test_data("single-read.fq"), "a")
         assert 0, ("ReadParser's constructor shouldn't accept a character for "
                    "the number of threads")
     except TypeError as err:
         print str(err)
     try:
-        rparser = ReadParser("non-existent-file-name")
+        ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
-    except ValueError as err:
+    except IOError as err:
         print str(err)
 
 

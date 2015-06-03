@@ -1,0 +1,1548 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_lexical" data-page="Lexical">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Lexical - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Lexical<div><div>Comparator for lexical comparison.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;[typename TSpec]&gt;
+class Lexical;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing size type, defaults to <tt>size_t</tt>.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23compare" title="#Lexical#compare (interface function)" data-lang-entity="interface_function">void compare(comparator, left, right);</a></code></span>
+    <span class="summary_desc"><div>Compares two objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23hasPrefix" title="#Lexical#hasPrefix (interface function)" data-lang-entity="interface_function">bool isPrefix(left, right);, bool isPrefix(comparator);</a></code></span>
+    <span class="summary_desc"><div>Test whether a sequence is the prefix of another sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isEqual" title="#Lexical#isEqual (interface function)" data-lang-entity="interface_function">bool isEqual(left, right);, bool isEqual(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "==".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isGreater" title="#Lexical#isGreater (interface function)" data-lang-entity="interface_function">bool isGreater(left, right);, bool isGreater(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "&gt;".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isGreaterOrEqual" title="#Lexical#isGreaterOrEqual (interface function)" data-lang-entity="interface_function">bool isGreaterOrEqual(left, right);, bool isGreaterOrEqual(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "&gt;=".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isLess" title="#Lexical#isLess (interface function)" data-lang-entity="interface_function">bool isLess(left, right);, bool isLess(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "&lt;".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isLessOrEqual" title="#Lexical#isLessOrEqual (interface function)" data-lang-entity="interface_function">bool isLessOrEqual(left, right);, bool isLessOrEqual(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "&lt;=".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isNotEqual" title="#Lexical#isNotEqual (interface function)" data-lang-entity="interface_function">bool isNotEqual(left, right);, bool isNotEqual(comparator);</a></code></span>
+    <span class="summary_desc"><div>Operator "!=".</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23isPrefix" title="#Lexical#isPrefix (interface function)" data-lang-entity="interface_function">bool isPrefix(left, right);, bool isPrefix(comparator);</a></code></span>
+    <span class="summary_desc"><div>Test whether a sequence is the prefix of another sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Lexical%23lcpLength" title="#Lexical#lcpLength (interface function)" data-lang-entity="interface_function">TSize lcpLength(left, right);, TSize lcpLength(comparator);</a></code></span>
+    <span class="summary_desc"><div>Length of the longest common prefix.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>This class implement comparator objects that perform (lexical) comparisons between two sequences. The result of the
+comparison is stored in the data members of the instance and can be accessed by some functions, for example <a href="class_Lexical.html#Lexical#isLess" data-lang-entity="interface_function">isLess</a> or <a href="class_Lexical.html#Lexical#isEqual" data-lang-entity="interface_function">isEqual</a>.</p><p>In most cases, there is no need for an explicite use of comparators, but sometimes this concept provide the
+opportunity to speed up the code.</p><h3>Examples</h3><p>This program compares the strings <tt>str1</tt> and <tt>str2</tt>:</p><div data-src-path="None"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">isLess</span><span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">))</span> <span class="c1">//first comparison</span>
+<span class="p">{</span>
+    <span class="c1">//str1 &lt; str2</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isGreater</span><span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">))</span> <span class="c1">//second comparison</span>
+<span class="p">{</span>
+    <span class="c1">//str1 &gt; str2</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="c1">//str == str2</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>Using a comparator, the same program only needs one comparison instead of two:</p><div data-src-path="None"><div class="highlight"><pre><span class="n">Lexical</span> <span class="o">&lt;&gt;</span> <span class="n">comparator</span><span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span> <span class="c1">//comparison is executed here</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">isLess</span><span class="p">(</span><span class="n">comparator</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">//str1 &lt; str2</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">lexGreater</span><span class="p">(</span><span class="n">comparator</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">//str1 &gt; str2</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="c1">//str == str2</span>
+<span class="p">}</span>
+</pre></div>
+</div><p>The state of a default constructed <tt>Lexical</tt> instance is undefined until it is set by a call of <a href="class_Lexical.html#Lexical#compare" data-lang-entity="interface_function">compare</a>.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="global_metafunction_Comparator.html" data-lang-entity="global_metafunction">Comparator</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Lexical#compare" class="signature first" data-lang-entity="interface_function">
+      <code>void compare(comparator, left, right);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Compares two objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">comparator</code>
+            
+        
+      </th>
+      <td>Object that stores the results. Types: Lexical</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first objects.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second objects that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a href="global_metafunction_Comparator.html" data-lang-entity="global_metafunction">Comparator</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#hasPrefix" class="signature" data-lang-entity="interface_function">
+      <code>bool isPrefix(left, right);
+bool isPrefix(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether a sequence is the prefix of another sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first sequence.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The putative prefix.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is a prefix of<tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By definition, a sequence is a prefix of itself: <tt>hasPrefix("abc", "abc")</tt> is <tt>true</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isEqual" class="signature" data-lang-entity="interface_function">
+      <code>bool isEqual(left, right);
+bool isEqual(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "==".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> equals <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isGreater" class="signature" data-lang-entity="interface_function">
+      <code>bool isGreater(left, right);
+bool isGreater(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "&gt;".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is greater than <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isGreaterOrEqual" class="signature" data-lang-entity="interface_function">
+      <code>bool isGreaterOrEqual(left, right);
+bool isGreaterOrEqual(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "&gt;=".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is greater than or equal to <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isLess" class="signature" data-lang-entity="interface_function">
+      <code>bool isLess(left, right);
+bool isLess(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "&lt;".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is less than <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isLessOrEqual" class="signature" data-lang-entity="interface_function">
+      <code>bool isLessOrEqual(left, right);
+bool isLessOrEqual(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "&lt;=".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is less than or equal to <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isNotEqual" class="signature" data-lang-entity="interface_function">
+      <code>bool isNotEqual(left, right);
+bool isNotEqual(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Operator "!=".</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first parameter.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second parameter that is compared to <tt>left</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> does not equal <tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#isPrefix" class="signature" data-lang-entity="interface_function">
+      <code>bool isPrefix(left, right);
+bool isPrefix(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Test whether a sequence is the prefix of another sequence.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The putative prefix.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second sequence.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if <tt>left</tt> is a prefix of<tt>right</tt>, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By definition, a sequence is a prefix of itself: <tt>isPrefix("abc", "abc")</tt> is <tt>true</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Lexical#lcpLength" class="signature" data-lang-entity="interface_function">
+      <code>TSize lcpLength(left, right);
+TSize lcpLength(comparator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Length of the longest common prefix.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">left</code>
+            
+        
+      </th>
+      <td>The first sequence.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">right</code>
+            
+        
+      </th>
+      <td>The second sequence.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">comparator</code>
+            
+        
+      </th>
+      <td>A comparator. Types: Lexical</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TSize</code></th>
+        <td>The length of the longest common prefix of <tt>left</tt> and <tt>right</tt>. TSize is the Size type of
+the left size type.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>By definition, a sequence is a prefix of itself: <tt>hasPrefix("abc", "abc")</tt> is <tt>true</tt>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Lexical
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Comparator for lexical comparison.
+ * 
+ * @signature template &lt;[typename TSpec]&gt; class Lexical;
+ * 
+ * @tparam TSpec The specializing size type, defaults to &lt;tt&gt;size_t&lt;/tt&gt;.
+ * 
+ * This class implement comparator objects that perform (lexical) comparisons
+ * between two sequences. The result of the comparison is stored in the data
+ * members of the instance and can be accessed by some functions, for example
+ * @link Lexical#isLess @endlink or @link Lexical#isEqual @endlink.
+ * 
+ * In most cases, there is no need for an explicite use of comparators, but
+ * sometimes this concept provide the opportunity to speed up the code.
+ * 
+ * @section Examples
+ * 
+ * This program compares the strings &lt;tt&gt;str1&lt;/tt&gt; and &lt;tt&gt;str2&lt;/tt&gt;:
+ * 
+ * @code{.cpp}
+ * if (isLess(str1, str2)) //first comparison
+ * {
+ *     //str1 &lt; str2
+ * }
+ * else if (isGreater(str1, str2)) //second comparison
+ * {
+ *     //str1 &gt; str2
+ * }
+ * else
+ * {
+ *     //str == str2
+ * }
+ * @endcode
+ * 
+ * 
+ * Using a comparator, the same program only needs one comparison instead of
+ * two:
+ * 
+ * @code{.cpp}
+ * Lexical &lt;&gt; comparator(str1, str2); //comparison is executed here
+ * if (isLess(comparator))
+ * {
+ *     //str1 &lt; str2
+ * }
+ * else if (lexGreater(comparator))
+ * {
+ *     //str1 &gt; str2
+ * }
+ * else
+ * {
+ *     //str == str2
+ * }
+ * @endcode
+ * 
+ * 
+ * The state of a default constructed &lt;tt&gt;Lexical&lt;/tt&gt; instance is undefined
+ * until it is set by a call of @link Lexical#compare @endlink.
+ * 
+ * @see Comparator
+ * 
+ * @fn Lexical#compare
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Compares two objects.
+ * 
+ * @signature void compare(comparator, left, right);
+ * 
+ * @param[out] comparator Object that stores the results. Types: Lexical
+ * @param[in] left The first objects.
+ * @param[in] right The second objects that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * 
+ * @see Comparator
+ * 
+ * @fn Lexical#isEqual
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;==&#34;.
+ * 
+ * @signature bool isEqual(left, right);
+ * @signature bool isEqual(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; equals &lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isNotEqual
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;!=&#34;.
+ * 
+ * @signature bool isNotEqual(left, right);
+ * @signature bool isNotEqual(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; does not equal &lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isLess
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;&amp;lt;&#34;.
+ * 
+ * @signature bool isLess(left, right);
+ * @signature bool isLess(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is less than &lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isLessOrEqual
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;&amp;lt;=&#34;.
+ * 
+ * @signature bool isLessOrEqual(left, right);
+ * @signature bool isLessOrEqual(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is less than or equal to
+ *              &lt;tt&gt;right&lt;/tt&gt;, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isGreater
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;&amp;gt;&#34;.
+ * 
+ * @signature bool isGreater(left, right);
+ * @signature bool isGreater(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is greater than &lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isGreaterOrEqual
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Operator &#34;&amp;gt;=&#34;.
+ * 
+ * @signature bool isGreaterOrEqual(left, right);
+ * @signature bool isGreaterOrEqual(comparator);
+ * 
+ * @param[in] left The first parameter.
+ * @param[in] right The second parameter that is compared to &lt;tt&gt;left&lt;/tt&gt;.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is greater than or equal to
+ *              &lt;tt&gt;right&lt;/tt&gt;, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn Lexical#isPrefix
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Test whether a sequence is the prefix of another sequence.
+ * 
+ * @signature bool isPrefix(left, right);
+ * @signature bool isPrefix(comparator);
+ * 
+ * @param[in] left The putative prefix.
+ * @param[in] right The second sequence.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is a prefix of&lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * By definition, a sequence is a prefix of itself: &lt;tt&gt;isPrefix(&#34;abc&#34;,
+ * &#34;abc&#34;)&lt;/tt&gt; is &lt;tt&gt;true&lt;/tt&gt;.
+ * 
+ * @fn Lexical#hasPrefix
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Test whether a sequence is the prefix of another sequence.
+ * 
+ * @signature bool isPrefix(left, right);
+ * @signature bool isPrefix(comparator);
+ * 
+ * @param[in] left The first sequence.
+ * @param[in] right The putative prefix.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if &lt;tt&gt;left&lt;/tt&gt; is a prefix of&lt;tt&gt;right&lt;/tt&gt;,
+ *              &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * By definition, a sequence is a prefix of itself: &lt;tt&gt;hasPrefix(&#34;abc&#34;,
+ * &#34;abc&#34;)&lt;/tt&gt; is &lt;tt&gt;true&lt;/tt&gt;.
+ * 
+ * @fn Lexical#lcpLength
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Length of the longest common prefix.
+ * 
+ * @signature TSize lcpLength(left, right);
+ * @signature TSize lcpLength(comparator);
+ * 
+ * @param[in] left The first sequence.
+ * @param[in] right The second sequence.
+ * @param[in] comparator A comparator. Types: Lexical
+ * 
+ * @return TSize The length of the longest common prefix of &lt;tt&gt;left&lt;/tt&gt; and
+ *               &lt;tt&gt;right&lt;/tt&gt;. TSize is the Size type of the left size type.
+ * 
+ * By definition, a sequence is a prefix of itself: &lt;tt&gt;hasPrefix(&#34;abc&#34;,
+ * &#34;abc&#34;)&lt;/tt&gt; is &lt;tt&gt;true&lt;/tt&gt;.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

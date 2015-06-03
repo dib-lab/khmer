@@ -1,0 +1,734 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="specialization_pexpattern" data-page="PexPattern">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>PexPattern - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#specialization">Spec</a>
+<span>PexPattern<div><div>Provides a fast approximate string matching filter that splits the needle into several pieces that are
+searched with a multiple exact string matching algorithm and later verified.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+  <tr>
+    <th>Extends</th>
+    <td>
+      <a href="class_Pattern.html" data-lang-entity="class">Pattern</a>
+      
+    </td>
+  </tr>
+  
+
+  
+
+  
+  <tr>
+    <th>All Extended</dt>
+    <td>
+    <a href="class_Pattern.html" data-lang-entity="class">Pattern</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_HierarchicalPexPattern.html" data-lang-entity="specialization">HierarchicalPexPattern</a>, 
+    <a href="specialization_NonHierarchicalPexPattern.html" data-lang-entity="specialization">NonHierarchicalPexPattern</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/find.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TNeedle, typename TVerification, typename TMultiFinder&gt;
+class Pattern&lt;TNeedle, Pex&lt;TVerification, TMultiFinder&gt; &gt;;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TNeedle</a></code></th>
+        <td>The needle type. Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a></td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TVerification</a></code></th>
+        <td>Determines if the hierarchical verification proposed by Navarro and Beaza-Yates is used or
+not.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TMultiFinder</a></code></th>
+        <td>Specifies the algorithm for the multiple exact string matching algorithm. Type: AhoCorasick.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PexPattern%23getScore" title="#PexPattern#getScore (interface function)" data-lang-entity="interface_function">TScoreValue getScore(pattern);</a></code></span>
+    <span class="summary_desc"><div>Score of the last found match in approximate searching.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PexPattern%23scoreLimit" title="#PexPattern#scoreLimit (interface function)" data-lang-entity="interface_function">TScoreValue scoreLimit(pattern);</a></code></span>
+    <span class="summary_desc"><div>The minimal score a match must reach in approximate searching.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PexPattern%23setSoreLimit" title="#PexPattern#setSoreLimit (interface function)" data-lang-entity="interface_function">void setScoreLimit(pattern, limit);</a></code></span>
+    <span class="summary_desc"><div>Set the minimal score a match must reach in approximate serach.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+<h3 data-toc="hidden">Interface Functions Inherited From <a href="class_Pattern.html" data-lang-entity="class">Pattern</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#getBeginScore" data-lang-entity="interface_function">getBeginScore</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#host" data-lang-entity="interface_function">host</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#needle" data-lang-entity="interface_function">needle</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#position" data-lang-entity="interface_function">position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#scoringScheme" data-lang-entity="interface_function">scoringScheme</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#setNeedle" data-lang-entity="interface_function">setNeedle</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#setScoringScheme" data-lang-entity="interface_function">setScoringScheme</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+
+
+
+
+<h3 data-toc="hidden">Interface Metafunctions Inherited From <a href="class_Pattern.html" data-lang-entity="class">Pattern</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Container" data-lang-entity="interface_metafunction">Container</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Difference" data-lang-entity="interface_metafunction">Difference</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Host" data-lang-entity="interface_metafunction">Host</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Needle" data-lang-entity="interface_metafunction">Needle</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#PexMultiFinder" data-lang-entity="interface_metafunction">PexMultiFinder</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Position" data-lang-entity="interface_metafunction">Position</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#ScoringScheme" data-lang-entity="interface_metafunction">ScoringScheme</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Size" data-lang-entity="interface_metafunction">Size</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="class_Pattern.html#Pattern#Value" data-lang-entity="interface_metafunction">Value</a></code></span></li>
+  
+</ul>
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>There are two defaults available: <tt>PexHierarchical</tt> and <tt>PexNonHiearchical</tt> (e.g.
+<tt>Pattern&lt;CharString&gt;, PexHierarchical&gt;</tt> that both use the <a href="specialization_AhoCorasickPattern.html" data-lang-entity="specialization">Aho-Corasick</a> algorithm for the multiple exact string matching.</p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PexPattern#getScore" class="signature first" data-lang-entity="interface_function">
+      <code>TScoreValue getScore(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Score of the last found match in approximate searching.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>A pex pattern that can be used for approximate searching.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TScoreValue</code></th>
+        <td>The score of the last match found using <tt>pattern</tt>. If no match was found then the value
+is undefined.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PexPattern#scoreLimit" class="signature" data-lang-entity="interface_function">
+      <code>TScoreValue scoreLimit(pattern);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The minimal score a match must reach in approximate searching.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pattern</code>
+            
+        
+      </th>
+      <td>The pattern to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TScoreValue</code></th>
+        <td>The score limit value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PexPattern#setSoreLimit" class="signature" data-lang-entity="interface_function">
+      <code>void setScoreLimit(pattern, limit);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Set the minimal score a match must reach in approximate serach.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pattern</code>
+            
+        
+      </th>
+      <td>The pattern to set the limit for.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">limit</code>
+            
+        
+      </th>
+      <td>The limit score value to set.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TScoreValue</code></th>
+        <td>The score limit value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class PexPattern
+ * 
+ * @extends Pattern
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Provides a fast approximate string matching filter that splits the
+ *        needle into several pieces that are searched with a multiple exact
+ *        string matching algorithm and later verified.
+ * 
+ * @signature template &lt;typename TNeedle, typename TVerification, typename
+ *            TMultiFinder&gt; class Pattern&lt;TNeedle, Pex&lt;TVerification,
+ *            TMultiFinder&gt; &gt;;
+ * 
+ * @tparam TNeedle The needle type. Type: @link ContainerConcept @endlink
+ * @tparam TVerification Determines if the hierarchical verification proposed by
+ *                       Navarro and Beaza-Yates is used or not.
+ * @tparam TMultiFinder Specifies the algorithm for the multiple exact string
+ *                      matching algorithm. Type: AhoCorasick.
+ * 
+ * There are two defaults available: &lt;tt&gt;PexHierarchical&lt;/tt&gt; and
+ * &lt;tt&gt;PexNonHiearchical&lt;/tt&gt; (e.g. &lt;tt&gt;Pattern&amp;lt;CharString&amp;gt;,
+ * PexHierarchical&amp;gt;&lt;/tt&gt; that both use the @link AhoCorasickPattern Aho-
+ * Corasick @endlink algorithm for the multiple exact string matching.
+ * 
+ * @fn PexPattern#getScore
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Score of the last found match in approximate searching.
+ * 
+ * @signature TScoreValue getScore(pattern);
+ * 
+ * @param[in] pattern A pex pattern that can be used for approximate searching.
+ * 
+ * @return TScoreValue The score of the last match found using &lt;tt&gt;pattern&lt;/tt&gt;.
+ *                     If no match was found then the value is undefined.
+ * 
+ * @fn PexPattern#scoreLimit
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief The minimal score a match must reach in approximate searching.
+ * 
+ * @signature TScoreValue scoreLimit(pattern);
+ * 
+ * @param[in] pattern The pattern to query.
+ * 
+ * @return TScoreValue The score limit value.
+ * 
+ * @fn PexPattern#setSoreLimit
+ * 
+ * @headerfile &lt;seqan/find.h&gt;
+ * 
+ * @brief Set the minimal score a match must reach in approximate serach.
+ * 
+ * @signature void setScoreLimit(pattern, limit);
+ * 
+ * @param[in,out] pattern The pattern to set the limit for.
+ * @param[in] limit The limit score value to set.
+ * 
+ * @return TScoreValue The score limit value.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,6 @@
+endPositionH(seed1) = 6
+endPositionV(seed1) = 6
+endPositionH(seed2) = 9
+endPositionV(seed2) = 9
+endPositionH(seed3) = 14
+endPositionV(seed3) = 13

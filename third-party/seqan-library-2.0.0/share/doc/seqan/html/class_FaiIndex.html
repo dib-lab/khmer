@@ -1,0 +1,1566 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_faiindex" data-page="FaiIndex">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>FaiIndex - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>FaiIndex<div><div>Data structure for access to FAI indices.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/seq_io.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>class FaiIndex;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%3A%3AFaiIndex" title="#FaiIndex::FaiIndex (interface function)" data-lang-entity="member_function">FaiIndex::FaiIndex();</a></code></span>
+    <span class="summary_desc"><div>Constructor.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23build" title="#FaiIndex#build (interface function)" data-lang-entity="interface_function">bool build(faiIndex, seqFileName[, faiFileName]);</a></code></span>
+    <span class="summary_desc"><div>Create a FaiIndex from FASTA file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23clear" title="#FaiIndex#clear (interface function)" data-lang-entity="interface_function">void clear(faiIndex);</a></code></span>
+    <span class="summary_desc"><div>Reset a FaiIndex object to the state after default construction.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23getIdByName" title="#FaiIndex#getIdByName (interface function)" data-lang-entity="interface_function">bool getIdByName(rID, faiIndex, name);</a></code></span>
+    <span class="summary_desc"><div>Return reference ID (numeric index in the file) of a sequence in a FAI file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23numSeqs" title="#FaiIndex#numSeqs (interface function)" data-lang-entity="interface_function">__uint64 numSeqs(faiIndex);</a></code></span>
+    <span class="summary_desc"><div>Return the number of sequences known to a FaiIndex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23open" title="#FaiIndex#open (interface function)" data-lang-entity="interface_function">bool open(faiIndex, fastaFilename [, faiFileName]);</a></code></span>
+    <span class="summary_desc"><div>Open a FaiIndex object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23readRecord" title="#FaiIndex#readRecord (interface function)" data-lang-entity="interface_function">void readRecord(faiIndex, fastaFileName[, faiFileName]);</a></code></span>
+    <span class="summary_desc"><div>Read a FAI index from file.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23readRegion" title="#FaiIndex#readRegion (interface function)" data-lang-entity="interface_function">void readRegion(str, faiIndex, rID, beginPos, endPos);, void readRegion(str, faiIndex, region);</a></code></span>
+    <span class="summary_desc"><div>Read a region through an FaiIndex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23readSequence" title="#FaiIndex#readSequence (interface function)" data-lang-entity="interface_function">void readSequence(str, faiIndex, rID);</a></code></span>
+    <span class="summary_desc"><div>Load a whole sequence from a FaiIndex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23save" title="#FaiIndex#save (interface function)" data-lang-entity="interface_function">bool save(faiIndex[, faiFileName]);</a></code></span>
+    <span class="summary_desc"><div>Save a FaiIndex object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23sequenceLength" title="#FaiIndex#sequenceLength (interface function)" data-lang-entity="interface_function">__uint64 sequenceLength(faiIndex, rID);</a></code></span>
+    <span class="summary_desc"><div>Return length of the sequence with the given id in the FaiIndex.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#FaiIndex%23sequenceName" title="#FaiIndex#sequenceName (interface function)" data-lang-entity="interface_function">CharString sequenceName(faiIndex, rID);</a></code></span>
+    <span class="summary_desc"><div>Return the name of the sequence with the given id in the FaiIndex.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>FAI indices allow the rast random access to sequences or parts of sequences in a FASTA file. Originally, they were
+introduced in the <a href="http://samtools.sourceforge.net/samtools.shtml">samtools</a> program.</p><p>Also see the <a href="http://seqan.readthedocs.org/en/develop/Tutorial/IndexedFastaIO.html">Indexed FASTA I/O
+Tutorial</a>.</p><h3>Example</h3><p>The following example demonstrates the usage of the FaiIndex class.</p><div data-src-path="demos/seq_io/fai_index_example.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/seq_io.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">CharString</span> <span class="n">path</span> <span class="o">=</span> <span class="n">SEQAN_PATH_TO_ROOT</span><span class="p">();</span>
+    <span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;/demos/seq_io/example.fa&quot;</span><span class="p">);</span>
+
+    <span class="n">FaiIndex</span> <span class="n">faiIndex</span><span class="p">;</span>
+
+    <span class="c1">// Try to read the FAI index.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">open</span><span class="p">(</span><span class="n">faiIndex</span><span class="p">,</span> <span class="n">toCString</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Could not read the FAI index.  Not fatal, we can just build it.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Try to build the FAI index (in memory) if reading was unsuccessful.  If</span>
+    <span class="c1">// building into memory succeeded, we try to write it out.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">build</span><span class="p">(</span><span class="n">faiIndex</span><span class="p">,</span> <span class="n">toCString</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;FATAL: Could not build FAI index.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">save</span><span class="p">(</span><span class="n">faiIndex</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;FATAL: Could not write out FAI index after building.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Now, read the first 1000 characters of chr1.</span>
+    <span class="kt">unsigned</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">getIdByName</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">faiIndex</span><span class="p">,</span> <span class="s">&quot;chr&quot;</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;FATAL: chr1 not found in FAI index.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">CharString</span> <span class="n">seq</span><span class="p">;</span>
+    <span class="n">readRegion</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">faiIndex</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+
+    <span class="c1">// Now print the first 100 characters we just read.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;chr:1-100 = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">seq</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/seq_io/fai_index_example.cpp" target="_top">demos/seq_io/fai_index_example.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/seq_io/fai_index_example.cpp.stdout">chr:1-100 = CCTATCTAATAATATACCTTATACTGGACTAGTGCCAATATTAAAATGAAGTGGGCGTAGTGTGTAATTTGATTGGGTGGAGGTGTGGCTTTGGCGTGCT
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+<div class="member_function_details" data-lang-entity-container="member_function">
+  <h2 data-lang-entity="member_function">Member Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FaiIndex::FaiIndex" class="signature first" data-lang-entity="member_function">
+      <code>FaiIndex::FaiIndex();</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Constructor.</div>
+    </div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="FaiIndex#build" class="signature first" data-lang-entity="interface_function">
+      <code>bool build(faiIndex, seqFileName[, faiFileName]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Create a FaiIndex from FASTA file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to build into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqFileName</code>
+            
+        
+      </th>
+      <td>Path to the FASTA file to build an index for. Type: <tt>char const *</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiFileName</code>
+            
+        
+      </th>
+      <td>Path to the FAI file to use as the index file. Type: <tt>char const *</tt>.
+Default: <tt>"${seqFileName}.fai"</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(faiIndex);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Reset a FaiIndex object to the state after default construction.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#getIdByName" class="signature" data-lang-entity="interface_function">
+      <code>bool getIdByName(rID, faiIndex, name);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return reference ID (numeric index in the file) of a sequence in a FAI file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">name</code>
+            
+        
+      </th>
+      <td>The name of the sequence to look the id up for. Type: <a href="concept_ContainerConcept.html" data-lang-entity="concept">ContainerConcept</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">rID</code>
+            
+        
+      </th>
+      <td>The id of the sequence is written here.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> if a sequence with the given name is known in the index, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#numSeqs" class="signature" data-lang-entity="interface_function">
+      <code>__uint64 numSeqs(faiIndex);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the number of sequences known to a FaiIndex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to query.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>__uint64</code></th>
+        <td>The number of sequences in the index.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#open" class="signature" data-lang-entity="interface_function">
+      <code>bool open(faiIndex, fastaFilename [, faiFileName]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Open a FaiIndex object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to write out.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fastaFilename</code>
+            
+        
+      </th>
+      <td>Path to the FASTA file to build an index for. Type: <tt>char const *</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiFileName</code>
+            
+        
+      </th>
+      <td>The name of the FAI file to open. This parameter is optional. By default, the FAI
+file name is derived from the FASTA file name. Type: <tt>char
+const *</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#readRecord" class="signature" data-lang-entity="interface_function">
+      <code>void readRecord(faiIndex, fastaFileName[, faiFileName]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read a FAI index from file.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to read into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">fastaFileName</code>
+            
+        
+      </th>
+      <td>Path to the FASTA file to read. Type: <tt>char const *</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiFileName</code>
+            
+        
+      </th>
+      <td>Path to the FAI file to read. Type: <tt>char const *</tt>. Defaults to
+<tt>"${fastaFileName}.fai"</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#readRegion" class="signature" data-lang-entity="interface_function">
+      <code>void readRegion(str, faiIndex, rID, beginPos, endPos);
+void readRegion(str, faiIndex, region);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Read a region through an FaiIndex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">str</code>
+            
+        
+      </th>
+      <td>The <a href="class_String.html" data-lang-entity="class">String</a> to read the sequence into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">rID</code>
+            
+        
+      </th>
+      <td>The id of the sequence to read (Type: <tt>unsigned).</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">beginPos</code>
+            
+        
+      </th>
+      <td>The begin position of the region to read (Type: <tt>unsigned).</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">endPos</code>
+            
+        
+      </th>
+      <td>The end position of the region to read (Type: <tt>unsigned).</tt></td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">region</code>
+            
+        
+      </th>
+      <td>The <a href="class_GenomicRegion.html" data-lang-entity="class">GenomicRegion</a> to read.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#readSequence" class="signature" data-lang-entity="interface_function">
+      <code>void readSequence(str, faiIndex, rID);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Load a whole sequence from a FaiIndex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">str</code>
+            
+        
+      </th>
+      <td>The <a href="class_String.html" data-lang-entity="class">String</a> to read into.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to read from.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">seqID</code>
+            
+        
+      </th>
+      <td>The index of the sequence in the file.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#save" class="signature" data-lang-entity="interface_function">
+      <code>bool save(faiIndex[, faiFileName]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Save a FaiIndex object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to write out.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiFileName</code>
+            
+        
+      </th>
+      <td>The name of the FAI file to write to. This parameter is optional only if the FAI index knows
+the FAI file name from a previous <a href="class_FaiIndex.html#FaiIndex#build" data-lang-entity="interface_function">build</a> call. By default, the FAI
+file name from the previous call to <a href="class_FaiIndex.html#FaiIndex#build" data-lang-entity="interface_function">build</a> is used. Type: <tt>char
+const *</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>bool</code></th>
+        <td><tt>true</tt> on success, <tt>false</tt> otherwise.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#sequenceLength" class="signature" data-lang-entity="interface_function">
+      <code>__uint64 sequenceLength(faiIndex, rID);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return length of the sequence with the given id in the FaiIndex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">rID</code>
+            
+        
+      </th>
+      <td>The id of the sequence to get the length of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>__uint64</code></th>
+        <td>The length of the sequence with index rID in faiIndex.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="FaiIndex#sequenceName" class="signature" data-lang-entity="interface_function">
+      <code>CharString sequenceName(faiIndex, rID);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the name of the sequence with the given id in the FaiIndex.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">faiIndex</code>
+            
+        
+      </th>
+      <td>The FaiIndex to query.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">rID</code>
+            
+        
+      </th>
+      <td>The index of the sequence.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>CharString</code></th>
+        <td>The name of the sequence with the given id.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class FaiIndex
+ * 
+ * @headerfile &lt;seqan/seq_io.h&gt;
+ * 
+ * @brief Data structure for access to FAI indices.
+ * 
+ * @signature class FaiIndex;
+ * 
+ * FAI indices allow the rast random access to sequences or parts of sequences
+ * in a FASTA file. Originally, they were introduced in the &lt;a
+ * href=&#34;http://samtools.sourceforge.net/samtools.shtml&#34;&gt;samtools&lt;/a&gt; program.
+ * 
+ * Also see the &lt;a href=&#34;http://seqan.readthedocs.org/en/develop/Tutorial/Indexe
+ * dFastaIO.html&#34;&gt;Indexed FASTA I/O Tutorial&lt;/a&gt;.
+ * 
+ * @section Example
+ * 
+ * The following example demonstrates the usage of the FaiIndex class.
+ * 
+ * @include demos/seq_io/fai_index_example.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/seq_io/fai_index_example.cpp.stdout
+ * 
+ * @fn FaiIndex::FaiIndex
+ * 
+ * @brief Constructor.
+ * 
+ * @signature FaiIndex::FaiIndex();
+ * 
+ * @fn FaiIndex#clear
+ * 
+ * @brief Reset a FaiIndex object to the state after default construction.
+ * 
+ * @signature void clear(faiIndex);
+ * 
+ * @param[in,out] faiIndex The FaiIndex to clear.
+ * 
+ * @fn FaiIndex#getIdByName
+ * 
+ * @brief Return reference ID (numeric index in the file) of a sequence in a FAI
+ *        file.
+ * 
+ * @signature bool getIdByName(rID, faiIndex, name);
+ * 
+ * @param[in] faiIndex The FaiIndex to query.
+ * @param[in] name The name of the sequence to look the id up for. Type: @link
+ *                 ContainerConcept @endlink.
+ * @param[out] rID The id of the sequence is written here.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; if a sequence with the given name is known in the
+ *              index, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FaiIndex#sequenceLength
+ * 
+ * @brief Return length of the sequence with the given id in the FaiIndex.
+ * 
+ * @signature __uint64 sequenceLength(faiIndex, rID);
+ * 
+ * @param[in] faiIndex The FaiIndex to query.
+ * @param[in] rID The id of the sequence to get the length of.
+ * 
+ * @return __uint64 The length of the sequence with index rID in faiIndex.
+ * 
+ * @fn FaiIndex#sequenceName
+ * 
+ * @brief Return the name of the sequence with the given id in the FaiIndex.
+ * 
+ * @signature CharString sequenceName(faiIndex, rID);
+ * 
+ * @param[in] faiIndex The FaiIndex to query.
+ * @param[in] rID The index of the sequence.
+ * 
+ * @return CharString The name of the sequence with the given id.
+ * 
+ * @fn FaiIndex#numSeqs
+ * 
+ * @brief Return the number of sequences known to a FaiIndex.
+ * 
+ * @signature __uint64 numSeqs(faiIndex);
+ * 
+ * @param[in] faiIndex The FaiIndex to query.
+ * 
+ * @return __uint64 The number of sequences in the index.
+ * 
+ * @fn FaiIndex#readRegion
+ * 
+ * @brief Read a region through an FaiIndex.
+ * 
+ * @signature void readRegion(str, faiIndex, rID, beginPos, endPos);
+ * @signature void readRegion(str, faiIndex, region);
+ * 
+ * @param[out] str The @link String @endlink to read the sequence into.
+ * @param[in] faiIndex The FaiIndex to read from.
+ * @param[in] rID The id of the sequence to read (Type: &lt;tt&gt;unsigned).
+ * @param[in] beginPos The begin position of the region to read (Type:
+ *                     &lt;tt&gt;unsigned).
+ * @param[in] endPos The end position of the region to read (Type:
+ *                   &lt;tt&gt;unsigned).
+ * @param[in] region The @link GenomicRegion @endlink to read.
+ * 
+ * @fn FaiIndex#readSequence
+ * 
+ * @brief Load a whole sequence from a FaiIndex.
+ * 
+ * @signature void readSequence(str, faiIndex, rID);
+ * 
+ * @param[out] str The @link String @endlink to read into.
+ * @param[in] faiIndex The FaiIndex to read from.
+ * @param[in] seqID The index of the sequence in the file.
+ * 
+ * @fn FaiIndex#readRecord
+ * 
+ * @brief Read a FAI index from file.
+ * 
+ * @signature void readRecord(faiIndex, fastaFileName[, faiFileName]);
+ * 
+ * @param[out] faiIndex The FaiIndex to read into.
+ * @param[in] fastaFileName Path to the FASTA file to read. Type: &lt;tt&gt;char const
+ *                          *&lt;/tt&gt;.
+ * @param[in] faiFileName Path to the FAI file to read. Type: &lt;tt&gt;char const
+ *                        *&lt;/tt&gt;. Defaults to &lt;tt&gt;&#34;${fastaFileName}.fai&#34;&lt;/tt&gt;.
+ * 
+ * @fn FaiIndex#open
+ * 
+ * @brief Open a FaiIndex object.
+ * 
+ * @signature bool open(faiIndex, fastaFilename [, faiFileName]);
+ * 
+ * @param[in] faiIndex The FaiIndex to write out.
+ * @param[in] fastaFilename Path to the FASTA file to build an index for. Type:
+ *                          &lt;tt&gt;char const *&lt;/tt&gt;.
+ * @param[in] faiFileName The name of the FAI file to open. This parameter is
+ *                        optional. By default, the FAI file name is derived
+ *                        from the FASTA file name. Type: &lt;tt&gt;char const *&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FaiIndex#save
+ * 
+ * @brief Save a FaiIndex object.
+ * 
+ * @signature bool save(faiIndex[, faiFileName]);
+ * 
+ * @param[in] faiIndex The FaiIndex to write out.
+ * @param[in] faiFileName The name of the FAI file to write to. This parameter
+ *                        is optional only if the FAI index knows the FAI file
+ *                        name from a previous @link FaiIndex#build @endlink
+ *                        call. By default, the FAI file name from the previous
+ *                        call to @link FaiIndex#build @endlink is used. Type:
+ *                        &lt;tt&gt;char const *&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ * 
+ * @fn FaiIndex#build
+ * 
+ * @brief Create a FaiIndex from FASTA file.
+ * 
+ * @signature bool build(faiIndex, seqFileName[, faiFileName]);
+ * 
+ * @param[out] faiIndex The FaiIndex to build into.
+ * @param[in] seqFileName Path to the FASTA file to build an index for. Type:
+ *                        &lt;tt&gt;char const *&lt;/tt&gt;.
+ * @param[in] faiFileName Path to the FAI file to use as the index file. Type:
+ *                        &lt;tt&gt;char const *&lt;/tt&gt;. Default:
+ *                        &lt;tt&gt;&#34;${seqFileName}.fai&#34;&lt;/tt&gt;.
+ * 
+ * @return bool &lt;tt&gt;true&lt;/tt&gt; on success, &lt;tt&gt;false&lt;/tt&gt; otherwise.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

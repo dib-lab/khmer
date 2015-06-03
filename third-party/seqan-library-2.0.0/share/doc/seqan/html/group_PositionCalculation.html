@@ -1,0 +1,937 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="group_positioncalculation" data-page="PositionCalculation">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Position Calculation - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+<h1 data-lang-entity="group" data-pimped="true">
+  <a href="page_LanguageEntities.html#group">Group</a> <span>Position Calculation
+  <div><div>Position calculation functions.</div></div></span>
+</h1>
+
+<!--
+ =============================================================================
+  Grouped Overview
+ =============================================================================
+-->
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Tags Overview -->
+
+
+
+
+
+<!-- Grouped Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Grouped Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posAdd" title="#PositionCalculation#posAdd (interface function)" data-lang-entity="interface_function">TPos posAdd(pos, delta);</a></code></span>
+    <span class="summary_desc"><div>Returns a position where the local offset is increased by a value <tt>delta</tt>.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posAddAndCheck" title="#PositionCalculation#posAddAndCheck (interface function)" data-lang-entity="interface_function">bool posAddAndCheck(pos, delta, text);</a></code></span>
+    <span class="summary_desc"><div>Increases the local offset of a position by a value <tt>delta</tt> and check for overflow.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posInc" title="#PositionCalculation#posInc (interface function)" data-lang-entity="interface_function">void posInc(pos);</a></code></span>
+    <span class="summary_desc"><div>Increments the local offset of a position type.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posNext" title="#PositionCalculation#posNext (interface function)" data-lang-entity="interface_function">TPos posNext(pos);</a></code></span>
+    <span class="summary_desc"><div>Returns a position where the local offset is increased by one.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posPrev" title="#PositionCalculation#posPrev (interface function)" data-lang-entity="interface_function">TPos posPrev(pos);</a></code></span>
+    <span class="summary_desc"><div>Returns a position where the local offset is decreased by one.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#PositionCalculation%23posSub" title="#PositionCalculation#posSub (interface function)" data-lang-entity="interface_function">TPos posSub(pos, delta);</a></code></span>
+    <span class="summary_desc"><div>Returns a position where the local offset is decreased by a value <tt>delta</tt>.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Grouped Metafunctions Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Grouped Details
+ =============================================================================
+-->
+
+<!-- Grouped Tags Details -->
+
+
+
+
+<!-- Grouped macros Details -->
+
+
+
+
+<!-- Grouped Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Grouped Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="PositionCalculation#posAdd" class="signature first" data-lang-entity="interface_function">
+      <code>TPos posAdd(pos, delta);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a position where the local offset is increased by a value <tt>delta</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">delta</code>
+            
+        
+      </th>
+      <td>Increase the local offset of <tt>pos</tt> by this value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>Returns a value of the same type as <tt>pos</tt> where <tt>seqOfs</tt> is increased by <tt>delta</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posInc</a></li>
+    
+    <li><a class="error">posNext</a></li>
+    
+    <li><a class="error">posPrev</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PositionCalculation#posAddAndCheck" class="signature" data-lang-entity="interface_function">
+      <code>bool posAddAndCheck(pos, delta, text);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Increases the local offset of a position by a value <tt>delta</tt> and check for overflow.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">delta</code>
+            
+        
+      </th>
+      <td>Increase the local offset of <tt>pos</tt> by this value.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">text</code>
+            
+        
+      </th>
+      <td>The <a href="concept_TextConcept.html" data-lang-entity="concept">text</a> to use for checking.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posAdd</a></li>
+    
+    <li><a class="error">posInc</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PositionCalculation#posInc" class="signature" data-lang-entity="interface_function">
+      <code>void posInc(pos);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Increments the local offset of a position type.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>. In both
+cases, <tt>seqOfs</tt> will be incremented by one.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posAdd</a></li>
+    
+    <li><a class="error">posNext</a></li>
+    
+    <li><a class="error">posPrev</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PositionCalculation#posNext" class="signature" data-lang-entity="interface_function">
+      <code>TPos posNext(pos);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a position where the local offset is increased by one.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>Returns a value of the same type as <tt>pos</tt> where <tt>seqOfs</tt> is increased by one.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posAdd</a></li>
+    
+    <li><a class="error">posInc</a></li>
+    
+    <li><a class="error">posPrev</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PositionCalculation#posPrev" class="signature" data-lang-entity="interface_function">
+      <code>TPos posPrev(pos);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a position where the local offset is decreased by one.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>The predecessor. TPos is the type of <tt>pos</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posAdd</a></li>
+    
+    <li><a class="error">posInc</a></li>
+    
+    <li><a class="error">posNext</a></li>
+    
+  </ul>
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="PositionCalculation#posSub" class="signature" data-lang-entity="interface_function">
+      <code>TPos posSub(pos, delta);</code>
+    </h3>
+  </div>
+
+  
+  <dl>
+    <dt>Defined in</dt>
+    <dd>
+      
+      &lt;seqan/sequence.h&gt;
+      
+      
+    </dd>
+  </dl>
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a position where the local offset is decreased by a value <tt>delta</tt>.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>A position type, an integer with <tt>seqOfs</tt> or a pair <tt>(seqNo, seqOfs)</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">delta</code>
+            
+        
+      </th>
+      <td>Decrease the local offset of <tt>pos</tt> by this value.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TPos</code></th>
+        <td>Returns a value of the same type as <tt>pos</tt> where <tt>seqOfs</tt> is decreased by <tt>delta</tt>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  <h4>See Also</h4>
+  <ul>
+    
+    <li><a class="error">posAdd</a></li>
+    
+    <li><a class="error">posInc</a></li>
+    
+    <li><a class="error">posNext</a></li>
+    
+  </ul>
+  
+  
+
+</div>
+
+
+
+<!-- Grouped Metafunctions Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @defgroup PositionCalculation Position Calculation
+ * 
+ * @brief Position calculation functions.
+ * 
+ * @fn PositionCalculation#posPrev
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns a position where the local offset is decreased by one.
+ * 
+ * @signature TPos posPrev(pos);
+ * 
+ * @param[in] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;.
+ * 
+ * @return TPos The predecessor. TPos is the type of &lt;tt&gt;pos&lt;/tt&gt;.
+ * 
+ * @see PositionCalculation#posNext
+ * @see PositionCalculation#posInc
+ * @see PositionCalculation#posAdd
+ * 
+ * @fn PositionCalculation#posInc
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Increments the local offset of a position type.
+ * 
+ * @signature void posInc(pos);
+ * 
+ * @param[in,out] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                    &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;. In both cases, &lt;tt&gt;seqOfs&lt;/tt&gt;
+ *                    will be incremented by one.
+ * 
+ * @see PositionCalculation#posNext
+ * @see PositionCalculation#posPrev
+ * @see PositionCalculation#posAdd
+ * 
+ * @fn PositionCalculation#posNext
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns a position where the local offset is increased by one.
+ * 
+ * @signature TPos posNext(pos);
+ * 
+ * @param[in] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;.
+ * 
+ * @return TPos Returns a value of the same type as &lt;tt&gt;pos&lt;/tt&gt; where
+ *              &lt;tt&gt;seqOfs&lt;/tt&gt; is increased by one.
+ * 
+ * @see PositionCalculation#posInc
+ * @see PositionCalculation#posPrev
+ * @see PositionCalculation#posAdd
+ * 
+ * @fn PositionCalculation#posAdd
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns a position where the local offset is increased by a value
+ *        &lt;tt&gt;delta&lt;/tt&gt;.
+ * 
+ * @signature TPos posAdd(pos, delta);
+ * 
+ * @param[in] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;.
+ * @param[in] delta Increase the local offset of &lt;tt&gt;pos&lt;/tt&gt; by this value.
+ * 
+ * @return TPos Returns a value of the same type as &lt;tt&gt;pos&lt;/tt&gt; where
+ *              &lt;tt&gt;seqOfs&lt;/tt&gt; is increased by &lt;tt&gt;delta&lt;/tt&gt;.
+ * 
+ * @see PositionCalculation#posInc
+ * @see PositionCalculation#posPrev
+ * @see PositionCalculation#posNext
+ * 
+ * @fn PositionCalculation#posAddAndCheck
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Increases the local offset of a position by a value &lt;tt&gt;delta&lt;/tt&gt; and
+ *        check for overflow.
+ * 
+ * @signature bool posAddAndCheck(pos, delta, text);
+ * 
+ * @param[in,out] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                    &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;.
+ * @param[in] delta Increase the local offset of &lt;tt&gt;pos&lt;/tt&gt; by this value.
+ * @param[in] text The @link TextConcept text @endlink to use for checking.
+ * 
+ * @see PositionCalculation#posAdd
+ * @see PositionCalculation#posInc
+ * 
+ * @fn PositionCalculation#posSub
+ * 
+ * @headerfile &lt;seqan/sequence.h&gt;
+ * 
+ * @brief Returns a position where the local offset is decreased by a value
+ *        &lt;tt&gt;delta&lt;/tt&gt;.
+ * 
+ * @signature TPos posSub(pos, delta);
+ * 
+ * @param[in] pos A position type, an integer with &lt;tt&gt;seqOfs&lt;/tt&gt; or a pair
+ *                &lt;tt&gt;(seqNo, seqOfs)&lt;/tt&gt;.
+ * @param[in] delta Decrease the local offset of &lt;tt&gt;pos&lt;/tt&gt; by this value.
+ * 
+ * @return TPos Returns a value of the same type as &lt;tt&gt;pos&lt;/tt&gt; where
+ *              &lt;tt&gt;seqOfs&lt;/tt&gt; is decreased by &lt;tt&gt;delta&lt;/tt&gt;.
+ * 
+ * @see PositionCalculation#posAdd
+ * @see PositionCalculation#posInc
+ * @see PositionCalculation#posNext
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_allocator" data-page="Allocator">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Allocator - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Allocator<div><div>Manager for allocated memory.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Subcl's</dt>
+    <td>
+    <a href="specialization_MultiPoolAllocator.html" data-lang-entity="specialization">MultiPoolAllocator</a>, 
+    <a href="specialization_SimpleAllocator.html" data-lang-entity="specialization">SimpleAllocator</a>, 
+    <a href="specialization_SinglePoolAllocator.html" data-lang-entity="specialization">SinglePoolAllocator</a>
+    
+    </td>
+  </tr>
+  
+
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/basic.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSpec&gt;
+class Allocator;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSpec</a></code></th>
+        <td>The specializing type.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Allocator%23allocate" title="#Allocator#allocate (interface function)" data-lang-entity="interface_function">void allocate(allocator, data, count[, usageTag]);</a></code></span>
+    <span class="summary_desc"><div>Allocates memory from heap.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Allocator%23clear" title="#Allocator#clear (interface function)" data-lang-entity="interface_function">void clear(allocator);</a></code></span>
+    <span class="summary_desc"><div>Deallocates all memory blocks.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Allocator%23deallocate" title="#Allocator#deallocate (interface function)" data-lang-entity="interface_function">void deallocate(object, data, count[, usageTag])</a></code></span>
+    <span class="summary_desc"><div>Deallocates memory.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><h3>Remarks</h3><p>There are two reasons for using non-trivial allocators:</p><p><ol>
+<li>Allocators support the function <a href="class_Allocator.html#Allocator#clear" data-lang-entity="interface_function">clear</a> for a fast deallocation of all allocated
+memory blocks.</li>
+<li>Some allocators are faster in allocating an deallocating memory. Pool allocators like e.g.
+<a href="specialization_SinglePoolAllocator.html" data-lang-entity="specialization">SinglePoolAllocator</a> or <a href="specialization_MultiPoolAllocator.html" data-lang-entity="specialization">MultiPoolAllocator</a> speed up
+<a href="class_Allocator.html#Allocator#allocate" data-lang-entity="interface_function">allocate</a>, <a href="class_Allocator.html#Allocator#deallocate" data-lang-entity="interface_function">*</a>, and
+<a href="class_Allocator.html#Allocator#clear" data-lang-entity="interface_function">clear</a> for pooled memory blocks.</li>
+</ol></p></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Allocator#allocate" class="signature first" data-lang-entity="interface_function">
+      <code>void allocate(allocator, data, count[, usageTag]);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Allocates memory from heap.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>Number of items that could be stored in the allocated memory. The type of the allocated
+items is given by the type of <tt>data</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">usageTag</code>
+            
+        
+      </th>
+      <td>A tag the specifies the purpose for the allocated memory. Values:
+<a href="group_AllocatorUsageTags.html" data-lang-entity="group">AllocatorUsageTags</a>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">allocator</code>
+            
+        
+      </th>
+      <td>Allocator object. <tt>allocator</tt> is conceptually the "owner" of the allocated
+memory. Objects of all types can be used as allocators. If no special behavior is
+implemented, default functions allocation/deallocation are applied that uses standard
+<tt>new</tt> and <tt>delete</tt> operators. Types: Allocator</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>The function allocates at least <tt>count*sizeof(data)</tt> bytes. The allocated memory is large enough to hold
+<tt>count</tt> objects of type <tt>T</tt>, where <tt>T *</tt> is type of <tt>data</tt>.</p><p>These objects are not constructed by <tt>allocate</tt>.</p><p>Use e.g. one of the functions <a href="global_function_valueConstruct.html" data-lang-entity="global_function">valueConstruct</a>, <a href="global_function_arrayConstruct.html" data-lang-entity="global_function">arrayConstruct</a>, <a href="global_function_arrayConstructCopy.html" data-lang-entity="global_function">arrayConstructCopy</a> or <a href="global_function_arrayFill.html" data-lang-entity="global_function">arrayFill</a> to construct the objects. A <tt>new</tt> operator which is part of the C++
+standard (defined in <tt>&lt;new&gt;</tt>) can also be used to construct objects at a given memory address.</p><h4>Remarks</h4><p>All allocated memory blocks should be deallocated by the corresponding function <a href="class_Allocator.html#Allocator#deallocate" data-lang-entity="interface_function">deallocate</a>.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Allocator#clear" class="signature" data-lang-entity="interface_function">
+      <code>void clear(allocator);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Deallocates all memory blocks.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">The</code>
+            
+        
+      </th>
+      <td>allocator to clear.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><h4>Remarks</h4><p>This function deallocates all memory block sthat were allocated using <tt>allocate()</tt> for <tt>allocator</tt>.
+The memory is not pooled but directly passed back to the heap manager.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Allocator#deallocate" class="signature" data-lang-entity="interface_function">
+      <code>void deallocate(object, data, count[, usageTag])</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Deallocates memory.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">object</code>
+            
+        
+      </th>
+      <td>Allocator object.<tt>object</tt> is conceptually the "owner" of the allocated memory.
+Objects of all types can be used as allocators. If no special behavior is implemented,
+default functions allocation/deallocation are applied that uses standard <tt>new</tt>
+and <tt>delete</tt> operators. Types: Allocator</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="out" title="OUT parameters are modified and used as a means to return values">data</code>
+            
+        
+      </th>
+      <td>Pointer to allocated memory that was allocated by <tt>allocate</tt>.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">count</code>
+            
+        
+      </th>
+      <td>Number of items that could be stored in the allocated memory.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">usageTag</code>
+            
+        
+      </th>
+      <td>A tag the specifies the purpose for the allocated memory.
+Values: <a href="group_AllocatorUsageTags.html" data-lang-entity="group">AllocatorUsageTags</a>.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div><p>The values for <tt>object</tt>, <tt>count</tt> and <tt>usageTag</tt> should be the same that was used when
+<tt>allocate</tt> was called. The value of <tt>data</tt> should be the same that was returned by <tt>allocate</tt>.</p><p><tt>deallocate</tt> does not destruct objects.</p><p>Use e.g. one of the functions <a href="global_function_valueDestruct.html" data-lang-entity="global_function">valueDestruct</a> or <a href="global_function_arrayDestruct.html" data-lang-entity="global_function">arrayDestruct</a> to destruct the objects.
+<tt>delete</tt> and <tt>delete []</tt> operators which are part of the C++ standard (defined in <tt>&lt;new&gt;</tt>)
+can also be used to destruct objects at a given memory address.</p></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Allocator
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Manager for allocated memory.
+ * 
+ * @signature template &lt;typename TSpec&gt; class Allocator;
+ * 
+ * @tparam TSpec The specializing type.
+ * 
+ * @section Remarks
+ * 
+ * There are two reasons for using non-trivial allocators:
+ * 
+ * &lt;ol&gt; &lt;li&gt;Allocators support the function @link Allocator#clear @endlink for a
+ * fast deallocation of all allocated memory blocks.&lt;/li&gt; &lt;li&gt;Some allocators
+ * are faster in allocating an deallocating memory. Pool allocators like e.g.
+ * @link SinglePoolAllocator @endlink or @link MultiPoolAllocator @endlink speed
+ * up @link Allocator#allocate @endlink, @link Allocator#deallocate * @endlink,
+ * and @link Allocator#clear @endlink for pooled memory blocks.&lt;/li&gt; &lt;/ol&gt;
+ * 
+ * @fn Allocator#allocate
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Allocates memory from heap.
+ * 
+ * @signature void allocate(allocator, data, count[, usageTag]);
+ * 
+ * @param[in] count Number of items that could be stored in the allocated
+ *                  memory. The type of the allocated items is given by the type
+ *                  of &lt;tt&gt;data&lt;/tt&gt;.
+ * @param[in] usageTag A tag the specifies the purpose for the allocated memory.
+ *                     Values: @link AllocatorUsageTags @endlink.
+ * @param[in,out] allocator Allocator object. &lt;tt&gt;allocator&lt;/tt&gt; is conceptually
+ *                          the &#34;owner&#34; of the allocated memory. Objects of all
+ *                          types can be used as allocators. If no special
+ *                          behavior is implemented, default functions
+ *                          allocation/deallocation are applied that uses
+ *                          standard &lt;tt&gt;new&lt;/tt&gt; and &lt;tt&gt;delete&lt;/tt&gt; operators.
+ *                          Types: Allocator
+ * 
+ * @section Remarks
+ * 
+ * The function allocates at least &lt;tt&gt;count*sizeof(data)&lt;/tt&gt; bytes. The
+ * allocated memory is large enough to hold &lt;tt&gt;count&lt;/tt&gt; objects of type
+ * &lt;tt&gt;T&lt;/tt&gt;, where &lt;tt&gt;T *&lt;/tt&gt; is type of &lt;tt&gt;data&lt;/tt&gt;.
+ * 
+ * These objects are not constructed by &lt;tt&gt;allocate&lt;/tt&gt;.
+ * 
+ * Use e.g. one of the functions @link valueConstruct @endlink, @link
+ * arrayConstruct @endlink, @link arrayConstructCopy @endlink or @link arrayFill
+ * @endlink to construct the objects. A &lt;tt&gt;new&lt;/tt&gt; operator which is part of
+ * the C++ standard (defined in &lt;tt&gt;&amp;lt;new&amp;gt;&lt;/tt&gt;) can also be used to
+ * construct objects at a given memory address.
+ * 
+ * @section Remarks
+ * 
+ * All allocated memory blocks should be deallocated by the corresponding
+ * function @link Allocator#deallocate @endlink.
+ * 
+ * @fn Allocator#deallocate
+ * 
+ * @headerfile &lt;seqan/basic.h&gt;
+ * 
+ * @brief Deallocates memory.
+ * 
+ * @signature void deallocate(object, data, count[, usageTag])
+ * 
+ * @param[in,out] object Allocator object.&lt;tt&gt;object&lt;/tt&gt; is conceptually the
+ *                       &#34;owner&#34; of the allocated memory. Objects of all types
+ *                       can be used as allocators. If no special behavior is
+ *                       implemented, default functions allocation/deallocation
+ *                       are applied that uses standard &lt;tt&gt;new&lt;/tt&gt; and
+ *                       &lt;tt&gt;delete&lt;/tt&gt; operators. Types: Allocator
+ * @param[out] data Pointer to allocated memory that was allocated by
+ *                  &lt;tt&gt;allocate&lt;/tt&gt;.
+ * @param[in] count Number of items that could be stored in the allocated
+ *                  memory.
+ * @param[in] usageTag A tag the specifies the purpose for the allocated memory.
+ *                     Values: @link AllocatorUsageTags @endlink.
+ * 
+ * The values for &lt;tt&gt;object&lt;/tt&gt;, &lt;tt&gt;count&lt;/tt&gt; and &lt;tt&gt;usageTag&lt;/tt&gt; should
+ * be the same that was used when &lt;tt&gt;allocate&lt;/tt&gt; was called. The value of
+ * &lt;tt&gt;data&lt;/tt&gt; should be the same that was returned by &lt;tt&gt;allocate&lt;/tt&gt;.
+ * 
+ * &lt;tt&gt;deallocate&lt;/tt&gt; does not destruct objects.
+ * 
+ * Use e.g. one of the functions @link valueDestruct @endlink or @link
+ * arrayDestruct @endlink to destruct the objects. &lt;tt&gt;delete&lt;/tt&gt; and
+ * &lt;tt&gt;delete []&lt;/tt&gt; operators which are part of the C++ standard (defined in
+ * &lt;tt&gt;&amp;lt;new&amp;gt;&lt;/tt&gt;) can also be used to destruct objects at a given memory
+ * address.
+ * 
+ * @fn Allocator#clear
+ * 
+ * @brief Deallocates all memory blocks.
+ * 
+ * @signature void clear(allocator);
+ * 
+ * @param[in,out] The allocator to clear.
+ * 
+ * @section Remarks
+ * 
+ * This function deallocates all memory block sthat were allocated using
+ * &lt;tt&gt;allocate()&lt;/tt&gt; for &lt;tt&gt;allocator&lt;/tt&gt;. The memory is not pooled but
+ * directly passed back to the heap manager.
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>

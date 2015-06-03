@@ -1,0 +1,1954 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="class_align" data-page="Align">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+    <title>Align - SeqAn API Documentation</title>
+
+      
+
+      
+      <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" href="lib/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="lib/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="lib/ZeroClipboard/ZeroClipboard.min.js"></script>
+
+      <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+      <link rel="stylesheet" href="css/common.less.css" type="text/css" media="screen" charset="utf-8" />
+      <script type="text/javascript" charset="utf-8" src="js/less.min.js"></script>
+      
+
+
+
+    <script type="text/javascript" charset="utf-8">
+      hasFrames = window.top.frames.main ? true : false;
+      relpath = '/';
+      docsPrefix = 'docs/yard';
+      listPrefix = 'list/docs/yard';
+      searchPrefix = 'search/docs/yard';
+      framesUrl = '/docs/yard/frames/file/README.md';
+    </script>
+
+    <style type="text/css">
+    .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+    </style>
+
+    <style>
+      .link.error
+      {
+          color: red;
+      }
+    </style>
+
+      
+      
+      <script type="text/javascript" charset="utf-8" src="lib/jquery-bbq/jquery.ba-bbq.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/jquery.smooth-scroll.js"></script>
+
+      <script type="text/javascript" charset="utf-8" src="js/lang_entities.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/autocomplete.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/rubydoc_custom.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/common.js"></script>
+      
+  </head>
+  <body>
+    <a id="top" name="top"></a>
+
+    <div id="content">
+      
+
+<h1 data-lang-entity="class" data-pimped="true"><a href="page_LanguageEntities.html#class">Class</a>
+<span>Align<div><div>Tabular alignment of same-type sequences.</div></div></span>
+</h1>
+
+
+<table class="overview">
+
+  
+
+  
+  <tr>
+    <th>Implements</dt>
+    <td>
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>
+    
+    </td>
+  </tr>
+  
+
+  
+
+  
+
+  
+  <tr>
+    <th>All Impl'd</dt>
+    <td>
+    <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a>
+    
+    </td>
+  
+  </tr>
+
+  <tr>
+    <th>Defined in</th>
+    <td>
+      
+      &lt;seqan/align.h&gt;
+      
+      
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Signature</th>
+    <td>
+      <code>template &lt;typename TSequence, typename TGapSpec&gt;
+class Align;
+</code>
+    </td>
+  </tr>
+</table>
+
+
+<!-- Template Parameters -->
+
+
+
+
+<div data-lang-entity-container="template_parameter">
+<h2 data-lang-entity="template_parameter">Template Parameters</h2>
+
+<table class="overview">
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TSequence</a></code></th>
+        <td>Type of the underlying sequence.</td>
+    </tr>
+
+    <tr>
+        <th><code><a href="#" data-lang-entity="template_parameter">TGapSpec</a></code></th>
+        <td>Tag for selecting the <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> specialization.</td>
+    </tr>
+
+</table>
+</div>
+
+
+
+
+
+
+<!--
+ =============================================================================
+  Member and Interface Overview
+ =============================================================================
+-->
+
+<!-- Member Functions Overview -->
+
+
+
+<div data-lang-entity-container="member_function">
+<h2 data-lang-entity="member_function">Member Function Overview</h2>
+
+
+
+
+
+
+
+
+<h3 data-toc="hidden">Member Functions Inherited From <a href="concept_EqualityComparableConcept.html" data-lang-entity="concept">EqualityComparableConcept</a></h3>
+
+<ul class="summary compact">
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator!=" data-lang-entity="member_function">operator!=</a></code></span></li>
+  
+  <li class="public"><span class="summary_signature"><code><a href="concept_EqualityComparableConcept.html#EqualityComparableConcept::operator==" data-lang-entity="member_function">operator==</a></code></span></li>
+  
+</ul>
+
+
+
+
+</div>
+
+
+
+
+<!-- Interface Functions Overview -->
+
+
+
+<div data-lang-entity-container="interface_function">
+<h2 data-lang-entity="interface_function">Interface Function Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23clearClipping" title="#Align#clearClipping (interface function)" data-lang-entity="interface_function">void clearClipping(align);</a></code></span>
+    <span class="summary_desc"><div>Clear clipping on all rows.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23clearGaps" title="#Align#clearGaps (interface function)" data-lang-entity="interface_function">void clearGaps(align);</a></code></span>
+    <span class="summary_desc"><div>Clear gaps of all Align rows.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23col" title="#Align#col (interface function)" data-lang-entity="interface_function">TCol col(align);</a></code></span>
+    <span class="summary_desc"><div>Returns the columns of an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23cols" title="#Align#cols (interface function)" data-lang-entity="interface_function">TCols cols(align);</a></code></span>
+    <span class="summary_desc"><div>Returns the columns of an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23operator%3C%3C" title="#Align#operator<< (interface function)" data-lang-entity="interface_function">TStream operator&lt;&lt;(stream, align);</a></code></span>
+    <span class="summary_desc"><div>Stream-output for Align objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23row" title="#Align#row (interface function)" data-lang-entity="interface_function">TRow row(align, pos);</a></code></span>
+    <span class="summary_desc"><div>Returns a single row of an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23rows" title="#Align#rows (interface function)" data-lang-entity="interface_function">TRows rows(align);</a></code></span>
+    <span class="summary_desc"><div>Returns the rows of an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23setStrings" title="#Align#setStrings (interface function)" data-lang-entity="interface_function">void setStrings(align, stringSet);</a></code></span>
+    <span class="summary_desc"><div>Loads the sequences of a string set into an alignment.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23stringSet" title="#Align#stringSet (interface function)" data-lang-entity="interface_function">TStringSet stringSet(align);</a></code></span>
+    <span class="summary_desc"><div>Return string set with all ungapped sequences.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23write" title="#Align#write (interface function)" data-lang-entity="interface_function">void write(stream, align);</a></code></span>
+    <span class="summary_desc"><div>Writing of Gaps to Streams in human-readable format.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+ 
+
+
+<!-- Member Typedefs Overview -->
+
+  
+
+
+<!-- Interface Metafunctions Overview -->
+
+
+
+<div data-lang-entity-container="interface_metafunction">
+<h2 data-lang-entity="interface_metafunction">Interface  Metafunction Overview</h2>
+
+<ul class="summary">
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Col" title="#Align#Col (interface function)" data-lang-entity="interface_metafunction">Col&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>The column type for <a href="class_Align.html" data-lang-entity="class">Align</a> objects.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Cols" title="#Align#Cols (interface function)" data-lang-entity="interface_metafunction">Cols&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the type representing a column in an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23GetValue" title="#Align#GetValue (interface function)" data-lang-entity="interface_metafunction">GetValue&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the get-value type for an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Reference" title="#Align#Reference (interface function)" data-lang-entity="interface_metafunction">GetValue&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the reference type for an Align object.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Row" title="#Align#Row (interface function)" data-lang-entity="interface_metafunction">Row&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the row type (<a href="class_Gaps.html" data-lang-entity="class">Gaps</a> specialization).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Rows" title="#Align#Rows (interface function)" data-lang-entity="interface_metafunction">Rows&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the type used for rows in an Align object (a Gaps specialization).</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Source" title="#Align#Source (interface function)" data-lang-entity="interface_metafunction">Rows&lt;TAlign&gt;::Type;</a></code></span>
+    <span class="summary_desc"><div>Return the type of the underlying sequence.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23StringSetType" title="#Align#StringSetType (interface function)" data-lang-entity="interface_metafunction">Rows&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the type that would be used for a string set of the sources.</div></span>
+    
+  </li>
+  
+  <li class="public">
+    
+    <span class="summary_signature"><code><a href="#Align%23Value" title="#Align#Value (interface function)" data-lang-entity="interface_metafunction">Value&lt;TAlign&gt;::Type</a></code></span>
+    <span class="summary_desc"><div>Return the value type for an Align object.</div></span>
+    
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  
+
+
+<!-- Member Variable Overview -->
+
+  
+
+
+<!--
+ =============================================================================
+  Detailed Description
+ =============================================================================
+-->
+
+
+<h2>Detailed Description</h2>
+<div class="docstring">
+  <div class="discussion">
+    <!-- @internal -->
+    
+
+    <!-- @deprecated -->
+    
+
+    <!-- @warning -->
+    
+
+    <!-- @note -->
+    
+
+    <!-- @aka -->
+    
+
+    <!-- paragraphs -->
+    
+<div><p>The Alignment class is for storing tabular alignments of sequences having the same type. They do so by being a
+container of <a href="class_Gaps.html" data-lang-entity="class">Gaps</a> objects. The most common use case is storing pairwise alignments that are
+generated by one of the dynamic programming alignment algorithms.</p><h3>Example</h3><p>Here is an example of using an Align object with <a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a>.</p><div data-src-path="demos/align/align.cpp"><div class="highlight"><pre><span class="cp">#include &lt;seqan/basic.h&gt;</span>
+<span class="cp">#include &lt;seqan/sequence.h&gt;</span>
+<span class="cp">#include &lt;seqan/stream.h&gt;  </span><span class="c1">// for I/O</span>
+<span class="cp">#include &lt;seqan/align.h&gt;</span>
+<span class="cp">#include &lt;seqan/score.h&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">seqan</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">StringSet</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">stringSet</span><span class="p">;</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="s">&quot;AGTTTAATCA&quot;</span><span class="p">);</span>
+    <span class="n">appendValue</span><span class="p">(</span><span class="n">stringSet</span><span class="p">,</span> <span class="s">&quot;AGTATACGA&quot;</span><span class="p">);</span>
+
+    <span class="n">Align</span><span class="o">&lt;</span><span class="n">DnaString</span><span class="o">&gt;</span> <span class="n">align</span><span class="p">(</span><span class="n">stringSet</span><span class="p">);</span>                        <span class="c1">// Initialize the Align object using a StringSet.</span>
+
+    <span class="kt">int</span> <span class="n">score</span> <span class="o">=</span> <span class="n">globalAlignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">EditDistanceScore</span><span class="p">());</span>  <span class="c1">// Compute a global alingment using the Align object.</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;score = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">score</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;align</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">align</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<div class="path_label"><span class="label">Demo:</span> <a href="demos/align/align.cpp" target="_top">demos/align/align.cpp</a></div></div><p>The output is as follows:</p><pre class="console" data-src-path="demos/align/align.cpp.stdout">score = -4
+align
+      0     .    : 
+        AGTTTAATCA
+        ||| | |  |
+        AGTAT-ACGA
+
+
+
+</pre></div>
+
+  </div>
+</div>
+
+
+<!-- @see -->
+
+  <h2 class="clause_header">See Also</h2>
+  <ul class="summary compact">
+  
+  <li><a href="class_Gaps.html" data-lang-entity="class">Gaps</a></li>
+  
+  <li><a href="global_function_globalAlignment.html" data-lang-entity="global_function">globalAlignment</a></li>
+  
+  <li><a href="global_function_localAlignment.html" data-lang-entity="global_function">localAlignment</a></li>
+  
+  </ul>
+
+
+<!--
+ =============================================================================
+  Member and Interface Details
+ =============================================================================
+-->
+
+<!-- Member Functions Details -->
+
+
+
+
+
+
+<!-- Interface Functions Details -->
+
+<div class="interface_function_details" data-lang-entity-container="interface_function">
+  <h2 data-lang-entity="interface_function">Interface Functions Detail</h2>
+
+  
+  <div class="method_details first">
+    <h3 data-toc="hidden" id="Align#clearClipping" class="signature first" data-lang-entity="interface_function">
+      <code>void clearClipping(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear clipping on all rows.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align</code>
+            
+        
+      </th>
+      <td>Align object to clear clippings of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#clearGaps" class="signature" data-lang-entity="interface_function">
+      <code>void clearGaps(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Clear gaps of all Align rows.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to clear all all gaps from.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#col" class="signature" data-lang-entity="interface_function">
+      <code>TCol col(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the columns of an Align object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to get the cols of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCol</code></th>
+        <td>The column of the Align object (Metafunction: <a href="class_Align.html#Align#Col" data-lang-entity="interface_metafunction">Col</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#cols" class="signature" data-lang-entity="interface_function">
+      <code>TCols cols(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the columns of an Align object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to get the cols of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TCols</code></th>
+        <td>The columns of the Align object (Metafunction: <a href="class_Align.html#Align#Cols" data-lang-entity="interface_metafunction">Cols</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#operator<<" class="signature" data-lang-entity="interface_function">
+      <code>TStream operator&lt;&lt;(stream, align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Stream-output for Align objects.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td><tt>std::ostream</tt> to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>Align object to write out.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TStream</code></th>
+        <td>Reference to stream after output of align.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#row" class="signature" data-lang-entity="interface_function">
+      <code>TRow row(align, pos);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns a single row of an Align object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to get the row of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">pos</code>
+            
+        
+      </th>
+      <td>The number of the row to get.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TRow</code></th>
+        <td>Reference to the given row of align (Metafunction: <a href="class_Align.html#Align#Row" data-lang-entity="interface_metafunction">Row</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#rows" class="signature" data-lang-entity="interface_function">
+      <code>TRows rows(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Returns the rows of an Align object.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to get the rows for.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TRows</code></th>
+        <td>A container with the Gaps of the Align object.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#setStrings" class="signature" data-lang-entity="interface_function">
+      <code>void setStrings(align, stringSet);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Loads the sequences of a string set into an alignment.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">align</code>
+            
+        
+      </th>
+      <td>Align object to set underlying sequence of.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">stringSet</code>
+            
+        
+      </th>
+      <td>The <a href="class_StringSet.html" data-lang-entity="class">StringSet</a> with the data.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#stringSet" class="signature" data-lang-entity="interface_function">
+      <code>TStringSet stringSet(align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return string set with all ungapped sequences.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>Align object to get sequences of.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+  <h4>Returns</h4>
+  <table class="overview">
+    
+    <tr>
+        <th><code>TStringSet</code></th>
+        <td>The set of ungapped sequences (Metafunction: <a href="class_Align.html#Align#StringSetType" data-lang-entity="interface_metafunction">StringSetType</a>).</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+  <div class="method_details">
+    <h3 data-toc="hidden" id="Align#write" class="signature" data-lang-entity="interface_function">
+      <code>void write(stream, align);</code>
+    </h3>
+  </div>
+
+  
+
+  
+  <div class="note deprecated">Deprecated. <div class='inline'>
+      
+      <p>Old-style I/O.</p>
+      
+  </div></div>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Writing of Gaps to Streams in human-readable format.</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h4>Parameters</h4>
+  <table class="overview">
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in_out" title="IN/OUT parameters are read and also modified by the called function">stream</code>
+            
+        
+      </th>
+      <td>The Stream to write to.</td>
+    </tr>
+    
+    <tr>
+      <th>
+        
+            
+                <code data-param-type="in" title="IN parameters are only read and not modified">align</code>
+            
+        
+      </th>
+      <td>The Align object to write out.</td>
+    </tr>
+    
+  </table>
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+
+  
+  
+
+</div>
+
+
+
+<!-- Member Typedefs Details -->
+
+
+
+
+<!-- Interface Metafunctions Details -->
+
+<div class="interface_metafunction_details" data-lang-entity-container="">
+<h2 data-lang-entity="interface_metafunction">Interface Metafunctions Detail</h2>
+
+
+<div class="method_details first">
+  <h3 data-toc="hidden" id="Align#Col" class="signature first" data-lang-entity="interface_metafunction">
+    <code>Col&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>The column type for <a href="class_Align.html" data-lang-entity="class">Align</a> objects.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The <a href="class_Align.html" data-lang-entity="class">Align</a> object to query for its column type.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Cols" class="signature" data-lang-entity="interface_metafunction">
+    <code>Cols&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the type representing a column in an Align object.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the column type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting column type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#GetValue" class="signature" data-lang-entity="interface_metafunction">
+    <code>GetValue&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the get-value type for an Align object.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the get-value type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting get-value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Reference" class="signature" data-lang-entity="interface_metafunction">
+    <code>GetValue&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the reference type for an Align object.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the reference type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting reference type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Row" class="signature" data-lang-entity="interface_metafunction">
+    <code>Row&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the row type (<a href="class_Gaps.html" data-lang-entity="class">Gaps</a> specialization).</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the row type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting row type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Rows" class="signature" data-lang-entity="interface_metafunction">
+    <code>Rows&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the type used for rows in an Align object (a Gaps specialization).</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the rows type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting rows type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Source" class="signature" data-lang-entity="interface_metafunction">
+    <code>Rows&lt;TAlign&gt;::Type;</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the type of the underlying sequence.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the underlying sequence type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting sequence type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#StringSetType" class="signature" data-lang-entity="interface_metafunction">
+    <code>Rows&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the type that would be used for a string set of the sources.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the string set type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting string set type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="method_details">
+  <h3 data-toc="hidden" id="Align#Value" class="signature" data-lang-entity="interface_metafunction">
+    <code>Value&lt;TAlign&gt;::Type</code>
+  </h3>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      <div>Return the value type for an Align object.</div>
+    </div>
+  </div>
+
+  
+  <h4>Template Parameters</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>TAlign</code></th>
+            <td>The Align object to get the value type for.</td>
+        </tr>
+    
+    </table>
+  
+
+  
+  <h4>Returns</h4>
+    <table class="overview">
+    
+        <tr>
+            <th><code>Type</code></th>
+            <td>The resulting value type.</td>
+        </tr>
+    
+    </table>
+  
+
+  <div class="docstring">
+    <div class="discussion">
+      
+<div></div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+<!-- Member Variable Details -->
+
+
+
+
+<!--
+ =============================================================================
+  Footer / Debug
+ =============================================================================
+-->
+
+
+
+<div class="modal fade" id="doxSources" tabindex="-1" role="dialog" aria-labelledby="doxSourcesLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doxSourcesLabel">Dox Sources</h4>
+      </div>
+      <div class="modal-body">
+        <pre>/*!
+ * @class Align
+ * 
+ * @implements EqualityComparableConcept
+ * 
+ * @headerfile &lt;seqan/align.h&gt;
+ * 
+ * @brief Tabular alignment of same-type sequences.
+ * 
+ * @signature template &lt;typename TSequence, typename TGapSpec&gt; class Align;
+ * 
+ * @tparam TSequence Type of the underlying sequence.
+ * @tparam TGapSpec Tag for selecting the @link Gaps @endlink specialization.
+ * 
+ * The Alignment class is for storing tabular alignments of sequences having the
+ * same type. They do so by being a container of @link Gaps @endlink objects.
+ * The most common use case is storing pairwise alignments that are generated by
+ * one of the dynamic programming alignment algorithms.
+ * 
+ * @section Example
+ * 
+ * Here is an example of using an Align object with @link globalAlignment
+ * @endlink.
+ * 
+ * @include demos/align/align.cpp
+ * 
+ * The output is as follows:
+ * 
+ * @include demos/align/align.cpp.stdout
+ * 
+ * @see globalAlignment
+ * @see localAlignment
+ * @see Gaps
+ * 
+ * @mfn Align#Cols
+ * 
+ * @brief Return the type representing a column in an Align object.
+ * 
+ * @signature Cols&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the column type for.
+ * 
+ * @return Type The resulting column type.
+ * 
+ * @mfn Align#Value
+ * 
+ * @brief Return the value type for an Align object.
+ * 
+ * @signature Value&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the value type for.
+ * 
+ * @return Type The resulting value type.
+ * 
+ * @mfn Align#GetValue
+ * 
+ * @brief Return the get-value type for an Align object.
+ * 
+ * @signature GetValue&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the get-value type for.
+ * 
+ * @return Type The resulting get-value type.
+ * 
+ * @mfn Align#Reference
+ * 
+ * @brief Return the reference type for an Align object.
+ * 
+ * @signature GetValue&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the reference type for.
+ * 
+ * @return Type The resulting reference type.
+ * 
+ * @mfn Align#Row
+ * 
+ * @brief Return the row type (@link Gaps @endlink specialization).
+ * 
+ * @signature Row&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the row type for.
+ * 
+ * @return Type The resulting row type.
+ * 
+ * @mfn Align#Rows
+ * 
+ * @brief Return the type used for rows in an Align object (a Gaps
+ *        specialization).
+ * 
+ * @signature Rows&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the rows type for.
+ * 
+ * @return Type The resulting rows type.
+ * 
+ * @mfn Align#Source
+ * 
+ * @brief Return the type of the underlying sequence.
+ * 
+ * @signature Rows&lt;TAlign&gt;::Type;
+ * 
+ * @tparam TAlign The Align object to get the underlying sequence type for.
+ * 
+ * @return Type The resulting sequence type.
+ * 
+ * @mfn Align#StringSetType
+ * 
+ * @brief Return the type that would be used for a string set of the sources.
+ * 
+ * @signature Rows&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The Align object to get the string set type for.
+ * 
+ * @return Type The resulting string set type.
+ * 
+ * @mfn Align#Col
+ * 
+ * @headerfile &lt;seqan/align.h&gt;
+ * 
+ * @brief The column type for @link Align @endlink objects.
+ * 
+ * @signature Col&lt;TAlign&gt;::Type
+ * 
+ * @tparam TAlign The @link Align @endlink object to query for its column type.
+ * 
+ * @return Type The resulting type.
+ * 
+ * @fn Align#rows
+ * 
+ * @brief Returns the rows of an Align object.
+ * 
+ * @signature TRows rows(align);
+ * 
+ * @param[in] align The Align object to get the rows for.
+ * 
+ * @return TRows A container with the Gaps of the Align object.
+ * 
+ * @fn Align#row
+ * 
+ * @brief Returns a single row of an Align object.
+ * 
+ * @signature TRow row(align, pos);
+ * 
+ * @param[in] align The Align object to get the row of.
+ * @param[in] pos The number of the row to get.
+ * 
+ * @return TRow Reference to the given row of align (Metafunction: @link
+ *              Align#Row @endlink).
+ * 
+ * @fn Align#cols
+ * 
+ * @brief Returns the columns of an Align object.
+ * 
+ * @signature TCols cols(align);
+ * 
+ * @param[in] align The Align object to get the cols of.
+ * 
+ * @return TCols The columns of the Align object (Metafunction: @link Align#Cols
+ *               @endlink).
+ * 
+ * @fn Align#col
+ * 
+ * @brief Returns the columns of an Align object.
+ * 
+ * @signature TCol col(align);
+ * 
+ * @param[in] align The Align object to get the cols of.
+ * 
+ * @return TCol The column of the Align object (Metafunction: @link Align#Col
+ *              @endlink).
+ * 
+ * @fn Align#write
+ * 
+ * @brief Writing of Gaps to Streams in human-readable format.
+ * 
+ * @deprecated Old-style I/O.
+ * 
+ * @signature void write(stream, align);
+ * 
+ * @param[in,out] stream The Stream to write to.
+ * @param[in] align The Align object to write out.
+ * 
+ * @fn Align#clearClipping
+ * 
+ * @brief Clear clipping on all rows.
+ * 
+ * @signature void clearClipping(align);
+ * 
+ * @param[in,out] align Align object to clear clippings of.
+ * 
+ * @fn Align#operator&lt;&lt;
+ * 
+ * @brief Stream-output for Align objects.
+ * 
+ * @signature TStream operator&lt;&lt;(stream, align);
+ * 
+ * @param[in,out] stream &lt;tt&gt;std::ostream&lt;/tt&gt; to write to.
+ * @param[in] align Align object to write out.
+ * 
+ * @return TStream Reference to stream after output of align.
+ * 
+ * @fn Align#setStrings
+ * 
+ * @brief Loads the sequences of a string set into an alignment.
+ * 
+ * @signature void setStrings(align, stringSet);
+ * 
+ * @param[in,out] align Align object to set underlying sequence of.
+ * @param[in] stringSet The @link StringSet @endlink with the data.
+ * 
+ * @fn Align#clearGaps
+ * 
+ * @brief Clear gaps of all Align rows.
+ * 
+ * @signature void clearGaps(align);
+ * 
+ * @param[in] align The Align object to clear all all gaps from.
+ * 
+ * @fn Align#stringSet
+ * 
+ * @brief Return string set with all ungapped sequences.
+ * 
+ * @signature TStringSet stringSet(align);
+ * 
+ * @param[in] align Align object to get sequences of.
+ * 
+ * @return TStringSet The set of ungapped sequences (Metafunction: @link
+ *                    Align#StringSetType @endlink).
+ */</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+
+  </body>
+</html>
