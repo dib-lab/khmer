@@ -40,11 +40,6 @@ DEFAULT_DESIRED_COVERAGE = 10
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
 
 
-def batchwise(coll, size):
-    iter_coll = iter(coll)
-    return izip(*[iter_coll] * size)
-
-
 def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
     """
     Generator/context manager to do boilerplate output of statistics while
