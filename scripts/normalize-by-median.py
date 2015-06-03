@@ -45,7 +45,7 @@ def batchwise(coll, size):
     return izip(*[iter_coll] * size)
 
 
-def WithDiagnostics(ifile, fp, paired, single, norm):
+def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
     """
     Generator/context manager to do boilerplate output of statistics while
     normalizing data. Also checks for properly paired data.
@@ -53,17 +53,13 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
 
     index = 0
 
-    screed_iter = screed.open(ifile, parse_description=False)
-    reader = broken_paired_reader(screed_iter, force_single=single)
+    for index, is_paired, read0, read1 in reader:
 
-    for index, paired_reads, read0, read1 in reader:
+        if read1:
+            norm.total += 2
+        else:
+            norm.total += 1
 
-        batch = []
-        batch.append(read0)
-        if read1 is not None:
-            batch.append(read1)
-
-        norm.total += len(batch)
         total = norm.total
         discarded = norm.discarded
 
@@ -74,7 +70,7 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
                           perc=int(100. - discarded / float(total) * 100.)),
                   file=sys.stderr)
 
-            print('... in file ' + input_filename, file=sys.stderr)
+            print('... in file ' + ifilename, file=sys.stderr)
 
             if fp:
                 print(total + " " + total - discarded + " " +
@@ -82,10 +78,10 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
                 report_fp.flush()
 
         # If in paired mode, check that the reads are properly interleaved
-        if paired and not paired_reads:
+        if force_paired and not is_paired:
             raise IOError('Error: unpaired reads in input while paired reading'
                           ' is forced.')
-        yield batch
+        yield read0, read1
 
 
 class Normalizer(object):
@@ -106,10 +102,19 @@ class Normalizer(object):
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        for batch in WithDiagnostics(input_filename, self.report_fp,
-                                     force_paired, self.force_single, self):
+        screed_iter = screed.open(input_filename, parse_description=False)
+        reader = broken_paired_reader(screed_iter,
+                                      force_single=self.force_single)
+
+        for read0, read1 in WithDiagnostics(input_filename, self.report_fp,
+                                            force_paired, self, reader):
             passed_filter = False
             passed_length = True
+
+            batch = []
+            batch.append(read0)
+            if read1 is not None:
+                batch.append(read1)
 
             for record in batch:
                 if len(record.sequence) < ksize:
