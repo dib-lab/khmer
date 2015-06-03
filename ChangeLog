@@ -1,3 +1,39 @@
+2015-05-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/{__init__.py,_khmermodule.cc},lib/labelhash.{cc,hh},
+   lib/{hashtable,khmer}.hh: changed LabelHash to be a "friend" of Hashtable,
+   rather than a subclass; allowed initialization with either a CountingHash
+   or a Hashbits; added 'graph' attribute to the Python object to store a
+   reference to host object.
+   * lib/labelhash.{cc,hh}: changed TagPtr maps to Tag maps to fix disastrous
+   bug.
+   * lib/labelhash.{cc,hh}: added save/load_tags_and_labels functions for
+   saving and loading labels.
+   * tests/test_labelhash.py: removed unnecessary tests; added tests for save
+   and load.
+   * sandbox/sweep-reads.py: updated with LabelHash changes.
+
+2015-05-26  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Remove old libkhmer.so versions during make clean
+
+2015-05-25  Kevin Murray  <spam@kdmurray.id.au>
+
+   * Makefile: Fix issue with 'lib' target not building by using FORCE
+
+2015-05-20  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{__init__,khmer_api,common}.py,scripts/build-graph.py,
+   tests/test_scripts.py: added oxli module, oxlified load_graph script, tests
+   * scripts/load-graph.py: replaced with oxlified version
+   * setup.py: added oxli module and entry point
+
+2015-05-20  Kevin Murray  <spam@kdmurray.id.au>
+
+   * .gitignore: Add htmlcov/ and diff-cover.html to gitignore
+   * Makefile: Use rm -f to remove files to quash error messages on
+   non-existant files
+
 2015-05-18  Sherine Awad  <sherine.awad@gmail.com>
 
    * tests/test_scripts.py: Test loading of compressed counting table

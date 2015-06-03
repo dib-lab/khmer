@@ -988,7 +988,37 @@ def test_count_median_fq_csv():
 
 def test_load_graph():
     script = scriptpath('load-graph.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e7', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+def test_oxli_build_graph():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data('random-20-a.fa')
@@ -1039,6 +1069,29 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
+def test_oxli_build_graph_no_tags():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert not os.path.exists(tagset_file), tagset_file
+
+    assert khmer.load_hashbits(ht_file)
+
+    # can't think of a good way to make sure this worked, beyond just
+    # loading the ht file...
+
+
 def test_load_graph_fail():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -1053,9 +1106,46 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+def test_oxli_build_graph_fail():
+    script = scriptpath('oxli')
+    args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == 1, status
+    assert "** ERROR: the graph structure is too small" in err
+
+
 def test_load_graph_write_fp():
     script = scriptpath('load-graph.py')
-    args = ['-x', '1e5', '-N', '2', '-k', '20', '-w']  # use small HT
+    args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    data = [x.strip() for x in open(info_file)]
+    data = set(data)
+    assert '3959 unique k-mers' in data, data
+    assert 'false positive rate estimated to be 0.002' in data
+
+
+def test_oxli_build_graph_write_fp():
+    script = scriptpath('oxli')
+    # use small HT
+    args = ['build-graph', '-x', '1e5', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data('random-20-a.fa')
@@ -1082,6 +1172,17 @@ def test_load_graph_multithread():
     infile = utils.get_test_data('test-reads.fa')
 
     args = ['-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
+
+    (status, out, err) = utils.runscript(script, args)
+
+
+def test_oxli_build_graph_multithread():
+    script = scriptpath('oxli')
+
+    outfile = utils.get_temp_filename('test')
+    infile = utils.get_test_data('test-reads.fa')
+
+    args = ['build-graph', '-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
 
@@ -1900,7 +2001,7 @@ def test_make_initial_stoptags():
     in_dir = os.path.dirname(bzinfile)
 
     genscript = scriptpath('load-graph.py')
-    genscriptargs = ['-t', 'test-reads', 'test-reads.fq.bz2']
+    genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
     # test input file gen'd by load-graphs
@@ -2610,7 +2711,7 @@ def execute_load_graph_streaming(filename):
     '''
 
     script = scriptpath('load-graph.py')
-    args = '-x 1e7 -N 2 -k 20 -t out -'
+    args = '-x 1e7 -N 2 -k 20 out -'
 
     infile = utils.get_temp_filename('temp')
     in_dir = os.path.dirname(infile)
