@@ -55,7 +55,7 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
 
     for index, is_paired, read0, read1 in reader:
 
-        if read1:
+        if is_paired:
             norm.total += 2
         else:
             norm.total += 1
