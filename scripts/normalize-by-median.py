@@ -176,8 +176,9 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
     except IOError as err:
         caught_error = True
         handle_error(err, ofile, ifile, save_on_fail, ht)
+        # TO-DO: write test coverage for this line
         if not force:
-            print >> sys.stderr, '** Exiting!'
+            print('** Exiting!', file=sys.stderr)
 
             sys.exit(1)
         else:
@@ -212,7 +213,6 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         else:
             output_name = single_output_file.name
         outfp = single_output_file
-
     else:
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
@@ -334,12 +334,11 @@ def CheckpointCountingTable(input_filenames, freq, ht, savename):
     """
     Generator/context manager to progressively save counting tables
     """
-
     for index, ifile in enumerate(input_filenames):
-        yield ifile
+        yield ifile[0], ifile[1]
         if freq > 0 and index > 0 and index % freq == 0:
             print('Backup: Saving k-mer counting file through ' +
-                  ifile, file=sys.stderr)
+                  ifile[0], file=sys.stderr)
             if savename:
                 hashname = savename
                 print('...saving to ' + hashname, file=sys.stderr)
@@ -353,6 +352,10 @@ def CheckpointCountingTable(input_filenames, freq, ht, savename):
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
+
+    # TO-DO: write a test for this
+    if args.force_single and args.paired:
+        raise RuntimeError("** ERROR: Both single and paired modes forced.")
 
     report_on_config(args)
 
@@ -391,24 +394,20 @@ file for one of the input files will be generated.)" % filename,
 
     norm = Normalizer(args.cutoff, htable, report_fp, force_single)
 
-    for f in CheckpointCountingTable(args.input_filenames, args.dump_frequency,
-                                     htable, args.savetable):
+    # make a list of all filenames and if they're paired or not
+    # if we don't know if they're paired, default to not forcing paired
+    files = []
+    for e in args.input_filenames:
+        files.append([e, args.paired])
+    if args.unpaired_reads:
+        files.append([args.unpaired_reads, False])
+
+    for f, p in CheckpointCountingTable(files, args.dump_frequency, htable,
+                                        args.savetable):
         total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
-                args.fail_save, args.paired, args.force, norm, report_fp)
-
-    # Stuff to handle paired and unpaired data
-    if args.paired and args.unpaired_reads:
-        args.paired = False
-        output_name = args.unpaired_reads
-        if not args.single_output_file:
-            output_name = os.path.basename(args.unpaired_reads) + '.keep'
-        outfp = open(output_name, 'w')
-        total_acc, discarded_acc, corrupt = \
-            normalize_by_median_and_check(
-                args.unpaired_reads, htable, args.single_output_file,
-                args.fail_save, args.paired, args.force, norm, report_fp)
+                args.fail_save, p, args.force, norm, report_fp)
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'
