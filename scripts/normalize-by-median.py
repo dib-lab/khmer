@@ -63,9 +63,6 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
         if read1 is not None:
             batch.append(read1)
 
-        if paired_reads:
-            assert read1 is not None
-
         norm.total += len(batch)
         total = norm.total
         discarded = norm.discarded
