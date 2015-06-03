@@ -44,8 +44,6 @@ def batchwise(coll, size):
     iter_coll = iter(coll)
     return izip(*[iter_coll] * size)
 
-# Returns true if the pair of records are properly pairs
-
 
 def WithDiagnostics(ifile, fp, paired, single, norm):
     """
@@ -93,7 +91,7 @@ def WithDiagnostics(ifile, fp, paired, single, norm):
             raise IOError('Error: unpaired reads in input while paired reading'
                           ' is forced.')
 
-        # TO-DO: obsoleted by broken_paired, to be removed
+        # TO-DO: obsoleted by the above/BPR, to be removed
         if paired:
             if not check_is_pair(read0, read1):
                 raise IOError('Error: Improperly interleaved pairs \
@@ -120,8 +118,8 @@ class Normalizer(object):
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        # TO-DO: hacked in a way to not change this logic--BPR would
-        # probably make a lot of it cleaner
+        # TO-DO: hacked in a way to not change this logic--BPR 
+        # might make a lot of it cleaner
         for batch in WithDiagnostics(input_filename, self.report_fp,
                                      force_paired, self.force_single, self):
             passed_filter = False
@@ -169,14 +167,12 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
     upkeep on some statistics and diagnostic output.
     """
 
-    # global corrupt_files, total, discarded, total_acc, discarded_acc
     caught_error = False
     try:
         yield
     except IOError as err:
         caught_error = True
         handle_error(err, ofile, ifile, save_on_fail, ht)
-        # TO-DO: write test coverage for this line
         if not force:
             print('** Exiting!', file=sys.stderr)
 
@@ -353,9 +349,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
-    # TO-DO: write a test for this
     if args.force_single and args.paired:
-        raise RuntimeError("** ERROR: Both single and paired modes forced.")
+        print("** ERROR: Both single and paired modes forced.",
+              file=sys.stderr)
+        sys.exit(0)
 
     report_on_config(args)
 

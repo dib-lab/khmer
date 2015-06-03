@@ -15,6 +15,7 @@ import shutil
 from cStringIO import StringIO
 import traceback
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
 import subprocess
 import threading
 import bz2
@@ -601,6 +602,39 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
+
+def test_normalize_by_median_unforced_badfile():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename("potatoes")
+    in_dir = os.path.dirname(infile)
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shoulnd't get to this")
+    except AssertionError as e:
+        pass
+
+
+def test_normalize_by_median_contradictory_args():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '-t', '--force-single', '-p', '-R',
+            outfile, infile]
+
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "ERROR" in err, err
+    assert "Both single and paired modes" in err, err
+
+    assert status == 0, status
 
 
 def test_normalize_by_median_report_fp():
