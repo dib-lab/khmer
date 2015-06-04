@@ -603,6 +603,23 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_report_fp():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '-t', '-R', outfile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "fp rate estimated to be 0.626" in err, err
+    report = open(outfile, 'r')
+    line = report.readline()
+    assert "100000 25232 0.25232" in line, line
+
+
 def test_normalize_by_median_unpaired_and_paired():
     CUTOFF = '1'
 
@@ -622,6 +639,27 @@ def test_normalize_by_median_unpaired_and_paired():
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
+
+
+def test_normalize_by_median_count_kmers_PE():
+    CUTOFF = '1'
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    # The test file has one pair of identical read except for the last base
+    # The 2nd read should be discarded in the unpaired mode
+    # but kept in the paired end mode adding only one more unique kmer
+    shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
+    script = scriptpath('normalize-by-median.py')
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'kept 1 of 2 or 50%' in err, err
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-p', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert 'Total number of unique k-mers: 99' in err, err
+    assert 'kept 2 of 2 or 100%' in err, err
 
 
 def test_normalize_by_median_double_file_name():
@@ -832,8 +870,8 @@ def test_normalize_by_median_dumpfrequency():
     assert test_ht.count(test_good_read2[:17]) > 0
 
     assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
-    assert out.count('Backup: Saving') == 2
-    assert 'Nothing' in out
+    assert err.count('Backup: Saving') == 2
+    assert 'Nothing' in err
 
 
 def test_normalize_by_median_empty():
