@@ -56,14 +56,12 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
         else:
             norm.total += 1
 
-        total = norm.total
-        discarded = norm.discarded
-
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
-                  .format(kept=total - discarded,
-                          total=total,
-                          perc=int(100. - discarded / float(total) * 100.)),
+                  .format(kept=norm.total - norm.discarded,
+                          total=norm.total,
+                          perc=int(100. - norm.discarded /
+                                   float(norm.total) * 100.)),
                   file=sys.stderr)
 
             print('... in file ' + ifilename, file=sys.stderr)
