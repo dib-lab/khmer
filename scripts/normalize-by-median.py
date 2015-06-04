@@ -76,9 +76,9 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
         yield index, is_paired, read0, read1
 
     # per file diagnostic output
-    if norm.total == 0 and norm.discarded == 0:
+    if norm.total == 0:
         print('SKIPPED empty file ' + ifilename, file=sys.stderr)
-    if norm.total > 0:
+    else:
         print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
               .format(inp=ifilename, kept=norm.total - norm.discarded,
                       total=norm.total, perc=int(100. - norm.discarded /
@@ -104,13 +104,12 @@ class Normalizer(object):
         self.discarded = 0
 
     def __call__(self, input_filename, force_paired=False):
-        seq = ""
 
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
         screed_iter = screed.open(input_filename, parse_description=False)
-        reader = broken_paired_reader(screed_iter,
+        reader = broken_paired_reader(screed_iter, min_length=ksize,
                                       force_single=self.force_single,
                                       require_paired=force_paired)
 
@@ -119,7 +118,6 @@ class Normalizer(object):
                                                               force_paired,
                                                               self, reader):
             passed_filter = False
-            passed_length = True
 
             batch = []
             batch.append(read0)
@@ -127,17 +125,13 @@ class Normalizer(object):
                 batch.append(read1)
 
             for record in batch:
-                if len(record.sequence) < ksize:
-                    passed_length = False
-                    continue
-
                 seq = record.sequence.replace('N', 'A')
                 med, _, _ = self.htable.get_median_count(seq)
 
                 if med < desired_coverage:
                     passed_filter = True
 
-            if passed_length and passed_filter:
+            if passed_filter:
                 for record in batch:
                     seq = record.sequence.replace('N', 'A')
                     self.htable.consume(seq)
@@ -161,15 +155,13 @@ def handle_error(error, output_name, input_name, fail_save, htable):
               file=sys.stderr)
 
 
-# TO-DO: find a better way of getting corrupt files out of here
 @contextmanager
-def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
+def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, corrupt_files):
     """
-    Context manager to do boilerplate excepting of IOErrors; also does
-    upkeep on some statistics and diagnostic output.
+    Context manager to do boilerplate excepting of IOErrors
     """
     try:
-        yield False
+        yield
     except (IOError, ValueError) as err:
         handle_error(err, ofile, ifile, save_on_fail, ht)
         if not force:
@@ -178,42 +170,7 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
             sys.exit(1)
         else:
             print('*** Skipping error file, moving on...', file=sys.stderr)
-
-
-def normalize_by_median_and_check(input_filename, htable, single_output_file,
-                                  fail_save, paired, force, norm,
-                                  report_fp=None):
-    total = 0
-    discarded = 0
-
-    total_acc = None
-    discarded_acc = None
-    corrupt = None
-    if single_output_file:
-        if single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
-        else:
-            output_name = single_output_file.name
-        outfp = single_output_file
-    else:
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
-
-    with CatchIOErrors(input_filename, outfp, fail_save, htable, force) as \
-            failsafed:
-
-        for record in norm(input_filename, paired):
-            write_record(record, outfp)
-
-        total = norm.total
-        discarded = norm.discarded
-
-        print('output in ' + output_name, file=sys.stderr)
-
-    if not failsafed:
-        corrupt = input_filename
-
-    return norm.total, norm.discarded, corrupt
+            corrupt_files.append(ifile)
 
 
 def get_parser():
@@ -376,6 +333,7 @@ file for one of the input files will be generated.)" % filename,
 
     input_filename = None
 
+    # diginorm algorithm lives in Normalizer, go get it
     norm = Normalizer(args.cutoff, htable, report_fp, force_single)
 
     # make a list of all filenames and if they're paired or not
@@ -387,14 +345,31 @@ file for one of the input files will be generated.)" % filename,
         files.append([args.unpaired_reads, False])
 
     corrupt_files = []
+
     for f, p in CheckpointCountingTable(files, args.dump_frequency, htable,
                                         args.savetable):
-        total_acc, discarded_acc, corrupt = \
-            normalize_by_median_and_check(
-                f, htable, args.single_output_file,
-                args.fail_save, p, args.force, norm, report_fp)
-        if corrupt is not None:
-            corrupt_files.append(corrupt)
+        outfp = None
+
+        # figure out what we're calling out output file
+        if args.single_output_file:
+            if args.single_output_file is sys.stdout:
+                output_name = '/dev/stdout'
+            else:
+                output_name = args.single_output_file.name
+            outfp = args.single_output_file
+        else:
+            output_name = os.path.basename(f) + '.keep'
+            outfp = open(output_name, 'w')
+
+        # failsafe context manager in case an input file breaks
+        with CatchIOErrors(f, outfp, args.fail_save, htable, args.force,
+                           corrupt_files):
+
+            # actually do diginorm
+            for record in norm(f, p):
+                write_record(record, outfp)
+
+            print('output in ' + output_name, file=sys.stderr)
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'

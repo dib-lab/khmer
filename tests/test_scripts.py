@@ -602,7 +602,7 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-    assert "IOError" not in err
+    assert "IOErrors" not in err
 
 
 def test_normalize_by_median_unforced_badfile():
