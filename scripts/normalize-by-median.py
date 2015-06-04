@@ -48,6 +48,7 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
 
     index = 0
 
+    # per read diagnostic output
     for index, is_paired, read0, read1 in reader:
 
         if is_paired:
@@ -74,6 +75,22 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
 
         yield index, is_paired, read0, read1
 
+    # per file diagnostic output
+    if norm.total == 0 and norm.discarded == 0:
+        print('SKIPPED empty file ' + ifilename, file=sys.stderr)
+    if norm.total > 0:
+        print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
+              .format(inp=ifilename, kept=norm.total - norm.discarded,
+                      total=norm.total, perc=int(100. - norm.discarded /
+                                                 float(norm.total) * 100.)),
+              file=sys.stderr)
+
+    if fp:
+            print(str(norm.total) + " " + str(norm.total - norm.discarded) +
+                  " " + str(1. - (norm.discarded / float(norm.total))),
+                  file=fp)
+            fp.flush()
+
 
 class Normalizer(object):
     def __init__(self, desired_coverage, htable, report_fp=None,
@@ -85,7 +102,6 @@ class Normalizer(object):
 
         self.total = 0
         self.discarded = 0
-        self.corrupt_files = []
 
     def __call__(self, input_filename, force_paired=False):
         seq = ""
@@ -98,8 +114,10 @@ class Normalizer(object):
                                       force_single=self.force_single,
                                       require_paired=force_paired)
 
-        for index, is_paired, read0, read1 in WithDiagnostics(input_filename, self.report_fp,
-                                            force_paired, self, reader):
+        for index, is_paired, read0, read1 in WithDiagnostics(input_filename,
+                                                              self.report_fp,
+                                                              force_paired,
+                                                              self, reader):
             passed_filter = False
             passed_length = True
 
@@ -143,18 +161,16 @@ def handle_error(error, output_name, input_name, fail_save, htable):
               file=sys.stderr)
 
 
+# TO-DO: find a better way of getting corrupt files out of here
 @contextmanager
-def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
+def CatchIOErrors(ifile, ofile, save_on_fail, ht, force):
     """
     Context manager to do boilerplate excepting of IOErrors; also does
     upkeep on some statistics and diagnostic output.
     """
-
-    caught_error = False
     try:
-        yield
+        yield False
     except (IOError, ValueError) as err:
-        caught_error = True
         handle_error(err, ofile, ifile, save_on_fail, ht)
         if not force:
             print('** Exiting!', file=sys.stderr)
@@ -162,19 +178,6 @@ def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, norm):
             sys.exit(1)
         else:
             print('*** Skipping error file, moving on...', file=sys.stderr)
-            norm.corrupt_files.append(ifile)
-
-    if norm.total == 0 and norm.discarded == 0:
-        print('SKIPPED empty file ' + ifile, file=sys.stderr)
-    elif not caught_error:
-        total = norm.total
-        discarded = norm.discarded
-        print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
-              .format(inp=ifile, kept=total - discarded,
-                      total=total,
-                      perc=int(100. - discarded / float(total) * 100.)),
-              file=sys.stderr)
-        print('output in ' + ofile.name, file=sys.stderr)
 
 
 def normalize_by_median_and_check(input_filename, htable, single_output_file,
@@ -185,7 +188,7 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
 
     total_acc = None
     discarded_acc = None
-
+    corrupt = None
     if single_output_file:
         if single_output_file is sys.stdout:
             output_name = '/dev/stdout'
@@ -196,7 +199,8 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-    with CatchIOErrors(input_filename, outfp, fail_save, htable, force, norm):
+    with CatchIOErrors(input_filename, outfp, fail_save, htable, force) as \
+            failsafed:
 
         for record in norm(input_filename, paired):
             write_record(record, outfp)
@@ -204,12 +208,12 @@ def normalize_by_median_and_check(input_filename, htable, single_output_file,
         total = norm.total
         discarded = norm.discarded
 
-        if report_fp:
-            print(str(total) + " " + str(total - discarded) + " " +
-                  str(1. - (discarded / float(total))), file=report_fp)
-            report_fp.flush()
+        print('output in ' + output_name, file=sys.stderr)
 
-    return norm.total, norm.discarded, norm.corrupt_files
+    if not failsafed:
+        corrupt = input_filename
+
+    return norm.total, norm.discarded, corrupt
 
 
 def get_parser():
@@ -382,12 +386,15 @@ file for one of the input files will be generated.)" % filename,
     if args.unpaired_reads:
         files.append([args.unpaired_reads, False])
 
+    corrupt_files = []
     for f, p in CheckpointCountingTable(files, args.dump_frequency, htable,
                                         args.savetable):
         total_acc, discarded_acc, corrupt = \
             normalize_by_median_and_check(
                 f, htable, args.single_output_file,
                 args.fail_save, p, args.force, norm, report_fp)
+        if corrupt is not None:
+            corrupt_files.append(corrupt)
 
     if args.report_total_kmers:
         print('Total number of unique k-mers: {0}'
@@ -405,10 +412,10 @@ file for one of the input files will be generated.)" % filename,
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
           file=sys.stderr)
 
-    if args.force and len(norm.corrupt_files) > 0:
+    if args.force and len(corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
         print("** IOErrors occurred in the following files:", file=sys.stderr)
-        print("\t", " ".join(norm.corrupt_files), file=sys.stderr)
+        print("\t", " ".join(corrupt_files), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

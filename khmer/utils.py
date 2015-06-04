@@ -135,7 +135,7 @@ def broken_paired_reader(screed_iter, min_length=None,
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    raise ValueError("requiring paired seqs @CTB")
+                    raise ValueError("Unpaired reads when force-paired is set")
                 yield n, False, prev_record, None
                 n += 1
 

@@ -602,6 +602,7 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert "IOError" not in err
 
 
 def test_normalize_by_median_unforced_badfile():
@@ -826,7 +827,7 @@ def test_normalize_by_median_impaired():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert 'Error: unpaired reads ' in err, err
+    assert 'ERROR: Unpaired reads ' in err, err
 
 
 def test_normalize_by_median_force():
