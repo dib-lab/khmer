@@ -51,7 +51,7 @@ def WithDiagnostics(ifilename, norm, reader):
     fp = norm.report_fp
 
     # per read diagnostic output
-    for index, is_paired, read0, read1 in reader:
+    for record, index in norm(reader):
 
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
@@ -68,8 +68,7 @@ def WithDiagnostics(ifilename, norm, reader):
                       1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
-        for record in norm(index, is_paired, read0, read1):
-            yield record
+        yield record
 
     # per file diagnostic output
     if norm.total == 0:
@@ -99,37 +98,38 @@ class Normalizer(object):
         self.total = 0
         self.discarded = 0
 
-    def __call__(self, index, is_paired, read0, read1):
+    def __call__(self, reader):
 
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        passed_filter = False
+        for index, is_paired, read0, read1 in reader:
+            passed_filter = False
 
-        if is_paired:
-            self.total += 2
-        else:
             self.total += 1
 
-        batch = []
-        batch.append(read0)
-        if read1 is not None:
-            batch.append(read1)
+            if is_paired:
+                self.total += 1
 
-        for record in batch:
-            seq = record.sequence.replace('N', 'A')
-            med, _, _ = self.htable.get_median_count(seq)
+            batch = []
+            batch.append(read0)
+            if read1 is not None:
+                batch.append(read1)
 
-            if med < desired_coverage:
-                passed_filter = True
-
-        if passed_filter:
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                self.htable.consume(seq)
-                yield record
-        else:
-            self.discarded += len(batch)
+                med, _, _ = self.htable.get_median_count(seq)
+
+                if med < desired_coverage:
+                    passed_filter = True
+
+            if passed_filter:
+                for record in batch:
+                    seq = record.sequence.replace('N', 'A')
+                    self.htable.consume(seq)
+                    yield record, index
+            else:
+                self.discarded += len(batch)
 
 
 def handle_error(error, input_name):
