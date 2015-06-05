@@ -45,6 +45,20 @@ class Test_CountingHash(object):
     def setup(self):
         self.hi = khmer.CountingHash(12, PRIMES_1m)
 
+    def test_failed_get(self):
+        GG = 'G' * 12                   # forward_hash: 11184810
+        GGhash = khmer.forward_hash(GG, 12)
+        assert khmer.forward_hash(GG, 12) == 11184810
+
+        hi = self.hi
+        hi.consume(GG)
+
+        try:
+            hi.get(float(GGhash))
+            assert "the previous statement should fail"
+        except ValueError as err:
+            print str(err)
+
     def test_collision_1(self):
 
         GG = 'G' * 12                   # forward_hash: 11184810

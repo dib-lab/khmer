@@ -904,7 +904,7 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
     unsigned long count = 0;
 
-    if (PyInt_Check(arg)) {
+    if (PyInt_Check(arg) || PyLong_Check(arg)) {
         long pos = PyInt_AsLong(arg);
         count = hashtable->get_count((unsigned int) pos);
     } else if (PyBytes_Check(arg)) {
@@ -917,6 +917,10 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
         }
 
         count = hashtable->get_count(s.c_str());
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "please pass either a hash value or a string");
+        return NULL;
     }
 
     return PyLong_FromLong(count);
