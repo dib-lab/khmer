@@ -1364,14 +1364,12 @@ void SubsetPartition::merge_from_disk(string other_filename)
         assert(i == n_bytes);
         memcpy(buf, buf + n_bytes, remainder);
     }
+    delete[] buf;
 
     if (loaded != expected_pmap_size) {
-        delete[] buf;
         throw khmer_file_exception("error loading partitionmap - "
                               "invalid # of items");
     }
-
-    delete[] buf;
 }
 
 // Save a partition map to disk.
