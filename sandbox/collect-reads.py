@@ -19,7 +19,6 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
