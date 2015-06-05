@@ -40,7 +40,7 @@ DEFAULT_DESIRED_COVERAGE = 10
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
 
 
-def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
+def WithDiagnostics(ifilename, norm, reader):
     """
     Generator/context manager to do boilerplate output of statistics while
     normalizing data. Also checks for properly paired data.
@@ -48,13 +48,10 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
 
     index = 0
 
+    fp = norm.report_fp
+
     # per read diagnostic output
     for index, is_paired, read0, read1 in reader:
-
-        if is_paired:
-            norm.total += 2
-        else:
-            norm.total += 1
 
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
@@ -71,7 +68,8 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
                       1. - (discarded / float(total)), file=fp)
                 report_fp.flush()
 
-        yield index, is_paired, read0, read1
+        for record in norm(index, is_paired, read0, read1):
+            yield record
 
     # per file diagnostic output
     if norm.total == 0:
@@ -84,10 +82,11 @@ def WithDiagnostics(ifilename, fp, force_paired, norm, reader):
               file=sys.stderr)
 
     if fp:
-            print(str(norm.total) + " " + str(norm.total - norm.discarded) +
-                  " " + str(1. - (norm.discarded / float(norm.total))),
-                  file=fp)
-            fp.flush()
+        print("{total} {kept} {discarded}"
+              .format(total=norm.total, kept=norm.total - norm.discarded,
+                      discarded=1. - (norm.discarded / float(norm.total))),
+              file=fp)
+        fp.flush()
 
 
 class Normalizer(object):
@@ -96,72 +95,57 @@ class Normalizer(object):
         self.htable = htable
         self.desired_coverage = desired_coverage
         self.report_fp = report_fp
-        self.force_single = force_single
 
         self.total = 0
         self.discarded = 0
 
-    def __call__(self, input_filename, force_paired=False):
+    def __call__(self, index, is_paired, read0, read1):
 
         desired_coverage = self.desired_coverage
         ksize = self.htable.ksize()
 
-        screed_iter = screed.open(input_filename, parse_description=False)
-        reader = broken_paired_reader(screed_iter, min_length=ksize,
-                                      force_single=self.force_single,
-                                      require_paired=force_paired)
+        passed_filter = False
 
-        for index, is_paired, read0, read1 in WithDiagnostics(input_filename,
-                                                              self.report_fp,
-                                                              force_paired,
-                                                              self, reader):
-            passed_filter = False
+        if is_paired:
+            self.total += 2
+        else:
+            self.total += 1
 
-            batch = []
-            batch.append(read0)
-            if read1 is not None:
-                batch.append(read1)
+        batch = []
+        batch.append(read0)
+        if read1 is not None:
+            batch.append(read1)
 
+        for record in batch:
+            seq = record.sequence.replace('N', 'A')
+            med, _, _ = self.htable.get_median_count(seq)
+
+            if med < desired_coverage:
+                passed_filter = True
+
+        if passed_filter:
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                med, _, _ = self.htable.get_median_count(seq)
-
-                if med < desired_coverage:
-                    passed_filter = True
-
-            if passed_filter:
-                for record in batch:
-                    seq = record.sequence.replace('N', 'A')
-                    self.htable.consume(seq)
-                    yield record
-            else:
-                self.discarded += len(batch)
+                self.htable.consume(seq)
+                yield record
+        else:
+            self.discarded += len(batch)
 
 
-def handle_error(error, output_name, input_name, fail_save, htable):
+def handle_error(error, input_name):
     print('** ERROR: ' + str(error), file=sys.stderr)
     print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
-    if fail_save:
-        tablename = os.path.basename(input_name) + '.ct.failed'
-        print('** ...dumping k-mer counting table to {tn}'
-              .format(tn=tablename), file=sys.stderr)
-        htable.save(tablename)
-    try:
-        os.remove(output_name)
-    except:  # pylint: disable=bare-except
-        print('** ERROR: problem removing corrupt filtered file',
-              file=sys.stderr)
 
 
 @contextmanager
-def CatchIOErrors(ifile, ofile, save_on_fail, ht, force, corrupt_files):
+def CatchIOErrors(ifile, force, corrupt_files):
     """
     Context manager to do boilerplate excepting of IOErrors
     """
     try:
         yield
     except (IOError, ValueError) as err:
-        handle_error(err, ofile, ifile, save_on_fail, ht)
+        handle_error(err, ifile)
         if not force:
             print('** Exiting!', file=sys.stderr)
 
@@ -244,9 +228,6 @@ def get_parser():
     parser.add_argument('-f', '--fault-tolerant', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
-    parser.add_argument('--save-on-failure', dest='fail_save',
-                        action='store_false', default=True,
-                        help='Save k-mer counting table when an error occurs')
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump k-mer counting table every d '
                         'files', default=-1)
@@ -313,7 +294,7 @@ file for one of the input files will be generated.)" % filename,
     input_filename = None
 
     # diginorm algorithm lives in Normalizer, go get it
-    norm = Normalizer(args.cutoff, htable, report_fp, force_single)
+    norm = Normalizer(args.cutoff, htable, report_fp)
 
     # make a list of all filenames and if they're paired or not
     # if we don't know if they're paired, default to not forcing paired
@@ -325,27 +306,33 @@ file for one of the input files will be generated.)" % filename,
 
     corrupt_files = []
 
-    for f, p in files:
-        outfp = None
+    outfp = None
 
-        # figure out what we're calling out output file
-        if args.single_output_file:
-            if args.single_output_file is sys.stdout:
-                output_name = '/dev/stdout'
-            else:
-                output_name = args.single_output_file.name
-            outfp = args.single_output_file
+    if args.single_output_file:
+        if args.single_output_file is sys.stdout:
+            output_name = '/dev/stdout'
         else:
+            output_name = args.single_output_file.name
+        outfp = args.single_output_file
+
+    for f, p in files:
+        if not args.single_output_file:
             output_name = os.path.basename(f) + '.keep'
             outfp = open(output_name, 'w')
 
+        ksize = htable.ksize()
+        screed_iter = screed.open(f, parse_description=False)
+        reader = broken_paired_reader(screed_iter, min_length=ksize,
+                                      force_single=force_single,
+                                      require_paired=p)
+
         # failsafe context manager in case an input file breaks
-        with CatchIOErrors(f, outfp, args.fail_save, htable, args.force,
-                           corrupt_files):
+        with CatchIOErrors(f, args.force, corrupt_files):
 
             # actually do diginorm
-            for record in norm(f, p):
-                write_record(record, outfp)
+            for record in WithDiagnostics(f, norm, reader):
+                if record is not None:
+                    write_record(record, outfp)
 
             print('output in ' + output_name, file=sys.stderr)
 

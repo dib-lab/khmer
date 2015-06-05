@@ -614,7 +614,7 @@ def test_normalize_by_median_unforced_badfile():
     args = ['-C', CUTOFF, '-k', '17', '-t', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
-        raise Exception("Shoulnd't get to this")
+        raise Exception("Shouldn't get to this")
     except AssertionError as e:
         pass
 
@@ -848,12 +848,6 @@ def test_normalize_by_median_force():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(corrupt_infile + '.ct.failed')
-    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
-    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
-    assert test_ht.count(test_good_read[:17]) > 0
-    assert test_ht.count(test_good_read2[:17]) > 0
-    assert os.path.exists(corrupt_infile + '.ct.failed')
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
