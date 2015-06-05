@@ -268,25 +268,6 @@ def get_parser():
     return parser
 
 
-def CheckpointCountingTable(input_filenames, freq, ht, savename):
-    """
-    Generator/context manager to progressively save counting tables
-    """
-    for index, ifile in enumerate(input_filenames):
-        yield ifile[0], ifile[1]
-        if freq > 0 and index > 0 and index % freq == 0:
-            print('Backup: Saving k-mer counting file through ' +
-                  ifile[0], file=sys.stderr)
-            if savename:
-                hashname = savename
-                print('...saving to ' + hashname, file=sys.stderr)
-            else:
-                hashname = 'backup.ct'
-                print('Nothing given for savetable, saving to ' + hashname,
-                      file=sys.stderr)
-            ht.save(hashname)
-
-
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
@@ -344,8 +325,7 @@ file for one of the input files will be generated.)" % filename,
 
     corrupt_files = []
 
-    for f, p in CheckpointCountingTable(files, args.dump_frequency, htable,
-                                        args.savetable):
+    for f, p in files:
         outfp = None
 
         # figure out what we're calling out output file

@@ -880,35 +880,6 @@ def test_normalize_by_median_no_bigcount():
     assert kh.get('GGTTGACG') == 255
 
 
-def test_normalize_by_median_dumpfrequency():
-    CUTOFF = '1'
-
-    infiles = [utils.get_temp_filename('test-0.fq')]
-    in_dir = os.path.dirname(infiles[0])
-    for x in range(1, 5):
-        infiles.append(utils.get_temp_filename('test-{x}.fq'.format(x=x),
-                                               tempdir=in_dir))
-
-    for infile in infiles:
-        shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
-
-    script = scriptpath('normalize-by-median.py')
-    args = ['-d', '2', '-C', CUTOFF, '-k', '17']
-    args.extend(infiles)
-
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ct'))
-    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
-    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
-    assert test_ht.count(test_good_read[:17]) > 0
-    assert test_ht.count(test_good_read2[:17]) > 0
-
-    assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
-    assert err.count('Backup: Saving') == 2
-    assert 'Nothing' in err
-
-
 def test_normalize_by_median_empty():
     CUTOFF = '1'
 
