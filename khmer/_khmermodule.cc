@@ -2334,6 +2334,30 @@ hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
 }
 
 
+static
+PyObject *
+hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<HashIntoType> hashes;
+    hashtable->get_kmer_hashes(sequence, hashes);
+
+    PyObject * x = PyList_New(hashes.size());
+    for (unsigned int i = 0; i < hashes.size(); i++) {
+       PyObject * obj = PyLong_FromUnsignedLongLong(hashes[i]);
+       PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
     //
     // Basic methods
@@ -2390,9 +2414,13 @@ static PyMethodDef khmer_hashtable_methods[] = {
       (PyCFunction)hashtable_get_kmers, METH_VARARGS,
       "Generate an ordered list of all substrings of length k in the string."
     },
+    { "get_kmer_hashes",
+      (PyCFunction)hashtable_get_kmer_hashes, METH_VARARGS,
+      "Retrieve an ordered list of all hashes of all k-mers in the string."
+    },
     { "get_kmer_counts",
       (PyCFunction)hashtable_get_kmer_counts, METH_VARARGS,
-      "Retrieve the counts of all k-mers in the string."
+      "Retrieve an ordered list of the counts of all k-mers in the string."
     },
 
     //

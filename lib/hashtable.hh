@@ -467,6 +467,10 @@ public:
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)
       const;
 
+    // return hash values for all k-mer substrings
+    void get_kmer_hashes(const std::string &s,
+                         std::vector<HashIntoType> &kmers) const;
+
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;

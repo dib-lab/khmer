@@ -383,6 +383,43 @@ def test_get_kmer_counts():
     assert counts[1] == 3
 
 
+def test_get_kmer_hashes():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes("AAAAAA")
+    print hashes
+    assert len(hashes) == 1
+    assert hi.get(hashes[0]) == 1
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes("AAAAAA")
+    print hashes
+    assert len(hashes) == 1
+    assert hi.get(hashes[0]) == 2
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 1
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 2
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 3
+
+
 def test_get_kmers():
     hi = khmer.new_counting_hash(6, 1e6, 2)
 

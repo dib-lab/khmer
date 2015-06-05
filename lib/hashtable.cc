@@ -1503,6 +1503,18 @@ void Hashtable::get_kmers(const std::string &s,
 }
 
 
+void Hashtable::get_kmer_hashes(const std::string &s,
+                                std::vector<HashIntoType> &kmers_vec) const
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        kmers_vec.push_back(kmer);
+    }
+}
+
+
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
