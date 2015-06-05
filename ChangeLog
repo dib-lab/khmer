@@ -1,5 +1,13 @@
 2015-06-04  Titus Brown  <titus@idyll.org>
 
+   * khmer/_khmermodule.cc: added error handling to load_partitionmap.
+   * lib/subset.cc: modified partitionmap format to detect truncated files;
+   changed untestable sanity checks to assertions.
+   * tests/{test_counting_hash,test_hashbits,test_subset_graph}.py: added
+   tests to try loading all possible truncations of binary save files.
+
+2015-06-04  Titus Brown  <titus@idyll.org>
+
    * khmer/_khmermodule.cc,lib/hashbits.{cc,hh}: add Hashbits::update_from()
    and Hashbits.update().
    * tests/test_hashbits.py: associated tests.
@@ -12,7 +20,7 @@
    
 2015-06-01  Tamer Mansour <drtamermansour@gmail.com>
 
-   * scripts/normalize-by-median.py: changed to count kmers from both PE reads 
+   * scripts/normalize-by-median.py: changed to count kmers from both PE reads
    when either one of them is below the coverage cutoff
    * tests/test_scripts.py: Added test for new behaviour
 
