@@ -48,6 +48,7 @@ class Test_CountingHash(object):
     def test_collision_1(self):
 
         GG = 'G' * 12                   # forward_hash: 11184810
+        GGhash = khmer.forward_hash(GG, 12)
         assert khmer.forward_hash(GG, 12) == 11184810
 
         collision_1 = 'AAACGTATGACT'
@@ -64,6 +65,7 @@ class Test_CountingHash(object):
         hi.consume(collision_1)
 
         assert hi.get(GG) == 1
+        assert hi.get(GGhash) == 1
 
     def test_collision_2(self):
 
