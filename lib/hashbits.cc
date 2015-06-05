@@ -253,4 +253,24 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
     return n_consumed;
 }
 
+void Hashbits::update_from(const Hashbits &other)
+{
+    if (_ksize != other._ksize) {
+        throw khmer_exception("both nodegraphs must have same k size");
+    }
+    if (_tablesizes != other._tablesizes) {
+        throw khmer_exception("both nodegraphs must have same table sizes");
+    }
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        Byte * me = _counts[table_num];
+        Byte * ot = other._counts[table_num];
+        HashIntoType tablesize = _tablesizes[table_num];
+        HashIntoType tablebytes = tablesize / 8 + 1;
+
+        for (HashIntoType index = 0; index < tablebytes; index++) {
+            me[index] |= ot[index];     // bitwise or
+        }
+    }
+}
+
 // vim: set sts=2 sw=2:

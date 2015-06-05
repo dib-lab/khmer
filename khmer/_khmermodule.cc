@@ -3078,8 +3078,36 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     return Py_BuildValue("KKO", n, n_overlap, x);
 }
 
+static
+PyObject *
+hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
+{
+    Hashbits * hashbits = me->hashbits;
+    Hashbits * other;
+    khmer_KHashbits_Object * other_o;
+
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KHashbits_Type, &other_o)) {
+        return NULL;
+    }
+
+    other = other_o->hashbits;
+
+    try {
+        hashbits->update_from(*other);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
     { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
+    { "update",
+      (PyCFunction) hashbits_update, METH_VARARGS,
+      "a set update: update this nodegraph with all the entries from the other"
+    },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
