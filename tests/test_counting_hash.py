@@ -346,6 +346,22 @@ def test_get_kmer_counts_too_short():
     assert len(counts) == 0
 
 
+def test_get_kmer_counts_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("A")
+    assert len(counts) == 0
+
+
+def test_get_kmers_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    kmers = hi.get_kmers("A")
+    assert len(kmers) == 0
+
+
 def test_get_kmer_counts():
     hi = khmer.new_counting_hash(6, 1e6, 2)
 
