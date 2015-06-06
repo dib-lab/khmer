@@ -248,3 +248,25 @@ def test_hll_get_counters():
     counters = hll.counters
     assert len(counters) == 2 ** 4
     assert all(c == 0 for c in counters)
+
+
+def test_hll_merge_1():
+    hll = khmer.HLLCounter(0.36, K)
+    hll2 = khmer.HLLCounter(0.36, K - 1)
+
+    try:
+        hll.merge(hll2)
+        assert 0, "previous statement should fail with a ValueError"
+    except ValueError as err:
+        print str(err)
+
+
+def test_hll_merge_2():
+    hll = khmer.HLLCounter(0.10, K)
+    hll2 = khmer.HLLCounter(0.36, K)
+
+    try:
+        hll.merge(hll2)
+        assert 0, "previous statement should fail with a ValueError"
+    except ValueError as err:
+        print str(err)
