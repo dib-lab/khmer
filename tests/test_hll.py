@@ -270,3 +270,21 @@ def test_hll_merge_2():
         assert 0, "previous statement should fail with a ValueError"
     except ValueError as err:
         print str(err)
+
+
+def test_hll_merge_3():
+    hll = khmer.HLLCounter(0.36, 32)
+    hll2 = khmer.HLLCounter(0.36, 32)
+
+    filename = utils.get_test_data('paired-mixed.fa')
+    hll = khmer.HLLCounter(0.36, 32)
+    hll.consume_fasta(filename)
+
+    hll2 = khmer.HLLCounter(0.36, 32)
+    hll2.consume_fasta(filename)
+
+    assert len(hll) == 236
+    assert len(hll2) == 236
+
+    hll.merge(hll2)
+    assert len(hll) == 236
