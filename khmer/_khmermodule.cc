@@ -4434,7 +4434,6 @@ static PyTypeObject khmer_KHLLCounter_Type = {
 static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args)
 {
-    const char * filename;
     khmer_KHLLCounter_Object * other;
 
     if (!PyArg_ParseTuple(args, "O!", &khmer_KHLLCounter_Type, &other)) {
