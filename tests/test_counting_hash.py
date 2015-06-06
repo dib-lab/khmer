@@ -335,6 +335,30 @@ def test_save_load():
     assert x == y, (x, y)
 
 
+def test_load_truncated():
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('save.ht')
+    truncpath = utils.get_temp_filename('trunc.ht')
+
+    sizes = khmer.get_n_primes_near_x(3, 200)
+
+    hi = khmer.CountingHash(12, sizes)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    data = open(savepath, 'rb').read()
+    for i in range(len(data)):
+        fp = open(truncpath, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            ht = khmer.load_counting_hash(truncpath)
+            assert 0, "this should not be reached!"
+        except IOError as err:
+            print str(err)
+
+
 def test_load_gz():
     inpath = utils.get_test_data('random-20-a.fa')
 
