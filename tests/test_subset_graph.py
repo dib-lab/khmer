@@ -1,7 +1,7 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring
@@ -9,7 +9,7 @@ import khmer
 import screed
 
 import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+import os
 
 
 def teardown():
@@ -26,7 +26,9 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        divvy = ht.divide_tags_into_subsets(1)
+        assert len(divvy) is 3
+        (a, b, c) = divvy
 
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
@@ -45,7 +47,9 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        divvy = ht.divide_tags_into_subsets(1)
+        assert len(divvy) is 3
+        (a, b, c) = divvy
 
         x = ht.do_subset_partition(b, c)
         ht.merge_subset(x)
@@ -202,6 +206,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -225,6 +230,43 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
+    def test_save_load_merge_truncate(self):
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
+        filename = utils.get_test_data('test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        assert len(divvy) is 3
+        (a, b, c) = divvy
+
+        outfile1 = utils.get_temp_filename('x.pmap')
+        outfile2 = utils.get_temp_filename('y.pmap')
+
+        x = ht.do_subset_partition(a, b)
+        ht.save_subset_partitionmap(x, outfile1)
+        del x
+
+        y = ht.do_subset_partition(b, 0)
+        ht.save_subset_partitionmap(y, outfile2)
+        del y
+
+        outfile3 = utils.get_temp_filename('z.pmap')
+        data = open(outfile1, 'rb').read()
+
+        for i in range(len(data)):
+            fp = open(outfile3, 'wb')
+            fp.write(data[:i])
+            fp.close()
+
+            try:
+                a = ht.load_subset_partitionmap(outfile3)
+                assert 0, "this should not pass"
+            except IOError as err:
+                print str(err), i
+
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 8 + 1)
         filename = utils.get_test_data('random-20-a.fa')
@@ -245,6 +287,8 @@ class Test_SaveLoadPmap(object):
         ht.save_subset_partitionmap(y, outfile2)
         del y
 
+        assert os.path.exists(outfile1)
+        assert os.path.exists(outfile2)
         a = ht.load_subset_partitionmap(outfile1)
         b = ht.load_subset_partitionmap(outfile2)
 
@@ -272,6 +316,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -312,6 +357,8 @@ class Test_SaveLoadPmap(object):
         ht.save_subset_partitionmap(y, outfile2)
         del y
 
+        assert os.path.exists(outfile1)
+        assert os.path.exists(outfile2)
         ht.merge_subset_from_disk(outfile1)
         ht.merge_subset_from_disk(outfile2)
 
@@ -328,6 +375,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -369,6 +417,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
+        assert len(divvy) is 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -382,6 +431,77 @@ class Test_SaveLoadPmap(object):
             assert 0, "this should fail"
         except IOError as e:
             print str(e)
+
+
+def test_save_load_merge_on_graph():
+    ht = khmer.new_hashbits(20, 4 ** 4 + 1)
+    filename = utils.get_test_data('test-graph2.fa')
+
+    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    assert total_reads == 3, total_reads
+
+    divvy = ht.divide_tags_into_subsets(1)
+    print divvy
+    assert len(divvy) is 3
+    (a, b, c) = divvy
+
+    outfile1 = utils.get_temp_filename('x.pmap')
+    outfile2 = utils.get_temp_filename('y.pmap')
+
+    x = ht.do_subset_partition(a, b)
+    ht.save_subset_partitionmap(x, outfile1)
+    del x
+
+    y = ht.do_subset_partition(b, 0)
+    ht.save_subset_partitionmap(y, outfile2)
+    del y
+
+    a = ht.load_partitionmap(outfile1)  # <-- this is different
+    b = ht.load_subset_partitionmap(outfile2)
+
+    ht.merge_subset(b)
+
+    outfile = utils.get_temp_filename('out.part')
+    n_partitions = ht.output_partitions(filename, outfile)
+    assert n_partitions == 1, n_partitions        # combined.
+
+
+def test_save_load_on_graph_truncate():
+    ht = khmer.new_hashbits(20, 4 ** 4 + 1)
+    filename = utils.get_test_data('test-graph2.fa')
+
+    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    assert total_reads == 3, total_reads
+
+    divvy = ht.divide_tags_into_subsets(1)
+    print divvy
+    assert len(divvy) is 3
+    (a, b, c) = divvy
+
+    outfile1 = utils.get_temp_filename('x.pmap')
+    outfile2 = utils.get_temp_filename('y.pmap')
+
+    x = ht.do_subset_partition(a, b)
+    ht.save_subset_partitionmap(x, outfile1)
+    del x
+
+    y = ht.do_subset_partition(b, 0)
+    ht.save_subset_partitionmap(y, outfile2)
+    del y
+
+    outfile3 = utils.get_temp_filename('z.pmap')
+    data = open(outfile1, 'rb').read()
+
+    for i in range(len(data)):
+        fp = open(outfile3, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            a = ht.load_partitionmap(outfile3)
+            assert 0, "this should not pass"
+        except IOError as err:
+            print str(err), i
 
 
 def test_output_partitions():

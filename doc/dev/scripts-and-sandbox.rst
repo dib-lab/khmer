@@ -66,7 +66,7 @@ Copyright message
 Our current Copyright message is::
 
    #
-   # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+   # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    # Copyright (C) Michigan State University, 2009-2015. It is licensed under
    # the three-clause BSD license; see doc/LICENSE.txt.
    # Contact: khmer-project@idyll.org
@@ -114,5 +114,7 @@ development/PR checklist::
    - [ ] argparse help text exists, with an epilog docstring, with examples and options
    - [ ] standard command line options are implemented
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
+   - [ ] support '-' (STDIN) as an input file, if appropriate
+   - [ ] support designation of an output file (including STDOUT), if appropriate
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
    - [ ] script has been removed from sandbox/README.rst

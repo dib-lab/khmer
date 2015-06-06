@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
 
@@ -36,7 +36,7 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.kfile import (check_file_status, check_valid_file_exists,
+from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
 from khmer.utils import write_record
@@ -229,7 +229,7 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    check_file_status(args.input_fastp, args.force)
+    check_input_files(args.input_fastp, args.force)
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)
@@ -301,7 +301,8 @@ def main():
 
     print >>sys.stderr, 'done consuming input sequence. \
                         added {t} tags and {l} \
-                        labels...'.format(t=ht.n_tags(), l=ht.n_labels())
+                        labels...'.format(t=ht.graph.n_tags(),
+                                          l=ht.n_labels())
 
     label_dict = defaultdict(int)
     label_number_dist = []

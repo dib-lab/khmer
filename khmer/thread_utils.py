@@ -1,12 +1,11 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-"""
-Utilities for dealing with multithreaded processing of short reads.
-"""
+"""Utilities for dealing with multithreaded processing of short reads."""
+
 import threading
 import Queue
 import sys
@@ -17,6 +16,7 @@ DEFAULT_GROUPSIZE = 100
 
 
 def verbose_loader(filename):
+    """Screed iterator that additionally prints progress info to stderr."""
     screed_iter = screed.open(filename, parse_description=False)
     for n, record in enumerate(screed_iter):
         if n % 100000 == 0:

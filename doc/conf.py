@@ -32,7 +32,8 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.txt'
+source_suffix = '.rst'
+
 
 # The encoding of source files.
 # source_encoding = 'utf-8'
@@ -56,16 +57,16 @@ Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown'''
 
 # The full version, including alpha/beta/rc tags.
 
-import pkg_resources
-try:
-    release = pkg_resources.get_distribution('khmer').version
-except pkg_resources.DistributionNotFound:
-    print 'To build the documentation, The distribution information of khmer' \
-        ' has to be available.  Either install the package into your' \
-        ' development environment or run "setup.py develop" to setup the' \
-        ' metadata.  A virtualenv is recommended!'
-    sys.exit(1)
-del pkg_resources
+sys.path.insert(0, '../')
+import versioneer
+versioneer.VCS = 'git'
+versioneer.versionfile_source = '../khmer/_version.py'
+versioneer.versionfile_build = '../khmer/_version.py'
+versioneer.tag_prefix = 'v'  # tags are like v1.2.0
+versioneer.parentdir_prefix = '..'
+release = versioneer.get_version()
+del versioneer
+sys.path.remove('../')
 
 # The short X.Y version.
 
@@ -154,7 +155,7 @@ html_style = 'labibi.css'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = False
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -192,7 +193,7 @@ htmlhelp_basename = 'khmerdoc'
 html_context = {
    "google_analytics_id" : 'UA-51731094-1',
    "disqus_shortname" : 'khmer-docs',
-#   "github_base_account" : 'ged-lab',
+#   "github_base_account" : 'dib-lab',
    "github_project" : 'khmer',
 }
 

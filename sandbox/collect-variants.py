@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2013-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2013-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -144,16 +144,9 @@ def main():
         ht.save(args.savehash)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(ht)
+    fp_rate = khmer.calc_expected_collisions(ht, args.force, max_false_pos=.2)
     print 'fp rate estimated to be %1.3f' % fp_rate
 
-    if fp_rate > 0.20:
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the counting hash is too small for"
-        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** Do not use these results!!"
-        sys.exit(-1)
 
 if __name__ == '__main__':
     main()

@@ -17,9 +17,12 @@ doc/_build
 /.project
 /.pydevproject
 /.Rhistory
+.idea
 coverage.xml
 coverage-gcovr.xml
 coverage-debug
+htmlcov/
+diff-cover.html
 khmer-cov.tgz
 cppcheck-result.xml
 MANIFEST
@@ -43,3 +46,5 @@ sphinx-contrib
 compile_commands.json
 .DS_Store
 pylint_report.txt
+pep8_report.txt
+pep257_report.txt

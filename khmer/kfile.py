@@ -1,23 +1,24 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 
-'''
-File handling/checking utilities for command-line scripts.
-'''
+"""File handling/checking utilities for command-line scripts."""
 
 import os
 import sys
+import errno
 from stat import S_ISBLK, S_ISFIFO
 
 
-def check_file_status(file_path, force):
-    """Check the status of the file; if the file is empty or doesn't exist
-    AND if the file is NOT a fifo/block/named pipe then a warning is printed
-    and sys.exit(1) is called
+def check_input_files(file_path, force):
+    """Check the status of the file.
+
+    If the file is empty or doesn't exist AND if the file is NOT a
+    fifo/block/named pipe then a warning is printed and sys.exit(1) is
+    called
     """
     mode = None
 
@@ -52,12 +53,28 @@ def check_file_status(file_path, force):
                 sys.exit(1)
 
 
-def check_space(in_files, force, _testhook_free_space=None):
-    """
-    Estimate size of input files passed, then calculate
-    disk space available. Exit if insufficient disk space,
-    """
+def check_file_writable(file_path):
+    """Return if file_path is writable, exit out if it's not."""
+    try:
+        file_obj = open(file_path, "a")
+    except IOError as error:
+        if error.errno == errno.EACCES:
+            print >>sys.stderr, "ERROR: File %s does not have write " \
+                % file_path + "permission; exiting"
+            sys.exit(1)
+        else:
+            print >>sys.stderr, "ERROR: " + error.strerror
+    else:
+        file_obj.close()
+        return
 
+
+def check_space(in_files, force, _testhook_free_space=None):
+    """Check for available disk space.
+
+    Estimate size of input files passed, then calculate disk space
+    available and exit if disk space is insufficient.
+    """
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
     in_file = in_files[0]
@@ -93,9 +110,7 @@ def check_space(in_files, force, _testhook_free_space=None):
 
 
 def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
-    """
-    Check we have enough size to write a hash table
-    """
+    """Check we have enough size to write a hash table."""
     cwd = os.getcwd()
     dir_path = os.path.dirname(os.path.realpath(cwd))
     target = os.statvfs(dir_path)
@@ -119,11 +134,12 @@ def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
 
 
 def check_valid_file_exists(in_files):
-    """
+    """Warn if input files are empty or missing.
+
     In a scenario where we expect multiple input files and
     are OK with some of them being empty or non-existent,
     this check warns to stderr if any input file is empty
-    or non-existent
+    or non-existent.
     """
     for in_file in in_files:
         if os.path.exists(in_file):

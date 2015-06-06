@@ -8,7 +8,7 @@ CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
-autopep8 pylint coverage gcovr nose screed
+autopep8 pylint coverage gcovr nose screed pep257
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -63,11 +63,12 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so || true
-	rm khmer/*.pyc lib/*.pyc || true
+	rm -f khmer/_khmermodule.so
+	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
-	rm coverage-debug || true
-	rm -Rf .coverage || true
+	rm -f coverage-debug
+	rm -Rf .coverage
+	rm -f diff-cover.html
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
@@ -101,14 +102,26 @@ cppcheck: $(CPPSOURCES)
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
-		scripts/ tests/ || true
+		scripts/ tests/ oxli/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
+
+## pep257      : check Python code style
+pep257: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 --ignore=D100,D101,D102,D103 \
+		setup.py khmer/ scripts/ tests/ || true
+
+pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 setup.py khmer/ scripts/ tests/ \
+		> pep257_report.txt 2>&1 || true
+
+diff_pep257_report: pep257_report.txt
+	diff-quality --violations=pep8 pep257_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
@@ -117,7 +130,7 @@ astyle: $(CPPSOURCES)
 ## autopep8    : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
-		setup.py khmer/*.py scripts/*.py tests/*.py
+		setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
 ## format      : check/fix all code indentation and formatting (runs astyle and autopep8)
@@ -128,12 +141,12 @@ format: astyle autopep8
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		|| true
+		oxli/*.py || true
 
 pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		sandbox/*.py > pylint_report.txt || true
+		sandbox/*.py oxli/*.py > pylint_report.txt || true
 
 diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
@@ -142,7 +155,7 @@ diff_pylint_report: pylint_report.txt
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
-	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
+	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
 
 coverage.xml: .coverage
@@ -180,7 +193,7 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 		Doxyfile
 	doxygen
 
-lib:
+lib: FORCE
 	cd lib && \
 	$(MAKE)
 
@@ -256,4 +269,10 @@ coverity-configure:
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext
+
+convert-release-notes:
+	for file in doc/release-notes/*.md; do \
+		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
+		done
+
 FORCE:

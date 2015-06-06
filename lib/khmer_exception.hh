@@ -1,7 +1,7 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
@@ -22,18 +22,17 @@ namespace khmer
 class khmer_exception : public std::exception
 {
 public:
-    explicit khmer_exception(const char * msg) : _msg(msg) { }
     explicit khmer_exception(const std::string& msg = "Generic khmer exception")
-        : _msg(msg.c_str()) { }
+        : _msg(msg) { }
 
     virtual ~khmer_exception() throw() { }
     virtual const char* what() const throw ()
     {
-        return _msg;
+        return _msg.c_str();
     }
 
 protected:
-    const char * _msg;
+    const std::string _msg;
 };
 
 ///
@@ -42,7 +41,6 @@ protected:
 class khmer_file_exception : public khmer_exception
 {
 public:
-    explicit khmer_file_exception(const char * msg) : khmer_exception(msg) { }
     explicit khmer_file_exception(const std::string& msg)
         : khmer_exception(msg) { }
 };
@@ -55,7 +53,7 @@ class InvalidStreamHandle : public khmer_file_exception
 public:
     InvalidStreamHandle()
         : khmer_file_exception("Generic InvalidStreamHandle error") {}
-    InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
+    InvalidStreamHandle(const std::string& msg) : khmer_file_exception(msg) {}
 };
 
 class StreamReadError : public khmer_file_exception
@@ -63,7 +61,7 @@ class StreamReadError : public khmer_file_exception
 public:
     StreamReadError()
         : khmer_file_exception("Generic StreamReadError error") {}
-    StreamReadError(const char * msg) : khmer_file_exception(msg) {}
+    StreamReadError(const std::string& msg) : khmer_file_exception(msg) {}
 };
 
 
@@ -74,7 +72,6 @@ public:
 class InvalidValue : public khmer_exception
 {
 public:
-    explicit InvalidValue(const char * msg) : khmer_exception(msg) { }
     explicit InvalidValue(const std::string& msg)
         : khmer_exception(msg) { }
 };
@@ -86,7 +83,6 @@ public:
 class ReadOnlyAttribute : public khmer_exception
 {
 public:
-    explicit ReadOnlyAttribute(const char * msg) : khmer_exception(msg) { }
     explicit ReadOnlyAttribute(const std::string& msg)
         : khmer_exception(msg) { }
 };

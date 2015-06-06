@@ -1,16 +1,17 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2010-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Produce the k-mer abundance distribution for the given file, without
-loading a prebuilt k-mer counting table.
+Produce the k-mer abundance distribution for the given file.
 
 % python scripts/abundance-dist-single.py <data> <histout>
+
+The script does not load a prebuilt k-mer counting table.
 
 Use '-h' for parameter help.
 """
@@ -22,7 +23,7 @@ import threading
 import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
-from khmer.kfile import (check_file_status, check_space,
+from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 
 
@@ -74,7 +75,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     args = get_parser().parse_args()
     report_on_config(args)
 
-    check_file_status(args.input_sequence_filename, args.force)
+    check_input_files(args.input_sequence_filename, args.force)
     check_space([args.input_sequence_filename], args.force)
     if args.savetable:
         check_space_for_hashtable(args.n_tables * args.min_tablesize,

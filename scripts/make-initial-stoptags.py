@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -16,7 +16,7 @@ import sys
 import textwrap
 import khmer
 from khmer.khmer_args import (build_counting_args, info)
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 
 DEFAULT_SUBSET_SIZE = int(1e4)
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -79,7 +79,7 @@ def main():
     if args.stoptags:
         infiles.append(args.stoptags)
     for _ in infiles:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(infiles, args.force)
 

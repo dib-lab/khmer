@@ -1,7 +1,7 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # Convenience functions for performing common argument-checking tasks in
@@ -9,18 +9,26 @@
 
 
 def print_error(msg):
-    """
-    Prints the given message to 'stderr'.
-    """
-
+    """Print the given message to 'stderr'."""
     import sys
 
     print >>sys.stderr, msg
 
 
-def check_is_pair(record1, record2):
+def _split_left_right(name):
+    """Split record name at the first whitespace and return both parts.
+
+    RHS is set to an empty string if not present.
     """
-    Checks to see if the two sequence records are left and right pairs
+    parts = name.split(None, 1)
+    lhs, rhs = [parts[0], parts[1] if len(parts) > 1 else '']
+    return lhs, rhs
+
+
+def check_is_pair(record1, record2):
+    """Check if the two sequence records belong to the same fragment.
+
+    In an matching pair the records are left and right pairs
     of each other, respectively.  Returns True or False as appropriate.
 
     Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
@@ -30,64 +38,60 @@ def check_is_pair(record1, record2):
         if not (hasattr(record1, 'quality') and hasattr(record2, 'quality')):
             raise ValueError("both records must be same type (FASTA or FASTQ)")
 
-    name1 = record1.name
-    name2 = record2.name
+    lhs1, rhs1 = _split_left_right(record1.name)
+    lhs2, rhs2 = _split_left_right(record2.name)
 
-    if ' ' in name1 and ' ' in name2:                    # handle '@name 1:rst'
-        name1, rest1 = record1.name.split(' ', 1)
-        name2, rest2 = record2.name.split(' ', 1)
-
-        if name1 == name2 and \
-           rest1.startswith('1:') and rest2.startswith('2:'):
-            return True
-
-    elif name1.endswith('/1') and name2.endswith('/2'):  # handle name/1
-        subpart1 = name1.split('/', 1)[0]
-        subpart2 = name2.split('/', 1)[0]
+    # handle 'name/1'
+    if lhs1.endswith('/1') and lhs2.endswith('/2'):
+        subpart1 = lhs1.split('/', 1)[0]
+        subpart2 = lhs2.split('/', 1)[0]
 
         assert subpart1
         if subpart1 == subpart2:
             return True
 
+    # handle '@name 1:rst'
+    elif lhs1 == lhs2 and rhs1.startswith('1:') and rhs2.startswith('2:'):
+        return True
+
     return False
 
 
 def check_is_left(name):
-    """
-    Checks if the name belongs to a 'left' sequence (/1).  Returns True or
-    False.
+    """Check if the name belongs to a 'left' sequence (/1).
+
+    Returns True or False.
 
     Handles both Casava formats: seq/1 and 'seq::... 1::...'
     """
-    if ' ' in name:                        # handle '@name 1:rst'
-        name, rest = name.split(' ', 1)
-        if rest.startswith('1:'):
-            return True
-    elif name.endswith('/1'):              # handle name/1
+    lhs, rhs = _split_left_right(name)
+    if lhs.endswith('/1'):              # handle 'name/1'
+        return True
+    elif rhs.startswith('1:'):          # handle '@name 1:rst'
         return True
 
     return False
 
 
 def check_is_right(name):
-    """
-    Checks if the name belongs to a 'right' sequence (/2).  Returns True or
-    False.
+    """Check if the name belongs to a 'right' sequence (/2).
+
+    Returns True or False.
 
     Handles both Casava formats: seq/2 and 'seq::... 2::...'
     """
-    if ' ' in name:                        # handle '@name 2:rst'
-        name, rest = name.split(' ', 1)
-        if rest.startswith('2:'):
-            return True
-    elif name.endswith('/2'):              # handle name/2
+    lhs, rhs = _split_left_right(name)
+    if lhs.endswith('/2'):              # handle 'name/2'
+        return True
+    elif rhs.startswith('2:'):          # handle '@name 2:rst'
         return True
 
     return False
 
 
 def broken_paired_reader(screed_iter, min_length=None, force_single=False):
-    """
+    """Read pairs from a stream.
+
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
     records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
     'r2' is None if is_pair is False.
@@ -138,9 +142,7 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
 
 
 def write_record(record, fileobj):
-    """
-    Writes sequence record to 'fileobj' in FASTA/FASTQ format.
-    """
+    """Write sequence record to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(record, 'quality'):
         fileobj.write(
             '@{name}\n{seq}\n'
@@ -154,9 +156,7 @@ def write_record(record, fileobj):
 
 
 def write_record_pair(read1, read2, fileobj):
-    """
-    Writes pair of sequence records to 'fileobj' in FASTA/FASTQ format.
-    """
+    """Write a pair of sequence records to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(read1, 'quality'):
         assert hasattr(read2, 'quality')
     write_record(read1, fileobj)

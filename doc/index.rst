@@ -12,7 +12,10 @@ khmer -- k-mer counting & filtering FTW
           Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown
 
 :Contact: khmer-project@idyll.org
+:GitHub: https://github.com/dib-lab/khmer
+:Chat: https://gitter.im/dib-lab/khmer
 :License: BSD
+
 
 khmer is a library and suite of command line tools for working with
 DNA sequence.  It is primarily aimed at short-read sequencing data
@@ -20,6 +23,8 @@ such as that produced by the Illumina platform.  khmer takes a k-mer-centric
 approach to sequence analysis, hence the name.
 
 :doc:`user/install`
+
+:doc:`user/getting-help`
 
 There are two mailing lists dedicated to khmer, an announcements-only list and
 a discussion list. To search their archives and sign-up for them, please visit
@@ -47,9 +52,8 @@ Contents:
    introduction
    contributors
    citations
-
+   release-notes/index
    user/index
    dev/index
    roadmap
-
    LICENSE

@@ -1,15 +1,17 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Count the median/avg k-mer abundance for each sequence in the input file,
-based on the k-mer counts in the given k-mer counting table.  Can be used to
-estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
+Count the median/avg k-mer abundance for each sequence in the input file.
+
+The abundance is based on the k-mer counts in the given k-mer counting
+table.  Can be used to estimate expression levels (mRNAseq) or coverage
+(genomic/metagenomic).
 
 % scripts/count-median.py <htname> <input seqs> <output counts>
 
@@ -17,7 +19,7 @@ Use '-h' for parameter help.
 
 The output file contains sequence id, median, average, stddev, and seq length.
 
-NOTE: All 'N's in the input sequences are converted to 'G's.
+NOTE: All 'N's in the input sequences are converted to 'A's.
 """
 import screed
 import argparse
@@ -26,7 +28,7 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 
@@ -47,7 +49,7 @@ def get_parser():
 
        count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
 
-    NOTE: All 'N's in the input sequences are converted to 'G's.
+    NOTE: All 'N's in the input sequences are converted to 'A's.
     """
     parser = argparse.ArgumentParser(
         description='Count k-mers summary stats for sequences',
@@ -79,7 +81,7 @@ def main():
 
     infiles = [htfile, input_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(infiles, args.force)
 
@@ -103,7 +105,7 @@ def main():
                               parse_description=parse_description):
         seq = record.sequence.upper()
         if 'N' in seq:
-            seq = seq.replace('N', 'G')
+            seq = seq.replace('N', 'A')
 
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)

@@ -1,12 +1,10 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-"""
-This is khmer; please see http://khmer.readthedocs.org/.
-"""
+"""This is khmer; please see http://khmer.readthedocs.org/."""
 
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
@@ -36,6 +34,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+import sys
 
 from struct import pack, unpack
 
@@ -117,12 +116,15 @@ def extract_hashbits_info(filename):
     uchar_size = len(pack('B', 0))
     ulonglong_size = len(pack('Q', 0))
 
-    with open(filename, 'rb') as hashbits:
-        version, = unpack('B', hashbits.read(1))
-        ht_type, = unpack('B', hashbits.read(1))
-        ksize, = unpack('I', hashbits.read(uint_size))
-        n_tables, = unpack('B', hashbits.read(uchar_size))
-        table_size, = unpack('Q', hashbits.read(ulonglong_size))
+    try:
+        with open(filename, 'rb') as hashbits:
+            version, = unpack('B', hashbits.read(1))
+            ht_type, = unpack('B', hashbits.read(1))
+            ksize, = unpack('I', hashbits.read(uint_size))
+            n_tables, = unpack('B', hashbits.read(uchar_size))
+            table_size, = unpack('Q', hashbits.read(ulonglong_size))
+    except:
+        raise ValueError("Presence table '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, version, ht_type
 
@@ -146,20 +148,24 @@ def extract_countinghash_info(filename):
     uint_size = len(pack('I', 0))
     ulonglong_size = len(pack('Q', 0))
 
-    with open(filename, 'rb') as countinghash:
-        version, = unpack('B', countinghash.read(1))
-        ht_type, = unpack('B', countinghash.read(1))
-        use_bigcount, = unpack('B', countinghash.read(1))
-        ksize, = unpack('I', countinghash.read(uint_size))
-        n_tables, = unpack('B', countinghash.read(1))
-        table_size, = unpack('Q', countinghash.read(ulonglong_size))
+    try:
+        with open(filename, 'rb') as countinghash:
+            version, = unpack('B', countinghash.read(1))
+            ht_type, = unpack('B', countinghash.read(1))
+            use_bigcount, = unpack('B', countinghash.read(1))
+            ksize, = unpack('I', countinghash.read(uint_size))
+            n_tables, = unpack('B', countinghash.read(1))
+            table_size, = unpack('Q', countinghash.read(ulonglong_size))
+    except:
+        raise ValueError("Counting table '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, use_bigcount, version, \
         ht_type
 
 
-def calc_expected_collisions(hashtable):
+def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
+    Check to see that collision rate is within threshold.
 
     Keyword argument:
     hashtable: the hashtable object to inspect
@@ -172,11 +178,21 @@ def calc_expected_collisions(hashtable):
     fp_one = occupancy / min_size
     fp_all = fp_one ** n_ht
 
+    if fp_all > max_false_pos:
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** ERROR: the graph structure is too small for "
+        print >>sys.stderr, "this data set.  Increase k-mer presence table "
+        print >>sys.stderr, "size/num of tables."
+        print >>sys.stderr, "** Do not use these results!!"
+        print >>sys.stderr, "**"
+        if not force:
+            sys.exit(1)
+
     return fp_all
 
 
 def is_prime(number):
-    '''Checks if a number is prime.'''
+    """Check if a number is prime."""
     if number < 2:
         return False
     if number == 2:
@@ -190,13 +206,15 @@ def is_prime(number):
 
 
 def get_n_primes_near_x(number, target):
-    ''' Step backwards until a number of primes (other than 2) have been
+    """Backward-find primes smaller than target.
+
+    Step backwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
     number -- the number of primes to find
     target -- the number to step backwards from
-    '''
+    """
     primes = []
     i = target - 1
     if i % 2 == 0:
@@ -209,13 +227,15 @@ def get_n_primes_near_x(number, target):
 
 
 def get_n_primes_above_x(number, target):
-    '''Step forwards until a number of primes (other than 2) have been
+    """Forward-find primes smaller than target.
+
+    Step forwards until a number of primes (other than 2) have been
     found that are smaller than the target and return them.
 
     Keyword arguments:
     number -- the number of primes to find
     target -- the number to step forwards from
-    '''
+    """
     primes = []
     i = target + 1
     if i % 2 == 0:
@@ -226,20 +246,29 @@ def get_n_primes_above_x(number, target):
         i += 2
     return primes
 
-'''
-Expose the cpython objects with __new__ implementations.
-These constructors add the functionality provided by the existing
-factory methods to the constructors defined over in cpython land.
-Additional functionality can be added to these classes as appropriate.
-'''
+
+# Expose the cpython objects with __new__ implementations.
+# These constructors add the functionality provided by the existing
+# factory methods to the constructors defined over in cpython land.
+# Additional functionality can be added to these classes as appropriate.
 
 
 class LabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
+        hb = Hashbits(k, starting_size, n_tables)
+        c = _LabelHash.__new__(cls, hb)
+        c.graph = hb
+        return c
+
+
+class CountingLabelHash(_LabelHash):
+
+    def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_above_x(n_tables, starting_size)
-        c = _LabelHash.__new__(cls, k, primes)
-        c.primes = primes
+        hb = CountingHash(k, primes)
+        c = _LabelHash.__new__(cls, hb)
+        c.graph = hb
         return c
 
 
@@ -253,7 +282,9 @@ class Hashbits(_Hashbits):
 
 
 class HLLCounter(_HLLCounter):
-    """
+
+    """HyperLogLog counter.
+
     A HyperLogLog counter is a probabilistic data structure specialized on
     cardinality estimation.
     There is a precision/memory consumption trade-off: error rate determines

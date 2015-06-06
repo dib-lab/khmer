@@ -1,7 +1,7 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
@@ -246,6 +246,13 @@ public:
         }
         return 1;
     }
+    // accessors to get table info
+    const HashIntoType n_entries() const
+    {
+        return _tablesizes[0];
+    }
+
+    void update_from(const Hashbits &other);
 };
 };
 

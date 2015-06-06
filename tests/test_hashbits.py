@@ -1,7 +1,7 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,protected-access
@@ -26,6 +26,76 @@ def test__get_set_tag_density():
     assert orig != 2
     ht._set_tag_density(2)
     assert ht._get_tag_density() == 2
+
+
+def test_update_from():
+    ht = khmer.Hashbits(5, 1000, 4)
+    ht2 = khmer.Hashbits(5, 1000, 4)
+
+    assert ht.get('AAAAA') == 0
+    assert ht.get('GCGCG') == 0
+    assert ht2.get('AAAAA') == 0
+    assert ht2.get('GCGCG') == 0
+
+    ht2.count('AAAAA')
+
+    assert ht.get('AAAAA') == 0
+    assert ht.get('GCGCG') == 0
+    assert ht2.get('AAAAA') == 1
+    assert ht2.get('GCGCG') == 0
+
+    ht.count('GCGCG')
+
+    assert ht.get('AAAAA') == 0
+    assert ht.get('GCGCG') == 1
+    assert ht2.get('AAAAA') == 1
+    assert ht2.get('GCGCG') == 0
+
+    ht.update(ht2)
+
+    assert ht.get('AAAAA') == 1
+    assert ht.get('GCGCG') == 1
+    assert ht2.get('AAAAA') == 1
+    assert ht2.get('GCGCG') == 0
+
+
+def test_update_from_diff_ksize_2():
+    ht = khmer.Hashbits(5, 1000, 4)
+    ht2 = khmer.Hashbits(4, 1000, 4)
+
+    try:
+        ht.update(ht2)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print str(err)
+
+    try:
+        ht2.update(ht)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print str(err)
+
+
+def test_update_from_diff_tablesize():
+    ht = khmer.Hashbits(5, 100, 4)
+    ht2 = khmer.Hashbits(5, 1000, 4)
+
+    try:
+        ht.update(ht2)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print str(err)
+
+
+def test_update_from_diff_num_tables():
+    ht = khmer.Hashbits(5, 1000, 3)
+    ht2 = khmer.Hashbits(5, 1000, 4)
+
+    try:
+        ht.update(ht2)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print str(err)
 
 
 def test_n_occupied_1():
@@ -584,23 +654,24 @@ def test_save_load_tagset_trunc():
     ht.add_tag('A' * 32)
     ht.add_tag('G' * 32)
     ht.save_tagset(outfile)
-    ht.save_tagset('/tmp/goodversion-k32.tagset')
 
     # truncate tagset file...
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
 
-    fp = open(outfile, 'wb')
-    fp.write(data[:26])
-    fp.close()
+    for i in range(len(data)):
+        fp = open(outfile, 'wb')
+        fp.write(data[:i])
+        fp.close()
 
-    # try loading it...
-    try:
-        ht.load_tagset(outfile)
-        assert 0, "this test should fail"
-    except IOError:
-        pass
+        # try loading it...
+        try:
+            ht.load_tagset(outfile)
+            assert 0, "this test should fail"
+        except IOError as err:
+            print str(err), i
+
 
 # to build the test files used below, add 'test' to this function
 # and then look in /tmp. You will need to tweak the version info in
@@ -716,6 +787,25 @@ def test_tagset_file_version_check():
         assert 0, "this should fail"
     except IOError as e:
         print str(e)
+
+
+def test_stop_tags_truncate_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    data = open(inpath, 'rb').read()
+
+    truncpath = utils.get_temp_filename('zzz')
+    for i in range(len(data)):
+        fp = open(truncpath, 'wb')
+        fp.write(data[:i])
+        fp.close()
+
+        try:
+            ht.load_stop_tags(truncpath)
+            assert 0, "expect failure of previous command"
+        except IOError as e:
+            print i, str(e)
 
 
 def test_tagset_ksize_check():

@@ -1,7 +1,7 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
@@ -11,6 +11,7 @@
 #include "read_parsers.hh"
 
 #include <sstream>
+#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -45,9 +46,16 @@ void Hashbits::save(std::string outfilename)
 
         outfile.write((const char *) _counts[i], tablebytes);
     }
+    if (outfile.fail()) {
+        throw khmer_file_exception(strerror(errno));
+    }
     outfile.close();
 }
 
+/**
+ * Loads @param infilename into Hashbits, with error checking on
+ * file type and file version.  Populates _counts internally.
+ */
 void Hashbits::load(std::string infilename)
 {
     ifstream infile;
@@ -65,7 +73,7 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (_counts) {
@@ -91,12 +99,12 @@ void Hashbits::load(std::string infilename)
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer graph from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_HASHBITS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer graph from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -133,16 +141,14 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Error reading from k-mer graph file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
-// for counting overlap k-mers specifically!!
-
-//
-// check_and_process_read: checks for non-ACGT characters before consuming
-//
-
+/**
+ * Checks for non-ACGT characters before consuming read.
+ * This is specifically for counting overlap k-mers.
+ */
 unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
         bool &is_valid,
         Hashbits &ht2)
@@ -156,10 +162,9 @@ unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
     return consume_string_overlap(read, ht2);
 }
 
-//
-// consume_fasta: consume a FASTA file of reads
-//
-
+/**
+ * Consume a FASTA file of reads.
+ */
 void Hashbits::consume_fasta_overlap(const std::string &filename,
                                      HashIntoType curve[2][100],Hashbits &ht2,
                                      unsigned int &total_reads,
@@ -227,10 +232,9 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     delete parser;
 }
 
-//
-// consume_string: run through every k-mer in the given string, & hash it.
-//
-
+/**
+ * Run through every k-mer in the given string, & hash it.
+ */
 unsigned int Hashbits::consume_string_overlap(const std::string &s,
         Hashbits &ht2)
 {
@@ -247,6 +251,26 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
     }
 
     return n_consumed;
+}
+
+void Hashbits::update_from(const Hashbits &other)
+{
+    if (_ksize != other._ksize) {
+        throw khmer_exception("both nodegraphs must have same k size");
+    }
+    if (_tablesizes != other._tablesizes) {
+        throw khmer_exception("both nodegraphs must have same table sizes");
+    }
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        Byte * me = _counts[table_num];
+        Byte * ot = other._counts[table_num];
+        HashIntoType tablesize = _tablesizes[table_num];
+        HashIntoType tablebytes = tablesize / 8 + 1;
+
+        for (HashIntoType index = 0; index < tablebytes; index++) {
+            me[index] |= ot[index];     // bitwise or
+        }
+    }
 }
 
 // vim: set sts=2 sw=2:

@@ -1,7 +1,7 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -62,6 +62,18 @@ def test_check_tablespace_force():
             1e9, force=True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
+        print str(e)
+    finally:
+        sys.stderr = save_stderr
+
+
+def test_invalid_file_warn():
+    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    try:
+        khmer.kfile.check_valid_file_exists(["nonexistent", "nonexistent2"])
+        assert sys.stderr.getvalue().count("\n") == 2,  \
+            "Should produce two warning lines"
+    except SystemExit, e:
         print str(e)
     finally:
         sys.stderr = save_stderr

@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
@@ -25,7 +25,7 @@ import textwrap
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 import re
 import platform
 
@@ -110,7 +110,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     report_on_config(args, hashtype='hashbits')
 
     for infile in args.input_filenames:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(args.input_filenames, args.force)
 
@@ -131,16 +131,10 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         print >>sys.stderr, 'consuming input', filename
         htable.consume_fasta_and_tag(filename)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
+    # 0.18 is ACTUAL MAX. Do not change.
+    fp_rate = \
+        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-    if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the graph structure is too small for"
-                              " this data set.  Increase k-mer presence table "
-                              "size/num of tables.")
-        print >> sys.stderr, "**"
-        if not args.force:
-            sys.exit(1)
 
     # partition-graph
 
