@@ -16,7 +16,7 @@ release makers, following this checklist by MRC.
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
-        git clone git@github.com:ged-lab/khmer.git
+        git clone git@github.com:dib-lab/khmer.git
         cd khmer
 
 #. (Optional) Check for updates to versioneer::
@@ -65,7 +65,7 @@ release makers, following this checklist by MRC.
    the letter 'v'::
 
         git tag v${new_version}-${rc}
-        git push --tags git@github.com:ged-lab/khmer.git
+        git push --tags git@github.com:dib-lab/khmer.git
 
 #. Test the release candidate. Bonus: repeat on Mac OS X::
 
@@ -78,32 +78,33 @@ release makers, following this checklist by MRC.
         
         cd testenv1
         source bin/activate
-        git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
+        git clone --depth 1 --branch v${new_version}-${rc} https://github.com/dib-lab/khmer.git
         cd khmer
         make install-dependencies
-        make install
         make test
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 1st manual version check passed
-        cd ..
-        nosetests khmer --attr '!known_failing'
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
+        # there instead of the installed khmer module's tests
+        pushd ../not-khmer; nosetests khmer --attr '!known_failing'; popd
 
 
         # Secondly we test via pip
         
-        cd ../testenv2
+        cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
-        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-${rc}#egg=khmer
+        pip install -e git+https://github.com/dib-lab/khmer.git@v${new_version}-${rc}#egg=khmer
         cd src/khmer
         make install-dependencies
         make dist
-        make install
         make test
+        cp dist/khmer*tar.gz ../../../testenv3/
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 2nd manual version check passed
-        cp dist/khmer*tar.gz ../../../testenv3/
-        cd ../..
         nosetests khmer --attr '!known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
@@ -118,7 +119,9 @@ release makers, following this checklist by MRC.
         cd khmer*
         make dist
         make test
-        pushd .. ; nosetests khmer --attr '!known_failing' ; popd
+        pip uninstall -y khmer; pip uninstall -y khmer; make install
+        mkdir ../not-khmer
+        pushd ../not-khmer ; nosetests khmer --attr '!known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
@@ -163,8 +166,8 @@ so:
 #. Delete the release candidate tag and push the tag updates to GitHub.::
 
         git tag -d v${new_version}-${rc}
-        git push git@github.com:ged-lab/khmer.git
-        git push --tags git@github.com:ged-lab/khmer.git
+        git push git@github.com:dib-lab/khmer.git
+        git push --tags git@github.com:dib-lab/khmer.git
 
 #. Add the release on GitHub, using the tag you just pushed.  Name
    it 'version X.Y.Z', and copy and paste in the release notes.

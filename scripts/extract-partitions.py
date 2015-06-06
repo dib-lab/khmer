@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -24,7 +24,7 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -90,7 +90,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     n_unassigned = 0
 
     for infile in args.part_filenames:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(args.part_filenames, args.force)
 

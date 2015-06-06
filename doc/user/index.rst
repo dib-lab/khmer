@@ -16,4 +16,5 @@ Contents:
    known-issues
    galaxy
    biblio
+   getting-help
 

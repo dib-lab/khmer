@@ -41,7 +41,7 @@ Some users have reported that normalize-by-median.py will utilize more memory
 than it was configured for. This is being investigated in #266
 
 If your k-mer table is truncated on write, an error may not be reported; this
-is being tracked in https://github.com/ged-lab/khmer/issues/443. However, khmer
+is being tracked in https://github.com/dib-lab/khmer/issues/443. However, khmer
 will now (correctly) fail when trying to read a truncated file (See #333).
 
 Paired-end reads from Casava 1.8 currently require renaming for use in

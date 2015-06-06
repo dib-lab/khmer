@@ -7,7 +7,7 @@ blog post <http://ivory.idyll.org/blog/2014-khmer-hackathon.html>`__).
 ----
 
 Please track `khmer issue #446
-<https://github.com/ged-lab/khmer/issues/446>`__ for up-to-the-minute
+<https://github.com/dib-lab/khmer/issues/446>`__ for up-to-the-minute
 information.  You can subscribe to this issue (lower right on issue page)
 to get automatic e-mail updates.
 
@@ -21,7 +21,7 @@ khmer is a piece of scientific software that does cool stuff in biology.
 can read more about khmer `here <http://figshare.com/articles/The_khmer_software_package_enabling_efficient_sequence_analysis/979190>`__ if you like.)
 
 The important bit about khmer is that we develop it openly,
-at http://github.com/ged-lab/khmer; we use reasonably OK software development
+at https://github.com/dib-lab/khmer; we use reasonably OK software development
 practices; and we're interested in spreading the gospel, so to speak.
 
 So!  For this Hackathon, we're providing a "mentored software
@@ -37,9 +37,9 @@ To get started, go to :doc:`getting-started`!
 
 You can contact us directly at khmer-project@idyll.org, but if you're
 experience trouble of any kind, please feel to `create an issue
-<https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__
+<https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__
 where we can help you out.  Also keep an eye on `issue #446
-<https://github.com/ged-lab/khmer/issues/446>`__ where we're updating
+<https://github.com/dib-lab/khmer/issues/446>`__ where we're updating
 Hackathon information more generally.
 
 Problems, questions, and solutions
@@ -54,7 +54,7 @@ Problems, questions, and solutions
 #. There's a bug in this documentation! But I can fix it...
 
    Oh noes! Fixes are welcome -- these docs are in branch
-   'docs/hackathon' on http://github.com/ged-lab/khmer/, so please
+   'docs/hackathon' on https://github.com/dib-lab/khmer/, so please
    send PRs there.  Or if you haven't worked through the process yet,
    please `add an issue
-   <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__ and we'll be on it.
+   <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__ and we'll be on it.

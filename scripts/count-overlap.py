@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2012-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2012-2015-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
@@ -22,7 +22,7 @@ import sys
 import csv
 import khmer
 import textwrap
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 
 DEFAULT_K = 32
@@ -46,8 +46,9 @@ def get_parser():
     parser.add_argument('report_filename', metavar='output_report_filename',
                         help='output report filename')
     parser.add_argument('--csv', default=False, action='store_true',
-                        help='Use the CSV format for the curve output. '
-                        'Includes column headers.')
+                        help='Use the CSV format for the curve output '
+                        'in ${output_report_filename}.curve, '
+                        'including column headers.')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -59,7 +60,7 @@ def main():
     report_on_config(args, hashtype='hashbits')
 
     for infile in [args.ptfile, args.fafile]:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space([args.ptfile, args.fafile], args.force)
 

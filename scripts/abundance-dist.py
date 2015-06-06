@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2010-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
@@ -20,7 +20,7 @@ import csv
 import khmer
 import argparse
 import os
-from khmer.kfile import check_file_status
+from khmer.kfile import check_input_files
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -61,7 +61,7 @@ def main():
     infiles = [args.input_counting_table_filename,
                args.input_sequence_filename]
     for infile in infiles:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     print ('hashtable from', args.input_counting_table_filename,
            file=sys.stderr)

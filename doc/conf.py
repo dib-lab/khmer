@@ -155,7 +155,7 @@ html_style = 'labibi.css'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = False
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -193,7 +193,7 @@ htmlhelp_basename = 'khmerdoc'
 html_context = {
    "google_analytics_id" : 'UA-51731094-1',
    "disqus_shortname" : 'khmer-docs',
-#   "github_base_account" : 'ged-lab',
+#   "github_base_account" : 'dib-lab',
    "github_project" : 'khmer',
 }
 

@@ -1,7 +1,7 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
@@ -18,7 +18,7 @@
 namespace khmer
 {
 
-class LabelHash : public khmer::Hashbits
+class LabelHash
 {
 protected:
     // Does the given tag already have the given label?
@@ -37,14 +37,14 @@ protected:
     }
 
     // Does the given label already have a tag associated with it?
-    bool _cmap_contains_tag(const LabelTagPtrMap& cmap,
+    bool _cmap_contains_tag(const LabelTagMap& cmap,
                             Label& the_label,
                             HashIntoType& kmer)
     {
-        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+        std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(the_label);
-        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            if(*(it->second) == kmer) {
+        for (LabelTagMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            if(it->second == kmer) {
                 return true;
             }
         }
@@ -66,13 +66,13 @@ protected:
     }
 
     unsigned int _get_tags_from_label(const Label& label,
-                                      const LabelTagPtrMap& cmap,
-                                      TagPtrSet& labeled_tags)
+                                      const LabelTagMap& cmap,
+                                      TagSet& labeled_tags)
     {
         unsigned int num_tags = 0;
-        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+        std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(label);
-        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+        for (LabelTagMap::const_iterator it=ret.first; it!=ret.second; ++it) {
             labeled_tags.insert(it->second);
             ++num_tags;
         }
@@ -82,19 +82,18 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
+    khmer::Hashtable * graph;
 
-    LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
-        : khmer::Hashbits(ksize, tablesizes)
+    explicit LabelHash(Hashtable * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
-        _all_tags_spin_lock = 0;
 
     }
 
     ~LabelHash();
 
     TagLabelPtrMap tag_labels;
-    LabelTagPtrMap label_tag_ptrs;
+    LabelTagMap label_tag_ptrs;
     LabelPtrMap label_ptrs;
 
     size_t n_labels() const
@@ -140,7 +139,6 @@ public:
             SeenSet * new_tags = 0);
 
     LabelPtrSet get_tag_labels(const HashIntoType& tag);
-    TagPtrSet get_label_tags(const Label& label);
 
     void link_tag_and_label(HashIntoType& kmer, Label& label);
 
@@ -152,6 +150,9 @@ public:
 
     void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
                                      LabelPtrSet& found_labels);
+
+    void save_labels_and_tags(std::string);
+    void load_labels_and_tags(std::string);
 
 };
 };

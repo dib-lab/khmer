@@ -1,5 +1,5 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
@@ -256,9 +256,19 @@ def get_n_primes_above_x(number, target):
 class LabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
+        hb = Hashbits(k, starting_size, n_tables)
+        c = _LabelHash.__new__(cls, hb)
+        c.graph = hb
+        return c
+
+
+class CountingLabelHash(_LabelHash):
+
+    def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_above_x(n_tables, starting_size)
-        c = _LabelHash.__new__(cls, k, primes)
-        c.primes = primes
+        hb = CountingHash(k, primes)
+        c = _LabelHash.__new__(cls, hb)
+        c.graph = hb
         return c
 
 

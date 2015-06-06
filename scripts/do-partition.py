@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,invalid-name
@@ -25,7 +25,7 @@ import textwrap
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 import re
 import platform
 
@@ -110,7 +110,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     report_on_config(args, hashtype='hashbits')
 
     for infile in args.input_filenames:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(args.input_filenames, args.force)
 

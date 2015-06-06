@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
 """
@@ -22,7 +22,7 @@ import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -80,7 +80,7 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name, args.force)
+        check_input_files(name, args.force)
 
     check_space(args.input_sequence_filename, args.force)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
@@ -101,6 +101,8 @@ def main():
     htable.set_use_bigcount(args.bigcount)
 
     filename = None
+
+    total_num_reads = 0
 
     for index, filename in enumerate(filenames):
 
@@ -126,6 +128,7 @@ def main():
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:
             print >> info_fh, 'through', filename
+        total_num_reads += rparser.num_reads
 
     n_kmers = htable.n_unique_kmers()
     if args.report_total_kmers:
@@ -154,15 +157,21 @@ def main():
                     "fpr": fp_rate,
                     "num_kmers": n_kmers,
                     "files": filenames,
-                    "mrinfo_version": "0.1.0",
+                    "mrinfo_version": "0.2.0",
+                    "num_reads": total_num_reads,
                 }
                 json.dump(mr_data, mr_fh)
                 mr_fh.write('\n')
             elif mr_fmt == 'tsv':
-                mr_fh.write("ht_name\tfpr\tnum_kmers\tfiles\n")
-                mr_fh.write("{b:s}\t{fpr:1.3f}\t{k:d}\t{fls:s}\n".format(
-                    b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
-                    fls=";".join(filenames)))
+                mr_fh.write("ht_name\tfpr\tnum_kmers\tnum_reads\tfiles\n")
+                vals = [
+                    os.path.basename(base),
+                    "{:1.3f}".format(fp_rate),
+                    str(n_kmers),
+                    str(total_num_reads),
+                    ";".join(filenames),
+                ]
+                mr_fh.write("\t".join(vals) + "\n")
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 

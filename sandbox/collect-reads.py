@@ -1,8 +1,8 @@
 #! /usr/bin/env python2
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
 """
@@ -19,7 +19,7 @@ import sys
 import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 import argparse
 import screed
@@ -71,7 +71,7 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name, False)
+        check_input_files(name, False)
 
     check_space(args.input_sequence_filename, False)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
@@ -92,7 +92,7 @@ def main():
         for record in screed.open(filename):
             seq = record.sequence.upper()
             if 'N' in seq:
-                seq = seq.replace('N', 'G')
+                seq = seq.replace('N', 'A')
 
             try:
                 med, _, _ = htable.get_median_count(seq)
