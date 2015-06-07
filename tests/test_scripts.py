@@ -591,7 +591,7 @@ def test_normalize_by_median():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    args = ['-C', CUTOFF, '-k', '17', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -611,7 +611,7 @@ def test_normalize_by_median_unforced_badfile():
     infile = utils.get_temp_filename("potatoes")
     in_dir = os.path.dirname(infile)
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    args = ['-C', CUTOFF, '-k', '17', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
@@ -627,7 +627,7 @@ def test_normalize_by_median_contradictory_args():
     shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', '1', '-k', '17', '-t', '--force-single', '-p', '-R',
+    args = ['-C', '1', '-k', '17', '--force-single', '-p', '-R',
             outfile, infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir)
@@ -646,7 +646,7 @@ def test_normalize_by_median_report_fp():
     shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', '1', '-k', '17', '-t', '-R', outfile, infile]
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert "fp rate estimated to be 0.626" in err, err
@@ -667,7 +667,7 @@ def test_normalize_by_median_unpaired_and_paired():
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-u', unpairedfile, '-p', infile]
+    args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 4029' in err, err
@@ -686,12 +686,12 @@ def test_normalize_by_median_count_kmers_PE():
     shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = scriptpath('normalize-by-median.py')
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', '--force-single', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'kept 1 of 2 or 50%' in err, err
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-p', infile]
+    args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 99' in err, err
     assert 'kept 2 of 2 or 100%' in err, err
@@ -720,7 +720,7 @@ def test_normalize_by_median_overwrite():
     shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
     script = scriptpath('normalize-by-median.py')
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, infile]
+    args = ['-C', CUTOFF, '-k', '17', '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile), outfile
     seqs = [r.sequence for r in screed.open(outfile)]

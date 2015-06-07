@@ -40,18 +40,16 @@ DEFAULT_DESIRED_COVERAGE = 10
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
 
 
-def WithDiagnostics(ifilename, norm, reader):
+def WithDiagnostics(ifilename, norm, reader, fp):
     """
-    Generator/context manager to do boilerplate output of statistics while
-    normalizing data. Also checks for properly paired data.
+    Generator/context manager to do boilerplate output of statistics using a
+    Normalizer object. Also checks for properly paired data.
     """
 
     index = 0
 
-    fp = norm.report_fp
-
     # per read diagnostic output
-    for record, index in norm(reader):
+    for index, record in enumerate(norm(reader)):
 
         if index > 0 and index % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}%'
@@ -66,7 +64,7 @@ def WithDiagnostics(ifilename, norm, reader):
             if fp:
                 print(total + " " + total - discarded + " " +
                       1. - (discarded / float(total)), file=fp)
-                report_fp.flush()
+                fp.flush()
 
         yield record
 
@@ -89,11 +87,12 @@ def WithDiagnostics(ifilename, norm, reader):
 
 
 class Normalizer(object):
-    def __init__(self, desired_coverage, htable, report_fp=None,
-                 force_single=False):
+    """
+    Digital normalization algorithm encapsulated in a class/generator.
+    """
+    def __init__(self, desired_coverage, htable, force_single=False):
         self.htable = htable
         self.desired_coverage = desired_coverage
-        self.report_fp = report_fp
 
         self.total = 0
         self.discarded = 0
@@ -101,7 +100,6 @@ class Normalizer(object):
     def __call__(self, reader):
 
         desired_coverage = self.desired_coverage
-        ksize = self.htable.ksize()
 
         for index, is_paired, read0, read1 in reader:
             passed_filter = False
@@ -127,25 +125,21 @@ class Normalizer(object):
                 for record in batch:
                     seq = record.sequence.replace('N', 'A')
                     self.htable.consume(seq)
-                    yield record, index
+                    yield record
             else:
                 self.discarded += len(batch)
-
-
-def handle_error(error, input_name):
-    print('** ERROR: ' + str(error), file=sys.stderr)
-    print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
 
 
 @contextmanager
 def CatchIOErrors(ifile, force, corrupt_files):
     """
-    Context manager to do boilerplate excepting of IOErrors
+    Context manager to do boilerplate handling of IOErrors
     """
     try:
         yield
-    except (IOError, ValueError) as err:
-        handle_error(err, ifile)
+    except (IOError, ValueError) as error:
+        print('** ERROR: ' + str(error), file=sys.stderr)
+        print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
         if not force:
             print('** Exiting!', file=sys.stderr)
 
@@ -225,12 +219,9 @@ def get_parser():
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
-    parser.add_argument('-f', '--fault-tolerant', dest='force',
+    parser.add_argument('-f', '--force', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
-    parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
-                        type=int, help='dump k-mer counting table every d '
-                        'files', default=-1)
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_file',
                         type=argparse.FileType('w'),
@@ -240,11 +231,6 @@ def get_parser():
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers"
-                        " post-normalization to stderr")
-    parser.add_argument('--force', default=False, action='store_true',
-                        help='Overwrite output file if it exists')
     add_loadhash_args(parser)
     return parser
 
@@ -315,31 +301,29 @@ file for one of the input files will be generated.)" % filename,
             output_name = args.single_output_file.name
         outfp = args.single_output_file
 
-    for f, p in files:
+    for filename, require_paired in files:
         if not args.single_output_file:
-            output_name = os.path.basename(f) + '.keep'
+            output_name = os.path.basename(filename) + '.keep'
             outfp = open(output_name, 'w')
 
-        ksize = htable.ksize()
-        screed_iter = screed.open(f, parse_description=False)
-        reader = broken_paired_reader(screed_iter, min_length=ksize,
+        screed_iter = screed.open(filename, parse_description=False)
+        reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                       force_single=force_single,
-                                      require_paired=p)
+                                      require_paired=require_paired)
 
         # failsafe context manager in case an input file breaks
-        with CatchIOErrors(f, args.force, corrupt_files):
+        with CatchIOErrors(filename, args.force, corrupt_files):
 
             # actually do diginorm
-            for record in WithDiagnostics(f, norm, reader):
+            for record in WithDiagnostics(filename, norm, reader, report_fp):
                 if record is not None:
                     write_record(record, outfp)
 
             print('output in ' + output_name, file=sys.stderr)
 
-    if args.report_total_kmers:
-        print('Total number of unique k-mers: {0}'
-              .format(htable.n_unique_kmers()),
-              file=sys.stderr)
+    print('Total number of unique k-mers: {0}'
+          .format(htable.n_unique_kmers()),
+          file=sys.stderr)
 
     if args.savetable:
         print('...saving to ' + args.savetable, file=sys.stderr)
