@@ -609,6 +609,7 @@ def test_normalize_by_median_unforced_badfile():
     CUTOFF = '1'
 
     infile = utils.get_temp_filename("potatoes")
+    outfile = infile + '.keep'
     in_dir = os.path.dirname(infile)
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
@@ -617,6 +618,9 @@ def test_normalize_by_median_unforced_badfile():
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
         pass
+
+    if os.path.exists(outfile):
+        assert False, '.keep file should have been removed: '
 
 
 def test_normalize_by_median_contradictory_args():

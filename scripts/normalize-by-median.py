@@ -36,14 +36,11 @@ from khmer.kfile import (check_space, check_space_for_hashtable,
 from khmer.utils import write_record, check_is_pair, broken_paired_reader
 DEFAULT_DESIRED_COVERAGE = 10
 
-# Iterate a collection in arbitrary batches
-# from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
-
 
 def WithDiagnostics(ifilename, norm, reader, fp):
     """
     Generator/context manager to do boilerplate output of statistics using a
-    Normalizer object. Also checks for properly paired data.
+    Normalizer object.
     """
 
     index = 0
@@ -90,7 +87,7 @@ class Normalizer(object):
     """
     Digital normalization algorithm encapsulated in a class/generator.
     """
-    def __init__(self, desired_coverage, htable, force_single=False):
+    def __init__(self, desired_coverage, htable):
         self.htable = htable
         self.desired_coverage = desired_coverage
 
@@ -131,7 +128,7 @@ class Normalizer(object):
 
 
 @contextmanager
-def CatchIOErrors(ifile, force, corrupt_files):
+def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
     """
     Context manager to do boilerplate handling of IOErrors
     """
@@ -140,6 +137,8 @@ def CatchIOErrors(ifile, force, corrupt_files):
     except (IOError, ValueError) as error:
         print('** ERROR: ' + str(error), file=sys.stderr)
         print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
+        if not single_out:
+            os.remove(out.name)
         if not force:
             print('** Exiting!', file=sys.stderr)
 
@@ -280,7 +279,7 @@ file for one of the input files will be generated.)" % filename,
     input_filename = None
 
     # diginorm algorithm lives in Normalizer, go get it
-    norm = Normalizer(args.cutoff, htable, report_fp)
+    norm = Normalizer(args.cutoff, htable)
 
     # make a list of all filenames and if they're paired or not
     # if we don't know if they're paired, default to not forcing paired
@@ -299,20 +298,21 @@ file for one of the input files will be generated.)" % filename,
             output_name = '/dev/stdout'
         else:
             output_name = args.single_output_file.name
-        outfp = args.single_output_file
 
     for filename, require_paired in files:
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
-            outfp = open(output_name, 'w')
 
-        screed_iter = screed.open(filename, parse_description=False)
-        reader = broken_paired_reader(screed_iter, min_length=args.ksize,
-                                      force_single=force_single,
-                                      require_paired=require_paired)
+        outfp = open(output_name, 'w')
 
         # failsafe context manager in case an input file breaks
-        with CatchIOErrors(filename, args.force, corrupt_files):
+        with CatchIOErrors(filename, outfp, args.single_output_file,
+                           args.force, corrupt_files):
+
+            screed_iter = screed.open(filename, parse_description=False)
+            reader = broken_paired_reader(screed_iter, min_length=args.ksize,
+                                          force_single=force_single,
+                                          require_paired=require_paired)
 
             # actually do diginorm
             for record in WithDiagnostics(filename, norm, reader, report_fp):
