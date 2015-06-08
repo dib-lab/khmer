@@ -55,6 +55,23 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_nobig():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 89' in err, err
+    assert os.path.exists(outfile)
+    assert 'WARNING:' in err, err
+    assert 'REMINDER' in err, err
+    assert 'Bigcount is DISABLED.' in err, err
+
+
 def test_load_into_counting_nonwritable():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
