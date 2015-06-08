@@ -1,3 +1,7 @@
+2015-06-08  Luiz Irber  <khmer@luizirber.org>
+
+   * tests/test_hll.py: test return values from consume_{string,fasta}.
+
 2015-06-06  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: added hllcounter_merge.
