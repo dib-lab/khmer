@@ -618,7 +618,9 @@ def test_normalize_by_median_unpaired_final_read():
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
-    except:
+    except AssertionError as e:
+        out = e.message[2]
+        assert "ERROR: Unpaired reads when require_paired" in out, out
         pass
 
 
@@ -634,7 +636,8 @@ def test_normalize_by_median_unforced_badfile():
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
-        pass
+        out = e.message[2]
+        assert "ERROR: [Errno 2] No such file or directory:" in out, out
 
     if os.path.exists(outfile):
         assert False, '.keep file should have been removed: '
@@ -653,8 +656,9 @@ def test_normalize_by_median_contradictory_args():
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
-    except:
-        pass
+    except AssertionError as e:
+        out = e.message[2]
+        assert "cannot both be set" in out, out
 
 
 def test_normalize_by_median_stdout_3():
@@ -666,12 +670,11 @@ def test_normalize_by_median_stdout_3():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', infile, '--out']
+    args = ['-C', CUTOFF, '-k', '17', infile, '--out', '-']
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'in /dev/stdout' in err, err
-    assert 'GGTTGACGGGGCTCAGGGGG' in out, out
     assert "IOErrors" not in err
 
 
@@ -684,7 +687,7 @@ def test_normalize_by_median_stdout_2():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', infile, '--out', '/dev/stdout']
+    args = ['-C', CUTOFF, '-k', '17', infile, '-o', '/dev/stdout']
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -985,7 +988,7 @@ def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
     ofile.close()
 
 
-def test_normalize_by_median_stdout():
+def test_normalize_by_median_streaming():
     CUTOFF = '20'
 
     infile = utils.get_test_data('100-reads.fq.gz')

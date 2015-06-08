@@ -135,7 +135,8 @@ def broken_paired_reader(screed_iter, min_length=None,
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    raise ValueError("Unpaired reads when force-paired is set")
+                    raise ValueError("Unpaired reads when require_paired"
+                                     " is set!")
                 yield n, False, prev_record, None
                 n += 1
 
@@ -145,7 +146,7 @@ def broken_paired_reader(screed_iter, min_length=None,
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
         if require_paired:
-            raise ValueError("Last two records weren't paired!")
+            raise ValueError("Unpaired reads when require_paired is set!")
         yield n, False, prev_record, None
 
 

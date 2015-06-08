@@ -292,9 +292,11 @@ file for one of the input files will be generated.)" % filename,
 
     corrupt_files = []
     outfp = None
+    output_name = None
 
     if args.single_output_file:
-        if args.single_output_file.name is sys.stdout:
+        if args.single_output_file is sys.stdout:
+            output_name = '/dev/stdout'
         else:
             output_name = args.single_output_file.name
 
