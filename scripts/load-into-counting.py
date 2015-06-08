@@ -89,8 +89,8 @@ def main():
     check_file_writable(base + ".info")
 
     if not args.bigcount:
-        print >> sys.stderr, """WARNING: Bigcount is DISABLED. This can cause 
-                             unknown behaviour if used with abundance-dist 
+        print >> sys.stderr, """WARNING: Bigcount is DISABLED. This can cause
+                             unknown behaviour if used with abundance-dist
                              when abundance-dist's bigcount is enabled."""
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
@@ -184,8 +184,8 @@ def main():
     print >>sys.stderr, 'wrote to:', base + '.info'
 
     if not args.bigcount:
-        print >> sys.stderr, """REMINDER: Bigcount is DISABLED. This can cause 
-                             unknown behaviour if used with abundance-dist 
+        print >> sys.stderr, """REMINDER: Bigcount is DISABLED. This can cause
+                             unknown behaviour if used with abundance-dist
                              when abundance-dist's bigcount is enabled."""
 
 
