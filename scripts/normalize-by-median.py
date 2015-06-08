@@ -48,7 +48,7 @@ def WithDiagnostics(ifilename, norm, reader, fp):
     # per read diagnostic output
     for index, record in enumerate(norm(reader)):
 
-        if norm.total > 0 and norm.total % 100000 == 0:
+        if norm.total % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}% so far'
                   .format(kept=norm.total - norm.discarded,
                           total=norm.total,
@@ -80,7 +80,7 @@ def WithDiagnostics(ifilename, norm, reader, fp):
 
 class Normalizer(object):
     """
-    Digital normalization algorithm encapsulated in a class/generator.
+    Digital normalization algorithm.
     """
     def __init__(self, desired_coverage, htable):
         self.htable = htable
@@ -90,6 +90,15 @@ class Normalizer(object):
         self.discarded = 0
 
     def __call__(self, reader):
+        """
+        Actually does digital normalization - the core algorithm.
+
+        * get one (unpaired) or two (paired) reads;
+        * sanitize the sequences (convert Ns to As);
+        * get the median k-mer count of one/both reads;
+        * if any read's median k-mer count is below desired coverage, keep all;
+        * consume and yield kept reads.
+        """
 
         desired_coverage = self.desired_coverage
 
@@ -125,7 +134,7 @@ class Normalizer(object):
 @contextmanager
 def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
     """
-    Context manager to do boilerplate handling of IOErrors
+    Context manager to do boilerplate handling of IOErrors.
     """
     try:
         yield
@@ -250,13 +259,14 @@ file for one of the input files will be generated.)" % filename,
         else:
             filenames.append(filename)
 
-    # check for others
+    # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
         check_space_for_hashtable(
             args.n_tables * args.min_tablesize, args.force)
 
+    # load or create counting table.
     if args.loadtable:
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
@@ -268,11 +278,12 @@ file for one of the input files will be generated.)" % filename,
 
     input_filename = None
 
-    # diginorm algorithm lives in Normalizer, go get it
+    # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, htable)
 
-    # make a list of all filenames and if they're paired or not
-    # if we don't know if they're paired, default to not forcing paired
+    # make a list of all filenames and if they're paired or not;
+    # if we don't know if they're paired, default to allowing but not
+    # forcing pairing.
     files = []
     for e in args.input_filenames:
         files.append([e, args.paired])
@@ -280,14 +291,16 @@ file for one of the input files will be generated.)" % filename,
         files.append([args.unpaired_reads, False])
 
     corrupt_files = []
-
     outfp = None
 
     if args.single_output_file:
-        if args.single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
+        if args.single_output_file.name is sys.stdout:
         else:
             output_name = args.single_output_file.name
+
+    #
+    # main loop: iterate over all files given, do diginorm.
+    #
 
     for filename, require_paired in files:
         if not args.single_output_file:
@@ -310,6 +323,8 @@ file for one of the input files will be generated.)" % filename,
                     write_record(record, outfp)
 
             print('output in ' + output_name, file=sys.stderr)
+
+    # finished - print out some diagnostics.
 
     print('Total number of unique k-mers: {0}'
           .format(htable.n_unique_kmers()),
