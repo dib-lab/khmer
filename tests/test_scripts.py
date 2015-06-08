@@ -657,7 +657,7 @@ def test_normalize_by_median_contradictory_args():
         pass
 
 
-def test_normalize_by_median_stdout():
+def test_normalize_by_median_stdout_3():
     CUTOFF = '1'
 
     infile = utils.get_temp_filename('test.fa')
