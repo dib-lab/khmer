@@ -145,7 +145,7 @@ def broken_paired_reader(screed_iter, min_length=None,
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
         if require_paired:
-            raise ValueError("requiring paired seqs @CTB")
+            raise ValueError("Last two records weren't paired!")
         yield n, False, prev_record, None
 
 

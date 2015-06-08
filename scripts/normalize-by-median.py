@@ -48,8 +48,8 @@ def WithDiagnostics(ifilename, norm, reader, fp):
     # per read diagnostic output
     for index, record in enumerate(norm(reader)):
 
-        if index > 0 and index % 100000 == 0:
-            print('... kept {kept} of {total} or {perc:2}%'
+        if norm.total > 0 and norm.total % 10000 == 0:
+            print('... kept {kept} of {total} or {perc:2}% so far'
                   .format(kept=norm.total - norm.discarded,
                           total=norm.total,
                           perc=int(100. - norm.discarded /
@@ -57,11 +57,6 @@ def WithDiagnostics(ifilename, norm, reader, fp):
                   file=sys.stderr)
 
             print('... in file ' + ifilename, file=sys.stderr)
-
-            if fp:
-                print(total + " " + total - discarded + " " +
-                      1. - (discarded / float(total)), file=fp)
-                fp.flush()
 
         yield record
 
@@ -237,11 +232,6 @@ def get_parser():
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
-
-    if args.force_single and args.paired:
-        print("** ERROR: Both single and paired modes forced.",
-              file=sys.stderr)
-        sys.exit(0)
 
     report_on_config(args)
 
