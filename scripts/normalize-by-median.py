@@ -48,7 +48,7 @@ def WithDiagnostics(ifilename, norm, reader, fp):
     # per read diagnostic output
     for index, record in enumerate(norm(reader)):
 
-        if norm.total > 0 and norm.total % 10000 == 0:
+        if norm.total > 0 and norm.total % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}% so far'
                   .format(kept=norm.total - norm.discarded,
                           total=norm.total,

@@ -670,8 +670,25 @@ def test_normalize_by_median_stdout():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
-    assert 'in: /dev/stdout' in err, err
-    assert 'GGTTGACGGGGCTCAGGGGG' in out, seqs
+    assert 'in /dev/stdout' in err, err
+    assert 'GGTTGACGGGGCTCAGGGGG' in out, out
+    assert "IOErrors" not in err
+
+
+def test_normalize_by_median_stdout_2():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile, '--out', '/dev/stdout']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'in /dev/stdout' in err, err
     assert "IOErrors" not in err
 
 
@@ -687,9 +704,6 @@ def test_normalize_by_median_report_fp():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert "fp rate estimated to be 0.626" in err, err
-    assert "... kept" in err, err
-    assert "... in file" in err, err
-    assert "so far" in err, err
     report = open(outfile, 'r')
     line = report.readline()
     assert "100000 25232 0.25232" in line, line
