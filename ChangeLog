@@ -1,3 +1,11 @@
+2015-06-06  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added hllcounter_merge.
+   * tests/test_hll.py: added merge tests.
+   * lib/hllcounter.cc: changed HLLCounter::consume_string to uppercase input.
+   * sandbox/unique-kmers.py: added --stream-out option; updated to print out
+   k-mers per file as well as k-mer size used.
+
 2015-06-04  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: added error handling to load_partitionmap.
