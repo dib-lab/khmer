@@ -3109,9 +3109,10 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 
 static PyMethodDef khmer_hashbits_methods[] = {
     { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
-    { "update",
-      (PyCFunction) hashbits_update, METH_VARARGS,
-      "a set update: update this nodegraph with all the entries from the other"
+    {
+        "update",
+        (PyCFunction) hashbits_update, METH_VARARGS,
+        "a set update: update this nodegraph with all the entries from the other"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -4221,6 +4222,9 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
+                                   PyObject * args);
+
 static
 PyObject *
 hllcounter_get_erate(khmer_KHLLCounter_Object * me)
@@ -4345,6 +4349,11 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter."
     },
+    {
+        "merge", (PyCFunction)hllcounter_merge,
+        METH_VARARGS,
+        "Merge other counter into this one."
+    },
     {NULL} /* Sentinel */
 };
 
@@ -4423,6 +4432,24 @@ static PyTypeObject khmer_KHLLCounter_Type = {
 
 #define is_hllcounter_obj(v)  (Py_TYPE(v) == &khmer_KHLLCounter_Type)
 
+static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
+                                   PyObject * args)
+{
+    khmer_KHLLCounter_Object * other;
+
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KHLLCounter_Type, &other)) {
+        return NULL;
+    }
+
+    try {
+        me->hllcounter->merge(*(other->hllcounter));
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
 
 //////////////////////////////
 // standalone functions

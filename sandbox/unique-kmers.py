@@ -23,7 +23,7 @@ import textwrap
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
 from khmer import __version__
-
+import screed
 
 def get_parser():
     descr = "Estimate number of unique k-mers, with precision <= ERROR_RATE."
@@ -66,6 +66,9 @@ def get_parser():
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
 
+    parser.add_argument('--stream-out', '-S', default=False,
+                        action='store_true')
+
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
 
@@ -77,19 +80,34 @@ def main():
     info('unique-kmers.py', ['SeqAn', 'hll'])
     args = get_parser().parse_args()
 
-    hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
+    total_hll = khmer.HLLCounter(args.error_rate, args.ksize)
 
     report_fp = args.report
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
-        hllcpp.consume_fasta(input_filename)
+        hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
+        for record in screed.open(input_filename):
+            seq = record.sequence.upper().replace('N', 'A')
+            hllcpp.consume_string(seq)
+            if args.stream_out:
+                write_record(record, sys.stdout)
 
-    cardinality = hllcpp.estimate_cardinality()
-    print >> sys.stdout, 'Estimated number of unique k-mers: {0}'.format(
-        cardinality)
+        cardinality = hllcpp.estimate_cardinality()
+        print >> sys.stderr, \
+                 'Estimated number of unique {0}-mers in {1}: {2}'.format(
+            args.ksize, input_filename, cardinality)
+
+        if report_fp:
+            print >> report_fp, cardinality, args.ksize, '(total)'
+            report_fp.flush()
+        total_hll.merge(hllcpp)
+
+    cardinality = total_hll.estimate_cardinality()
+    print >> sys.stderr, 'Total estimated number of unique {0}-mers: {1}'.format(
+        args.ksize, cardinality)
 
     if report_fp:
-        print >> report_fp, cardinality
+        print >> report_fp, cardinality, args.ksize, 'total'
         report_fp.flush()
 
 if __name__ == "__main__":
