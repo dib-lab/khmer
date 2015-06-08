@@ -107,7 +107,7 @@ def main():
         output_filename = output_file.name
     else:
         filename = args.filenames[0]
-        output_filename = os.path.basename(filename) + '.subset'
+        output_filename = os.path.basename(filename) + '.blue'
 
     if num_samples == 1:
         print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' %\
