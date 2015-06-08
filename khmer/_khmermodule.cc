@@ -3109,9 +3109,10 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 
 static PyMethodDef khmer_hashbits_methods[] = {
     { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
-    { "update",
-      (PyCFunction) hashbits_update, METH_VARARGS,
-      "a set update: update this nodegraph with all the entries from the other"
+    {
+        "update",
+        (PyCFunction) hashbits_update, METH_VARARGS,
+        "a set update: update this nodegraph with all the entries from the other"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -4441,7 +4442,7 @@ static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
     }
 
     try {
-          me->hllcounter->merge(*(other->hllcounter));
+        me->hllcounter->merge(*(other->hllcounter));
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;

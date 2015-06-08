@@ -1368,7 +1368,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     if (loaded != expected_pmap_size) {
         throw khmer_file_exception("error loading partitionmap - "
-                              "invalid # of items");
+                                   "invalid # of items");
     }
 }
 
