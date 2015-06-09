@@ -45,9 +45,24 @@ class Test_CountingHash(object):
     def setup(self):
         self.hi = khmer.CountingHash(12, PRIMES_1m)
 
+    def test_failed_get(self):
+        GG = 'G' * 12                   # forward_hash: 11184810
+        GGhash = khmer.forward_hash(GG, 12)
+        assert khmer.forward_hash(GG, 12) == 11184810
+
+        hi = self.hi
+        hi.consume(GG)
+
+        try:
+            hi.get(float(GGhash))
+            assert "the previous statement should fail"
+        except ValueError as err:
+            print str(err)
+
     def test_collision_1(self):
 
         GG = 'G' * 12                   # forward_hash: 11184810
+        GGhash = khmer.forward_hash(GG, 12)
         assert khmer.forward_hash(GG, 12) == 11184810
 
         collision_1 = 'AAACGTATGACT'
@@ -64,6 +79,7 @@ class Test_CountingHash(object):
         hi.consume(collision_1)
 
         assert hi.get(GG) == 1
+        assert hi.get(GGhash) == 1
 
     def test_collision_2(self):
 
@@ -215,6 +231,17 @@ def test_simple_median():
     assert median == 3
     assert average == 2.5
     assert int(stddev * 100) == 50        # .5
+
+
+def test_median_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    try:
+        hi.get_median_count("A")
+        assert 0, "this should fail"
+    except ValueError:
+        pass
 
 
 def test_median_at_least():
@@ -440,6 +467,114 @@ def test_2_kadian():
     #           ------^-------^^---^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 1, x
+
+
+def test_get_kmer_counts_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("A")
+    assert len(counts) == 0
+
+
+def test_get_kmer_counts_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("A")
+    assert len(counts) == 0
+
+
+def test_get_kmers_too_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    kmers = hi.get_kmers("A")
+    assert len(kmers) == 0
+
+
+def test_get_kmer_counts():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("AAAAAA")
+    print counts
+    assert len(counts) == 1
+    assert counts[0] == 1
+
+    hi.consume("AAAAAA")
+    counts = hi.get_kmer_counts("AAAAAA")
+    print counts
+    assert len(counts) == 1
+    assert counts[0] == 2
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 1
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 2
+
+    hi.consume("AAAAAT")
+    counts = hi.get_kmer_counts("AAAAAAT")
+    print counts
+    assert len(counts) == 2
+    assert counts[0] == 2
+    assert counts[1] == 3
+
+
+def test_get_kmer_hashes():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes("AAAAAA")
+    print hashes
+    assert len(hashes) == 1
+    assert hi.get(hashes[0]) == 1
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes("AAAAAA")
+    print hashes
+    assert len(hashes) == 1
+    assert hi.get(hashes[0]) == 2
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 1
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 2
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes("AAAAAAT")
+    print hashes
+    assert len(hashes) == 2
+    assert hi.get(hashes[0]) == 2
+    assert hi.get(hashes[1]) == 3
+
+
+def test_get_kmers():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    kmers = hi.get_kmers("AAAAAA")
+    assert kmers == ["AAAAAA"]
+
+    kmers = hi.get_kmers("AAAAAAT")
+    assert kmers == ["AAAAAA", "AAAAAT"]
 
 
 def test_save_load():
