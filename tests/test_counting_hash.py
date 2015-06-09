@@ -217,6 +217,137 @@ def test_simple_median():
     assert int(stddev * 100) == 50        # .5
 
 
+def test_median_at_least():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    assert hi.median_at_least("AAAAAA", 1)
+    assert hi.median_at_least("AAAAAA", 2) is False
+
+    hi.consume("AAAAAA")
+    assert hi.median_at_least("AAAAAA", 2)
+    assert hi.median_at_least("AAAAAA", 3) is False
+
+    hi.consume("AAAAAA")
+    assert hi.median_at_least("AAAAAA", 3)
+    assert hi.median_at_least("AAAAAA", 4) is False
+
+    hi.consume("AAAAAA")
+    assert hi.median_at_least("AAAAAA", 4)
+    assert hi.median_at_least("AAAAAA", 5) is False
+
+    hi.consume("AAAAAA")
+    assert hi.median_at_least("AAAAAA", 5)
+    assert hi.median_at_least("AAAAAA", 6) is False
+
+
+def test_median_at_least_single_gt():
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    kmers = ['ATCGATCGATCGATCGATCG',
+             'GTACGTACGTACGTACGTAC',
+             'TTAGTTAGTTAGTTAGTTAG']
+
+    for kmer in kmers:
+        hi.consume(kmer)
+        assert hi.median_at_least(kmer, 1) is True
+
+
+def test_median_at_least_single_lt():
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    kmers = ['ATCGATCGATCGATCGATCG',
+             'GTACGTACGTACGTACGTAC',
+             'TTAGTTAGTTAGTTAGTTAG']
+
+    for kmer in kmers:
+        hi.consume(kmer)
+        assert hi.median_at_least(kmer, 2) is False
+
+
+def test_median_at_least_odd_gt():
+    # test w/odd number of k-mers
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    seqs = ['ATCGATCGATCGATCGATCGCC',
+            'GTACGTACGTACGTACGTACCC',
+            'TTAGTTAGTTAGTTAGTTAGCC']
+
+    for seq in seqs:
+        hi.consume(seq)
+        assert hi.median_at_least(seq, 1) is True
+
+
+def test_median_at_least_odd_lt():
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    seqs = ['ATCGATCGATCGATCGATCGCC',
+            'GTACGTACGTACGTACGTACCC',
+            'TTAGTTAGTTAGTTAGTTAGCC']
+
+    for seq in seqs:
+        hi.consume(seq)
+        assert hi.median_at_least(seq, 2) is False
+
+
+# Test median with even number of k-mers
+def test_median_at_least_even_gt():
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    seqs = ['ATCGATCGATCGATCGATCGCCC',
+            'GTACGTACGTACGTACGTACCCC',
+            'TTAGTTAGTTAGTTAGTTAGCCC']
+
+    for seq in seqs:
+        hi.consume(seq)
+        assert hi.median_at_least(seq, 1) is True
+
+
+def test_median_at_least_even_lt():
+    K = 20
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    seqs = ['ATCGATCGATCGATCGATCGCCC',
+            'GTACGTACGTACGTACGTACCCC',
+            'TTAGTTAGTTAGTTAGTTAGCCC']
+
+    for seq in seqs:
+        hi.consume(seq)
+        assert hi.median_at_least(seq, 2) is False
+
+
+def test_median_at_least_comp():
+    K = 20
+    C = 4
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    seqs = ['ATCGATCGATCGATCGATCGCCC',
+            'GTACGTACGTACGTACGTACCCC',
+            'TTAGTTAGTTAGTTAGTTAGCCC']
+
+    for seq in seqs:
+        hi.consume(seq)
+        hi.consume(seq)
+        hi.consume(seq)
+
+        med, _, _ = hi.get_median_count(seq)
+        assert hi.median_at_least(seq, C) is (med >= C)
+
+
+def test_median_at_least_exception():
+    ht = khmer.new_counting_hash(20, 1e6, 2)
+    try:
+        ht.median_at_least('ATGGCTGATCGAT', 1)
+        assert 0, "should have thrown ValueError"
+    except ValueError as e:
+        pass
+
+
 def test_simple_kadian():
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")

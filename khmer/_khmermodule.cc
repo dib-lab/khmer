@@ -1151,6 +1151,32 @@ hashtable_get_median_count(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_median_at_least(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+    unsigned int cutoff;
+
+    if (!PyArg_ParseTuple(args, "sI", &long_str, &cutoff)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    if (hashtable->median_at_least(long_str, cutoff)) {
+        Py_RETURN_TRUE;
+    }
+    Py_RETURN_FALSE;
+
+}
+
+static
+PyObject *
 hashtable_n_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2302,6 +2328,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+    { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
     { "extract_unique_paths", (PyCFunction)hashtable_extract_unique_paths, METH_VARARGS, "" },
     { "load_stop_tags", (PyCFunction)hashtable_load_stop_tags, METH_VARARGS, "" },
     { "save_stop_tags", (PyCFunction)hashtable_save_stop_tags, METH_VARARGS, "" },

@@ -117,9 +117,7 @@ class Normalizer(object):
 
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                med, _, _ = self.htable.get_median_count(seq)
-
-                if med < desired_coverage:
+                if not self.htable.median_at_least(seq, desired_coverage):
                     passed_filter = True
 
             if passed_filter:
