@@ -249,21 +249,20 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # if we're using a single output file only check for identical filenames
     # otherwise, check for identical BASE names as well.
     filenames = []
+    basenames = []
     for pathfilename in args.input_filenames:
-        basename = os.path.basename(pathfilename)
-        if pathfilename in filenames:
-            print("WARNING: duplicate filepath, ignoring.", file=sys.stderr)
-            continue  # skip adding this file
-        elif any(basename in filename for filename in filenames) and not\
-                args.single_output_file:
-            print("ERROR: At least two input files are named \
-%s . (The script normalize-by-median.py can not handle this, only one .keep \
-file for one of the input files will be generated and data would be lost)"
-                  % basename,
-                  file=sys.stderr)
-            sys.exit(1)  # would destroy data, fail out.
-
         filenames.append(pathfilename)
+        if args.single_output_file:
+            continue  # nothing more to worry about
+
+        basename = os.path.basename(pathfilename)
+        if basename in basenames:
+            print('ERROR: Duplicate filename--Cannot handle this!',
+                  file=sys.stderr)
+            print('** Exiting!', file=sys.stderr)
+            sys.exit(1)
+
+        basenames.append(basename)
 
     # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)

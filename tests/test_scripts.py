@@ -15,7 +15,6 @@ import shutil
 from cStringIO import StringIO
 import traceback
 from nose.plugins.attrib import attr
-from nose.tools import assert_raises
 import subprocess
 import threading
 import bz2
@@ -677,23 +676,6 @@ def test_normalize_by_median_stdout_3():
     assert "IOErrors" not in err
 
 
-def test_normalize_by_median_stdout_2():
-    CUTOFF = '1'
-
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', infile, '-o', '/dev/stdout']
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    assert 'Total number of unique k-mers: 98' in err, err
-    assert 'in /dev/stdout' in err, err
-    assert "IOErrors" not in err
-
-
 @attr('known_failing')
 def test_normalize_by_median_known_good():
     CUTOFF = '2'
@@ -789,7 +771,7 @@ def test_normalize_by_median_double_file_name():
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
     except AssertionError as e:
-        assert "ERROR: At least two input files are named" in str(e), str(e)
+        assert "Duplicate filename--Cannot handle this!" in str(e), str(e)
 
 
 def test_normalize_by_median_overwrite():
