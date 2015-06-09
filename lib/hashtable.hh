@@ -292,6 +292,9 @@ public:
         unsigned long long  &n_consumed
     );
 
+    bool median_at_least(const std::string &s,
+                          unsigned int cutoff);
+
     void get_median_count(const std::string &s,
                           BoundedCounterType &median,
                           float &average,

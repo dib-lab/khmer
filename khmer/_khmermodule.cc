@@ -1155,6 +1155,32 @@ hashtable_get_median_count(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_median_at_least(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+    unsigned int cutoff;
+
+    if (!PyArg_ParseTuple(args, "sI", &long_str, &cutoff)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    if (hashtable->median_at_least(long_str, cutoff)) {
+        Py_RETURN_TRUE;
+    }
+    Py_RETURN_FALSE;
+
+}
+
+static
+PyObject *
 hashtable_n_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2448,6 +2474,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+    { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+    { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
     { "extract_unique_paths", (PyCFunction)hashtable_extract_unique_paths, METH_VARARGS, "" },
     { "print_tagset", (PyCFunction)hashtable_print_tagset, METH_VARARGS, "" },
     { "add_tag", (PyCFunction)hashtable_add_tag, METH_VARARGS, "" },
@@ -3256,9 +3284,10 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 
 static PyMethodDef khmer_hashbits_methods[] = {
     { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
-    { "update",
-      (PyCFunction) hashbits_update, METH_VARARGS,
-      "a set update: update this nodegraph with all the entries from the other"
+    {
+        "update",
+        (PyCFunction) hashbits_update, METH_VARARGS,
+        "a set update: update this nodegraph with all the entries from the other"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -4368,6 +4397,9 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
+                                   PyObject * args);
+
 static
 PyObject *
 hllcounter_get_erate(khmer_KHLLCounter_Object * me)
@@ -4492,6 +4524,11 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter."
     },
+    {
+        "merge", (PyCFunction)hllcounter_merge,
+        METH_VARARGS,
+        "Merge other counter into this one."
+    },
     {NULL} /* Sentinel */
 };
 
@@ -4570,6 +4607,24 @@ static PyTypeObject khmer_KHLLCounter_Type = {
 
 #define is_hllcounter_obj(v)  (Py_TYPE(v) == &khmer_KHLLCounter_Type)
 
+static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
+                                   PyObject * args)
+{
+    khmer_KHLLCounter_Object * other;
+
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KHLLCounter_Type, &other)) {
+        return NULL;
+    }
+
+    try {
+        me->hllcounter->merge(*(other->hllcounter));
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
 
 //////////////////////////////
 // standalone functions
