@@ -1,3 +1,7 @@
+2015-06-09   Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/_khmermodule.cc, lib/hashtable.{cc,hh}: astyle fixes.
+
 2015-06-09  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: fixed nasty Hashtable.get() bug.
