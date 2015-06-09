@@ -1,8 +1,22 @@
-2015-06-08  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/normalize-by-median.py: implemented broken_paired_reader
    * tests/test_scripts.py: modified tests to properly use new args
    * khmer/utils.py: added force-paired option to broken_paired_reader (@ctb)
+
+2015-06-09   Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/_khmermodule.cc, lib/hashtable.{cc,hh}: astyle fixes.
+
+2015-06-09  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed nasty Hashtable.get() bug.
+   * lib/hashtable.{cc,hh}: add Hashtable::get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts().
+   * khmer/_khmermodule.cc: add CPython functions for get_kmers(),
+   get_kmer_hashes(), and get_kmer_counts(); reorganize hashtable_methods.
+   * tests/test_counting_hash.py: add tests for get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts(), as well as for nasty Hashtable.get() bug.
 
 2015-06-08  Camille Scott  <camille.scott.w@gmail.com>
 

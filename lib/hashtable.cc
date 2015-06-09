@@ -193,24 +193,10 @@ void Hashtable::get_median_count(const std::string &s,
                                  float &stddev)
 {
     std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        BoundedCounterType count = this->get_count(kmer);
-        counts.push_back(count);
-    }
+    this->get_kmer_counts(s, counts);
 
     if (!counts.size()) {
-        throw khmer_exception();
-    }
-
-    if (!counts.size()) {
-        median = 0;
-        average = 0;
-        stddev = 0;
-
-        return;
+        throw khmer_exception("no k-mer counts for this string; too short?");
     }
 
     average = 0;
@@ -236,7 +222,8 @@ void Hashtable::get_median_count(const std::string &s,
 // Optimized filter function for normalize-by-median
 //
 bool Hashtable::median_at_least(const std::string &s,
-                                unsigned int cutoff) {
+                                unsigned int cutoff)
+{
     KMerIterator kmers(s.c_str(), _ksize);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
@@ -1522,4 +1509,43 @@ void Hashtable::extract_unique_paths(std::string seq,
         }
     }
 }
+
+
+void Hashtable::get_kmers(const std::string &s,
+                          std::vector<std::string> &kmers_vec) const
+{
+    if (s.length() < _ksize) {
+        return;
+    }
+    for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+        std::string sub = s.substr(i, i + _ksize);
+        kmers_vec.push_back(sub);
+    }
+}
+
+
+void Hashtable::get_kmer_hashes(const std::string &s,
+                                std::vector<HashIntoType> &kmers_vec) const
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        kmers_vec.push_back(kmer);
+    }
+}
+
+
+void Hashtable::get_kmer_counts(const std::string &s,
+                                std::vector<BoundedCounterType> &counts) const
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        BoundedCounterType c = this->get_count(kmer);
+        counts.push_back(c);
+    }
+}
+
 // vim: set sts=2 sw=2:

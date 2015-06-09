@@ -904,7 +904,7 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
     unsigned long count = 0;
 
-    if (PyInt_Check(arg)) {
+    if (PyInt_Check(arg) || PyLong_Check(arg)) {
         long pos = PyInt_AsLong(arg);
         count = hashtable->get_count((unsigned int) pos);
     } else if (PyBytes_Check(arg)) {
@@ -917,6 +917,10 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
         }
 
         count = hashtable->get_count(s.c_str());
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "please pass either a hash value or a string");
+        return NULL;
     }
 
     return PyLong_FromLong(count);
@@ -2307,22 +2311,182 @@ hashtable_extract_unique_paths(khmer_KHashtable_Object * me, PyObject * args)
     return x;
 }
 
+
+static
+PyObject *
+hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<std::string> kmers;
+
+    hashtable->get_kmers(sequence, kmers);
+
+    PyObject * x = PyList_New(kmers.size());
+    for (unsigned int i = 0; i < kmers.size(); i++) {
+        PyObject * obj = PyBytes_FromString(kmers[i].c_str());
+        PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+static
+PyObject *
+hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<BoundedCounterType> counts;
+    hashtable->get_kmer_counts(sequence, counts);
+
+    PyObject * x = PyList_New(counts.size());
+    for (unsigned int i = 0; i <counts.size(); i++) {
+        PyObject * obj = PyInt_FromLong(counts[i]);
+        PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+
+static
+PyObject *
+hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::vector<HashIntoType> hashes;
+    hashtable->get_kmer_hashes(sequence, hashes);
+
+    PyObject * x = PyList_New(hashes.size());
+    for (unsigned int i = 0; i < hashes.size(); i++) {
+        PyObject * obj = PyLong_FromUnsignedLongLong(hashes[i]);
+        PyList_SET_ITEM(x, i, obj);
+    }
+
+    return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
-    { "ksize", (PyCFunction)hashtable_get_ksize, METH_VARARGS, "" },
-    { "hashsizes", (PyCFunction)hashtable_get_hashsizes, METH_VARARGS, "" },
-    { "n_unique_kmers", (PyCFunction)hashtable_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
-    { "n_occupied", (PyCFunction)hashtable_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
-    { "n_entries", (PyCFunction)hashtable_n_entries, METH_VARARGS, "" },
-    { "count", (PyCFunction)hashtable_count, METH_VARARGS, "Count the given kmer" },
-    { "consume", (PyCFunction)hashtable_consume, METH_VARARGS, "Count all k-mers in the given string" },
-    { "consume_fasta", (PyCFunction)hashtable_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    //
+    // Basic methods
+    //
+
     {
-        "consume_fasta_with_reads_parser", (PyCFunction)hashtable_consume_fasta_with_reads_parser,
-        METH_VARARGS, "Count all k-mers using a given reads parser"
+        "ksize",
+        (PyCFunction)hashtable_get_ksize, METH_VARARGS,
+        "Returns the k-mer size of this graph."
     },
-    { "get", (PyCFunction)hashtable_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "load", (PyCFunction)hashtable_load, METH_VARARGS, "" },
-    { "save", (PyCFunction)hashtable_save, METH_VARARGS, "" },
+    { "hashsizes", (PyCFunction)hashtable_get_hashsizes, METH_VARARGS, "" },
+    {
+        "n_unique_kmers",
+        (PyCFunction)hashtable_n_unique_kmers, METH_VARARGS,
+        "Count the number of unique kmers in this graph."
+    },
+    {
+        "n_occupied", (PyCFunction)hashtable_n_occupied, METH_VARARGS,
+        "Count the number of occupied bins."
+    },
+    { "n_entries", (PyCFunction)hashtable_n_entries, METH_VARARGS, "" },
+    {
+        "count",
+        (PyCFunction)hashtable_count, METH_VARARGS,
+        "Increment the count of this k-mer."
+    },
+    {
+        "consume",
+        (PyCFunction)hashtable_consume, METH_VARARGS,
+        "Increment the counts of all of the k-mers in the string."
+    },
+    {
+        "consume_fasta",
+        (PyCFunction)hashtable_consume_fasta, METH_VARARGS,
+        "Incrment the counts of all the k-mers in the sequences in the "
+        "given file"
+    },
+    {
+        "consume_fasta_with_reads_parser",
+        (PyCFunction)hashtable_consume_fasta_with_reads_parser, METH_VARARGS,
+        "Count all k-mers retrieved with this reads parser object."
+    },
+    {
+        "get",
+        (PyCFunction)hashtable_get, METH_VARARGS,
+        "Retrieve the count for the given k-mer."
+    },
+    {
+        "load",
+        (PyCFunction)hashtable_load, METH_VARARGS,
+        "Load the graph from the specified file."
+    },
+    {
+        "save",
+        (PyCFunction)hashtable_save, METH_VARARGS,
+        "Save the graph to the specified file."
+    },
+    {
+        "get_median_count",
+        (PyCFunction)hashtable_get_median_count, METH_VARARGS,
+        "Get the median, average, and stddev of the k-mer counts "
+        " in the string"
+    },
+    {
+        "get_kmers",
+        (PyCFunction)hashtable_get_kmers, METH_VARARGS,
+        "Generate an ordered list of all substrings of length k in the string."
+    },
+    {
+        "get_kmer_hashes",
+        (PyCFunction)hashtable_get_kmer_hashes, METH_VARARGS,
+        "Retrieve an ordered list of all hashes of all k-mers in the string."
+    },
+    {
+        "get_kmer_counts",
+        (PyCFunction)hashtable_get_kmer_counts, METH_VARARGS,
+        "Retrieve an ordered list of the counts of all k-mers in the string."
+    },
+
+    //
+    // graph/traversal functionality
+    //
+
+    {
+        "calc_connected_graph_size",
+        (PyCFunction)hashtable_calc_connected_graph_size, METH_VARARGS, ""
+    },
+    {
+        "kmer_degree",
+        (PyCFunction)hashtable_kmer_degree, METH_VARARGS,
+        "Calculate the number of immediate neighbors this k-mer has in "
+        "the graph."
+    },
+    {
+        "count_kmers_within_radius",
+        (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
+        "Calculate the number of neighbors with given radius in the graph."
+    },
+
+    //
+    // tagging / sparse graph functionality
+    //
+
     { "consume_and_tag", (PyCFunction)hashtable_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
@@ -2330,39 +2494,30 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
     { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
     { "extract_unique_paths", (PyCFunction)hashtable_extract_unique_paths, METH_VARARGS, "" },
-    { "load_stop_tags", (PyCFunction)hashtable_load_stop_tags, METH_VARARGS, "" },
-    { "save_stop_tags", (PyCFunction)hashtable_save_stop_tags, METH_VARARGS, "" },
-    { "print_stop_tags", (PyCFunction)hashtable_print_stop_tags, METH_VARARGS, "" },
     { "print_tagset", (PyCFunction)hashtable_print_tagset, METH_VARARGS, "" },
-    { "calc_connected_graph_size", (PyCFunction)hashtable_calc_connected_graph_size, METH_VARARGS, "" },
-    { "kmer_degree", (PyCFunction)hashtable_kmer_degree, METH_VARARGS, "" },
-    { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
-    { "identify_stoptags_by_position", (PyCFunction)hashtable_identify_stoptags_by_position, METH_VARARGS, "" },
-    { "do_subset_partition", (PyCFunction)hashtable_do_subset_partition, METH_VARARGS, "" },
-    { "find_all_tags", (PyCFunction)hashtable_find_all_tags, METH_VARARGS, "" },
-    { "assign_partition_id", (PyCFunction)hashtable_assign_partition_id, METH_VARARGS, "" },
-    { "output_partitions", (PyCFunction)hashtable_output_partitions, METH_VARARGS, "" },
-    { "find_unpart", (PyCFunction)hashtable_find_unpart, METH_VARARGS, "" },
-    { "filter_if_present", (PyCFunction)hashtable_filter_if_present, METH_VARARGS, "" },
     { "add_tag", (PyCFunction)hashtable_add_tag, METH_VARARGS, "" },
-    { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
-    { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
     { "get_tagset", (PyCFunction)hashtable_get_tagset, METH_VARARGS, "" },
     { "load_tagset", (PyCFunction)hashtable_load_tagset, METH_VARARGS, "" },
     { "save_tagset", (PyCFunction)hashtable_save_tagset, METH_VARARGS, "" },
     { "n_tags", (PyCFunction)hashtable_n_tags, METH_VARARGS, "" },
     { "divide_tags_into_subsets", (PyCFunction)hashtable_divide_tags_into_subsets, METH_VARARGS, "" },
+    { "_get_tag_density", (PyCFunction)hashtable__get_tag_density, METH_VARARGS, "" },
+    { "_set_tag_density", (PyCFunction)hashtable__set_tag_density, METH_VARARGS, "" },
+
+    // partitioning
+    { "do_subset_partition", (PyCFunction)hashtable_do_subset_partition, METH_VARARGS, "" },
+    { "find_all_tags", (PyCFunction)hashtable_find_all_tags, METH_VARARGS, "" },
+    { "assign_partition_id", (PyCFunction)hashtable_assign_partition_id, METH_VARARGS, "" },
+    { "output_partitions", (PyCFunction)hashtable_output_partitions, METH_VARARGS, "" },
+    { "find_unpart", (PyCFunction)hashtable_find_unpart, METH_VARARGS, "" },
     { "load_partitionmap", (PyCFunction)hashtable_load_partitionmap, METH_VARARGS, "" },
     { "save_partitionmap", (PyCFunction)hashtable_save_partitionmap, METH_VARARGS, "" },
     { "_validate_partitionmap", (PyCFunction)hashtable__validate_partitionmap, METH_VARARGS, "" },
-    { "_get_tag_density", (PyCFunction)hashtable__get_tag_density, METH_VARARGS, "" },
-    { "_set_tag_density", (PyCFunction)hashtable__set_tag_density, METH_VARARGS, "" },
+    { "consume_fasta_and_traverse", (PyCFunction)hashtable_consume_fasta_and_traverse, METH_VARARGS, "" },
     {
         "consume_fasta_and_tag_with_reads_parser", (PyCFunction)hashtable_consume_fasta_and_tag_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"
     },
-    { "consume_fasta_and_traverse", (PyCFunction)hashtable_consume_fasta_and_traverse, METH_VARARGS, "" },
-    { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
     { "consume_partitioned_fasta", (PyCFunction)hashtable_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     { "join_partitions_by_path", (PyCFunction)hashtable_join_partitions_by_path, METH_VARARGS, "" },
     { "merge_subset", (PyCFunction)hashtable_merge_subset, METH_VARARGS, "" },
@@ -2377,9 +2532,20 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "join_partitions", (PyCFunction)hashtable_join_partitions, METH_VARARGS, "" },
     { "get_partition_id", (PyCFunction)hashtable_get_partition_id, METH_VARARGS, "" },
     { "is_single_partition", (PyCFunction)hashtable_is_single_partition, METH_VARARGS, "" },
-    { "count_kmers_within_radius", (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS, "" },
     { "traverse_from_tags", (PyCFunction)hashtable_traverse_from_tags, METH_VARARGS, "" },
     { "repartition_largest_partition", (PyCFunction)hashtable_repartition_largest_partition, METH_VARARGS, "" },
+
+    // stop tags
+    { "load_stop_tags", (PyCFunction)hashtable_load_stop_tags, METH_VARARGS, "" },
+    { "save_stop_tags", (PyCFunction)hashtable_save_stop_tags, METH_VARARGS, "" },
+    { "print_stop_tags", (PyCFunction)hashtable_print_stop_tags, METH_VARARGS, "" },
+    { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
+    { "identify_stoptags_by_position", (PyCFunction)hashtable_identify_stoptags_by_position, METH_VARARGS, "" },
+    { "filter_if_present", (PyCFunction)hashtable_filter_if_present, METH_VARARGS, "" },
+    { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
+    { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
+    { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
+
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

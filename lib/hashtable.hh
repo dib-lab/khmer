@@ -293,7 +293,7 @@ public:
     );
 
     bool median_at_least(const std::string &s,
-                          unsigned int cutoff);
+                         unsigned int cutoff);
 
     void get_median_count(const std::string &s,
                           BoundedCounterType &median,
@@ -465,6 +465,18 @@ public:
 
         return kmer_degree(kmer_f, kmer_r);
     }
+
+    // return all k-mer substrings, on the forward strand.
+    void get_kmers(const std::string &s, std::vector<std::string> &kmers)
+    const;
+
+    // return hash values for all k-mer substrings
+    void get_kmer_hashes(const std::string &s,
+                         std::vector<HashIntoType> &kmers) const;
+
+    // return counts of all k-mers in this string.
+    void get_kmer_counts(const std::string &s,
+                         std::vector<BoundedCounterType> &counts) const;
 };
 };
 
