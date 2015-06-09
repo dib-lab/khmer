@@ -1,3 +1,9 @@
+2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/normalize-by-median.py: implemented broken_paired_reader
+   * tests/test_scripts.py: modified tests to properly use new args
+   * khmer/utils.py: added force-paired option to broken_paired_reader (@ctb)
+
 2015-06-09   Luiz Irber  <khmer@luizirber.org>
 
    * khmer/_khmermodule.cc, lib/hashtable.{cc,hh}: astyle fixes.

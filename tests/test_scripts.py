@@ -590,7 +590,7 @@ def test_normalize_by_median():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    args = ['-C', CUTOFF, '-k', '17', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -601,6 +601,79 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert "IOErrors" not in err
+
+
+def test_normalize_by_median_unpaired_final_read():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', '-p',  infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
+    except AssertionError as e:
+        out = str(e)
+        assert "ERROR: Unpaired reads when require_paired" in out, out
+
+
+def test_normalize_by_median_unforced_badfile():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename("potatoes")
+    outfile = infile + '.keep'
+    in_dir = os.path.dirname(infile)
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
+    except AssertionError as e:
+        out = str(e)
+        assert "ERROR: [Errno 2] No such file or directory:" in out, out
+
+    if os.path.exists(outfile):
+        assert False, '.keep file should have been removed: '
+
+
+def test_normalize_by_median_contradictory_args():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '--force-single', '-p', '-R',
+            outfile, infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
+    except AssertionError as e:
+        out = str(e)
+        assert "cannot both be set" in out, out
+
+
+def test_normalize_by_median_stdout_3():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile, '--out', '-']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'in /dev/stdout' in err, err
+    assert "IOErrors" not in err
 
 
 @attr('known_failing')
@@ -635,7 +708,7 @@ def test_normalize_by_median_report_fp():
     shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', '1', '-k', '17', '-t', '-R', outfile, infile]
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert "fp rate estimated to be 0.626" in err, err
@@ -656,7 +729,7 @@ def test_normalize_by_median_unpaired_and_paired():
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-u', unpairedfile, '-p', infile]
+    args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 4029' in err, err
@@ -675,12 +748,12 @@ def test_normalize_by_median_count_kmers_PE():
     shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = scriptpath('normalize-by-median.py')
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'kept 1 of 2 or 50%' in err, err
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-p', infile]
+    args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 99' in err, err
     assert 'kept 2 of 2 or 100%' in err, err
@@ -694,9 +767,11 @@ def test_normalize_by_median_double_file_name():
 
     script = scriptpath('normalize-by-median.py')
     args = [utils.get_test_data('test-abund-read-2.fa'), infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "WARNING: At least two input files are named" in err, err
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+    except AssertionError as e:
+        assert "Duplicate filename--Cannot handle this!" in str(e), str(e)
 
 
 def test_normalize_by_median_overwrite():
@@ -709,7 +784,7 @@ def test_normalize_by_median_overwrite():
     shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
     script = scriptpath('normalize-by-median.py')
 
-    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, infile]
+    args = ['-C', CUTOFF, '-k', '17', '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile), outfile
     seqs = [r.sequence for r in screed.open(outfile)]
@@ -816,7 +891,7 @@ def test_normalize_by_median_impaired():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert '** ERROR: Error: Improperly interleaved pairs ' in err
+    assert 'ERROR: Unpaired reads ' in err, err
 
 
 def test_normalize_by_median_force():
@@ -837,12 +912,6 @@ def test_normalize_by_median_force():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(corrupt_infile + '.ct.failed')
-    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
-    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
-    assert test_ht.count(test_good_read[:17]) > 0
-    assert test_ht.count(test_good_read2[:17]) > 0
-    assert os.path.exists(corrupt_infile + '.ct.failed')
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
@@ -867,35 +936,6 @@ def test_normalize_by_median_no_bigcount():
     kh = khmer.load_counting_hash(hashfile)
 
     assert kh.get('GGTTGACG') == 255
-
-
-def test_normalize_by_median_dumpfrequency():
-    CUTOFF = '1'
-
-    infiles = [utils.get_temp_filename('test-0.fq')]
-    in_dir = os.path.dirname(infiles[0])
-    for x in range(1, 5):
-        infiles.append(utils.get_temp_filename('test-{x}.fq'.format(x=x),
-                                               tempdir=in_dir))
-
-    for infile in infiles:
-        shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
-
-    script = scriptpath('normalize-by-median.py')
-    args = ['-d', '2', '-C', CUTOFF, '-k', '17']
-    args.extend(infiles)
-
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ct'))
-    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
-    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
-    assert test_ht.count(test_good_read[:17]) > 0
-    assert test_ht.count(test_good_read2[:17]) > 0
-
-    assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
-    assert err.count('Backup: Saving') == 2
-    assert 'Nothing' in err
 
 
 def test_normalize_by_median_empty():
@@ -955,7 +995,7 @@ def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
     ofile.close()
 
 
-def test_normalize_by_median_stdout():
+def test_normalize_by_median_streaming():
     CUTOFF = '20'
 
     infile = utils.get_test_data('100-reads.fq.gz')
