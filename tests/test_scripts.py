@@ -619,9 +619,8 @@ def test_normalize_by_median_unpaired_final_read():
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
-        out = e.message[2]
+        out = str(e)
         assert "ERROR: Unpaired reads when require_paired" in out, out
-        pass
 
 
 def test_normalize_by_median_unforced_badfile():
@@ -636,7 +635,7 @@ def test_normalize_by_median_unforced_badfile():
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
-        out = e.message[2]
+        out = str(e)
         assert "ERROR: [Errno 2] No such file or directory:" in out, out
 
     if os.path.exists(outfile):
@@ -657,7 +656,7 @@ def test_normalize_by_median_contradictory_args():
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
-        out = e.message[2]
+        out = str(e)
         assert "cannot both be set" in out, out
 
 
