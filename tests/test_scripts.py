@@ -762,9 +762,11 @@ def test_normalize_by_median_double_file_name():
 
     script = scriptpath('normalize-by-median.py')
     args = [utils.get_test_data('test-abund-read-2.fa'), infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "WARNING: At least two input files are named" in err, err
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+    except AssertionError as e:
+        assert "ERROR: At least two input files are named" in str(e), str(e)
 
 
 def test_normalize_by_median_overwrite():

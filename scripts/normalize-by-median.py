@@ -248,16 +248,24 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     force_single = args.force_single
 
     # check for similar filenames
+    # if we're using a single output file only check for identical filenames
+    # otherwise, check for identical BASE names as well.
     filenames = []
     for pathfilename in args.input_filenames:
-        filename = pathfilename.split('/')[-1]
-        if (filename in filenames):
-            print("WARNING: At least two input files are named \
+        basename = os.path.basename(pathfilename)
+        if pathfilename in filenames:
+            print("WARNING: duplicate filepath, ignoring.", file=sys.stderr)
+            continue  # skip adding this file
+        elif any(basename in filename for filename in filenames) and not\
+                args.single_output_file:
+            print("ERROR: At least two input files are named \
 %s . (The script normalize-by-median.py can not handle this, only one .keep \
-file for one of the input files will be generated.)" % filename,
+file for one of the input files will be generated and data would be lost)"
+                  % basename,
                   file=sys.stderr)
-        else:
-            filenames.append(filename)
+            sys.exit(1)  # would destroy data, fail out.
+
+        filenames.append(pathfilename)
 
     # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
@@ -285,7 +293,7 @@ file for one of the input files will be generated.)" % filename,
     # if we don't know if they're paired, default to allowing but not
     # forcing pairing.
     files = []
-    for e in args.input_filenames:
+    for e in filenames:
         files.append([e, args.paired])
     if args.unpaired_reads:
         files.append([args.unpaired_reads, False])
@@ -299,6 +307,7 @@ file for one of the input files will be generated.)" % filename,
             output_name = '/dev/stdout'
         else:
             output_name = args.single_output_file.name
+        outfp = args.single_output_file
 
     #
     # main loop: iterate over all files given, do diginorm.
@@ -307,8 +316,7 @@ file for one of the input files will be generated.)" % filename,
     for filename, require_paired in files:
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
-
-        outfp = open(output_name, 'w')
+            outfp = open(output_name, 'w')
 
         # failsafe context manager in case an input file breaks
         with CatchIOErrors(filename, outfp, args.single_output_file,
@@ -325,6 +333,8 @@ file for one of the input files will be generated.)" % filename,
                     write_record(record, outfp)
 
             print('output in ' + output_name, file=sys.stderr)
+            if output_name is not '/dev/stdout':
+                outfp.close()
 
     # finished - print out some diagnostics.
 
