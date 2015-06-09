@@ -1,3 +1,11 @@
+2015-06-08  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.{cc,hh}: Add filter_on_median method to check
+   if median k-mer count is above a cutoff
+   * khmer/_khmermodule.cc: Expose filter_on_median to python-land
+   * scripts/normalize-by-median.py: Switch to new filter_on_median
+   * tests/test_counting_hash.py: Tests for new method
+
 2015-06-08  Luiz Irber  <khmer@luizirber.org>
 
    * tests/test_hll.py: test return values from consume_{string,fasta}.

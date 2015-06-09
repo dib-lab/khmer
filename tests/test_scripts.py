@@ -603,6 +603,30 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+@attr('known_failing')
+def test_normalize_by_median_known_good():
+    CUTOFF = '2'
+
+    infile = utils.get_temp_filename('test.fa.gz')
+    in_dir = os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data('100k-filtered.fa.gz'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '20', '-x', '4e6', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+    iter_known = screed.open(utils.get_test_data('100k-filtered.fa.keep.gz'))
+    iter_out = screed.open(outfile)
+    try:
+        for rknown, rout in zip(iter_known, iter_out):
+            assert rknown.name == rout.name
+    except Exception as e:
+        print e
+        assert False
+
+
 def test_normalize_by_median_report_fp():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
