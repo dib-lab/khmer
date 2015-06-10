@@ -1,7 +1,13 @@
-2015-06-09  Camille Scott  <camille.scott.w@gmail.com>
+2015-06-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/hashtable.cc: Tweaked median_at_least to reduce number of
    conditional checks.
+
+2015-06-10  Titus Brown  <titus@idyll.org>
+
+   * scripts/find-knots.py: fixed invocation of check_space to take correct
+   arguments.
+   * tests/test_scripts.py: added simple test of find-knots.py execution.
 
 2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
