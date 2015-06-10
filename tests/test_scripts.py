@@ -1496,6 +1496,22 @@ def test_partition_graph_no_big_traverse():
     assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
+def test_partition_find_knots_execute():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    script = scriptpath('partition-graph.py')
+    args = [graphbase]
+
+    utils.runscript(script, args)
+
+    script = scriptpath('find-knots.py')
+    args = [graphbase]
+    utils.runscript(script, args)
+
+    stoptags_file = graphbase + '.stoptags'
+    assert os.path.exists(stoptags_file)
+
+
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
