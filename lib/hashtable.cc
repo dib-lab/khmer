@@ -227,12 +227,18 @@ bool Hashtable::median_at_least(const std::string &s,
     KMerIterator kmers(s.c_str(), _ksize);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
+
+    // first loop:
+    // accumulate at least min_req worth of counts before checking to see
+    // if we have enough high-abundance k-mers to indicate success.
     for (unsigned int i = 0; i < min_req; ++i) {
         HashIntoType kmer = kmers.next();
         if (this->get_count(kmer) >= cutoff) {
             ++num_cutoff_kmers;
         }
     }
+
+    // second loop: now check to see if we pass the threshold for each k-mer.
     if (num_cutoff_kmers >= min_req) return true;
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
