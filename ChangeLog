@@ -1,3 +1,9 @@
+2015-06-10  Titus Brown  <titus@idyll.org>
+
+   * scripts/find-knots.py: fixed invocation of check_space to take correct
+   arguments.
+   * tests/test_scripts.py: added simple test of find-knots.py execution.
+
 2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/normalize-by-median.py: implemented broken_paired_reader

@@ -76,6 +76,8 @@ def get_parser():
                         'files.')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Continue past warnings')
     return parser
 
 
@@ -90,9 +92,9 @@ def main():
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
-        check_input_files(_, False)
+        check_input_files(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading k-mer presence table %s.pt' % graphbase
     htable = khmer.load_hashbits(graphbase + '.pt')
