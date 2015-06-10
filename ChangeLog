@@ -1,3 +1,8 @@
+2015-06-09  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.cc: Tweaked median_at_least to reduce number of
+   conditional checks.
+
 2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/normalize-by-median.py: implemented broken_paired_reader
