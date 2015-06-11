@@ -1,3 +1,13 @@
+2015-06-11  Titus Brown  <titus@idyll.org>
+
+   * scripts/normalize-by-median.py: changed DEFAULT_DESIRED_COVERAGE to 20,
+   and corrected options help.
+   * tests/{test_scripts.py,test_normalize_by_median.py}: moved
+   normalize-by-median.py tests into a their own file.
+   * tests/test-data/{dn-test-all-paired-all-keep.fa,dn-test-none-paired.fa,
+   dn-test-some-paired-all-keep.fa}: added test data files for specific
+   pairing/saturation behavior.
+
 2015-06-16  Kevin Murray  <spam@kdmurray.id.au>
 
    * doc/dev/binary-file-formats.rst: Add documentation of khmer's binary file

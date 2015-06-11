@@ -528,13 +528,13 @@ def test_diginorm_basic_functionality_2():
                         'b/2',
                         'c/1',
                         'd/2']), seqs
-    
+
 
 def test_diginorm_basic_functionality_3():
     # This data is entirely unpaired, but with one duplicate ('A...').
     # and a random sequence ('G...').  With 'C=1' only three seqs should
     # be left, with no other complaints.
-    
+
     CUTOFF = ['-C', '1']
     PAIRING = []
 
@@ -558,13 +558,13 @@ def test_diginorm_basic_functionality_3():
     assert seqs == set(['a/1',
                         'b/2',
                         'd/1']), seqs
-    
+
 
 def test_diginorm_basic_functionality_4():
     # This data is mixed paired/unpaired, but with one duplicate ('A...').
     # and a random sequence ('G...').  With 'C=2' all of the sequences
     # should be kept.
-    
+
     CUTOFF = ['-C', '1']
     PAIRING = ['-p']
 
