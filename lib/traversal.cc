@@ -11,6 +11,13 @@
 using namespace khmer;
 using namespace std;
 
+Traverser::Traverser(Hashtable * ht) : graph(ht)
+{
+    bitmask = graph->bitmask;
+    K = graph->ksize();
+    rc_left_shift = K * 2 - 2;
+}
+
 KmerNode Traverser::get_next(KmerNode& node, const char ch)
 {
     HashIntoType kmer_f, kmer_r;
@@ -100,4 +107,20 @@ unsigned int Traverser::degree_left(KmerNode& node)
 unsigned int Traverser::degree(KmerNode& node)
 {
     return degree_right(node) + degree_left(node);
+}
+
+KmerNode Traverser::build_node(HashIntoType kmer) {
+    return KmerNode(kmer, K);
+}
+
+KmerNode Traverser::build_node(HashIntoType kmer_f, HashIntoType kmer_r) {
+    return KmerNode(kmer_f, kmer_r, K);
+}
+
+KmerNode Traverser::build_node(std::string kmer) {
+    return KmerNode(kmer, K);
+}
+
+KmerNode Traverser::build_node(const char * kmer) {
+    return KmerNode(kmer, K);
 }

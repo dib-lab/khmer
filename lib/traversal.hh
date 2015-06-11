@@ -14,8 +14,8 @@
 
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
-#include "subset.hh"
 #include "kmer_hash.hh"
+#include "hashtable.hh"
 
 namespace khmer {
 
@@ -76,12 +76,7 @@ public:
     Hashtable * graph;
     unsigned int K;
 
-    explicit Traverser(Hashtable * ht) : graph(ht)
-    {
-        bitmask = graph->bitmask;
-        K = graph->ksize();
-        rc_left_shift = K * 2 - 2;
-    }
+    explicit Traverser(Hashtable * ht);
 
     KmerNode get_next(KmerNode& node, const char ch);
     KmerNode get_prev(KmerNode& node, const char ch);
@@ -94,6 +89,11 @@ public:
     unsigned int degree_right(KmerNode& node);
     unsigned int degree_left(KmerNode& node);
     unsigned int degree(KmerNode& node);
+
+    KmerNode build_node(HashIntoType kmer);
+    KmerNode build_node(HashIntoType kmer_f, HashIntoType kmer_r);
+    KmerNode build_node(std::string kmer);
+    KmerNode build_node(const char * kmer);
 
 };
 };
