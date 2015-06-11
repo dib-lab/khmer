@@ -812,63 +812,8 @@ const
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
 const
 {
-    unsigned int neighbors = 0;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    HashIntoType f, r;
-
-    // NEXT.
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    return neighbors;
+    KmerNode node = traverser->build_node(kmer_f, kmer_r);
+    return traverser->degree(node);
 }
 
 void Hashtable::filter_if_present(const std::string &infilename,
