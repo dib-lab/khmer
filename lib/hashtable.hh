@@ -463,13 +463,7 @@ public:
 
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
-    unsigned int kmer_degree(const char * kmer_s) const
-    {
-        HashIntoType kmer_f, kmer_r;
-        _hash(kmer_s, _ksize, kmer_f, kmer_r);
-
-        return kmer_degree(kmer_f, kmer_r);
-    }
+    unsigned int kmer_degree(const char * kmer_s) const;
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)

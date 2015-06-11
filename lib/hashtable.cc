@@ -816,6 +816,13 @@ const
     return traverser->degree(node);
 }
 
+unsigned int Hashtable::kmer_degree(const char * kmer_s)
+const
+{
+    KmerNode node = traverser->build_node(kmer_s);
+    return traverser->degree(node);
+}
+
 void Hashtable::filter_if_present(const std::string &infilename,
                                   const std::string &outputfile)
 {

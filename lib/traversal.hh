@@ -26,38 +26,19 @@ class KmerNode {
 
 public:
 
-    HashIntoType kmer_f, kmer_r;
-    HashIntoType kmer_u;
-    unsigned int K;
-    
-    KmerNode(HashIntoType kmer, unsigned int K) {
-        this->K = K;
-        kmer_u = kmer;
-        _hash(_revhash(kmer, K).c_str(), K, kmer_f, kmer_r);
+    HashIntoType kmer_f, kmer_r, kmer_u;
+
+    KmerNode(HashIntoType f, HashIntoType r, HashIntoType u) {
+        kmer_f = f;
+        kmer_r = r;
+        kmer_u = u;
     }
 
-    KmerNode(HashIntoType kmer_f, HashIntoType kmer_r, unsigned int K) {
-        this->K = K;
-        this->kmer_f = kmer_f;
-        this->kmer_r = kmer_r;
-        kmer_u = uniqify_rc(kmer_f, kmer_f);
-    }
-
-    KmerNode(std::string kmer, unsigned int K) {
-        this->K = K;
-        kmer_u = _hash(kmer.c_str(), K, kmer_f, kmer_r);
-    }
-
-    KmerNode(const char * kmer, unsigned int K) {
-        this->K = K;
-        kmer_u = _hash(kmer, K, kmer_f, kmer_r);
-    }
-
-    std::string get_string_rep() {
+    std::string get_string_rep(unsigned int K) {
         return _revhash(kmer_u, K);
     }
 
-    const char * get_char_rep() {
+    const char * get_char_rep(unsigned int K) {
         return _revhash(kmer_u, K).c_str();
     }
 };
