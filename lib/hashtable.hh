@@ -175,6 +175,7 @@ class Hashtable  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
+    friend class Traverser;
 protected:
     unsigned int _tag_density;
 
