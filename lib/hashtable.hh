@@ -25,6 +25,7 @@
 #include "read_parsers.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
+#include "traversal.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -176,6 +177,7 @@ class Hashtable  		// Base class implementation of a Bloom ht.
     friend class SubsetPartition;
     friend class LabelHash;
     friend class Traverser;
+
 protected:
     unsigned int _tag_density;
 
@@ -196,6 +198,7 @@ protected:
             throw khmer_exception();
         }
         partition = new SubsetPartition(this);
+        traverser = new Traverser(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
 
@@ -246,6 +249,7 @@ protected:
 
 public:
     SubsetPartition * partition;
+    Traverser * traverser;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
