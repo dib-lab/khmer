@@ -215,7 +215,7 @@ def get_parser():
                         help='require that all sequences be properly paired')
     parser.add_argument('--force-single', dest='force_single',
                         action='store_true',
-                        'treat all sequences as single-ended/unpaired')
+                        help='treat all sequences as single-ended/unpaired')
     parser.add_argument('-u', '--unpaired-reads',
                         metavar="unpaired_reads_filename",
                         help='include a file of unpaired reads to which '
