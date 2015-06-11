@@ -198,9 +198,9 @@ protected:
             throw khmer_exception();
         }
         partition = new SubsetPartition(this);
-        traverser = new Traverser(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
+        traverser = new Traverser(this);
 
     }
 
