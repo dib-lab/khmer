@@ -470,3 +470,151 @@ def test_normalize_by_median_streaming():
     assert linecount == 400
 
 
+def test_diginorm_basic_functionality_1():
+    # each of these pairs has both a multicopy sequence ('ACTTCA...') and
+    # a random sequence.  With 'C=1' and '-p', all should be kept.
+    CUTOFF = ['-C', '1']
+    PAIRING = ['-p']
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
+                    infile)
+
+    script = 'normalize-by-median.py'
+    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+
+    assert seqs == set(['a/1', 'a/2',
+                        'b/1', 'b/2',
+                        'c/1', 'c/2',
+                        'd/1', 'd/2']), seqs
+
+
+def test_diginorm_basic_functionality_2():
+    # each of these pairs has both a multicopy sequence ('ACTTCA...')
+    # and a random sequence ('G...').  With 'C=1' and '--force-
+    # single', only random seqs should be kept, together with one copy
+    # of the multicopy sequence.
+    CUTOFF = ['-C', '1']
+    PAIRING = ['--force-single']
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
+                    infile)
+
+    script = 'normalize-by-median.py'
+    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+
+    assert seqs == set(['a/1', 'a/2',
+                        'b/2',
+                        'c/1',
+                        'd/2']), seqs
+    
+
+def test_diginorm_basic_functionality_3():
+    # This data is entirely unpaired, but with one duplicate ('A...').
+    # and a random sequence ('G...').  With 'C=1' only three seqs should
+    # be left, with no other complaints.
+    
+    CUTOFF = ['-C', '1']
+    PAIRING = []
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('dn-test-none-paired.fa'),
+                    infile)
+
+    script = 'normalize-by-median.py'
+    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+
+    assert seqs == set(['a/1',
+                        'b/2',
+                        'd/1']), seqs
+    
+
+def test_diginorm_basic_functionality_4():
+    # This data is mixed paired/unpaired, but with one duplicate ('A...').
+    # and a random sequence ('G...').  With 'C=2' all of the sequences
+    # should be kept.
+    
+    CUTOFF = ['-C', '1']
+    PAIRING = ['-p']
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('dn-test-some-paired-all-keep.fa'),
+                    infile)
+
+    script = 'normalize-by-median.py'
+    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+
+    assert seqs == set(['a/1', 'a/2',
+                        'b/2',
+                        'c/1', 'c/2',
+                        'd/2']), seqs
+
+
+def test_diginorm_basic_functionality_4():
+    # each of these pairs has both a multicopy sequence ('ACTTCA...') and
+    # a random sequence.  With 'C=1' and '-p', all should be
+    CUTOFF = ['-C', '1']
+    PAIRING = ['-p']
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
+                    infile)
+
+    script = 'normalize-by-median.py'
+    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+
+    assert seqs == set(['a/1', 'a/2',
+                        'b/1', 'b/2',
+                        'c/1', 'c/2',
+                        'd/1', 'd/2']), seqs
