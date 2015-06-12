@@ -613,7 +613,7 @@ def test_normalize_by_median_unpaired_final_read():
     shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '-p',  infile]
+    args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
@@ -991,6 +991,7 @@ def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
     while len(chunk) > 0:
         ofile.write(chunk)
         chunk = ifile.read(CHUNKSIZE)
+
     ifile.close()
     ofile.close()
 
@@ -2213,6 +2214,36 @@ def test_extract_paired_reads_2_fq():
         assert r.sequence == q.sequence
         assert r.quality == q.quality
     assert n > 0
+
+
+def execute_split_paired_streaming(ifilename):
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+    outfile1 = utils.get_temp_filename('paired-1.fa')
+    outfile2 = utils.get_temp_filename('paired-2.fa')
+    script = scriptpath('split-paired-reads.py')
+    args = [fifo, '-1', outfile1, '-2', outfile2]
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    ifile = open(ifilename, 'r')
+    fifofile = open(fifo, 'w')
+    chunk = ifile.read(4)
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(4)
+    fifofile.close()
+    thread.join()
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+
+def test_split_paired_streaming():
+    o = execute_split_paired_streaming(utils.get_test_data('paired.fa'))
 
 
 def test_split_paired_reads_1_fa():

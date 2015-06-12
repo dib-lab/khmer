@@ -1,3 +1,8 @@
+2015-06-11  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * Change split-paired-reads.py to accept input from stdin.
+   * Add test function to test new behavior of split-paired.
+
 2015-06-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/hashtable.cc: Tweaked median_at_least to reduce number of
