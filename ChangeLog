@@ -1,3 +1,9 @@
+2015-06-13  Titus Brown  <titus@idyll.org>
+
+   * doc/dev/getting-started.rst: update instructions for creating a new
+   branch name to preferred practice (fix/brief_issue_description, instead
+   of fix/issuenum).
+
 2015-06-13  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * doc/dev/release.rst: remove false positive from version check
