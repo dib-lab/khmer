@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
@@ -12,7 +12,7 @@ autopep8 pylint coverage gcovr nose pep257 future screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
-CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
+CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
 	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
@@ -39,9 +39,9 @@ install-dependencies:
 	pip install --upgrade $(DEVPKGS)
 
 ## sharedobj   : build khmer shared object file
-sharedobj: khmer/_khmermodule.so
+sharedobj: khmer/_khmer.so
 
-khmer/_khmermodule.so: $(CPPSOURCES)
+khmer/_khmer.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -63,7 +63,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so
+	rm -f khmer/_khmer*.so
 	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
@@ -154,7 +154,7 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
+.coverage: $(PYSOURCES) $(wildcard tests/*.py) $(wildcard khmer/_khmer*.so)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
 
