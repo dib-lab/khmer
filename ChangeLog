@@ -1,3 +1,11 @@
+2015-06-12  Luiz Irber  <khmer@luizirber.org>
+
+   * setup.py: revert changes to zlib compilation.
+   * setup.cfg: nose should stop on first error by default.
+   * Makefile, tests/test_threaded_sequence_processor.py,
+   scripts/{do-partition,partition-graph}.py, khmer/thread_utils.py: Remove
+   dependency on future package.
+
 2015-06-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * setup.py: update screed version to 0.9
