@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -8,8 +10,8 @@
 import khmer
 import screed
 
-import khmer_tst_utils as utils
 import os
+from . import khmer_tst_utils as utils
 
 
 def teardown():
@@ -205,8 +207,8 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
-        assert len(divvy) is 3
+        print(divvy)
+        assert len(divvy) == 3
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -238,7 +240,7 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
+        print(divvy)
         assert len(divvy) is 3
         (a, b, c) = divvy
 
@@ -265,7 +267,7 @@ class Test_SaveLoadPmap(object):
                 a = ht.load_subset_partitionmap(outfile3)
                 assert 0, "this should not pass"
             except IOError as err:
-                print str(err), i
+                print(str(err), i)
 
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 8 + 1)
@@ -305,7 +307,7 @@ class Test_SaveLoadPmap(object):
             a = ht.load_subset_partitionmap('this does not exist')
             assert 0, "this should not succeed"
         except IOError as e:
-            print str(e)
+            print(str(e))
 
     def test_save_merge_from_disk(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
@@ -315,8 +317,7 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
-        assert len(divvy) is 3
+        print(divvy)
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -374,8 +375,7 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
-        assert len(divvy) is 3
+        print(divvy)
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -386,7 +386,7 @@ class Test_SaveLoadPmap(object):
             ht.merge_subset_from_disk(outfile1)
             assert 0, "this should fail"
         except IOError as e:
-            print str(e)
+            print(str(e))
 
     def test_merge_from_disk_file_bad_type(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
@@ -396,7 +396,7 @@ class Test_SaveLoadPmap(object):
             ht.merge_subset_from_disk(infile)
             assert 0, "this should fail"
         except IOError as e:
-            print str(e)
+            print(str(e))
 
     def test_merge_from_disk_file_version(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
@@ -406,7 +406,7 @@ class Test_SaveLoadPmap(object):
             ht.merge_subset_from_disk(infile)
             assert 0, "this should fail"
         except IOError as e:
-            print str(e)
+            print(str(e))
 
     def test_save_merge_from_disk_ksize(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
@@ -416,8 +416,7 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
-        assert len(divvy) is 3
+        print(divvy)
         (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
@@ -430,7 +429,7 @@ class Test_SaveLoadPmap(object):
             ht.merge_subset_from_disk(outfile1)
             assert 0, "this should fail"
         except IOError as e:
-            print str(e)
+            print(str(e))
 
 
 def test_save_load_merge_on_graph():
@@ -441,7 +440,7 @@ def test_save_load_merge_on_graph():
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
-    print divvy
+    print(divvy)
     assert len(divvy) is 3
     (a, b, c) = divvy
 
@@ -474,7 +473,7 @@ def test_save_load_on_graph_truncate():
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
-    print divvy
+    print(divvy)
     assert len(divvy) is 3
     (a, b, c) = divvy
 
@@ -501,7 +500,7 @@ def test_save_load_on_graph_truncate():
             a = ht.load_partitionmap(outfile3)
             assert 0, "this should not pass"
         except IOError as err:
-            print str(err), i
+            print(str(err), i)
 
 
 def test_output_partitions():
@@ -599,14 +598,14 @@ CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
 
 
 def test_partition_on_abundance_1():
-    print(a,)
-    print(b,)
+    print((a,))
+    print((b,))
     kh = khmer.new_counting_hash(20, 1e3, 4)
     for i in range(10):
-        print kh.consume_and_tag(a)
+        print(kh.consume_and_tag(a))
 
     for i in range(10):
-        print kh.consume_and_tag(b)
+        print(kh.consume_and_tag(b))
 
     # all paths in 'a' and 'b'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -617,10 +616,10 @@ def test_partition_on_abundance_1():
 def test_partition_on_abundance_2():
     kh = khmer.new_counting_hash(20, 1e3, 4)
     for i in range(10):
-        print kh.consume_and_tag(a)
+        print(kh.consume_and_tag(a))
 
     for i in range(5):
-        print kh.consume_and_tag(b)
+        print(kh.consume_and_tag(b))
 
     # all paths in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -631,10 +630,10 @@ def test_partition_on_abundance_2():
 def test_partition_on_abundance_3():
     kh = khmer.new_counting_hash(20, 1e4, 4)
     for i in range(10):
-        print kh.consume_and_tag(a)
+        print(kh.consume_and_tag(a))
 
     for i in range(5):
-        print kh.consume_and_tag(b)
+        print(kh.consume_and_tag(b))
 
     # this will get paths only in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -643,7 +642,7 @@ def test_partition_on_abundance_3():
     p = kh.do_subset_partition_with_abundance(5, 10)
 
     x = p.count_partitions()
-    print x
+    print(x)
     assert x == (2, 2)                  # two partitions, two ignored tags
 
 

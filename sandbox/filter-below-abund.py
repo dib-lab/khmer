@@ -1,10 +1,11 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import print_function
 import sys
 import os
 import khmer
@@ -22,17 +23,17 @@ def main():
     counting_ht = sys.argv[1]
     infiles = sys.argv[2:]
 
-    print 'file with ht: %s' % counting_ht
-    print '-- settings:'
-    print 'N THREADS', WORKER_THREADS
-    print '--'
+    print('file with ht: %s' % counting_ht)
+    print('-- settings:')
+    print('N THREADS', WORKER_THREADS)
+    print('--')
 
-    print 'making hashtable'
+    print('making hashtable')
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
     for infile in infiles:
-        print 'filtering', infile
+        print('filtering', infile)
         outfile = os.path.basename(infile) + '.below'
 
         outfp = open(outfile, 'w')

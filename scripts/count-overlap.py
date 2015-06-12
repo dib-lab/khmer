@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2012-2015-2015. It is licensed under
@@ -18,6 +18,7 @@ usage: count-overlap_cpp.py [-h] [-q] [--ksize KSIZE] [--n_tables N_HASHES]
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import sys
 import csv
 import khmer
@@ -64,7 +65,7 @@ def main():
 
     check_space([args.ptfile, args.fafile], args.force)
 
-    print >>sys.stderr, 'loading k-mer presence table from', args.ptfile
+    print('loading k-mer presence table from', args.ptfile, file=sys.stderr)
     ht1 = khmer.load_hashbits(args.ptfile)
     kmer_size = ht1.ksize()
 
@@ -93,9 +94,9 @@ dataset2: %s
         if args.csv:
             f_curve_obj_csv.writerow([list_curve[100 + i], list_curve[i]])
         else:
-            print >> f_curve_obj, list_curve[100 + i], list_curve[i]
+            print(list_curve[100 + i], list_curve[i], file=f_curve_obj)
 
-    print >> sys.stderr, 'wrote to: ' + args.report_filename
+    print('wrote to: ' + args.report_filename, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

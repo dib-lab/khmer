@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,11 +13,12 @@ Do all the partition steps in one script.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import khmer
 import sys
 import threading
-import Queue
+import queue
 import gc
 import os.path
 import os
@@ -36,9 +37,9 @@ DEFAULT_K = 32
 # Debugging Support
 if "Linux" == platform.system():
     def __debug_vm_usage(msg):
-        print >>sys.stderr, "===> DEBUG: " + msg
+        print("===> DEBUG: " + msg, file=sys.stderr)
         for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print vmstat
+            print(vmstat)
 else:
     def __debug_vm_usage(msg):  # pylint: disable=unused-argument
         pass
@@ -48,23 +49,23 @@ def worker(queue, basename, stop_big_traversals):
     while True:
         try:
             (htable, index, start, stop) = queue.get(False)
-        except Queue.Empty:
-            print >>sys.stderr, 'exiting'
+        except queue.Empty:
+            print('exiting', file=sys.stderr)
             return
 
         outfile = basename + '.subset.%d.pmap' % (index,)
         if os.path.exists(outfile):
-            print >>sys.stderr, 'SKIPPING', outfile, ' -- already exists'
+            print('SKIPPING', outfile, ' -- already exists', file=sys.stderr)
             continue
 
-        print >>sys.stderr, 'starting:', basename, index
+        print('starting:', basename, index, file=sys.stderr)
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
         subset = htable.do_subset_partition(start, stop, True,
                                             stop_big_traversals)
 
-        print >>sys.stderr, 'saving:', basename, index
+        print('saving:', basename, index, file=sys.stderr)
         htable.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
@@ -114,38 +115,39 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     check_space(args.input_filenames, args.force)
 
-    print >>sys.stderr, 'Saving k-mer presence table to %s' % args.graphbase
-    print >>sys.stderr, 'Loading kmers from sequences in %s' % \
-        repr(args.input_filenames)
-    print >>sys.stderr, '--'
-    print >>sys.stderr, 'SUBSET SIZE', args.subset_size
-    print >>sys.stderr, 'N THREADS', args.threads
-    print >>sys.stderr, '--'
+    print('Saving k-mer presence table to %s' %
+          args.graphbase, file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(args.input_filenames), file=sys.stderr)
+    print('--', file=sys.stderr)
+    print('SUBSET SIZE', args.subset_size, file=sys.stderr)
+    print('N THREADS', args.threads, file=sys.stderr)
+    print('--', file=sys.stderr)
 
     # load-graph
 
-    print >>sys.stderr, 'making k-mer presence table'
+    print('making k-mer presence table', file=sys.stderr)
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
     for _, filename in enumerate(args.input_filenames):
-        print >>sys.stderr, 'consuming input', filename
+        print('consuming input', filename, file=sys.stderr)
         htable.consume_fasta_and_tag(filename)
 
     # 0.18 is ACTUAL MAX. Do not change.
     fp_rate = \
         khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
-    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     # partition-graph
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print >>sys.stderr, '** This script brakes for lumps: ', \
-                            'stop_big_traversals is true.'
+        print('** This script brakes for lumps: ',
+              'stop_big_traversals is true.', file=sys.stderr)
     else:
-        print >>sys.stderr, '** Traverse all the things:', \
-                            ' stop_big_traversals is false.'
+        print('** Traverse all the things:',
+              ' stop_big_traversals is false.', file=sys.stderr)
 
     #
     # now, partition!
@@ -157,7 +159,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     divvy.append(0)
 
     # build a queue of tasks:
-    worker_q = Queue.Queue()
+    worker_q = queue.Queue()
 
     # break up the subsets into a list of worker tasks
     for _ in range(0, n_subsets):
@@ -165,7 +167,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         end = divvy[_ + 1]
         worker_q.put((htable, _, start, end))
 
-    print >>sys.stderr, 'enqueued %d subset tasks' % n_subsets
+    print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
     open('%s.info' % args.graphbase, 'w').write('%d subsets total\n'
                                                 % (n_subsets))
 
@@ -173,8 +175,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         args.threads = n_subsets
 
     # start threads!
-    print >>sys.stderr, 'starting %d threads' % args.threads
-    print >>sys.stderr, '---'
+    print('starting %d threads' % args.threads, file=sys.stderr)
+    print('---', file=sys.stderr)
 
     threads = []
     for _ in range(args.threads):
@@ -186,43 +188,43 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     assert threading.active_count() == args.threads + 1
 
-    print >>sys.stderr, 'done starting threads'
+    print('done starting threads', file=sys.stderr)
 
     # wait for threads
     for _ in threads:
         _.join()
 
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'done making subsets! see %s.subset.*.pmap' % \
-        (args.graphbase,)
+    print('---', file=sys.stderr)
+    print('done making subsets! see %s.subset.*.pmap' %
+          (args.graphbase,), file=sys.stderr)
 
     # merge-partitions
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-        (len(pmap_files), pmap_files[0])
+    print('loading %d pmap files (first one: %s)' %
+          (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
     htable = khmer.new_hashbits(args.ksize, 1, 1)
 
     for pmap_file in pmap_files:
-        print >>sys.stderr, 'merging', pmap_file
+        print('merging', pmap_file, file=sys.stderr)
         htable.merge_subset_from_disk(pmap_file)
 
     if args.remove_subsets:
-        print >>sys.stderr, 'removing pmap files'
+        print('removing pmap files', file=sys.stderr)
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
 
     # annotate-partitions
 
     for infile in args.input_filenames:
-        print >>sys.stderr, 'outputting partitions for', infile
+        print('outputting partitions for', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print >>sys.stderr, 'output %d partitions for %s' % (
-            part_count, infile)
-        print >>sys.stderr, 'partitions are in', outfile
+        print('output %d partitions for %s' % (
+            part_count, infile), file=sys.stderr)
+        print('partitions are in', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

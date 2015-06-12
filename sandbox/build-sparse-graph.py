@@ -1,4 +1,5 @@
-#! /usr/bin/env python2
+from __future__ import print_function
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2013-2015. It is licensed under
@@ -27,13 +28,13 @@ def main():
 
     for n, record in enumerate(screed.open(input_fasta)):
         if n % 1000 == 0:
-            print >>sys.stderr, '...loaded and tagged {} sequences'.format(n)
+            print('...loaded and tagged {} sequences'.format(n), file=sys.stderr)
         name = record.name
         sequence = record.sequence
 
         ht.consume_sequence_and_tag_with_labels(sequence, n)
         tags = ht.sweep_tag_neighborhood(sequence, 0)
-        for i in xrange(len(tags) - 1):
+        for i in range(len(tags) - 1):
             src = tags[i]
             dst = tags[i + 1]
 
@@ -58,7 +59,7 @@ def main():
             if new:
                 e = sparse_graph.add_edge(srcv, dstv)
 
-    print 'Sparse graph has {} nodes, {} edges'.format(sparse_graph.num_vertices(), sparse_graph.num_edges())
+    print('Sparse graph has {} nodes, {} edges'.format(sparse_graph.num_vertices(), sparse_graph.num_edges()))
     comp = gt.label_largest_component(sparse_graph, directed=False)
     #pos = gt.radial_tree_layout(sparse_graph, sparse_graph.vertex(0))
     gt.graph_draw(sparse_graph, output_size=(

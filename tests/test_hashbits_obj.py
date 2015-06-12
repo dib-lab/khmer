@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -17,7 +19,7 @@ from khmer import Hashbits
 from screed.fasta import fasta_iter
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 
@@ -31,7 +33,7 @@ def test_toobig():
         pt = khmer.Hashbits(32, 1e13, 1)
         assert 0, "This should fail"
     except MemoryError as err:
-        print str(err)
+        print(str(err))
 
 
 def test__get_set_tag_density():
@@ -213,7 +215,7 @@ def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.Hashbits(4, 1e6, 2)
 
-    print ht.consume_fasta(inpfile)
+    print(ht.consume_fasta(inpfile))
     n = ht.count_kmers_within_radius('AAAA', 1)
     assert n == 1
 
@@ -404,7 +406,7 @@ def test_extract_unique_paths_1():
 
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGAT']  # all but the last k-mer
 
 
@@ -413,7 +415,7 @@ def test_extract_unique_paths_2():
 
     kh.consume('ATGGAGAGAC')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGATG']  # all but the 1st k-mer
 
 
@@ -423,7 +425,7 @@ def test_extract_unique_paths_3():
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     # all but the 1st/last k-mer
     assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGAT']
 
@@ -437,7 +439,7 @@ def test_extract_unique_paths_4():
     kh.consume('ATAGACAGGA')
 
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print x
+    print(x)
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
@@ -511,14 +513,14 @@ def test_simple_median():
     hi = khmer.Hashbits(6, 1e6, 2)
 
     (median, average, stddev) = hi.get_median_count("AAAAAA")
-    print median, average, stddev
+    print(median, average, stddev)
     assert median == 0
     assert average == 0.0
     assert stddev == 0.0
 
     hi.consume("AAAAAA")
     (median, average, stddev) = hi.get_median_count("AAAAAA")
-    print median, average, stddev
+    print(median, average, stddev)
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
@@ -539,7 +541,7 @@ def test_badget():
         hbts.get("AGCTT")
         assert 0, "this should fail"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_bad_primes():
@@ -548,7 +550,7 @@ def test_bad_primes():
             khmer._Hashbits, 6, ["a", "b", "c"])
         assert 0, "this should fail"
     except TypeError as e:
-        print str(e)
+        print(str(e))
 
 
 def test_consume_fasta_and_tag_with_badreads_parser():
@@ -558,6 +560,6 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         presencetable.consume_fasta_and_tag_with_reads_parser(readsparser)
         assert 0, "this should fail"
     except IOError as e:
-        print str(e)
+        print(str(e))
     except ValueError as e:
-        print str(e)
+        print(str(e))

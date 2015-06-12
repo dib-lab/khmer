@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -18,6 +18,7 @@ TODO: move output_single elsewhere
 TODO: add to sandbox/README
 TODO: change name to correct-reads?
 """
+from __future__ import print_function
 import sys
 import screed
 import os
@@ -90,13 +91,13 @@ def main():
 
     NORMALIZE_LIMIT = args.normalize_to
 
-    print 'making hashtable'
+    print('making hashtable')
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     aligner = khmer.ReadAligner(ht, args.trusted_cov, args.bits_theta)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print 'created temporary directory %s; use -T to change location' % tempdir
+    print('created temporary directory %s; use -T to change location' % tempdir)
 
     ###
 
@@ -120,8 +121,8 @@ def main():
             total_reads += 1
 
             if n % 10000 == 0:
-                print '...', n, filename, n_aligned, n_corrected, save_pass2, \
-                      total_reads
+                print('...', n, filename, n_aligned, n_corrected, save_pass2, \
+                      total_reads)
             seq = read.sequence.replace('N', 'A')
 
             # build the alignment...
@@ -165,18 +166,18 @@ def main():
         pass2fp.close()
         corrfp.close()
 
-        print '%s: kept aside %d of %d from first pass, in %s' % \
-              (filename, save_pass2, n, filename)
-        print 'aligned %d of %d reads so far' % (n_aligned, total_reads)
-        print 'changed %d of %d reads so far' % (n_corrected, total_reads)
+        print('%s: kept aside %d of %d from first pass, in %s' % \
+              (filename, save_pass2, n, filename))
+        print('aligned %d of %d reads so far' % (n_aligned, total_reads))
+        print('changed %d of %d reads so far' % (n_corrected, total_reads))
 
     for orig_filename, pass2filename, corrfilename in pass2list:
-        print 'second pass: looking at sequences kept aside in %s' % \
-              pass2filename
+        print('second pass: looking at sequences kept aside in %s' % \
+              pass2filename)
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, pass2filename, n_aligned, n_corrected, \
-                      total_reads
+                print('... x 2', n, pass2filename, n_aligned, n_corrected, \
+                      total_reads)
 
             corrfp = open(corrfilename, 'a')
 
@@ -205,14 +206,14 @@ def main():
 
             corrfp.write(output_single(read, corrected))
 
-        print 'removing %s' % pass2filename
+        print('removing %s' % pass2filename)
         os.unlink(pass2filename)
 
-    print 'removing temp directory & contents (%s)' % tempdir
+    print('removing temp directory & contents (%s)' % tempdir)
     shutil.rmtree(tempdir)
 
-    print 'Aligned %d of %d total' % (n_aligned, total_reads)
-    print 'Changed %d of %d total' % (n_corrected, total_reads)
+    print('Aligned %d of %d total' % (n_aligned, total_reads))
+    print('Changed %d of %d total' % (n_corrected, total_reads))
 
 if __name__ == '__main__':
     main()

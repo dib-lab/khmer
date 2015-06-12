@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -17,6 +17,7 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import os
 import sys
 import khmer
@@ -73,15 +74,15 @@ def main():
             args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
 
-    print >>sys.stderr, 'making k-mer counting table'
+    print('making k-mer counting table', file=sys.stderr)
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables)
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(args.datafile)
     threads = []
-    print >>sys.stderr, 'consuming input, round 1 --', args.datafile
-    for _ in xrange(args.threads):
+    print('consuming input, round 1 --', args.datafile, file=sys.stderr)
+    for _ in range(args.threads):
         cur_thread = \
             threading.Thread(
                 target=htable.consume_fasta_with_reads_parser,
@@ -94,11 +95,11 @@ def main():
         _.join()
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            htable.n_unique_kmers())
+        print('Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers()), file=sys.stderr)
 
     fp_rate = khmer.calc_expected_collisions(htable, args.force)
-    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     # now, trim.
 
@@ -118,21 +119,21 @@ def main():
         return None, None
 
     # the filtering loop
-    print >>sys.stderr, 'filtering', args.datafile
+    print('filtering', args.datafile, file=sys.stderr)
     outfile = os.path.basename(args.datafile) + '.abundfilt'
     outfp = open(outfile, 'w')
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print >>sys.stderr, 'output in', outfile
+    print('output in', outfile, file=sys.stderr)
 
     if args.savetable:
-        print >>sys.stderr, 'Saving k-mer counting table filename', \
-            args.savetable
-        print >>sys.stderr, '...saving to', args.savetable
+        print('Saving k-mer counting table filename',
+              args.savetable, file=sys.stderr)
+        print('...saving to', args.savetable, file=sys.stderr)
         htable.save(args.savetable)
-    print >>sys.stderr, 'wrote to: ', outfile
+    print('wrote to: ', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,6 +13,7 @@ hash table.  Output sequences will be placed in 'infile.medpctfilt'.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import sys
 import screed.fasta
 import os
@@ -37,15 +38,15 @@ def main():
     counting_ht = args.input_table
     infiles = args.input_filenames
 
-    print 'file with ht: %s' % counting_ht
+    print('file with ht: %s' % counting_ht)
 
-    print 'loading hashtable'
+    print('loading hashtable')
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
     xxxfp = None
 
-    print "K:", K
+    print("K:", K)
 
     # the filtering function.
     def process_fn(record):
@@ -64,20 +65,20 @@ def main():
 
     # the filtering loop
     for infile in infiles:
-        print 'filtering', infile
+        print('filtering', infile)
         xxxfp = open(os.path.basename(infile) + '.medpctfilt.stats', 'w')
         outfile = os.path.basename(infile) + '.medpctfilt'
         outfp = open(outfile, 'w')
 
         for n, record in enumerate(screed.open(infile)):
             if n % 100000 == 0:
-                print '...', n
+                print('...', n)
 
             name, seq = process_fn(record)
             if name and seq:
-                print >>outfp, '>%s\n%s' % (name, seq)
+                print('>%s\n%s' % (name, seq), file=outfp)
 
-        print 'output in', outfile
+        print('output in', outfile)
 
 if __name__ == '__main__':
     main()
