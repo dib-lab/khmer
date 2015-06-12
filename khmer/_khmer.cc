@@ -34,6 +34,7 @@ using namespace read_parsers;
 #if (PY_MAJOR_VERSION >= 3)
 #define PyInt_Check(arg) PyLong_Check(arg)
 #define PyInt_AsLong(arg) PyLong_AsLong(arg)
+#define PyInt_FromLong(arg) PyLong_FromLong(arg)
 #endif
 
 //
@@ -2324,7 +2325,7 @@ hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
 
     PyObject * x = PyList_New(kmers.size());
     for (unsigned int i = 0; i < kmers.size(); i++) {
-        PyObject * obj = PyBytes_FromString(kmers[i].c_str());
+        PyObject * obj = PyUnicode_FromString(kmers[i].c_str());
         PyList_SET_ITEM(x, i, obj);
     }
 
