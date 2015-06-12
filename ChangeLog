@@ -1,6 +1,57 @@
-2015-06-06  Sarah Guermond  <sarah.guermond@gmail.com>
+2015-06-12  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * scripts/trim-low-abund.py: changed _screed_record_dict to Record
+
+2015-06-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.cc: Tweaked median_at_least to reduce number of
+   conditional checks.
+
+2015-06-10  Titus Brown  <titus@idyll.org>
+
+   * scripts/find-knots.py: fixed invocation of check_space to take correct
+   arguments.
+   * tests/test_scripts.py: added simple test of find-knots.py execution.
+
+2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/normalize-by-median.py: implemented broken_paired_reader
+   * tests/test_scripts.py: modified tests to properly use new args
+   * khmer/utils.py: added force-paired option to broken_paired_reader (@ctb)
+
+2015-06-09   Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/_khmermodule.cc, lib/hashtable.{cc,hh}: astyle fixes.
+
+2015-06-09  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed nasty Hashtable.get() bug.
+   * lib/hashtable.{cc,hh}: add Hashtable::get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts().
+   * khmer/_khmermodule.cc: add CPython functions for get_kmers(),
+   get_kmer_hashes(), and get_kmer_counts(); reorganize hashtable_methods.
+   * tests/test_counting_hash.py: add tests for get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts(), as well as for nasty Hashtable.get() bug.
+
+2015-06-08  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.{cc,hh}: Add filter_on_median method to check
+   if median k-mer count is above a cutoff
+   * khmer/_khmermodule.cc: Expose filter_on_median to python-land
+   * scripts/normalize-by-median.py: Switch to new filter_on_median
+   * tests/test_counting_hash.py: Tests for new method
+
+2015-06-08  Luiz Irber  <khmer@luizirber.org>
+
+   * tests/test_hll.py: test return values from consume_{string,fasta}.
+
+2015-06-06  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added hllcounter_merge.
+   * tests/test_hll.py: added merge tests.
+   * lib/hllcounter.cc: changed HLLCounter::consume_string to uppercase input.
+   * sandbox/unique-kmers.py: added --stream-out option; updated to print out
+   k-mers per file as well as k-mer size used.
 
 2015-06-04  Titus Brown  <titus@idyll.org>
 
