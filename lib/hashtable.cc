@@ -239,7 +239,9 @@ bool Hashtable::median_at_least(const std::string &s,
     }
 
     // second loop: now check to see if we pass the threshold for each k-mer.
-    if (num_cutoff_kmers >= min_req) return true;
+    if (num_cutoff_kmers >= min_req) {
+        return true;
+    }
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
         if (this->get_count(kmer) >= cutoff) {

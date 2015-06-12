@@ -909,7 +909,7 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
         count = hashtable->get_count((unsigned int) pos);
     } else if (PyUnicode_Check(arg)) {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-            arg, "utf-8", "strict"));
+                                             arg, "utf-8", "strict"));
         if (strlen(s.c_str()) != hashtable->ksize()) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer size must equal the presence table k-mer size");
