@@ -50,6 +50,19 @@ def get_parser():
     parser.add_argument('infile')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
+
+    parser.add_argument('-o', '--output-dir', metavar="output_directory",
+                        dest='output_directory', default='', help='Output '
+                        'split reads to specified directory. Creates '
+                        'directory if necessary')
+
+    parser.add_argument('-p', '--output-paired', metavar='output_paired',
+                        default=None, help='Output paired reads to this '
+                        'file')
+    parser.add_argument('-s', '--output-single', metavar='output_single',
+                        default=None, help='Output orphaned reads to this '
+                        'file')
+
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -59,25 +72,42 @@ def main():
     info('extract-paired-reads.py')
     args = get_parser().parse_args()
 
-    check_input_files(args.infile, args.force)
-    infiles = [args.infile]
-    check_space(infiles, args.force)
+    infile = args.infile
+    check_input_files(infile, args.force)
+    check_space([infile], args.force)
 
-    outfile = os.path.basename(args.infile)
-    if len(sys.argv) > 2:
-        outfile = sys.argv[2]
+    # decide where to put output files - specific directory? or just default?
+    if infile == '/dev/stdin':
+        if not (args.output_paired and args.output_single):
+            print >>sys.stderr, ("Accepting input from stdin; "
+                                 "output filenames must be provided.")
+            sys.exit(1)
+    elif args.output_directory:
+        if not os.path.exists(args.output_directory):
+            os.makedirs(args.output_directory)
+        out1 = args.output_directory + '/' + os.path.basename(infile) + '.se'
+        out2 = args.output_directory + '/' + os.path.basename(infile) + '.pe'
+    else:
+        out1 = os.path.basename(infile) + '.se'
+        out2 = os.path.basename(infile) + '.pe'
 
-    single_fp = open(outfile + '.se', 'w')
-    paired_fp = open(outfile + '.pe', 'w')
+    # OVERRIDE output file locations with -p, -s
+    if args.output_paired:
+        out2 = args.output_paired
+    if args.output_single:
+        out1 = args.output_single
 
-    print >>sys.stderr, 'reading file "%s"' % args.infile
-    print >>sys.stderr, 'outputting interleaved pairs to "%s.pe"' % outfile
-    print >>sys.stderr, 'outputting orphans to "%s.se"' % outfile
+    single_fp = open(out1, 'w')
+    paired_fp = open(out2, 'w')
+
+    print >>sys.stderr, 'reading file "%s"' % infile
+    print >>sys.stderr, 'outputting interleaved pairs to "%s"' % out2
+    print >>sys.stderr, 'outputting orphans to "%s"' % out1
 
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(args.infile, parse_description=False)
+    screed_iter = screed.open(infile, parse_description=False)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
             print >>sys.stderr, '...', index
@@ -99,8 +129,7 @@ def main():
         ' %d pairs and %d singletons' % \
         (n_pe * 2 + n_se, n_pe, n_se)
 
-    print >> sys.stderr, 'wrote to: ' + outfile \
-        + '.se' + ' and ' + outfile + '.pe'
+    print >> sys.stderr, 'wrote to: %s and %s' % (out2, out1)
 
 
 if __name__ == '__main__':
