@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -16,6 +16,7 @@ files (.1 and .2).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from __future__ import print_function
 import screed
 import sys
 import os
@@ -63,7 +64,7 @@ def get_parser():
         epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('infile')
+    parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
     parser.add_argument('-o', '--output-dir', metavar="output_directory",
                         dest='output_directory', default='', help='Output '
@@ -92,12 +93,17 @@ def main():
 
     infile = args.infile
 
-    check_input_files(infile, args.force)
     filenames = [infile]
+    check_input_files(infile, args.force)
     check_space(filenames, args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if args.output_directory:
+    if infile == '/dev/stdin':
+        if not (args.output_first and args.output_second):
+            print >>sys.stderr, ("Accepting input from stdin; "
+                                 "output filenames must be provided.")
+            sys.exit(1)
+    elif args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
         out1 = args.output_directory + '/' + os.path.basename(infile) + '.1'
@@ -122,14 +128,15 @@ def main():
     screed_iter = screed.open(infile, parse_description=False)
 
     # walk through all the reads in broken-paired mode.
-    for index, is_pair, record1, record2 in broken_paired_reader(screed_iter):
-        if index % 100000 == 0 and index:
-            print >> sys.stderr, '...', index
+    paired_iter = broken_paired_reader(screed_iter)
+    for index, is_pair, record1, record2 in paired_iter:
+        if index % 10000 == 0:
+            print('...', index, file=sys.stderr)
 
         # are we requiring pairs?
         if args.force_paired and not is_pair:
-            print >>sys.stderr, 'ERROR, %s is not part of a pair' % \
-                record1.name
+            print('ERROR, %s is not part of a pair' %
+                  record1.name, file=sys.stderr)
             sys.exit(1)
 
         if is_pair:
@@ -146,15 +153,15 @@ def main():
                 write_record(record1, fp_out2)
                 counter2 += 1
             else:
-                print >>sys.stderr, \
-                    "Unrecognized format for read pair information: %s" % name
-                print >>sys.stderr, "Exiting."
+                print("Unrecognized format for read pair information: %s" %
+                      name, file=sys.stderr)
+                print("Exiting.", file=sys.stderr)
                 sys.exit(1)
 
-    print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
-        (counter1 + counter2, counter1, counter2)
-    print >> sys.stderr, "/1 reads in %s" % out1
-    print >> sys.stderr, "/2 reads in %s" % out2
+    print("DONE; split %d sequences (%d left, %d right)" %
+          (counter1 + counter2, counter1, counter2), file=sys.stderr)
+    print("/1 reads in %s" % out1, file=sys.stderr)
+    print("/2 reads in %s" % out2, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

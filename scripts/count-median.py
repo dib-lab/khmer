@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -21,6 +21,7 @@ The output file contains sequence id, median, average, stddev, and seq length.
 
 NOTE: All 'N's in the input sequences are converted to 'A's.
 """
+from __future__ import print_function
 import screed
 import argparse
 import sys
@@ -85,11 +86,11 @@ def main():
 
     check_space(infiles, args.force)
 
-    print >>sys.stderr, 'loading k-mer counting table from', htfile
+    print('loading k-mer counting table from', htfile, file=sys.stderr)
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
 
-    print >>sys.stderr, 'writing to', output_filename
+    print('writing to', output_filename, file=sys.stderr)
     output = open(output_filename, 'w')
 
     if args.csv:
@@ -109,10 +110,11 @@ def main():
 
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
+            ave, stdev = [round(x, 9) for x in (ave, stdev)]
             if args.csv:
                 output.writerow([record.name, medn, ave, stdev, len(seq)])
             else:
-                print >> output, record.name, medn, ave, stdev, len(seq)
+                print(record.name, medn, ave, stdev, len(seq), file=output)
 
 if __name__ == '__main__':
     main()

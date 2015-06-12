@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -8,7 +10,7 @@
 # pylint: disable=C0111,C0103
 
 import khmer
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 MAX_COUNT = 255
@@ -30,7 +32,7 @@ def test_toobig():
         ct = khmer.new_hashtable(4, 1000000000000)
         assert 0, "this should fail"
     except MemoryError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_collision():
@@ -49,12 +51,12 @@ def test_badcount():
         countingtable.count()
         assert 0, "count should require one argument"
     except TypeError as err:
-        print str(err)
+        print(str(err))
     try:
         countingtable.count('ABCDE')
         assert 0, "count should require k-mer size to be equal"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_hashtable_n_entries():
@@ -63,7 +65,7 @@ def test_hashtable_n_entries():
         countingtable.n_entries("nope")
         assert 0, "n_entries should accept no arguments"
     except TypeError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_complete_no_collision():
@@ -143,7 +145,7 @@ def test_maxcount():
         kh.count('AAAA')
         c = kh.get('AAAA')
 
-        print last_count, c
+        print(last_count, c)
         if c == last_count:
             break
         last_count = c
@@ -162,7 +164,7 @@ def test_maxcount_with_bigcount():
         kh.count('AAAA')
         c = kh.get('AAAA')
 
-        print last_count, c
+        print(last_count, c)
         if c == last_count:
             break
         last_count = c
@@ -278,7 +280,7 @@ def test_badget():
         kh.get("AGCTT")
         assert 0, "this should fail"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_64bitshift():
@@ -328,7 +330,7 @@ class Test_ConsumeString(object):
             self.kh.n_occupied("MU", 1, 3)
             assert 0, "n_occupied shouldn't accept three arguments"
         except TypeError as err:
-            print str(err)
+            print(str(err))
 
     def test_abundance_by_pos(self):
         kh = self.kh

@@ -1,10 +1,11 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import print_function
 import sys
 import screed
 import gzip
@@ -21,7 +22,7 @@ def main():
         old_to_new = {}
         for n, record in enumerate(screed.open(filename)):
             if n > 0 and n % 10000 == 0:
-                print '...', os.path.basename(filename), n
+                print('...', os.path.basename(filename), n)
             partition = record.name.split()[-1]
             name = record.name.split()[0]
 
@@ -33,7 +34,7 @@ def main():
 
             outfp.write('>%s\t%d\n%s\n' % (name, new_part, record.sequence))
         outfp.close()
-        print 'renumbered %d partitions in %s' % (len(old_to_new), filename)
+        print('renumbered %d partitions in %s' % (len(old_to_new), filename))
 
 
 if __name__ == '__main__':

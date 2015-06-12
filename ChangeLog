@@ -1,4 +1,4 @@
-2015-06-05  Titus Brown  <titus@idyll.org>
+2015-06-12  Titus Brown  <titus@idyll.org>
 
    * khmer/__init__.py: pass IOError through extract_countinghash_info and
    extract_hashbits_info so that file-does-not-exist errors are correctly
@@ -18,6 +18,93 @@
    changed hashtype over to 'nodegraph' and 'bitgraph' in call to
    report_on_config.
 
+2015-06-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * setup.py: update screed version to 0.9
+
+2015-06-12  Luiz Irber  <khmer@luizirber.org>
+
+   * *.py: refactor for Python 3 compatibility. Clear separation of Unicode
+   and Byte strings, use __future__ imports for compatibility (print function,
+   absolute imports, unicode_literals), fix tests to consider changes to random
+   number generator between Python versions.
+   * khmer/_khmer.cc: rename file, methods return Unicode strings instead of
+   Bytestrings.
+
+2015-06-12  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/{khmermodule.cc},tests/test_hashbits.py: Add Unicode support to
+   hashbits.get method.
+   * tests/test_hll.py: Avoid using translate for revcomp calculation.
+
+2015-06-12  Sarah Guermond  <sarah.guermond@gmail.com>
+
+   * scripts/trim-low-abund.py: changed _screed_record_dict to Record
+
+2015-06-11  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * Change split-paired-reads.py to accept input from stdin.
+   * Add test function to test new behavior of split-paired.
+
+2015-06-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.cc: Tweaked median_at_least to reduce number of
+   conditional checks.
+
+2015-06-10  Titus Brown  <titus@idyll.org>
+
+   * scripts/find-knots.py: fixed invocation of check_space to take correct
+   arguments.
+   * tests/test_scripts.py: added simple test of find-knots.py execution.
+
+2015-06-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/normalize-by-median.py: implemented broken_paired_reader
+   * tests/test_scripts.py: modified tests to properly use new args
+   * khmer/utils.py: added force-paired option to broken_paired_reader (@ctb)
+
+2015-06-09   Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/_khmermodule.cc, lib/hashtable.{cc,hh}: astyle fixes.
+
+2015-06-09  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed nasty Hashtable.get() bug.
+   * lib/hashtable.{cc,hh}: add Hashtable::get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts().
+   * khmer/_khmermodule.cc: add CPython functions for get_kmers(),
+   get_kmer_hashes(), and get_kmer_counts(); reorganize hashtable_methods.
+   * tests/test_counting_hash.py: add tests for get_kmers(), get_kmer_hashes(),
+   and get_kmer_counts(), as well as for nasty Hashtable.get() bug.
+
+2015-06-08  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashtable.{cc,hh}: Add filter_on_median method to check
+   if median k-mer count is above a cutoff
+   * khmer/_khmermodule.cc: Expose filter_on_median to python-land
+   * scripts/normalize-by-median.py: Switch to new filter_on_median
+   * tests/test_counting_hash.py: Tests for new method
+
+2015-06-08  Luiz Irber  <khmer@luizirber.org>
+
+   * tests/test_hll.py: test return values from consume_{string,fasta}.
+
+2015-06-06  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added hllcounter_merge.
+   * tests/test_hll.py: added merge tests.
+   * lib/hllcounter.cc: changed HLLCounter::consume_string to uppercase input.
+   * sandbox/unique-kmers.py: added --stream-out option; updated to print out
+   k-mers per file as well as k-mer size used.
+
+2015-06-04  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added error handling to load_partitionmap.
+   * lib/subset.cc: modified partitionmap format to detect truncated files;
+   changed untestable sanity checks to assertions.
+   * tests/{test_counting_hash,test_hashbits,test_subset_graph}.py: added
+   tests to try loading all possible truncations of binary save files.
+
 2015-06-04  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc,lib/hashbits.{cc,hh}: add Hashbits::update_from()
@@ -29,10 +116,10 @@
    * scripts/normalize-by-median.py: major refactoring to use context
    managers and classes; fixed -R
    * tests/test_scripts.py: added test for normalize's -R arg
-   
+
 2015-06-01  Tamer Mansour <drtamermansour@gmail.com>
 
-   * scripts/normalize-by-median.py: changed to count kmers from both PE reads 
+   * scripts/normalize-by-median.py: changed to count kmers from both PE reads
    when either one of them is below the coverage cutoff
    * tests/test_scripts.py: Added test for new behaviour
 

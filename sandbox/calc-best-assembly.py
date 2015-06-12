@@ -1,9 +1,10 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 #
+from __future__ import print_function
 import screed
 import argparse
 import sys
@@ -34,31 +35,31 @@ def main():
         try:
             total = calculate_bp_above_cutoff(filename, args.cutoff)
         except IOError:
-            print >>sys.stderr, "** WARNING: %s does not exist, skipping" %\
-                filename
+            print("** WARNING: %s does not exist, skipping" %\
+                filename, file=sys.stderr)
             continue
 
         stats.append((total, filename))
 
         if not args.quiet:
-            print >>sys.stderr, "assembly %s has %d bp > %d" % (filename,
+            print("assembly %s has %d bp > %d" % (filename,
                                                                 total,
-                                                                args.cutoff)
+                                                                args.cutoff), file=sys.stderr)
 
     stats.sort(reverse=True)
 
     best_total, winner_file = stats[0]
-    print >>sys.stderr, '----'
-    print >>sys.stderr, "assembly %s wins: %d total bp > %d" % (winner_file,
+    print('----', file=sys.stderr)
+    print("assembly %s wins: %d total bp > %d" % (winner_file,
                                                                 best_total,
-                                                                args.cutoff)
+                                                                args.cutoff), file=sys.stderr)
 
     if args.output_file:
         for record in screed.open(winner_file, parse_description=False):
-            print >>args.output_file, '>%s\n%s' % (record.name,
-                                                   record.sequence)
+            print('>%s\n%s' % (record.name,
+                                                   record.sequence), file=args.output_file)
 
-    print winner_file
+    print(winner_file)
 
 if __name__ == '__main__':
     main()

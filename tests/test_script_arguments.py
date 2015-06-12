@@ -7,10 +7,12 @@
 """
 Tests for various argument-handling code.
 """
+from __future__ import print_function, unicode_literals
+from __future__ import absolute_import
 
 import sys
-import cStringIO
-import khmer_tst_utils as utils
+import io
+from . import khmer_tst_utils as utils
 
 import argparse
 import khmer.kfile
@@ -20,19 +22,19 @@ from khmer import khmer_args
 def test_check_space():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space(
             [fakelump_fa], force=False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_check_tablespace():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
@@ -42,7 +44,7 @@ def test_check_tablespace():
                                               _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
@@ -50,19 +52,19 @@ def test_check_tablespace():
 def test_check_space_force():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_space(
             [fakelump_fa], force=True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_check_tablespace_force():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
@@ -72,18 +74,18 @@ def test_check_tablespace_force():
                                               _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
-        print str(e)
+        print(str(e))
     finally:
         sys.stderr = save_stderr
 
 
 def test_invalid_file_warn():
-    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_valid_file_exists(["nonexistent", "nonexistent2"])
         assert sys.stderr.getvalue().count("\n") == 2,  \
             "Should produce two warning lines"
-    except SystemExit, e:
-        print str(e)
+    except SystemExit as e:
+        print(str(e))
     finally:
         sys.stderr = save_stderr

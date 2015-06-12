@@ -1,4 +1,5 @@
-#! /usr/bin/env python2
+from __future__ import print_function
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -31,9 +32,9 @@ def main():
                 n_unique += 1
             ht.count(kmer)
 
-    print n_unique
-    print ht.n_occupied()
-    print ht.n_unique_kmers()
+    print(n_unique)
+    print(ht.n_occupied())
+    print(ht.n_unique_kmers())
 
 
 if __name__ == '__main__':
