@@ -80,13 +80,12 @@ unsigned int Traverser::degree_right(KmerNode& node)
     char * base = bases;
     while(*base != '\0') {
         KmerNode next = get_next(node, *base);
-        cout << next.get_char_rep(K) << endl;
         if (graph->get_count(next.kmer_u)) {
             ++degree;
         }
         ++base;
     }
-    cout << "Right: " << degree << endl;
+    
     return degree;
 }
 
@@ -98,13 +97,12 @@ unsigned int Traverser::degree_left(KmerNode& node)
     char * base = bases;
     while(*base != '\0') {
         KmerNode prev = get_prev(node, *base);
-        cout << prev.get_char_rep(K) << endl;
         if (graph->get_count(prev.kmer_u)) {
             ++degree;
         }
         ++base;
     }
-    cout << "Left: " << degree << endl;
+    
     return degree;
 }
 

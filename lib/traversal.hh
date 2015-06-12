@@ -21,6 +21,7 @@ namespace khmer {
 
 class KmerNode;
 typedef std::queue<KmerNode> KmerNodeQueue;
+typedef std::set<KmerNode> KmerNodeSet;
 
 class KmerNode {
 
@@ -32,6 +33,10 @@ public:
         kmer_f = f;
         kmer_r = r;
         kmer_u = u;
+    }
+
+    bool operator< (const KmerNode &other) const {
+        return kmer_u < other.kmer_u;
     }
 
     std::string get_string_rep(unsigned int K) {
