@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function, unicode_literals
 from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
@@ -270,7 +270,7 @@ def test_hll_merge_1():
         hll.merge(hll2)
         assert 0, "previous statement should fail with a ValueError"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_hll_merge_2():
@@ -281,7 +281,7 @@ def test_hll_merge_2():
         hll.merge(hll2)
         assert 0, "previous statement should fail with a ValueError"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_hll_merge_3():
