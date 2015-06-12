@@ -69,13 +69,13 @@ def test_update_from_diff_ksize_2():
         ht.update(ht2)
         assert 0, "should not be reached"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
     try:
         ht2.update(ht)
         assert 0, "should not be reached"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_update_from_diff_tablesize():
@@ -86,7 +86,7 @@ def test_update_from_diff_tablesize():
         ht.update(ht2)
         assert 0, "should not be reached"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_update_from_diff_num_tables():
@@ -97,7 +97,7 @@ def test_update_from_diff_num_tables():
         ht.update(ht2)
         assert 0, "should not be reached"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_n_occupied_1():
@@ -596,7 +596,7 @@ def test_badget():
         hbts.get(b"AGCTT")
         assert 0, "this should fail"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
     try:
         hbts.get(u"AGCTT")
@@ -678,7 +678,7 @@ def test_save_load_tagset_trunc():
             ht.load_tagset(outfile)
             assert 0, "this test should fail"
         except IOError as err:
-            print str(err), i
+            print(str(err), i)
 
 
 # to build the test files used below, add 'test' to this function
@@ -813,7 +813,7 @@ def test_stop_tags_truncate_check():
             ht.load_stop_tags(truncpath)
             assert 0, "expect failure of previous command"
         except IOError as e:
-            print i, str(e)
+            print(i, str(e))
 
 
 def test_tagset_ksize_check():

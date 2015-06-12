@@ -59,7 +59,7 @@ class Test_CountingHash(object):
             hi.get(float(GGhash))
             assert "the previous statement should fail"
         except ValueError as err:
-            print str(err)
+            print(str(err))
 
     def test_collision_1(self):
 
@@ -491,33 +491,33 @@ def test_get_kmer_counts():
 
     hi.consume("AAAAAA")
     counts = hi.get_kmer_counts("AAAAAA")
-    print counts
+    print(counts)
     assert len(counts) == 1
     assert counts[0] == 1
 
     hi.consume("AAAAAA")
     counts = hi.get_kmer_counts("AAAAAA")
-    print counts
+    print(counts)
     assert len(counts) == 1
     assert counts[0] == 2
 
     hi.consume("AAAAAT")
     counts = hi.get_kmer_counts("AAAAAAT")
-    print counts
+    print(counts)
     assert len(counts) == 2
     assert counts[0] == 2
     assert counts[1] == 1
 
     hi.consume("AAAAAT")
     counts = hi.get_kmer_counts("AAAAAAT")
-    print counts
+    print(counts)
     assert len(counts) == 2
     assert counts[0] == 2
     assert counts[1] == 2
 
     hi.consume("AAAAAT")
     counts = hi.get_kmer_counts("AAAAAAT")
-    print counts
+    print(counts)
     assert len(counts) == 2
     assert counts[0] == 2
     assert counts[1] == 3
@@ -528,33 +528,33 @@ def test_get_kmer_hashes():
 
     hi.consume("AAAAAA")
     hashes = hi.get_kmer_hashes("AAAAAA")
-    print hashes
+    print(hashes)
     assert len(hashes) == 1
     assert hi.get(hashes[0]) == 1
 
     hi.consume("AAAAAA")
     hashes = hi.get_kmer_hashes("AAAAAA")
-    print hashes
+    print(hashes)
     assert len(hashes) == 1
     assert hi.get(hashes[0]) == 2
 
     hi.consume("AAAAAT")
     hashes = hi.get_kmer_hashes("AAAAAAT")
-    print hashes
+    print(hashes)
     assert len(hashes) == 2
     assert hi.get(hashes[0]) == 2
     assert hi.get(hashes[1]) == 1
 
     hi.consume("AAAAAT")
     hashes = hi.get_kmer_hashes("AAAAAAT")
-    print hashes
+    print(hashes)
     assert len(hashes) == 2
     assert hi.get(hashes[0]) == 2
     assert hi.get(hashes[1]) == 2
 
     hi.consume("AAAAAT")
     hashes = hi.get_kmer_hashes("AAAAAAT")
-    print hashes
+    print(hashes)
     assert len(hashes) == 2
     assert hi.get(hashes[0]) == 2
     assert hi.get(hashes[1]) == 3
@@ -615,7 +615,7 @@ def test_load_truncated():
             ht = khmer.load_counting_hash(truncpath)
             assert 0, "this should not be reached!"
         except IOError as err:
-            print str(err)
+            print(str(err))
 
 
 def test_load_gz():

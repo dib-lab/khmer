@@ -240,7 +240,7 @@ class Test_SaveLoadPmap(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print divvy
+        print(divvy)
         assert len(divvy) is 3
         (a, b, c) = divvy
 
@@ -267,7 +267,7 @@ class Test_SaveLoadPmap(object):
                 a = ht.load_subset_partitionmap(outfile3)
                 assert 0, "this should not pass"
             except IOError as err:
-                print str(err), i
+                print(str(err), i)
 
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 8 + 1)
@@ -440,7 +440,7 @@ def test_save_load_merge_on_graph():
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
-    print divvy
+    print(divvy)
     assert len(divvy) is 3
     (a, b, c) = divvy
 
@@ -473,7 +473,7 @@ def test_save_load_on_graph_truncate():
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
-    print divvy
+    print(divvy)
     assert len(divvy) is 3
     (a, b, c) = divvy
 
@@ -500,7 +500,7 @@ def test_save_load_on_graph_truncate():
             a = ht.load_partitionmap(outfile3)
             assert 0, "this should not pass"
         except IOError as err:
-            print str(err), i
+            print(str(err), i)
 
 
 def test_output_partitions():

@@ -699,7 +699,7 @@ def test_normalize_by_median_known_good():
         for rknown, rout in zip(iter_known, iter_out):
             assert rknown.name == rout.name
     except Exception as e:
-        print e
+        print(e)
         assert False
 
 
