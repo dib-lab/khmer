@@ -725,37 +725,34 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(const HashIntoType kmer_f,
-        const HashIntoType kmer_r,
+void Hashtable::calc_connected_graph_size(KmerNode node,
         unsigned long long& count,
-        SeenSet& keeper,
+        KmerNodeSet& keeper,
         const unsigned long long threshold,
         bool break_on_circum)
 const
 {
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    const BoundedCounterType val = get_count(kmer);
+    const BoundedCounterType val = get_count(node);
 
     if (val == 0) {
         return;
     }
 
     // have we already seen me? don't count; exit.
-    if (set_contains(keeper, kmer)) {
+    if (set_contains(keeper, node)) {
         return;
     }
 
     // is this in stop_tags?
-    if (set_contains(stop_tags, kmer)) {
+    if (set_contains(stop_tags, node.kmer_u)) {
         return;
     }
 
     // keep track of both seen kmers, and counts.
-    keeper.insert(kmer);
+    keeper.insert(node);
 
     // is this a high-circumference k-mer? if so, don't count it; get outta here!
-    if (break_on_circum && \
-            kmer_degree(kmer_f, kmer_r) > 4) {
+    if (break_on_circum && traverser->degree(node) > 4) {
         return;
     }
 
@@ -768,45 +765,20 @@ const
 
     // otherwise, explore in all directions.
 
-    // NEXT.
+    char bases[] = "ACGT";
+    char * base = bases;
+    while(*base != '\0') {
+        KmerNode next_node = traverser->get_next(node, *base);
+        if (get_count(next_node)) {
+            calc_connected_graph_size(next_node, count, keeper, threshold, break_on_circum);
+        }
 
-    HashIntoType f, r;
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    // PREVIOUS.
-
-
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
+        KmerNode prev_node = traverser->get_prev(node, *base);
+        if (get_count(prev_node)) {
+            calc_connected_graph_size(prev_node, count, keeper, threshold, break_on_circum);
+        }
+        ++base;
+    }
 }
 
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)

@@ -266,6 +266,7 @@ public:
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
+    virtual const BoundedCounterType get_count(KmerNode node) const = 0;
 
     virtual void save(std::string) = 0;
     virtual void load(std::string) = 0;
@@ -441,21 +442,9 @@ public:
                               float min_unique_f,
                               std::vector<std::string> &results);
 
-    void calc_connected_graph_size(const char * kmer,
+    void calc_connected_graph_size(KmerNode node,
                                    unsigned long long& count,
-                                   SeenSet& keeper,
-                                   const unsigned long long threshold=0,
-                                   bool break_on_circum=false) const
-    {
-        HashIntoType r, f;
-        _hash(kmer, _ksize, f, r);
-        calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-    }
-
-    void calc_connected_graph_size(const HashIntoType kmer_f,
-                                   const HashIntoType kmer_r,
-                                   unsigned long long& count,
-                                   SeenSet& keeper,
+                                   KmerNodeSet& keeper,
                                    const unsigned long long threshold=0,
                                    bool break_on_circum=false) const;
 
