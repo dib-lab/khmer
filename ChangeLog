@@ -1,3 +1,7 @@
+2015-06-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * setup.py: update screed version to 0.9
+
 2015-06-12  Luiz Irber  <khmer@luizirber.org>
 
    * khmer/{khmermodule.cc},tests/test_hashbits.py: Add Unicode support to

@@ -177,7 +177,7 @@ SETUP_METADATA = \
         "url": 'https://khmer.readthedocs.org/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.8'],
+        "install_requires": ['screed >= 0.9'],
         # testing screed download link
 
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
