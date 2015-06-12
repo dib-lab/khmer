@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,6 +12,7 @@ Find all reads connected to the given contigs on a per-partition basis.
 % sweep-files.py -r <range> --db <fasta/q files> \
 --query <fasta/q files separate>
 """
+from __future__ import print_function
 
 EPILOG = """
 Output will be a collection of fasta/q files, each corresponding to a database
@@ -121,7 +122,7 @@ def main():
     # de Bruin graph; open a file and output queue for each file as well.
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
     try:
-        print >>sys.stderr, 'consuming and labeling input sequences...'
+        print('consuming and labeling input sequences...', file=sys.stderr)
 
         for i, dbfile in enumerate(args.db):
 
@@ -132,18 +133,17 @@ def main():
 
             for n, record in enumerate(screed.open(dbfile)):
                 if n % 50000 == 0:
-                    print >>sys.stderr, \
-                        '...consumed {n} sequences...'.format(n=n)
+                    print('...consumed {n} sequences...'.format(n=n), file=sys.stderr)
                 ht.consume_sequence_and_tag_with_labels(record.sequence, i)
 
 
     except IOError as e:
-        print >>sys.stderr, '!! ERROR: !!', e
-        print >>sys.stderr, '...error setting up outputs. exiting...'
+        print('!! ERROR: !!', e, file=sys.stderr)
+        print('...error setting up outputs. exiting...', file=sys.stderr)
 
-    print >>sys.stderr, 'done consuming input sequence. \
+    print('done consuming input sequence. \
                         added {t} tags and {l} labels...' \
-                        .format(t=ht.n_tags(), l=ht.n_labels())
+                        .format(t=ht.n_tags(), l=ht.n_labels()), file=sys.stderr)
 
     n_orphaned = 0
     n_labeled = 0
@@ -152,21 +152,20 @@ def main():
     # Iterate through all the reads and check for the labels with which they
     # intersect. Queue to the corresponding label when found.
     for read_file in args.query:
-        print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
-            read_file=read_file)
+        print('** sweeping {read_file} for labels...'.format(
+            read_file=read_file), file=sys.stderr)
         try:
             read_fp = screed.open(read_file)
         except IOError as error:
-            print >>sys.stderr, '!! ERROR: !!', error
-            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(
-                fn=read_file)
+            print('!! ERROR: !!', error, file=sys.stderr)
+            print('*** Could not open {fn}, skipping...'.format(
+                fn=read_file), file=sys.stderr)
         else:
             for n, record in enumerate(read_fp):
                 if n % 50000 == 0 and n > 0:
-                    print >>sys.stderr, \
-                        '\tswept {n} reads [{nc} labeled, {no} orphaned]' \
+                    print('\tswept {n} reads [{nc} labeled, {no} orphaned]' \
                                         .format(n=n, nc=n_labeled,
-                                                no=n_orphaned)
+                                                no=n_orphaned), file=sys.stderr)
                 seq = record.sequence
                 try:
                     labels = ht.sweep_label_neighborhood(seq, traversal_range)
@@ -184,19 +183,19 @@ def main():
                     else:
                         n_orphaned += 1
 
-            print >>sys.stderr, '** End of file {fn}...'.format(fn=read_file)
+            print('** End of file {fn}...'.format(fn=read_file), file=sys.stderr)
             read_fp.close()
 
     # gotta output anything left in the buffers at the end!
-    print >>sys.stderr, '** End of run...'
-    for q in outputs.values():
+    print('** End of run...', file=sys.stderr)
+    for q in list(outputs.values()):
         q.clear()
 
-    print >>sys.stderr, 'swept {n_reads}...'.format(
-        n_reads=n_labeled + n_orphaned)
-    print >>sys.stderr, '...with {nc} labeled and {no} orphaned'.format(
-        nc=n_labeled, no=n_orphaned)
-    print >>sys.stderr, '...and {nmc} multilabeled'.format(nmc=n_mlabeled)
+    print('swept {n_reads}...'.format(
+        n_reads=n_labeled + n_orphaned), file=sys.stderr)
+    print('...with {nc} labeled and {no} orphaned'.format(
+        nc=n_labeled, no=n_orphaned), file=sys.stderr)
+    print('...and {nmc} multilabeled'.format(nmc=n_mlabeled), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

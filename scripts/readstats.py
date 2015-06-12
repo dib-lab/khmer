@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,6 +12,7 @@ Display summary statistics for one or more FASTA/FASTQ files.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import csv
@@ -130,7 +131,7 @@ def analyze_file(filename):
     input_iter = screed.open(filename, parse_description=False)
     for record in input_iter:
         if seqs % 100000 == 0:
-            print >>sys.stderr, '...', filename, seqs
+            print('...', filename, seqs, file=sys.stderr)
         bps += len(record.sequence)
         seqs += 1
     return bps, seqs
@@ -150,8 +151,8 @@ def main():
         try:
             bps, seqs = analyze_file(filename)
         except (IOError, OSError, EOFError) as exc:
-            print >>sys.stderr, 'ERROR in opening %s:' % filename
-            print >>sys.stderr, '     ', str(exc)
+            print('ERROR in opening %s:' % filename, file=sys.stderr)
+            print('     ', str(exc), file=sys.stderr)
             continue
 
         if seqs:
@@ -161,11 +162,9 @@ def main():
                                                                    seqs,
                                                                    avg,
                                                                    filename)
-
-            print >>sys.stderr, '... found', msg
-
+            print('... found', msg, file=sys.stderr)
         else:
-            print >>sys.stderr, 'No sequences found in %s' % filename
+            print('No sequences found in %s' % filename, file=sys.stderr)
 
     if statistics:
         if args.csv:
@@ -176,8 +175,8 @@ def main():
             for stat in statistics:
                 out.append(*stat)
     else:
-        print >>args.outfp, \
-            'No sequences found in %d files' % len(args.filenames)
+        print('No sequences found in %d files' %
+              len(args.filenames), file=args.outfp)
 
 
 if __name__ == '__main__':

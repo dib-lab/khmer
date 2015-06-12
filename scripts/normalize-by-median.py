@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -17,7 +17,6 @@ option to output to STDOUT.
 
 Use '-h' for parameter help.
 """
-
 from __future__ import print_function
 
 import sys
@@ -25,7 +24,6 @@ import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
 from contextlib import contextmanager
 
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
@@ -158,9 +156,9 @@ def get_parser():
     Paired end reads will be considered together if :option:`-p` is set. If
     either read will be kept, then both will be kept. This should result in
     keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`, 
+    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`,
     unpaired reads from the specified file will be read after the paired data
-    is read. 
+    is read.
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
@@ -354,6 +352,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print("** WARNING: Finished with errors!", file=sys.stderr)
         print("** IOErrors occurred in the following files:", file=sys.stderr)
         print("\t", " ".join(corrupt_files), file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

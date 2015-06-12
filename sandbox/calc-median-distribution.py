@@ -1,10 +1,12 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import division
+from __future__ import print_function
 import sys
 import khmer
 import argparse
@@ -27,7 +29,7 @@ def main():
 
     outfp = open(histout, 'w')
 
-    print 'hashtable from', hashfile
+    print('hashtable from', hashfile)
     ht = khmer.load_counting_hash(hashfile)
 
     hist = {}
@@ -37,7 +39,7 @@ def main():
 
     for n, record in enumerate(screed.open(seqfile)):
         if n > 0 and n % 100000 == 0:
-            print '...', n
+            print('...', n)
 
         seq = record.sequence.replace('N', 'A')
 

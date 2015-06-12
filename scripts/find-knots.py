@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,6 +13,7 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 
 % python scripts/find-knots.py <base>
 """
+from __future__ import print_function
 
 import argparse
 import glob
@@ -96,28 +97,30 @@ def main():
 
     check_space(infiles, args.force)
 
-    print >>sys.stderr, 'loading k-mer presence table %s.pt' % graphbase
+    print('loading k-mer presence table %s.pt' % graphbase, file=sys.stderr)
     htable = khmer.load_hashbits(graphbase + '.pt')
 
-    print >>sys.stderr, 'loading tagset %s.tagset...' % graphbase
+    print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
     htable.load_tagset(graphbase + '.tagset')
 
     initial_stoptags = False    # @CTB regularize with make-initial
     if os.path.exists(graphbase + '.stoptags'):
-        print >>sys.stderr, 'loading stoptags %s.stoptags' % graphbase
+        print('loading stoptags %s.stoptags' % graphbase, file=sys.stderr)
         htable.load_stop_tags(graphbase + '.stoptags')
         initial_stoptags = True
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-        (len(pmap_files), pmap_files[0])
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'output stoptags will be in', graphbase + '.stoptags'
+    print('loading %d pmap files (first one: %s)' %
+          (len(pmap_files), pmap_files[0]), file=sys.stderr)
+    print('---', file=sys.stderr)
+    print('output stoptags will be in',
+          graphbase + '.stoptags', file=sys.stderr)
     if initial_stoptags:
-        print >>sys.stderr, \
-            '(these output stoptags will include the already-loaded set)'
-    print >>sys.stderr, '---'
+        print(
+            '(these output stoptags will include the already-loaded set)',
+            file=sys.stderr)
+    print('---', file=sys.stderr)
 
     # create counting hash
     ksize = htable.ksize()
@@ -126,31 +129,32 @@ def main():
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):
-        print >>sys.stderr, '<-', subset_file
+        print('<-', subset_file, file=sys.stderr)
         subset = htable.load_subset_partitionmap(subset_file)
 
-        print >>sys.stderr, '** repartitioning subset... %s' % subset_file
+        print('** repartitioning subset... %s' % subset_file, file=sys.stderr)
         htable.repartition_largest_partition(subset, counting,
                                              EXCURSION_DISTANCE,
                                              EXCURSION_KMER_THRESHOLD,
                                              EXCURSION_KMER_COUNT_THRESHOLD)
 
-        print >>sys.stderr, '** merging subset... %s' % subset_file
+        print('** merging subset... %s' % subset_file, file=sys.stderr)
         htable.merge_subset(subset)
 
-        print >>sys.stderr, '** repartitioning, round 2... %s' % subset_file
+        print('** repartitioning, round 2... %s' %
+              subset_file, file=sys.stderr)
         size = htable.repartition_largest_partition(
             None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
             EXCURSION_KMER_COUNT_THRESHOLD)
 
-        print >>sys.stderr, '** repartitioned size:', size
+        print('** repartitioned size:', size, file=sys.stderr)
 
-        print >>sys.stderr, 'saving stoptags binary'
+        print('saving stoptags binary', file=sys.stderr)
         htable.save_stop_tags(graphbase + '.stoptags')
         os.rename(subset_file, subset_file + '.processed')
-        print >>sys.stderr, '(%d of %d)\n' % (index, len(pmap_files))
+        print('(%d of %d)\n' % (index, len(pmap_files)), file=sys.stderr)
 
-    print >>sys.stderr, 'done!'
+    print('done!', file=sys.stderr)
 
 if __name__ == '__main__':
     main()

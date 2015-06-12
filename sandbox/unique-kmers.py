@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,6 +13,7 @@ Estimate number of unique k-mers, with precision <= ERROR_RATE.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 
 import argparse
@@ -93,21 +94,22 @@ def main():
                 write_record(record, sys.stdout)
 
         cardinality = hllcpp.estimate_cardinality()
-        print >> sys.stderr, \
-                 'Estimated number of unique {0}-mers in {1}: {2}'.format(
-            args.ksize, input_filename, cardinality)
+        print('Estimated number of unique {0}-mers in {1}: {2}'.format(
+              args.ksize, input_filename, cardinality),
+              file=sys.stderr)
 
         if report_fp:
-            print >> report_fp, cardinality, args.ksize, '(total)'
+            print(cardinality, args.ksize, '(total)', file=report_fp)
             report_fp.flush()
         total_hll.merge(hllcpp)
 
     cardinality = total_hll.estimate_cardinality()
-    print >> sys.stderr, 'Total estimated number of unique {0}-mers: {1}'.format(
-        args.ksize, cardinality)
+    print('Total estimated number of unique {0}-mers: {1}'.format(
+          args.ksize, cardinality),
+          file=sys.stderr)
 
     if report_fp:
-        print >> report_fp, cardinality, args.ksize, 'total'
+        print(cardinality, args.ksize, 'total', file=report_fp)
         report_fp.flush()
 
 if __name__ == "__main__":

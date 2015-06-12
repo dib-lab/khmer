@@ -1,3 +1,5 @@
+from __future__ import division, print_function, unicode_literals
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
@@ -12,7 +14,7 @@ import khmer
 
 from screed.fasta import fasta_iter
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.tools import assert_raises
 
 
@@ -235,7 +237,7 @@ def test_hll_change_ksize():
     hllcpp.ksize = 24
     assert hllcpp.ksize == 24
 
-    hllcpp.ksize = 12L
+    hllcpp.ksize = 12
     assert hllcpp.ksize == 12
 
     with assert_raises(ValueError):
@@ -268,7 +270,7 @@ def test_hll_merge_1():
         hll.merge(hll2)
         assert 0, "previous statement should fail with a ValueError"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_hll_merge_2():
@@ -279,7 +281,7 @@ def test_hll_merge_2():
         hll.merge(hll2)
         assert 0, "previous statement should fail with a ValueError"
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 def test_hll_merge_3():

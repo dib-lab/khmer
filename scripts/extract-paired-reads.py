@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -16,6 +16,7 @@ extract them into separate files (.pe and .se).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from __future__ import print_function
 import screed
 import sys
 import os.path
@@ -70,9 +71,9 @@ def main():
     single_fp = open(outfile + '.se', 'w')
     paired_fp = open(outfile + '.pe', 'w')
 
-    print >>sys.stderr, 'reading file "%s"' % args.infile
-    print >>sys.stderr, 'outputting interleaved pairs to "%s.pe"' % outfile
-    print >>sys.stderr, 'outputting orphans to "%s.se"' % outfile
+    print('reading file "%s"' % args.infile, file=sys.stderr)
+    print('outputting interleaved pairs to "%s.pe"' % outfile, file=sys.stderr)
+    print('outputting orphans to "%s.se"' % outfile, file=sys.stderr)
 
     n_pe = 0
     n_se = 0
@@ -80,7 +81,7 @@ def main():
     screed_iter = screed.open(args.infile, parse_description=False)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
-            print >>sys.stderr, '...', index
+            print('...', index, file=sys.stderr)
 
         if is_pair:
             write_record_pair(read1, read2, paired_fp)
@@ -95,12 +96,12 @@ def main():
     if n_pe == 0:
         raise Exception("no paired reads!? check file formats...")
 
-    print >>sys.stderr, 'DONE; read %d sequences,' \
-        ' %d pairs and %d singletons' % \
-        (n_pe * 2 + n_se, n_pe, n_se)
+    print('DONE; read %d sequences,'
+          ' %d pairs and %d singletons' %
+          (n_pe * 2 + n_se, n_pe, n_se), file=sys.stderr)
 
-    print >> sys.stderr, 'wrote to: ' + outfile \
-        + '.se' + ' and ' + outfile + '.pe'
+    print('wrote to: ' + outfile + '.se' + ' and ' + outfile + '.pe',
+          file=sys.stderr)
 
 
 if __name__ == '__main__':

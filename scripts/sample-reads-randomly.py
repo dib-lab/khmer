@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -17,6 +17,7 @@ By default take one subsample, but take -S samples if specified.
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from __future__ import print_function
 
 import argparse
 import screed
@@ -110,17 +111,18 @@ def main():
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
-        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' %\
-            args.num_reads
-        print >>sys.stderr, 'Subsampled reads will be placed in %s' % \
-            output_filename
-        print >>sys.stderr, ''
+        print('Subsampling %d reads using reservoir sampling.' %
+              args.num_reads, file=sys.stderr)
+        print('Subsampled reads will be placed in %s' %
+              output_filename, file=sys.stderr)
+        print('', file=sys.stderr)
     else:  # > 1
-        print >>sys.stderr, 'Subsampling %d reads, %d times,' \
-            % (args.num_reads, num_samples), ' using reservoir sampling.'
-        print >>sys.stderr, 'Subsampled reads will be placed in %s.N' \
-            % output_filename
-        print >>sys.stderr, ''
+        print('Subsampling %d reads, %d times,'
+              % (args.num_reads, num_samples), ' using reservoir sampling.',
+              file=sys.stderr)
+        print('Subsampled reads will be placed in %s.N'
+              % output_filename, file=sys.stderr)
+        print('', file=sys.stderr)
 
     reads = []
     for n in range(num_samples):
@@ -128,17 +130,17 @@ def main():
 
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
-        print >>sys.stderr, 'opening', filename, 'for reading'
+        print('opening', filename, 'for reading', file=sys.stderr)
         screed_iter = screed.open(filename, parse_description=False)
 
         for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,
                 force_single=args.force_single)):
             if count % 10000 == 0:
-                print >>sys.stderr, '...', count, 'reads scanned'
+                print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
-                    print >>sys.stderr, 'reached upper limit of %d reads' % \
-                        args.max_reads, '(see -M); exiting'
+                    print('reached upper limit of %d reads' %
+                          args.max_reads, '(see -M); exiting', file=sys.stderr)
                     break
 
             # collect first N reads
@@ -158,8 +160,8 @@ def main():
 
     # output all the subsampled reads:
     if len(reads) == 1:
-        print >>sys.stderr, 'Writing %d sequences to %s' % \
-            (len(reads[0]), output_filename)
+        print('Writing %d sequences to %s' %
+              (len(reads[0]), output_filename), file=sys.stderr)
         if not output_file:
             output_file = open(output_filename, 'w')
 
@@ -170,8 +172,8 @@ def main():
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
-            print >>sys.stderr, 'Writing %d sequences to %s' % \
-                (len(reads[n]), n_filename)
+            print('Writing %d sequences to %s' %
+                  (len(reads[n]), n_filename), file=sys.stderr)
             output_file = open(n_filename, 'w')
             for records in reads[n]:
                 write_record(records[0], output_file)
