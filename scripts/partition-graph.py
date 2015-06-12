@@ -18,7 +18,6 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import queue
 import gc
 import os.path
 import argparse
@@ -38,6 +37,12 @@ if "Linux" == platform.system():
 else:
     def __debug_vm_usage(msg):  # pylint: disable=unused-argument
         pass
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
