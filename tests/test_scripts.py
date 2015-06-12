@@ -2716,7 +2716,7 @@ def test_sample_reads_randomly_S():
     outfile = infile + '.subset.0'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile)])
+    seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
     print list(sorted(seqs))
 
     assert seqs == set(['895:1:1:1303:14389', '895:1:1:1347:3237',
@@ -2728,7 +2728,7 @@ def test_sample_reads_randomly_S():
     outfile = infile + '.subset.1'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile)])
+    seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
     print list(sorted(seqs))
 
     assert seqs == set(['895:1:1:1303:14389', '895:1:1:1373:4848',
@@ -2740,7 +2740,7 @@ def test_sample_reads_randomly_S():
     outfile = infile + '.subset.2'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile)])
+    seqs = set([r.name for r in screed.open(outfile, parse_description=True)])
     print list(sorted(seqs))
 
     assert seqs == set(['895:1:1:1298:13380', '895:1:1:1348:18672',
