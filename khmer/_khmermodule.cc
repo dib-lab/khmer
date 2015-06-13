@@ -1307,8 +1307,8 @@ hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
     unsigned long long size = 0;
 
     Py_BEGIN_ALLOW_THREADS
-    KmerNode start_kmer = hashtable->traverser->build_node(_kmer);
-    KmerNodeSet keeper;
+    Kmer start_kmer = hashtable->traverser->build_node(_kmer);
+    KmerSet keeper;
     hashtable->calc_connected_graph_size(start_kmer, size, keeper, max_size,
                                          break_on_circum);
     Py_END_ALLOW_THREADS

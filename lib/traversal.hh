@@ -19,23 +19,23 @@
 
 namespace khmer {
 
-class KmerNode;
-typedef std::queue<KmerNode> KmerNodeQueue;
-typedef std::set<KmerNode> KmerNodeSet;
+class Kmer;
+typedef std::queue<Kmer> KmerQueue;
+typedef std::set<Kmer> KmerSet;
 
-class KmerNode {
+class Kmer {
 
 public:
 
     HashIntoType kmer_f, kmer_r, kmer_u;
 
-    KmerNode(HashIntoType f, HashIntoType r, HashIntoType u) {
+    Kmer(HashIntoType f, HashIntoType r, HashIntoType u) {
         kmer_f = f;
         kmer_r = r;
         kmer_u = u;
     }
 
-    bool operator< (const KmerNode &other) const {
+    bool operator< (const Kmer &other) const {
         return kmer_u < other.kmer_u;
     }
 
@@ -48,10 +48,11 @@ public:
     }
 };
 
-class Traverser {
 
+class Traverser
+{
     friend class Hashtable;
-    
+
 protected:
 
     HashIntoType bitmask;
@@ -64,23 +65,28 @@ public:
 
     explicit Traverser(Hashtable * ht);
 
-    KmerNode get_next(KmerNode& node, const char ch);
-    KmerNode get_prev(KmerNode& node, const char ch);
+    Kmer get_left(Kmer& node, const char ch);
+    Kmer get_right(Kmer& node, const char ch);
 
-    unsigned int traverse_right(KmerNode& node,
-                                KmerNodeQueue &node_q);
-    unsigned int traverse_left(KmerNode& node,
-                               KmerNodeQueue &node_q);
-    
-    unsigned int degree_right(KmerNode& node);
-    unsigned int degree_left(KmerNode& node);
-    unsigned int degree(KmerNode& node);
+    unsigned int traverse_left(Kmer& node,
+                               KmerQueue &node_q,
+                               std::function<bool (Kmer&)> filter);
+    unsigned int traverse_right(Kmer& node,
+                                KmerQueue &node_q,
+                                std::function<bool (Kmer&)> filter);
 
-    KmerNode build_node(HashIntoType kmer);
-    KmerNode build_node(HashIntoType kmer_f, HashIntoType kmer_r);
-    KmerNode build_node(std::string kmer);
-    KmerNode build_node(const char * kmer);
+    unsigned int degree_left(Kmer& node);
+    unsigned int degree_right(Kmer& node);
+    unsigned int degree(Kmer& node);
+
+    Kmer build_node(HashIntoType kmer);
+    Kmer build_node(HashIntoType kmer_f, HashIntoType kmer_r);
+    Kmer build_node(std::string kmer);
+    Kmer build_node(const char * kmer);
 
 };
+
+
+
 };
 #endif

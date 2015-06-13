@@ -202,7 +202,7 @@ public:
 
     } // count
 
-    virtual const BoundedCounterType get_count(KmerNode node) const
+    virtual const BoundedCounterType get_count(Kmer node) const
     {
         return get_count(node.kmer_u);
     }

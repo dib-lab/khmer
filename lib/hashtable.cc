@@ -725,9 +725,9 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(KmerNode node,
+void Hashtable::calc_connected_graph_size(Kmer node,
         unsigned long long& count,
-        KmerNodeSet& keeper,
+        KmerSet& keeper,
         const unsigned long long threshold,
         bool break_on_circum)
 const
@@ -768,12 +768,12 @@ const
     char bases[] = "ACGT";
     char * base = bases;
     while(*base != '\0') {
-        KmerNode next_node = traverser->get_next(node, *base);
+        Kmer next_node = traverser->get_right(node, *base);
         if (get_count(next_node)) {
             calc_connected_graph_size(next_node, count, keeper, threshold, break_on_circum);
         }
 
-        KmerNode prev_node = traverser->get_prev(node, *base);
+        Kmer prev_node = traverser->get_left(node, *base);
         if (get_count(prev_node)) {
             calc_connected_graph_size(prev_node, count, keeper, threshold, break_on_circum);
         }
@@ -784,14 +784,14 @@ const
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
 const
 {
-    KmerNode node = traverser->build_node(kmer_f, kmer_r);
+    Kmer node = traverser->build_node(kmer_f, kmer_r);
     return traverser->degree(node);
 }
 
 unsigned int Hashtable::kmer_degree(const char * kmer_s)
 const
 {
-    KmerNode node = traverser->build_node(kmer_s);
+    Kmer node = traverser->build_node(kmer_s);
     return traverser->degree(node);
 }
 
