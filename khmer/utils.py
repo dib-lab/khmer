@@ -1,3 +1,4 @@
+from __future__ import print_function, unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,7 +13,7 @@ def print_error(msg):
     """Print the given message to 'stderr'."""
     import sys
 
-    print >>sys.stderr, msg
+    print(msg, file=sys.stderr)
 
 
 def _split_left_right(name):
@@ -89,7 +90,8 @@ def check_is_right(name):
     return False
 
 
-def broken_paired_reader(screed_iter, min_length=None, force_single=False):
+def broken_paired_reader(screed_iter, min_length=None,
+                         force_single=False, require_paired=False):
     """Read pairs from a stream.
 
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
@@ -117,6 +119,9 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     prev_record = None
     n = 0
 
+    if force_single and require_paired:
+        raise ValueError("force_single and require_paired cannot both be set!")
+
     # handle the majority of the stream.
     for record in screed_iter:
         # ignore short reads
@@ -130,6 +135,9 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
                 n += 2
                 record = None
             else:                                   # orphan.
+                if require_paired:
+                    raise ValueError("Unpaired reads when require_paired"
+                                     " is set!")
                 yield n, False, prev_record, None
                 n += 1
 
@@ -138,21 +146,27 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
 
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
+        if require_paired:
+            raise ValueError("Unpaired reads when require_paired is set!")
         yield n, False, prev_record, None
 
 
 def write_record(record, fileobj):
     """Write sequence record to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(record, 'quality'):
-        fileobj.write(
-            '@{name}\n{seq}\n'
-            '+\n{qual}\n'.format(name=record.name,
-                                 seq=record.sequence,
-                                 qual=record.quality))
+        recstr = '@{name}\n{sequence}\n+\n{quality}\n'.format(
+            name=record.name,
+            sequence=record.sequence,
+            quality=record.quality)
     else:
-        fileobj.write(
-            '>{name}\n{seq}\n'.format(name=record.name,
-                                      seq=record.sequence))
+        recstr = '>{name}\n{sequence}\n'.format(
+            name=record.name,
+            sequence=record.sequence)
+
+    try:
+        fileobj.write(bytes(recstr, 'utf-8'))
+    except TypeError:
+        fileobj.write(recstr)
 
 
 def write_record_pair(read1, read2, fileobj):

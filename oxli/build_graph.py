@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,6 +13,8 @@ Build a graph from the given sequences, save in <ptname>.
 
 Use '-h' for parameter help.
 """
+
+from __future__ import print_function, absolute_import, unicode_literals
 
 import sys
 
@@ -52,28 +54,29 @@ def main(args):
     check_space_for_hashtable(
         (float(args.n_tables * args.min_tablesize) / 8.), args.force)
 
-    print >>sys.stderr, 'Saving k-mer presence table to %s' % base
-    print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
+    print('Saving k-mer presence table to %s' % base, file=sys.stderr)
+    print('Loading kmers from sequences in %s' %
+          repr(filenames), file=sys.stderr)
     if args.no_build_tagset:
-        print >>sys.stderr, 'We WILL NOT build the tagset.'
+        print('We WILL NOT build the tagset.', file=sys.stderr)
     else:
-        print >>sys.stderr, 'We WILL build the tagset', \
-                            ' (for partitioning/traversal).'
+        print('We WILL build the tagset (for partitioning/traversal).',
+              file=sys.stderr)
 
-    print >>sys.stderr, 'making k-mer presence table'
+    print('making k-mer presence table', file=sys.stderr)
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
     functions.build_graph(filenames, htable, args.threads,
                           not args.no_build_tagset)
 
-    print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-        htable.n_unique_kmers())
+    print('Total number of unique k-mers: {0}'.format(htable.n_unique_kmers()),
+          file=sys.stderr)
 
-    print >>sys.stderr, 'saving k-mer presence table in', base + '.pt'
+    print('saving k-mer presence table in', base + '.pt', file=sys.stderr)
     htable.save(base + '.pt')
 
     if not args.no_build_tagset:
-        print >>sys.stderr, 'saving tagset in', base + '.tagset'
+        print('saving tagset in', base + '.tagset', file=sys.stderr)
         htable.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
@@ -83,12 +86,14 @@ def main(args):
         khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
     # 0.18 is ACTUAL MAX. Do not change.
 
-    print >>sys.stderr, 'false positive rate estimated to be %1.3f' % fp_rate
-    print >>info_fp, '\nfalse positive rate estimated to be %1.3f' % fp_rate
+    print('false positive rate estimated to be %1.3f' % fp_rate,
+          file=sys.stderr)
+    print('\nfalse positive rate estimated to be %1.3f' % fp_rate,
+          file=info_fp)
 
-    print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
+    print('wrote to', base + '.info and', base + '.pt', file=sys.stderr)
     if not args.no_build_tagset:
-        print >> sys.stderr, 'and ' + base + '.tagset'
+        print('and ' + base + '.tagset', file=sys.stderr)
 
     sys.exit(0)
 

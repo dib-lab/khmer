@@ -1,10 +1,12 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import division
+from __future__ import print_function
 import sys
 import khmer
 import screed
@@ -59,9 +61,9 @@ def main():
             present2 = False
 
         if present1 and not present2:
-            print >>uniq1, '>%s\n%s' % (record.name, record.sequence)
+            print('>%s\n%s' % (record.name, record.sequence), file=uniq1)
         elif present2 and not present1:
-            print >>uniq2, '>%s\n%s' % (record.name, record.sequence)
+            print('>%s\n%s' % (record.name, record.sequence), file=uniq2)
 
 
 if __name__ == '__main__':

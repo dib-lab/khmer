@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -11,6 +11,7 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 
 % python scripts/make-initial-stoptags.py <base>
 """
+from __future__ import print_function
 
 import sys
 import textwrap
@@ -83,15 +84,15 @@ def main():
 
     check_space(infiles, args.force)
 
-    print >>sys.stderr, 'loading htable %s.pt' % graphbase
+    print('loading htable %s.pt' % graphbase, file=sys.stderr)
     htable = khmer.load_hashbits(graphbase + '.pt')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
-        print >>sys.stderr, 'loading stoptags from', args.stoptags
+        print('loading stoptags from', args.stoptags, file=sys.stderr)
         htable.load_stop_tags(args.stoptags)
 
-    print >>sys.stderr, 'loading tagset %s.tagset...' % graphbase
+    print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
     htable.load_tagset(graphbase + '.tagset')
 
     ksize = htable.ksize()
@@ -108,19 +109,19 @@ def main():
         start, end = divvy[:2]
 
     # partition!
-    print >>sys.stderr, 'doing pre-partitioning from', start, 'to', end
+    print('doing pre-partitioning from', start, 'to', end, file=sys.stderr)
     subset = htable.do_subset_partition(start, end)
 
     # now, repartition...
-    print >>sys.stderr, 'repartitioning to find HCKs.'
+    print('repartitioning to find HCKs.', file=sys.stderr)
     htable.repartition_largest_partition(subset, counting,
                                          EXCURSION_DISTANCE,
                                          EXCURSION_KMER_THRESHOLD,
                                          EXCURSION_KMER_COUNT_THRESHOLD)
 
-    print >>sys.stderr, 'saving stop tags'
+    print('saving stop tags', file=sys.stderr)
     htable.save_stop_tags(graphbase + '.stoptags')
-    print >> sys.stderr, 'wrote to:', graphbase + '.stoptags'
+    print('wrote to:', graphbase + '.stoptags', file=sys.stderr)
 
 if __name__ == '__main__':
     main()
