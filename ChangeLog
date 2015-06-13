@@ -1,3 +1,8 @@
+2015-06-13  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/dev/release.rst: remove false positive from version check
+   * tests/test_{counting_hash,scripts}.py: remove scriptpath no-op method
+
 2015-06-12  Luiz Irber  <khmer@luizirber.org>
 
    * setup.py: revert changes to zlib compilation.
