@@ -180,7 +180,6 @@ def main():
     print('DONE.', file=sys.stderr)
     print('wrote to:', base + '.info', file=sys.stderr)
 
-
 if __name__ == '__main__':
     main()
 
