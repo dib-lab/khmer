@@ -72,12 +72,12 @@ def main():
         args.input_counting_table_filename)
 
     if not counting_hash.get_use_bigcount() and args.bigcount:
-        print("""WARNING: The loaded graph has bigcount DISABLED while bigcount
-              reporting is ENABLED--This can cause unknown behaviour.""", 
-              file=sys.stderr) 
-        
+        print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
+              " reporting is ENABLED--This can cause unknown behaviour.",
+              file=sys.stderr)
+
     counting_hash.set_use_bigcount(args.bigcount)
-    
+
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
     tracking = khmer._Hashbits(  # pylint: disable=protected-access

@@ -92,7 +92,7 @@ def main():
     print('Saving k-mer counting table to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(filenames), file=sys.stderr)
-    
+
     # clobber the '.info' file now, as we always open in append mode below
     if os.path.exists(base + '.info'):
         os.remove(base + '.info')

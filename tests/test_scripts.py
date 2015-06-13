@@ -72,10 +72,11 @@ def test_load_into_counting_abundance_dist_nobig():
     assert os.path.exists(outfile)
 
     htfile = outfile
+    outfile = utils.get_temp_filename('out')
     script = scriptpath('abundance-dist.py')
-    args = ['-z', htfile, infile, 'dist']
+    args = ['-z', htfile, infile, outfile]
     (status, out, err) = utils.runscript(script, args)
-    assert 'WARNNG: ' in err, err
+    assert 'WARNING: The loaded graph has bigcount' in err, err
     assert 'bigcount' in err, err
 
 
