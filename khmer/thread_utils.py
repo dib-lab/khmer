@@ -10,10 +10,16 @@
 from __future__ import print_function, unicode_literals
 
 import threading
-import queue
 import sys
 import screed
 from khmer import utils
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
 DEFAULT_WORKER_THREADS = 8
 DEFAULT_GROUPSIZE = 100
 

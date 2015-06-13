@@ -18,7 +18,6 @@ from __future__ import print_function
 import khmer
 import sys
 import threading
-import queue
 import gc
 import os.path
 import os
@@ -29,6 +28,12 @@ import glob
 from khmer.kfile import check_input_files, check_space
 import re
 import platform
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
