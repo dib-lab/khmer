@@ -23,7 +23,7 @@ import imp
 from . import khmer_tst_utils as utils
 import khmer
 import screed
-from test_scripts import _make_counting
+from .test_scripts import _make_counting
 
 
 def scriptpath(script):
