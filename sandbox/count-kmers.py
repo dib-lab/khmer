@@ -39,8 +39,6 @@ def get_parser():
                         dest='output_file',
                         type=argparse.FileType('w'),
                         default=None, help='output counts to this file')
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers to stderr")
 
     return parser
 
@@ -72,9 +70,8 @@ def main():
                     tracking.count(kmer)
                     writer.writerow([kmer, str(counting_hash.get(kmer))])
 
-    if args.report_total_kmers:
-        print ('Total number of unique k-mers: {0}'.format(
-            counting_hash.n_unique_kmers()), file=sys.stderr)
+    print ('Total number of unique k-mers: {0}'.format(
+        counting_hash.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':

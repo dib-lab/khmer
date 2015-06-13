@@ -1,8 +1,4 @@
-2015-05-09  Titus Brown  <titus@idyll.org>
-
-2015-05-09  Titus Brown  <titus@idyll.org>
-
-2015-05-09  Titus Brown  <titus@idyll.org>
+2015-07-05  Titus Brown  <titus@idyll.org>
 
    * sandbox/{count-kmers.py,count-kmers-single.py}: added scripts to output
    k-mer counts.
