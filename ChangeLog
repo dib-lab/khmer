@@ -1,3 +1,9 @@
+2015-06-14  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.cc: Fix infinite loop in gzipped CountingHash I/O
+   * tests/test_counting_hash.py: Add test of large CountingHash I/O
+   * setup.cfg: Skip tests with the 'huge' label by default
+
 2015-06-13  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * Makefile, build-jenkins.sh: unify sphinx dependencies

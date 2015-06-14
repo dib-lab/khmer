@@ -27,7 +27,7 @@ def teardown():
     utils.cleanup()
 
 
-@attr('linux')
+@attr('huge')
 def test_toobig():
     try:
         pt = khmer.Hashbits(32, 1e13, 1)

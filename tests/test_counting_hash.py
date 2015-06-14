@@ -142,7 +142,7 @@ def test_get_raw_tables_view():
         assert sum(tab.tolist()) == 1
 
 
-@attr('linux')
+@attr('huge')
 def test_toobig():
     try:
         ct = khmer.new_counting_hash(30, 1e13, 1)
@@ -566,6 +566,29 @@ def test_get_kmers():
 
     kmers = hi.get_kmers("AAAAAAT")
     assert kmers == ["AAAAAA", "AAAAAT"]
+
+
+@attr("huge")
+def test_save_load_large():
+    def do_test(ctfile):
+        inpath = utils.get_test_data('random-20-a.fa')
+        savepath = utils.get_temp_filename(ctfile)
+
+        sizes = khmer.get_n_primes_above_x(1, 2**31)
+
+        orig = khmer.CountingHash(12, sizes)
+        orig.consume_fasta(inpath)
+        orig.save(savepath)
+
+        loaded = khmer.load_counting_hash(savepath)
+
+        orig_count = orig.n_occupied()
+        loaded_count = loaded.n_occupied()
+        assert orig_count == 3966, orig_count
+        assert loaded_count == orig_count, loaded_count
+
+    for ctfile in ['temp.ct.gz', 'temp.ct']:
+        do_test(ctfile)
 
 
 def test_save_load():

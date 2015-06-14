@@ -72,7 +72,7 @@ def test_load_into_counting_nonwritable():
     assert status == 1, status
 
 
-@attr('linux')
+@attr('huge')
 def test_load_into_counting_toobig():
     script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
