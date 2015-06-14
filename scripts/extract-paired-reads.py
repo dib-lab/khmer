@@ -64,8 +64,7 @@ def get_parser():
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
 
-    parser.add_argument('-o', '--output-dir',
-                        dest='output_directory', default='', help='Output '
+    parser.add_argument('-o', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
 
