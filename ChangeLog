@@ -1,9 +1,5 @@
 2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
-2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
-
-2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
-
    * khmer/__init__.py,lib/{counting,hashbits,hashtable,subset}.cc,
    lib/khmer.hh: add signature to beginning of all binary file types
    * tests/test-data/normC20k20.ct: update to new format by prepending
