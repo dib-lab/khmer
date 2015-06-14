@@ -94,11 +94,11 @@ def main():
             print("Accepting input from stdin; output filenames must be "
                   "provided.", file=sys.stderr)
             sys.exit(1)
-    elif args.output_directory:
-        if not os.path.exists(args.output_directory):
-            os.makedirs(args.output_directory)
-        out1 = args.output_directory + '/' + os.path.basename(infile) + '.se'
-        out2 = args.output_directory + '/' + os.path.basename(infile) + '.pe'
+    elif args.output_dir:
+        if not os.path.exists(args.output_dir):
+            os.makedirs(args.output_dir)
+        out1 = args.output_dir + '/' + os.path.basename(infile) + '.se'
+        out2 = args.output_dir + '/' + os.path.basename(infile) + '.pe'
         single_fp = open(out1, 'w')
         paired_fp = open(out2, 'w')
     else:
