@@ -688,10 +688,9 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
         if (check_and_normalize_read(seq)) {	// process?
             KmerIterator kmers(seq.c_str(), _ksize);
 
-            HashIntoType kmer = 0;
             bool is_first_kmer = true;
             while (!kmers.done()) {
-                kmer = kmers.next();
+                Kmer kmer = kmers.next();
 
                 if (set_contains(stop_tags, kmer)) {
                     break;
@@ -702,8 +701,7 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 
             if (!is_first_kmer) {	// traverse
                 KmerSet keeper;
-                Kmer node = traverser->build_kmer(kmer);
-                unsigned int n = traverse_from_kmer(node, radius, keeper);
+                unsigned int n = traverse_from_kmer(kmer, radius, keeper);
                 if (n >= big_threshold) {
 #if VERBOSE_REPARTITION
                     std::cout << "lmp: " << n << "; added: " << stop_tags.size() << "\n";
