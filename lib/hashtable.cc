@@ -1232,16 +1232,16 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-unsigned int Hashtable::count_and_transfer_to_stoptags(SeenSet &keeper,
+unsigned int Hashtable::count_and_transfer_to_stoptags(KmerSet &keeper,
         unsigned int threshold,
         CountingHash &counting)
 {
     unsigned int n_inserted = 0;
 
-    SeenSet::const_iterator ti;
+    KmerSet::const_iterator ti;
     for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
         if (counting.get_count(*ti) >= threshold) {
-            stop_tags.insert(*ti);
+            stop_tags.insert((*ti).kmer_u);
             n_inserted++;
         } else {
             counting.count(*ti);

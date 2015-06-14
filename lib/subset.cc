@@ -1681,7 +1681,8 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int n = 0;
     unsigned int count;
     unsigned int n_big = 0;
-    SeenSet keeper;
+    KmerSet keeper;
+    KmerFactory factory(_ht->ksize());
 
     SeenSet::const_iterator si = bigtags.begin();
 
@@ -1694,15 +1695,16 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
 #endif //0
 
-        count = _ht->traverse_from_kmer(*si, distance, keeper);
+        count = _ht->traverse_from_kmer(factory.build_kmer(*si),
+                                        distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
-            SeenSet::const_iterator ti;
+            KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
-                    _ht->stop_tags.insert(*ti);
+                    _ht->stop_tags.insert((*ti).kmer_u);
                 } else {
                     counting.count(*ti);
                 }
@@ -1720,13 +1722,13 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
         keeper.clear();
 
-        if (n % 1000 == 0) {
 #if VERBOSE_REPARTITION
+        if (n % 1000 == 0) {
             std::cout << "found big 'un!  traversed " << n << " tags, " <<
                       n_big << " big; " << bigtags.size() << " total tags; " <<
                       _ht->stop_tags.size() << " stop tags\n";
-#endif // 0
         }
+#endif // 0
     }
 
     // return next_largest;

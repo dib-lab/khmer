@@ -421,11 +421,11 @@ public:
                             unsigned int num_high_todo,
                             CountingHash &counting);
 
-    unsigned int traverse_from_kmer(HashIntoType start,
+    unsigned int traverse_from_kmer(Kmer start,
                                     unsigned int radius,
-                                    SeenSet &keeper) const;
+                                    KmerSet &keeper) const;
 
-    unsigned int count_and_transfer_to_stoptags(SeenSet &keeper,
+    unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
             unsigned int threshold,
             CountingHash &counting);
 
