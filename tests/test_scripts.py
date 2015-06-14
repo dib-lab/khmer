@@ -2244,7 +2244,6 @@ def test_extract_paired_reads_3_output_dir():
 
     # output directory
     out_dir = utils.get_temp_filename('output')
-    os.mkdir(out_dir)
 
     script = 'extract-paired-reads.py'
     args = [infile, '-o', out_dir]
