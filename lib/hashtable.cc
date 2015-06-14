@@ -784,14 +784,14 @@ const
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
 const
 {
-    Kmer node = traverser->build_node(kmer_f, kmer_r);
+    Kmer node = traverser->build_kmer(kmer_f, kmer_r);
     return traverser->degree(node);
 }
 
 unsigned int Hashtable::kmer_degree(const char * kmer_s)
 const
 {
-    Kmer node = traverser->build_node(kmer_s);
+    Kmer node = traverser->build_kmer(kmer_s);
     return traverser->degree(node);
 }
 

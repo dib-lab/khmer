@@ -1305,9 +1305,12 @@ hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
     }
 
     unsigned long long size = 0;
+    // We *could* reach through to hashtable->traverser->build_kmer(..),
+    // but reaching through is bad :)
+    KmerFactory factory(hashtable->ksize());
 
     Py_BEGIN_ALLOW_THREADS
-    Kmer start_kmer = hashtable->traverser->build_node(_kmer);
+    Kmer start_kmer = factory.build_kmer(_kmer);
     KmerSet keeper;
     hashtable->calc_connected_graph_size(start_kmer, size, keeper, max_size,
                                          break_on_circum);

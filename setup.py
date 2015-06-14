@@ -114,7 +114,7 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
-EXTRA_COMPILE_ARGS = ['-O3', ]
+EXTRA_COMPILE_ARGS = ['-O3', '-mmacosx-version-min=10.7', '-std=c++11', '-stdlib=libc++']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':

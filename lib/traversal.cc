@@ -11,10 +11,9 @@
 using namespace khmer;
 using namespace std;
 
-Traverser::Traverser(Hashtable * ht) : graph(ht)
+Traverser::Traverser(Hashtable * ht) : KmerFactory(ht->ksize()), graph(ht)
 {
     bitmask = graph->bitmask;
-    K = graph->ksize();
     rc_left_shift = K * 2 - 2;
 }
 
@@ -23,7 +22,7 @@ Kmer Traverser::get_left(Kmer& node, const char ch)
     HashIntoType kmer_f, kmer_r;
     kmer_f = ((node.kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift);
     kmer_r = (((node.kmer_r) << 2) & bitmask) | (twobit_comp(ch));
-    return build_node(kmer_f, kmer_r);
+    return build_kmer(kmer_f, kmer_r);
 }
 
 
@@ -32,7 +31,7 @@ Kmer Traverser::get_right(Kmer& node, const char ch)
     HashIntoType kmer_f, kmer_r;
     kmer_f = (((node.kmer_f) << 2) & bitmask) | (twobit_repr(ch));
     kmer_r = ((node.kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift);
-    return build_node(kmer_f, kmer_r);
+    return build_kmer(kmer_f, kmer_r);
 }
 
 unsigned int Traverser::traverse_left(Kmer& node,
@@ -112,27 +111,4 @@ unsigned int Traverser::degree_right(Kmer& node)
 unsigned int Traverser::degree(Kmer& node)
 {
     return degree_right(node) + degree_left(node);
-}
-
-Kmer Traverser::build_node(HashIntoType kmer_u) {
-    HashIntoType kmer_f, kmer_r;
-    _hash(_revhash(kmer_u, K).c_str(), K, kmer_f, kmer_r);
-    return Kmer(kmer_f, kmer_r, kmer_u);
-}
-
-Kmer Traverser::build_node(HashIntoType kmer_f, HashIntoType kmer_r) {
-    HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
-    return Kmer(kmer_f, kmer_r, kmer_u);
-}
-
-Kmer Traverser::build_node(std::string kmer) {
-    HashIntoType kmer_f, kmer_r, kmer_u;
-    kmer_u = _hash(kmer.c_str(), K, kmer_f, kmer_r);
-    return Kmer(kmer_f, kmer_r, kmer_u);
-}
-
-Kmer Traverser::build_node(const char * kmer) {
-    HashIntoType kmer_f, kmer_r, kmer_u;
-    kmer_u = _hash(kmer, K, kmer_f, kmer_r);
-    return Kmer(kmer_f, kmer_r, kmer_u);
 }

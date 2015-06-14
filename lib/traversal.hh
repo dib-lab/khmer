@@ -23,13 +23,15 @@ class Kmer;
 typedef std::queue<Kmer> KmerQueue;
 typedef std::set<Kmer> KmerSet;
 
-class Kmer {
+class Kmer
+{
 
 public:
 
     HashIntoType kmer_f, kmer_r, kmer_u;
 
-    Kmer(HashIntoType f, HashIntoType r, HashIntoType u) {
+    Kmer(HashIntoType f, HashIntoType r, HashIntoType u)
+    {
         kmer_f = f;
         kmer_r = r;
         kmer_u = u;
@@ -48,8 +50,54 @@ public:
     }
 };
 
+/*
+ * At first, I had many contructors defined on Kmer itself. However, it quickly
+ * became apparent that this would not work, as the need to pass in a uint8_t
+ * for K made the calls ambiguous for. Then I moved it to Traverser, but that
+ * really felt like I was shoehorning it in. So here we our, with a factory
+ * object. All apologies.
+ */
+class KmerFactory
+{
+protected:
+    unsigned int K;
 
-class Traverser
+public:
+
+    explicit KmerFactory(unsigned int K)
+    {
+        this->K = K;
+    }
+
+    Kmer build_kmer(HashIntoType kmer_u)
+    {
+        HashIntoType kmer_f, kmer_r;
+        _hash(_revhash(kmer_u, K).c_str(), K, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
+    {
+        HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    Kmer build_kmer(std::string kmer_s)
+    {
+        HashIntoType kmer_f, kmer_r, kmer_u;
+        kmer_u = _hash(kmer_s.c_str(), K, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    Kmer build_kmer(const char * kmer_c)
+    {
+        HashIntoType kmer_f, kmer_r, kmer_u;
+        kmer_u = _hash(kmer_c, K, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+};
+
+class Traverser: public KmerFactory
 {
     friend class Hashtable;
 
@@ -61,7 +109,6 @@ protected:
 public:
 
     Hashtable * graph;
-    unsigned int K;
 
     explicit Traverser(Hashtable * ht);
 
@@ -78,12 +125,6 @@ public:
     unsigned int degree_left(Kmer& node);
     unsigned int degree_right(Kmer& node);
     unsigned int degree(Kmer& node);
-
-    Kmer build_node(HashIntoType kmer);
-    Kmer build_node(HashIntoType kmer_f, HashIntoType kmer_r);
-    Kmer build_node(std::string kmer);
-    Kmer build_node(const char * kmer);
-
 };
 
 
