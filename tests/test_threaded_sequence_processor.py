@@ -3,8 +3,13 @@ from khmer.thread_utils import ThreadedSequenceProcessor, SequenceGroup
 from io import StringIO
 from screed.fasta import fasta_iter
 from screed.fastq import fastq_iter
-import queue
 from nose.plugins.attrib import attr
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 
 def load_records(stringio_fp):

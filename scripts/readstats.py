@@ -27,7 +27,7 @@ def get_parser():
     Report number of bases, number of sequences, and average sequence length
     for one or more FASTA/FASTQ files; and report aggregate statistics at end.
 
-    With :option:`-o`/:options:`--output`, the output will be saved to the
+    With :option:`-o`/:option:`--output`, the output will be saved to the
     specified file.
 
     Example::
