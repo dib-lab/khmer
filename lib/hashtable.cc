@@ -726,59 +726,53 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(Kmer node,
+void Hashtable::calc_connected_graph_size(Kmer start,
         unsigned long long& count,
         KmerSet& keeper,
         const unsigned long long threshold,
         bool break_on_circum)
 const
 {
-    const BoundedCounterType val = get_count(node);
+    const BoundedCounterType val = get_count(start);
 
     if (val == 0) {
         return;
     }
 
-    // have we already seen me? don't count; exit.
-    if (set_contains(keeper, node)) {
-        return;
-    }
+    KmerQueue node_q;
+    node_q.push(start);
 
-    // is this in stop_tags?
-    if (set_contains(stop_tags, node.kmer_u)) {
-        return;
-    }
+    // Avoid high-circumference k-mers
+    auto filter = [&] (Kmer& n) { return !(break_on_circum &&
+                                  traverser->degree(n) > 4); };
 
-    // keep track of both seen kmers, and counts.
-    keeper.insert(node);
+    while(!node_q.empty()) {
+      Kmer node = node_q.front();
+      node_q.pop();
 
-    // is this a high-circumference k-mer? if so, don't count it; get outta here!
-    if (break_on_circum && traverser->degree(node) > 4) {
-        return;
-    }
+      // have we already seen me? don't count; exit.
+      if (set_contains(keeper, node)) {
+          continue;
+      }
 
-    count += 1;
+      // is this in stop_tags?
+      if (set_contains(stop_tags, node)) {
+          continue;
+      }
 
-    // are we past the threshold? truncate search.
-    if (threshold && count >= threshold) {
-        return;
-    }
+      // keep track of both seen kmers, and counts.
+      keeper.insert(node);
 
-    // otherwise, explore in all directions.
+      count += 1;
 
-    char bases[] = "ACGT";
-    char * base = bases;
-    while(*base != '\0') {
-        Kmer next_node = traverser->get_right(node, *base);
-        if (get_count(next_node)) {
-            calc_connected_graph_size(next_node, count, keeper, threshold, break_on_circum);
-        }
+      // are we past the threshold? truncate search.
+      if (threshold && count >= threshold) {
+          return;
+      }
 
-        Kmer prev_node = traverser->get_left(node, *base);
-        if (get_count(prev_node)) {
-            calc_connected_graph_size(prev_node, count, keeper, threshold, break_on_circum);
-        }
-        ++base;
+      // otherwise, explore in all directions.
+      traverser->traverse_right(node, node_q, filter);
+      traverser->traverse_left(node, node_q, filter);
     }
 }
 
