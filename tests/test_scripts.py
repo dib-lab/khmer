@@ -2217,6 +2217,76 @@ def test_extract_paired_reads_2_fq():
     assert n > 0
 
 
+def test_extract_paired_reads_3_output_dir():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # output directory
+    out_dir = utils.get_temp_filename('output')
+    os.mkdir(out_dir)
+
+    script = 'extract-paired-reads.py'
+    args = [infile, '-o', out_dir]
+
+    utils.runscript(script, args)
+
+    outfile1 = os.path.join(out_dir, 'paired-mixed.fa.pe')
+    outfile2 = os.path.join(out_dir, 'paired-mixed.fa.se')
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
+def test_extract_paired_reads_4_output_files():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('out_pe')
+    outfile2 = utils.get_temp_filename('out_se')
+
+    script = 'extract-paired-reads.py'
+    args = [infile, '-p', outfile1, '-s', outfile2]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
 def execute_split_paired_streaming(ifilename):
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
