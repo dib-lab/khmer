@@ -38,6 +38,8 @@ public:
         kmer_u = u;
     }
 
+    operator HashIntoType() const { return kmer_u; }
+
     bool operator< (const Kmer &other) const {
         return kmer_u < other.kmer_u;
     }
