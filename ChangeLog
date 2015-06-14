@@ -8,6 +8,11 @@
    * tests/test_scripts.py: added tests for new extract-paired-reads.py
    behavior.
 
+2015-06-14  Titus Brown  <titus@idyll.org>
+
+   * tests/test_counting_hash.py: fixed duplicated test
+   'get_kmer_counts_too_short' by changing to 'get_kmer_hashes_too_short'.
+
 2015-06-14  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/abundance-dist.py: added weird bigcount circumstance detection
