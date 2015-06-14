@@ -154,6 +154,11 @@ public:
         return n;
     }
 
+    virtual void count(Kmer kmer)
+    {
+        count(kmer.kmer_u);
+    }
+
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);

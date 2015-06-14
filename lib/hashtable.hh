@@ -260,6 +260,7 @@ public:
         return _ksize;
     }
 
+    virtual void count(Kmer kmer) = 0;
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
 
