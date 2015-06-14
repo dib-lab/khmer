@@ -216,8 +216,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                                          SETUP_METADATA["packages"])
 
         if "z" not in self.libraries:
-            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' &&  bash ./configure '
-                    '--static && make -f Makefile.pic PIC']
+            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
+                    ' configure || bash ./configure --static ) && make -f '
+                    'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
             self.extensions[0].extra_objects.extend(
                 path_join("third-party", "zlib", bn + ".lo") for bn in [

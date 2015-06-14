@@ -81,6 +81,7 @@ class Normalizer(object):
     """
     Digital normalization algorithm.
     """
+
     def __init__(self, desired_coverage, htable):
         self.htable = htable
         self.desired_coverage = desired_coverage

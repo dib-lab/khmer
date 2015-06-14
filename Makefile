@@ -7,8 +7,8 @@
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
-DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
-autopep8 pylint coverage gcovr nose pep257 future screed
+DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
+	screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -22,7 +22,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
 	TESTATTR='!known_failing,!jenkins'
 else
-	TESTATTR='!known_failing,!jenkins,!linux'
+	TESTATTR='!known_failing,!jenkins,!huge'
 endif
 
 ## all         : default task; compile C++ code, build shared object library
@@ -37,6 +37,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
 sharedobj: khmer/_khmermodule.so

@@ -685,8 +685,15 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
         HashIntoType loaded = 0;
         while (loaded != tablesize) {
-            read_b = gzread(infile, (char *) ht._counts[i],
-                            (unsigned) (tablesize - loaded));
+            unsigned long long  to_read_ll = tablesize - loaded;
+            unsigned int        to_read_int;
+            // Zlib can only read chunks of at most INT_MAX bytes.
+            if (to_read_ll > INT_MAX) {
+                to_read_int = INT_MAX;
+            } else {
+                to_read_int = to_read_ll;
+            }
+            read_b = gzread(infile, (char *) ht._counts[i], to_read_int);
 
             if (read_b <= 0) {
                 std::string gzerr = gzerror(infile, &read_b);
@@ -845,8 +852,38 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
                 sizeof(save_tablesize));
         unsigned long long written = 0;
         while (written != save_tablesize) {
-            written += gzwrite(outfile, (const char *) ht._counts[i],
-                               (int) (save_tablesize - written));
+            unsigned long long  to_write_ll = save_tablesize - written;
+            unsigned int        to_write_int;
+            int                 gz_result;
+            // Zlib can only write chunks of at most INT_MAX bytes.
+            if (to_write_ll > INT_MAX) {
+                to_write_int = INT_MAX;
+            } else {
+                to_write_int = to_write_ll;
+            }
+            gz_result = gzwrite(outfile, (const char *) ht._counts[i],
+                                to_write_int);
+            // Zlib returns 0 on error
+            if (gz_result == 0) {
+                int errcode = 0;
+                const char *err_msg;
+                std::ostringstream msg;
+
+                msg << "gzwrite failed while writing counting hash: ";
+                // Get zlib error
+                err_msg = gzerror(outfile, &errcode);
+                if (errcode != Z_ERRNO) {
+                    // Zlib error, not stdlib
+                    msg << err_msg;
+                    gzclearerr(outfile);
+                } else {
+                    // stdlib error
+                    msg << strerror(errno);
+                }
+                gzclose(outfile);
+                throw khmer_file_exception(msg.str().c_str());
+            }
+            written += gz_result;
         }
     }
 
