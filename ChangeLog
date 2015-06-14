@@ -1,3 +1,8 @@
+2015-06-14  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/abundance-dist.py: added weird bigcount circumstance detection
+   * tests/test_scripts.py: added test for the above
+
 2015-06-14  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/counting.cc: Fix infinite loop in gzipped CountingHash I/O

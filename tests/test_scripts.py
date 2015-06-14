@@ -54,6 +54,28 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_abundance_dist_nobig():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 89' in err, err
+    assert os.path.exists(outfile)
+
+    htfile = outfile
+    outfile = utils.get_temp_filename('out')
+    script2 = 'abundance-dist.py'
+    args = ['-z', htfile, infile, outfile]
+    (status, out, err) = utils.runscript(script2, args)
+    assert 'WARNING: The loaded graph has bigcount' in err, err
+    assert 'bigcount' in err, err
+
+
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
@@ -1810,10 +1832,10 @@ def test_abundance_dist_nobigcount():
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+    htfile = _make_counting(infile, K=17)
 
     script = 'abundance-dist.py'
-    args = ['-z', htfile, infile, outfile]
+    args = ['-b', '-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
