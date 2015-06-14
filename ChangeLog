@@ -1,7 +1,37 @@
-2015-06-13  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-06-14  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/abundance-dist.py: added weird bigcount circumstance detection
    * tests/test_scripts.py: added test for the above
+
+2015-06-14  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/counting.cc: Fix infinite loop in gzipped CountingHash I/O
+   * tests/test_counting_hash.py: Add test of large CountingHash I/O
+   * setup.cfg: Skip tests with the 'huge' label by default
+
+2015-06-13  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * Makefile, build-jenkins.sh: unify sphinx dependencies
+   * scripts/readstats.py: fix typo
+
+2015-06-13  Titus Brown  <titus@idyll.org>
+
+   * doc/dev/getting-started.rst: update instructions for creating a new
+   branch name to preferred practice (fix/brief_issue_description, instead
+   of fix/issuenum).
+
+2015-06-13  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/dev/release.rst: remove false positive from version check
+   * tests/test_{counting_hash,scripts}.py: remove scriptpath no-op method
+
+2015-06-12  Luiz Irber  <khmer@luizirber.org>
+
+   * setup.py: revert changes to zlib compilation.
+   * setup.cfg: nose should stop on first error by default.
+   * Makefile, tests/test_threaded_sequence_processor.py,
+   scripts/{do-partition,partition-graph}.py, khmer/thread_utils.py: Remove
+   dependency on future package.
 
 2015-06-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
