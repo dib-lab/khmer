@@ -60,19 +60,19 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description='Take a mixture of reads and split into pairs and '
         'orphans.', epilog=textwrap.dedent(epilog))
-    parser.add_argument('infile')
+    parser.add_argument('infile', nargs='?', default='/dev/stdin')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
 
-    parser.add_argument('-o', '--output-dir', metavar="output_directory",
+    parser.add_argument('-o', '--output-dir',
                         dest='output_directory', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
 
-    parser.add_argument('-p', '--output-paired', metavar='output_paired',
+    parser.add_argument('-p', '--output-paired',
                         default=None, help='Output paired reads to this '
                         'file', type=argparse.FileType('w'))
-    parser.add_argument('-s', '--output-single', metavar='output_single',
+    parser.add_argument('-s', '--output-single',
                         default=None, help='Output orphaned reads to this '
                         'file', type=argparse.FileType('w'))
 
@@ -90,7 +90,7 @@ def main():
     check_space([infile], args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin':
+    if infile == '/dev/stdin' or infile == '-':
         if not (args.output_paired and args.output_single):
             print("Accepting input from stdin; output filenames must be "
                   "provided.", file=sys.stderr)

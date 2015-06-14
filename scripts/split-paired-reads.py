@@ -98,7 +98,7 @@ def main():
     check_space(filenames, args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin':
+    if infile == '/dev/stdin' or infile == '-':
         if not (args.output_first and args.output_second):
             print >>sys.stderr, ("Accepting input from stdin; "
                                  "output filenames must be provided.")

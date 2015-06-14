@@ -4,7 +4,7 @@
    and --single-output arguments to change output file details; script
    now accepts stdin, and will output to stdout upon request.
    * scripts/split-paired-reads.py: changed script to output to stdout upon
-   request.
+   request; added '-' as stdin input.
    * tests/test_scripts.py: added tests for new extract-paired-reads.py
    behavior.
 
