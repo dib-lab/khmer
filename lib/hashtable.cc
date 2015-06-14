@@ -699,9 +699,9 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
             }
 
             if (!is_first_kmer) {	// traverse
-                SeenSet keeper;
-
-                unsigned int n = traverse_from_kmer(kmer, radius, keeper);
+                KmerSet keeper;
+                Kmer node = traverser->build_kmer(kmer);
+                unsigned int n = traverse_from_kmer(node, radius, keeper);
                 if (n >= big_threshold) {
 #if VERBOSE_REPARTITION
                     std::cout << "lmp: " << n << "; added: " << stop_tags.size() << "\n";

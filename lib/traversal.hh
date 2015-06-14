@@ -9,6 +9,7 @@
 #define TRAVERSAL_HH
 
 #include <queue>
+#include <functional>
 
 #include "khmer.hh"
 
