@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -14,6 +14,7 @@ Output sequences will be placed in 'infile.abundtrim'.
 
 Use -h for parameter help.
 """
+from __future__ import print_function
 import sys
 import screed
 import os
@@ -23,7 +24,7 @@ import shutil
 import textwrap
 import argparse
 
-from screed.screedRecord import _screed_record_dict
+from screed import Record
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
@@ -35,7 +36,7 @@ DEFAULT_CUTOFF = 2
 
 
 def trim_record(read, trim_at):
-    new_read = _screed_record_dict()
+    new_read = Record()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
     if hasattr(read, 'quality'):
@@ -113,8 +114,8 @@ def main():
     ###
 
     if len(set(args.input_filenames)) != len(args.input_filenames):
-        print >>sys.stderr, \
-            "Error: Cannot input the same filename multiple times."
+        print("Error: Cannot input the same filename multiple times.",
+              file=sys.stderr)
         sys.exit(1)
 
     ###
@@ -132,15 +133,16 @@ def main():
     NORMALIZE_LIMIT = args.normalize_to
 
     if args.loadtable:
-        print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
+        print('loading k-mer counting table from',
+              args.loadtable, file=sys.stderr)
         ct = khmer.load_counting_hash(args.loadtable)
     else:
-        print >>sys.stderr, 'making k-mer counting table'
+        print('making k-mer counting table', file=sys.stderr)
         ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print >>sys.stderr, 'created temporary directory %s; ' \
-                        'use -T to change location' % tempdir
+    print('created temporary directory %s; '
+          'use -T to change location' % tempdir, file=sys.stderr)
 
     # ### FIRST PASS ###
 
@@ -173,8 +175,8 @@ def main():
                                            force_single=args.ignore_pairs)
         for n, is_pair, read1, read2 in paired_iter:
             if n % 10000 == 0:
-                print >>sys.stderr, '...', n, filename, save_pass2, \
-                    n_reads, n_bp, written_reads, written_bp
+                print('...', n, filename, save_pass2, n_reads, n_bp,
+                      written_reads, written_bp, file=sys.stderr)
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
@@ -240,8 +242,9 @@ def main():
 
         pass2fp.close()
 
-        print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' \
-            % (filename, save_pass2, n, filename)
+        print('%s: kept aside %d of %d from first pass, in %s' %
+              (filename, save_pass2, n, filename),
+              file=sys.stderr)
         save_pass2_total += save_pass2
 
     # ### SECOND PASS. ###
@@ -249,8 +252,9 @@ def main():
     skipped_n = 0
     skipped_bp = 0
     for _, pass2filename, trimfp in pass2list:
-        print >>sys.stderr, ('second pass: looking at sequences kept aside '
-                             'in %s') % pass2filename
+        print('second pass: looking at sequences kept aside in %s' %
+              pass2filename,
+              file=sys.stderr)
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
@@ -260,8 +264,8 @@ def main():
         for n, read in enumerate(screed.open(pass2filename,
                                              parse_description=False)):
             if n % 10000 == 0:
-                print >>sys.stderr, '... x 2', n, pass2filename, \
-                    written_reads, written_bp
+                print('... x 2', n, pass2filename,
+                      written_reads, written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ct.get_median_count(seq)
@@ -288,42 +292,45 @@ def main():
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
 
-        print >>sys.stderr, 'removing %s' % pass2filename
+        print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
 
-    print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
+    print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
 
     n_passes = 1.0 + (float(save_pass2_total) / n_reads)
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print >>sys.stderr, 'read %d reads, %d bp' % (n_reads, n_bp,)
-    print >>sys.stderr, 'wrote %d reads, %d bp' % (written_reads, written_bp,)
-    print >>sys.stderr, 'looked at %d reads twice (%.2f passes)' % \
-        (save_pass2_total, n_passes)
-    print >>sys.stderr, 'removed %d reads and trimmed %d reads (%.2f%%)' % \
-        (n_reads - written_reads, trimmed_reads, percent_reads_trimmed)
-    print >>sys.stderr, 'trimmed or removed %.2f%% of bases (%d total)' % \
-        ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp)
+    print('read %d reads, %d bp' % (n_reads, n_bp,))
+    print('wrote %d reads, %d bp' % (written_reads, written_bp,))
+    print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
+                                                      n_passes))
+    print('removed %d reads and trimmed %d reads (%.2f%%)' %
+          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed))
+    print('trimmed or removed %.2f%% of bases (%d total)' %
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print >>sys.stderr, '%d reads were high coverage (%.2f%%);' % \
-            (n_reads - skipped_n, percent_reads_hicov)
-        print >>sys.stderr, ('skipped %d reads/%d bases because of low'
-                             'coverage') % (skipped_n, skipped_bp)
+        print('%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
+                                                         percent_reads_hicov),
+              file=sys.stderr)
+        print('skipped %d reads/%d bases because of low coverage' %
+              (skipped_n, skipped_bp),
+              file=sys.stderr)
 
     fp_rate = \
         khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
-    print >>sys.stderr, \
-        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
+          file=sys.stderr)
 
-    print >>sys.stderr, 'output in *.abundtrim'
+    print('output in *.abundtrim', file=sys.stderr)
 
     if args.savetable:
-        print >>sys.stderr, "Saving k-mer counting table to", args.savetable
+        print("Saving k-mer counting table to",
+              args.savetable, file=sys.stderr)
         ct.save(args.savetable)
 
 

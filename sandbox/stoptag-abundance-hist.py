@@ -1,10 +1,11 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+from __future__ import print_function
 import sys
 import khmer
 import os
@@ -33,7 +34,7 @@ def main():
         d[count] = d.get(count, 0) + 1
 
         if count > 1000:
-            print >>outabund, sequence, count
+            print(sequence, count, file=outabund)
 
     outfp = open(figure + '.countshist', 'w')
     sofar = 0
@@ -41,7 +42,7 @@ def main():
     for k in sorted(d.keys()):
         sofar += d[k]
         sofar_cumu += k * d[k]
-        print >>outfp, k, d[k], sofar, sofar_cumu
+        print(k, d[k], sofar, sofar_cumu, file=outfp)
 
     hist(counts, normed=True, cumulative=True, bins=100, range=(1, 1000))
     savefig(figure)

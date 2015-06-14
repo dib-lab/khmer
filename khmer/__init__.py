@@ -6,6 +6,8 @@
 #
 """This is khmer; please see http://khmer.readthedocs.org/."""
 
+from __future__ import print_function
+
 from khmer._khmer import CountingHash
 from khmer._khmer import LabelHash as _LabelHash
 from khmer._khmer import Hashbits as _Hashbits
@@ -179,12 +181,14 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     fp_all = fp_one ** n_ht
 
     if fp_all > max_false_pos:
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the graph structure is too small for "
-        print >>sys.stderr, "this data set.  Increase k-mer presence table "
-        print >>sys.stderr, "size/num of tables."
-        print >>sys.stderr, "** Do not use these results!!"
-        print >>sys.stderr, "**"
+        print("**", file=sys.stderr)
+        print(
+            "** ERROR: the graph structure is too small for ", file=sys.stderr)
+        print(
+            "this data set.  Increase k-mer presence table ", file=sys.stderr)
+        print("size/num of tables.", file=sys.stderr)
+        print("** Do not use these results!!", file=sys.stderr)
+        print("**", file=sys.stderr)
         if not force:
             sys.exit(1)
 

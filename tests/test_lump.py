@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -8,7 +9,7 @@
 import khmer
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
@@ -138,7 +139,7 @@ def test_fakelump_load_stop_tags_trunc():
                                      EXCURSION_KMER_COUNT_THRESHOLD)
 
     ht.save_stop_tags(fakelump_fa_foo)
-    data = open(fakelump_fa_foo).read()
+    data = open(fakelump_fa_foo, 'rb').read()
 
     fp = open(fakelump_fa_foo, 'wb')
     fp.write(data[:10])
