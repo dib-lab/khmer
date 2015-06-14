@@ -114,12 +114,13 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-stdlib=libc++']
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7'])
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
+                               '-stdlib=libc++'])
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
