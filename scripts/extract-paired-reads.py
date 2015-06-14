@@ -31,15 +31,29 @@ from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
 def get_parser():
     epilog = """
-    The output is two files, <input file>.pe and <input file>.se, placed in the
-    current directory. The .pe file contains interleaved and properly paired
-    sequences, while the .se file contains orphan sequences.
+    Separate properly interleaved reads from orphaned reads.
 
-    Many assemblers (e.g. Velvet) require that you give them either perfectly
-    interleaved files, or files containing only single reads. This script takes
-    files that were originally interleaved but where reads may have been
-    orphaned via error filtering, application of abundance filtering, digital
-    normalization in non-paired mode, or partitioning.
+    Many read-handling programs (assemblers, mappers, etc.) require
+    that you give them either perfectly interleaved files, or files
+    containing only single reads. This script takes files that were
+    originally interleaved but where reads may have been orphaned (via
+    error filtering, application of abundance filtering, digital
+    normalization in non-paired mode, or partitioning) and separates
+    the interleaved reads from the orphaned reads.
+
+    The default output is two files, <input file>.pe and <input
+    file>.se, placed in the current directory. The .pe file contains
+    interleaved and properly paired sequences, while the .se file
+    contains orphan sequences.
+
+    The directory into which the interleaved and orphaned reads are
+    output may be specified using :option:`-o`/:option:`--output-dir`.
+    This directory will be created if it does not already exist.
+
+    Alternatively, you can specify the filenames directly with
+    :option:`-p`/:option:`--output-paired` and
+    :option:`-s`/:option:`--output-single`, which will override the
+    :option:`-o`/:option:`--output-dir` option.
 
     Example::
 
@@ -59,10 +73,10 @@ def get_parser():
 
     parser.add_argument('-p', '--output-paired', metavar='output_paired',
                         default=None, help='Output paired reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-s', '--output-single', metavar='output_single',
                         default=None, help='Output orphaned reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
 
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
@@ -80,26 +94,29 @@ def main():
     # decide where to put output files - specific directory? or just default?
     if infile == '/dev/stdin':
         if not (args.output_paired and args.output_single):
-            print >>sys.stderr, ("Accepting input from stdin; "
-                                 "output filenames must be provided.")
+            print("Accepting input from stdin; output filenames must be "
+                  "provided.", file=sys.stderr)
             sys.exit(1)
     elif args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
         out1 = args.output_directory + '/' + os.path.basename(infile) + '.se'
         out2 = args.output_directory + '/' + os.path.basename(infile) + '.pe'
+        single_fp = open(out1, 'w')
+        paired_fp = open(out2, 'w')
     else:
         out1 = os.path.basename(infile) + '.se'
         out2 = os.path.basename(infile) + '.pe'
+        single_fp = open(out1, 'w')
+        paired_fp = open(out2, 'w')
 
-    # OVERRIDE output file locations with -p, -s
+    # OVERRIDE default output file locations with -p, -s
     if args.output_paired:
-        out2 = args.output_paired
+        paired_fp = args.output_paired
+        out2 = paired_fp.name
     if args.output_single:
-        out1 = args.output_single
-
-    single_fp = open(out1, 'w')
-    paired_fp = open(out2, 'w')
+        single_fp = args.output_single
+        out1 = single_fp.name
 
     print('reading file "%s"' % infile, file=sys.stderr)
     print('outputting interleaved pairs to "%s"' % out2, file=sys.stderr)
