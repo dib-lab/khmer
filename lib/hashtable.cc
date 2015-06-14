@@ -1002,7 +1002,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     unsigned int i = 0;
     unsigned int n = 0;
     unsigned int n_big = 0;
-    SeenSet keeper;
+    KmerSet keeper;
 
 #if VERBOSE_REPARTITION
     std::cout << all_tags.size() << " tags...\n";
@@ -1010,16 +1010,18 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 
     for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
             ++si, i++) {
+
         n++;
-        unsigned int count = traverse_from_kmer(*si, distance, keeper);
+        Kmer tag = traverser->build_kmer(*si);
+        unsigned int count = traverse_from_kmer(tag, distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
-            SeenSet::const_iterator ti;
+            KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
-                    stop_tags.insert(*ti);
+                    stop_tags.insert((*ti).kmer_u);
                 } else {
                     counting.count(*ti);
                 }
@@ -1040,35 +1042,28 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     }
 }
 
-unsigned int Hashtable::traverse_from_kmer(HashIntoType start,
+unsigned int Hashtable::traverse_from_kmer(Kmer start,
         unsigned int radius,
-        SeenSet &keeper)
+        KmerSet &keeper)
 const
 {
-    std::string kmer_s = _revhash(start, _ksize);
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
-    HashIntoType f, r;
-    NodeQueue node_q;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
     bool is_first_kmer = true;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    // start breadth-first search.
+    auto filter = [&] (Kmer& n) { return !set_contains(keeper, n); };
 
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
@@ -1080,23 +1075,17 @@ const
             break;
         }
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
+        if (set_contains(keeper, node)) {
             continue;
         }
 
-        if (set_contains(stop_tags, kmer)) {
+        if (set_contains(stop_tags, node.kmer_u)) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
-
-        // QUESTION: Huh? What's up with the following?
-        if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
-            continue;
-        }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
             throw khmer_exception();
@@ -1105,78 +1094,12 @@ const
             cur_breadth = breadth;
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
+        nfound = traverser->traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        //r = next_r(kmer_r, 'A');
+        nfound = traverser->traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
 
         is_first_kmer = false;
     }
