@@ -190,7 +190,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), graph->_ksize);
+    KmerIterator kmers(seq.c_str(), graph->_ksize);
     HashIntoType kmer;
 
     unsigned int since = graph->_tag_density / 2 + 1;

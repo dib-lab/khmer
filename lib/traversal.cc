@@ -14,7 +14,7 @@ using namespace std;
 Traverser::Traverser(Hashtable * ht) : KmerFactory(ht->ksize()), graph(ht)
 {
     bitmask = graph->bitmask;
-    rc_left_shift = K * 2 - 2;
+    rc_left_shift = ksize * 2 - 2;
 }
 
 Kmer Traverser::get_left(Kmer& node, const char ch)

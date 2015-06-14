@@ -598,7 +598,7 @@ unsigned int SubsetPartition::sweep_for_tags(
     // start breadth-first search.
 
     HashIntoType kmer_f, kmer_r;
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
+    KmerIterator kmers(seq.c_str(), _ht->ksize());
     std::string kmer_s;
 
     // Queue up all the sequence's k-mers at breadth zero
@@ -1508,7 +1508,7 @@ bool SubsetPartition::is_single_partition(std::string seq)
     PartitionSet partitions;
     PartitionID *pp;
 
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
+    KmerIterator kmers(seq.c_str(), _ht->ksize());
     while (!kmers.done()) {
         HashIntoType kmer = kmers.next();
 
@@ -1531,7 +1531,7 @@ void SubsetPartition::join_partitions_by_path(std::string seq)
 {
     SeenSet tagged_kmers;
 
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
+    KmerIterator kmers(seq.c_str(), _ht->ksize());
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();

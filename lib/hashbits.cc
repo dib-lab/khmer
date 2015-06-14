@@ -241,7 +241,7 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    KMerIterator kmers(sp, _ksize);
+    KmerIterator kmers(sp, _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();

@@ -120,6 +120,10 @@ void deallocate_ptr_set(T& s)
     }
 }
 
+class Kmer;
+typedef std::queue<Kmer> KmerQueue;
+typedef std::set<Kmer> KmerSet;
+
 }
 
 #endif // KHMER_HH

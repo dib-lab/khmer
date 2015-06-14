@@ -1064,7 +1064,7 @@ hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
     std::vector<HashIntoType> tags;
 
     unsigned int pos = 1;
-    KMerIterator kmers(seq, hashtable->ksize());
+    KmerIterator kmers(seq, hashtable->ksize());
 
     while (!kmers.done()) {
         HashIntoType kmer = kmers.next();

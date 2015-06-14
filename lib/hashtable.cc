@@ -172,7 +172,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    KMerIterator kmers(sp, _ksize);
+    KmerIterator kmers(sp, _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -224,7 +224,7 @@ void Hashtable::get_median_count(const std::string &s,
 bool Hashtable::median_at_least(const std::string &s,
                                 unsigned int cutoff)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
 
@@ -369,7 +369,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 {
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
     HashIntoType kmer;
 
     unsigned int since = _tag_density / 2 + 1;
@@ -523,7 +523,7 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
         if (check_and_normalize_read(seq)) {	// process?
             bool is_new_kmer;
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             HashIntoType kmer, last_kmer;
             bool is_first_kmer = true;
@@ -686,7 +686,7 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {	// process?
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             HashIntoType kmer = 0;
             bool is_first_kmer = true;
@@ -816,7 +816,7 @@ void Hashtable::filter_if_present(const std::string &infilename,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
             bool keep = true;
 
             while (!kmers.done()) {
@@ -982,7 +982,7 @@ size_t Hashtable::trim_on_stoptags(std::string seq) const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     size_t i = _ksize - 2;
     while (!kmers.done()) {
@@ -1261,7 +1261,7 @@ const
         return;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     unsigned int i = 0;
     while(!kmers.done()) {
@@ -1289,7 +1289,7 @@ void Hashtable::extract_unique_paths(std::string seq,
 
     min_length = min_length - _ksize + 1; // adjust for k-mer size.
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     std::deque<bool> seen_queue;
     unsigned int n_already_seen = 0;
@@ -1389,7 +1389,7 @@ void Hashtable::get_kmers(const std::string &s,
 void Hashtable::get_kmer_hashes(const std::string &s,
                                 std::vector<HashIntoType> &kmers_vec) const
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -1401,7 +1401,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
