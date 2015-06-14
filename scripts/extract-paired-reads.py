@@ -31,8 +31,6 @@ from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
 def get_parser():
     epilog = """
-    Separate properly interleaved reads from orphaned reads.
-
     Many read-handling programs (assemblers, mappers, etc.) require
     that you give them either perfectly interleaved files, or files
     containing only single reads. This script takes files that were
