@@ -2304,6 +2304,15 @@ def test_extract_paired_reads_4_output_files():
     assert n > 0
 
 
+def test_extract_paired_reads_5_stdin_error():
+    script = 'extract-paired-reads.py'
+    args = ['-f', '/dev/stdin']
+
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+    assert "output filenames must be provided." in err
+
+
 def execute_extract_paired_streaming(ifilename):
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
