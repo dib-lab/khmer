@@ -73,7 +73,8 @@ def main():
 
     if not counting_hash.get_use_bigcount() and args.bigcount:
         print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
-              " reporting is ENABLED--This can cause unknown behaviour.",
+              " reporting is ENABLED--counts higher than 255 will not be "
+              "reported.",
               file=sys.stderr)
 
     counting_hash.set_use_bigcount(args.bigcount)
