@@ -468,12 +468,12 @@ def test_get_kmer_counts_too_short():
     assert len(counts) == 0
 
 
-def test_get_kmer_counts_too_short():
+def test_get_kmer_hashes_too_short():
     hi = khmer.new_counting_hash(6, 1e6, 2)
 
     hi.consume("AAAAAA")
-    counts = hi.get_kmer_counts("A")
-    assert len(counts) == 0
+    hashes = hi.get_kmer_hashes("A")
+    assert len(hashes) == 0
 
 
 def test_get_kmers_too_short():
