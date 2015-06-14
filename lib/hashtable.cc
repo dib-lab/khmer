@@ -689,8 +689,9 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
             KmerIterator kmers(seq.c_str(), _ksize);
 
             bool is_first_kmer = true;
+            Kmer kmer(0,0,0);
             while (!kmers.done()) {
-                Kmer kmer = kmers.next();
+                kmer = kmers.next();
 
                 if (set_contains(stop_tags, kmer)) {
                     break;
