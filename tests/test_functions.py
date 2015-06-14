@@ -7,10 +7,10 @@ from __future__ import absolute_import
 # Contact: khmer-project@idyll.org
 #
 import khmer
-from nose.plugins.attrib import attr
 import os
-from . import khmer_tst_utils as utils
+import sys
 import collections
+from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
 from khmer.kfile import check_input_files
@@ -78,13 +78,25 @@ def test_get_primes():
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
 
+def test_extract_countinghash_info_badfile():
+    try:
+        khmer.extract_countinghash_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
+
+
 def test_extract_countinghash_info():
     fn = utils.get_temp_filename('test_extract_counting.ct')
     for size in [1e6, 2e6, 5e6, 1e7]:
         ht = khmer.new_counting_hash(25, size, 4)
         ht.save(fn)
 
-        info = khmer.extract_countinghash_info(fn)
+        try:
+            info = khmer.extract_countinghash_info(fn)
+        except ValueError as err:
+            assert 0, 'Should not throw a ValueErorr: ' + str(err)
         ksize, table_size, n_tables, _, _, _ = info
         print(ksize, table_size, n_tables)
 
@@ -94,8 +106,17 @@ def test_extract_countinghash_info():
 
         try:
             os.remove(fn)
-        except OSError as e:
-            print('...failed to remove {fn}'.format(fn), file=sys.stder)
+        except OSError as err:
+            assert 0, '...failed to remove ' + fn + str(err)
+
+
+def test_extract_hashbits_info_badfile():
+    try:
+        khmer.extract_hashbits_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
 
 
 def test_extract_hashbits_info():
@@ -114,8 +135,9 @@ def test_extract_hashbits_info():
 
         try:
             os.remove(fn)
-        except OSError as e:
-            print('...failed to remove {fn}'.format(fn), file=sys.stderr)
+        except OSError as err:
+            print('...failed to remove {fn}'.format(fn) + str(err),
+                  file=sys.stderr)
 
 
 def test_check_file_status_kfile():
@@ -132,7 +154,7 @@ def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     try:
         check_input_files(fn, True)
-    except OSError as e:
+    except OSError:
         assert False
 
 

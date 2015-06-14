@@ -262,6 +262,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -313,15 +314,23 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
+    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
     HashIntoType * buf = NULL;
 
     try {
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading tagset from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading tagset from " << infilename
@@ -1287,14 +1296,22 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
+    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
 
     try {
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading stoptags from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading stoptags from " << infilename
@@ -1337,6 +1354,7 @@ void Hashtable::save_stop_tags(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 

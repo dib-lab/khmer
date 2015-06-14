@@ -52,6 +52,7 @@ Contents:
    introduction
    contributors
    citations
+   whats-new-2.0
    release-notes/index
    user/index
    dev/index
