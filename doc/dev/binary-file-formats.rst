@@ -59,8 +59,21 @@ Then follows the Countgraph's tables. For each table:
 Field               Len   Off     Value
 ================== ===== ===== ==============================================
 Table size          8       0   Length of this table. (``uint64_t``)
-Bins                N       8   This table's bins, length given by previous field. (``uint8_t``)
+Bins                N       8   This table's bins, length given by previous
+                                field. (``uint8_t``)
 ================== ===== ===== ==============================================
+
+Then follows a single value, the (``uint64_t``) number of ``kmer: count``
+pairs. Then follows the Bigcount map, if this number is greater than zero. For
+each kmer:
+
+================== ===== ===== ==============================================
+Field               Len   Off     Value
+================== ===== ===== ==============================================
+Kmer                8       0   Kmer's hash (``HashIntoType/uint64_t``).
+Count               2       8   Kmer's count (``uint16_t``).
+================== ===== ===== ==============================================
+
 
 Nodegraph
 ---------
@@ -87,8 +100,9 @@ Then follows the Nodegraph's tables. For each table:
 ================== ======= ===== ==============================================
 Field               Len     Off     Value
 ================== ======= ===== ==============================================
-Table size          8         0   Length of table, **in bits**. (``uint64_t``)
-Bins                N/8+1     8   This table's bytes, length given by previous field, divided by 8, plus 1. (``uint8_t``)
+Table size          8         0   Length of table, **in bits** (``uint64_t``).
+Bins                N/8+1     8   This table's bytes, length given by previous
+                                  field, divided by 8, plus 1 (``uint8_t``).
 ================== ======= ===== ==============================================
 
 .. todo:: Document ``Tags``, ``Stoptags``, ``Subset``, ``Labelset``
