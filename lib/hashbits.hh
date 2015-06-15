@@ -158,11 +158,6 @@ public:
         return _n_overlap_kmers;	// @@ CTB need to be able to *save* this...
     }
 
-    virtual void count(Kmer kmer)
-    {
-        count(kmer.kmer_u);
-    }
-
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
@@ -228,11 +223,6 @@ public:
                 _n_overlap_kmers +=1;
             }
         }
-    }
-
-    virtual const BoundedCounterType get_count(Kmer node) const
-    {
-        return get_count(node.kmer_u);
     }
 
     // get the count for the given k-mer.

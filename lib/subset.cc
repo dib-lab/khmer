@@ -1665,10 +1665,6 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
 {
     SeenSet tagged_kmers;
-    std::string kmer_s;
-    HashIntoType kmer_f, kmer_r;
-    unsigned int ksize = _ht->ksize();
-
     SeenSet::const_iterator si;
 
     unsigned n = 0;

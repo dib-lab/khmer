@@ -154,11 +154,6 @@ public:
         return n;
     }
 
-    virtual void count(Kmer kmer)
-    {
-        count(kmer.kmer_u);
-    }
-
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
@@ -206,11 +201,6 @@ public:
         }
 
     } // count
-
-    virtual const BoundedCounterType get_count(Kmer node) const
-    {
-        return get_count(node.kmer_u);
-    }
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const

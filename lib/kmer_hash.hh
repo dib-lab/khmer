@@ -95,6 +95,7 @@ public:
     }
 
     operator HashIntoType() const { return kmer_u; }
+	operator unsigned int() const { return kmer_u; }
 
     bool operator< (const Kmer &other) const {
         return kmer_u < other.kmer_u;
@@ -105,7 +106,8 @@ public:
     }
 
     const char * get_char_rep(unsigned int K) {
-        return _revhash(kmer_u, K).c_str();
+		std::string kmer_s = _revhash(kmer_u, K);
+        return kmer_s.c_str();
     }
 };
 

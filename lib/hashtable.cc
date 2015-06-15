@@ -883,7 +883,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
             KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
-                    stop_tags.insert((*ti).kmer_u);
+                    stop_tags.insert(*ti);
                 } else {
                     counting.count(*ti);
                 }
@@ -914,7 +914,6 @@ const
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    bool is_first_kmer = true;
     unsigned int total = 0;
     unsigned int nfound = 0;
 
@@ -962,9 +961,6 @@ const
 
         nfound = traverser->traverse_left(node, node_q, filter);
         for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
-
-
-        is_first_kmer = false;
     }
 
     return total;
@@ -1104,7 +1100,7 @@ unsigned int Hashtable::count_and_transfer_to_stoptags(KmerSet &keeper,
     KmerSet::const_iterator ti;
     for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
         if (counting.get_count(*ti) >= threshold) {
-            stop_tags.insert((*ti).kmer_u);
+            stop_tags.insert(*ti);
             n_inserted++;
         } else {
             counting.count(*ti);
