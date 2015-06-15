@@ -111,6 +111,7 @@ def extract_hashbits_info(filename):
     ksize = None
     n_tables = None
     table_size = None
+    signature = None
     version = None
     ht_type = None
 
@@ -120,11 +121,15 @@ def extract_hashbits_info(filename):
 
     try:
         with open(filename, 'rb') as hashbits:
+            signature, = unpack('4s', hashbits.read(4))
             version, = unpack('B', hashbits.read(1))
             ht_type, = unpack('B', hashbits.read(1))
             ksize, = unpack('I', hashbits.read(uint_size))
             n_tables, = unpack('B', hashbits.read(uchar_size))
             table_size, = unpack('Q', hashbits.read(ulonglong_size))
+        if signature != b"OXLI":
+            raise ValueError("Node graph '{}' is missing file type "
+                             "signature".format(filename) + str(signature))
     except:
         raise ValueError("Presence table '{}' is corrupt ".format(filename))
 
@@ -143,6 +148,7 @@ def extract_countinghash_info(filename):
     ksize = None
     n_tables = None
     table_size = None
+    signature = None
     version = None
     ht_type = None
     use_bigcount = None
@@ -152,12 +158,16 @@ def extract_countinghash_info(filename):
 
     try:
         with open(filename, 'rb') as countinghash:
+            signature, = unpack('4s', countinghash.read(4))
             version, = unpack('B', countinghash.read(1))
             ht_type, = unpack('B', countinghash.read(1))
             use_bigcount, = unpack('B', countinghash.read(1))
             ksize, = unpack('I', countinghash.read(uint_size))
             n_tables, = unpack('B', countinghash.read(1))
             table_size, = unpack('Q', countinghash.read(ulonglong_size))
+        if signature != b'OXLI':
+            raise ValueError("Counting table '{}' is missing file type "
+                             "signature. ".format(filename) + str(signature))
     except:
         raise ValueError("Counting table '{}' is corrupt ".format(filename))
 

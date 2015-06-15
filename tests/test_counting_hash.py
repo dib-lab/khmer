@@ -142,7 +142,7 @@ def test_get_raw_tables_view():
         assert sum(tab.tolist()) == 1
 
 
-@attr('linux')
+@attr('huge')
 def test_toobig():
     try:
         ct = khmer.new_counting_hash(30, 1e13, 1)
@@ -468,12 +468,12 @@ def test_get_kmer_counts_too_short():
     assert len(counts) == 0
 
 
-def test_get_kmer_counts_too_short():
+def test_get_kmer_hashes_too_short():
     hi = khmer.new_counting_hash(6, 1e6, 2)
 
     hi.consume("AAAAAA")
-    counts = hi.get_kmer_counts("A")
-    assert len(counts) == 0
+    hashes = hi.get_kmer_hashes("A")
+    assert len(hashes) == 0
 
 
 def test_get_kmers_too_short():
@@ -568,6 +568,29 @@ def test_get_kmers():
     assert kmers == ["AAAAAA", "AAAAAT"]
 
 
+@attr("huge")
+def test_save_load_large():
+    def do_test(ctfile):
+        inpath = utils.get_test_data('random-20-a.fa')
+        savepath = utils.get_temp_filename(ctfile)
+
+        sizes = khmer.get_n_primes_above_x(1, 2**31)
+
+        orig = khmer.CountingHash(12, sizes)
+        orig.consume_fasta(inpath)
+        orig.save(savepath)
+
+        loaded = khmer.load_counting_hash(savepath)
+
+        orig_count = orig.n_occupied()
+        loaded_count = loaded.n_occupied()
+        assert orig_count == 3966, orig_count
+        assert loaded_count == orig_count, loaded_count
+
+    for ctfile in ['temp.ct.gz', 'temp.ct']:
+        do_test(ctfile)
+
+
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
@@ -580,7 +603,10 @@ def test_save_load():
     hi.save(savepath)
 
     ht = khmer.CountingHash(12, sizes)
-    ht.load(savepath)
+    try:
+        ht.load(savepath)
+    except IOError as err:
+        assert 0, 'Should not produce an IOError: ' + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -639,7 +665,10 @@ def test_load_gz():
 
     # load compressed hashtable.
     ht = khmer.CountingHash(12, sizes)
-    ht.load(loadpath)
+    try:
+        ht.load(loadpath)
+    except IOError as err:
+        assert 0, "Should not produce an IOError: " + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -663,7 +692,10 @@ def test_save_load_gz():
     hi.save(savepath)
 
     ht = khmer.CountingHash(12, sizes)
-    ht.load(savepath)
+    try:
+        ht.load(savepath)
+    except IOError as err:
+        assert 0, 'Should not produce an IOError: ' + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -753,7 +785,7 @@ def test_find_spectral_error_positions_5():
     assert posns == [10], posns
 
 
-def test_find_spectral_error_positions_6():
+def test_find_spectral_error_locs7():
     K = 8
     hi = khmer.new_counting_hash(K, 1e6, 2)
 
@@ -832,7 +864,10 @@ def test_maxcount_with_bigcount_save():
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
-    kh.load(savepath)
+    try:
+        kh.load(savepath)
+    except IOError as err:
+        assert 0, "Should not produce an IOError: " + str(err)
 
     c = kh.get('AAAA')
     assert c == 1000, "should be able to count to 1000: %d" % c
@@ -848,7 +883,10 @@ def test_bigcount_save():
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
-    kh.load(savepath)
+    try:
+        kh.load(savepath)
+    except IOError as err:
+        assert 0, "Should not produce an IOError: " + str(err)
 
     # set_use_bigcount should still be True after load (i.e. should be saved)
 
@@ -869,7 +907,10 @@ def test_nobigcount_save():
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
-    kh.load(savepath)
+    try:
+        kh.load(savepath)
+    except IOError as err:
+        assert 0, 'Should not produce an IOError: ' + str(err)
 
     # set_use_bigcount should still be False after load (i.e. should be saved)
 
@@ -1374,7 +1415,10 @@ def test_abund_dist_gz_bigcount():
     f_out.write(data)
     f_out.close()
     # load the compressed bigcount table
-    counting_hash = khmer.load_counting_hash(outfile)
+    try:
+        counting_hash = khmer.load_counting_hash(outfile)
+    except IOError as err:
+        assert 0, 'Should not produce IOError: ' + str(err)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
     tracking = khmer._Hashbits(kmer_size, hashsizes)

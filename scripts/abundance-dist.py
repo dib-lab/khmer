@@ -44,6 +44,9 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite existing output_histogram_filename')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the histogram. '
                         'Includes column headers.')
@@ -67,6 +70,14 @@ def main():
           file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
+
+    if not counting_hash.get_use_bigcount() and args.bigcount:
+        print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
+              " reporting is ENABLED--counts higher than 255 will not be "
+              "reported.",
+              file=sys.stderr)
+
+    counting_hash.set_use_bigcount(args.bigcount)
 
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()

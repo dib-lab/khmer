@@ -27,7 +27,7 @@ def teardown():
     utils.cleanup()
 
 
-@attr('linux')
+@attr('huge')
 def test_toobig():
     try:
         pt = khmer.Hashbits(32, 1e13, 1)
@@ -267,7 +267,7 @@ def test_save_load_tagset():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 26, len(data)
+    assert len(data) == 30, len(data)
 
 
 def test_save_load_tagset_noclear():
@@ -289,7 +289,7 @@ def test_save_load_tagset_noclear():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 34, len(data)
+    assert len(data) == 38, len(data)
 
 
 def test_stop_traverse():

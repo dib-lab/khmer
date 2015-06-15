@@ -54,6 +54,28 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_abundance_dist_nobig():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 89' in err, err
+    assert os.path.exists(outfile)
+
+    htfile = outfile
+    outfile = utils.get_temp_filename('out')
+    script2 = 'abundance-dist.py'
+    args = ['-z', htfile, infile, outfile]
+    (status, out, err) = utils.runscript(script2, args)
+    assert 'WARNING: The loaded graph has bigcount' in err, err
+    assert 'bigcount' in err, err
+
+
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
@@ -72,7 +94,7 @@ def test_load_into_counting_nonwritable():
     assert status == 1, status
 
 
-@attr('linux')
+@attr('huge')
 def test_load_into_counting_toobig():
     script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
@@ -932,7 +954,10 @@ def test_normalize_by_median_no_bigcount():
     print((out, err))
 
     assert os.path.exists(hashfile), hashfile
-    kh = khmer.load_counting_hash(hashfile)
+    try:
+        kh = khmer.load_counting_hash(hashfile)
+    except IOError as e:
+        assert 0, 'Should not produce an IOError: ' + str(e)
 
     assert kh.get('GGTTGACG') == 255
 
@@ -1105,7 +1130,10 @@ def test_load_graph():
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
 
-    ht = khmer.load_hashbits(ht_file)
+    try:
+        ht = khmer.load_hashbits(ht_file)
+    except IOError as err:
+        assert 0, str(err)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set
@@ -1810,10 +1838,10 @@ def test_abundance_dist_nobigcount():
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+    htfile = _make_counting(infile, K=17)
 
     script = 'abundance-dist.py'
-    args = ['-z', htfile, infile, outfile]
+    args = ['-b', '-z', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
