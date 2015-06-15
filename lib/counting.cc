@@ -511,11 +511,19 @@ CountingHashFileReader::CountingHashFileReader(
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
+        char signature [4];
         unsigned char version = 0, ht_type = 0, use_bigcount = 0;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a khmer " <<
+                "file: " << signature << " Should be: " <<
+                SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer count file from " << infilename
@@ -612,16 +620,23 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;
+    char signature [4];
     unsigned char version, ht_type, use_bigcount;
 
+    int read_s = gzread(infile, signature, 4);
     int read_v = gzread(infile, (char *) &version, 1);
     int read_t = gzread(infile, (char *) &ht_type, 1);
-
-    if (read_v <= 0 || read_t <= 0) {
+    if (read_s <= 0 || read_v <= 0 || read_t <= 0) {
         std::string err = "K-mer count file read error: " + infilename + " "
                           + strerror(errno);
         gzclose(infile);
         throw khmer_file_exception(err);
+    } else if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+        std::ostringstream err;
+        err << "Does not start with signature for a khmer " <<
+            "file: " << signature << " Should be: " <<
+            SAVED_SIGNATURE;
+        throw khmer_file_exception(err.str());
     } else if (!(version == SAVED_FORMAT_VERSION)
                || !(ht_type == SAVED_COUNTING_HT)) {
         if (!(version == SAVED_FORMAT_VERSION)) {
@@ -768,6 +783,7 @@ CountingHashFileWriter::CountingHashFileWriter(
 
     ofstream outfile(outfilename.c_str(), ios::binary);
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -830,6 +846,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         }
     }
 
+    gzwrite(outfile, SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     gzwrite(outfile, (const char *) &version, 1);
 
