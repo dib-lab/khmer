@@ -68,10 +68,10 @@ def get_parser():
                         'split reads to specified directory. Creates '
                         'directory if necessary')
 
-    parser.add_argument('-p', '--output-paired',
+    parser.add_argument('-p', '--output-paired', metavar='output_paired',
                         default=None, help='Output paired reads to this '
                         'file', type=argparse.FileType('w'))
-    parser.add_argument('-s', '--output-single',
+    parser.add_argument('-s', '--output-single', metavar='output_single',
                         default=None, help='Output orphaned reads to this '
                         'file', type=argparse.FileType('w'))
 
