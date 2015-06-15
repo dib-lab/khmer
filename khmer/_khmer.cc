@@ -2270,13 +2270,13 @@ hashtable_count_kmers_within_radius(khmer_KHashtable_Object * me,
     }
 
     unsigned int n;
+    KmerFactory factory(hashtable->ksize());
 
     Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer, hashtable->ksize(), kmer_f, kmer_r);
-    n = hashtable->count_kmers_within_radius(kmer_f, kmer_r, radius,
-            max_count);
+    Kmer start_kmer = factory.build_kmer(kmer);
+    KmerSet seen;
+    n = hashtable->traverse_from_kmer(start_kmer, radius,
+                                      seen, max_count);
 
     Py_END_ALLOW_THREADS
 

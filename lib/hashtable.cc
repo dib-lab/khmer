@@ -1039,7 +1039,8 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 
 unsigned int Hashtable::traverse_from_kmer(Kmer start,
         unsigned int radius,
-        KmerSet &keeper)
+        KmerSet &keeper,
+        unsigned int max_count)
 const
 {
 
@@ -1066,7 +1067,7 @@ const
             break;
         }
 
-        if (total > MAX_KEEPER_SIZE) {
+        if (max_count && total > max_count) {
             break;
         }
 
@@ -1074,7 +1075,7 @@ const
             continue;
         }
 
-        if (set_contains(stop_tags, node.kmer_u)) {
+        if (set_contains(stop_tags, node)) {
             continue;
         }
 

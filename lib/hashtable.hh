@@ -316,7 +316,9 @@ public:
 
     unsigned int traverse_from_kmer(Kmer start,
                                     unsigned int radius,
-                                    KmerSet &keeper) const;
+                                    KmerSet &keeper,
+                                    unsigned int max_count = MAX_KEEPER_SIZE)
+                                    const;
 
     unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
             unsigned int threshold,
