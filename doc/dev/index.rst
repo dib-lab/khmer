@@ -26,3 +26,4 @@ Contents:
    details
    development
    crazy-ideas
+   binary-file-formats
