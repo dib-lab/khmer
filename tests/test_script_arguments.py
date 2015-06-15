@@ -12,6 +12,7 @@ from __future__ import absolute_import
 
 import sys
 import io
+import collections
 from . import khmer_tst_utils as utils
 
 import argparse
@@ -89,3 +90,22 @@ def test_invalid_file_warn():
         print(str(e))
     finally:
         sys.stderr = save_stderr
+
+
+FakeArgparseObject = collections.namedtuple('FakeArgs',
+                                            ['ksize', 'n_tables',
+                                             'min_tablesize',
+                                             'max_memory_usage'])
+
+
+def test_create_countgraph_1():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    countgraph = khmer_args.create_countgraph(args)
+    assert countgraph.hashsizes() == [2499997L, 2499989L, 2499983L, 2499967L]
+    assert sum(countgraph.hashsizes()) < max_mem, sum(countgraph.hashsizes())

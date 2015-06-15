@@ -534,7 +534,7 @@ def test_filter_stoptags():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer.new_hashbits(K, 1, 1)
+    kh = khmer._Hashbits(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -565,7 +565,7 @@ def test_filter_stoptags_fq():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer.new_hashbits(K, 1, 1)
+    kh = khmer._Hashbits(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -990,7 +990,7 @@ def test_normalize_by_median_emptycountingtable():
 
 
 def test_normalize_by_median_fpr():
-    MIN_TABLESIZE_PARAM = 1
+    MIN_TABLESIZE_PARAM = 20
 
     infile = utils.get_temp_filename('test-fpr.fq')
     in_dir = os.path.dirname(infile)

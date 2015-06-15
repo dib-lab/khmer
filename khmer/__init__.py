@@ -8,7 +8,7 @@
 
 from __future__ import print_function
 
-from khmer._khmer import CountingHash
+from khmer._khmer import CountingHash as _CountingHash
 from khmer._khmer import LabelHash as _LabelHash
 from khmer._khmer import Hashbits as _Hashbits
 from khmer._khmer import HLLCounter as _HLLCounter
@@ -56,7 +56,7 @@ def new_hashbits(k, starting_size, n_tables=2):
     starting_size -- lower bound on hashsize to use
     n_tables -- number of hash tables to use (default = 2)
     """
-    primes = get_n_primes_above_x(n_tables, starting_size)
+    primes = get_n_primes_near_x(n_tables, starting_size)
 
     return _Hashbits(k, primes)
 
@@ -70,7 +70,7 @@ def new_counting_hash(k, starting_size, n_tables=2):
     n_tables -- number of hash tables to use (default = 2)
     n_threads  -- number of simultaneous threads to execute (default = 1)
     """
-    primes = get_n_primes_above_x(n_tables, starting_size)
+    primes = get_n_primes_near_x(n_tables, starting_size)
 
     return CountingHash(k, primes)
 
@@ -93,7 +93,7 @@ def load_counting_hash(filename):
     Keyword argument:
     filename -- the name of the counting_hash file
     """
-    hashtable = CountingHash(1, [1])
+    hashtable = _CountingHash(1, [1])
     hashtable.load(filename)
 
     return hashtable
@@ -229,6 +229,9 @@ def get_n_primes_near_x(number, target):
     number -- the number of primes to find
     target -- the number to step backwards from
     """
+    if target == 1 and number == 1:
+      return [1]
+
     primes = []
     i = target - 1
     if i % 2 == 0:
@@ -237,6 +240,11 @@ def get_n_primes_near_x(number, target):
         if is_prime(i):
             primes.append(i)
         i -= 2
+
+    if len(primes) != number:
+        raise Exception("unable to find %d prime numbers < %d" % (number,
+                                                                  target))
+      
     return primes
 
 
@@ -267,6 +275,15 @@ def get_n_primes_above_x(number, target):
 # Additional functionality can be added to these classes as appropriate.
 
 
+class CountingHash(_CountingHash):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        c = _CountingHash.__new__(cls, k, primes)
+        c.primes = primes
+        return c
+
+
 class LabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
@@ -279,8 +296,8 @@ class LabelHash(_LabelHash):
 class CountingLabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_above_x(n_tables, starting_size)
-        hb = CountingHash(k, primes)
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        hb = _CountingHash(k, primes)
         c = _LabelHash.__new__(cls, hb)
         c.graph = hb
         return c
@@ -289,7 +306,7 @@ class CountingLabelHash(_LabelHash):
 class Hashbits(_Hashbits):
 
     def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_above_x(n_tables, starting_size)
+        primes = get_n_primes_near_x(n_tables, starting_size)
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c

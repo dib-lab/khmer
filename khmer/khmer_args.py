@@ -12,10 +12,13 @@ import sys
 import os
 import argparse
 from argparse import _VersionAction
-from khmer import extract_countinghash_info, extract_hashbits_info
-from khmer import __version__
+
 import screed
 import khmer
+from khmer import extract_countinghash_info, extract_hashbits_info
+from khmer import __version__
+from khmer.utils import print_error
+
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
@@ -94,8 +97,6 @@ def add_loadhash_args(parser):
     class LoadAction(argparse.Action):
 
         def __call__(self, parser, namespace, values, option_string=None):
-            from khmer.utils import print_error
-
             setattr(namespace, self.dest, values)
 
             if getattr(namespace, 'ksize') != DEFAULT_K or \
@@ -147,15 +148,23 @@ def _calculate_tablesize(args, hashtype):
 def create_nodegraph(args, ksize=None):
     if ksize is None:
         ksize = args.ksize
+    if ksize > 32:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        sys.exit(1)
+
     tablesize = _calculate_tablesize(args, 'nodegraph')
-    return khmer.new_hashbits(ksize, tablesize, args.n_tables)
+    return khmer.Hashbits(ksize, tablesize, args.n_tables)
 
 
 def create_countgraph(args, ksize=None):
     if ksize is None:
         ksize = args.ksize
+    if ksize > 32:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        sys.exit(1)
+
     tablesize = _calculate_tablesize(args, 'countgraph')
-    return khmer.new_counting_hash(ksize, tablesize, args.n_tables)
+    return khmer.CountingHash(ksize, tablesize, args.n_tables)
 
 
 def report_on_config(args, hashtype='countgraph'):

@@ -3103,7 +3103,7 @@ static PyTypeObject khmer_KCountingHash_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
-    "_khmer.KCountingHash",              /*tp_name*/
+    "_khmer.CountingHash",              /*tp_name*/
     sizeof(khmer_KCountingHash_Object),  /*tp_basicsize*/
     0,                                   /*tp_itemsize*/
     (destructor)khmer_counting_dealloc,  /*tp_dealloc*/
@@ -3121,7 +3121,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
     0,                                   /*tp_getattro*/
     0,                                   /*tp_setattro*/
     0,                                   /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,                  /*tp_flags*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                  /*tp_flags*/
     "counting hash object",              /* tp_doc */
     0,                                   /* tp_traverse */
     0,                                   /* tp_clear */

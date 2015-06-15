@@ -27,7 +27,7 @@ def load_fa_seq_names(filename):
 class Test_Filter(object):
 
     def test_abund(self):
-        ht = khmer.new_hashtable(10, 4 ** 10)
+        ht = khmer.CountingHash(10, 4 ** 10, 1)
 
         filename = utils.get_test_data('test-abund-read.fa')
         outname = utils.get_temp_filename('test_abund.out')

@@ -15,7 +15,7 @@ def eq_(v1, v2):
 
 
 def test_alignnocov():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -29,7 +29,7 @@ def test_alignnocov():
 
 
 def test_simple_readalign():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 2, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACATGTCCTTGACAGAT")
@@ -48,7 +48,7 @@ def test_simple_readalign():
 
 
 def test_readalign():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
@@ -209,7 +209,7 @@ queries = [
 
 
 def test_readalign_new():
-    ch = khmer.new_counting_hash(32, 1048576, 1)
+    ch = khmer.CountingHash(32, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for seq in ht_seqs:
         ch.consume(seq)

@@ -81,7 +81,7 @@ def test_get_primes():
 def test_extract_countinghash_info():
     fn = utils.get_temp_filename('test_extract_counting.ct')
     for size in [1e6, 2e6, 5e6, 1e7]:
-        ht = khmer.new_counting_hash(25, size, 4)
+        ht = khmer.CountingHash(25, size, 4)
         ht.save(fn)
 
         info = khmer.extract_countinghash_info(fn)
