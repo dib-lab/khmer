@@ -1103,13 +1103,12 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     SeenSet tags;
+    KmerFactory factory(hashtable->ksize());
 
     Py_BEGIN_ALLOW_THREADS
 
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
-
-    hashtable->partition->find_all_tags(kmer_f, kmer_r, tags,
+    Kmer start_kmer = factory.build_kmer(kmer_s);
+    hashtable->partition->find_all_tags(start_kmer, tags,
                                         hashtable->all_tags);
 
     Py_END_ALLOW_THREADS
@@ -1632,18 +1631,18 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     pre_partition_info * ppi = NULL;
+    KmerFactory factory(hashtable->ksize());
 
     Py_BEGIN_ALLOW_THREADS
 
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
+    Kmer kmer = factory.build_kmer(kmer_s);
 
     try {
         ppi = new pre_partition_info(kmer);
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
-    hashtable->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers,
+    hashtable->partition->find_all_tags(kmer, ppi->tagged_kmers,
                                         hashtable->all_tags);
     hashtable->add_kmer_to_tags(kmer);
 

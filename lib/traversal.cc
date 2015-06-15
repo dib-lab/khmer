@@ -64,7 +64,7 @@ unsigned int Traverser::traverse_right(Kmer& node,
     char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
-        if (graph->get_count(next_node.kmer_u) && filter(next_node)) {
+        if (graph->get_count(next_node) && filter(next_node)) {
             node_q.push(next_node);
             ++found;
         }

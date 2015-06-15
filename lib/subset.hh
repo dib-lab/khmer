@@ -9,6 +9,7 @@
 #define SUBSET_HH
 
 #include "khmer.hh"
+#include "traversal.hh"
 
 namespace khmer
 {
@@ -29,6 +30,7 @@ class SubsetPartition
 protected:
     unsigned int next_partition_id;
     Hashtable * _ht;
+    Traverser * traverser;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -40,10 +42,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
-    {
-        ;
-    };
+    SubsetPartition(Hashtable * ht);
 
     ~SubsetPartition()
     {
@@ -80,7 +79,7 @@ public:
                          NodeQueue& node_q,
                          std::queue<unsigned int>& breadth_q);
 
-    void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
+    void find_all_tags(Kmer start_kmer,
                        SeenSet& tagged_kmers,
                        const SeenSet& all_tags,
                        bool break_on_stop_tags=false,

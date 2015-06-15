@@ -23,9 +23,9 @@
 #include "khmer.hh"
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
-#include "subset.hh"
 #include "kmer_hash.hh"
 #include "traversal.hh"
+#include "subset.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 

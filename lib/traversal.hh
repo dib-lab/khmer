@@ -20,6 +20,8 @@
 
 namespace khmer {
 
+class Hashtable;
+
 class Traverser: public KmerFactory
 {
     friend class Hashtable;
@@ -49,8 +51,6 @@ public:
     unsigned int degree_right(Kmer& node);
     unsigned int degree(Kmer& node);
 };
-
-
 
 };
 #endif
