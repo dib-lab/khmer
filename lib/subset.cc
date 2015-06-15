@@ -1275,11 +1275,19 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     try {
         unsigned int save_ksize = 0;
+        char signature[4];
         unsigned char version, ht_type;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading subset pmap from " << other_filename
+                << " Should be: " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
@@ -1379,6 +1387,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
     ofstream outfile(pmap_filename.c_str(), ios::binary);
 
     unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write(SAVED_SIGNATURE, 4);
     outfile.write((const char *) &version, 1);
 
     unsigned char ht_type = SAVED_SUBSET;
