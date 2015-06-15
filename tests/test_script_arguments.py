@@ -109,3 +109,82 @@ def test_create_countgraph_1():
     countgraph = khmer_args.create_countgraph(args)
     assert countgraph.hashsizes() == [2499997L, 2499989L, 2499983L, 2499967L]
     assert sum(countgraph.hashsizes()) < max_mem, sum(countgraph.hashsizes())
+
+
+
+
+def test_create_countgraph_2():
+    # tests overriding ksize by passing into create_nodegraph explicitly.
+
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    countgraph = khmer_args.create_countgraph(args, ksize=15)
+    assert countgraph.ksize() == 15
+
+
+def test_create_countgraph_3():
+    # tests too-big ksize
+
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    try:
+        countgraph = khmer_args.create_countgraph(args, ksize=35)
+        assert 0, "should not reach this"
+    except SystemExit as err:
+        print(str(err))
+
+
+def test_create_nodegraph_1():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    nodegraph = khmer_args.create_nodegraph(args)
+    assert nodegraph.hashsizes() == [19999999L, 19999981L,
+                                     19999963L, 19999927L]
+
+    assert sum(nodegraph.hashsizes())/8.0 < max_mem, sum(nodegraph.hashsizes())
+
+
+def test_create_nodegraph_2():
+    # tests overriding ksize by passing into create_nodegraph explicitly.
+
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    nodegraph = khmer_args.create_nodegraph(args, ksize=15)
+    assert nodegraph.ksize() == 15
+
+
+def test_create_nodegraph_3():
+    # tests too-big ksize
+
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    try:
+        nodegraph = khmer_args.create_nodegraph(args, ksize=35)
+        assert 0, "should not reach this"
+    except SystemExit as err:
+        print(str(err))
