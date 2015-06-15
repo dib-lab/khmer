@@ -236,7 +236,7 @@ def get_n_primes_near_x(number, target):
     target -- the number to step backwards from
     """
     if target == 1 and number == 1:
-      return [1]
+        return [1]
 
     primes = []
     i = target - 1
@@ -250,7 +250,7 @@ def get_n_primes_near_x(number, target):
     if len(primes) != number:
         raise Exception("unable to find %d prime numbers < %d" % (number,
                                                                   target))
-      
+
     return primes
 
 

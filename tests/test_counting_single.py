@@ -116,7 +116,7 @@ def test_complete_2_collision():
 
 
 def test_complete_4_collision():
-    kh = khmer.CountingHash(4, 2, 1)
+    kh = khmer._CountingHash(4, [3])
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)

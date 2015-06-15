@@ -433,7 +433,7 @@ class Test_SaveLoadPmap(object):
 
 
 def test_save_load_merge_on_graph():
-    ht = khmer.Hashbits(20, 4 ** 4 + 1)
+    ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
     (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -466,7 +466,7 @@ def test_save_load_merge_on_graph():
 
 
 def test_save_load_on_graph_truncate():
-    ht = khmer.Hashbits(20, 4 ** 4 + 1)
+    ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
     (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
