@@ -21,7 +21,6 @@ Number of Tables    1           Number of Count-min Sketch tables
 ================== =========== ==============================================
 
 
-
 Khmer v2.0 formats
 ~~~~~~~~~~~~~~~~~~
 
@@ -29,7 +28,7 @@ Magic string
 ------------
 
 All formats shall have the "magic string" ``OXLI`` as their first bytes, after
-any external compression/encoding (e.g. gzip encapuslation) is removed. Note
+any external compression/encoding (e.g. gzip encapsulation) is removed. Note
 that this makes them incompatible with older versions of Khmer.
 
 Countgraph
