@@ -301,12 +301,6 @@ public:
     void filter_if_present(const std::string &infilename,
                            const std::string &outputfilename);
 
-    unsigned int count_kmers_within_radius(HashIntoType kmer_f,
-                                           HashIntoType kmer_r,
-                                           unsigned int radius,
-                                           unsigned int max_count,
-                                           const SeenSet * seen=0) const;
-
     size_t trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
