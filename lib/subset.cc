@@ -432,7 +432,7 @@ void SubsetPartition::find_all_tags(
 
     KmerSet keeper;		// keep track of traversed kmers
 
-    auto filter = [&] (Kmer& n) {
+    auto filter = [&] (Kmer& n) -> bool {
         return !set_contains(keeper, n);
     };
 

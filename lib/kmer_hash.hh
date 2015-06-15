@@ -130,7 +130,8 @@ public:
     Kmer build_kmer(HashIntoType kmer_u)
     {
         HashIntoType kmer_f, kmer_r;
-        _hash(_revhash(kmer_u, ksize).c_str(), ksize, kmer_f, kmer_r);
+		std:: string kmer_s = _revhash(kmer_u, ksize);
+        _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
 
