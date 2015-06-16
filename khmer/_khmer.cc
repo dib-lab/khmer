@@ -1104,8 +1104,7 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 
     SeenSet tags;
 
-    KmerFactory factory(hashtable->ksize());
-    Kmer start_kmer = factory.build_kmer(kmer_s);
+    Kmer start_kmer = hashtable->build_kmer(kmer_s);
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -1329,10 +1328,7 @@ hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
     }
 
     unsigned long long size = 0;
-    // We *could* reach through to hashtable->traverser->build_kmer(..),
-    // but reaching through is bad :)
-    KmerFactory factory(hashtable->ksize());
-    Kmer start_kmer = factory.build_kmer(_kmer);
+    Kmer start_kmer = hashtable->build_kmer(_kmer);
 
     Py_BEGIN_ALLOW_THREADS
     KmerSet keeper;
@@ -1633,8 +1629,7 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
 
     pre_partition_info * ppi = NULL;
 
-    KmerFactory factory(hashtable->ksize());
-    Kmer kmer = factory.build_kmer(kmer_s);
+    Kmer kmer = hashtable->build_kmer(kmer_s);
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -2270,10 +2265,9 @@ hashtable_count_kmers_within_radius(khmer_KHashtable_Object * me,
     }
 
     unsigned int n;
-    KmerFactory factory(hashtable->ksize());
 
     Py_BEGIN_ALLOW_THREADS
-    Kmer start_kmer = factory.build_kmer(kmer);
+    Kmer start_kmer = hashtable->build_kmer(kmer);
     KmerSet seen;
     n = hashtable->traverse_from_kmer(start_kmer, radius,
                                       seen, max_count);

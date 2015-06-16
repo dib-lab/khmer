@@ -15,10 +15,10 @@ Traverser::Traverser(const Hashtable * ht) :
     KmerFactory(ht->ksize()), graph(ht)
 {
     bitmask = 0;
-    for (unsigned int i = 0; i < _K; i++) {
+    for (unsigned int i = 0; i < _ksize; i++) {
         bitmask = (bitmask << 2) | 3;
     }
-    rc_left_shift = _K * 2 - 2;
+    rc_left_shift = _ksize * 2 - 2;
 }
 
 Kmer Traverser::get_left(Kmer& node, const char ch)
