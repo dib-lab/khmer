@@ -1,6 +1,6 @@
 2015-06-16  Kevin Murray  <spam@kdmurray.id.au>
 
-   * doc/dev/scripts-and-sandbox.rst: Add documentation of Khmer's binary file
+   * doc/dev/binary-file-formats.rst: Add documentation of Khmer's binary file
    formats.
    * doc/dev/index.rst: Add above docs to developer documentation index.
 
