@@ -22,7 +22,7 @@ def main():
         outfile = sys.argv[3]
 
     # create a hashbits data structure
-    ht = khmer.new_hashbits(K, 1, 1)
+    ht = khmer.Hashbits(K, 1, 1)
 
     # tag every k-mer in the contigs
     ht._set_tag_density(0)

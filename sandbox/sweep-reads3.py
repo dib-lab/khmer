@@ -64,7 +64,7 @@ def main():
     query_list = []
     for n, inp_name in enumerate(inputlist):
         # create a hashbits data structure
-        ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+        ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
         outfile = os.path.basename(inp_name) + '.sweep3'
         outfp = open(outfile, 'w')

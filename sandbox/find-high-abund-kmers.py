@@ -65,7 +65,7 @@ def main():
     ###
 
     print('making hashtable')
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ht = khmer.CountingHash(K, HT_SIZE, N_HT)
     ht.set_use_bigcount(True)
 
     print('consuming input', input)

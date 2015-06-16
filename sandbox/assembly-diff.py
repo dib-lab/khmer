@@ -26,9 +26,9 @@ def main():
     uniq2 = open(os.path.basename(sys.argv[2]) + '.uniq', 'w')
     paths = sys.argv[3]
 
-    kh1 = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    kh1 = khmer.Hashbits(K, HASHTABLE_SIZE, N_HT)
     kh1.consume_fasta(filename1)
-    kh2 = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    kh2 = khmer.Hashbits(K, HASHTABLE_SIZE, N_HT)
     kh2.consume_fasta(filename2)
 
     for record in screed.open(paths):

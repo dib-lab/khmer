@@ -58,7 +58,7 @@ def main():
     outfp = open(outfile, 'w')
 
     # create a hashbits data structure
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     # load contigs, connect into N partitions
     print('loading input reads from', inp)

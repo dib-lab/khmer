@@ -88,7 +88,7 @@ def main():
         ht = khmer.load_counting_hash(args.loadhash)
     else:
         print('making hashtable')
-        ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+        ht = khmer.CountingHash(K, HT_SIZE, N_HT)
 
     total = 0
     discarded = 0
