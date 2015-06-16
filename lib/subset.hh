@@ -84,8 +84,7 @@ public:
                                 bool break_on_stop_tags,
                                 bool stop_big_traversals);
 
-    void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
-            HashIntoType kmer_r,
+    void find_all_tags_truncate_on_abundance(Kmer start_kmer,
             SeenSet& tagged_kmers,
             const SeenSet& all_tags,
             BoundedCounterType min_count,

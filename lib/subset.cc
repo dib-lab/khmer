@@ -339,7 +339,6 @@ void SubsetPartition::find_all_tags(
 
     Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
-    Kmer tmp_node;
 
     auto filter = [&] (Kmer& n) -> bool {
         return !set_contains(keeper, n);
@@ -501,8 +500,7 @@ unsigned int SubsetPartition::sweep_for_tags(
 //    connected to kmer_f/kmer_r in the graph.
 
 void SubsetPartition::find_all_tags_truncate_on_abundance(
-    HashIntoType	kmer_f,
-    HashIntoType	kmer_r,
+    Kmer start_kmer,
     SeenSet&		tagged_kmers,
     const SeenSet&	all_tags,
     BoundedCounterType	min_count,
@@ -510,24 +508,25 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     bool		break_on_stop_tags,
     bool		stop_big_traversals)
 {
-    const HashIntoType bitmask = _ht->bitmask;
 
-    HashIntoType f, r;
     bool first = true;
-    NodeQueue node_q;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
+
     unsigned int cur_breadth = 0;
-
     const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
-    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
+
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    SeenSet keeper;		// keep track of traversed kmers
+    Traverser traverser(_ht);
+    KmerSet keeper;		// keep track of traversed kmers
 
-    // start breadth-first search.
+    auto filter = [&] (Kmer& n) -> bool {
+        return !set_contains(keeper, n);
+    };
 
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
@@ -536,47 +535,47 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             break;
         }
 
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-
         // Have we already seen this k-mer?  If so, skip.
-        if (set_contains(keeper, kmer)) {
+        // NOTE: redundant, move this to before while loop
+        if (set_contains(keeper, node)) {
             continue;
         }
 
         // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
             // @CTB optimize by inserting into keeper set?
             continue;
         }
 
-        BoundedCounterType count = _ht->get_count(kmer);
+        BoundedCounterType count = _ht->get_count(node);
         if (count < min_count || count > max_count) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
         // already? Search no further in this direction.  (This is where we
         // connect partitions.)
-        if (!first && set_contains(all_tags, kmer)) {
-            tagged_kmers.insert(kmer);
+        if (!first && set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
             continue;
         }
 
         // @cswelcher Do these lines actually do anything?
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging.
-            throw khmer_exception();
+            throw khmer_exception("Desynchonization between traversal "
+                                  "and breadth tracking. Did you forget "
+                                  "to pop the node or breadth queue?");
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -586,83 +585,11 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             continue;    // truncate search @CTB exit?
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
+        nfound = traverser.traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        // NEXT
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
+        nfound = traverser.traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
         first = false;
     }
@@ -736,8 +663,6 @@ void SubsetPartition::do_partition_with_abundance(
 {
     unsigned int total_reads = 0;
 
-    std::string kmer_s;
-    HashIntoType kmer_f, kmer_r;
     SeenSet tagged_kmers;
     const unsigned char ksize = _ht->ksize();
 
@@ -757,12 +682,11 @@ void SubsetPartition::do_partition_with_abundance(
     for (; si != end; ++si) {
         total_reads++;
 
-        kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-        HashIntoType kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+        Kmer kmer = _ht->build_kmer(*si);
 
         // find all tagged kmers within range.
         tagged_kmers.clear();
-        find_all_tags_truncate_on_abundance(kmer_f, kmer_r, tagged_kmers,
+        find_all_tags_truncate_on_abundance(kmer, tagged_kmers,
                                             _ht->all_tags, min_count,
                                             max_count, break_on_stop_tags,
                                             stop_big_traversals);
