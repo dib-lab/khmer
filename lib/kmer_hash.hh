@@ -105,11 +105,11 @@ public:
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(unsigned int K) {
+    std::string get_string_rep(WordLength K) {
         return _revhash(kmer_u, K);
     }
 
-    const char * get_char_rep(unsigned int K) {
+    const char * get_char_rep(WordLength K) {
 		std::string kmer_s = _revhash(kmer_u, K);
         return kmer_s.c_str();
     }
@@ -129,7 +129,7 @@ protected:
 
 public:
 
-    explicit KmerFactory(unsigned int K): _K(K) {}
+    KmerFactory(WordLength K): _K(K) {}
 
     Kmer build_kmer(HashIntoType kmer_u)
     {
