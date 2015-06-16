@@ -748,12 +748,13 @@ const
         return;
     }
 
+    Traverser traverser(this);
     KmerQueue node_q;
     node_q.push(start);
 
     // Avoid high-circumference k-mers
     auto filter = [&] (Kmer& n) { return !(break_on_circum &&
-                                  traverser->degree(n) > 4); };
+                                  traverser.degree(n) > 4); };
 
     while(!node_q.empty()) {
       Kmer node = node_q.front();
@@ -780,23 +781,23 @@ const
       }
 
       // otherwise, explore in all directions.
-      traverser->traverse_right(node, node_q, filter);
-      traverser->traverse_left(node, node_q, filter);
+      traverser.traverse_right(node, node_q, filter);
+      traverser.traverse_left(node, node_q, filter);
     }
 }
 
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
-const
 {
-    Kmer node = traverser->build_kmer(kmer_f, kmer_r);
-    return traverser->degree(node);
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_f, kmer_r);
+    return traverser.degree(node);
 }
 
 unsigned int Hashtable::kmer_degree(const char * kmer_s)
-const
 {
-    Kmer node = traverser->build_kmer(kmer_s);
-    return traverser->degree(node);
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_s);
+    return traverser.degree(node);
 }
 
 void Hashtable::filter_if_present(const std::string &infilename,
@@ -883,7 +884,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
             ++si, i++) {
 
         n++;
-        Kmer tag = traverser->build_kmer(*si);
+        Kmer tag = build_kmer(*si);
         unsigned int count = traverse_from_kmer(tag, distance, keeper);
 
         if (count >= threshold) {
@@ -920,6 +921,7 @@ unsigned int Hashtable::traverse_from_kmer(Kmer start,
 const
 {
 
+    Traverser traverser(this);
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
@@ -965,10 +967,10 @@ const
             cur_breadth = breadth;
         }
 
-        nfound = traverser->traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q, filter);
         for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        nfound = traverser->traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q, filter);
         for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
     }
 

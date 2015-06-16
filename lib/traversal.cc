@@ -11,10 +11,14 @@
 using namespace khmer;
 using namespace std;
 
-Traverser::Traverser(Hashtable * ht) : KmerFactory(ht->ksize()), graph(ht)
+Traverser::Traverser(const Hashtable * ht) :
+    KmerFactory(ht->ksize()), graph(ht)
 {
-    bitmask = graph->bitmask;
-    rc_left_shift = ksize * 2 - 2;
+    bitmask = 0;
+    for (unsigned int i = 0; i < _K; i++) {
+        bitmask = (bitmask << 2) | 3;
+    }
+    rc_left_shift = _K * 2 - 2;
 }
 
 Kmer Traverser::get_left(Kmer& node, const char ch)

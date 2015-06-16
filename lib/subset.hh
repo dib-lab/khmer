@@ -30,7 +30,6 @@ class SubsetPartition
 protected:
     unsigned int next_partition_id;
     Hashtable * _ht;
-    Traverser * traverser;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -47,7 +46,6 @@ public:
     ~SubsetPartition()
     {
         _clear_all_partitions();
-        delete traverser;
     }
 
     PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);

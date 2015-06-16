@@ -125,17 +125,17 @@ public:
 class KmerFactory
 {
 protected:
-    const unsigned int ksize;
+    WordLength _K;
 
 public:
 
-    explicit KmerFactory(unsigned int K): ksize(K) {}
+    explicit KmerFactory(unsigned int K): _K(K) {}
 
     Kmer build_kmer(HashIntoType kmer_u)
     {
         HashIntoType kmer_f, kmer_r;
-		std:: string kmer_s = _revhash(kmer_u, ksize);
-        _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+		std:: string kmer_s = _revhash(kmer_u, _K);
+        _hash(kmer_s.c_str(), _K, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
 
@@ -148,14 +148,14 @@ public:
     Kmer build_kmer(std::string kmer_s)
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+        kmer_u = _hash(kmer_s.c_str(), _K, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
 
     Kmer build_kmer(const char * kmer_c)
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_c, ksize, kmer_f, kmer_r);
+        kmer_u = _hash(kmer_c, _K, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
 };
@@ -199,7 +199,7 @@ public:
 
     unsigned int get_start_pos() const
     {
-        return index - ksize;
+        return index - _K;
     }
 
     unsigned int get_end_pos() const

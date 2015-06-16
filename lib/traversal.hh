@@ -33,9 +33,9 @@ protected:
 
 public:
 
-    Hashtable * graph;
+    const Hashtable * graph;
 
-    explicit Traverser(Hashtable * ht);
+    explicit Traverser(const Hashtable * ht);
 
     Kmer get_left(Kmer& node, const char ch);
     Kmer get_right(Kmer& node, const char ch);

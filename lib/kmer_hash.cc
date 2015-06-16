@@ -161,12 +161,12 @@ KmerIterator::KmerIterator(const char * seq,
                            KmerFactory(k), _seq(seq)
 {
     bitmask = 0;
-    for (unsigned char i = 0; i < ksize; i++) {
+    for (unsigned char i = 0; i < _K; i++) {
         bitmask = (bitmask << 2) | 3;
     }
-    _nbits_sub_1 = (ksize*2 - 2);
+    _nbits_sub_1 = (_K*2 - 2);
 
-    index = ksize - 1;
+    index = _K - 1;
     length = strlen(seq);
     _kmer_f = 0;
     _kmer_r = 0;
@@ -177,12 +177,12 @@ KmerIterator::KmerIterator(const char * seq,
 Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
 {
     HashIntoType x;
-    x = _hash(_seq, ksize, _kmer_f, _kmer_r);
+    x = _hash(_seq, _K, _kmer_f, _kmer_r);
 
     f = _kmer_f;
     r = _kmer_r;
 
-    index = ksize;
+    index = _K;
 
     return Kmer(_kmer_f, _kmer_r, x);
 }

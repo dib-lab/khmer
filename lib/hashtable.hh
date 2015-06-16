@@ -65,7 +65,7 @@ struct HashTablePerformanceMetrics : public IPerformanceMetrics {
 };
 #endif
 
-class Hashtable  		// Base class implementation of a Bloom ht.
+class Hashtable: public KmerFactory  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
@@ -82,7 +82,8 @@ protected:
     unsigned int    _nbits_sub_1;
 
     Hashtable( WordLength ksize )
-        : _max_count( MAX_KCOUNT ),
+        : KmerFactory( ksize ),
+          _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT ),
           _ksize( ksize )
     {
@@ -90,11 +91,9 @@ protected:
         if (!(_tag_density % 2 == 0)) {
             throw khmer_exception();
         }
-        partition = new SubsetPartition(this);
         _init_bitstuff();
+        partition = new SubsetPartition(this);
         _all_tags_spin_lock = 0;
-        traverser = new Traverser(this);
-
     }
 
     virtual ~Hashtable( )
@@ -142,7 +141,6 @@ protected:
 
 public:
     SubsetPartition * partition;
-    Traverser * traverser;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -339,8 +337,8 @@ public:
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
 
-    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
-    unsigned int kmer_degree(const char * kmer_s) const;
+    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
+    unsigned int kmer_degree(const char * kmer_s);
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)

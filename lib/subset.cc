@@ -47,7 +47,6 @@ static void print_tag_set(SeenSet& p)
 SubsetPartition::SubsetPartition(Hashtable * ht) :
                                  next_partition_id(2), _ht(ht)
 {
-    traverser = new Traverser(_ht);
 }
 
 void SubsetPartition::count_partitions(
@@ -290,7 +289,7 @@ unsigned int SubsetPartition::find_unpart(
                 ++si) {
             n += 1;
 
-            Kmer kmer = traverser->build_kmer(*si);
+            Kmer kmer = _ht->build_kmer(*si);
 
             // find all tagged kmers within range.
             tagged_kmers.clear();
@@ -430,7 +429,9 @@ void SubsetPartition::find_all_tags(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
+    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
+    Kmer tmp_node;
 
     auto filter = [&] (Kmer& n) -> bool {
         return !set_contains(keeper, n);
@@ -486,11 +487,12 @@ void SubsetPartition::find_all_tags(
             continue;    // truncate search @CTB exit?
         }
 
-        nfound = traverser->traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q, filter);
         for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        nfound = traverser->traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q, filter);
         for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+
 
         first = false;
     }
@@ -797,7 +799,6 @@ void SubsetPartition::do_partition(
     unsigned int total_reads = 0;
 
     SeenSet tagged_kmers;
-
     SeenSet::const_iterator si, end;
 
     if (first_kmer) {
@@ -814,7 +815,7 @@ void SubsetPartition::do_partition(
     for (; si != end; ++si) {
         total_reads++;
 
-        Kmer kmer = traverser->build_kmer(*si);
+        Kmer kmer = _ht->build_kmer(*si);
 
         // find all tagged kmers within range.
         tagged_kmers.clear();
@@ -1611,7 +1612,6 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int count;
     unsigned int n_big = 0;
     KmerSet keeper;
-    KmerFactory factory(_ht->ksize());
 
     SeenSet::const_iterator si = bigtags.begin();
 
@@ -1624,7 +1624,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
 #endif //0
 
-        count = _ht->traverse_from_kmer(factory.build_kmer(*si),
+        count = _ht->traverse_from_kmer(_ht->build_kmer(*si),
                                         distance, keeper);
 
         if (count >= threshold) {
@@ -1685,7 +1685,7 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
 #endif // 0
         }
 
-        Kmer kmer = traverser->build_kmer(*si);
+        Kmer kmer = _ht->build_kmer(*si);
 
         tagged_kmers.clear();
         find_all_tags(kmer, tagged_kmers, _ht->all_tags, true, false);
