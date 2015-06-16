@@ -11,19 +11,16 @@
    defaults; added -M/--max_memory_usage, and functions create_nodegraph()
    and create_countgraph().
    * khmer/kfile.py: fixed check_space_for_hashtable to depend on args obj.
-   * tests/test_script_arguments.py: updated tests.
-   * scripts/{abundance-dist-single.py,count-overlap.py,do-partition.py,
-   filter-abund-single.py,find-knots.py,load-into-counting.py,
-   make-initial-stoptags.py,normalize-by-median.py,trim-low-abund.py,
-   sandbox/{collect-reads.py,saturate-by-median.py}: replaced
-   counting hash/hashbits creation with new khmer_args create* functions.
-   * oxli/build_graph.py,sandbox/{sweep-files.py,sweep-reads.py},
-   scripts/{count-overlap.py,do-partition.py,filter-stoptags.py,
-   merge-partitions.py}:
-   changed hashtype over to 'nodegraph' and 'countgraph' in call to
-   report_on_config; replaced counting hash/hashbits creation with new
-   khmer_args create* functions.
-   * scripts/annotate-partitions.py: changed new_hashbits over to Hashbits.
+   * oxli/build_graph.py, scripts/{annotate-partitions.py,count-overlap.py,
+   do-partition.py,filter-stoptags.py,
+   merge-partitions.py}, sandbox/{assembly-diff.py,assembly-diff-2.py,
+   bloom-count-intersection.py,bloom-count.py,build-sparse-graph.py,
+   collect-reads.py,saturate-by-median.py, graph-size.py,print-stoptags.py,
+   print-tagset.py,stoptags-by-position.py, subset-report.py,
+   sweep-out-reads-with-contigs.py,sweep-reads2.py,sweep-reads3.py}: changed
+   hashtype over to 'nodegraph' and 'countgraph' in call to report_on_config;
+   replaced counting hash/hashbits creation with new khmer_args create*
+   functions, and/or new_counting_hash/new_hashbits with CountingHash/Hashbits.
    * doc/scripts.rst: updated hashtable size help text.
    * tests/test*.py: switched from new_counting_hash to CountingHash, and
    new_hashbits to Hashbits; adjusts tests for new behavior of hashtable
