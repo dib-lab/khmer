@@ -1103,11 +1103,12 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     SeenSet tags;
+
     KmerFactory factory(hashtable->ksize());
+    Kmer start_kmer = factory.build_kmer(kmer_s);
 
     Py_BEGIN_ALLOW_THREADS
 
-    Kmer start_kmer = factory.build_kmer(kmer_s);
     hashtable->partition->find_all_tags(start_kmer, tags,
                                         hashtable->all_tags);
 

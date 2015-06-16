@@ -93,6 +93,10 @@ public:
         kmer_r = r;
         kmer_u = u;
     }
+	Kmer()
+	{
+		kmer_f = kmer_r = kmer_u = 0;
+	}
 
     operator HashIntoType() const { return kmer_u; }
 	operator unsigned int() const { return kmer_u; }

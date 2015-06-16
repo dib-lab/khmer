@@ -47,6 +47,7 @@ public:
     ~SubsetPartition()
     {
         _clear_all_partitions();
+        delete traverser;
     }
 
     PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);
