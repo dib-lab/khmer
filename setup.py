@@ -115,7 +115,7 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-O0']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':

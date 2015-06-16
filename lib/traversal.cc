@@ -40,7 +40,7 @@ unsigned int Traverser::traverse_left(Kmer& node,
 {
     unsigned int found = 0;
 
-    char bases[] = "ATCG";
+    char bases[] = "ACGT";
     char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
@@ -60,7 +60,7 @@ unsigned int Traverser::traverse_right(Kmer& node,
 {
     unsigned int found = 0;
 
-    char bases[] = "ATCG";
+    char bases[] = "ACGT";
     char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
@@ -78,7 +78,7 @@ unsigned int Traverser::degree_left(Kmer& node)
 {
     unsigned int degree = 0;
 
-    char bases[] = "ATCG";
+    char bases[] = "ACGT";
     char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
@@ -95,7 +95,7 @@ unsigned int Traverser::degree_right(Kmer& node)
 {
     unsigned int degree = 0;
 
-    char bases[] = "ATCG";
+    char bases[] = "ACGT";
     char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
