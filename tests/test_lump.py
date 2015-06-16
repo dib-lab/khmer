@@ -88,7 +88,7 @@ def test_fakelump_repartitioning():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.CountingHash(32, 1e4, 4)
+    counting = khmer.CountingHash(32, 1e5, 4)
 
     ht.repartition_largest_partition(None, counting,
                                      EXCURSION_DISTANCE,
@@ -107,7 +107,7 @@ def test_fakelump_repartitioning():
     ht.merge_subset(subset)
 
     (n_partitions, n_singletons) = ht.count_partitions()
-    assert n_partitions == 3, n_partitions
+    assert n_partitions == 6, n_partitions
 
 
 def test_fakelump_load_stop_tags_trunc():

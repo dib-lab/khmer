@@ -50,7 +50,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 89' in err, err
+    assert 'Total number of unique k-mers: 83' in err, err
     assert os.path.exists(outfile)
 
 
@@ -64,7 +64,7 @@ def test_load_into_counting_abundance_dist_nobig():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 89' in err, err
+    assert 'Total number of unique k-mers: 83' in err, err
     assert os.path.exists(outfile)
 
     htfile = outfile
@@ -180,13 +180,14 @@ def test_load_into_counting_json():
     with open(jsonfile) as jsonfh:
         got_json = json.load(jsonfh)
     outbase = os.path.basename(outfile)
+
     expected_json = {
-        "files": [infile],
-        "ht_name": outbase,
-        "num_kmers": 95,
-        "num_reads": 1001,
-        "fpr": 9.024965705097741e-11,
-        "mrinfo_version": "0.2.0",
+        u"files": [infile],
+        u"ht_name": outbase,
+        u"num_kmers": 95,
+        u"num_reads": 1001,
+        u"fpr": 9.025048735197377e-11,
+        u"mrinfo_version": "0.2.0",
     }
 
     assert got_json == expected_json, got_json
@@ -732,10 +733,10 @@ def test_normalize_by_median_report_fp():
     args = ['-C', '1', '-k', '17', '-R', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "fp rate estimated to be 0.626" in err, err
+    assert "fp rate estimated to be 0.623" in err, err
     report = open(outfile, 'r')
     line = report.readline()
-    assert "100000 25232 0.25232" in line, line
+    assert "100000 25261 0.25261" in line, line
 
 
 def test_normalize_by_median_unpaired_and_paired():
@@ -753,7 +754,7 @@ def test_normalize_by_median_unpaired_and_paired():
     args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of unique k-mers: 4029' in err, err
+    assert 'Total number of unique k-mers: 4030' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -1632,13 +1633,13 @@ def test_extract_partitions_header_whitespace():
     assert os.path.exists(groupfile)
 
     dist = open(distfile).readline()
-    assert dist.strip() == '1 11957 11957 11957'
+    assert dist.strip() == '1 11960 11960 11960', dist.strip()
 
     parts = [r.name.split('\t')[1]
              for r in screed.open(partfile, parse_description=False)]
     assert len(parts) == 13538, len(parts)
     parts = set(parts)
-    assert len(parts) == 12601, len(parts)
+    assert len(parts) == 12602, len(parts)
 
 
 def test_extract_partitions_fq():
@@ -2875,14 +2876,14 @@ def test_count_overlap():
     assert os.path.exists(outfile), outfile
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert '# of unique k-mers in dataset2: 759047' in data
-    assert '# of overlap unique k-mers: 245621' in data
+    assert '# of unique k-mers in dataset2: 759020' in data, data
+    assert '# of overlap unique k-mers: 245547' in data
     assert os.path.exists(curvefile), curvefile
     data = [x.strip() for x in open(curvefile)]
     data = set(data)
-    assert '178633 1155' in data
-    assert '496285 2970' in data
-    assert '752053 238627' in data
+    assert '178630 1134' in data, data
+    assert '496280 2904' in data
+    assert '752031 238558' in data
 
 
 def test_count_overlap_csv():
@@ -2902,14 +2903,14 @@ def test_count_overlap_csv():
     assert os.path.exists(outfile), outfile
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert '# of unique k-mers in dataset2: 759047' in data
-    assert '# of overlap unique k-mers: 245621' in data
+    assert '# of unique k-mers in dataset2: 759020' in data
+    assert '# of overlap unique k-mers: 245547' in data
     assert os.path.exists(curvefile), curvefile
     data = [x.strip() for x in open(curvefile)]
     data = set(data)
-    assert '178633,1155' in data
-    assert '496285,2970' in data
-    assert '752053,238627' in data
+    assert '178630,1134' in data, data
+    assert '496280,2904' in data
+    assert '752031,238558' in data
 
 
 def execute_streaming_diginorm(ifilename):

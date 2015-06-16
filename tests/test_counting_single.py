@@ -17,7 +17,7 @@ MAX_COUNT = 255
 
 
 def test_no_collision():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
@@ -36,7 +36,7 @@ def test_toobig():
 
 
 def test_collision():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
@@ -46,7 +46,7 @@ def test_collision():
 
 
 def test_badcount():
-    countingtable = khmer.CountingHash(4, 4, 1)
+    countingtable = khmer._CountingHash(4, [5])
     try:
         countingtable.count()
         assert 0, "count should require one argument"
@@ -60,7 +60,7 @@ def test_badcount():
 
 
 def test_hashtable_n_entries():
-    countingtable = khmer.CountingHash(4, 4, 1)
+    countingtable = khmer._CountingHash(4, [5])
     try:
         countingtable.n_entries("nope")
         assert 0, "n_entries should accept no arguments"
@@ -69,7 +69,7 @@ def test_hashtable_n_entries():
 
 
 def test_complete_no_collision():
-    kh = khmer.CountingHash(4, 4 ** 2, 1)
+    kh = khmer._CountingHash(4, [4**4])
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -89,13 +89,13 @@ def test_complete_no_collision():
             n_fwd_filled += 1
 
     assert n_rc_filled == kh.n_entries(), n_rc_filled
-    assert n_palindromes == 16, n_palindromes  # @CTB check this
+    assert n_palindromes == 16, n_palindromes
     assert n_fwd_filled == kh.n_entries() // 2 + n_palindromes // 2, \
         n_fwd_filled
 
 
 def test_complete_2_collision():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -138,7 +138,7 @@ def test_complete_4_collision():
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     last_count = None
     for _ in range(0, 10000):
@@ -156,7 +156,7 @@ def test_maxcount():
 
 def test_maxcount_with_bigcount():
     # hashtable should not saturate, if use_bigcount is set.
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
     kh.set_use_bigcount(True)
 
     last_count = None
@@ -174,7 +174,7 @@ def test_maxcount_with_bigcount():
 
 
 def test_consume_uniqify_first():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     s = "TTTT"
     s_rc = "AAAA"
@@ -186,7 +186,7 @@ def test_consume_uniqify_first():
 
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     s = "A" * 10000
     kh.consume(s)
@@ -197,7 +197,7 @@ def test_maxcount_consume():
 
 def test_maxcount_consume_with_bigcount():
     # use the bigcount hack to avoid saturating the hashtable.
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
     kh.set_use_bigcount(True)
 
     s = "A" * 10000
@@ -208,21 +208,21 @@ def test_maxcount_consume_with_bigcount():
 
 
 def test_get_mincount():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     s = "AAAAACGT"
     kh.consume(s)
 
     x = kh.get_min_count(s)
-    assert x == 1
+    assert x == 1, x
 
     kh.consume(s)
     x = kh.get_min_count(s)
-    assert x == 2
+    assert x == 2, x
 
 
 def test_get_maxcount():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [7])
 
     s = "AAAAACGT"
     kh.consume(s)
@@ -236,29 +236,29 @@ def test_get_maxcount():
 
 
 def test_get_maxcount_rc():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [7])
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
     kh.consume(s)
 
     x = kh.get_max_count(s)
-    assert x == 2
+    assert x == 2, x
 
     kh.consume(src)
     x = kh.get_max_count(s)
-    assert x == 4
+    assert x == 4, x
 
 
 def test_get_mincount_rc():
-    kh = khmer.CountingHash(4, 4, 1)
+    kh = khmer._CountingHash(4, [5])
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
 
     kh.consume(s)
     x = kh.get_min_count(s)
-    assert x == 1
+    assert x == 1, x
 
     kh.consume(src)
     x = kh.get_min_count(s)
@@ -318,7 +318,7 @@ def test_very_short_read():
 class Test_ConsumeString(object):
 
     def setup(self):
-        self.kh = khmer.CountingHash(4, 4 ** 4, 1)
+        self.kh = khmer._CountingHash(4, [4**4])
 
     def test_n_occupied(self):
         assert self.kh.n_occupied() == 0
@@ -375,7 +375,7 @@ class Test_ConsumeString(object):
         assert self.kh.n_occupied() == 0
         self.kh.consume('AAAA')
         assert self.kh.n_occupied(0, 1) == 1
-        assert self.kh.n_occupied(1, 4 ** 4) == 0
+        assert self.kh.n_occupied(1, 4 ** 4) == 0, self.kh.n_occupied()
 
         hashvalue = khmer.forward_hash('AACT', 4)
         self.kh.consume('AACT')
@@ -414,14 +414,14 @@ class Test_ConsumeString(object):
 class Test_AbundanceDistribution(object):
 
     def setup(self):
-        self.kh = khmer.CountingHash(4, 4, 1)
+        self.kh = khmer._CountingHash(4, [5])
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_fasta(A_filename)
 
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')
 
-        tracking = khmer.Hashbits(4, 4, 1)
+        tracking = khmer._Hashbits(4, [5])
         dist = self.kh.abundance_distribution(A_filename, tracking)
 
         assert sum(dist) == 1
