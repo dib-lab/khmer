@@ -316,98 +316,6 @@ unsigned int SubsetPartition::find_unpart(
     return n_singletons;
 }
 
-/* @cswelcher Brilliant idea: let's *not* copy this same piece of code
- * over and over again!
- */
-void SubsetPartition::queue_neighbors(
-    HashIntoType		kmer_f,
-    HashIntoType		kmer_r,
-    unsigned int		breadth,
-    SeenSet&			traversed_kmers,
-    NodeQueue&			node_q,
-    std::queue<unsigned int>&	breadth_q)
-{
-
-    HashIntoType f, r;
-    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
-    const HashIntoType bitmask = _ht->bitmask;
-
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-}
-
-///
-
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
 //    connected to kmer_f/kmer_r in the graph.
 
@@ -511,107 +419,81 @@ unsigned int SubsetPartition::sweep_for_tags(
     bool		stop_big_traversals)
 {
 
-    SeenSet traversed_kmers;
-    NodeQueue node_q;
+    Traverser traverser(_ht);
+    KmerSet traversed_nodes;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
-    //unsigned int cur_breadth = 0;
 
     unsigned int max_breadth = range;
-    //unsigned int breadth_seen = 0;
-
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    // start breadth-first search.
-
-    HashIntoType kmer_f, kmer_r;
-    KmerIterator kmers(seq.c_str(), _ht->ksize());
-    std::string kmer_s;
+    auto filter = [&] (Kmer& n) -> bool {
+        return !set_contains(traversed_nodes, n);
+    };
 
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
-    // @cswelcher still using kludgy kmer iterator, let's fix this sometime...
+    KmerIterator kmers(seq.c_str(), _ht->ksize());
     while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        kmer_s = _revhash(kmer, _ht->ksize());
-        kmer = _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
-        traversed_kmers.insert(kmer);
+        Kmer node = kmers.next();
+        traversed_nodes.insert(node);
 
-        node_q.push(kmer_f);
-        node_q.push(kmer_r);
+        node_q.push(node);
         breadth_q.push(0);
     }
 
     size_t seq_length = node_q.size() / 2;
     size_t BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
-    //unsigned int cur_it = 0;
     while(!node_q.empty()) {
         // change this to a better hueristic
-        if (stop_big_traversals && traversed_kmers.size() >
+        if (stop_big_traversals && traversed_nodes.size() >
                 BIG_PERIMETER_TRAVERSALS) {
             tagged_kmers.clear();
             break;
         }
 
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
-        //cur_it++;
-        //printf("current iteration: %u, current breadth: %u\n", cur_it, breadth);
-
-        //if (breadth > breadth_seen) {
-        //  breadth_seen = breadth;
-        //}
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-
-        // Have we already seen this k-mer?  If so, skip.
-        // @cswelcher we already check before queuing
-        //if (set_contains(traversed_kmers, kmer)) {
-        // continue;
-        //}
 
         // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
-            // @CTB optimize by inserting into traversed_kmers set?
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
             continue;
         }
 
-        // keep track of seen kmers
-        traversed_kmers.insert(kmer);
+        traversed_nodes.insert(node);
         total++;
 
-        //
-        if (set_contains(all_tags, kmer)) {
-            tagged_kmers.insert(kmer);
+        if (set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
             // if we find a tag, finish the remaining queued nodes,
             // but don't queue up any more
             // max_breadth = breadth;
             continue;
         }
 
-        // removed for not doing anything
-        //assert(breadth >= cur_breadth); // keep track of watermark, for
-        //debugging.
-        //if (breadth > cur_breadth) { cur_breadth = breadth; }
-
         if (breadth == max_breadth) {
             continue;
         }
+
         // finish up nodes on the current level, but if we go beyond, end it
-        // immediately this keeps from having to look at nodes which have
+        // immediately; this keeps from having to look at nodes which have
         // already been queued once we lower the limit after finding a tag
         else if (breadth > max_breadth) {
-            return total;    // truncate search @CTB exit?
+            return total;
         }
 
-        queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q,
-                        breadth_q);
+        nfound = traverser.traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+
+        nfound = traverser.traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
     }
-    //printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
+
     return total;
 }
 

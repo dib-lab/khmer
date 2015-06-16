@@ -71,13 +71,6 @@ public:
     void load_partitionmap(std::string infile);
     void _validate_pmap();
 
-    void queue_neighbors(HashIntoType kmer_f,
-                         HashIntoType kmer_r,
-                         unsigned int breadth,
-                         SeenSet& traversed_kmers,
-                         NodeQueue& node_q,
-                         std::queue<unsigned int>& breadth_q);
-
     void find_all_tags(Kmer start_kmer,
                        SeenSet& tagged_kmers,
                        const SeenSet& all_tags,
