@@ -39,8 +39,8 @@ Kmer Traverser::get_right(Kmer& node, const char ch)
 }
 
 unsigned int Traverser::traverse_left(Kmer& node,
-                                       KmerQueue & node_q,
-                                       std::function<bool (Kmer&)> filter)
+                                       KmerQueue & target_q,
+                                       std::function<bool (Kmer&)> keep_func)
 {
     unsigned int found = 0;
 
@@ -48,8 +48,8 @@ unsigned int Traverser::traverse_left(Kmer& node,
     char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
-        if (graph->get_count(prev_node) && filter(prev_node)) {
-            node_q.push(prev_node);
+        if (graph->get_count(prev_node) && keep_func(prev_node)) {
+            target_q.push(prev_node);
             ++found;
         }
         ++base;
@@ -59,8 +59,8 @@ unsigned int Traverser::traverse_left(Kmer& node,
 }
 
 unsigned int Traverser::traverse_right(Kmer& node,
-                                       KmerQueue & node_q,
-                                       std::function<bool (Kmer&)> filter)
+                                       KmerQueue & target_q,
+                                       std::function<bool (Kmer&)> keep_func)
 {
     unsigned int found = 0;
 
@@ -68,8 +68,8 @@ unsigned int Traverser::traverse_right(Kmer& node,
     char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
-        if (graph->get_count(next_node) && filter(next_node)) {
-            node_q.push(next_node);
+        if (graph->get_count(next_node) && keep_func(next_node)) {
+            target_q.push(next_node);
             ++found;
         }
         ++base;
@@ -124,25 +124,35 @@ BreadthFirstTraversal::BreadthFirstTraversal(const Hashtable * ht) :
     total = 0;
 }
 
-unsigned int BreadthFirstTraversal::search(Kmer& start_node,
-                                           KmerSet& seen_set)
+unsigned int
+BreadthFirstTraversal::search(
+       Kmer& start_node,
+       KmerSet& start_seen_set,
+       std::function<bool ()> continue_func,
+       std::function<bool ()> break_func,
+       std::function<bool (Kmer& node)> node_keep_func)
 {
     current_breadth = 0;
     total = 0;
     unsigned int nfound = 0;
+    first_node = true;
 
-    this->seen_set = seen_set;
+    seen_set = &start_seen_set;
 
     node_q.push(start_node);
     breadth_q.push(0);
 
     auto filter = [&] (Kmer& n) -> bool {
-        return node_filter_func(n);
+        return node_keep_func(n);
     };
+
+    int nbreaks = 0;
+    int ncontinues = 0;
 
     while(!node_q.empty()) {
 
         if (break_func()) {
+            ++nbreaks;
             break;
         }
 
@@ -152,11 +162,27 @@ unsigned int BreadthFirstTraversal::search(Kmer& start_node,
         current_breadth = breadth_q.front();
         breadth_q.pop();
 
+        if (set_contains(*seen_set, current_node)) {
+            continue;
+        }
+
         // keep track of seen kmers
-        seen_set.insert(current_node);
+        seen_set->insert(current_node);
         total++;
 
+        if (current_breadth > 150
+            || total > 10000) {
+            std::cout << "Uh oh. Current breadth is " << current_breadth
+                      << " and total traversed is " << total
+                      << ". Warp core overload imminent!" << std::endl
+                      << "Breaks: " << nbreaks << std::endl
+                      << "Continues: " << ncontinues << std::endl;
+            throw khmer_exception("Traversal failed to terminate, "
+                                  "warp core has breached. Your ship explodes.");
+        }
+
         if(continue_func()) {
+            ++ncontinues;
             continue;
         } else {
             nfound = traverse_right(current_node, node_q, filter);
@@ -172,4 +198,19 @@ unsigned int BreadthFirstTraversal::search(Kmer& start_node,
 
         first_node = false;
     }
+
+    /*
+    std::cout << std::endl << "Breadth: " << current_breadth << std::endl
+              << "Total: " << total << std::endl
+              << "Queue size: " << node_q.size() << std::endl
+              << "Set size: " << seen_set->size() << std::endl
+              << "Breaks: " << nbreaks << std::endl
+              << "Continues: " << ncontinues << std::endl;
+              */
+    return total;
+}
+
+bool BreadthFirstTraversal::seen_set_contains(Kmer& node)
+{
+    return set_contains(*seen_set, node);
 }

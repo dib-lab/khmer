@@ -327,82 +327,55 @@ void SubsetPartition::find_all_tags(
     bool		stop_big_traversals)
 {
 
-    bool first = true;
-    KmerQueue node_q;
-    std::queue<unsigned int> breadth_q;
-
-    unsigned int cur_breadth = 0;
     const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
 
-    unsigned int total = 0;
-    unsigned int nfound = 0;
-
-    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
+    BreadthFirstTraversal traversal(_ht);
 
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(keeper, n);
+    auto continue_func = [&] () {
+
+        if (!traversal.on_first_node() &&
+            set_contains(all_tags, traversal.cursor()))
+        {
+            tagged_kmers.insert(traversal.cursor());
+            return true;
+        }
+
+        if (traversal.get_cursor_breadth() >= max_breadth) {
+            return true;
+        }
+
+        return false;
     };
 
-    node_q.push(start_kmer);
-    breadth_q.push(0);
+    auto break_func = [&] () {
 
-    while(!node_q.empty()) {
-
-        if (stop_big_traversals && keeper.size() > BIG_TRAVERSALS_ARE) {
+        if (stop_big_traversals &&
+            traversal.seen_set_size() > BIG_TRAVERSALS_ARE)
+        {
             tagged_kmers.clear();
-            break;
+            return true;
         }
 
-        Kmer node = node_q.front();
-        node_q.pop();
+        return false;
+    };
 
-        unsigned int breadth = breadth_q.front();
-        breadth_q.pop();
+    auto node_keep_func = [&] (Kmer& node) {
 
-        if (set_contains(keeper, node)) {
-            continue;
+        if (traversal.seen_set_contains(node)) {
+            return false;
+        }
+        if (break_on_stop_tags
+            && set_contains(_ht->stop_tags, traversal.cursor()))
+        {
+            return false;
         }
 
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
-            continue;
-        }
+        return true;
+    };
 
-        // keep track of seen kmers
-        keeper.insert(node);
-        total++;
-
-        // Is this a kmer-to-tag, and have we put this tag in a partition
-        // already? Search no further in this direction.  (This is where we
-        // connect partitions.)
-        if (!first && set_contains(all_tags, node)) {
-            tagged_kmers.insert(node);
-            continue;
-        }
-
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for
-            // debugging
-            throw khmer_exception("Desynchonization between traversal "
-                                  "and breadth tracking. Did you forget "
-                                  "to pop the node or breadth queue?");
-        }
-        if (breadth > cur_breadth) {
-            cur_breadth = breadth;
-        }
-
-        if (breadth >= max_breadth) {
-            continue;    // truncate search @CTB exit?
-        }
-
-        nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
-
-        nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
-
-
-        first = false;
-    }
+    traversal.search(start_kmer, keeper,
+                     continue_func, break_func, node_keep_func);
 }
 
 
