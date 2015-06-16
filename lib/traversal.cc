@@ -116,3 +116,60 @@ unsigned int Traverser::degree(Kmer& node)
 {
     return degree_right(node) + degree_left(node);
 }
+
+BreadthFirstTraversal::BreadthFirstTraversal(const Hashtable * ht) :
+    Traverser(ht)
+{
+    current_breadth = 0;
+    total = 0;
+}
+
+unsigned int BreadthFirstTraversal::search(Kmer& start_node,
+                                           KmerSet& seen_set)
+{
+    current_breadth = 0;
+    total = 0;
+    unsigned int nfound = 0;
+
+    this->seen_set = seen_set;
+
+    node_q.push(start_node);
+    breadth_q.push(0);
+
+    auto filter = [&] (Kmer& n) -> bool {
+        return node_filter_func(n);
+    };
+
+    while(!node_q.empty()) {
+
+        if (break_func()) {
+            break;
+        }
+
+        current_node = node_q.front();
+        node_q.pop();
+
+        current_breadth = breadth_q.front();
+        breadth_q.pop();
+
+        // keep track of seen kmers
+        seen_set.insert(current_node);
+        total++;
+
+        if(continue_func()) {
+            continue;
+        } else {
+            nfound = traverse_right(current_node, node_q, filter);
+            for (unsigned int i = 0; i<nfound; ++i) {
+                breadth_q.push(current_breadth + 1);
+            }
+
+            nfound = traverse_left(current_node, node_q, filter);
+            for (unsigned int i = 0; i<nfound; ++i) {
+                breadth_q.push(current_breadth + 1);
+            }
+        }
+
+        first_node = false;
+    }
+}

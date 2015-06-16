@@ -52,5 +52,29 @@ public:
     unsigned int degree(Kmer& node);
 };
 
+class BreadthFirstTraversal: public Traverser
+{
+protected:
+
+    unsigned int current_breadth, total;
+    bool first_node;
+
+    Kmer current_node;
+
+    KmerQueue node_q;
+    std::queue<unsigned int> breadth_q;
+    KmerSet seen_set;
+
+public:
+
+    explicit BreadthFirstTraversal(const Hashtable * ht);
+
+    unsigned int search(Kmer& start_node,
+                        KmerSet& seen_set);
+    virtual bool continue_func() = 0;
+    virtual bool break_func() = 0;
+    virtual bool node_filter_func(Kmer& node) = 0;
+};
+
 };
 #endif
