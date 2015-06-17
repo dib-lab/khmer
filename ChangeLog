@@ -1,4 +1,4 @@
-2015-06-11  Titus Brown  <titus@idyll.org>
+2015-06-17  Titus Brown  <titus@idyll.org>
 
    * scripts/normalize-by-median.py: changed DEFAULT_DESIRED_COVERAGE to 20,
    and corrected options help.

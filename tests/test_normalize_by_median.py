@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,9 +16,9 @@ import io
 import screed
 import khmer
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
-from test_scripts import _make_counting
+from .test_scripts import _make_counting
 
 
 def test_normalize_by_median_indent():
@@ -144,7 +147,7 @@ def test_normalize_by_median_known_good():
         for rknown, rout in zip(iter_known, iter_out):
             assert rknown.name == rout.name
     except Exception as e:
-        print e
+        print(e)
         assert False
 
 
@@ -252,8 +255,8 @@ def test_normalize_by_median_version():
             continue
         break
 
-    print errlines
-    print err
+    print(errlines)
+    print(err)
 
     assert err.startswith('khmer ')
 
@@ -311,8 +314,8 @@ def test_normalize_by_median_paired_fq():
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -378,7 +381,7 @@ def test_normalize_by_median_no_bigcount():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
-    print(out, err)
+    print((out, err))
 
     assert os.path.exists(hashfile), hashfile
     kh = khmer.load_counting_hash(hashfile)
@@ -485,8 +488,8 @@ def test_diginorm_basic_functionality_1():
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -516,8 +519,8 @@ def test_diginorm_basic_functionality_2():
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -547,8 +550,8 @@ def test_diginorm_basic_functionality_3():
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -577,8 +580,8 @@ def test_diginorm_basic_functionality_4():
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -606,8 +609,8 @@ def test_diginorm_basic_functionality_4():
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
     _, out, err = utils.runscript(script, args, in_dir)
-    print out
-    print err
+    print(out)
+    print(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
