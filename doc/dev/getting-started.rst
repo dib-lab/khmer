@@ -220,10 +220,11 @@ Claiming an issue and starting to develop
 
 #. Create a new branch and link it to your fork on GitHub::
 
-      git checkout -b fix/issue_number
-      git push -u origin fix/issue_number
+      git checkout -b fix/brief_issue_description
+      git push -u origin fix/brief_issue_description
 
-   where you replace "issue_number" with the number of the issue.
+   where you replace "brief_issue_description" with 2-3 words, separated
+   by underscores, describing the issue.
 
    (This is the set of changes you're going to ask to be merged into khmer.)
 

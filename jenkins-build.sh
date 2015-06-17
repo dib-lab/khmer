@@ -56,7 +56,7 @@ then
 	#hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
 	#hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
 	#pip install --upgrade sphinx-contrib/autoprogram/
-	pip install -r doc/requirements.txt
+	#pip install -r doc/requirements.txt # now covered by make install-dep
 	make doc
 fi
 make pylint 2>&1 > pylint.out

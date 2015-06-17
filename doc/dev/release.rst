@@ -82,7 +82,7 @@ release makers, following this checklist by MRC.
         cd khmer
         make install-dependencies
         make test
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 1st manual version check passed
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
@@ -103,7 +103,7 @@ release makers, following this checklist by MRC.
         cp dist/khmer*tar.gz ../../../testenv3/
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 2nd manual version check passed
         nosetests khmer --attr '!known_failing'
 
@@ -141,7 +141,7 @@ release makers, following this checklist by MRC.
         pip install screed nose
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         nosetests khmer --attr '!known_failing'
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 3rd manual version check passed
         cd build/khmer
         make test

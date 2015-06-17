@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
@@ -14,6 +14,8 @@ Place reads into -o output_file.
 
 Use '-h' for parameter help.
 """
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import textwrap
@@ -76,12 +78,12 @@ def main():
     check_space(args.input_sequence_filename, False)
     check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
 
-    print 'Saving k-mer counting table to %s' % base
-    print 'Loading sequences from %s' % repr(filenames)
+    print('Saving k-mer counting table to %s' % base)
+    print('Loading sequences from %s' % repr(filenames))
     if args.output:
-        print 'Outputting sequences to', args.output
+        print('Outputting sequences to', args.output)
 
-    print 'making k-mer counting table'
+    print('making k-mer counting table')
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize)
     htable.set_use_bigcount(args.bigcount)
 
@@ -103,8 +105,8 @@ def main():
             n += 1
 
             if total_coverage / float(n) > args.coverage:
-                print 'reached target average coverage:', \
-                      total_coverage / float(n)
+                print('reached target average coverage:', \
+                      total_coverage / float(n))
                 break
 
             htable.consume(seq)
@@ -112,18 +114,18 @@ def main():
                 args.output.write(output_single(record))
 
             if n % 100000 == 0:
-                print '...', index, filename, n, total_coverage / float(n)
+                print('...', index, filename, n, total_coverage / float(n))
 
         if total_coverage / float(n) > args.coverage:
             break
 
-    print 'Collected %d reads' % (n,)
+    print('Collected %d reads' % (n,))
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print('Total number of k-mers: {0}'.format(
+            htable.n_occupied()), file=sys.stderr)
 
-    print 'saving', base
+    print('saving', base)
     htable.save(base)
 
     info_fp = open(base + '.info', 'w')
@@ -131,10 +133,10 @@ def main():
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
-    print 'fp rate estimated to be %1.3f' % fp_rate
-    print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate)
+    print('fp rate estimated to be %1.3f' % fp_rate, file=info_fp)
 
-    print 'DONE.'
+    print('DONE.')
 
 if __name__ == '__main__':
     main()

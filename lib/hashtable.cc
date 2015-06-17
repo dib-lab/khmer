@@ -193,24 +193,10 @@ void Hashtable::get_median_count(const std::string &s,
                                  float &stddev)
 {
     std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        BoundedCounterType count = this->get_count(kmer);
-        counts.push_back(count);
-    }
+    this->get_kmer_counts(s, counts);
 
     if (!counts.size()) {
-        throw khmer_exception();
-    }
-
-    if (!counts.size()) {
-        median = 0;
-        average = 0;
-        stddev = 0;
-
-        return;
+        throw khmer_exception("no k-mer counts for this string; too short?");
     }
 
     average = 0;
@@ -232,6 +218,42 @@ void Hashtable::get_median_count(const std::string &s,
     median = counts[counts.size() / 2]; // rounds down
 }
 
+//
+// Optimized filter function for normalize-by-median
+//
+bool Hashtable::median_at_least(const std::string &s,
+                                unsigned int cutoff)
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+    unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
+    unsigned int num_cutoff_kmers = 0;
+
+    // first loop:
+    // accumulate at least min_req worth of counts before checking to see
+    // if we have enough high-abundance k-mers to indicate success.
+    for (unsigned int i = 0; i < min_req; ++i) {
+        HashIntoType kmer = kmers.next();
+        if (this->get_count(kmer) >= cutoff) {
+            ++num_cutoff_kmers;
+        }
+    }
+
+    // second loop: now check to see if we pass the threshold for each k-mer.
+    if (num_cutoff_kmers >= min_req) {
+        return true;
+    }
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        if (this->get_count(kmer) >= cutoff) {
+            ++num_cutoff_kmers;
+            if (num_cutoff_kmers >= min_req) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void Hashtable::save_tagset(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
@@ -240,6 +262,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -291,15 +314,23 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
+    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
     HashIntoType * buf = NULL;
 
     try {
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading tagset from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading tagset from " << infilename
@@ -1265,14 +1296,22 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
+    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
 
     try {
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading stoptags from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading stoptags from " << infilename
@@ -1315,6 +1354,7 @@ void Hashtable::save_stop_tags(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -1502,4 +1542,43 @@ void Hashtable::extract_unique_paths(std::string seq,
         }
     }
 }
+
+
+void Hashtable::get_kmers(const std::string &s,
+                          std::vector<std::string> &kmers_vec) const
+{
+    if (s.length() < _ksize) {
+        return;
+    }
+    for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+        std::string sub = s.substr(i, i + _ksize);
+        kmers_vec.push_back(sub);
+    }
+}
+
+
+void Hashtable::get_kmer_hashes(const std::string &s,
+                                std::vector<HashIntoType> &kmers_vec) const
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        kmers_vec.push_back(kmer);
+    }
+}
+
+
+void Hashtable::get_kmer_counts(const std::string &s,
+                                std::vector<BoundedCounterType> &counts) const
+{
+    KMerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        BoundedCounterType c = this->get_count(kmer);
+        counts.push_back(c);
+    }
+}
+
 // vim: set sts=2 sw=2:

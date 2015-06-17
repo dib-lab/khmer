@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <errno.h>
+#include <assert.h>
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
@@ -1255,6 +1256,7 @@ void SubsetPartition::_merge_other(
 void SubsetPartition::merge_from_disk(string other_filename)
 {
     ifstream infile;
+    unsigned long long expected_pmap_size;
 
     // configure ifstream to raise exceptions for everything.
     infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -1273,11 +1275,19 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     try {
         unsigned int save_ksize = 0;
+        char signature[4];
         unsigned char version, ht_type;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature " << signature
+                << " while reading subset pmap from " << other_filename
+                << " Should be: " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
@@ -1296,6 +1306,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
                 << " while reading subset pmap from " << other_filename;
             throw khmer_file_exception(err.str());
         }
+
+        infile.read((char *) &expected_pmap_size, sizeof(expected_pmap_size));
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
@@ -1332,6 +1344,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             // _nothing_.  Note that the while loop exits on EOF.
 
             if (infile.gcount() == 0) {
+                delete[] buf;
                 std::string err;
                 err = "Unknown error reading data from: " + other_filename;
                 throw khmer_file_exception(err);
@@ -1350,21 +1363,21 @@ void SubsetPartition::merge_from_disk(string other_filename)
             diskp = (PartitionID *) (buf + i);
             i += sizeof(PartitionID);
 
-            if (!(*diskp != 0)) {		// sanity check.
-                throw khmer_exception();
-            }
+            assert((*diskp != 0)); // sanity check!
 
             _merge_other(*kmer_p, *diskp, diskp_to_pp);
 
             loaded++;
         }
-        if (!(i == n_bytes)) {
-            throw khmer_exception();
-        }
+        assert(i == n_bytes);
         memcpy(buf, buf + n_bytes, remainder);
     }
-
     delete[] buf;
+
+    if (loaded != expected_pmap_size) {
+        throw khmer_file_exception("error loading partitionmap - "
+                                   "invalid # of items");
+    }
 }
 
 // Save a partition map to disk.
@@ -1374,6 +1387,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
     ofstream outfile(pmap_filename.c_str(), ios::binary);
 
     unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write(SAVED_SIGNATURE, 4);
     outfile.write((const char *) &version, 1);
 
     unsigned char ht_type = SAVED_SUBSET;
@@ -1381,6 +1395,9 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 
     unsigned int save_ksize = _ht->ksize();
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+
+    unsigned long long pmap_size = partition_map.size();
+    outfile.write((const char *) &pmap_size, sizeof(pmap_size));
 
     ///
 

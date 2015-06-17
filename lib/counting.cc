@@ -511,11 +511,19 @@ CountingHashFileReader::CountingHashFileReader(
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
+        char signature [4];
         unsigned char version = 0, ht_type = 0, use_bigcount = 0;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a khmer " <<
+                "file: " << signature << " Should be: " <<
+                SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer count file from " << infilename
@@ -612,16 +620,23 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;
+    char signature [4];
     unsigned char version, ht_type, use_bigcount;
 
+    int read_s = gzread(infile, signature, 4);
     int read_v = gzread(infile, (char *) &version, 1);
     int read_t = gzread(infile, (char *) &ht_type, 1);
-
-    if (read_v <= 0 || read_t <= 0) {
+    if (read_s <= 0 || read_v <= 0 || read_t <= 0) {
         std::string err = "K-mer count file read error: " + infilename + " "
                           + strerror(errno);
         gzclose(infile);
         throw khmer_file_exception(err);
+    } else if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+        std::ostringstream err;
+        err << "Does not start with signature for a khmer " <<
+            "file: " << signature << " Should be: " <<
+            SAVED_SIGNATURE;
+        throw khmer_file_exception(err.str());
     } else if (!(version == SAVED_FORMAT_VERSION)
                || !(ht_type == SAVED_COUNTING_HT)) {
         if (!(version == SAVED_FORMAT_VERSION)) {
@@ -685,8 +700,15 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
         HashIntoType loaded = 0;
         while (loaded != tablesize) {
-            read_b = gzread(infile, (char *) ht._counts[i],
-                            (unsigned) (tablesize - loaded));
+            unsigned long long  to_read_ll = tablesize - loaded;
+            unsigned int        to_read_int;
+            // Zlib can only read chunks of at most INT_MAX bytes.
+            if (to_read_ll > INT_MAX) {
+                to_read_int = INT_MAX;
+            } else {
+                to_read_int = to_read_ll;
+            }
+            read_b = gzread(infile, (char *) ht._counts[i], to_read_int);
 
             if (read_b <= 0) {
                 std::string gzerr = gzerror(infile, &read_b);
@@ -761,6 +783,7 @@ CountingHashFileWriter::CountingHashFileWriter(
 
     ofstream outfile(outfilename.c_str(), ios::binary);
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -823,6 +846,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         }
     }
 
+    gzwrite(outfile, SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     gzwrite(outfile, (const char *) &version, 1);
 
@@ -845,8 +869,38 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
                 sizeof(save_tablesize));
         unsigned long long written = 0;
         while (written != save_tablesize) {
-            written += gzwrite(outfile, (const char *) ht._counts[i],
-                               (int) (save_tablesize - written));
+            unsigned long long  to_write_ll = save_tablesize - written;
+            unsigned int        to_write_int;
+            int                 gz_result;
+            // Zlib can only write chunks of at most INT_MAX bytes.
+            if (to_write_ll > INT_MAX) {
+                to_write_int = INT_MAX;
+            } else {
+                to_write_int = to_write_ll;
+            }
+            gz_result = gzwrite(outfile, (const char *) ht._counts[i],
+                                to_write_int);
+            // Zlib returns 0 on error
+            if (gz_result == 0) {
+                int errcode = 0;
+                const char *err_msg;
+                std::ostringstream msg;
+
+                msg << "gzwrite failed while writing counting hash: ";
+                // Get zlib error
+                err_msg = gzerror(outfile, &errcode);
+                if (errcode != Z_ERRNO) {
+                    // Zlib error, not stdlib
+                    msg << err_msg;
+                    gzclearerr(outfile);
+                } else {
+                    // stdlib error
+                    msg << strerror(errno);
+                }
+                gzclose(outfile);
+                throw khmer_file_exception(msg.str().c_str());
+            }
+            written += gz_result;
         }
     }
 

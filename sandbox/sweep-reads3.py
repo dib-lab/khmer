@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -14,6 +14,7 @@ Results end up in <search reads>.sweep3.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import os.path
@@ -38,20 +39,20 @@ def main():
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print >>sys.stderr, "** WARNING: hashsize is default!  " \
+            print("** WARNING: hashsize is default!  " \
                 "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
+                "Please read the docs!", file=sys.stderr)
 
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print >>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % \
-            args.min_hashsize
-        print >>sys.stderr, ''
-        print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
+        print('\nPARAMETERS:', file=sys.stderr)
+        print(' - kmer size =    %d \t\t(-k)' % args.ksize, file=sys.stderr)
+        print(' - n hashes =     %d \t\t(-N)' % args.n_hashes, file=sys.stderr)
+        print(' - min hashsize = %-5.2g \t(-x)' % \
+            args.min_hashsize, file=sys.stderr)
+        print('', file=sys.stderr)
+        print('Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize / 8)' % (
-                args.n_hashes * args.min_hashsize * len(args.input_filenames) / 8.)
-        print >>sys.stderr, '-' * 8
+                args.n_hashes * args.min_hashsize * len(args.input_filenames) / 8.), file=sys.stderr)
+        print('-' * 8, file=sys.stderr)
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
@@ -73,10 +74,10 @@ def main():
         ht = query_list[n][0]
 
         # load contigs, connect into N partitions
-        print 'loading input reads from', inp_name
+        print('loading input reads from', inp_name)
         ht.consume_fasta(inp_name)
 
-    print 'starting sweep.'
+    print('starting sweep.')
 
     n = 0
     m = 0
@@ -85,7 +86,7 @@ def main():
             continue
 
         if n % 10000 == 0:
-            print '...', n, m
+            print('...', n, m)
 
         for ht, outfp in query_list:
             count = ht.get_median_count(record.sequence)[0]
