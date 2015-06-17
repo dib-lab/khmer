@@ -1,4 +1,4 @@
-Khmer/Oxli Binary File Formats
+khmer/Oxli Binary File Formats
 ==============================
 
 - C++ macro definitions are given in parenthesis.
@@ -6,7 +6,7 @@ Khmer/Oxli Binary File Formats
 - ``Len`` is the field's size, in bytes, and ``Off`` is the field's zero-based
   byte offset in the file/section.
 
-Khmer v1.4 and previous
+khmer v1.4 and previous
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 CountingHash
@@ -26,7 +26,7 @@ Number of Tables    1           Number of Count-min Sketch tables
 ================== =========== ==============================================
 
 
-Khmer v2.0 formats
+khmer v2.0 formats
 ~~~~~~~~~~~~~~~~~~
 
 
@@ -35,7 +35,7 @@ Magic string
 
 All formats shall have the "magic string" ``OXLI`` as their first bytes, after
 any external compression/encoding (e.g. gzip encapsulation) is removed. Note
-that this makes them incompatible with older versions of Khmer.
+that this makes them incompatible with older versions of khmer.
 
 Countgraph
 ----------
