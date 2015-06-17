@@ -220,6 +220,9 @@ test: FORCE
 	./setup.py develop
 	./setup.py nosetests --attr ${TESTATTR}
 
+test-all: FORCE
+	tox
+
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
 		setup.py Makefile > sloccount.sc
