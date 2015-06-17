@@ -1,17 +1,18 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 #
-from __future__ import print_function
 
 import khmer
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 # from nose.tools import assert_almost_equals
 
 
 def pretty_compare(a, b):
-    print len(a), len(b)
+    print(len(a), len(b))
 
     line1 = []
     line2 = []
@@ -25,9 +26,9 @@ def pretty_compare(a, b):
             line3.append('x')
 
     for i in range(0, len(line1), 60):
-        print "".join(line1[i:i+60])
-        print "".join(line3[i:i+60])
-        print "".join(line2[i:i+60])
+        print("".join(line1[i:i+60]))
+        print("".join(line3[i:i+60]))
+        print("".join(line2[i:i+60]))
 
 
 def eq_(v1, v2):
@@ -59,7 +60,7 @@ def test_align_nothing():
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc = aligner.align(read)
 
-    print score, graphAlign, readAlign
+    print(score, graphAlign, readAlign)
 
     assert trunc
     assert len(graphAlign) == 0
@@ -130,8 +131,8 @@ def test_align_middle_trunc_2():
     score, graphAlign, readAlign, trunc = aligner.align(read)
 
     # here, the alignment must start not at the beginning
-    print readAlign
-    print graphAlign
+    print(readAlign)
+    print(graphAlign)
 
     eq_(readAlign, read[12:])
     eq_(graphAlign, read[12:])
@@ -149,7 +150,7 @@ def test_align_fwd_nothing():
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
-    print score, graphAlign, readAlign
+    print(score, graphAlign, readAlign)
 
     assert trunc
     assert len(graphAlign) == 0
@@ -240,8 +241,8 @@ def test_align_fwd_covs_1():
     score, g, r, is_t, covs = aligner.align_forward(read)
 
     for start in range(0, len(read) - K + 1):
-        print ch.get(read[start:start+K]),
-    print ''
+        print(ch.get(read[start:start+K]), end=' ')
+    print('')
 
     assert len(covs) == len(read)
     assert covs[0] == 19
@@ -262,10 +263,10 @@ def test_align_fwd_covs_2():
     #            ^
     score, g, r, is_t, covs = aligner.align_forward(read)
 
-    print covs, g
+    print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print ch.get(read[start:start+K]),
-    print ''
+        print(ch.get(read[start:start+K]), end=' ')
+    print('')
 
     assert len(covs) == len(read)
     assert covs[0] == 19
@@ -287,10 +288,10 @@ def test_align_fwd_covs_3():
     #             ^
     score, g, r, is_t, covs = aligner.align_forward(read)
 
-    print covs, g
+    print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print ch.get(read[start:start+K]),
-    print ''
+        print(ch.get(read[start:start+K]), end=' ')
+    print('')
 
     assert len(covs) == len(read)
     assert covs[0] == 19
@@ -313,10 +314,10 @@ def test_align_fwd_covs_4():
     #                               ^
     score, g, r, is_t, covs = aligner.align_forward(read)
 
-    print covs, g
+    print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print ch.get(read[start:start+K]),
-    print ''
+        print(ch.get(read[start:start+K]), end=' ')
+    print('')
 
     assert len(covs) == len(read)
     assert covs[-K] == 19
@@ -337,10 +338,10 @@ def test_align_fwd_covs_5():
     #                              ^
     score, g, r, is_t, covs = aligner.align_forward(read)
 
-    print covs, g
+    print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print ch.get(read[start:start+K]),
-    print ''
+        print(ch.get(read[start:start+K]), end=' ')
+    print('')
 
     assert len(covs) == len(read)
     assert covs[-K] == 19

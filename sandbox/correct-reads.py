@@ -25,7 +25,6 @@ import shutil
 import textwrap
 import argparse
 
-from screed.screedRecord import _screed_record_dict
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader

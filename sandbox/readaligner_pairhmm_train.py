@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import division
+from __future__ import print_function
 import pysam
 import khmer
 import argparse
@@ -80,11 +81,11 @@ def main():
             base_cnt[kmer[-1]] = base_cnt.get(kmer[-1], 0) + 1
 
     if not args.json:
-        print "kmer size=", k
-        print "seq count=", seq_cnt, "dropped seqs=", dropped_seqs
-        print "base counts=", base_cnt
-        print "state counts=", state_cnts
-        print "trans counts=", trans_cnts
+        print("kmer size=", k)
+        print("seq count=", seq_cnt, "dropped seqs=", dropped_seqs)
+        print("base counts=", base_cnt)
+        print("state counts=", state_cnts)
+        print("trans counts=", trans_cnts)
 
     
     if not args.json:
@@ -95,38 +96,38 @@ def main():
             start_state = trans.split('-')[0]
             trans_probs[trans] = trans_cnts[
                 trans] / float(state_cnts[start_state])
-            print '{0}\t{1:0.7f}'.format(trans, trans_probs[trans])
+            print('{0}\t{1:0.7f}'.format(trans, trans_probs[trans]))
 
-        print 'static double trans_default[] = { log2{0:0.7f}, log2{1:0.7f}, ' \
+        print('static double trans_default[] = { log2{0:0.7f}, log2{1:0.7f}, ' \
             'log2{2:0.7f}, log2{3:0.7f}, log2{4:0.7f}, ' \
             'log2(5:0.7f},'.format(trans_probs['M_t-M_t'],
                                    trans_probs['M_t-Ir_t'],
                                    trans_probs[
                 'M_t-Ig_t'], trans_probs['M_t-M_u'],
                 trans_probs['M_t-Ir_u'],
-                trans_probs['M_t-Ig_u'])
-        print 'log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
+                trans_probs['M_t-Ig_u']))
+        print('log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
             trans_probs[
                 'Ir_t-M_t'], trans_probs['Ir_t-Ir_t'], trans_probs['Ir_t-M_u'],
-            trans_probs['Ir_t,Ir_u'])
-        print 'log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
+            trans_probs['Ir_t,Ir_u']))
+        print('log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
             trans_probs[
                 'Ig_t-M_t'], trans_probs['Ig_t-Ig_t'], trans_probs['Ig_t-M_u'],
-            trans_probs['Ig_t,Ig_u'])
-        print 'log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f}, '\
+            trans_probs['Ig_t,Ig_u']))
+        print('log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f}, '\
             'log2{4:0.7f}, log2(5:0.7f},'.format(
                 trans_probs['M_u-M_t'], trans_probs['M_u-Ir_t'],
                 trans_probs['M_u-Ig_t'], trans_probs['M_u-M_u'],
-                trans_probs['M_u-Ir_u'], trans_probs['M_u-Ig_u'])
-        print 'log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
+                trans_probs['M_u-Ir_u'], trans_probs['M_u-Ig_u']))
+        print('log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
             trans_probs[
                 'Ir_u-M_t'], trans_probs['Ir_u-Ir_t'], trans_probs['Ir_u-M_u'],
-            trans_probs['Ir_u,Ir_u'])
-        print 'log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
+            trans_probs['Ir_u,Ir_u']))
+        print('log2{0:0.7f}, log2{1:0.7f}, log2{2:0.7f}, log2{3:0.7f},'.format(
             trans_probs[
                 'Ig_u-M_t'], trans_probs['Ig_u-Ig_t'], trans_probs['Ig_u-M_u'],
-            trans_probs['Ig_u,Ig_u'])
-        print '};'
+            trans_probs['Ig_u,Ig_u']))
+        print('};')
     else:
         params = {'scoring_matrix':
                   [-0.06642736173897607,
@@ -194,7 +195,7 @@ def main():
                   )
                   )
                   }
-        print json.dumps(params, sort_keys=True, indent=4, separators=(',', ': '))
+        print(json.dumps(params, sort_keys=True, indent=4, separators=(',', ': ')))
 
 
 if __name__ == "__main__":
