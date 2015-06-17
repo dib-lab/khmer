@@ -1,3 +1,10 @@
+2015-07-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/*.{cc,hh},sandbox/*.py,khmer/_khmer.cc,tests/test_*.py: Simplify
+   exception hierarchy, and ensure all C++ exceptions are converted to python
+   errors.
+   * scripts/normalize-by-median.py: Clarifiy error message.
+
 2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/{test_script_arguments,test_functions}.py: changed tests to use
