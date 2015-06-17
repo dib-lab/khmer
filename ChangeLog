@@ -3,7 +3,7 @@
    * lib/*.{cc,hh},sandbox/*.py,khmer/_khmer.cc,tests/test_*.py: Simplify
    exception hierarchy, and ensure all C++ exceptions are converted to python
    errors.
-   * scripts/normalize-by-median.py: Clarifiy error message.
+   * scripts/normalize-by-median.py: Clarify error message.
 
 2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
 
