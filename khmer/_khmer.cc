@@ -381,7 +381,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
-    if (!stop_iteration)
+    if (!stop_iteration) {
         try {
             parser->imprint_next_read_pair( the_read_pair, pair_mode );
         } catch (NoMoreReadsAvailable &exc) {
@@ -391,6 +391,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         } catch (khmer_value_exception &exc) {
             value_exception = exc.what();
         }
+    }
     Py_END_ALLOW_THREADS
 
     // Note: Can return NULL instead of setting the StopIteration exception.
@@ -1845,7 +1846,7 @@ hashtable_find_unpart(khmer_KHashtable_Object * me, PyObject * args)
     unsigned int n_singletons = 0;
 
     try {
-        SubsetPartition * subset_p = hashbits->partition;
+        SubsetPartition * subset_p = hashtable->partition;
         n_singletons = subset_p->find_unpart(filename, traverse,
                                              stop_big_traversals);
     } catch (khmer_file_exception &exc) {
@@ -3014,14 +3015,30 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser = rparser_obj->parser;
-    Hashbits * hashbits = tracking_obj->hashbits;
-
-    HashIntoType * dist = NULL;
+    read_parsers::IParser *rparser      = rparser_obj->parser;
+    Hashbits           *hashbits        = tracking_obj->hashbits;
+    HashIntoType       *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
 
     Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(rparser, hashbits);
+    try {
+        dist = counting->abundance_distribution(rparser, hashbits);
+    } catch (khmer_file_exception &exc) {
+        file_exception = exc.what();
+    } catch (khmer_value_exception &exc) {
+        value_exception = exc.what();
+    }
     Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        return NULL;
+    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
@@ -3056,7 +3073,7 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
-    } catch (khmer_file_exception &e) {
+    } catch (khmer_file_exception &exc) {
         file_exception = exc.what();
     } catch (khmer_value_exception &exc) {
         value_exception = exc.what();
@@ -3324,14 +3341,18 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
 
 // call the C++ function, and trap signals => Python
 
-    unsigned long long n_consumed;
-    unsigned int total_reads;
-    HashIntoType curve[2][100];
+    unsigned long long  n_consumed;
+    unsigned int        total_reads;
+    HashIntoType        curve[2][100];
 
     try {
-        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed);
-    } catch (InvalidStreamHandle &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
+        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads,
+                                        n_consumed);
+    } catch (khmer_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (khmer_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
 
