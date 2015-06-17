@@ -686,7 +686,7 @@ def test_save_load_tagset_trunc():
         try:
             ht.load_tagset(outfile)
             assert 0, "this test should fail"
-        except IOError as err:
+        except OSError as err:
             print(str(err), i)
 
     # try loading it...
@@ -827,7 +827,7 @@ def test_stop_tags_truncate_check():
         try:
             ht.load_stop_tags(truncpath)
             assert 0, "expect failure of previous command"
-        except IOError as e:
+        except OSError as e:
             print(i, str(e))
 
 

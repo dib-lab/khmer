@@ -266,7 +266,7 @@ class Test_SaveLoadPmap(object):
             try:
                 a = ht.load_subset_partitionmap(outfile3)
                 assert 0, "this should not pass"
-            except IOError as err:
+            except OSError as err:
                 print(str(err), i)
 
     def test_save_load_merge_2(self):
@@ -499,7 +499,7 @@ def test_save_load_on_graph_truncate():
         try:
             a = ht.load_partitionmap(outfile3)
             assert 0, "this should not pass"
-        except IOError as err:
+        except OSError as err:
             print(str(err), i)
 
 
