@@ -13,6 +13,7 @@ Estimate optimal arguments using hashbits counting.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import math
@@ -21,8 +22,8 @@ import threading
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
-from khmer.kfile import check_file_status, check_space
-from khmer.kfile import check_space_for_hashtable
+from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_space
 
 
 def get_parser():
@@ -86,13 +87,13 @@ def main():
     filenames = args.input_filenames
     base = filenames[0]
     for _ in args.input_filenames:
-        check_file_status(_, False)
+        check_input_files(_, False)
 
     check_space(args.input_filenames, False)
-    check_space_for_hashtable(
-        (float(args.n_tables * args.min_tablesize) / 8.), False)
+    check_space((float(args.n_tables * args.min_tablesize) / 8.), False)
 
-    print >>sys.stderr, 'Counting kmers from sequences in %s' % repr(filenames)
+    print('Counting kmers from sequences in %s' % repr(filenames),
+          file=sys.stderr)
 
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
     target_method = htable.consume_fasta_with_reads_parser
@@ -100,7 +101,7 @@ def main():
     for _, filename in enumerate(filenames):
         rparser = khmer.ReadParser(filename)
         threads = []
-        print >>sys.stderr, 'consuming input', filename
+        print('consuming input', filename, file=sys.stderr)
         for num in xrange(args.threads):
             cur_thread = threading.Thread(
                 target=target_method, args=(rparser,))
@@ -110,28 +111,28 @@ def main():
         for thread in threads:
             thread.join()
     unique_kmers = htable.n_unique_kmers()
-    print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            unique_kmers)
+    print('Total number of unique k-mers: {0}'.format(unique_kmers),
+          file=sys.stderr)
 
     info_optimal = open(base + '.optimal_args', 'w')
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the graph structure is too small for "
-                              "this data set. Increase table size/# tables.")
-        print >> sys.stderr, "**"
+        print("**", file=sys.stderr)
+        print("** ERROR: the graph structure is too small for this data set."
+              "Increase table size/# tables.", file=sys.stderr)
+        print("**", file=sys.stderr)
         if not False:
             sys.exit(1)
 
     to_print = to_print_func(unique_kmers,fp_rate)
     
-    print >> info_optimal, to_print
+    print(to_print, file=info_optimal)
     
-    print >> sys.stderr, \
-    'optimal arguments were written to', base + '.optimal_args'
+    print('optimal arguments were written to', base + '.optimal_args',
+          file=sys.stderr)
     
 if __name__ == '__main__':
     main()

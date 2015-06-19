@@ -26,13 +26,14 @@ For this scenario, use only "-f" and "number of kmers".
 Use '-h' for parameter help.
 
 """
+from __future__ import print_function
 import screed
 import argparse
 import khmer
 from khmer.khmer_args import info
 import textwrap
 import math
-
+import sys
 
 def get_parser():
     epilog = """
@@ -109,22 +110,30 @@ def main():
     if args.M:
         M = args.M
         result = estimate_optimal_with_N_and_M(N,M)
-        print "number of estimated distinct k-mers:  ", N
-        print "size of memory available to use:      ", M
-        print "optimal number of hash tables:        ", result[0]
-        print "optimal size of hash tables:          ", result[1]
-        print "estimated false positive rate:        ", result[3]
-        print "estimated usage of memory:            ", result[2]
+        print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
+        print("size of memory available to use:      ", M, file=sys.stderr)
+        print("optimal number of hash tables:        ", result[0],
+              file=sys.stderr)
+        print("optimal size of hash tables:          ", result[1],
+              file=sys.stderr)
+        print("estimated false positive rate:        ", result[3],
+              file=sys.stderr)
+        print("estimated usage of memory:            ", result[2],
+              file=sys.stderr)
         
     elif args.f:
         f = args.f
         result = estimate_optimal_with_N_and_f(N,f)
-        print "number of estimated distinct k-mers:  ", N
-        print "desired maximum false posotive rate:  ", f
-        print "optimal number of hash tables:        ", result[0]
-        print "optimal size of hash tables:          ", result[1]
-        print "estimated false positive rate:        ", result[3]
-        print "estimated usage of memory:            ", result[2]
+        print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
+        print("desired maximum false posotive rate:  ", f, file=sys.stderr)
+        print("optimal number of hash tables:        ", result[0],
+              file=sys.stderr)
+        print("optimal size of hash tables:          ", result[1],
+              file=sys.stderr)
+        print("estimated false positive rate:        ", result[3],
+              file=sys.stderr)
+        print("estimated usage of memory:            ", result[2],
+              file=sys.stderr)
         
     else:
         get_parser().error('No action requested, add -M (size of memory available to use) or -f (desired maximum false posotive rate)')

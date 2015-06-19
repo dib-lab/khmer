@@ -13,6 +13,7 @@ Estimate optimal arguments using HLL couter.
 Use '-h' for parameter help.
 """
 
+from __future__ import print_function
 
 import argparse
 import os
@@ -121,14 +122,14 @@ def main():
         hllcpp.consume_fasta(input_filename)
 
     cardinality = hllcpp.estimate_cardinality()
-    print >> sys.stdout, 'Estimated number of unique k-mers: {0}'.format(
-        cardinality)
+    print('Estimated number of unique k-mers: {0}'.format(cardinality),
+          file=sys.stderr)
         
     to_print = to_print_func(cardinality,fp_rate)
     
-    print >> sys.stdout, to_print
+    print(to_print)
     if report_fp:
-        print >> report_fp, to_print
+        print(to_print, file=report_fp)
         report_fp.flush()
     
     
