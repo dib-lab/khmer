@@ -391,82 +391,70 @@ unsigned int SubsetPartition::sweep_for_tags(
     bool		stop_big_traversals)
 {
 
-    Traverser traverser(_ht);
-    KmerSet traversed_nodes;
-    KmerQueue node_q;
-    std::queue<unsigned int> breadth_q;
-
     unsigned int max_breadth = range;
-    unsigned int total = 0;
-    unsigned int nfound = 0;
-
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(traversed_nodes, n);
-    };
+    KmerSet traversed_nodes;
+    BreadthFirstTraversal traversal(_ht);
 
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
     KmerIterator kmers(seq.c_str(), _ht->ksize());
+    Kmer start_kmer = kmers.next();
     while (!kmers.done()) {
         Kmer node = kmers.next();
         traversed_nodes.insert(node);
 
-        node_q.push(node);
-        breadth_q.push(0);
+        traversal.node_q.push(node);
+        traversal.breadth_q.push(0);
     }
 
-    size_t seq_length = node_q.size() / 2;
+    size_t seq_length = traversal.node_q.size() / 2;
     size_t BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
-    while(!node_q.empty()) {
-        // change this to a better hueristic
-        if (stop_big_traversals && traversed_nodes.size() >
-                BIG_PERIMETER_TRAVERSALS) {
+    auto break_func = [&] () {
+        if (stop_big_traversals
+            && traversal.seen_set_size() >  BIG_PERIMETER_TRAVERSALS) {
             tagged_kmers.clear();
-            break;
+            return true;
         }
 
-        Kmer node = node_q.front();
-        node_q.pop();
+        if (traversal.get_cursor_breadth() > max_breadth) {
+            return true;
+        }
+        return false;
+    };
 
-        unsigned int breadth = breadth_q.front();
-        breadth_q.pop();
-
-        // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
-            continue;
+    auto continue_func = [&] () {
+        if (!traversal.on_first_node() &&
+            set_contains(all_tags, traversal.cursor()))
+        {
+            tagged_kmers.insert(traversal.cursor());
+            return true;
         }
 
-        traversed_nodes.insert(node);
-        total++;
-
-        if (set_contains(all_tags, node)) {
-            tagged_kmers.insert(node);
-            // if we find a tag, finish the remaining queued nodes,
-            // but don't queue up any more
-            // max_breadth = breadth;
-            continue;
+        if (traversal.get_cursor_breadth() >= max_breadth) {
+            return true;
         }
 
-        if (breadth == max_breadth) {
-            continue;
+        return false;
+    };
+
+    auto node_keep_func = [&] (Kmer& node) {
+
+        if (traversal.seen_set_contains(node)) {
+            return false;
+        }
+        if (break_on_stop_tags
+            && set_contains(_ht->stop_tags, traversal.cursor()))
+        {
+            return false;
         }
 
-        // finish up nodes on the current level, but if we go beyond, end it
-        // immediately; this keeps from having to look at nodes which have
-        // already been queued once we lower the limit after finding a tag
-        else if (breadth > max_breadth) {
-            return total;
-        }
+        return true;
+    };
 
-        nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
-    }
-
-    return total;
+    return traversal.search(start_kmer, traversed_nodes,
+                            continue_func, break_func, node_keep_func);
 }
 
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
