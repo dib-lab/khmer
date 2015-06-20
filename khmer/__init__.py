@@ -254,27 +254,6 @@ def get_n_primes_near_x(number, target):
     return primes
 
 
-def get_n_primes_above_x(number, target):
-    """Forward-find primes smaller than target.
-
-    Step forwards until a number of primes (other than 2) have been
-    found that are smaller than the target and return them.
-
-    Keyword arguments:
-    number -- the number of primes to find
-    target -- the number to step forwards from
-    """
-    primes = []
-    i = target + 1
-    if i % 2 == 0:
-        i += 1
-    while len(primes) != number and i > 0:
-        if is_prime(i):
-            primes.append(i)
-        i += 2
-    return primes
-
-
 # Expose the cpython objects with __new__ implementations.
 # These constructors add the functionality provided by the existing
 # factory methods to the constructors defined over in cpython land.
