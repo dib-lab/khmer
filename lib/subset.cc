@@ -398,13 +398,9 @@ unsigned int SubsetPartition::sweep_for_tags(
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
     KmerIterator kmers(seq.c_str(), _ht->ksize());
-    Kmer start_kmer = kmers.next();
+    KmerSet start_nodes;
     while (!kmers.done()) {
-        Kmer node = kmers.next();
-        traversed_nodes.insert(node);
-
-        traversal.node_q.push(node);
-        traversal.breadth_q.push(0);
+        start_nodes.insert(kmers.next());
     }
 
     size_t seq_length = traversal.node_q.size() / 2;
@@ -417,7 +413,7 @@ unsigned int SubsetPartition::sweep_for_tags(
             return true;
         }
 
-        if (traversal.get_cursor_breadth() > max_breadth) {
+        if (traversal.get_cursor_breadth() > range) {
             return true;
         }
         return false;
@@ -453,7 +449,7 @@ unsigned int SubsetPartition::sweep_for_tags(
     };
 
 
-    return traversal.search(start_kmer, traversed_nodes,
+    return traversal.search(start_nodes, traversed_nodes,
                             continue_func, break_func, node_keep_func);
 }
 
@@ -487,7 +483,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         return !set_contains(keeper, n);
     };
 
-    node_q.push(start_kmer);
+    node_q.push_front(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
@@ -497,7 +493,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         }
 
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
@@ -625,7 +621,6 @@ void SubsetPartition::do_partition_with_abundance(
     unsigned int total_reads = 0;
 
     SeenSet tagged_kmers;
-    const unsigned char ksize = _ht->ksize();
 
     SeenSet::const_iterator si, end;
 

@@ -8,6 +8,7 @@
 #ifndef TRAVERSAL_HH
 #define TRAVERSAL_HH
 
+#include <deque>
 #include <queue>
 #include <functional>
 
@@ -64,7 +65,7 @@ public:
 
     KmerSet * seen_set;
     KmerQueue node_q;
-    std::queue<unsigned int> breadth_q;
+    std::deque<unsigned int> breadth_q;
 
     explicit BreadthFirstTraversal(const Hashtable * ht);
 
@@ -74,6 +75,13 @@ public:
            std::function<bool ()> continue_func,
            std::function<bool ()> break_func,
            std::function<bool (Kmer& node)> node_keep_func);
+
+   unsigned int
+   search(KmerSet& start_nodes,
+          KmerSet& start_seen_set,
+          std::function<bool ()> continue_func,
+          std::function<bool ()> break_func,
+          std::function<bool (Kmer& node)> node_keep_func);
 
     Kmer cursor() {
         return current_node;

@@ -750,7 +750,7 @@ const
 
     Traverser traverser(this);
     KmerQueue node_q;
-    node_q.push(start);
+    node_q.push_back(start);
 
     // Avoid high-circumference k-mers
     auto filter = [&] (Kmer& n) { return !(break_on_circum &&
@@ -758,7 +758,7 @@ const
 
     while(!node_q.empty()) {
       Kmer node = node_q.front();
-      node_q.pop();
+      node_q.pop_front();
 
       // have we already seen me? don't count; exit.
       if (set_contains(keeper, node)) {
@@ -930,12 +930,12 @@ const
 
     auto filter = [&] (Kmer& n) { return !set_contains(keeper, n); };
 
-    node_q.push(start);
+    node_q.push_back(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
