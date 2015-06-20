@@ -137,7 +137,7 @@ def main():
                 ht.consume_sequence_and_tag_with_labels(record.sequence, i)
 
 
-    except IOError as e:
+    except (IOError, OSError) as e:
         print('!! ERROR: !!', e, file=sys.stderr)
         print('...error setting up outputs. exiting...', file=sys.stderr)
 
