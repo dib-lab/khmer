@@ -1,4 +1,4 @@
-2015-06-16  Titus Brown  <titus@idyll.org>
+2015-06-19  Titus Brown  <titus@idyll.org>
 
    * khmer/__init__.py: split CountingHash into _CountingHash (CPython) and
    CountingHash to mimic Hashbits behavior; pass IOError through
@@ -30,6 +30,26 @@
    behavior; added tests for create_countgraph and create_nodegraph.
    * tests/test_counting_single.py: fixed countgraph size & palindrome testing
    beahavior in test_complete_no_collision.
+
+2015-06-19  Titus Brown  <titus@idyll.org>
+
+   * Makefile: temporarily disable 'huge' tests on Linux.
+
+2015-06-17  Titus Brown  <titus@idyll.org>
+
+   * scripts/normalize-by-median.py: changed DEFAULT_DESIRED_COVERAGE to 20,
+   and corrected options help.
+   * tests/{test_scripts.py,test_normalize_by_median.py}: moved
+   normalize-by-median.py tests into a their own file.
+   * tests/test-data/{dn-test-all-paired-all-keep.fa,dn-test-none-paired.fa,
+   dn-test-some-paired-all-keep.fa}: added test data files for specific
+   pairing/saturation behavior.
+
+2015-06-16  Kevin Murray  <spam@kdmurray.id.au>
+
+   * doc/dev/binary-file-formats.rst: Add documentation of khmer's binary file
+   formats.
+   * doc/dev/index.rst: Add above docs to developer documentation index.
 
 2015-06-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
