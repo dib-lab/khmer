@@ -27,12 +27,12 @@ Use '-h' for parameter help.
 
 """
 from __future__ import print_function
-import screed
 import argparse
-import khmer
+import khmer, oxli
 from khmer.khmer_args import info
+from oxli.functions import estimate_optimal_with_N_and_M
+from oxli.functions import estimate_optimal_with_N_and_f
 import textwrap
-import math
 import sys
 
 def get_parser():
@@ -69,39 +69,6 @@ def get_parser():
                         + khmer.__version__)
     return parser
 
-
-def estimate_optimal_with_N_and_M(N,M):
-    Z = math.log(2)*(M/float(N))
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H = int(M/intZ)
-    M = H*intZ
-#    f1 = (0.5) ** intZ # inaccurate
-    f2 = (1-math.exp(-N/float(H)))**intZ
-    return intZ,H,M,f2
-
-def estimate_optimal_with_N_and_f(N,f):
-    Z = math.log(f,0.5)
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-        
-# formula 1 (best)
-    H1 = int(-N/(math.log(1-f**(1/float(intZ)))))
-    M1 = H1 * intZ
-    f1 = (1-math.exp(-N/float(H1)))**intZ
-    
-# formula 2
-#    M2 = intZ/math.log(2)*N
-#    H2 = int(M2/intZ)
-#    f2 = (1-math.exp(-N/float(H2)))**intZ
-
-# formula 3
-#    M3 = math.log(f,0.6185)*N
-#    H3 = int(M3/intZ)
-#    f3 = (1-math.exp(-N/float(H3)))**intZ
-    return intZ, H1,M1,f1
     
 def main():
     info('estimate_optimal_hash.py', ['counting'])

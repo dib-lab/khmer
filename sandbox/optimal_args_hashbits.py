@@ -24,6 +24,8 @@ from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space
+from oxli.functions import estimate_optimal_with_N_and_M
+from oxli.functions import estimate_optimal_with_N_and_f
 
 
 def get_parser():
@@ -33,26 +35,6 @@ def get_parser():
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filename')
     return parser
-
-def estimate_optimal_with_N_and_M(N,M):
-    Z = math.log(2)*(M/float(N))
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H = int(M/intZ)
-    M = H*intZ
-    f2 = (1-math.exp(-N/float(H)))**intZ
-    return intZ,H,M,f2
-
-def estimate_optimal_with_N_and_f(N,f):
-    Z = math.log(f,0.5)
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H1 = int(-N/(math.log(1-f**(1/float(intZ)))))
-    M1 = H1 * intZ
-    f1 = (1-math.exp(-N/float(H1)))**intZ
-    return intZ, H1,M1,f1
 
 def to_print_func(unique_kmers,fp_rate):
     to_print = 'number of unique k-mers:    {}\n\
