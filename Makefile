@@ -7,7 +7,6 @@
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
-DEVPKGS="-r requirements-dev.txt"
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -35,7 +34,8 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --requirement requirements-dev.txt
+	pip install --upgrade --requirement requirements.txt
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
