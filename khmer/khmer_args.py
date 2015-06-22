@@ -132,7 +132,7 @@ def add_loadhash_args(parser):
 
 def _calculate_tablesize(args, hashtype):
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type:", hashtype
+        raise Exception, "unknown graph type: %s" % (hashtype,)
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
@@ -175,7 +175,7 @@ def report_on_config(args, hashtype='countgraph'):
     """
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type:", hashtype
+        raise Exception, "unknown graph type: %s" % (hashtype,)
 
     if args.quiet:
         return

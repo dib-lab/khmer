@@ -188,3 +188,39 @@ def test_create_nodegraph_3():
         assert 0, "should not reach this"
     except SystemExit as err:
         print(str(err))
+
+
+def test_report_on_config_bad_hashtype():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    try:
+        khmer_args.report_on_config(args, 'foograph')
+        assert 0, "the previous statement should raise an exception"
+    except AssertionError:
+        raise
+    except Exception as err:
+        assert "unknown graph type: foograph" in str(err), str(err)
+
+
+def test_fail_calculate_foograph_size():
+    # tests unknown graph type
+
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    min_tablesize = khmer_args.DEFAULT_MIN_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, min_tablesize, max_mem)
+
+    try:
+        nodegraph = khmer_args._calculate_tablesize(args, 'foograph')
+        assert 0, "previous statement should fail"
+    except AssertionError:
+        raise
+    except Exception as err:
+        assert "unknown graph type: foograph" in str(err), str(err)

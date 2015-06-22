@@ -78,6 +78,16 @@ def test_get_primes():
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
 
+def test_get_primes_fal():
+    try:
+        primes = khmer.get_n_primes_near_x(5, 5)
+        assert 0, "previous statement should fail"
+    except AssertionError:
+        raise
+    except Exception as err:
+        assert "unable to find 5 prime numbers < 5" in str(err)
+
+
 def test_extract_countinghash_info_badfile():
     try:
         khmer.extract_countinghash_info(
