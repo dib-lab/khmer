@@ -75,11 +75,10 @@ class _checkImportSucceeds(object):
                 exec(
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
-            except (ImportError, SyntaxError):
-                print(unicode(traceback))
-                raise AssertionError(
-                    "%s cannot be exec'd" % (self.filename),
-                    unicode(traceback.format_exc()))
+            except (ImportError, SyntaxError) as err:
+                print("{0}".format(err))
+                raise AssertionError("%s cannot be exec'd" % (self.filename),
+                                     "{0}".format(traceback))
             except:
                 pass                        # other failures are expected :)
         finally:
