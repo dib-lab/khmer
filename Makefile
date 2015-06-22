@@ -63,7 +63,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so
+	rm -f khmer/_khmer.so
 	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
