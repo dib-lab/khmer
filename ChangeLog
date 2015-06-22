@@ -5,7 +5,7 @@
    extract_countinghash_info and extract_hashbits_info so that
    file-does-not-exist errors are correctly reported; fixed FP rate reporting;
    changed to using get_n_primes_near_x to build hashtable sizes; removed
-   get_n_primes_above_x.
+   get_n_primes_above_x, new_hashbits, and new_counting_hash functions.
    * khmer/_khmer.cc: changed tp_flags for KCountingHash so that it could
    be a base class.
    * khmer/khmer_args.py: removed environment variable override for hash size
