@@ -45,36 +45,6 @@ __version__ = get_versions()['version']
 del get_versions
 
 
-def new_hashbits(k, starting_size, n_tables=2):
-    """Return a new hashbits object. Deprecated.
-
-    This factory method is deprecated in favor of creating a Hashbits object
-    directly via 'new Hashbits(...)'.
-
-    Keyword argument:
-    k -- kmer size to use
-    starting_size -- lower bound on hashsize to use
-    n_tables -- number of hash tables to use (default = 2)
-    """
-    primes = get_n_primes_near_x(n_tables, starting_size)
-
-    return _Hashbits(k, primes)
-
-
-def new_counting_hash(k, starting_size, n_tables=2):
-    """Return a new countinghash object.
-
-    Keyword arguments:
-    k -- kmer size to use
-    starting_size -- lower bound on hashsize to use
-    n_tables -- number of hash tables to use (default = 2)
-    n_threads  -- number of simultaneous threads to execute (default = 1)
-    """
-    primes = get_n_primes_near_x(n_tables, starting_size)
-
-    return CountingHash(k, primes)
-
-
 def load_hashbits(filename):
     """Load a hashbits object from the given filename and return it.
 
