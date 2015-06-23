@@ -23,7 +23,7 @@ import math
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
 from khmer import __version__
-
+from oxli import functions
 
 def get_parser():
     descr = "Estimate optimal arguments using HLL couter., with precision <= ERROR_RATE."
@@ -66,25 +66,6 @@ def get_parser():
 
     return parser
 
-def estimate_optimal_with_N_and_M(N,M):
-    Z = math.log(2)*(M/float(N))
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H = int(M/intZ)
-    M = H*intZ
-    f2 = (1-math.exp(-N/float(H)))**intZ
-    return intZ,H,M,f2
-
-def estimate_optimal_with_N_and_f(N,f):
-    Z = math.log(f,0.5)
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H1 = int(-N/(math.log(1-f**(1/float(intZ)))))
-    M1 = H1 * intZ
-    f1 = (1-math.exp(-N/float(H1)))**intZ
-    return intZ, H1,M1,f1
 
 def to_print_func(unique_kmers,fp_rate):
     to_print = 'number of unique k-mers:    {}\n\
