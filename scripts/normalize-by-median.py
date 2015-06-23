@@ -138,7 +138,7 @@ def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
     """
     try:
         yield
-    except (IOError, ValueError) as error:
+    except (IOError, OSError, ValueError) as error:
         print('** ERROR: ' + str(error), file=sys.stderr)
         print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
         if not single_out:
