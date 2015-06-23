@@ -50,7 +50,7 @@ DEFAULT_BUFFER_SIZE = 10
 DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
 
-MIN_HSIZE = 4e7
+MAX_HSIZE = 4e7
 MIN_KSIZE = 21
 
 
@@ -208,15 +208,15 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    if args.min_tablesize < MIN_HSIZE:
-        args.min_tablesize = MIN_HSIZE
+    if args.max_tablesize < MAX_HSIZE:
+        args.max_tablesize = MAX_HSIZE
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
     report_on_config(args, hashtype='nodegraph')
 
     K = args.ksize
-    HT_SIZE = args.min_tablesize
+    HT_SIZE = args.max_tablesize
     N_HT = args.n_tables
 
     traversal_range = args.traversal_range

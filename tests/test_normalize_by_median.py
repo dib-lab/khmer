@@ -420,14 +420,14 @@ def test_normalize_by_median_emptycountingtable():
 
 
 def test_normalize_by_median_fpr():
-    MIN_TABLESIZE_PARAM = 12
+    MAX_TABLESIZE_PARAM = 12
 
     infile = utils.get_temp_filename('test-fpr.fq')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-f', '-k 17', '-x ' + str(MIN_TABLESIZE_PARAM), infile]
+    args = ['-f', '-k 17', '-x ' + str(MAX_TABLESIZE_PARAM), infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 

@@ -22,7 +22,7 @@ from khmer.utils import print_error
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
-DEFAULT_MIN_TABLESIZE = 1e6
+DEFAULT_MAX_TABLESIZE = 1e6
 DEFAULT_N_THREADS = 1
 
 
@@ -62,8 +62,8 @@ def build_hash_args(descr=None, epilog=None, parser=None):
                         help='number of k-mer counting tables to use')
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--min-tablesize', '-x', type=float,
-                       default=DEFAULT_MIN_TABLESIZE,
+    group.add_argument('--max-tablesize', '-x', type=float,
+                       default=DEFAULT_MAX_TABLESIZE,
                        help='upper bound on tablesize to use; overrides ' +
                        '--max-memory-usage/-M.')
     group.add_argument('-M', '--max-memory-usage', type=float,
@@ -101,7 +101,7 @@ def add_loadhash_args(parser):
 
             if getattr(namespace, 'ksize') != DEFAULT_K or \
                getattr(namespace, 'n_tables') != DEFAULT_N_TABLES or \
-               getattr(namespace, 'min_tablesize') != DEFAULT_MIN_TABLESIZE:
+               getattr(namespace, 'max_tablesize') != DEFAULT_MAX_TABLESIZE:
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved k-mer table from
@@ -123,7 +123,7 @@ def add_loadhash_args(parser):
                     n = info[2]
                     setattr(namespace, 'ksize', K)
                     setattr(namespace, 'n_tables', n)
-                    setattr(namespace, 'min_tablesize', x)
+                    setattr(namespace, 'max_tablesize', x)
 
     parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
                         help='load a precomputed k-mer table from disk',
@@ -140,7 +140,7 @@ def _calculate_tablesize(args, hashtype):
         elif hashtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables
     else:
-        tablesize = args.min_tablesize
+        tablesize = args.max_tablesize
 
     return tablesize
 
@@ -186,24 +186,24 @@ def report_on_config(args, hashtype='countgraph'):
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
     print_error(" - n tables =     {0} \t\t(-N)".format(args.n_tables))
     print_error(
-        " - min tablesize = {0:5.2g} \t(-x)".format(tablesize)
+        " - max tablesize = {0:5.2g} \t(-x)".format(tablesize)
     )
     print_error("")
     if hashtype == 'countgraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x min_tablesize)".format(
-                args.n_tables * args.min_tablesize))
+            "(n_tables x max_tablesize)".format(
+                args.n_tables * args.max_tablesize))
     elif hashtype == 'nodegraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x min_tablesize / 8)".format(args.n_tables *
-                                                    args.min_tablesize / 8)
+            "(n_tables x max_tablesize / 8)".format(args.n_tables *
+                                                    args.max_tablesize / 8)
         )
 
     print_error("-" * 8)
 
-    if DEFAULT_MIN_TABLESIZE == args.min_tablesize and \
+    if DEFAULT_MAX_TABLESIZE == args.max_tablesize and \
        not getattr(args, 'loadtable', None):
         print_error('''\
 

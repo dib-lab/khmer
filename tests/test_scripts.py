@@ -54,6 +54,22 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_max_memory_usage_parameter():
+    script = 'load-into-counting.py'
+    args = ['-M', '2e3', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(outfile)
+
+    kh = khmer.load_counting_hash(outfile)
+    assert sum(kh.hashsizes()) < 3e8
+
+
 def test_load_into_counting_abundance_dist_nobig():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
@@ -858,6 +874,30 @@ def test_oxli_build_graph_multithread():
     args = ['build-graph', '-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
+
+
+def test_load_graph_max_memory_usage_parameter():
+    script = 'load-graph.py'
+    args = ['-M', '2e7', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    try:
+        ht = khmer.load_hashbits(ht_file)
+    except IOError as err:
+        assert 0, str(err)
+
+    assert (sum(ht.hashsizes()) / 8.) < 2e7, ht.hashsizes()
 
 
 def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
@@ -2394,7 +2434,7 @@ def test_count_overlap_invalid_datafile():
     htfile = _make_graph(seqfile1, ksize=20)
     outfile = utils.get_temp_filename('overlap.out', in_dir)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     if sys.version_info.major == 2:
@@ -2413,7 +2453,7 @@ def test_count_overlap():
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
@@ -2440,7 +2480,7 @@ def test_count_overlap_csv():
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
             '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0

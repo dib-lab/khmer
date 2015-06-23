@@ -20,7 +20,7 @@ import sys
 import khmer
 import os.path
 import screed
-from khmer.khmer_args import (build_hashbits_args, DEFAULT_MIN_TABLESIZE)
+from khmer.khmer_args import (build_hashbits_args, DEFAULT_MAX_TABLESIZE)
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
+        if args.min_hashsize == DEFAULT_MAX_TABLESIZE:
             print("** WARNING: hashsize is default!  " \
                 "You absodefly want to increase this!\n** " \
                 "Please read the docs!", file=sys.stderr)
