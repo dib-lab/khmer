@@ -402,7 +402,7 @@ def test_label_tag_correctness_save_load():
     assert 3 in labels
 
 
-def test_load_wrong_filetype():
+def test_load_wrong_filetype1():
     lb = LabelHash(20, 1e7, 4)
 
     # try to load a tagset
@@ -414,6 +414,10 @@ def test_load_wrong_filetype():
         print(str(err))
         assert "Incorrect file format type" in str(err)
 
+
+def test_load_wrong_filetype2():
+
+    lb = LabelHash(20, 1e7, 4)
     # try to load a nonsense file
     filename2 = utils.get_test_data('all-A.fa')
     try:
