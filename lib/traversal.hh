@@ -77,7 +77,7 @@ public:
            std::function<bool (Kmer& node)> node_keep_func);
 
    unsigned int
-   search(KmerSet& start_nodes,
+   search(KmerQueue& start_nodes,
           KmerSet& start_seen_set,
           std::function<bool ()> continue_func,
           std::function<bool ()> break_func,

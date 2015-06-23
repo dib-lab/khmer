@@ -300,7 +300,10 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     //printf("range=%u ", range);
     if (range == 0) {
         if (!(num_traversed == seq.length()-graph->ksize()+1)) {
-            throw khmer_exception("sweep_label_neighborhood: range 0 sweep "
+            std::cout << "Failing, sweep traversed " << num_traversed
+            << " k-mers, expected " << seq.length() - graph->ksize()+1
+            << std::endl;
+            throw khmer_exception("sweep_label_neighborhood: range 0 sweep, "
                                   "failed to traverse k-mers from given seq");
         }
     }

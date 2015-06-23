@@ -126,21 +126,23 @@ BreadthFirstTraversal::BreadthFirstTraversal(const Hashtable * ht) :
 
 unsigned int
 BreadthFirstTraversal::search(
-       KmerSet& start_nodes,
+       KmerQueue& start_nodes,
        KmerSet& start_seen_set,
        std::function<bool ()> continue_func,
        std::function<bool ()> break_func,
        std::function<bool (Kmer& node)> node_keep_func)
 {
 
-    auto it = start_nodes.begin();
-    Kmer start_node = *it;
-    ++it;
-
-    for (; it!=start_nodes.end(); ++it) {
-        node_q.push_back(*it);
+    Kmer start_node = start_nodes.front();
+    start_nodes.pop_front();
+    while(!start_nodes.empty()) {
+        node_q.push_back(start_nodes.front());
+        start_nodes.pop_front();
         breadth_q.push_back(0);
     }
+
+    //std::cout << "Passing to main search() func, " << node_q.size() <<
+    //" nodes on the queue" << std::endl;
 
     return search(start_node, start_seen_set, continue_func, break_func,
                   node_keep_func);
@@ -182,14 +184,6 @@ BreadthFirstTraversal::search(
         current_breadth = breadth_q.front();
         breadth_q.pop_front();
 
-        if (set_contains(*seen_set, current_node)) {
-            continue;
-        }
-
-        // keep track of seen kmers
-        seen_set->insert(current_node);
-        total++;
-
         if (current_breadth > 150
             || total > 10000) {
             std::cout << "Uh oh. Current breadth is " << current_breadth
@@ -200,10 +194,16 @@ BreadthFirstTraversal::search(
                                   "warp core has breached. Your ship explodes.");
         }
 
+        total++;
+
+
         if(continue_func()) {
             ++ncontinues;
             continue;
         } else {
+            // keep track of seen kmers
+            seen_set->insert(current_node);
+
             nfound = traverse_right(current_node, node_q, filter);
             for (unsigned int i = 0; i<nfound; ++i) {
                 breadth_q.push_back(current_breadth + 1);

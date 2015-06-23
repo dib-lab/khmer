@@ -334,10 +334,15 @@ void SubsetPartition::find_all_tags(
 
     auto continue_func = [&] () {
 
-        if (!traversal.on_first_node() &&
-            set_contains(all_tags, traversal.cursor()))
+        Kmer cur_node = traversal.cursor();
+
+        if(traversal.seen_set_contains(cur_node)) {
+            return true;
+        }
+
+        if (!traversal.on_first_node() && set_contains(all_tags, cur_node))
         {
-            tagged_kmers.insert(traversal.cursor());
+            tagged_kmers.insert(cur_node);
             return true;
         }
 
@@ -398,28 +403,32 @@ unsigned int SubsetPartition::sweep_for_tags(
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
     KmerIterator kmers(seq.c_str(), _ht->ksize());
-    KmerSet start_nodes;
+    KmerQueue start_nodes;
     while (!kmers.done()) {
-        start_nodes.insert(kmers.next());
+        Kmer node = kmers.next();
+        start_nodes.push_back(node);
     }
 
-    size_t seq_length = traversal.node_q.size() / 2;
+    size_t seq_length = start_nodes.size() / 2;
     size_t BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
     auto break_func = [&] () {
         if (stop_big_traversals
             && traversal.seen_set_size() >  BIG_PERIMETER_TRAVERSALS) {
             tagged_kmers.clear();
+            std::cout << "Broke on stop-tag" << std::endl;
             return true;
         }
 
         if (traversal.get_cursor_breadth() > range) {
+            std::cout << "Broke on range" << std::endl;
             return true;
         }
         return false;
     };
 
     auto continue_func = [&] () {
+
         if (!traversal.on_first_node() &&
             set_contains(all_tags, traversal.cursor()))
         {
