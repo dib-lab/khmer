@@ -232,3 +232,15 @@ def test_sweep_reads_3():
     assert os.path.exists(counts_fn)
     assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_collect_reads():
+    outfile = utils.get_temp_filename('out.graph')
+    infile = utils.get_test_data('test-reads.fa')
+    script = 'collect-reads.py'
+    args = ['-M', '1e7', outfile, infile]
+    
+    status, out, err = utils.runscript(script, args, sandbox=True)
+
+    assert status == 0
+    assert os.path.exists(outfile)
