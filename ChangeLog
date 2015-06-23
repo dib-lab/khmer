@@ -1,5 +1,10 @@
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
 
+   * doc/dev/binary-file-formats.rst: Fix issue in ksize documentation for
+   Countgraph
+
+2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
+
    * README.rst: Fix link to virtualenv installation instructions.
 
 2015-06-19  Titus Brown  <titus@idyll.org>
