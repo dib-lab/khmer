@@ -24,8 +24,7 @@ from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space
-from oxli.functions import estimate_optimal_with_N_and_M
-from oxli.functions import estimate_optimal_with_N_and_f
+from oxli.functions import optimal_args_output_gen as output_gen
 
 
 def get_parser():
@@ -36,29 +35,6 @@ def get_parser():
                         nargs='+', help='input FAST[AQ] sequence filename')
     return parser
 
-def to_print_func(unique_kmers,fp_rate):
-    to_print = 'number of unique k-mers:    {}\n\
-    false positive rate:    {:>.3f}'.format(unique_kmers,fp_rate) 
-    to_print = to_print + \
-    '\n\n\nIf you have expected false positive rate to achieve:\n' + \
-'expected_fp\tnumber_hashtable(Z)\tsize_hashtable(H)\texpected_memory_usage\n'
-
-    for fp_rate in range(1,10):
-        Z,H,M,f = estimate_optimal_with_N_and_f(unique_kmers,fp_rate/10.0)
-        to_print =to_print + '{:11.3f}\t{:19}\t{:17e}\t{:21e}\n'.format(f,Z,H,M)
-
-    mem_list = [1,5,10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000,5000]
-    
-    to_print = to_print + \
-               '\nIf you have expected memory to use:\n' + \
-                'expected_memory_usage\tnumber_hashtable(Z)\t' + \
-                'size_hashtable(H)\texpected_fp\n'
-    for mem in mem_list:
-        Z,H,M,f = estimate_optimal_with_N_and_M(unique_kmers,mem*1000000000)
-        #print Z,H,M,f
-        to_print =to_print + '{:21e}\t{:19}\t{:17e}\t{:11.3f}\n'.format(M,Z,H,f) 
-    return to_print
-        
 
 def main():
     info('optimal_args_hashbits.py', ['graph', 'SeqAn'])
@@ -109,7 +85,7 @@ def main():
         if not False:
             sys.exit(1)
 
-    to_print = to_print_func(unique_kmers,fp_rate)
+    to_print = output_gen(unique_kmers,fp_rate)
     
     print(to_print, file=info_optimal)
     

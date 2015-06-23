@@ -23,7 +23,7 @@ import math
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
 from khmer import __version__
-from oxli import functions
+from oxli.functions import optimal_args_output_gen as output_gen
 
 def get_parser():
     descr = "Estimate optimal arguments using HLL couter., with precision <= ERROR_RATE."
@@ -67,29 +67,6 @@ def get_parser():
     return parser
 
 
-def to_print_func(unique_kmers,fp_rate):
-    to_print = 'number of unique k-mers:    {}\n\
-    false positive rate:    {:>.3f}'.format(unique_kmers,fp_rate) 
-    to_print = to_print + \
-    '\n\n\nIf you have expected false positive rate to achieve:\n' + \
-'expected_fp\tnumber_hashtable(Z)\tsize_hashtable(H)\texpected_memory_usage\n'
-
-    for fp_rate in range(1,10):
-        Z,H,M,f = estimate_optimal_with_N_and_f(unique_kmers,fp_rate/10.0)
-        to_print =to_print + '{:11.3f}\t{:19}\t{:17e}\t{:21e}\n'.format(f,Z,H,M)
-
-    mem_list = [1,5,10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000,5000]
-    
-    to_print = to_print + \
-               '\nIf you have expected memory to use:\n' + \
-                'expected_memory_usage\tnumber_hashtable(Z)\t' + \
-                'size_hashtable(H)\texpected_fp\n'
-    for mem in mem_list:
-        Z,H,M,f = estimate_optimal_with_N_and_M(unique_kmers,mem*1000000000)
-        #print Z,H,M,f
-        to_print =to_print + '{:21e}\t{:19}\t{:17e}\t{:11.3f}\n'.format(M,Z,H,f) 
-    return to_print
-
 def main():
     info('optimal_args_HLL.py', ['SeqAn'])
     args = get_parser().parse_args()
@@ -106,15 +83,12 @@ def main():
     print('Estimated number of unique k-mers: {0}'.format(cardinality),
           file=sys.stderr)
         
-    to_print = to_print_func(cardinality,fp_rate)
+    to_print = output_gen(cardinality,fp_rate)
     
     print(to_print)
     if report_fp:
         print(to_print, file=report_fp)
         report_fp.flush()
-    
-    
-
 
 
 if __name__ == "__main__":
