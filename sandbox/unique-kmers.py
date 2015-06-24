@@ -23,6 +23,7 @@ import textwrap
 
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
+from oxli.functions import optimal_args_output_gen as output_gen
 from khmer import __version__
 import screed
 
@@ -107,9 +108,13 @@ def main():
     print('Total estimated number of unique {0}-mers: {1}'.format(
           args.ksize, cardinality),
           file=sys.stderr)
+    
+    to_print = output_gen(cardinality,fp_rate)
+    print(to_print)
 
     if report_fp:
         print(cardinality, args.ksize, 'total', file=report_fp)
+        print(to_print, file=report_fp)
         report_fp.flush()
 
 if __name__ == "__main__":

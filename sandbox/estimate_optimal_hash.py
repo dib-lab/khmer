@@ -58,7 +58,7 @@ def get_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('N', help='number of estimated distinct k-mers',
+    parser.add_argument('-N', help='number of estimated distinct k-mers',
                         type = int)
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-M', help='size of memory available to use', 
