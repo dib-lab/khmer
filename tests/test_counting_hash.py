@@ -574,7 +574,7 @@ def test_save_load_large():
         inpath = utils.get_test_data('random-20-a.fa')
         savepath = utils.get_temp_filename(ctfile)
 
-        sizes = khmer.get_n_primes_below_x(1, 2**31 + 1000)
+        sizes = khmer.get_n_primes_near_x(1, 2**31 + 1000)
 
         orig = khmer._CountingHash(12, sizes)
         orig.consume_fasta(inpath)
