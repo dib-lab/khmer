@@ -206,7 +206,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_khmer.Read",                         /* tp_name */
+    "_khmer.Read",                        /* tp_name */
     sizeof(khmer_Read_Object),            /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor)khmer_Read_dealloc,       /* tp_dealloc */
