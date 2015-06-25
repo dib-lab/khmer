@@ -56,6 +56,9 @@ class _checkImportSucceeds(object):
     def __call__(self):
         try:
             mod = imp.load_source('__zzz', self.filename)
+        except ImportError:
+            if "no module named pysam" in traceback.format_exc():
+                return
         except:
             print(traceback.format_exc())
             raise AssertionError("%s cannot be imported" % (self.filename,))
@@ -76,7 +79,7 @@ class _checkImportSucceeds(object):
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
             except (ImportError, SyntaxError):
-                print(traceback.format_exc())
+                print(u"{0}".format(traceback))
                 raise AssertionError("%s cannot be exec'd" % (self.filename,))
             except:
                 pass                        # other failures are expected :)
