@@ -40,3 +40,17 @@ def test_estimate_functions_1():
     assert res[1] == 850, res[1]
     assert res[2] == 850, res[2]
     assert abs(.7 - res[3]) < 0.0022, abs(.7 - res[3])
+
+
+def test_estimate_functions_namedtup():
+    res = functions.estimate_optimal_with_N_and_M(99, 1024)
+    assert res.num_htables == 7, res[0]
+    assert res.htable_size == 146, res[1]
+    assert res.mem_use == 1022, res[2]
+    assert abs(.008 - res.fp_rate) < .001, res[3]
+
+    res = functions.estimate_optimal_with_N_and_f(99, 0.00701925498897)
+    assert res.num_htables == 7, res[0]
+    assert res.htable_size == 145, res[1]
+    assert res.mem_use == 1015, res[2]
+    assert abs(.008 - res.fp_rate) < .002, res[3]

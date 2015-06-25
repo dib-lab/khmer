@@ -6,6 +6,7 @@
 #
 
 
+from collections import namedtuple
 import threading
 import math
 import khmer.utils
@@ -23,7 +24,9 @@ def estimate_optimal_with_N_and_M(N, M):
     H = int(M/intZ)
     M = H*intZ
     f2 = (1-math.exp(-N/float(H)))**intZ
-    return intZ, H, M, f2
+    res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
+                                "fp_rate"])
+    return res(intZ, H, M, f2)
 
 
 def estimate_optimal_with_N_and_f(N, f):
@@ -40,7 +43,9 @@ def estimate_optimal_with_N_and_f(N, f):
     M1 = H1 * intZ
     f1 = (1-math.exp(-N/float(H1)))**intZ
 
-    return intZ, H1, M1, f1
+    res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
+                                "fp_rate"])
+    return res(intZ, H1, M1, f1)
 
 
 def optimal_args_output_gen(unique_kmers, fp_rate):
