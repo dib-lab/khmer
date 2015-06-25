@@ -54,3 +54,7 @@ def test_estimate_functions_namedtup():
     assert res.htable_size == 145, res[1]
     assert res.mem_use == 1015, res[2]
     assert abs(.008 - res.fp_rate) < .002, res[3]
+
+
+def test_output_gen():
+    res = functions.optimal_args_output_gen(99, 0.00701925498897)
