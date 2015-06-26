@@ -244,3 +244,13 @@ def test_collect_reads():
 
     assert status == 0
     assert os.path.exists(outfile)
+
+
+def test_saturate_by_median():
+    infile = utils.get_test_data('test-reads.fa')
+    script = 'saturate-by-median.py'
+    args = ['-M', '1e7', infile]
+
+    status, out, err = utils.runscript(script, args, sandbox=True)
+
+    assert status == 0
