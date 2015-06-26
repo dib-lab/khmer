@@ -96,11 +96,11 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                                   'cumulative_fraction'])
 
     print('making countgraph', file=sys.stderr)
-    counting_hash = khmer_args.create_countgraph(args)
+    counting_hash = khmer_args.create_countgraph(args, multiplier=1.1)
     counting_hash.set_use_bigcount(args.bigcount)
 
     print('building k-mer tracking table', file=sys.stderr)
-    tracking = khmer_args.create_nodegraph(args, ksize=counting_hash.ksize())
+    tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
     print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
     print('k-mer counting table sizes:',

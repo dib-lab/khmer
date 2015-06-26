@@ -130,40 +130,42 @@ def add_loadhash_args(parser):
                         action=LoadAction)
 
 
-def _calculate_tablesize(args, hashtype):
+def _calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
         raise Exception, "unknown graph type: %s" % (hashtype,)
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
-            tablesize = args.max_memory_usage / args.n_tables
+            tablesize = args.max_memory_usage / args.n_tables / \
+                        float(multiplier)
         elif hashtype == 'nodegraph':
-            tablesize = 8. * args.max_memory_usage / args.n_tables
+            tablesize = 8. * args.max_memory_usage / args.n_tables / \
+                        float(multiplier)
     else:
         tablesize = args.max_tablesize
 
     return tablesize
 
 
-def create_nodegraph(args, ksize=None):
+def create_nodegraph(args, ksize=None, multiplier=1.0):
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = _calculate_tablesize(args, 'nodegraph')
+    tablesize = _calculate_tablesize(args, 'nodegraph', multiplier=multiplier)
     return khmer.Hashbits(ksize, tablesize, args.n_tables)
 
 
-def create_countgraph(args, ksize=None):
+def create_countgraph(args, ksize=None, multiplier=1.0):
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = _calculate_tablesize(args, 'countgraph')
+    tablesize = _calculate_tablesize(args, 'countgraph', multiplier=multiplier)
     return khmer.CountingHash(ksize, tablesize, args.n_tables)
 
 

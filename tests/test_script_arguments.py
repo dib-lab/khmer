@@ -111,8 +111,6 @@ def test_create_countgraph_1():
     assert sum(countgraph.hashsizes()) < max_mem, sum(countgraph.hashsizes())
 
 
-
-
 def test_create_countgraph_2():
     # tests overriding ksize by passing into create_nodegraph explicitly.
 
@@ -142,6 +140,19 @@ def test_create_countgraph_3():
         assert 0, "should not reach this"
     except SystemExit as err:
         print(str(err))
+
+
+def test_create_countgraph_4_multiplier():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+
+    countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
+    assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
+           sum(countgraph.hashsizes())
 
 
 def test_create_nodegraph_1():
@@ -188,6 +199,19 @@ def test_create_nodegraph_3():
         assert 0, "should not reach this"
     except SystemExit as err:
         print(str(err))
+
+
+def test_create_nodegraph_4_multiplier():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
+    max_mem = 1e7
+
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+
+    nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
+    assert sum(nodegraph.hashsizes())/8.0 < max_mem / 2.0, \
+           sum(nodegraph.hashsizes())
 
 
 def test_report_on_config_bad_hashtype():
