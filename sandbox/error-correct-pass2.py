@@ -13,6 +13,7 @@ Output sequences will be put in @@@.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import sys
 import screed
 import os
@@ -56,14 +57,14 @@ def main():
     
     args = parser.parse_args()
 
-    print 'loading counts'
+    print('loading counts')
     ht = khmer.load_counting_hash(args.counts_table)
 
     aligner = khmer.ReadAligner(ht,
                                 args.trusted_cov,
                                 args.bits_theta)
 
-    print "trusted:", args.trusted_cov
+    print("trusted:", args.trusted_cov)
 
     corrfp = args.output_file
     if not corrfp:
@@ -73,7 +74,7 @@ def main():
     n_corrected = 0
     for n, read in enumerate(screed.open(args.readfile)):
         if n % 10000 == 0:
-            print >>sys.stderr, '...', n, n_corrected
+            print('...', n, n_corrected, file=sys.stderr)
         seq = read.sequence.replace('N', 'A')
 
         # build the alignment...

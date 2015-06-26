@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -21,6 +21,8 @@ Once completed, you should be able to run this script as is.
 
 Author: Jason Pell (pelljaso@cse.msu.edu)
 '''
+from __future__ import division
+from __future__ import print_function
 
 import screed
 import sys
@@ -89,23 +91,23 @@ def main():
     totalSum = 0
 
     if len(sys.argv) < 3:
-        print "Usage: python assemstats.py <min contig length> [ FASTA files ]"
+        print("Usage: python assemstats.py <min contig length> [ FASTA files ]")
         return
 
     try:
         minLen = int(sys.argv[1])
     except ValueError:
-        print "Minimum contig length must be an integer."
+        print("Minimum contig length must be an integer.")
         return
 
-    print '** cutoff:', minLen
-    print "N\tsum\tmax\tfilename"
+    print('** cutoff:', minLen)
+    print("N\tsum\tmax\tfilename")
 
     for filename in sys.argv[2:]:
         if not os.path.exists(filename):
-            print >>sys.stderr, "WARNING: file %s does not exist." % filename
+            print("WARNING: file %s does not exist." % filename, file=sys.stderr)
             continue
-        
+
         lens = getLens(filename)
         trimmedLens = trimLens(lens, minLen)
 
@@ -121,12 +123,12 @@ def main():
         totalN += statTrimmedN
         totalSum += statSum
 
-        print "%d\t%d\t%d\t%s" % (statTrimmedN, statSum, statMax, filename)
+        print("%d\t%d\t%d\t%s" % (statTrimmedN, statSum, statMax, filename))
 
     if len(sys.argv) > 3 and totalN:
-        print '--'
-        print 'TOTAL: %g in %d contigs (mean size %d)' % (
-            totalSum, totalN, totalSum / float(totalN) + .5)
+        print('--')
+        print('TOTAL: %g in %d contigs (mean size %d)' % (
+            totalSum, totalN, totalSum / totalN + .5))
 
 main()
 

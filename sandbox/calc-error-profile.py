@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This script is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -12,6 +12,8 @@ reads.  The output is placed in <infile>.errhist in the cwd by default.
 
 Reads FASTQ and FASTA input.
 """
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import argparse
@@ -80,13 +82,13 @@ def main():
     # look for errors.
     total = 0
     for filename in args.filenames:
-        print >>sys.stderr, 'opening', filename
+        print('opening', filename, file=sys.stderr)
 
         for n, record in enumerate(screed.open(filename)):
             total += 1
 
             if total % CHECK_EXIT == 0:
-                print >>sys.stderr, '...', total, n_consumed, n_checked
+                print('...', total, n_consumed, n_checked, file=sys.stderr)
 
                 # two exit conditions: first, have we hit our max reads limit?
                 if total >= MAX_READS:
@@ -111,8 +113,8 @@ def main():
                 lengths.append(len(seq))
 
                 if args.errors_per_read:
-                    print >>args.errors_per_read, record.name, \
-                        ",".join(map(str, posns))
+                    print(record.name, \
+                        ",".join(map(str, posns)), file=args.errors_per_read)
 
                 # track the positions => errors
                 for p in posns:
@@ -131,24 +133,24 @@ def main():
     # write!
     output_file.write('position error_count error_fraction\n')
     for n, i in enumerate(positions[:max_length]):
-        print >>output_file, n, i, float(i) / float(length_count[n])
+        print(n, i, float(i) / float(length_count[n]), file=output_file)
 
     output_file.close()
 
-    print >>sys.stderr, ''
-    print >>sys.stderr, 'total sequences:', total
-    print >>sys.stderr, 'n consumed:', n_consumed
-    print >>sys.stderr, 'n checked:', n_checked
-    print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
-    print >>sys.stderr, 'error rate: %.2f%%' % \
-        (100.0 * sum(positions) / float(sum(lengths)))
+    print('', file=sys.stderr)
+    print('total sequences:', total, file=sys.stderr)
+    print('n consumed:', n_consumed, file=sys.stderr)
+    print('n checked:', n_checked, file=sys.stderr)
+    print('bp consumed:', bp_consumed, bp_consumed / float(C), file=sys.stderr)
+    print('error rate: %.2f%%' % \
+        (100.0 * sum(positions) / float(sum(lengths))), file=sys.stderr)
 
-    print >>sys.stderr, 'Error histogram is in %s' % output_filename
+    print('Error histogram is in %s' % output_filename, file=sys.stderr)
 
     if not exit_condition(n_consumed, n_checked):
-        print >>sys.stderr, ""
-        print >>sys.stderr, "** WARNING: not enough reads to get a good result"
-        print >>sys.stderr, "** Is this high diversity sample / small subset?"
+        print("", file=sys.stderr)
+        print("** WARNING: not enough reads to get a good result", file=sys.stderr)
+        print("** Is this high diversity sample / small subset?", file=sys.stderr)
         sys.exit(-1)
 
 

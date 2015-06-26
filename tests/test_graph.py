@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -7,7 +9,7 @@
 import khmer
 import screed
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 
 from nose.plugins.attrib import attr
 
@@ -237,7 +239,7 @@ class Test_Partitioning(object):
         output_file = utils.get_temp_filename('parttest')
         ht.output_partitions(filename, output_file, False)
 
-        print open(output_file).read()
+        print(open(output_file).read())
 
         x = set([r.quality for r in screed.open(output_file)])
         assert x, x
@@ -314,7 +316,7 @@ class Test_PythonAPI(object):
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
         c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
 
-        print ht.consume(a)
+        print(ht.consume(a))
         try:
             ppi = ht.find_all_tags(c[:19])
             assert False, "should raise a ValueError for wrong k-mer size"
@@ -334,17 +336,17 @@ class Test_PythonAPI(object):
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
         c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
 
-        print ht.consume(a)
+        print(ht.consume(a))
         ppi = ht.find_all_tags(a[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
 
-        print ht.consume(b)
+        print(ht.consume(b))
         ppi = ht.find_all_tags(b[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
 
-        print ht.consume(c)
+        print(ht.consume(c))
         ppi = ht.find_all_tags(c[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 2, pid

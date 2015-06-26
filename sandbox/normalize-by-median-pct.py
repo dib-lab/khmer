@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -13,12 +13,14 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
 
 Use '-h' for parameter help.
 """
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import screed
 import os
 import khmer
-from itertools import izip
+
 from khmer.khmer_args import build_counting_args, DEFAULT_MIN_TABLESIZE
 import argparse
 
@@ -30,7 +32,7 @@ DEFAULT_DESIRED_COVERAGE = 5
 
 def batchwise(t, size):
     it = iter(t)
-    return izip(*[it] * size)
+    return zip(*[it] * size)
 
 # Returns true if the pair of records are properly pairs
 
@@ -57,17 +59,17 @@ def main():
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE and not args.loadhash:
-            print>>sys.stderr, "** WARNING: hashsize is default!  You absodefly want to increase this!\n** Please read the docs!"
+            print("** WARNING: hashsize is default!  You absodefly want to increase this!\n** Please read the docs!", file=sys.stderr)
 
-        print>>sys.stderr, '\nPARAMETERS:'
-        print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print>>sys.stderr, ' - paired =	      %s \t\t(-p)' % args.paired
-        print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
-            args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-' * 8
+        print('\nPARAMETERS:', file=sys.stderr)
+        print(' - kmer size =    %d \t\t(-k)' % args.ksize, file=sys.stderr)
+        print(' - n hashes =     %d \t\t(-N)' % args.n_hashes, file=sys.stderr)
+        print(' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize, file=sys.stderr)
+        print(' - paired =	      %s \t\t(-p)' % args.paired, file=sys.stderr)
+        print('', file=sys.stderr)
+        print('Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize), file=sys.stderr)
+        print('-' * 8, file=sys.stderr)
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
@@ -82,10 +84,10 @@ def main():
         batch_size = 2
 
     if args.loadhash:
-        print 'loading hashtable from', args.loadhash
+        print('loading hashtable from', args.loadhash)
         ht = khmer.load_counting_hash(args.loadhash)
     else:
-        print 'making hashtable'
+        print('making hashtable')
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     total = 0
@@ -98,13 +100,13 @@ def main():
         n = -1
         for n, batch in enumerate(batchwise(screed.open(input_filename), batch_size)):
             if n > 0 and n % 100000 == 0:
-                print '... kept', total - discarded, 'of', total, ', or', \
-                    int(100. - discarded / float(total) * 100.), '%'
-                print '... in file', input_filename
+                print('... kept', total - discarded, 'of', total, ', or', \
+                    int(100. - discarded / float(total) * 100.), '%')
+                print('... in file', input_filename)
 
                 if report_fp:
-                    print>>report_fp, total, total - discarded, \
-                        1. - (discarded / float(total))
+                    print(total, total - discarded, \
+                        1. - (discarded / float(total)), file=report_fp)
                     report_fp.flush()
 
             total += batch_size
@@ -112,8 +114,8 @@ def main():
             # If in paired mode, check that the reads are properly interleaved
             if args.paired:
                 if not validpair(batch[0], batch[1]):
-                    print >>sys.stderr, 'Error: Improperly interleaved pairs %s %s' % (
-                        batch[0].name, batch[1].name)
+                    print('Error: Improperly interleaved pairs %s %s' % (
+                        batch[0].name, batch[1].name), file=sys.stderr)
                     sys.exit(-1)
 
             # Emit the batch of reads if any read passes the filter
@@ -150,27 +152,27 @@ def main():
                 discarded += batch_size
 
         if -1 < n:
-            print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
-                total, 'or', int(100. - discarded / float(total) * 100.), '%'
-            print 'output in', output_name
+            print('DONE with', input_filename, '; kept', total - discarded, 'of',\
+                total, 'or', int(100. - discarded / float(total) * 100.), '%')
+            print('output in', output_name)
         else:
-            print 'SKIPPED empty file', input_filename
+            print('SKIPPED empty file', input_filename)
 
     if args.savehash:
-        print 'Saving hashfile through', input_filename
-        print '...saving to', args.savehash
+        print('Saving hashfile through', input_filename)
+        print('...saving to', args.savehash)
         ht.save(args.savehash)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate)
 
     if fp_rate > 0.20:
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the counting hash is too small for"
-        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** Do not use these results!!"
+        print("**", file=sys.stderr)
+        print("** ERROR: the counting hash is too small for", file=sys.stderr)
+        print("** this data set.  Increase hashsize/num ht.", file=sys.stderr)
+        print("**", file=sys.stderr)
+        print("** Do not use these results!!", file=sys.stderr)
         sys.exit(-1)
 
 if __name__ == '__main__':

@@ -29,6 +29,7 @@ void Hashbits::save(std::string outfilename)
 
     ofstream outfile(outfilename.c_str(), ios::binary);
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -90,11 +91,19 @@ void Hashbits::load(std::string infilename)
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
+        char signature[4];
         unsigned char version, ht_type;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a khmer " <<
+                "file: " << signature << " Should be: " <<
+                SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading k-mer graph from " << infilename
@@ -251,6 +260,26 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
     }
 
     return n_consumed;
+}
+
+void Hashbits::update_from(const Hashbits &other)
+{
+    if (_ksize != other._ksize) {
+        throw khmer_exception("both nodegraphs must have same k size");
+    }
+    if (_tablesizes != other._tablesizes) {
+        throw khmer_exception("both nodegraphs must have same table sizes");
+    }
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        Byte * me = _counts[table_num];
+        Byte * ot = other._counts[table_num];
+        HashIntoType tablesize = _tablesizes[table_num];
+        HashIntoType tablebytes = tablesize / 8 + 1;
+
+        for (HashIntoType index = 0; index < tablebytes; index++) {
+            me[index] |= ot[index];     // bitwise or
+        }
+    }
 }
 
 // vim: set sts=2 sw=2:

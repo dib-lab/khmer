@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2010-2015. It is licensed under
@@ -15,6 +15,7 @@ The script does not load a prebuilt k-mer counting table.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import os
 import sys
 import csv
@@ -83,8 +84,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
-        print >> sys.stderr, 'ERROR: %s exists; not squashing.' % \
-            args.output_histogram_filename
+        print('ERROR: %s exists; not squashing.' %
+              args.output_histogram_filename, file=sys.stderr)
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
@@ -94,26 +95,26 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
                                   'cumulative_fraction'])
 
-    print >>sys.stderr, 'making k-mer counting table'
+    print('making k-mer counting table', file=sys.stderr)
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                             args.n_tables)
     counting_hash.set_use_bigcount(args.bigcount)
 
-    print >> sys.stderr, 'building k-mer tracking table'
+    print('building k-mer tracking table', file=sys.stderr)
     tracking = khmer.new_hashbits(counting_hash.ksize(), args.min_tablesize,
                                   args.n_tables)
 
-    print >>sys.stderr, 'kmer_size:', counting_hash.ksize()
-    print >>sys.stderr, 'k-mer counting table sizes:', \
-        counting_hash.hashsizes()
-    print >>sys.stderr, 'outputting to', args.output_histogram_filename
+    print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
+    print('k-mer counting table sizes:',
+          counting_hash.hashsizes(), file=sys.stderr)
+    print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print >>sys.stderr, 'consuming input, round 1 --', \
-        args.input_sequence_filename
-    for _ in xrange(args.threads):
+    print('consuming input, round 1 --',
+          args.input_sequence_filename, file=sys.stderr)
+    for _ in range(args.threads):
         thread = \
             threading.Thread(
                 target=counting_hash.consume_fasta_with_reads_parser,
@@ -126,8 +127,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         thread.join()
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            counting_hash.n_unique_kmers())
+        print('Total number of unique k-mers: {0}'.format(
+            counting_hash.n_unique_kmers()), file=sys.stderr)
 
     abundance_lists = []
 
@@ -136,13 +137,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             read_parser, tracking)
         abundance_lists.append(abundances)
 
-    print >>sys.stderr, 'preparing hist from %s...' % \
-        args.input_sequence_filename
+    print('preparing hist from %s...' %
+          args.input_sequence_filename, file=sys.stderr)
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print >>sys.stderr, 'consuming input, round 2 --', \
-        args.input_sequence_filename
-    for _ in xrange(args.threads):
+    print('consuming input, round 2 --',
+          args.input_sequence_filename, file=sys.stderr)
+    for _ in range(args.threads):
         thread = \
             threading.Thread(
                 target=__do_abundance_dist__,
@@ -163,10 +164,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     total = sum(abundance.values())
 
     if 0 == total:
-        print >> sys.stderr, \
-            "ERROR: abundance distribution is uniformly zero; " \
-            "nothing to report."
-        print >> sys.stderr, "\tPlease verify that the input files are valid."
+        print("ERROR: abundance distribution is uniformly zero; "
+              "nothing to report.", file=sys.stderr)
+        print(
+            "\tPlease verify that the input files are valid.", file=sys.stderr)
         sys.exit(1)
 
     sofar = 0
@@ -180,17 +181,17 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         if args.csv:
             hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
         else:
-            print >> hist_fp, _, i, sofar, round(frac, 3)
+            print(_, i, sofar, round(frac, 3), file=hist_fp)
 
         if sofar == total:
             break
 
     if args.savetable:
-        print >>sys.stderr, 'Saving k-mer counting table ', args.savetable
-        print >>sys.stderr, '...saving to', args.savetable
+        print('Saving k-mer counting table ', args.savetable, file=sys.stderr)
+        print('...saving to', args.savetable, file=sys.stderr)
         counting_hash.save(args.savetable)
 
-    print >> sys.stderr, 'wrote to: ' + args.output_histogram_filename
+    print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
 
 if __name__ == '__main__':
     main()
