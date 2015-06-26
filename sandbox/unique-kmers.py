@@ -109,7 +109,7 @@ def main():
           args.ksize, cardinality),
           file=sys.stderr)
     
-    to_print = output_gen(cardinality,fp_rate)
+    to_print = output_gen(cardinality, args.error_rate)
     print(to_print)
 
     if report_fp:

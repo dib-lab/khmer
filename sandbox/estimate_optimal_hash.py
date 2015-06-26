@@ -79,27 +79,27 @@ def main():
         result = estimate_optimal_with_N_and_M(N,M)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
         print("size of memory available to use:      ", M, file=sys.stderr)
-        print("optimal number of hash tables:        ", result[0],
+        print("optimal number of hash tables:        ", result.num_htables,
               file=sys.stderr)
-        print("optimal size of hash tables:          ", result[1],
+        print("optimal size of hash tables:          ", result.htable_size,
               file=sys.stderr)
-        print("estimated false positive rate:        ", result[3],
+        print("estimated false positive rate:        ", result.fp_rate,
               file=sys.stderr)
-        print("estimated usage of memory:            ", result[2],
+        print("estimated usage of memory:            ", result.mem_use,
               file=sys.stderr)
         
     elif args.f:
         f = args.f
         result = estimate_optimal_with_N_and_f(N,f)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
-        print("desired maximum false posotive rate:  ", f, file=sys.stderr)
-        print("optimal number of hash tables:        ", result[0],
+        print("desired maximum false positive rate:  ", f, file=sys.stderr)
+        print("optimal number of hash tables:        ", result.num_htables,
               file=sys.stderr)
-        print("optimal size of hash tables:          ", result[1],
+        print("optimal size of hash tables:          ", result.htable_size,
               file=sys.stderr)
-        print("estimated false positive rate:        ", result[3],
+        print("estimated false positive rate:        ", result.fp_rate,
               file=sys.stderr)
-        print("estimated usage of memory:            ", result[2],
+        print("estimated usage of memory:            ", result.mem_use,
               file=sys.stderr)
         
     else:

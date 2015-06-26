@@ -55,11 +55,9 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
     to_print = 'number of unique k-mers:'
     to_print += '\n' + 'false positive rate:    {:>.3f}'.format(unique_kmers,
                                                                 fp_rate)
-    to_print += """\n\n\nIf you have expected false positive rate to achieve:
-        \nexpected_fp
-        \tnumber_hashtable(Z)
-        \tsize_hashtable(H)
-        \texpected_memory_usage"""
+    to_print += "\n\n\nIf you have expected false positive rate to achieve:"
+    to_print += "\nexpected_fp\tnumber_hashtable(Z)\tsize_hashtable(H)\t"
+    to_print += "expected_memory_usage\n"
 
     for fp_rate in range(1, 10):
         Z, H, M, f = estimate_optimal_with_N_and_f(unique_kmers, fp_rate/10.0)
