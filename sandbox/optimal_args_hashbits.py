@@ -48,7 +48,6 @@ def main():
         check_input_files(_, False)
 
     check_space(args.input_filenames, False)
-    check_space((float(args.n_tables * args.min_tablesize) / 8.), False)
 
     print('Counting kmers from sequences in %s' % repr(filenames),
           file=sys.stderr)

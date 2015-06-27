@@ -52,30 +52,32 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
     """
     Assembles output string for optimal arg sandbox scripts
     """
-    to_print = 'number of unique k-mers:'
-    to_print += '\n' + 'false positive rate:    {:>.3f}'.format(unique_kmers,
-                                                                fp_rate)
-    to_print += "\n\n\nIf you have expected false positive rate to achieve:"
-    to_print += "\nexpected_fp\tnumber_hashtable(Z)\tsize_hashtable(H)\t"
-    to_print += "expected_memory_usage\n"
+    to_print = []
+
+    to_print.append('')  # blank line
+    to_print.append('number of unique k-mers: \t{0}'.format(unique_kmers))
+    to_print.append('false positive rate: \t{:>.3f}'.format(fp_rate))
+    to_print.append('')  # blank line
+    to_print.append('If you have expected false positive rate to achieve:')
+    to_print.append('expected_fp\tnumber_hashtable(Z)\tsize_hashtable(H)\t'
+                    'expected_memory_usage')
 
     for fp_rate in range(1, 10):
         Z, H, M, f = estimate_optimal_with_N_and_f(unique_kmers, fp_rate/10.0)
-        to_print = to_print + '{:11.3f}\t{:19}\t{:17e}\t{:21e}\n'.format(
-            f, Z, H, M)
+        to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
 
-    to_print = to_print + \
-        '\nIf you have expected memory to use:\n' + \
-        'expected_memory_usage\tnumber_hashtable(Z)\t' + \
-        'size_hashtable(H)\texpected_fp\n'
+    to_print.append('')  # blank line
+    to_print.append('If you have expected memory to use:')
+    to_print.append('expected_memory_usage\tnumber_hashtable(Z)\t'
+                    'size_hashtable(H)\texpected_fp')
+
     for mem in mem_list:
         Z, H, M, f = estimate_optimal_with_N_and_M(unique_kmers,
                                                    mem*1000000000)
-        to_print = to_print + '{:21e}\t{:19}\t{:17e}\t{:11.3f}\n'.format(
-            M, Z, H, f)
-    return to_print
+        to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
+    return "\n".join(to_print)
 
 
 def build_graph(ifilenames, graph, num_threads=1, tags=False):
