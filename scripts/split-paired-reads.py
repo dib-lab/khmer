@@ -73,10 +73,10 @@ def get_parser():
 
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-p', '--force-paired', action='store_true',
                         help='Require that reads be interleaved')
 
@@ -98,7 +98,7 @@ def main():
     check_space(filenames, args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin':
+    if infile == '/dev/stdin' or infile == '-':
         if not (args.output_first and args.output_second):
             print >>sys.stderr, ("Accepting input from stdin; "
                                  "output filenames must be provided.")
@@ -108,18 +108,21 @@ def main():
             os.makedirs(args.output_directory)
         out1 = args.output_directory + '/' + os.path.basename(infile) + '.1'
         out2 = args.output_directory + '/' + os.path.basename(infile) + '.2'
+        fp_out1 = open(out1, 'w')
+        fp_out2 = open(out2, 'w')
     else:
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
+        fp_out1 = open(out1, 'w')
+        fp_out2 = open(out2, 'w')
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
-        out1 = args.output_first
+        fp_out1 = args.output_first
+        out1 = fp_out1.name
     if args.output_second:
-        out2 = args.output_second
-
-    fp_out1 = open(out1, 'w')
-    fp_out2 = open(out2, 'w')
+        fp_out2 = args.output_second
+        out2 = fp_out2.name
 
     counter1 = 0
     counter2 = 0

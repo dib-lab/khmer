@@ -72,6 +72,16 @@
 
 2015-06-14  Titus Brown  <titus@idyll.org>
 
+   * scripts/extract-paired-reads.py: added --output_dir, --paired-output,
+   and --single-output arguments to change output file details; script
+   now accepts stdin, and will output to stdout upon request.
+   * scripts/split-paired-reads.py: changed script to output to stdout upon
+   request; added '-' as stdin input.
+   * tests/test_scripts.py: added tests for new extract-paired-reads.py
+   behavior.
+
+2015-06-14  Titus Brown  <titus@idyll.org>
+
    * tests/test_counting_hash.py: fixed duplicated test
    'get_kmer_counts_too_short' by changing to 'get_kmer_hashes_too_short'.
 
