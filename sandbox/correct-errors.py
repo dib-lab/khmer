@@ -92,7 +92,7 @@ def main():
     NORMALIZE_LIMIT = args.normalize_to
 
     print('making hashtable')
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ht = khmer.CountingHash(K, HT_SIZE, N_HT)
 
     aligner = khmer.ReadAligner(ht, args.trusted_cov, args.bits_theta)
 

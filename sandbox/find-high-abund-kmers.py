@@ -13,7 +13,7 @@ from __future__ import print_function
 import sys
 import screed
 import khmer
-from khmer.khmer_args import build_counting_args, DEFAULT_MIN_TABLESIZE
+from khmer.khmer_args import build_counting_args, DEFAULT_MAX_TABLESIZE
 
 DEFAULT_LOWER_CUTOFF = 2000
 DEFAULT_UPPER_CUTOFF = 65535
@@ -34,7 +34,7 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
+        if args.min_hashsize == DEFAULT_MAX_TABLESIZE:
             print("** WARNING: hashsize is default!  " \
                 "You absodefly want to increase this!\n** " \
                 "Please read the docs!", file=sys.stderr)
@@ -65,7 +65,7 @@ def main():
     ###
 
     print('making hashtable')
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ht = khmer.CountingHash(K, HT_SIZE, N_HT)
     ht.set_use_bigcount(True)
 
     print('consuming input', input)

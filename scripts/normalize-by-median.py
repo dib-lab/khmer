@@ -24,6 +24,7 @@ import screed
 import os
 import khmer
 import textwrap
+from khmer import khmer_args
 from contextlib import contextmanager
 
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
@@ -273,8 +274,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
 
     # load or create counting table.
     if args.loadtable:
@@ -282,9 +282,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print('making k-mer counting table', file=sys.stderr)
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        print('making countgraph', file=sys.stderr)
+        htable = khmer_args.create_countgraph(args)
 
     input_filename = None
 

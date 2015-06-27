@@ -67,7 +67,7 @@ def main():
 
     ksize = args.ksize
     filenames = args.input_filenames
-    htable = khmer.new_hashbits(ksize, 1, 1)
+    htable = khmer.Hashbits(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 

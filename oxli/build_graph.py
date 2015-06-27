@@ -19,6 +19,7 @@ from __future__ import print_function, absolute_import, unicode_literals
 import sys
 
 import khmer
+from khmer import khmer_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
@@ -43,7 +44,7 @@ def build_parser(parser):
 def main(args):
     info('build-graph.py', ['graph', 'SeqAn'])
 
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, hashtype='nodegraph')
     base = args.output_filename
     filenames = args.input_filenames
 
@@ -51,8 +52,7 @@ def main(args):
         check_input_files(fname, args.force)
 
     check_space(args.input_filenames, args.force)
-    check_space_for_hashtable(
-        (float(args.n_tables * args.min_tablesize) / 8.), args.force)
+    check_space_for_hashtable(args, 'nodegraph', args.force)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
@@ -63,8 +63,8 @@ def main(args):
         print('We WILL build the tagset (for partitioning/traversal).',
               file=sys.stderr)
 
-    print('making k-mer presence table', file=sys.stderr)
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    print('making nodegraph', file=sys.stderr)
+    htable = khmer_args.create_nodegraph(args)
 
     functions.build_graph(filenames, htable, args.threads,
                           not args.no_build_tagset)

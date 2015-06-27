@@ -24,6 +24,7 @@ import khmer
 import threading
 import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
 from khmer.kfile import (check_input_files, check_space,
@@ -70,13 +71,11 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
     report_on_config(args)
 
-    print('making k-mer counting table', file=sys.stderr)
-    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables)
+    print('making countgraph', file=sys.stderr)
+    htable = khmer_args.create_countgraph(args)
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(args.datafile)

@@ -13,6 +13,7 @@ import os
 import sys
 import errno
 from stat import S_ISBLK, S_ISFIFO
+from khmer import khmer_args
 
 
 def check_input_files(file_path, force):
@@ -111,8 +112,11 @@ def check_space(in_files, force, _testhook_free_space=None):
             sys.exit(1)
 
 
-def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
+def check_space_for_hashtable(args, hashtype, force,
+                              _testhook_free_space=None):
     """Check we have enough size to write a hash table."""
+    hash_size = khmer_args._calculate_tablesize(args, hashtype)
+
     cwd = os.getcwd()
     dir_path = os.path.dirname(os.path.realpath(cwd))
     target = os.statvfs(dir_path)

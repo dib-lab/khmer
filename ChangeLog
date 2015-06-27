@@ -1,5 +1,40 @@
 2015-06-19  Titus Brown  <titus@idyll.org>
 
+   * khmer/__init__.py: split CountingHash into _CountingHash (CPython) and
+   CountingHash to mimic Hashbits behavior; pass IOError through
+   extract_countinghash_info and extract_hashbits_info so that
+   file-does-not-exist errors are correctly reported; fixed FP rate reporting;
+   changed to using get_n_primes_near_x to build hashtable sizes; removed
+   get_n_primes_above_x, new_hashbits, and new_counting_hash functions.
+   * khmer/_khmer.cc: changed tp_flags for KCountingHash so that it could
+   be a base class.
+   * khmer/khmer_args.py: removed environment variable override for hash size
+   defaults; added -M/--max_memory_usage, and functions create_nodegraph()
+   and create_countgraph().  Also renamed --min-tablesize to --max-tablesize.
+   * khmer/kfile.py: fixed check_space_for_hashtable to depend on args obj.
+   * oxli/build_graph.py, scripts/{annotate-partitions.py,count-overlap.py,
+   do-partition.py,filter-stoptags.py,
+   merge-partitions.py}, sandbox/{assembly-diff.py,assembly-diff-2.py,
+   bloom-count-intersection.py,bloom-count.py,build-sparse-graph.py,
+   collect-reads.py,saturate-by-median.py, graph-size.py,print-stoptags.py,
+   print-tagset.py,stoptags-by-position.py, subset-report.py,
+   sweep-out-reads-with-contigs.py,sweep-reads2.py,sweep-reads3.py}: changed
+   hashtype over to 'nodegraph' and 'countgraph' in call to report_on_config;
+   replaced counting hash/hashbits creation with new khmer_args create*
+   functions, and/or new_counting_hash/new_hashbits with CountingHash/Hashbits.
+   * doc/scripts.rst: updated hashtable size help text.
+   * doc/whats-new-2.0.rst: updated with description of -M/--max-memory-usage.
+   * tests/test*.py: switched from new_counting_hash to CountingHash, and
+   new_hashbits to Hashbits; adjusts tests for new behavior of hashtable
+   size calculation.
+   * tests/test_hashbits_obj.py: merged into test_hashbits.py and removed file.
+   * tests/test_script_arguments.py: updated for new check_space_for_hashtable
+   behavior; added tests for create_countgraph and create_nodegraph.
+   * tests/test_counting_single.py: fixed countgraph size & palindrome testing
+   beahavior in test_complete_no_collision.
+
+2015-06-19  Titus Brown  <titus@idyll.org>
+
    * Makefile: temporarily disable 'huge' tests on Linux.
 
 2015-06-17  Titus Brown  <titus@idyll.org>
