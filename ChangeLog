@@ -1,3 +1,7 @@
+2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * README.rst: Fix link to virtualenv installation instructions.
+
 2015-06-19  Titus Brown  <titus@idyll.org>
 
    * khmer/__init__.py: split CountingHash into _CountingHash (CPython) and
