@@ -9,12 +9,13 @@ Incompatible changes
 New parameter for tablesize/number of table parameters.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is now a `-M/--max-memory-usage` parameter that sets the number
-of tables (`-N/--num_tables`) and tablesize (`-x/--min-tablesize`)
-parameters automatically to match the desired memory usage.
+There is now a :option:`-M`/:option:`--max-memory-usage` parameter
+that sets the number of tables (:option:`-N`/:option:`--num_tables`)
+and tablesize (:option:`-x`/:option:`--max-tablesize`) parameters
+automatically to match the desired memory usage.
 
-(`--min-tablesize` was also renamed to `--max-tablesize` to reflect
-this more desirable behavior.)
+(:option:`--min-tablesize` was also renamed to
+:option:`--max-tablesize` to reflect this more desirable behavior.)
 
 Binary file formats have changed!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
