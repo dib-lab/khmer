@@ -1611,6 +1611,30 @@ def test_do_partition_2_fq():
     assert '46 1::FIZ' in names
 
 
+def test_interleave_read_seq1_fq():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '-o', outfile]
+
+    utils.runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
 def test_interleave_reads_1_fq():
     # test input files
     infile1 = utils.get_test_data('paired.fq.1')

@@ -1,3 +1,9 @@
+2015-06-29  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * Fix bug in naming in interleave-reads.py
+   * Add a test function for the new behavior
+   * Add 3 test files needed for the testing
+
 2015-06-28  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_sandbox_scripts.py: made error more informative and not crashy
