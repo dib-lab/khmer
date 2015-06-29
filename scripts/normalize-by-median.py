@@ -26,7 +26,7 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
-
+from oxli import functions as oxliutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -251,6 +251,19 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_fp = args.report
     force_single = args.force_single
 
+    # if optimization args are given, do optimization
+    if args.unique_kmers is not 0:
+        if args.max_memory_usage:
+            # verify that this is a sane memory usage restriction
+            res = oxliutils.estimate_optimal_with_N_and_M(args.unique_kmers,
+                                                    args.max_memory_usage)
+            if res.fp_rate > 0.1:
+                print("""
+*** ERROR: The given restrictions yield an estimate false positive rate of {0},
+*** which is above the reccomended false positive ceiling of 0.1!
+*** Aborting!""".format(res.fp_rate), file=sys.stderr)
+                sys.exit(1)
+
     # check for similar filenames
     # if we're using a single output file only check for identical filenames
     # otherwise, check for identical BASE names as well.
@@ -281,6 +294,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
+        if args.unique_kmers is not 0:
+            print('Warning: You have specified a number of unique kmers'
+                  ' but are loading a precreated counting table--'
+                  'argument optimization will NOT be done.', file=sys.stderr)
     else:
         print('making countgraph', file=sys.stderr)
         htable = khmer_args.create_countgraph(args)

@@ -60,7 +60,9 @@ def build_hash_args(descr=None, epilog=None, parser=None):
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
                         help='number of k-mer counting tables to use')
-
+    parser.add_argument('-U', '--unique-kmers', type=int, default=0,
+                        help='number of unique kmers in the input set')
+    
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
@@ -69,6 +71,7 @@ def build_hash_args(descr=None, epilog=None, parser=None):
     group.add_argument('-M', '--max-memory-usage', type=float,
                        help='maximum amount of memory to use for data ' +
                        'structure.')
+
 
     return parser
 
