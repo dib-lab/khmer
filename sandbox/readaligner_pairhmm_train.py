@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import division
 from __future__ import print_function
-import pysam
 import khmer
 import argparse
 import collections
@@ -28,6 +27,11 @@ def trusted_str(cov, trusted_cutoff):
 
 
 def main():
+    try:
+        import pysam
+    except ImportError:
+        pass
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('--trusted-cutoff', type=int, default=5)
     parser.add_argument(

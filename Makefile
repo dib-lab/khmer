@@ -20,7 +20,7 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR='!known_failing,!jenkins'
+	TESTATTR='!known_failing,!jenkins,!huge'
 else
 	TESTATTR='!known_failing,!jenkins,!huge'
 endif

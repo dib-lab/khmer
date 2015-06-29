@@ -9,8 +9,6 @@ from __future__ import absolute_import
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
-from __future__ import unicode_literals
-
 import sys
 import os
 import os.path
@@ -58,13 +56,6 @@ class _checkImportSucceeds(object):
     def __call__(self):
         try:
             mod = imp.load_source('__zzz', self.filename)
-        except ImportError as err:
-            if "No module named pysam" in err:
-                pass
-            else:
-                print(traceback.format_exc())
-                raise AssertionError("%s cannot be imported" %
-                                     (self.filename,))
         except:
             print(traceback.format_exc())
             raise AssertionError("%s cannot be imported" % (self.filename,))
@@ -84,14 +75,9 @@ class _checkImportSucceeds(object):
                 exec(
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
-            except (ImportError, SyntaxError) as err:
-                if "No module named pysam" in err:
-                    print("Skipping test, no pysam found...", file=sys.stdout)
-                    pass
-                else:
-                    print("{0}".format(traceback))
-                    raise AssertionError("%s cannot be exec'd" %
-                                         (self.filename,))
+            except (ImportError, SyntaxError):
+                print(traceback.format_exc())
+                raise AssertionError("%s cannot be exec'd" % (self.filename,))
             except:
                 pass                        # other failures are expected :)
         finally:
