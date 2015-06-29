@@ -26,7 +26,7 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
-from oxli import functions as oxliutils
+from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -255,8 +255,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if args.unique_kmers is not 0:
         if args.max_memory_usage:
             # verify that this is a sane memory usage restriction
-            res = oxliutils.estimate_optimal_with_N_and_M(args.unique_kmers,
-                                                    args.max_memory_usage)
+            res = oxutils.estimate_optimal_with_N_and_M(args.unique_kmers,
+                                                        args.max_memory_usage)
             if res.fp_rate > 0.1:
                 print("""
 *** ERROR: The given restrictions yield an estimate false positive rate of {0},
@@ -264,14 +264,12 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 *** Aborting!""".format(res.fp_rate), file=sys.stderr)
                 sys.exit(1)
         else:
-            res = oxliutils.estimate_optimal_with_N_and_f(args.unique_kmers,
-                                                          0.1)
+            res = oxutils.estimate_optimal_with_N_and_f(args.unique_kmers, 0.1)
             if args.max_tablesize and args.max_tablesize < res.htable_size:
                 print("*** Warning: The given tablesize may be too small!",
                       file=sys.stderr)
             elif not args.max_tablesize:
                 args.max_mem = res.mem_use
-
 
     # check for similar filenames
     # if we're using a single output file only check for identical filenames

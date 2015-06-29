@@ -62,7 +62,7 @@ def build_hash_args(descr=None, epilog=None, parser=None):
                         help='number of k-mer counting tables to use')
     parser.add_argument('-U', '--unique-kmers', type=int, default=0,
                         help='number of unique kmers in the input set')
-    
+
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
@@ -71,7 +71,6 @@ def build_hash_args(descr=None, epilog=None, parser=None):
     group.add_argument('-M', '--max-memory-usage', type=float,
                        help='maximum amount of memory to use for data ' +
                        'structure.')
-
 
     return parser
 
@@ -135,15 +134,15 @@ def add_loadhash_args(parser):
 
 def _calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type: %s" % (hashtype,)
+        raise Exception("unknown graph type: %s" % (hashtype,))
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
-                        float(multiplier)
+                float(multiplier)
         elif hashtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
-                        float(multiplier)
+                float(multiplier)
     else:
         tablesize = args.max_tablesize
 
@@ -180,7 +179,7 @@ def report_on_config(args, hashtype='countgraph'):
     """
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type: %s" % (hashtype,)
+        raise Exception("unknown graph type: %s" % (hashtype,))
 
     if args.quiet:
         return
