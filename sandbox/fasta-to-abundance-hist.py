@@ -18,9 +18,7 @@ def main():
     n_seq_kept = len(files) * [0]
 
     print('loading ht')
-    ht = khmer.new_counting_hash(1, 1, 1)
-
-    ht.load(sys.argv[1])
+    ht = khmer.load_counting_hash(sys.argv[1])
 
     for i, infile in enumerate(files):
         print('outputting', infile + '.freq')

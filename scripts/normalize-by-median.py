@@ -24,6 +24,7 @@ import screed
 import os
 import khmer
 import textwrap
+from khmer import khmer_args
 from contextlib import contextmanager
 
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
@@ -32,7 +33,9 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
 from khmer.utils import write_record, check_is_pair, broken_paired_reader
-DEFAULT_DESIRED_COVERAGE = 10
+
+
+DEFAULT_DESIRED_COVERAGE = 20
 
 
 def WithDiagnostics(ifilename, norm, reader, fp):
@@ -154,12 +157,18 @@ def get_parser():
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
-    Paired end reads will be considered together if :option:`-p` is set. If
-    either read will be kept, then both will be kept. This should result in
-    keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`,
-    unpaired reads from the specified file will be read after the paired data
-    is read.
+    By default, paired end reads will be considered together; if
+    either read should be kept, both will be kept. (This keeps both
+    reads from a fragment, and helps with retention of repeats.)
+    Unpaired reads are treated individually.
+
+    If :option:`-p`/`--paired` is set, then proper pairing is required
+    and the script will exit on unpaired reads, although
+    :option:`--unpaired-reads` can be used to supply a file of orphan
+    reads to be read after the paired reads.
+
+    :option:`--force-single` will ignore all pairing information and treat
+    reads individually.
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
@@ -171,11 +180,6 @@ def get_parser():
     files.  Note that these tables are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
-
-    :option:`-f`/:option:`--fault-tolerant` will force the program to continue
-    upon encountering a formatting error in a sequence file; the k-mer counting
-    table up to that point will be dumped, and processing will continue on the
-    next file.
 
     To append reads to an output file (rather than overwriting it), send output
     to STDOUT with `--out -` and use UNIX file redirection syntax (`>>`) to
@@ -208,12 +212,15 @@ def get_parser():
         epilog=textwrap.dedent(epilog))
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
-    parser.add_argument('-p', '--paired', action='store_true')
+    parser.add_argument('-p', '--paired', action='store_true',
+                        help='require that all sequences be properly paired')
     parser.add_argument('--force-single', dest='force_single',
-                        action='store_true')
+                        action='store_true',
+                        help='treat all sequences as single-ended/unpaired')
     parser.add_argument('-u', '--unpaired-reads',
-                        metavar="unpaired_reads_filename", help='with paired data only,\
-                        include an unpaired file')
+                        metavar="unpaired_reads_filename",
+                        help='include a file of unpaired reads to which '
+                        '-p/--paired does not apply.')
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
@@ -267,8 +274,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
 
     # load or create counting table.
     if args.loadtable:
@@ -276,9 +282,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print('making k-mer counting table', file=sys.stderr)
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        print('making countgraph', file=sys.stderr)
+        htable = khmer_args.create_countgraph(args)
 
     input_filename = None
 

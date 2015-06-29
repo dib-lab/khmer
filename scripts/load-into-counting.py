@@ -20,6 +20,7 @@ import sys
 import threading
 import textwrap
 import khmer
+from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
@@ -84,7 +85,7 @@ def main():
         check_input_files(name, args.force)
 
     check_space(args.input_sequence_filename, args.force)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
+    check_space_for_hashtable(args, 'countgraph', args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
@@ -97,9 +98,8 @@ def main():
     if os.path.exists(base + '.info'):
         os.remove(base + '.info')
 
-    print('making k-mer counting table', file=sys.stderr)
-    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables)
+    print('making countgraph', file=sys.stderr)
+    htable = khmer_args.create_countgraph(args)
     htable.set_use_bigcount(args.bigcount)
 
     filename = None
@@ -124,9 +124,9 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args.n_tables * args.min_tablesize,
-                                      args.force)
+            check_space_for_hashtable(args, 'countgraph', args.force)
             print('mid-save', base, file=sys.stderr)
+
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:
             print('through', filename, file=info_fh)

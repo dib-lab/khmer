@@ -1,52 +1,54 @@
 .. vim: set filetype=rst
 
-==============================
-Choosing table sizes for khmer
-==============================
+==========================
+Setting khmer memory usage
+==========================
 
 If you look at the documentation for the scripts (:doc:`scripts`) you'll
-see two mysterious parameters -- :option:`-N` and :option:`-x`, or, more
-verbosely, :option:`-n_tables` and :option:`--tablesize`.  What are these, and
-how do you specify them?
+see a :option:`-M` parameter that sets the maximum memory usage for
+any script that uses k-mer counting tables or k-mer graphs.  What is this?
+
+khmer uses a special data structure that lets it store counting tables
+and k-mer graphs in very low memory; the trick is that you must fix
+the amount of memory khmer can use before running it. (See `Pell et
+al., 2012 <http://www.ncbi.nlm.nih.gov/pubmed/22847406>`__ and `Zhang
+et al., 2014 <http://www.ncbi.nlm.nih.gov/pubmed/25062443>`__ for the
+details.)  This is what the :option:`-M` parameter does.
+
+If you set it too low, khmer will warn you to set it higher at the end.
+See below for some good choices for various kinds of data.
+
+**Note for khmer 1.x users:** as of khmer 2.0, the :option:`-M`
+parameter sets the :option:`-N`/:option:`--n_tables` and
+:option:`-x`/:option:`--max_tablesize` parameters automatically.
+You can still set these parameters directly if you wish.
 
 The really short version
 ========================
 
 There is no way (except for experience, rules of thumb, and intuition) to
-know what these parameters should be up front.  So, make the product of
-these two parameters be the size of your available memory::
+know what this parameter should be up front.  So, use the maximum
+available memory::
 
-  -N 4 -x 4e9
+  -M 16e9
 
-for a machine with 16 GB of free memory, for example.  Also see
-the rules of thumb, below.
+for a machine with 16 GB of free memory, for example.
 
 The short version
 =================
 
-These parameters specify the maximum memory usage of the primary data
+This parameter specifies the maximum memory usage of the primary data
 structure in khmer, which is basically N big hash tables of size x.
 The **product** of the number of hash tables and the size of the hash
-tables specifies the total amount of memory used.
+tables specifies the total amount of memory used, which is what the
+:option:`-M` parameter sets.
 
-This table is used to track k-mers.  If it is too small, khmer
-will fail in various ways (and should complain), but there is no harm
+These tables are used to track k-mers.  If they are too small, khmer
+will fail in various ways (and will complain), but there is no harm
 in making it too large. So, **the absolute safest thing to do is to
 specify as much memory as is available**.  Most scripts will inform
 you of the total memory usage, and (at the end) will complain if it's
 too small.
-
-For normalize-by-median, khmer uses one byte per hash entry, so: if
-you had 16 GB of available RAM, you should specify something like ``-N
-4 -x 4e9``, which multiplies out to about 16 GB.
-
-For the graph partitioning stuff, khmer uses only 1 bit per k-mer, so
-you can multiple your available memory by 8: for 16 GB of RAM, you could
-use ::
-
-   -N 4 -x 32e9
-
-which multiplies out to 128 Gbits of RAM, or 16 Gbytes.
 
 Life is a bit more complicated than this, however, because some scripts --
 load-into-counting and load-graph -- keep ancillary information that will
@@ -124,26 +126,24 @@ an error-code.
 Rules of thumb
 --------------
 
-Just use -N 4, always, and vary the -x parameter.
-
 For digital normalization, we recommend:
 
- - ``-x 2e9`` for any amount of sequencing for a single microbial genome,
+ - ``-M 8e9`` for any amount of sequencing for a single microbial genome,
    MDA-amplified or single colony.
 
- - ``-x 4e9`` for up to a billion mRNAseq reads from any organism.  Past that,
+ - ``-M 16e9`` for up to a billion mRNAseq reads from any organism.  Past that,
    increase it.
 
- - ``-x 8e9`` for most eukaryotic genome samples.
+ - ``-M 32e9`` for most eukaryotic genome samples.
 
- - ``-x 8e9`` will also handle most "simple" metagenomic samples (HMP on down)
+ - ``-M 32e9`` will also handle most "simple" metagenomic samples (HMP on down)
 
  - For metagenomic samples that are more complex, such as soil or marine,
-   start as high as possible.  For example, we are using ``-x 64e9`` for
+   start as high as possible.  For example, we are using ``-M 256e9`` for
    ~300 Gbp of soil reads.
 
 For partitioning of complex metagenome samples, we recommend starting
 as high as you can -- something like half your system memory.  So if
-you have 256 GB of RAM, use ``-N 4 -x 256e9`` which will use 4 x 256 /
-8 = 128 GB of RAM for the basic graph storage, leaving other memory
-for the ancillary data structures.
+you have 256 GB of RAM, use ``-M 128e9`` which will use 128 GB of RAM
+for the basic graph storage, leaving other memory for the ancillary
+data structures.

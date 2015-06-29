@@ -42,7 +42,7 @@ def main():
     print('--')
 
     print('creating ht')
-    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HASHTABLE_SIZE, N_HT)
     print('eating fa', infile)
     total_reads, n_consumed = ht.consume_fasta(infile)
     outfp = open(outfile, 'w')

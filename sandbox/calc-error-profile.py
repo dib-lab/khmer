@@ -67,7 +67,7 @@ def main():
 
     # build a small counting hash w/default parameters. In general there
     # should be no need to change these parameters.
-    ht = khmer.new_counting_hash(K, HASHSIZE, N_HT)
+    ht = khmer.CountingHash(K, HASHSIZE, N_HT)
 
     # initialize list to contain counts of errors by position
     positions = [0] * MAX_SEQ_LEN

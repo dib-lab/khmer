@@ -22,7 +22,9 @@ import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer import khmer_args
+from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+                              report_on_config)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -62,21 +64,12 @@ def get_parser():
     process, and if you eliminate the already-processed pmap files, you can
     continue where you left off.
     """
-    parser = argparse.ArgumentParser(
-        description="Find all highly connected k-mers.",
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = build_counting_args(
+        descr="Find all highly connected k-mers.",
+        epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('--n_tables', '-N', type=int,
-                        default=DEFAULT_COUNTING_HT_N,
-                        help='number of k-mer counting tables to use')
-    parser.add_argument('--min-tablesize', '-x', type=float,
-                        default=DEFAULT_COUNTING_HT_SIZE, help='lower bound on'
-                        ' the size of the k-mer counting table(s)')
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue past warnings')
     return parser
@@ -124,8 +117,7 @@ def main():
 
     # create counting hash
     ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
-                                       args.n_tables)
+    counting = khmer_args.create_countgraph(args, ksize=ksize)
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):

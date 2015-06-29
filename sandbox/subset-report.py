@@ -17,7 +17,7 @@ K = 32
 def main():
     subset_filenames = sys.argv[1:]
 
-    ht = khmer.new_hashbits(K, 1, 1)
+    ht = khmer.Hashbits(K, 1, 1)
     for filename in subset_filenames:
         print('--')
         print('partition map:', filename)
