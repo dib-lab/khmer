@@ -16,6 +16,7 @@ from __future__ import print_function
 import sys
 import textwrap
 import khmer
+from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info)
 from khmer.kfile import check_input_files, check_space
 
@@ -96,8 +97,7 @@ def main():
     htable.load_tagset(graphbase + '.tagset')
 
     ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
-                                       args.n_tables)
+    counting = khmer_args.create_countgraph(args)
 
     # divide up into SUBSET_SIZE fragments
     divvy = htable.divide_tags_into_subsets(args.subset_size)

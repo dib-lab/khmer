@@ -22,6 +22,7 @@ import gc
 import os.path
 import os
 import textwrap
+from khmer import khmer_args
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
@@ -113,7 +114,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
     args = get_parser().parse_args()
 
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, hashtype='nodegraph')
 
     for infile in args.input_filenames:
         check_input_files(infile, args.force)
@@ -131,8 +132,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     # load-graph
 
-    print('making k-mer presence table', file=sys.stderr)
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    print('making nodegraph', file=sys.stderr)
+    htable = khmer_args.create_nodegraph(args)
 
     for _, filename in enumerate(args.input_filenames):
         print('consuming input', filename, file=sys.stderr)
@@ -210,7 +211,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     print('loading %d pmap files (first one: %s)' %
           (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
-    htable = khmer.new_hashbits(args.ksize, 1, 1)
+    htable = khmer.Hashbits(args.ksize, 1, 1)
 
     for pmap_file in pmap_files:
         print('merging', pmap_file, file=sys.stderr)

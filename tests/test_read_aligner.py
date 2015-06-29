@@ -46,13 +46,13 @@ def neq_(v1, v2):
 
 
 def test_graph_attribute():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 0, 0)
     assert aligner.graph is ch
 
 
 def test_align_nothing():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "ACCAAGGCTCGAGATTTACC"
 
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -68,7 +68,7 @@ def test_align_nothing():
 
 
 def test_alignnocov():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -83,7 +83,7 @@ def test_alignnocov():
 
 
 def test_align_middle():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -98,7 +98,7 @@ def test_align_middle():
 
 
 def test_align_middle_trunc():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -120,7 +120,7 @@ def test_align_middle_trunc():
 
 
 def test_align_middle_trunc_2():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -142,7 +142,7 @@ def test_align_middle_trunc_2():
 
 
 def test_align_fwd_nothing():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "ACCAAGGCTCGAGATTTACC"
 
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -158,7 +158,7 @@ def test_align_fwd_nothing():
 
 
 def test_align_fwd_nocov():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -173,7 +173,7 @@ def test_align_fwd_nocov():
 
 
 def test_align_fwd_middle():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -188,7 +188,7 @@ def test_align_fwd_middle():
 
 
 def test_align_fwd_middle_trunc():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -210,7 +210,7 @@ def test_align_fwd_middle_trunc():
 
 
 def test_align_fwd_middle_trunc_2():
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    ch = khmer.CountingHash(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(20):
@@ -230,7 +230,7 @@ def test_align_fwd_middle_trunc_2():
 def test_align_fwd_covs_1():
     K = 10
 
-    ch = khmer.new_counting_hash(K, 1048576, 1)
+    ch = khmer.CountingHash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(19):
@@ -253,7 +253,7 @@ def test_align_fwd_covs_1():
 def test_align_fwd_covs_2():
     K = 10
 
-    ch = khmer.new_counting_hash(K, 1048576, 1)
+    ch = khmer.CountingHash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(19):
@@ -278,7 +278,7 @@ def test_align_fwd_covs_2():
 def test_align_fwd_covs_3():
     K = 10
 
-    ch = khmer.new_counting_hash(K, 1048576, 1)
+    ch = khmer.CountingHash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(19):
@@ -304,7 +304,7 @@ def test_align_fwd_covs_3():
 def test_align_fwd_covs_4():
     K = 10
 
-    ch = khmer.new_counting_hash(K, 1048576, 1)
+    ch = khmer.CountingHash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(19):
@@ -328,7 +328,7 @@ def test_align_fwd_covs_4():
 def test_align_fwd_covs_5():
     K = 10
 
-    ch = khmer.new_counting_hash(K, 1048576, 1)
+    ch = khmer.CountingHash(K, 1048576, 1)
     read = "GTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
     for i in range(19):
@@ -351,8 +351,8 @@ def test_align_fwd_covs_5():
 
 
 def test_simple_readalign():
-    return  # DISABLED @CTB
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    return # @CTB
+    ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 2, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACATGTCCTTGACAGAT")
@@ -371,8 +371,8 @@ def test_simple_readalign():
 
 
 def test_readalign():
-    return  # DISABLED!
-    ch = khmer.new_counting_hash(10, 1048576, 1)
+    return # @CTB
+    ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
@@ -598,8 +598,8 @@ def check_query(aligner, query):
         assert_almost_equals(score, query["score"])
 
 def test_readalign_new():
-    return  # DISABLED
-    ch = khmer.new_counting_hash(32, 1048576, 1)
+    return # @CTB
+    ch = khmer.CountingHash(32, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for seq in ht_seqs:
         ch.consume(seq)
@@ -611,7 +611,7 @@ def test_readalign_new():
 
 
 def test_readaligner_load():
-    ct = khmer.new_counting_hash(32, 1048576, 1)
+    ct = khmer.CountingHash(32, 1048576, 1)
     parameters_json = utils.get_test_data('readaligner-default.json')
     a_aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
     a_scoring_matrix = a_aligner.get_scoring_matrix()

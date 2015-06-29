@@ -21,7 +21,7 @@ import khmer
 import textwrap
 
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+                              report_on_config, info, create_countgraph)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -187,7 +187,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, False)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
+        check_space_for_hashtable(args, 'countgraph', False)
 
     # list to save error files along with throwing exceptions
     if args.force:
@@ -197,9 +197,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('loading k-mer counting table from', args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print('making k-mer counting table')
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        print('making countgraph')
+        htable = create_countgraph(args)
 
     total = 0
     discarded = 0

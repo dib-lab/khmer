@@ -24,7 +24,7 @@ def main():
     filename2 = sys.argv[2]
     uniq2 = open(os.path.basename(sys.argv[2]) + '.uniq', 'w')
 
-    kh = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    kh = khmer.Hashbits(K, HASHTABLE_SIZE, N_HT)
     for n, record in enumerate(screed.open(filename1)):
         if n % 10000 == 0:
             print('...', filename1, n)
