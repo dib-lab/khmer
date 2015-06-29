@@ -263,6 +263,15 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 *** which is above the reccomended false positive ceiling of 0.1!
 *** Aborting!""".format(res.fp_rate), file=sys.stderr)
                 sys.exit(1)
+        else:
+            res = oxliutils.estimate_optimal_with_N_and_f(args.unique_kmers,
+                                                          0.1)
+            if args.max_tablesize and args.max_tablesize < res.htable_size:
+                print("*** Warning: The given tablesize may be too small!",
+                      file=sys.stderr)
+            elif not args.max_tablesize:
+                args.max_mem = res.mem_use
+
 
     # check for similar filenames
     # if we're using a single output file only check for identical filenames
