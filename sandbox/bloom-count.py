@@ -20,7 +20,7 @@ def main():
     HT_SIZE = int(sys.argv[3])  # size of hashtable
     N_HT = int(sys.argv[4])  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     n_unique = 0
     for n, record in enumerate(fasta_iter(open(filename))):

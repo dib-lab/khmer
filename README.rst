@@ -63,7 +63,7 @@ version.
 For more details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/user/install.html>`_
 
 The use of a virtualenv is recommended, see
-https://virtualenv.pypa.io/en/latest/virtualenv.html#installation
+https://virtualenv.readthedocs.org/en/latest/installation.html
 
 khmer is under the BSD license; see doc/LICENSE.txt. Distribution,
 modification and redistribution, incorporation into other software, and

@@ -22,6 +22,7 @@ import csv
 import khmer
 import threading
 import textwrap
+from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
 from khmer.kfile import (check_input_files, check_space,
@@ -79,8 +80,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     check_input_files(args.input_sequence_filename, args.force)
     check_space([args.input_sequence_filename], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize,
-                                  args.force)
+        check_space_for_hashtable(args, 'countgraph', args.force)
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
@@ -95,14 +95,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
                                   'cumulative_fraction'])
 
-    print('making k-mer counting table', file=sys.stderr)
-    counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                            args.n_tables)
+    print('making countgraph', file=sys.stderr)
+    counting_hash = khmer_args.create_countgraph(args, multiplier=1.1)
     counting_hash.set_use_bigcount(args.bigcount)
 
     print('building k-mer tracking table', file=sys.stderr)
-    tracking = khmer.new_hashbits(counting_hash.ksize(), args.min_tablesize,
-                                  args.n_tables)
+    tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
     print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
     print('k-mer counting table sizes:',

@@ -162,10 +162,10 @@ def test_normalize_by_median_report_fp():
     args = ['-C', '1', '-k', '17', '-R', outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "fp rate estimated to be 0.626" in err, err
+    assert "fp rate estimated to be 0.623" in err, err
     report = open(outfile, 'r')
     line = report.readline()
-    assert "100000 25232 0.25232" in line, line
+    assert "100000 25261 0.25261" in line, line
 
 
 def test_normalize_by_median_unpaired_and_paired():
@@ -183,7 +183,7 @@ def test_normalize_by_median_unpaired_and_paired():
     args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of unique k-mers: 4029' in err, err
+    assert 'Total number of unique k-mers: 4030' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -420,18 +420,21 @@ def test_normalize_by_median_emptycountingtable():
 
 
 def test_normalize_by_median_fpr():
-    MIN_TABLESIZE_PARAM = 1
+    MAX_TABLESIZE_PARAM = 12
 
     infile = utils.get_temp_filename('test-fpr.fq')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-f', '-k 17', '-x ' + str(MIN_TABLESIZE_PARAM), infile]
+    args = ['-f', '-k 17', '-x ' + str(MAX_TABLESIZE_PARAM), infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
-    assert os.path.exists(infile + '.keep')
+    print(out)
+    print(err)
+
+    assert os.path.exists(infile + '.keep'), infile
     assert '** ERROR: the graph structure is too small' in err, err
 
 

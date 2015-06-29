@@ -12,13 +12,17 @@ import sys
 import os
 import argparse
 from argparse import _VersionAction
+
+import screed
+import khmer
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
-import screed
+from khmer.utils import print_error
+
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
-DEFAULT_MIN_TABLESIZE = 1e6
+DEFAULT_MAX_TABLESIZE = 1e6
 DEFAULT_N_THREADS = 1
 
 
@@ -45,24 +49,26 @@ def build_hash_args(descr=None, epilog=None, parser=None):
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
                                          formatter_class=ComboFormatter)
 
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                   DEFAULT_MIN_TABLESIZE)
-
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
-    parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
+    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
+
     parser.add_argument('--n_tables', '-N', type=int,
-                        default=env_n_tables,
+                        default=DEFAULT_N_TABLES,
                         help='number of k-mer counting tables to use')
-    parser.add_argument('--min-tablesize', '-x', type=float,
-                        default=env_tablesize,
-                        help='lower bound on tablesize to use')
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--max-tablesize', '-x', type=float,
+                       default=DEFAULT_MAX_TABLESIZE,
+                       help='upper bound on tablesize to use; overrides ' +
+                       '--max-memory-usage/-M.')
+    group.add_argument('-M', '--max-memory-usage', type=float,
+                       help='maximum amount of memory to use for data ' +
+                       'structure.')
 
     return parser
 
@@ -70,7 +76,7 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 def build_counting_args(descr=None, epilog=None):
     """Build an ArgumentParser with args for counting_hash based scripts."""
     parser = build_hash_args(descr=descr, epilog=epilog)
-    parser.hashtype = 'counting'
+    parser.hashtype = 'countgraph'
 
     return parser
 
@@ -79,7 +85,7 @@ def build_hashbits_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for hashbits based scripts."""
 
     parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
-    parser.hashtype = 'hashbits'
+    parser.hashtype = 'nodegraph'
 
     return parser
 
@@ -91,31 +97,24 @@ def add_loadhash_args(parser):
     class LoadAction(argparse.Action):
 
         def __call__(self, parser, namespace, values, option_string=None):
-            env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-            env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-            env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                           DEFAULT_MIN_TABLESIZE)
-
-            from khmer.utils import print_error
-
             setattr(namespace, self.dest, values)
 
-            if getattr(namespace, 'ksize') != env_ksize or \
-               getattr(namespace, 'n_tables') != env_n_tables or \
-               getattr(namespace, 'min_tablesize') != env_tablesize:
+            if getattr(namespace, 'ksize') != DEFAULT_K or \
+               getattr(namespace, 'n_tables') != DEFAULT_N_TABLES or \
+               getattr(namespace, 'max_tablesize') != DEFAULT_MAX_TABLESIZE:
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved k-mer table from
-{hashfile}, but have set k-mer table parameters.
-Your values for ksize, n_tables, and tablesize
-will be ignored.'''.format(hashfile=values))
+** {hashfile}, but have set k-mer table parameters.
+** Your values for ksize, n_tables, and tablesize
+** will be ignored.'''.format(hashfile=values))
 
             if hasattr(parser, 'hashtype'):
                 info = None
-                if parser.hashtype == 'hashbits':
+                if parser.hashtype == 'nodegraph':
                     info = extract_hashbits_info(
                         getattr(namespace, self.dest))
-                elif parser.hashtype == 'counting':
+                elif parser.hashtype == 'countgraph':
                     info = extract_countinghash_info(
                         getattr(namespace, self.dest))
                 if info:
@@ -124,52 +123,96 @@ will be ignored.'''.format(hashfile=values))
                     n = info[2]
                     setattr(namespace, 'ksize', K)
                     setattr(namespace, 'n_tables', n)
-                    setattr(namespace, 'min_tablesize', x)
+                    setattr(namespace, 'max_tablesize', x)
 
     parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
                         help='load a precomputed k-mer table from disk',
                         action=LoadAction)
 
 
-def report_on_config(args, hashtype='counting'):
+def _calculate_tablesize(args, hashtype, multiplier=1.0):
+    if hashtype not in ('countgraph', 'nodegraph'):
+        raise Exception, "unknown graph type: %s" % (hashtype,)
+
+    if args.max_memory_usage:
+        if hashtype == 'countgraph':
+            tablesize = args.max_memory_usage / args.n_tables / \
+                        float(multiplier)
+        elif hashtype == 'nodegraph':
+            tablesize = 8. * args.max_memory_usage / args.n_tables / \
+                        float(multiplier)
+    else:
+        tablesize = args.max_tablesize
+
+    return tablesize
+
+
+def create_nodegraph(args, ksize=None, multiplier=1.0):
+    if ksize is None:
+        ksize = args.ksize
+    if ksize > 32:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        sys.exit(1)
+
+    tablesize = _calculate_tablesize(args, 'nodegraph', multiplier=multiplier)
+    return khmer.Hashbits(ksize, tablesize, args.n_tables)
+
+
+def create_countgraph(args, ksize=None, multiplier=1.0):
+    if ksize is None:
+        ksize = args.ksize
+    if ksize > 32:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        sys.exit(1)
+
+    tablesize = _calculate_tablesize(args, 'countgraph', multiplier=multiplier)
+    return khmer.CountingHash(ksize, tablesize, args.n_tables)
+
+
+def report_on_config(args, hashtype='countgraph'):
     """Print out configuration.
 
     Summarize the configuration produced by the command-line arguments
     made available by this module.
     """
     from khmer.utils import print_error
+    if hashtype not in ('countgraph', 'nodegraph'):
+        raise Exception, "unknown graph type: %s" % (hashtype,)
 
     if args.quiet:
         return
+
+    tablesize = _calculate_tablesize(args, hashtype)
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
     print_error(" - n tables =     {0} \t\t(-N)".format(args.n_tables))
     print_error(
-        " - min tablesize = {0:5.2g} \t(-x)".format(args.min_tablesize)
+        " - max tablesize = {0:5.2g} \t(-x)".format(tablesize)
     )
     print_error("")
-    if hashtype == 'counting':
+    if hashtype == 'countgraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x min_tablesize)".format(
-                args.n_tables * args.min_tablesize))
-    elif hashtype == 'hashbits':
+            "(n_tables x max_tablesize)".format(
+                args.n_tables * args.max_tablesize))
+    elif hashtype == 'nodegraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x min_tablesize / 8)".format(args.n_tables *
-                                                    args.min_tablesize / 8)
+            "(n_tables x max_tablesize / 8)".format(args.n_tables *
+                                                    args.max_tablesize / 8)
         )
 
     print_error("-" * 8)
 
-    if DEFAULT_MIN_TABLESIZE == args.min_tablesize and \
-       not hasattr(args, 'loadtable'):
-        print_error(
-            "** WARNING: tablesize is default!  "
-            "You absodefly want to increase this!\n** "
-            "Please read the docs!\n"
-        )
+    if DEFAULT_MAX_TABLESIZE == args.max_tablesize and \
+       not getattr(args, 'loadtable', None):
+        print_error('''\
+
+** WARNING: tablesize is default!
+** You probably want to increase this with -M/--max-memory-usage!
+** Please read the docs!
+''')
 
 
 def add_threading_args(parser):

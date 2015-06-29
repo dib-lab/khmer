@@ -50,8 +50,24 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 89' in err, err
+    assert 'Total number of unique k-mers: 83' in err, err
     assert os.path.exists(outfile)
+
+
+def test_load_into_counting_max_memory_usage_parameter():
+    script = 'load-into-counting.py'
+    args = ['-M', '2e3', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(outfile)
+
+    kh = khmer.load_counting_hash(outfile)
+    assert sum(kh.hashsizes()) < 3e8
 
 
 def test_load_into_counting_abundance_dist_nobig():
@@ -64,7 +80,7 @@ def test_load_into_counting_abundance_dist_nobig():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 89' in err, err
+    assert 'Total number of unique k-mers: 83' in err, err
     assert os.path.exists(outfile)
 
     htfile = outfile
@@ -180,13 +196,14 @@ def test_load_into_counting_json():
     with open(jsonfile) as jsonfh:
         got_json = json.load(jsonfh)
     outbase = os.path.basename(outfile)
+
     expected_json = {
-        "files": [infile],
-        "ht_name": outbase,
-        "num_kmers": 95,
-        "num_reads": 1001,
-        "fpr": 9.024965705097741e-11,
-        "mrinfo_version": "0.2.0",
+        u"files": [infile],
+        u"ht_name": outbase,
+        u"num_kmers": 95,
+        u"num_reads": 1001,
+        u"fpr": 9.025048735197377e-11,
+        u"mrinfo_version": "0.2.0",
     }
 
     assert got_json == expected_json, got_json
@@ -534,7 +551,7 @@ def test_filter_stoptags():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer.new_hashbits(K, 1, 1)
+    kh = khmer._Hashbits(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -565,7 +582,7 @@ def test_filter_stoptags_fq():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer.new_hashbits(K, 1, 1)
+    kh = khmer._Hashbits(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -857,6 +874,30 @@ def test_oxli_build_graph_multithread():
     args = ['build-graph', '-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
+
+
+def test_load_graph_max_memory_usage_parameter():
+    script = 'load-graph.py'
+    args = ['-M', '2e7', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    try:
+        ht = khmer.load_hashbits(ht_file)
+    except IOError as err:
+        assert 0, str(err)
+
+    assert (sum(ht.hashsizes()) / 8.) < 2e7, ht.hashsizes()
 
 
 def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
@@ -1176,13 +1217,13 @@ def test_extract_partitions_header_whitespace():
     assert os.path.exists(groupfile)
 
     dist = open(distfile).readline()
-    assert dist.strip() == '1 11957 11957 11957'
+    assert dist.strip() == '1 11960 11960 11960', dist.strip()
 
     parts = [r.name.split('\t')[1]
              for r in screed.open(partfile, parse_description=False)]
     assert len(parts) == 13538, len(parts)
     parts = set(parts)
-    assert len(parts) == 12601, len(parts)
+    assert len(parts) == 12602, len(parts)
 
 
 def test_extract_partitions_fq():
@@ -1570,6 +1611,30 @@ def test_do_partition_2_fq():
     assert '46 1::FIZ' in names
 
 
+def test_interleave_read_seq1_fq():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '-o', outfile]
+
+    utils.runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
 def test_interleave_reads_1_fq():
     # test input files
     infile1 = utils.get_test_data('paired.fq.1')
@@ -1783,6 +1848,115 @@ def test_extract_paired_reads_2_fq():
         assert r.sequence == q.sequence
         assert r.quality == q.quality
     assert n > 0
+
+
+def test_extract_paired_reads_3_output_dir():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # output directory
+    out_dir = utils.get_temp_filename('output')
+
+    script = 'extract-paired-reads.py'
+    args = [infile, '-o', out_dir]
+
+    utils.runscript(script, args)
+
+    outfile1 = os.path.join(out_dir, 'paired-mixed.fa.pe')
+    outfile2 = os.path.join(out_dir, 'paired-mixed.fa.se')
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
+def test_extract_paired_reads_4_output_files():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('out_pe')
+    outfile2 = utils.get_temp_filename('out_se')
+
+    script = 'extract-paired-reads.py'
+    args = [infile, '-p', outfile1, '-s', outfile2]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
+def test_extract_paired_reads_5_stdin_error():
+    script = 'extract-paired-reads.py'
+    args = ['-f', '/dev/stdin']
+
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+    assert "output filenames must be provided." in err
+
+
+def execute_extract_paired_streaming(ifilename):
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+    outfile1 = utils.get_temp_filename('paired.pe')
+    outfile2 = utils.get_temp_filename('paired.se')
+    script = 'extract-paired-reads.py'
+    args = [fifo, '-p', outfile1, '-s', outfile2]
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    ifile = open(ifilename, 'r')
+    fifofile = open(fifo, 'w')
+    chunk = ifile.read(4)
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(4)
+    fifofile.close()
+    thread.join()
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+
+def test_extract_paired_streaming():
+    testinput = utils.get_test_data('paired-mixed.fa')
+    o = execute_extract_paired_streaming(testinput)
 
 
 def execute_split_paired_streaming(ifilename):
@@ -2393,7 +2567,7 @@ def test_count_overlap_invalid_datafile():
     htfile = _make_graph(seqfile1, ksize=20)
     outfile = utils.get_temp_filename('overlap.out', in_dir)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     if sys.version_info.major == 2:
@@ -2412,21 +2586,21 @@ def test_count_overlap():
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert '# of unique k-mers in dataset2: 759047' in data
-    assert '# of overlap unique k-mers: 245621' in data
+    assert '# of unique k-mers in dataset2: 759020' in data, data
+    assert '# of overlap unique k-mers: 245547' in data
     assert os.path.exists(curvefile), curvefile
     data = [x.strip() for x in open(curvefile)]
     data = set(data)
-    assert '178633 1155' in data
-    assert '496285 2970' in data
-    assert '752053 238627' in data
+    assert '178630 1134' in data, data
+    assert '496280 2904' in data
+    assert '752031 238558' in data
 
 
 def test_count_overlap_csv():
@@ -2439,21 +2613,21 @@ def test_count_overlap_csv():
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize',
+    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
             '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert '# of unique k-mers in dataset2: 759047' in data
-    assert '# of overlap unique k-mers: 245621' in data
+    assert '# of unique k-mers in dataset2: 759020' in data
+    assert '# of overlap unique k-mers: 245547' in data
     assert os.path.exists(curvefile), curvefile
     data = [x.strip() for x in open(curvefile)]
     data = set(data)
-    assert '178633,1155' in data
-    assert '496285,2970' in data
-    assert '752053,238627' in data
+    assert '178630,1134' in data, data
+    assert '496280,2904' in data
+    assert '752031,238558' in data
 
 
 def execute_streaming_diginorm(ifilename):
