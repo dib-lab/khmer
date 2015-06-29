@@ -27,10 +27,7 @@ def trusted_str(cov, trusted_cutoff):
 
 
 def main():
-    try:
-        import pysam
-    except ImportError:
-        pass
+    import pysam
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--trusted-cutoff', type=int, default=5)
