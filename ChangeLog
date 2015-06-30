@@ -3,6 +3,11 @@
    * setup.cfg: changed 'stop=TRUE' to 'stop=FALSE', so that tests do not
    stop running at first failure.
 
+2015-06-30  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/{extract-paired-reads,split-paired-reads}.py: Fix creation of
+   default output files even when output files were provided on CLI.
+
 2015-06-29  Sherine Awad  <drmahmoud@ucdavis.edu>
 
    * Fix bug in naming in interleave-reads.py
