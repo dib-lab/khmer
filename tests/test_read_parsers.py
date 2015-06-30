@@ -334,7 +334,7 @@ def test_read_pair_iterator_in_error_mode_xfail():
             pass
         failed = False
     except ValueError as exc:
-        assert "Invalid read pair detected" in str(exc), str(exc)
+        assert "Invalid read pair" in str(exc), str(exc)
     assert failed
 
 
