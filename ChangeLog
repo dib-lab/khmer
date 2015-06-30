@@ -4,6 +4,11 @@
    when -M is used.
    * tests/test_scripts.py: added test for correct max_tablesize behavior.
 
+2015-06-30  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/{extract-paired-reads,split-paired-reads}.py: Fix creation of
+   default output files even when output files were provided on CLI.
+
 2015-06-29  Sherine Awad  <drmahmoud@ucdavis.edu>
 
    * Fix bug in naming in interleave-reads.py
