@@ -1,3 +1,8 @@
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: changed 'stop=TRUE' to 'stop=FALSE', so that tests do not
+   stop running at first failure.
+
 2015-06-30  Kevin Murray  <spam@kdmurray.id.au>
 
    * scripts/{extract-paired-reads,split-paired-reads}.py: Fix creation of
