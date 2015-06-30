@@ -108,6 +108,79 @@ def get_parser():
     return parser
 
 
+class Trimmer(object):
+    def __init__(self, graph, do_trim_low_abund, cutoff, normalize_limit):
+        self.graph = graph
+        self.do_trim_low_abund = do_trim_low_abund
+        self.cutoff = cutoff
+        self.normalize_limit = normalize_limit
+
+        self.n_reads = 0
+        self.n_bp = 0
+        self.trimmed_reads = 0
+        self.n_saved = 0
+        self.n_skipped = 0
+        self.bp_skipped = 0
+
+    def __call__(self, reader, saver):
+        graph = self.graph
+        NORMALIZE_LIMIT = self.normalize_limit
+        CUTOFF = self.cutoff
+        K = graph.ksize()
+
+        for n, is_pair, read1, read2 in reader:
+            examine = []
+            records = []
+
+            if is_pair:
+                reads = (read1, read2)
+            else:
+                reads = (read1,)
+
+            # clean up the sequences for examination.
+            for read in reads:
+                r = read.sequence.replace('N', 'A')
+                examine.append(r)
+
+                self.n_reads += 1
+                self.n_bp += len(r)
+
+            # find out if they are estimated to have low coverage
+            is_low_coverage = False
+            for r in examine:
+                med, _, _ = graph.get_median_count(r)
+                if med < NORMALIZE_LIMIT:
+                    is_low_coverage = True
+                    break
+
+            # if either of the sequences are low coverage & we have a 'saver',
+            # keep both for 2nd pass
+            if is_low_coverage and saver:
+                for read, seq in zip(reads, examine):
+                    graph.consume(seq)
+                    write_record(read, saver)
+                    self.n_saved += 1
+
+            # if they're low coverage, and we don't want to trim low coverage,
+            # save them.
+            elif is_low_coverage and not self.do_trim_low_abund:
+                for read in reads:
+                    self.n_skipped += 1
+                    self.bp_skipped += len(read)
+                    yield read
+            # otherwise, trim them if they should be trimmed, THEN write 'em
+            else:
+                trimmed = []
+                new_records = []
+                for read, seq in zip(reads, examine):
+                    _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
+                    if trim_at >= K:
+                        if trim_at != len(seq):
+                            self.trimmed_reads += 1
+                        read = trim_record(read, trim_at)
+                    yield read
+
+
 def main():
     info('trim-low-abund.py', ['streaming'])
     parser = get_parser()
@@ -147,11 +220,11 @@ def main():
 
     save_pass2_total = 0
 
-    n_bp = 0
-    n_reads = 0
     written_bp = 0
     written_reads = 0
-    trimmed_reads = 0
+
+    trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
+                      args.normalize_to)
 
     pass2list = []
     for filename in args.input_filenames:
@@ -167,79 +240,25 @@ def main():
         screed_iter = screed.open(filename, parse_description=False)
         pass2fp = open(pass2filename, 'w')
 
-        save_pass2 = 0
-        n = 0
+        n_start = trimmer.n_reads
 
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=args.ignore_pairs)
-        for n, is_pair, read1, read2 in paired_iter:
-            if n % 10000 == 0:
-                print('...', n, filename, save_pass2, n_reads, n_bp,
-                      written_reads, written_bp, file=sys.stderr)
 
-            # we want to track paired reads here, to make sure that pairs
-            # are not split between first pass and second pass.
-
-            if is_pair:
-                n_reads += 2
-                n_bp += len(read1.sequence) + len(read2.sequence)
-
-                seq1 = read1.sequence.replace('N', 'A')
-                seq2 = read2.sequence.replace('N', 'A')
-
-                med1, _, _ = ct.get_median_count(seq1)
-                med2, _, _ = ct.get_median_count(seq2)
-
-                if med1 < NORMALIZE_LIMIT or med2 < NORMALIZE_LIMIT:
-                    ct.consume(seq1)
-                    ct.consume(seq2)
-                    write_record_pair(read1, read2, pass2fp)
-                    save_pass2 += 2
-                else:
-                    _, trim_at1 = ct.trim_on_abundance(seq1, CUTOFF)
-                    _, trim_at2 = ct.trim_on_abundance(seq2, CUTOFF)
-
-                    if trim_at1 >= K:
-                        read1 = trim_record(read1, trim_at1)
-
-                    if trim_at2 >= K:
-                        read2 = trim_record(read2, trim_at2)
-
-                    if trim_at1 != len(seq1):
-                        trimmed_reads += 1
-                    if trim_at2 != len(seq2):
-                        trimmed_reads += 1
-
-                    write_record_pair(read1, read2, trimfp)
-                    written_reads += 2
-                    written_bp += trim_at1 + trim_at2
-            else:
-                n_reads += 1
-                n_bp += len(read1.sequence)
-
-                seq = read1.sequence.replace('N', 'A')
-
-                med, _, _ = ct.get_median_count(seq)
-
-                # has this portion of the graph saturated? if not,
-                # consume & save => pass2.
-                if med < NORMALIZE_LIMIT:
-                    ct.consume(seq)
-                    write_record(read1, pass2fp)
-                    save_pass2 += 1
-                else:                       # trim!!
-                    _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
-                    if trim_at >= K:
-                        new_read = trim_record(read1, trim_at)
-                        write_record(new_read, trimfp)
-
-                        written_reads += 1
-                        written_bp += trim_at
-
-                        if trim_at != len(read1.sequence):
-                            trimmed_reads += 1
-
+        for read in trimmer(paired_iter, pass2fp):
+            write_record(read, trimfp)
+            written_bp += len(read)
+            written_reads += 1
         pass2fp.close()
+
+        save_pass2 = trimmer.n_saved
+        n_reads = trimmer.n_reads
+        n = n_reads - n_start
+
+#            if n % 10000 == 0:
+#                print('...', n, filename, save_pass2, n_reads, n_bp,
+#                      written_reads, written_bp, file=sys.stderr)
+
 
         print('%s: kept aside %d of %d from first pass, in %s' %
               (filename, save_pass2, n, filename),
@@ -248,8 +267,8 @@ def main():
 
     # ### SECOND PASS. ###
 
-    skipped_n = 0
-    skipped_bp = 0
+    assert trimmer.n_skipped == 0
+    assert trimmer.bp_skipped == 0
     for _, pass2filename, trimfp in pass2list:
         print('second pass: looking at sequences kept aside in %s' %
               pass2filename,
@@ -260,42 +279,29 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        for n, read in enumerate(screed.open(pass2filename,
-                                             parse_description=False)):
-            if n % 10000 == 0:
-                print('... x 2', n, pass2filename,
-                      written_reads, written_bp, file=sys.stderr)
+        screed_iter = screed.open(pass2filename, parse_description=False)
+        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+                                           force_single=True)
 
-            seq = read.sequence.replace('N', 'A')
-            med, _, _ = ct.get_median_count(seq)
+        for read in trimmer(paired_iter, None):
+            write_record(read, trimfp)
+            written_reads += 1
 
-            # do we retain low-abundance components unchanged?
-            if med < NORMALIZE_LIMIT and args.variable_coverage:
-                write_record(read, trimfp)
-
-                written_reads += 1
-                written_bp += len(read.sequence)
-                skipped_n += 1
-                skipped_bp += len(read.sequence)
-
-            # otherwise, examine/trim/truncate.
-            else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
-                _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
-                if trim_at >= K:
-                    new_read = trim_record(read, trim_at)
-                    write_record(new_read, trimfp)
-
-                    written_reads += 1
-                    written_bp += trim_at
-
-                    if trim_at != len(read.sequence):
-                        trimmed_reads += 1
+#            if n % 10000 == 0:
+#                print('... x 2', n, pass2filename,
+#                      written_reads, written_bp, file=sys.stderr)
 
         print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
 
     print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
+
+    n_reads = trimmer.n_reads
+    trimmed_reads = trimmer.trimmed_reads
+    n_bp = trimmer.n_bp
+    n_skipped = trimmer.n_skipped
+    bp_skipped = trimmer.bp_skipped
 
     n_passes = 1.0 + (float(save_pass2_total) / n_reads)
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
@@ -311,12 +317,12 @@ def main():
           ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
 
     if args.variable_coverage:
-        percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print('%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
+        percent_reads_hicov = 100.0 * float(n_reads - n_skipped) / n_reads
+        print('%d reads were high coverage (%.2f%%);' % (n_reads - n_skipped,
                                                          percent_reads_hicov),
               file=sys.stderr)
         print('skipped %d reads/%d bases because of low coverage' %
-              (skipped_n, skipped_bp),
+              (n_skipped, bp_skipped),
               file=sys.stderr)
 
     fp_rate = \
