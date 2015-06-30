@@ -27,11 +27,7 @@ def trusted_str(cov, trusted_cutoff):
 
 
 def main():
-    try:
-        import pysam
-    except ImportError:
-        pass
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--trusted-cutoff', type=int, default=5)
     parser.add_argument(
@@ -40,6 +36,8 @@ def main():
     parser.add_argument("--json", action='store_true', help="output JSON")
 
     args = parser.parse_args()
+
+    import pysam
 
     ht = khmer.load_counting_hash(args.ht)
     samfile = pysam.Samfile(args.bam_file)
