@@ -108,21 +108,23 @@ def main():
             os.makedirs(args.output_directory)
         out1 = args.output_directory + '/' + os.path.basename(infile) + '.1'
         out2 = args.output_directory + '/' + os.path.basename(infile) + '.2'
-        fp_out1 = open(out1, 'w')
-        fp_out2 = open(out2, 'w')
     else:
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
-        fp_out1 = open(out1, 'w')
-        fp_out2 = open(out2, 'w')
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
         fp_out1 = args.output_first
         out1 = fp_out1.name
+    else:
+        # Use default filename created above
+        fp_out1 = open(out1, 'w')
     if args.output_second:
         fp_out2 = args.output_second
         out2 = fp_out2.name
+    else:
+        # Use default filename created above
+        fp_out2 = open(out2, 'w')
 
     counter1 = 0
     counter2 = 0
