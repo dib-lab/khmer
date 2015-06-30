@@ -11,6 +11,7 @@ import sys
 
 CUTOFF = 200
 
+max = 80
 
 def main():
     n = 0
