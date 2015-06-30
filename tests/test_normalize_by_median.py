@@ -419,6 +419,7 @@ def test_normalize_by_median_emptycountingtable():
     assert 'ValueError' in err, (status, out, err)
 
 
+@attr('huge')
 def test_normalize_by_median_fpr():
     MAX_TABLESIZE_PARAM = 12
 
