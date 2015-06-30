@@ -99,21 +99,23 @@ def main():
             os.makedirs(args.output_dir)
         out1 = args.output_dir + '/' + os.path.basename(infile) + '.se'
         out2 = args.output_dir + '/' + os.path.basename(infile) + '.pe'
-        single_fp = open(out1, 'w')
-        paired_fp = open(out2, 'w')
     else:
         out1 = os.path.basename(infile) + '.se'
         out2 = os.path.basename(infile) + '.pe'
-        single_fp = open(out1, 'w')
-        paired_fp = open(out2, 'w')
 
     # OVERRIDE default output file locations with -p, -s
     if args.output_paired:
         paired_fp = args.output_paired
         out2 = paired_fp.name
+    else:
+        # Don't override, just open the default filename from above
+        paired_fp = open(out2, 'w')
     if args.output_single:
         single_fp = args.output_single
         out1 = single_fp.name
+    else:
+        # Don't override, just open the default filename from above
+        single_fp = open(out1, 'w')
 
     print('reading file "%s"' % infile, file=sys.stderr)
     print('outputting interleaved pairs to "%s"' % out2, file=sys.stderr)
