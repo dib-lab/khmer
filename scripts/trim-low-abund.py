@@ -130,7 +130,6 @@ class Trimmer(object):
 
         for n, is_pair, read1, read2 in reader:
             examine = []
-            records = []
 
             if is_pair:
                 reads = (read1, read2)
@@ -170,14 +169,20 @@ class Trimmer(object):
                     yield read
             # otherwise, trim them if they should be trimmed, THEN write 'em
             else:
-                trimmed = []
-                new_records = []
+                assert (not is_low_coverage or self.do_trim_low_abund)
                 for read, seq in zip(reads, examine):
                     _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
-                    if trim_at >= K:
-                        if trim_at != len(seq):
-                            self.trimmed_reads += 1
+
+                    # too short after trimming? eliminate read.
+                    if trim_at < K:
+                        continue
+
+                    # will trim? do so.
+                    if trim_at != len(seq):
+                        self.trimmed_reads += 1
                         read = trim_record(read, trim_at)
+
+                    # save
                     yield read
 
 
@@ -240,35 +245,42 @@ def main():
         screed_iter = screed.open(filename, parse_description=False)
         pass2fp = open(pass2filename, 'w')
 
-        n_start = trimmer.n_reads
-
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=args.ignore_pairs)
 
+        n_start = trimmer.n_reads
+        save_start = trimmer.n_saved
         for read in trimmer(paired_iter, pass2fp):
+            if (trimmer.n_reads - n_start) % 10000 == 0:
+                print('...', n, filename, trimmer.n_saved,
+                      trimmer.n_reads, trimmer.n_bp,
+                      written_reads, written_bp, file=sys.stderr)
+
             write_record(read, trimfp)
             written_bp += len(read)
             written_reads += 1
         pass2fp.close()
 
-        save_pass2 = trimmer.n_saved
-        n_reads = trimmer.n_reads
-        n = n_reads - n_start
-
-#            if n % 10000 == 0:
-#                print('...', n, filename, save_pass2, n_reads, n_bp,
-#                      written_reads, written_bp, file=sys.stderr)
-
-
         print('%s: kept aside %d of %d from first pass, in %s' %
-              (filename, save_pass2, n, filename),
+              (filename,
+               trimmer.n_saved - save_start, trimmer.n_reads - n_start,
+               filename),
               file=sys.stderr)
-        save_pass2_total += save_pass2
+
+    # first pass goes across all the data, so record relevant stats...
+    n_reads = trimmer.n_reads           
+    n_bp = trimmer.n_bp
+    n_skipped = trimmer.n_skipped
+    bp_skipped = trimmer.bp_skipped
+    save_pass2_total = trimmer.n_saved
 
     # ### SECOND PASS. ###
 
+    # nothing should have been skipped yet!
     assert trimmer.n_skipped == 0
     assert trimmer.bp_skipped == 0
+
+    # go back through all the files again.
     for _, pass2filename, trimfp in pass2list:
         print('second pass: looking at sequences kept aside in %s' %
               pass2filename,
@@ -277,19 +289,22 @@ def main():
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
         # so pairs will stay together if not orphaned.  This is in contrast
-        # to the first loop.
+        # to the first loop.  Hence, force_single=True below.
 
         screed_iter = screed.open(pass2filename, parse_description=False)
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=True)
 
         for read in trimmer(paired_iter, None):
+            if (trimmer.n_reads - n_start) % 10000 == 0:
+                print('... x 2', trimmer.n_reads - n_start,
+                      pass2filename, trimmer.n_saved,
+                      trimmer.n_reads, trimmer.n_bp,
+                      written_reads, written_bp, file=sys.stderr)
+
             write_record(read, trimfp)
             written_reads += 1
-
-#            if n % 10000 == 0:
-#                print('... x 2', n, pass2filename,
-#                      written_reads, written_bp, file=sys.stderr)
+            written_bp += len(read)
 
         print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
@@ -297,11 +312,7 @@ def main():
     print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
 
-    n_reads = trimmer.n_reads
     trimmed_reads = trimmer.trimmed_reads
-    n_bp = trimmer.n_bp
-    n_skipped = trimmer.n_skipped
-    bp_skipped = trimmer.bp_skipped
 
     n_passes = 1.0 + (float(save_pass2_total) / n_reads)
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
