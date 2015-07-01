@@ -151,8 +151,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0):
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
-        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
-        sys.exit(1)
+        raise Exception("** ERROR: khmer only supports k-mer sizes <= 32.")
 
     tablesize = _calculate_tablesize(args, 'nodegraph', multiplier=multiplier)
     return khmer.Hashbits(ksize, tablesize, args.n_tables)
@@ -162,8 +161,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0):
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
-        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
-        sys.exit(1)
+        raise Exception("** ERROR: khmer only supports k-mer sizes <= 32.")
 
     tablesize = _calculate_tablesize(args, 'countgraph', multiplier=multiplier)
     return khmer.CountingHash(ksize, tablesize, args.n_tables)

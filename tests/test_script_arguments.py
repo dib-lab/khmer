@@ -138,8 +138,8 @@ def test_create_countgraph_3():
     try:
         countgraph = khmer_args.create_countgraph(args, ksize=35)
         assert 0, "should not reach this"
-    except SystemExit as err:
-        print(str(err))
+    except Exception as err:
+        assert 'khmer only supports k-mer sizes <= 32.' in str(err), err
 
 
 def test_create_countgraph_4_multiplier():
@@ -197,8 +197,8 @@ def test_create_nodegraph_3():
     try:
         nodegraph = khmer_args.create_nodegraph(args, ksize=35)
         assert 0, "should not reach this"
-    except SystemExit as err:
-        print(str(err))
+    except Exception as err:
+        assert 'khmer only supports k-mer sizes <= 32.' in str(err), err
 
 
 def test_create_nodegraph_4_multiplier():
