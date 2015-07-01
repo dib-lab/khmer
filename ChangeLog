@@ -3,6 +3,7 @@
    * khmer/khmer_args.py: Changed some error printing to be exceptions
    * tests/{test_script_arguments,test_functions}.py: changed tests to expect
    exceptions and/or to redirect stderr where appropriate.
+   * tests/test_normalize_by_median.py: changed to not duplicate a test
 
 2015-06-30  Titus Brown  <titus@idyll.org>
 

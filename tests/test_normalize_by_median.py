@@ -572,7 +572,6 @@ def test_diginorm_basic_functionality_4():
     # should be kept.
 
     CUTOFF = ['-C', '1']
-    PAIRING = ['-p']
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -581,7 +580,8 @@ def test_diginorm_basic_functionality_4():
                     infile)
 
     script = 'normalize-by-median.py'
-    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    args = list(CUTOFF) + ['-k', '15', infile]
+
     _, out, err = utils.runscript(script, args, in_dir)
     print(out)
     print(err)
@@ -597,7 +597,7 @@ def test_diginorm_basic_functionality_4():
                         'd/2']), seqs
 
 
-def test_diginorm_basic_functionality_4():
+def test_diginorm_basic_functionality_5():
     # each of these pairs has both a multicopy sequence ('ACTTCA...') and
     # a random sequence.  With 'C=1' and '-p', all should be
     CUTOFF = ['-C', '1']
