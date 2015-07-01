@@ -3,6 +3,19 @@
 What's New In khmer 2.0?
 ########################
 
+
+Script Updates
+==============
+
+Normalize by median supports broken-paired input
+------------------------------------------------
+
+Normalize-by-median now supports mixed paired and unpaired input. Behavior can
+be forced to either treat all reads as singletons or to require all reads be
+properly paired using --force-single or --paired, respectively. If --paired is
+set, -u can be used to include a file of unpaired reads. 
+
+
 Incompatible changes
 ====================
 
