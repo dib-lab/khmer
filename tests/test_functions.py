@@ -157,18 +157,18 @@ def test_check_file_status_kfile():
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
-    
+
     try:
         check_input_files(fn, False)
     except SystemExit:
         assert "does not exist" in capture.getvalue(), capture.getvalue()
     finally:
         sys.stderr = old_stderr
- 
+
 
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
-    
+
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
 
@@ -178,7 +178,7 @@ def test_check_file_status_kfile_force():
         assert False
     finally:
         sys.stderr = old_stderr
-    
+
     assert "does not exist" in capture.getvalue(), capture.getvalue()
 
 

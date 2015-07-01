@@ -240,7 +240,7 @@ def test_collect_reads():
     infile = utils.get_test_data('test-reads.fa')
     script = 'collect-reads.py'
     args = ['-M', '1e7', outfile, infile]
-    
+
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert status == 0

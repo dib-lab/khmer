@@ -20,6 +20,7 @@ import khmer.kfile
 from khmer import khmer_args
 from cStringIO import StringIO
 
+
 def test_check_space():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -147,6 +148,7 @@ def test_create_countgraph_3():
     finally:
         sys.stderr = old_stderr
 
+
 def test_create_countgraph_4_multiplier():
     ksize = khmer_args.DEFAULT_K
     n_tables = khmer_args.DEFAULT_N_TABLES
@@ -157,7 +159,7 @@ def test_create_countgraph_4_multiplier():
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
     assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
-           sum(countgraph.hashsizes())
+        sum(countgraph.hashsizes())
 
 
 def test_create_nodegraph_1():
@@ -201,7 +203,7 @@ def test_create_nodegraph_3():
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
-    
+
     try:
         nodegraph = khmer_args.create_nodegraph(args, ksize=35)
         assert 0, "should not reach this"
@@ -220,7 +222,7 @@ def test_create_nodegraph_4_multiplier():
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
     assert sum(nodegraph.hashsizes())/8.0 < max_mem / 2.0, \
-           sum(nodegraph.hashsizes())
+        sum(nodegraph.hashsizes())
 
 
 def test_report_on_config_bad_hashtype():
