@@ -18,7 +18,7 @@ from . import khmer_tst_utils as utils
 import argparse
 import khmer.kfile
 from khmer import khmer_args
-
+from cStringIO import StringIO
 
 def test_check_space():
     fakelump_fa = utils.get_test_data('fakelump.fa')
@@ -135,12 +135,17 @@ def test_create_countgraph_3():
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
         countgraph = khmer_args.create_countgraph(args, ksize=35)
         assert 0, "should not reach this"
-    except Exception as err:
-        assert 'khmer only supports k-mer sizes <= 32.' in str(err), err
-
+    except SystemExit:
+        err = capture.getvalue()
+        assert 'khmer only supports k-mer sizes <= 32.' in err, err
+    finally:
+        sys.stderr = old_stderr
 
 def test_create_countgraph_4_multiplier():
     ksize = khmer_args.DEFAULT_K
@@ -194,11 +199,15 @@ def test_create_nodegraph_3():
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+    
     try:
         nodegraph = khmer_args.create_nodegraph(args, ksize=35)
         assert 0, "should not reach this"
-    except Exception as err:
-        assert 'khmer only supports k-mer sizes <= 32.' in str(err), err
+    except SystemExit:
+        err = capture.getvalue()
+        assert 'khmer only supports k-mer sizes <= 32.' in err, err
 
 
 def test_create_nodegraph_4_multiplier():
