@@ -54,6 +54,20 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_tablesize_warning():
+    script = 'load-into-counting.py'
+    args = ['-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(outfile)
+    assert "WARNING: tablesize is default!" in err
+
+
 def test_load_into_counting_max_memory_usage_parameter():
     script = 'load-into-counting.py'
     args = ['-M', '2e3', '-k', '20', '-t']
@@ -65,6 +79,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
     (status, out, err) = utils.runscript(script, args)
     assert os.path.exists(outfile)
+    assert "WARNING: tablesize is default!" not in err
 
     kh = khmer.load_counting_hash(outfile)
     assert sum(kh.hashsizes()) < 3e8

@@ -1,5 +1,11 @@
 2015-06-30  Titus Brown  <titus@idyll.org>
 
+   * khmer/khmer_args.py: removed incorrect warning for default max_tablesize
+   when -M is used.
+   * tests/test_scripts.py: added test for correct max_tablesize behavior.
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
    * setup.cfg: changed 'stop=TRUE' to 'stop=FALSE', so that tests do not
    stop running at first failure.
 
