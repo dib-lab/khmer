@@ -151,6 +151,7 @@ def test_normalize_by_median_known_good():
         assert False
 
 
+@attr('huge')
 def test_normalize_by_median_report_fp():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
