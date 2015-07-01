@@ -161,7 +161,7 @@ class Trimmer(object):
                     self.n_saved += 1
 
             # if they're low coverage, and we don't want to trim low coverage,
-            # save them.
+            # write them out as is.
             elif is_low_coverage and not self.do_trim_low_abund:
                 for read in reads:
                     self.n_skipped += 1
