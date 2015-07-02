@@ -909,7 +909,7 @@ def test_load_graph_max_memory_usage_parameter():
 
     try:
         ht = khmer.load_hashbits(ht_file)
-    except IOError as err:
+    except OSError as err:
         assert 0, str(err)
 
     assert (sum(ht.hashsizes()) / 8.) < 2e7, ht.hashsizes()
