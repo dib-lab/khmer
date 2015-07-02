@@ -20,10 +20,9 @@ import screed
 import nose
 from nose.plugins.attrib import attr
 
+
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
-
-#
 
 # from http://www.rsok.com/~jrm/printprimes.html
 PRIMES_1m = [1000003, 1009837]
@@ -974,16 +973,15 @@ def test_get_ksize():
 
 def test_get_hashsizes():
     kh = khmer.CountingHash(22, 100, 4)
-    assert kh.hashsizes() == [97L, 89L, 83L, 79L], kh.hashsizes()
+    expected = utils.longify([97, 89, 83, 79])  # Py3 hack.
+    assert kh.hashsizes() == expected, kh.hashsizes()
+
 
 # def test_collect_high_abundance_kmers():
 #    seqpath = utils.get_test_data('test-abund-read-2.fa')
 #
 #    kh = khmer.CountingHash(18, 1e6, 4)
 #    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
-
-
-#
 
 
 def test_load_notexist_should_fail():

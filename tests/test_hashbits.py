@@ -450,7 +450,8 @@ def test_get_ksize():
 
 def test_get_hashsizes():
     kh = khmer.Hashbits(22, 100, 4)
-    assert kh.hashsizes() == [97L, 89L, 83L, 79L], kh.hashsizes()
+    expected = utils.longify([97, 89, 83, 79])  # Py3 hack.
+    assert kh.hashsizes() == expected, kh.hashsizes()
 
 
 def test_extract_unique_paths_0():
