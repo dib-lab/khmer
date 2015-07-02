@@ -319,7 +319,7 @@ def main():
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
-        except IOError as error:
+        except (IOError, OSError) as error:
             print('!! ERROR: !!', error, file=sys.stderr)
             print('*** Could not open {fn}, skipping...'.format(
                 fn=read_file), file=sys.stderr)
