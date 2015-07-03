@@ -19,6 +19,7 @@ import screed
 
 import nose
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
 
 
 MAX_COUNT = 255
@@ -704,6 +705,17 @@ def test_save_load_gz():
 
     assert sum(x) == 3966, sum(x)
     assert x == y, (x, y)
+
+
+def test_load_empty_files():
+    def do_load_ct(fname):
+        with assert_raises(OSError):
+            ct = khmer.load_counting_hash(fname)
+
+    # Check empty files, compressed or not
+    for ext in ['', '.gz']:
+        fn = utils.get_test_data('empty-file' + ext)
+        do_load_ct(fn)
 
 
 def test_trim_full():
