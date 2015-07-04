@@ -60,7 +60,6 @@ def test_load_into_counting_max_memory_usage_parameter():
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
-
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
@@ -577,7 +576,7 @@ def test_filter_stoptags_fq():
     in_dir = os.path.dirname(infile)
     stopfile = utils.get_temp_filename('stoptags', in_dir)
 
-    # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
+    # first, copy test-abunderead-2.fa to 'test.fa' in the temp dir.
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
 
     # now, create a file with some stop tags in it --
@@ -3043,7 +3042,6 @@ def test_trim_low_abund_highfpr():
 def test_trim_low_abund_trimtest():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "1",
@@ -3218,3 +3216,17 @@ def test_roundtrip_commented_format():
     r = open(infile).read()
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
+
+
+def test_multirename_fasta():
+
+    infile1 = utils.get_temp_filename('test-multi.fa')
+    multioutfile = utils.get_temp_filename('out.fa')
+    infile2 = utils.get_temp_filename('out.fa')
+    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
+    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    args = ['assembly', infile1]
+    _, out, err = utils.runscript('multi-rename.py', args)
+    r = open(infile2).read()
+    for k in r:
+        assert k in out, (k, out)

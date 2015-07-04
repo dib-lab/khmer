@@ -12,6 +12,7 @@ import textwrap
 
 CUTOFF = 200
 
+
 def main():
     n = 0
     prefix = sys.argv[1]
@@ -19,9 +20,9 @@ def main():
         for record in screed.open(filename):
             if len(record.sequence) >= CUTOFF:
                 n += 1
-                print('>%s.%s %s\n' % (prefix, n, record.name))
-		x = "\n".join( textwrap.wrap(record.sequence, 80) )
-		print ('%s' % (x) )
-	
+                print('>%s.%s %s' % (prefix, n, record.name))
+                x = "\n".join(textwrap.wrap(record.sequence, 80))
+                print ('%s' % (x))
+
 if __name__ == '__main__':
     main()
