@@ -18,6 +18,7 @@ from . import khmer_tst_utils as utils
 import argparse
 import khmer.kfile
 from khmer import khmer_args
+from cStringIO import StringIO
 
 
 def test_check_space():
@@ -135,11 +136,17 @@ def test_create_countgraph_3():
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
         countgraph = khmer_args.create_countgraph(args, ksize=35)
         assert 0, "should not reach this"
-    except SystemExit as err:
-        print(str(err))
+    except SystemExit:
+        err = capture.getvalue()
+        assert 'khmer only supports k-mer sizes <= 32.' in err, err
+    finally:
+        sys.stderr = old_stderr
 
 
 def test_create_countgraph_4_multiplier():
@@ -152,7 +159,7 @@ def test_create_countgraph_4_multiplier():
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
     assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
-           sum(countgraph.hashsizes())
+        sum(countgraph.hashsizes())
 
 
 def test_create_nodegraph_1():
@@ -194,11 +201,15 @@ def test_create_nodegraph_3():
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
         nodegraph = khmer_args.create_nodegraph(args, ksize=35)
         assert 0, "should not reach this"
-    except SystemExit as err:
-        print(str(err))
+    except SystemExit:
+        err = capture.getvalue()
+        assert 'khmer only supports k-mer sizes <= 32.' in err, err
 
 
 def test_create_nodegraph_4_multiplier():
@@ -211,7 +222,7 @@ def test_create_nodegraph_4_multiplier():
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
     assert sum(nodegraph.hashsizes())/8.0 < max_mem / 2.0, \
-           sum(nodegraph.hashsizes())
+        sum(nodegraph.hashsizes())
 
 
 def test_report_on_config_bad_hashtype():
