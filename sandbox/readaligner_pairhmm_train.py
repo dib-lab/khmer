@@ -27,7 +27,6 @@ def trusted_str(cov, trusted_cutoff):
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--trusted-cutoff', type=int, default=5)
     parser.add_argument(
@@ -37,7 +36,7 @@ def main():
 
     args = parser.parse_args()
 
-    import pysam
+    import pysamFOO
 
     ht = khmer.load_counting_hash(args.ht)
     samfile = pysam.Samfile(args.bam_file)
