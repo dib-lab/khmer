@@ -183,7 +183,7 @@ SETUP_METADATA = \
 
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
-                           'tests': ['nose >= 1.0', 'pysam']},
+                           'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
         "entry_points": {
             'console_scripts': [

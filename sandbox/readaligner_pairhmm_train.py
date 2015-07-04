@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import division
 from __future__ import print_function
-import pysam
 import khmer
 import argparse
 import collections
@@ -36,6 +35,8 @@ def main():
     parser.add_argument("--json", action='store_true', help="output JSON")
 
     args = parser.parse_args()
+
+    import pysamFOO
 
     ht = khmer.load_counting_hash(args.ht)
     samfile = pysam.Samfile(args.bam_file)
