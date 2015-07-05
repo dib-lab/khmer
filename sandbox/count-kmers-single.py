@@ -51,7 +51,7 @@ def main():
     check_input_files(args.input_sequence_filename, False)
 
     print ('making k-mer counting table', file=sys.stderr)
-    counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
+    counting_hash = khmer.CountingHash(args.ksize, args.max_tablesize,
                                             args.n_tables)
     # @CTB counting_hash.set_use_bigcount(args.bigcount)
 
