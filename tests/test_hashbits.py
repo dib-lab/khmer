@@ -450,7 +450,9 @@ def test_get_ksize():
 
 def test_get_hashsizes():
     kh = khmer.Hashbits(22, 100, 4)
-    expected = utils.longify([97, 89, 83, 79])  # Py3 hack.
+    # Py2/3 hack, longify converts to long in py2, remove once py2 isn't
+    # supported any longer.
+    expected = utils.longify([97, 89, 83, 79])
     assert kh.hashsizes() == expected, kh.hashsizes()
 
 
