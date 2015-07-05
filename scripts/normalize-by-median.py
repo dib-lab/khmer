@@ -138,7 +138,7 @@ def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
     """
     try:
         yield
-    except (IOError, ValueError) as error:
+    except (IOError, OSError, ValueError) as error:
         print('** ERROR: ' + str(error), file=sys.stderr)
         print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
         if not single_out:
@@ -380,7 +380,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.force and len(corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
-        print("** IOErrors occurred in the following files:", file=sys.stderr)
+        print("** I/O Errors occurred in the following files:",
+              file=sys.stderr)
         print("\t", " ".join(corrupt_files), file=sys.stderr)
 
 

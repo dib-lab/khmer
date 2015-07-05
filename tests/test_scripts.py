@@ -54,6 +54,20 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_tablesize_warning():
+    script = 'load-into-counting.py'
+    args = ['-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(outfile)
+    assert "WARNING: tablesize is default!" in err
+
+
 def test_load_into_counting_max_memory_usage_parameter():
     script = 'load-into-counting.py'
     args = ['-M', '2e3', '-k', '20', '-t']
@@ -65,6 +79,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
     (status, out, err) = utils.runscript(script, args)
     assert os.path.exists(outfile)
+    assert "WARNING: tablesize is default!" not in err
 
     kh = khmer.load_counting_hash(outfile)
     assert sum(kh.hashsizes()) < 3e8
@@ -693,7 +708,7 @@ def test_load_graph():
 
     try:
         ht = khmer.load_hashbits(ht_file)
-    except IOError as err:
+    except OSError as err:
         assert 0, str(err)
     ht.load_tagset(tagset_file)
 
@@ -894,7 +909,7 @@ def test_load_graph_max_memory_usage_parameter():
 
     try:
         ht = khmer.load_hashbits(ht_file)
-    except IOError as err:
+    except OSError as err:
         assert 0, str(err)
 
     assert (sum(ht.hashsizes()) / 8.) < 2e7, ht.hashsizes()
@@ -1609,6 +1624,30 @@ def test_do_partition_2_fq():
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
+
+
+def test_interleave_read_seq1_fq():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '-o', outfile]
+
+    utils.runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
 
 
 def test_interleave_reads_1_fq():
@@ -2546,10 +2585,7 @@ def test_count_overlap_invalid_datafile():
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    if sys.version_info.major == 2:
-        assert "IOError" in err
-    else:
-        assert "OSError" in err
+    assert "OSError" in err
 
 
 def test_count_overlap():

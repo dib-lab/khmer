@@ -1,3 +1,60 @@
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:
+   update API usage
+
+2015-07-05  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{count-kmers.py,count-kmers-single.py}: added scripts to output
+   k-mer counts.
+   * tests/test_sandbox_scripts.py: added tests for count-kmers.py and
+   count-kmers-single.py.
+   * sandbox/README.rst: added count-kmers.py and count-kmers-single.py to
+   sandbox/README.
+
+2015-07-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/*.{cc,hh},sandbox/*.py,khmer/_khmer.cc,tests/test_*.py: Simplify
+   exception hierarchy, and ensure all C++ exceptions are converted to python
+   errors.
+   * scripts/normalize-by-median.py: Clarify error message.
+   * tests/khmer_tst_utils.py: Add longify function, converts int => long on
+   py2, and passes thru list unmodified on py3.
+
+2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/{test_script_arguments,test_functions}.py: changed tests to use
+   stderr redirection to prevent leaks
+   * tests/test_normalize_by_median.py: changed to not duplicate a test
+   * tests/test_script_arguments.py: changed tests to use stderr redirection
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * tests/test_normalize_by_median.py: disabled running
+   test_normalize_by_median_report_fp during normal test running.
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * khmer/khmer_args.py: removed incorrect warning for default max_tablesize
+   when -M is used.
+   * tests/test_scripts.py: added test for correct max_tablesize behavior.
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: changed 'stop=TRUE' to 'stop=FALSE', so that tests do not
+   stop running at first failure.
+
+2015-06-30  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/{extract-paired-reads,split-paired-reads}.py: Fix creation of
+   default output files even when output files were provided on CLI.
+
+2015-06-29  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * khmer/utils.py: Fix bug in naming in interleave-reads.py
+   * tests/test_scripts.py: Add a test function for the new behavior
+   * tests/test-data/*.fq: Add 3 test files needed for the testing
+
 2015-06-28  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_sandbox_scripts.py: made error more informative and not crashy
@@ -7,6 +64,11 @@
 
    * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox 
    methods for estimating memory usage based on desired fp rate, etc.
+
+2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * doc/dev/binary-file-formats.rst: Fix issue in ksize documentation for
+   Countgraph
 
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
 
