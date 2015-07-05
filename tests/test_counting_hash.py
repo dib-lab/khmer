@@ -1353,6 +1353,7 @@ def test_consume_and_retrieve_tags_1():
             kmer = record.sequence[start:start + 4]
             tt.update(ct.find_all_tags_list(kmer))
 
+    print (ss, '\n', tt)
     assert ss == tt
 
 

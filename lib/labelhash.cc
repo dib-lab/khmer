@@ -190,7 +190,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), graph->_ksize);
+    KmerIterator kmers(seq.c_str(), graph->_ksize);
     HashIntoType kmer;
 
     unsigned int since = graph->_tag_density / 2 + 1;
@@ -300,7 +300,11 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     //printf("range=%u ", range);
     if (range == 0) {
         if (!(num_traversed == seq.length()-graph->ksize()+1)) {
-            throw khmer_exception();
+            std::cout << "Failing, sweep traversed " << num_traversed
+            << " k-mers, expected " << seq.length() - graph->ksize()+1
+            << std::endl;
+            throw khmer_exception("sweep_label_neighborhood: range 0 sweep, "
+                                  "failed to traverse k-mers from given seq");
         }
     }
     tagged_kmers.clear();

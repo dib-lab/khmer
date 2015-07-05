@@ -62,7 +62,7 @@ const HashIntoType CountingHash::n_unique_kmers() const
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType min_count = MAX_KCOUNT;
 
@@ -80,7 +80,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 
 BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType max_count = 0;
 
@@ -125,7 +125,7 @@ CountingHash::abundance_distribution(
             seq = read.sequence;
 
             if (check_and_normalize_read(seq)) {
-                KMerIterator kmers(seq.c_str(), _ksize);
+                KmerIterator kmers(seq.c_str(), _ksize);
 
                 while(!kmers.done()) {
                     HashIntoType kmer = kmers.next();
@@ -285,7 +285,7 @@ void CountingHash::get_kadian_count(
     unsigned int    nk)
 {
     std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -325,7 +325,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -361,7 +361,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -397,7 +397,7 @@ const
         throw khmer_exception("invalid read");
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer = kmers.next();
     if (kmers.done()) {
@@ -951,7 +951,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -990,7 +990,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();

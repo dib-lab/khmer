@@ -42,6 +42,7 @@ private:\
 #include <set>
 #include <map>
 #include <queue>
+#include <deque>
 
 #include "khmer_exception.hh"
 
@@ -120,6 +121,10 @@ void deallocate_ptr_set(T& s)
         delete *i;
     }
 }
+
+class Kmer;
+typedef std::deque<Kmer> KmerQueue;
+typedef std::set<Kmer> KmerSet;
 
 }
 

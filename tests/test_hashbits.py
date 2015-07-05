@@ -521,7 +521,7 @@ def test_find_unpart():
     ht.merge_subset(subset)
 
     n, _ = ht.count_partitions()
-    assert n == 49
+    assert n == 49, n
 
     ht.find_unpart(filename2, True, False)
     n, _ = ht.count_partitions()

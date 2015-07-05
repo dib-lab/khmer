@@ -1064,7 +1064,7 @@ hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
     std::vector<HashIntoType> tags;
 
     unsigned int pos = 1;
-    KMerIterator kmers(seq, hashtable->ksize());
+    KmerIterator kmers(seq, hashtable->ksize());
 
     while (!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -1104,12 +1104,11 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 
     SeenSet tags;
 
+    Kmer start_kmer = hashtable->build_kmer(kmer_s);
+
     Py_BEGIN_ALLOW_THREADS
 
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
-
-    hashtable->partition->find_all_tags(kmer_f, kmer_r, tags,
+    hashtable->partition->find_all_tags(start_kmer, tags,
                                         hashtable->all_tags);
 
     Py_END_ALLOW_THREADS
@@ -1329,10 +1328,11 @@ hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
     }
 
     unsigned long long size = 0;
+    Kmer start_kmer = hashtable->build_kmer(_kmer);
 
     Py_BEGIN_ALLOW_THREADS
-    SeenSet keeper;
-    hashtable->calc_connected_graph_size(_kmer, size, keeper, max_size,
+    KmerSet keeper;
+    hashtable->calc_connected_graph_size(start_kmer, size, keeper, max_size,
                                          break_on_circum);
     Py_END_ALLOW_THREADS
 
@@ -1629,17 +1629,16 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
 
     pre_partition_info * ppi = NULL;
 
-    Py_BEGIN_ALLOW_THREADS
+    Kmer kmer = hashtable->build_kmer(kmer_s);
 
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
+    Py_BEGIN_ALLOW_THREADS
 
     try {
         ppi = new pre_partition_info(kmer);
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
-    hashtable->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers,
+    hashtable->partition->find_all_tags(kmer, ppi->tagged_kmers,
                                         hashtable->all_tags);
     hashtable->add_kmer_to_tags(kmer);
 
@@ -2268,11 +2267,10 @@ hashtable_count_kmers_within_radius(khmer_KHashtable_Object * me,
     unsigned int n;
 
     Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer, hashtable->ksize(), kmer_f, kmer_r);
-    n = hashtable->count_kmers_within_radius(kmer_f, kmer_r, radius,
-            max_count);
+    Kmer start_kmer = hashtable->build_kmer(kmer);
+    KmerSet seen;
+    n = hashtable->traverse_from_kmer(start_kmer, radius,
+                                      seen, max_count);
 
     Py_END_ALLOW_THREADS
 

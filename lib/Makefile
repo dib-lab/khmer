@@ -46,7 +46,8 @@ CXX_SHARED_LIB_FLAGS=-fPIC
 CXXFLAGS+= 				\
 	   $(CXX_WARNING_FLAGS) 	\
 	   $(CXX_OPTIMIZATION_FLAGS)	\
-	   $(CXX_SHARED_LIB_FLAGS)
+	   $(CXX_SHARED_LIB_FLAGS)	\
+	   -std=c++11
 
 CFLAGS=$(INCLUDES)
 C_WARNING_FLAGS=-Wall
@@ -182,6 +183,7 @@ LIBKHMER_OBJS= \
 	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
+	traversal.o \
 	perf_metrics.o \
 	read_aligner.o \
 	read_parsers.o \
@@ -199,6 +201,7 @@ KHMER_HEADERS= \
 	khmer.hh \
 	kmer_hash.hh \
 	labelhash.hh \
+	traversal.hh \
 	perf_metrics.hh \
 	primes.hh \
 	read_aligner.hh \
