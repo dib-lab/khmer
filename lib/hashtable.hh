@@ -185,7 +185,7 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    Hashtable( WordLength ksize )
+    explicit Hashtable( WordLength ksize )
         : _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT ),
           _ksize( ksize )
@@ -241,7 +241,8 @@ protected:
 
     uint32_t _all_tags_spin_lock;
 
-    NONCOPYABLE(Hashtable);
+    explicit Hashtable(const Hashtable&);
+    const Hashtable& operator=(const Hashtable&)
 
 public:
     SubsetPartition * partition;

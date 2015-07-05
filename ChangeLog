@@ -1,5 +1,15 @@
 2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+   * Makefile: fix cppcheck invocation
+   * khmer/_khmer.cc: switch to prefix increment for non-primitive objects,
+   use a C++ cast, adjust scope
+   * lib/hashtable.{hh,cc}: make copy constructor no-op explicit. adjust scope
+   * lib/{ht-diff,test-HashTables,test-Parser}.cc: remove unused test code
+   * lib/labelhash.cc,hllcounter.cc: astyle reformatting
+   * lib/read_parsers.hh: more explicit constructors
+
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:
    update API usage
 

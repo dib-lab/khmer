@@ -910,7 +910,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
                     msg << strerror(errno);
                 }
                 gzclose(outfile);
-                throw khmer_file_exception(msg.str().c_str());
+                throw khmer_file_exception(msg.str());
             }
             written += gz_result;
         }
