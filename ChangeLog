@@ -4,6 +4,8 @@
    exception hierarchy, and ensure all C++ exceptions are converted to python
    errors.
    * scripts/normalize-by-median.py: Clarify error message.
+   * tests/khmer_tst_utils.py: Add longify function, converts int => long on
+   py2, and passes thru list unmodified on py3.
 
 2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
 
