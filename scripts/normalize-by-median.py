@@ -252,7 +252,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     force_single = args.force_single
 
     # if optimization args are given, do optimization
-    if args.unique_kmers is not 0:
+    if args.unique_kmers != 0:
         if args.max_memory_usage:
             # verify that this is a sane memory usage restriction
             res = oxutils.estimate_optimal_with_N_and_M(args.unique_kmers,
@@ -260,7 +260,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             if res.fp_rate > 0.1:
                 print("""
 *** ERROR: The given restrictions yield an estimate false positive rate of {0},
-*** which is above the reccomended false positive ceiling of 0.1!
+*** which is above the recommended false positive ceiling of 0.1!
 *** Aborting!""".format(res.fp_rate), file=sys.stderr)
                 sys.exit(1)
         else:
