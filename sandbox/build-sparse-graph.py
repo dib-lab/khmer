@@ -19,7 +19,7 @@ def main():
     input_fasta = sys.argv[3]
     K = int(sys.argv[1])
     x = float(sys.argv[2])
-    
+
     ht = khmer.Hashbits(K, x, 4)
 
     sparse_graph = gt.Graph()

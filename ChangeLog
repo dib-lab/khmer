@@ -1,6 +1,37 @@
-2015-07-01  Jaob Fenton  <bocajnotnef@gmail.com>
+2015-07-05  Jaob Fenton  <bocajnotnef@gmail.com>
 
-   * doc/whats-new-2.0.rst: added in norm-by-med broken paired updates
+   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 
+   updates
+
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:
+   update API usage
+
+2015-07-05  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{count-kmers.py,count-kmers-single.py}: added scripts to output
+   k-mer counts.
+   * tests/test_sandbox_scripts.py: added tests for count-kmers.py and
+   count-kmers-single.py.
+   * sandbox/README.rst: added count-kmers.py and count-kmers-single.py to
+   sandbox/README.
+
+2015-07-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/*.{cc,hh},sandbox/*.py,khmer/_khmer.cc,tests/test_*.py: Simplify
+   exception hierarchy, and ensure all C++ exceptions are converted to python
+   errors.
+   * scripts/normalize-by-median.py: Clarify error message.
+   * tests/khmer_tst_utils.py: Add longify function, converts int => long on
+   py2, and passes thru list unmodified on py3.
+
+2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/{test_script_arguments,test_functions}.py: changed tests to use
+   stderr redirection to prevent leaks
+   * tests/test_normalize_by_median.py: changed to not duplicate a test
+   * tests/test_script_arguments.py: changed tests to use stderr redirection
 
 2015-06-30  Titus Brown  <titus@idyll.org>
 
@@ -38,6 +69,11 @@
 
    * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox 
    methods for estimating memory usage based on desired fp rate, etc.
+
+2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * doc/dev/binary-file-formats.rst: Fix issue in ksize documentation for
+   Countgraph
 
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
 

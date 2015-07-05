@@ -19,11 +19,11 @@ import screed
 
 import nose
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
+
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
-
-#
 
 # from http://www.rsok.com/~jrm/printprimes.html
 PRIMES_1m = [1000003, 1009837]
@@ -605,8 +605,8 @@ def test_save_load():
     ht = khmer._CountingHash(12, sizes)
     try:
         ht.load(savepath)
-    except IOError as err:
-        assert 0, 'Should not produce an IOError: ' + str(err)
+    except OSError as err:
+        assert 0, 'Should not produce an OSError: ' + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -638,7 +638,7 @@ def test_load_truncated():
         try:
             ht = khmer.load_counting_hash(truncpath)
             assert 0, "this should not be reached!"
-        except IOError as err:
+        except OSError as err:
             print(str(err))
 
 
@@ -667,8 +667,8 @@ def test_load_gz():
     ht = khmer._CountingHash(12, sizes)
     try:
         ht.load(loadpath)
-    except IOError as err:
-        assert 0, "Should not produce an IOError: " + str(err)
+    except OSError as err:
+        assert 0, "Should not produce an OSError: " + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -694,8 +694,8 @@ def test_save_load_gz():
     ht = khmer._CountingHash(12, sizes)
     try:
         ht.load(savepath)
-    except IOError as err:
-        assert 0, 'Should not produce an IOError: ' + str(err)
+    except OSError as err:
+        assert 0, 'Should not produce an OSError: ' + str(err)
 
     tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
@@ -705,6 +705,17 @@ def test_save_load_gz():
 
     assert sum(x) == 3966, sum(x)
     assert x == y, (x, y)
+
+
+def test_load_empty_files():
+    def do_load_ct(fname):
+        with assert_raises(OSError):
+            ct = khmer.load_counting_hash(fname)
+
+    # Check empty files, compressed or not
+    for ext in ['', '.gz']:
+        fn = utils.get_test_data('empty-file' + ext)
+        do_load_ct(fn)
 
 
 def test_trim_full():
@@ -866,8 +877,8 @@ def test_maxcount_with_bigcount_save():
     kh = khmer.CountingHash(1, 1, 1)
     try:
         kh.load(savepath)
-    except IOError as err:
-        assert 0, "Should not produce an IOError: " + str(err)
+    except OSError as err:
+        assert 0, "Should not produce an OSError: " + str(err)
 
     c = kh.get('AAAA')
     assert c == 1000, "should be able to count to 1000: %d" % c
@@ -885,8 +896,8 @@ def test_bigcount_save():
     kh = khmer.CountingHash(1, 1, 1)
     try:
         kh.load(savepath)
-    except IOError as err:
-        assert 0, "Should not produce an IOError: " + str(err)
+    except OSError as err:
+        assert 0, "Should not produce an OSError: " + str(err)
 
     # set_use_bigcount should still be True after load (i.e. should be saved)
 
@@ -909,8 +920,8 @@ def test_nobigcount_save():
     kh = khmer.CountingHash(1, 1, 1)
     try:
         kh.load(savepath)
-    except IOError as err:
-        assert 0, 'Should not produce an IOError: ' + str(err)
+    except OSError as err:
+        assert 0, 'Should not produce an OSError: ' + str(err)
 
     # set_use_bigcount should still be False after load (i.e. should be saved)
 
@@ -974,16 +985,17 @@ def test_get_ksize():
 
 def test_get_hashsizes():
     kh = khmer.CountingHash(22, 100, 4)
-    assert kh.hashsizes() == [97L, 89L, 83L, 79L], kh.hashsizes()
+    # Py2/3 hack, longify converts to long in py2, remove once py2 isn't
+    # supported any longer.
+    expected = utils.longify([97, 89, 83, 79])
+    assert kh.hashsizes() == expected, kh.hashsizes()
+
 
 # def test_collect_high_abundance_kmers():
 #    seqpath = utils.get_test_data('test-abund-read-2.fa')
 #
 #    kh = khmer.CountingHash(18, 1e6, 4)
 #    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
-
-
-#
 
 
 def test_load_notexist_should_fail():
@@ -993,7 +1005,7 @@ def test_load_notexist_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1017,7 +1029,7 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1028,7 +1040,7 @@ def test_load_gz_notexist_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1052,7 +1064,7 @@ def test_load_gz_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1064,7 +1076,7 @@ def test_counting_file_version_check():
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1076,7 +1088,7 @@ def test_counting_gz_file_version_check():
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1088,7 +1100,7 @@ def test_counting_file_type_check():
     try:
         kh.load(inpath)
         assert 0, "this should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1102,7 +1114,7 @@ def test_counting_gz_file_type_check():
     try:
         kh.load(inpath)
         assert 0, "this should fail"
-    except IOError as e:
+    except OSError as e:
         print(str(e))
 
 
@@ -1130,7 +1142,7 @@ def test_consume_absentfasta():
     try:
         countingtable.consume_fasta("absent_file.fa")
         assert 0, "This should fail"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
 
 
@@ -1145,7 +1157,7 @@ def test_consume_absentfasta_with_reads_parser():
         readparser = ReadParser(utils.get_test_data('empty-file'))
         countingtable.consume_fasta_with_reads_parser(readparser)
         assert 0, "this should fail"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
     except ValueError as err:
         print(str(err))
@@ -1416,8 +1428,8 @@ def test_abund_dist_gz_bigcount():
     # load the compressed bigcount table
     try:
         counting_hash = khmer.load_counting_hash(outfile)
-    except IOError as err:
-        assert 0, 'Should not produce IOError: ' + str(err)
+    except OSError as err:
+        assert 0, 'Should not produce OSError: ' + str(err)
     hashsizes = counting_hash.hashsizes()
     kmer_size = counting_hash.ksize()
     tracking = khmer._Hashbits(kmer_size, hashsizes)

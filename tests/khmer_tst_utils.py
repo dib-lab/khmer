@@ -15,6 +15,7 @@ import traceback
 import subprocess
 from io import open
 
+
 try:
     from StringIO import StringIO
 except ImportError:
@@ -176,3 +177,15 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
 
         if sandbox:
             raise nose.SkipTest("sandbox tests are only run in a repository.")
+
+
+def longify(listofints):
+    '''List of ints => list of longs, only on py2
+
+    Takes a list of numeric types, and returns longs on python2, or the
+    original list on python3.
+    '''
+    # For map(long, [list of ints]) cross-version hackery
+    if sys.version_info.major < 3:
+        return map(long, listofints)
+    return listofints

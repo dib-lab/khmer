@@ -52,7 +52,7 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-    assert "IOErrors" not in err
+    assert "I/O Errors" not in err
 
 
 def test_normalize_by_median_unpaired_final_read():
@@ -124,7 +124,7 @@ def test_normalize_by_median_stdout_3():
 
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'in /dev/stdout' in err, err
-    assert "IOErrors" not in err
+    assert "I/O Errors" not in err
 
 
 @attr('known_failing')
@@ -365,7 +365,7 @@ def test_normalize_by_median_force():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert '*** Skipping' in err
-    assert '** IOErrors' in err
+    assert '** I/O Errors' in err
 
 
 def test_normalize_by_median_no_bigcount():
@@ -573,7 +573,6 @@ def test_diginorm_basic_functionality_4():
     # should be kept.
 
     CUTOFF = ['-C', '1']
-    PAIRING = ['-p']
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -582,7 +581,8 @@ def test_diginorm_basic_functionality_4():
                     infile)
 
     script = 'normalize-by-median.py'
-    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    args = list(CUTOFF) + ['-k', '15', infile]
+
     _, out, err = utils.runscript(script, args, in_dir)
     print(out)
     print(err)
@@ -598,7 +598,7 @@ def test_diginorm_basic_functionality_4():
                         'd/2']), seqs
 
 
-def test_diginorm_basic_functionality_4():
+def test_diginorm_basic_functionality_5():
     # each of these pairs has both a multicopy sequence ('ACTTCA...') and
     # a random sequence.  With 'C=1' and '-p', all should be
     CUTOFF = ['-C', '1']

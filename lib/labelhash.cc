@@ -65,7 +65,11 @@ LabelHash::consume_fasta_and_tag_with_labels(
     Label * the_label;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-        read = parser->get_next_read( );
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
 
         if (graph->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!

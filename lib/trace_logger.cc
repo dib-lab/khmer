@@ -40,7 +40,11 @@ TraceLogger( uint8_t const level, char const * const file_name_format, ... )
 
     _stream_handle = fopen( tfile_name, "w" );
     if (NULL == _stream_handle) {
-        throw InvalidStreamBuffer( );
+        std::ostringstream msg;
+        const char *err_str = strerror(errno);
+        msg << "Invalid trace filename " << tfile_name << std::endl;
+        msg << err_str << std::endl;
+        throw InvalidStream(msg.str());
     }
 
 }
