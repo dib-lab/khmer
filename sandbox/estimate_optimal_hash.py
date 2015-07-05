@@ -30,8 +30,8 @@ from __future__ import print_function
 import argparse
 import khmer, oxli
 from khmer.khmer_args import info
-from oxli.functions import estimate_optimal_with_N_and_M
-from oxli.functions import estimate_optimal_with_N_and_f
+from oxli.functions import estimate_optimal_with_K_and_M
+from oxli.functions import estimate_optimal_with_K_and_f
 import textwrap
 import sys
 
@@ -76,7 +76,7 @@ def main():
     N = args.N
     if args.M:
         M = args.M
-        result = estimate_optimal_with_N_and_M(N,M)
+        result = estimate_optimal_with_K_and_M(N,M)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
         print("size of memory available to use:      ", M, file=sys.stderr)
         print("optimal number of hash tables:        ", result.num_htables,
@@ -90,7 +90,7 @@ def main():
         
     elif args.f:
         f = args.f
-        result = estimate_optimal_with_N_and_f(N,f)
+        result = estimate_optimal_with_K_and_f(N,f)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
         print("desired maximum false positive rate:  ", f, file=sys.stderr)
         print("optimal number of hash tables:        ", result.num_htables,
