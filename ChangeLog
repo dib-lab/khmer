@@ -1,3 +1,8 @@
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:
+   update API usage
+
 2015-07-05  Titus Brown  <titus@idyll.org>
 
    * sandbox/{count-kmers.py,count-kmers-single.py}: added scripts to output
