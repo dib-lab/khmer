@@ -35,7 +35,11 @@ void CountingHash::output_fasta_kmer_pos_freq(
     Read read;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         long numPos = seq.length() - _ksize + 1;
@@ -119,31 +123,31 @@ CountingHash::abundance_distribution(
         throw khmer_exception();
     }
 
-    try {
-        while(!parser->is_complete()) {
+    while(!parser->is_complete()) {
+        try {
             read = parser->get_next_read();
-            seq = read.sequence;
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
+        seq = read.sequence;
 
-            if (check_and_normalize_read(seq)) {
-                KMerIterator kmers(seq.c_str(), _ksize);
+        if (check_and_normalize_read(seq)) {
+            KMerIterator kmers(seq.c_str(), _ksize);
 
-                while(!kmers.done()) {
-                    HashIntoType kmer = kmers.next();
+            while(!kmers.done()) {
+                HashIntoType kmer = kmers.next();
 
-                    if (!tracking->get_count(kmer)) {
-                        tracking->count(kmer);
+                if (!tracking->get_count(kmer)) {
+                    tracking->count(kmer);
 
-                        BoundedCounterType n = get_count(kmer);
-                        dist[n]++;
-                    }
+                    BoundedCounterType n = get_count(kmer);
+                    dist[n]++;
                 }
-
-                name.clear();
-                seq.clear();
             }
 
+            name.clear();
+            seq.clear();
         }
-    } catch (NoMoreReadsAvailable) {
     }
     return dist;
 }
@@ -180,7 +184,11 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(
     unsigned long long read_num = 0;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
 
         seq = read.sequence;
         bool valid_read = check_and_normalize_read(seq);
@@ -232,7 +240,11 @@ void CountingHash::fasta_dump_kmers_by_abundance(
     unsigned long long read_num = 0;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         bool valid_read = check_and_normalize_read(seq);
         seq = read.sequence;
 
@@ -944,7 +956,11 @@ void CountingHash::collect_high_abundance_kmers(
 
     bool done = false;
     while(!parser->is_complete() && !done)  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         currSeq = read.sequence;
 
         // do we want to process it?
@@ -983,7 +999,11 @@ void CountingHash::collect_high_abundance_kmers(
 
     total_reads = 0;
     while(!parser->is_complete() && total_reads != stop_at_read)  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         currSeq = read.sequence;
 
         // do we want to process it?

@@ -146,18 +146,18 @@ consume_fasta(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-
+        bool is_valid;
         try {
-            bool is_valid;
             read = parser->get_next_read( );
-
-            unsigned int this_n_consumed =
-                check_and_process_read(read.sequence, is_valid);
-
-            __sync_add_and_fetch( &n_consumed, this_n_consumed );
-            __sync_add_and_fetch( &total_reads, 1 );
-        } catch (read_parsers::NoMoreReadsAvailable) {
+        } catch (NoMoreReadsAvailable) {
+            break;
         }
+
+        unsigned int this_n_consumed =
+            check_and_process_read(read.sequence, is_valid);
+
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &total_reads, 1 );
 
     } // while reads left for parser
 
@@ -485,7 +485,12 @@ consume_fasta_and_tag(
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
 
-        read = parser->get_next_read( );
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable &e) {
+            // Bail out if this error is raised
+            break;
+        }
 
         if (check_and_normalize_read( read.sequence )) {
             unsigned long long this_n_consumed = 0;
@@ -523,7 +528,11 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         read_tags.clear();
@@ -644,7 +653,11 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
@@ -691,7 +704,11 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {	// process?
@@ -897,7 +914,11 @@ void Hashtable::filter_if_present(const std::string &infilename,
     HashIntoType kmer;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {

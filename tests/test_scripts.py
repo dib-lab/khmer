@@ -708,7 +708,7 @@ def test_load_graph():
 
     try:
         ht = khmer.load_hashbits(ht_file)
-    except IOError as err:
+    except OSError as err:
         assert 0, str(err)
     ht.load_tagset(tagset_file)
 
@@ -909,7 +909,7 @@ def test_load_graph_max_memory_usage_parameter():
 
     try:
         ht = khmer.load_hashbits(ht_file)
-    except IOError as err:
+    except OSError as err:
         assert 0, str(err)
 
     assert (sum(ht.hashsizes()) / 8.) < 2e7, ht.hashsizes()
@@ -2585,10 +2585,7 @@ def test_count_overlap_invalid_datafile():
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    if sys.version_info.major == 2:
-        assert "IOError" in err
-    else:
-        assert "OSError" in err
+    assert "OSError" in err
 
 
 def test_count_overlap():

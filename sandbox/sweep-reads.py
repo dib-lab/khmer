@@ -121,7 +121,7 @@ class ReadBufferManager(object):
         buf = self.buffers[buf_id]
         try:
             outfp = open(fpath, 'a')
-        except IOError as _:
+        except (IOError, OSError) as _:
             print('!! ERROR: {_} !!'.format(_=_), file=sys.stderr)
             print('*** Failed to open {fn} for \
                                 buffer flush'.format(fn=fpath), file=sys.stderr)
@@ -290,11 +290,11 @@ def main():
 
                     write_record(record, outfp)
 
-            except IOError as e:
+            except (IOError, OSError) as e:
                 print('!! ERROR !!', e, file=sys.stderr)
                 print('...error splitting input. exiting...', file=sys.stderr)
 
-    except IOError as e:
+    except (IOError, OSError) as e:
         print('!! ERROR: !!', e, file=sys.stderr)
         print('...error consuming \
                             {i}. exiting...'.format(i=input_fastp), file=sys.stderr)
@@ -319,7 +319,7 @@ def main():
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
-        except IOError as error:
+        except (IOError, OSError) as error:
             print('!! ERROR: !!', error, file=sys.stderr)
             print('*** Could not open {fn}, skipping...'.format(
                 fn=read_file), file=sys.stderr)

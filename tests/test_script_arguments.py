@@ -20,6 +20,13 @@ import khmer.kfile
 from khmer import khmer_args
 from cStringIO import StringIO
 
+import sys
+
+
+# For map(long, [list of ints]) cross-version hackery
+if sys.version_info.major > 2:
+    long = int
+
 
 def test_check_space():
     fakelump_fa = utils.get_test_data('fakelump.fa')
@@ -108,7 +115,8 @@ def test_create_countgraph_1():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     countgraph = khmer_args.create_countgraph(args)
-    assert countgraph.hashsizes() == [2499997L, 2499989L, 2499983L, 2499967L]
+    expected_hashsz = utils.longify([2499997, 2499989, 2499983, 2499967])
+    assert countgraph.hashsizes() == expected_hashsz, countgraph.hashsizes()
     assert sum(countgraph.hashsizes()) < max_mem, sum(countgraph.hashsizes())
 
 
@@ -171,8 +179,8 @@ def test_create_nodegraph_1():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     nodegraph = khmer_args.create_nodegraph(args)
-    assert nodegraph.hashsizes() == [19999999L, 19999981L,
-                                     19999963L, 19999927L]
+    expected_hashsz = utils.longify([19999999, 19999981, 19999963, 19999927])
+    assert nodegraph.hashsizes() == expected_hashsz, nodegraph.hashsizes()
 
     assert sum(nodegraph.hashsizes())/8.0 < max_mem, sum(nodegraph.hashsizes())
 
