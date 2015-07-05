@@ -103,15 +103,15 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    if args.min_tablesize < MIN_HSIZE:
-        args.min_tablesize = MIN_HSIZE
+    if args.max_tablesize < MIN_HSIZE:
+        args.max_tablesize = MIN_HSIZE
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
     report_on_config(args, hashtype='nodegraph')
 
     K = args.ksize
-    HT_SIZE = args.min_tablesize
+    HT_SIZE = args.max_tablesize
     N_HT = args.n_tables
 
     traversal_range = args.traversal_range

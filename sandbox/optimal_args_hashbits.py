@@ -52,7 +52,7 @@ def main():
     print('Counting kmers from sequences in %s' % repr(filenames),
           file=sys.stderr)
 
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    htable = khmer.new_hashbits(args.ksize, args.max_tablesize, args.n_tables)
     target_method = htable.consume_fasta_with_reads_parser
 
     for _, filename in enumerate(filenames):
