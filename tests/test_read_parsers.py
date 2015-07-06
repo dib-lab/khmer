@@ -40,6 +40,7 @@ import khmer
 from khmer import ReadParser
 from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
 from functools import reduce
 
 
@@ -355,15 +356,10 @@ def test_read_pair_iterator_in_error_mode_xfail():
     rparser = \
         ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
 
-    failed = True
-    try:
+    with assert_raises(ValueError) as ctx:
         for rpair in rparser.iter_read_pairs():
             pass
-        failed = False
-    except ValueError as exc:
-        print(str(exc))
-        assert "Invalid read pair" in str(exc), str(exc)
-    assert failed
+    assert "Invalid read pair" in str(ctx.exception), str(ctx.exception)
 
 
 def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
