@@ -402,7 +402,7 @@ void HLLCounter::consume_fasta(
                     bool is_valid;
                     int n, t = omp_get_thread_num();
                     n = counters[t]->check_and_process_read(read.sequence,
-                    is_valid);
+                                                            is_valid);
                     n_consumed_partial[t] += n;
                     if (is_valid) {
                         total_reads_partial[t] += 1;

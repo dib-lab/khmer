@@ -314,13 +314,13 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
-    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
     HashIntoType * buf = NULL;
 
     try {
+        char signature[4];
         infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
@@ -1317,12 +1317,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     }
 
     unsigned char version, ht_type;
-    char signature[4];
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
 
     try {
+        char signature[4];
         infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);

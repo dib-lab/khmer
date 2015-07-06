@@ -138,7 +138,7 @@ class SeqAnParser : public IParser
 {
 
 public:
-    SeqAnParser( const char * filename );
+    explicit SeqAnParser( const char * filename );
     ~SeqAnParser( );
 
     bool is_complete( );

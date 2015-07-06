@@ -1755,7 +1755,7 @@ hashtable_get_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
     PyObject * x = PyList_New(hashtable->stop_tags.size());
     unsigned long long i = 0;
     for (si = hashtable->stop_tags.begin(); si != hashtable->stop_tags.end();
-            si++) {
+            ++si) {
         std::string s = _revhash(*si, k);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
@@ -1779,7 +1779,8 @@ hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
 
     PyObject * x = PyList_New(hashtable->all_tags.size());
     unsigned long long i = 0;
-    for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end(); si++) {
+    for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end();
+	    ++si) {
         std::string s = _revhash(*si, k);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
@@ -2004,7 +2005,7 @@ hashtable_subset_partition_size_distribution(khmer_KHashtable_Object * me,
     PartitionCountDistribution::iterator di;
 
     unsigned int i;
-    for (i = 0, di = d.begin(); di != d.end(); di++, i++) {
+    for (i = 0, di = d.begin(); di != d.end(); ++di, i++) {
         PyObject * value =  Py_BuildValue("KK", di->first, di->second);
         if (value == NULL) {
             Py_DECREF(x);
@@ -2290,7 +2291,7 @@ hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
     PyObject * x = PyList_New(divvy.size());
     unsigned int i = 0;
     for (SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
-            si++, i++) {
+            ++si, i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
     }
 
@@ -3317,7 +3318,7 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = (Hashtable *) self->counting;
+        self->khashtable.hashtable = dynamic_cast<Hashtable*>(self->counting);
     }
 
     return (PyObject *) self;
@@ -3341,11 +3342,11 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
 
 // call the C++ function, and trap signals => Python
 
-    unsigned long long  n_consumed;
-    unsigned int        total_reads;
     HashIntoType        curve[2][100];
 
     try {
+	unsigned long long  n_consumed;
+	unsigned int        total_reads;
         hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads,
                                         n_consumed);
     } catch (khmer_file_exception &exc) {
@@ -3536,7 +3537,7 @@ subset_partition_size_distribution(khmer_KSubsetPartition_Object * me,
     PartitionCountDistribution::iterator di;
 
     unsigned int i;
-    for (i = 0, di = d.begin(); di != d.end(); di++, i++) {
+    for (i = 0, di = d.begin(); di != d.end(); ++di, i++) {
         PyObject * tup = Py_BuildValue("KK", di->first, di->second);
         if (tup != NULL) {
             PyList_SET_ITEM(x, i, tup);
@@ -3570,7 +3571,7 @@ subset_partition_sizes(khmer_KSubsetPartition_Object * me, PyObject * args)
 
     unsigned int i = 0;
     PartitionCountMap::const_iterator mi;
-    for (mi = cm.begin(); mi != cm.end(); mi++) {
+    for (mi = cm.begin(); mi != cm.end(); ++mi) {
         if (mi->second >= min_size) {
             i++;
         }
@@ -3582,7 +3583,7 @@ subset_partition_sizes(khmer_KSubsetPartition_Object * me, PyObject * args)
     }
 
     // this should probably be a dict. @CTB
-    for (i = 0, mi = cm.begin(); mi != cm.end(); mi++) {
+    for (i = 0, mi = cm.begin(); mi != cm.end(); ++mi) {
         if (mi->second >= min_size) {
             PyObject * tup = Py_BuildValue("II", mi->first, mi->second);
             if (tup != NULL) {
@@ -3623,7 +3624,7 @@ subset_partition_average_coverages(khmer_KSubsetPartition_Object * me,
     }
 
     // this should probably be a dict. @CTB
-    for (i = 0, mi = cm.begin(); mi != cm.end(); mi++, i++) {
+    for (i = 0, mi = cm.begin(); mi != cm.end(); ++mi, i++) {
         PyObject * tup = Py_BuildValue("II", mi->first, mi->second);
         if (tup != NULL) {
             PyList_SET_ITEM(x, i, tup);
@@ -3770,8 +3771,6 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KLabelHash_Object * me,
         PyObject * args)
 {
     LabelHash * hb = me->labelhash;
-
-    std::ofstream outfile;
 
     const char * filename;
 
@@ -4729,9 +4728,9 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    PyObject * hash;
     try {
-        hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
+        PyObject * hash;
+	hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
         return hash;
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());

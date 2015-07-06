@@ -20,7 +20,7 @@ struct pre_partition_info {
     HashIntoType kmer;
     SeenSet tagged_kmers;
 
-    pre_partition_info(HashIntoType _kmer) : kmer(_kmer) {};
+    explicit pre_partition_info(HashIntoType _kmer) : kmer(_kmer) {};
 };
 
 class SubsetPartition
@@ -40,7 +40,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
+    explicit SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
     {
         ;
     };
