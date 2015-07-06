@@ -635,13 +635,13 @@ def test_load_gz():
     assert x == y, (x, y)
 
 
-def test_counting_hash_consume_save_load_abund():
+def test_countgraph_consume_save_load_abund():
     """Test cycle of consume, save, load, abundance-dist with (un)zipped HT"""
 
-    def _do_c_h_consume_save_load_abund(outfile, infile='random-20-a.fa',
+    def _do_cg_consume_save_load_abund(outfile, infile='random-20-a.fa',
                                         expected_sum=3966):
         inpath = utils.get_test_data(infile)
-        savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
+        savepath = utils.get_temp_filename(outfile)
 
         orig_ht = khmer._CountingHash(12, PRIMES_1m)
         orig_ht.consume_fasta(inpath)
@@ -658,11 +658,11 @@ def test_counting_hash_consume_save_load_abund():
         assert orig == loaded, (orig, loaded)
 
     for ext in ['', '.gz', '.zstd']:
-        _do_c_h_consume_save_load_abund('temp_ht_' + ext)
+        _do_cg_consume_save_load_abund('temp_countgraph.ct' + ext)
 
 
 def test_save_load_bigcount():
-    """Test a save, load cycle of CountingHash with bigcounts & all zip
+    """Test a save, load cycle of Countgraph with bigcounts & all zip
     formats"""
 
     def _do_cg_save_load_bigcount(outfile):
@@ -688,7 +688,7 @@ def test_save_load_bigcount():
 
 
 def test_zstd_save_tiny_table():
-    """test zstd save with tiny table created"""
+    """Test zstd save with tiny table fails."""
     savepath = utils.get_temp_filename("test.ct.zstd")
 
     ht = khmer.CountingHash(1, 10, 1)
@@ -698,7 +698,7 @@ def test_zstd_save_tiny_table():
 
 
 def test_zstd_load_unzipped_table():
-    """test loading a normal table with .zstd extension"""
+    """test loading an unzipped table with .zstd extension"""
     normal_path = utils.get_test_data("normC20k20.ct")
     zstd_path = utils.get_temp_filename("test.ct.zstd")
 
@@ -723,7 +723,7 @@ def test_load_zstd_bad_files():
         inpath = utils.get_test_data(fname)
 
         # Check that a sane error is raised
-        with assert_raises(IOError) as ar:
+        with assert_raises(OSError) as ar:
             khmer.load_counting_hash(inpath)
         err_msg = str(ar.exception)
         assert expected_err_msg in err_msg, err_msg
@@ -736,19 +736,19 @@ def test_zstd_load_truncated_table():
     trunc_path = utils.get_temp_filename("trunc.ct.zstd")
 
     # Make a zstd-compressed hash table
-    orig_ht = khmer.CountingHash(12, PRIMES_1m)
+    orig_ht = khmer.CountingHash(12, 100000, 4)
     orig_ht.consume_fasta(inpath)
     orig_ht.save(orig_path)
     del orig_ht
 
     # truncate the hash table
     with open(orig_path, 'rb') as orig, open(trunc_path, 'wb') as trunc:
-        # write header + a bit
+        # write first 128 bytes header + a bit
         trunc.write(orig.read(128))
 
     # Check that a sane error is raised
     expected_err_msg = "Unexpected end of k-mer count file"
-    with assert_raises(IOError) as ar:
+    with assert_raises(OSError) as ar:
         khmer.load_counting_hash(trunc_path)
     err_msg = str(ar.exception)
     assert expected_err_msg in err_msg, err_msg
@@ -756,7 +756,7 @@ def test_zstd_load_truncated_table():
 
 def test_zstd_load_nonexistant():
     """test loading a nonexistant table with .zstd extension"""
-    zstd_path = utils.get_temp_filename("doesntexist.ct.zstd")
+    zstd_path = utils.get_temp_filename("doesnotexist.ct.zstd")
 
     expected_err_msg = "Cannot open k-mer count file"
 
