@@ -121,11 +121,14 @@ CXXFLAGS +=-fopenmp
 CFLAGS   +=-fopenmp
 endif
 
-VERSION = $(shell python get_version.py)
+VERSION = $(shell ./get_version.py)
 
-# Get the major version
-LIBVERSION = $(shell python get_version.py | sed -e 's/^\([^-]*\)-.*/\1/')
-LIBKHMERSO=libkhmer.so.$(LIBVERSION)
+MAJOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\1/')
+MINOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
+
+LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
+SONAME=libkhmer.so.$(MAJOR_VERSION)
+LIBKHMERSO=libkhmer.so.$(LIB_VERSION)
 
 CXXFLAGS += -DVERSION=$(VERSION)
 
@@ -229,7 +232,8 @@ install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 		$(PREFIX)/include/oxli/
 	cp khmer.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
-	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
+	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
+	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/libkhmer.so
 
 testinstall:
 	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -lkhmer -o test-shared test-compile.cc
