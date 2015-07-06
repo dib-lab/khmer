@@ -206,10 +206,10 @@ clean:
 test: $(TEST_PROGS)
 
 install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
-	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/
-	cp -r $(KHMER_HEADERS) \
-		../third-party/smhasher/MurmurHash3.h \
-		$(PREFIX)/include/
+	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
+	cp -r $(KHMER_HEADERS) 				\
+		../third-party/smhasher/MurmurHash3.h 	\
+		$(PREFIX)/include/oxli/
 	cp khmer.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
