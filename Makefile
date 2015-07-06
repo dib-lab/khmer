@@ -217,7 +217,7 @@ libtest: FORCE
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
-	test -f install_target/include/khmer.hh
+	test -f install_target/include/oxli/khmer.hh
 	test -d install_target/lib
 	test -f install_target/lib/libkhmer.a
 	$(CXX) -o install_target/test-prog-static -I install_target/include \
