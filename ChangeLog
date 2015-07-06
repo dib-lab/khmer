@@ -1,3 +1,8 @@
+2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * lib/read_parser.{cc,hh}: use std::string everywhere to match existing
+   exceptions
+
 2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
