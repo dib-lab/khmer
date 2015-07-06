@@ -1,3 +1,8 @@
+# Should we use the standard system zlib and libbz2?
+
+USE_SYSTEM_ZLIB ?= false
+USE_SYSTEM_LIBBZ2 ?= false
+
 # Profile?
 # Set this variable to true if you wish to profile the codes.
 WANT_PROFILING=false
@@ -34,41 +39,54 @@ PREFIX=/usr/local
 ### NOTE: No user-serviceable parts below this line! ###
 
 INCLUDES= -I ../third-party/seqan/core/include/ 	\
-	  -I ../third-party/zlib/ 			\
-	  -I ../third-party/bzip2/ 			\
 	  -I ../third-party/smhasher/
 
+ifeq ($(USE_SYSTEM_ZLIB), true)
+INCLUDES += -I ../third-party/zlib/
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), true)
+INCLUDES += -I ../third-party/bzip2/
+endif
+
 # Warnings in common to C and C++
-WARNINGS=-Wall -Wextra -Wundef
-
-# Debug C/CXXFLAGS
-DEBUG_FLAGS=-g
-
-DEFINE_KHMER_EXTRA_SANITY_CHECKS=-DKHMER_EXTRA_SANITY_CHECKS
+WARNINGS=-Wall
 
 # Flags in common to C and C++
 COMMON_FLAGS=-O3 -fPIC
-SEQAN_FLAGS=-DSEQAN_HAS_ZLIB=1 -DSEQAN_HAS_BZ2=1
+SEQAN_FLAGS=-DSEQAN_HAS_ZLIB=1 -DSEQAN_HAS_BZIP2=1
 
 # Base C/CXXFLAGS
+CPPFLAGS ?=
+CPPFLAGS += $(SEQAN_FLAGS)
+
 CXXFLAGS ?= $(COMMON_FLAGS) $(WARNINGS)
 CXXFLAGS += -Wstrict-null-sentinel
-CXXFLAGS += $(INCLUDES)
+CXXFLAGS += $(INCLUDES) $(CPPFLAGS)
 
 CFLAGS	 ?= $(COMMON_FLAGS) $(WARNINGS)
 CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
-CFLAGS   += $(INCLUDES)
+CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
 LDFLAGS  ?=
+ifeq ($(USE_SYSTEM_ZLIB), true)
+LDFLAGS  += -lz
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), true)
+LDFLAGS  += -lbz2
+endif
 
 ifeq ($(WANT_DEBUGGING), true)
-CXXFLAGS+= $(DEBUG_FLAGS)
-CFLAGS+= $(DEBUG_FLAGS)
+DEBUG_FLAGS=-g
+CXXFLAGS += $(DEBUG_FLAGS)
+CFLAGS   += $(DEBUG_FLAGS)
 endif
 
 ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
-CXXFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
-CFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
+DEFINE_KHMER_EXTRA_SANITY_CHECKS=-DKHMER_EXTRA_SANITY_CHECKS
+CXXFLAGS += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
+CFLAGS   += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
 endif
 
 ifeq ($(WANT_PROFILING), true)
@@ -76,21 +94,20 @@ ifeq ($(PROFILER_OF_CHOICE), TAU)
 CXX=tau_cxx.sh
 endif
 ifeq ($(PROFILER_OF_CHOICE), gprof)
-PROFILING_LIBS=-pg
-CXXFLAGS+= -pg
-CFLAGS+= -pg
-LIBS+= $(PROFILING_LIBS)
+CXXFLAGS += -pg
+CFLAGS   += -pg
+LDFLAGS  += -pg
 endif
 endif
 
 ifeq ($(WITH_INTERNAL_METRICS), true)
-CXXFLAGS+= -DWITH_INTERNAL_METRICS
-CFLAGS+= -DWITH_INTERNAL_METRICS
+CXXFLAGS += -DWITH_INTERNAL_METRICS
+CFLAGS   += -DWITH_INTERNAL_METRICS
 endif
 
 # Place POSIX threads last in linking order, if needed.
 ifneq ($(shell uname), Linux)
-LIBS+= -pthread
+LDFLAGS  += -pthread
 endif
 
 
@@ -100,48 +117,33 @@ HAVE_OPENMP=$(shell 						\
 	      rm -f chkomp)
 
 ifeq ($(HAVE_OPENMP), true)
-	CFLAGS+=-fopenmp
-	CXXFLAGS+=-fopenmp
+CXXFLAGS +=-fopenmp
+CFLAGS   +=-fopenmp
 endif
 
 VERSION = $(shell python get_version.py)
 
+# Get the major version
 LIBVERSION = $(shell python get_version.py | sed -e 's/^\([^-]*\)-.*/\1/')
 LIBKHMERSO=libkhmer.so.$(LIBVERSION)
 
-CXXFLAGS+= -DVERSION=$(VERSION)
+CXXFLAGS += -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
-CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
-CFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CXXFLAGS += -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CFLAGS   += -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 export CXX
 export CFLAGS
 export CXXFLAGS
-export LIBS
+export LDFLAGS
 export VERSION
 
 
 #### Third party dependencies ####
-# ZLIB
+# ZLIB, use .lo not .o, so we get -fPIC and other library-related flags
 ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
-	adler32.o \
-	crc32.o \
-	deflate.o \
-	infback.o \
-	inffast.o \
-	inflate.o \
-	inftrees.o \
-	trees.o \
-	zutil.o \
-	compress.o \
-	uncompr.o \
-	gzclose.o \
-	gzlib.o \
-	gzread.o \
-	gzwrite.o
-ZLIB_PIC_OBJS_BASE=\
 	adler32.lo \
 	crc32.lo \
 	deflate.lo \
@@ -159,7 +161,6 @@ ZLIB_PIC_OBJS_BASE=\
 	gzwrite.lo
 
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
-ZLIB_PIC_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_PIC_OBJS_BASE))
 
 # BZ2
 BZIP2_DIR=../third-party/bzip2
@@ -187,9 +188,16 @@ LIBKHMER_OBJS= \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
-	murmur3.o \
-	$(BZIP2_OBJS) \
-	$(ZLIB_PIC_OBJS)
+	trace_logger.o \
+	murmur3.o
+
+ifeq ($(USE_SYSTEM_ZLIB), true)
+LIBKHMER_OBJS += $(ZLIB_OBJS)
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), true)
+LIBKHMER_OBJS += $(BZIP2_OBJS)
+endif
 
 KHMER_HEADERS= \
 	counting.hh \
@@ -204,8 +212,6 @@ KHMER_HEADERS= \
 	read_parsers.hh \
 	subset.hh \
 
-TEST_PROGS = test-Colors test-read-aligner test-compile
-
 # START OF RULES #
 
 # The all rule comes first!
@@ -216,8 +222,6 @@ clean:
 	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
-test: $(TEST_PROGS)
-
 install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
 	cp -r $(KHMER_HEADERS) 				\
@@ -227,14 +231,17 @@ install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
 
+testinstall:
+	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -lkhmer -o test-shared test-compile.cc
+	rm -f test-shared
+	$(CXX) -I$(PREFIX)/include -o test-static test-compile.cc $(PREFIX)/lib/libkhmer.a
+	rm -f test-static
+
 khmer.pc: khmer.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
-
-$(ZLIB_PIC_OBJS):
-	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_PIC_OBJS_BASE))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
@@ -243,17 +250,13 @@ $(BZIP2_OBJS):
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o: %.cc $(ZLIB_OBJS) $(ZLIB_PIC_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
+%.o: %.cc $(ZLIB_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $(LIBKHMER_OBJS)
+	$(CXX) $(CXXFLAGS) -shared -o $@ $^
 	ln -sf $(LIBKHMERSO) libkhmer.so
 
 libkhmer.a: $(LIBKHMER_OBJS)
-	ar rcs $@ $(LIBKHMER_OBJS)
+	ar rcs $@ $^
 	ranlib $@
-
-# catch-all rule for test drivers
-test-%: test-%.cc libkhmer.a
-	$(CXX) $(CXXFLAGS) -I . -o $@ $< libkhmer.a
