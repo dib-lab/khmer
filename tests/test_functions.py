@@ -14,7 +14,10 @@ from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
 from khmer.kfile import check_input_files
-from cStringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 def test_forward_hash():

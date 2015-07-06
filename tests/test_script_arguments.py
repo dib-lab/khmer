@@ -18,7 +18,10 @@ from . import khmer_tst_utils as utils
 import argparse
 import khmer.kfile
 from khmer import khmer_args
-from cStringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import sys
 
