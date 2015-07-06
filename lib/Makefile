@@ -306,8 +306,8 @@ $(ZLIB_OBJS):
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
-$(ZSTD_OBJS):
-	$(CC) -std=c99 -Wall -Wextra -Wundef -Wshadow -Wcast-align -Wstrict-prototypes -fPIC -c $(ZSTD_DIR)/zstd.c
+$(ZSTD_OBJS): $(ZSTD_DIR)/zstd.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 # MurMur3
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
