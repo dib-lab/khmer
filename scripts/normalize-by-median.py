@@ -252,24 +252,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     force_single = args.force_single
 
     # if optimization args are given, do optimization
-    if args.unique_kmers != 0:
-        if args.max_memory_usage:
-            # verify that this is a sane memory usage restriction
-            res = oxutils.estimate_optimal_with_N_and_M(args.unique_kmers,
-                                                        args.max_memory_usage)
-            if res.fp_rate > 0.1:
-                print("""
-*** ERROR: The given restrictions yield an estimate false positive rate of {0},
-*** which is above the recommended false positive ceiling of 0.1!
-*** Aborting!""".format(res.fp_rate), file=sys.stderr)
-                sys.exit(1)
-        else:
-            res = oxutils.estimate_optimal_with_N_and_f(args.unique_kmers, 0.1)
-            if args.max_tablesize and args.max_tablesize < res.htable_size:
-                print("*** Warning: The given tablesize may be too small!",
-                      file=sys.stderr)
-            elif not args.max_tablesize:
-                args.max_mem = res.mem_use
+    args = oxutils.do_sanity_checking(args, 0.1)
 
     # check for similar filenames
     # if we're using a single output file only check for identical filenames

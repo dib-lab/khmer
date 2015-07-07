@@ -1,3 +1,10 @@
+2015-07-07  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/functions.py: moved optimization/sanity check func to oxli
+   * scripts/normalize-by-median.py,oxli/build_graph.py: added
+   optimization/sanity checking via oxli estimation funcs
+   * tests/test_normalize_by_median.py: updated tests to cover estimation funcs
+
 2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:

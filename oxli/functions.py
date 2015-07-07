@@ -6,10 +6,12 @@
 #
 
 
+from __future__ import print_function
 from collections import namedtuple
 import threading
 import math
 import khmer.utils
+import sys
 
 
 def estimate_optimal_with_N_and_M(N, M):
@@ -78,6 +80,37 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                                                    mem*1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
     return "\n".join(to_print)
+
+
+def do_sanity_checking(args, desired_max_fp):
+    # if optimization args are given, do optimization
+    if args.unique_kmers != 0:
+        if args.max_memory_usage:
+            # verify that this is a sane memory usage restriction
+            res = estimate_optimal_with_N_and_M(args.unique_kmers,
+                                                args.max_memory_usage)
+            if res.fp_rate > desired_max_fp:
+                print("""
+*** ERROR: The given restrictions yield an estimate false positive rate of {0},
+*** which is above the recommended false positive ceiling of 0.1!
+*** Aborting!""".format(res.fp_rate), file=sys.stderr)
+                sys.exit(1)
+        else:
+            res = estimate_optimal_with_N_and_f(args.unique_kmers,
+                                                desired_max_fp)
+            if args.max_tablesize and args.max_tablesize < res.htable_size:
+                print("*** Warning: The given tablesize is be too small!",
+                      file=sys.stderr)
+                print("*** Estimating false positive rate to be {0}".format(
+                      res.fp_rate), file=sys.stderr)
+            else:
+                print("*** INFO: set memory ceiling using atuo optimaztion.",
+                      file=sys.stderr)
+                print("*** Ceiling is: {0} bytes\n".format(res.mem_use),
+                      file=sys.stderr)
+                args.max_mem = res.mem_use
+
+    return args
 
 
 def build_graph(ifilenames, graph, num_threads=1, tags=False):

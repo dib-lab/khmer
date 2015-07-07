@@ -73,6 +73,51 @@ def test_normalize_by_median_unpaired_final_read():
         assert "ERROR: Unpaired reads when require_paired" in out, out
 
 
+def test_normalize_by_median_sanity_check_0():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '1024', '--max-mem', '60',  infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
+    except AssertionError as e:
+        out = str(e)
+        assert "recommended false positive ceiling of 0.1!" in out, out
+
+
+def test_normalize_by_median_sanity_check_1():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '83', '--max-tablesize', '17', infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+    except AssertionError as e:
+        out = str(e)
+        assert "Warning: The given tablesize is be too small!" in out, out
+
+
+def test_normalize_by_median_sanity_check_2():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '83', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "*** INFO: set memory ceiling using atuo optimaztion." in err, err
+    assert "*** Ceiling is: 399 bytes" in err, err
+
+
 def test_normalize_by_median_unforced_badfile():
     CUTOFF = '1'
 
