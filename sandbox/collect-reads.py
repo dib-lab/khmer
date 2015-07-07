@@ -54,7 +54,7 @@ def get_parser():
                         "sequence files.")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
-    parser.add_argument('-C', '--coverage', type=int,
+    parser.add_argument('-C', '--coverage', type=int, default=50,
                         help='Collect reads until this coverage, then exit.')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'),
                         help='Write collect reads into this file.')

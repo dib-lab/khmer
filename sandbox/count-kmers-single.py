@@ -73,7 +73,7 @@ def main():
     threads = []
     print ('consuming input, round 1 -- %s' % (args.input_sequence_filename),
            file=sys.stderr)
-    for _ in xrange(args.threads):
+    for _ in range(args.threads):
         thread = \
             threading.Thread(
                 target=counting_hash.consume_fasta_with_reads_parser,

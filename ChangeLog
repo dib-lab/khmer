@@ -1,3 +1,11 @@
+2015-07-06  Luiz Irber  <khmer@luizirber.org>
+
+   * sandbox/collect-reads.py: Set a default value for coverage based
+   on the docstring.
+   * sandbox/count-kmers-single.py, tests/test_{functions,script_arguments}.py:
+   Replace xrange and cStringIO (not Python 3 compatible).
+   * lib/*.{hh,cc}, oxli/functions.py, tests/*.py: make format.
+
 2015-07-05  Jaob Fenton  <bocajnotnef@gmail.com>
 
    * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 

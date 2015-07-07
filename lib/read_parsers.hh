@@ -56,8 +56,7 @@ struct Read {
     std:: string    quality;
     // TODO? Add description field.
 
-    inline void reset ( )
-    {
+    inline void reset ( ) {
         name.clear( );
         annotations.clear( );
         sequence.clear( );
@@ -90,8 +89,7 @@ struct IParser {
     //	     upon return.
     // TODO: Eliminate all calls to 'get_next_read'.
     // Or switch to C++11 w/ move constructors
-    inline Read		get_next_read( )
-    {
+    inline Read		get_next_read( ) {
         Read the_read;
         imprint_next_read( the_read );
         return the_read;
@@ -103,8 +101,7 @@ struct IParser {
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
-    size_t		    get_num_reads()
-    {
+    size_t		    get_num_reads() {
         return _num_reads;
     }
 

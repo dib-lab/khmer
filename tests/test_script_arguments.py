@@ -18,7 +18,10 @@ from . import khmer_tst_utils as utils
 import argparse
 import khmer.kfile
 from khmer import khmer_args
-from cStringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import sys
 
@@ -182,7 +185,8 @@ def test_create_nodegraph_1():
     expected_hashsz = utils.longify([19999999, 19999981, 19999963, 19999927])
     assert nodegraph.hashsizes() == expected_hashsz, nodegraph.hashsizes()
 
-    assert sum(nodegraph.hashsizes())/8.0 < max_mem, sum(nodegraph.hashsizes())
+    assert sum(nodegraph.hashsizes()) / \
+        8.0 < max_mem, sum(nodegraph.hashsizes())
 
 
 def test_create_nodegraph_2():
@@ -229,7 +233,7 @@ def test_create_nodegraph_4_multiplier():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
-    assert sum(nodegraph.hashsizes())/8.0 < max_mem / 2.0, \
+    assert sum(nodegraph.hashsizes()) / 8.0 < max_mem / 2.0, \
         sum(nodegraph.hashsizes())
 
 
