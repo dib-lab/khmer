@@ -121,10 +121,14 @@ CXXFLAGS +=-fopenmp
 CFLAGS   +=-fopenmp
 endif
 
+ifneq ($(PACKAGE_VERSION),)
+VERSION = $(PACKAGE_VERSION)
+else
 VERSION = $(shell ./get_version.py)
+endif
 
-MAJOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\1/')
-MINOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
+MAJOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\1/')
+MINOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
 
 LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
 
