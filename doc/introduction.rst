@@ -15,11 +15,10 @@ khmer can be used for a number of transformations, include inexact
 transformations (abundance filtering and error trimming) and exact 
 transformations (graph-size filtering, to throw away disconnected reads; and 
 partitioning, to split reads into disjoint sets).  Of these, only partitioning 
-is not constant memory.  In all cases, the memory required for assembly with 
-Velvet or another de Bruijn graph assembler will be more than the memory 
-required to use our software. Our software will not increase the memory required 
-for Velvet, either, although we may not be able to *decrease* the memory 
-required for assembly for every data set.
+is not constant memory.  In all cases, assembly with Velvet or another de Bruijn
+graph assembler will require more memory than our software. Although we may not 
+be able to *decrease* the memory required for assembly for every data set, our 
+software will never increase the amount of memory required.
 
 Most of khmer relies on an underlying probabilistic data structure known as a 
 `Bloom filter <http://en.wikipedia.org/wiki/Bloom_filter>`__ (also see 
