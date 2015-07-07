@@ -268,7 +268,7 @@ murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
 	ln -sf $(LIBKHMERSO) $(SONAME)
 	ln -sf $(SONAME) libkhmer.$(SHARED_EXT)
 
