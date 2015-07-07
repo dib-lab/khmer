@@ -261,12 +261,6 @@ install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
 	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
-testinstall:
-	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -loxli -o test-shared test-compile.cc
-	rm -f test-shared
-	$(CXX) -I$(PREFIX)/include -o test-static test-compile.cc $(PREFIX)/lib/liboxli.a
-	rm -f test-static
-
 oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
