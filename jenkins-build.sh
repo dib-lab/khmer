@@ -72,5 +72,10 @@ fi
 # takes too long to run on every build
 #bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
 
+unset CFLAGS
+unset LDFLAGS
+unset CPPFLAGS
+unset CXXFLAGS
+
 make lib
 make libtest
