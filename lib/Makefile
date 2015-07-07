@@ -127,8 +127,18 @@ MAJOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*
 MINOR_VERSION = $(shell ./get_version.py | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
 
 LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
-SONAME=libkhmer.so.$(MAJOR_VERSION)
-LIBKHMERSO=libkhmer.so.$(LIB_VERSION)
+
+ifeq ($(shell uname), Darwin)
+SHARED_EXT   = dylib
+SONAME       = libkhmer.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) -compatibility_version $(MAJOR_VERSION) -current_version $(VERSION)
+else
+SHARED_EXT   = so
+SONAME       = libkhmer.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME_FLAGS = -Wl,-soname=$(SONAME)
+endif
+
+LIBKHMERSO=libkhmer.$(SHARED_EXT).$(LIB_VERSION)
 
 CXXFLAGS += -DVERSION=$(VERSION)
 
@@ -221,7 +231,7 @@ KHMER_HEADERS= \
 all: $(LIBKHMERSO) libkhmer.a khmer.pc
 
 clean:
-	rm -f *.o *.a *.so* khmer.pc $(TEST_PROGS)
+	rm -f *.o *.a *.$(SHARED_EXT)* khmer.pc $(TEST_PROGS)
 	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
@@ -233,7 +243,7 @@ install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	cp khmer.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
-	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/libkhmer.so
+	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/libkhmer.$(SHARED_EXT)
 
 testinstall:
 	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -lkhmer -o test-shared test-compile.cc
@@ -255,11 +265,12 @@ murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.cc $(ZLIB_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $^
-	ln -sf $(LIBKHMERSO) libkhmer.so
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^
+	ln -sf $(LIBKHMERSO) $(SONAME)
+	ln -sf $(SONAME) libkhmer.$(SHARED_EXT)
 
 libkhmer.a: $(LIBKHMER_OBJS)
 	ar rcs $@ $^
