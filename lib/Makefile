@@ -136,15 +136,15 @@ LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
 
 ifeq ($(shell uname), Darwin)
 SHARED_EXT   = dylib
-SONAME       = libkhmer.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) -compatibility_version $(MAJOR_VERSION) -current_version $(VERSION)
 else
 SHARED_EXT   = so
-SONAME       = libkhmer.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
 SONAME_FLAGS = -Wl,-soname=$(SONAME)
 endif
 
-LIBKHMERSO=libkhmer.$(SHARED_EXT).$(LIB_VERSION)
+LIBKHMERSO=liboxli.$(SHARED_EXT).$(LIB_VERSION)
 
 CXXFLAGS += -DVERSION=$(VERSION)
 
@@ -195,7 +195,7 @@ BZIP2_OBJS_BASE= \
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 
-#### khmer proper below here ####
+#### oxli proper below here ####
 
 LIBKHMER_OBJS= \
 	counting.o \
@@ -241,7 +241,7 @@ KHMER_HEADERS= \
 # START OF RULES #
 
 # The all rule comes first!
-all: $(LIBKHMERSO) libkhmer.a khmer.pc
+all: $(LIBKHMERSO) liboxli.a oxli.pc
 
 zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
@@ -249,25 +249,25 @@ libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
 clean: $(PRECLEAN_TARGS)
-	rm -f *.o *.a *.$(SHARED_EXT)* khmer.pc $(TEST_PROGS)
+	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
 
-install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
+install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
 	cp -r $(KHMER_HEADERS) 				\
 		../third-party/smhasher/MurmurHash3.h 	\
 		$(PREFIX)/include/oxli/
-	cp khmer.pc $(PREFIX)/lib/pkgconfig/
-	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
+	cp oxli.pc $(PREFIX)/lib/pkgconfig/
+	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
-	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/libkhmer.$(SHARED_EXT)
+	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
 testinstall:
-	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -lkhmer -o test-shared test-compile.cc
+	$(CXX) -I$(PREFIX)/include -L$(PREFIX)/lib -loxli -o test-shared test-compile.cc
 	rm -f test-shared
-	$(CXX) -I$(PREFIX)/include -o test-static test-compile.cc $(PREFIX)/lib/libkhmer.a
+	$(CXX) -I$(PREFIX)/include -o test-static test-compile.cc $(PREFIX)/lib/liboxli.a
 	rm -f test-static
 
-khmer.pc: khmer.pc.in
+oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
 $(ZLIB_OBJS):
@@ -286,8 +286,8 @@ murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
 	ln -sf $(LIBKHMERSO) $(SONAME)
-	ln -sf $(SONAME) libkhmer.$(SHARED_EXT)
+	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
-libkhmer.a: $(LIBKHMER_OBJS)
+liboxli.a: $(LIBKHMER_OBJS)
 	ar rcs $@ $^
 	ranlib $@
