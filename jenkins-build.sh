@@ -77,5 +77,5 @@ unset LDFLAGS
 unset CPPFLAGS
 unset CXXFLAGS
 
-make lib
+# Don't do lib too, as we already compile as part of libtest
 make libtest
