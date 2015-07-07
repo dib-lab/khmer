@@ -41,11 +41,11 @@ PREFIX=/usr/local
 INCLUDES= -I ../third-party/seqan/core/include/ 	\
 	  -I ../third-party/smhasher/
 
-ifeq ($(USE_SYSTEM_ZLIB), true)
+ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../third-party/zlib/
 endif
 
-ifeq ($(USE_SYSTEM_LIBBZ2), true)
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
 INCLUDES += -I ../third-party/bzip2/
 endif
 
@@ -69,11 +69,11 @@ CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
 CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
 LDFLAGS  ?=
-ifeq ($(USE_SYSTEM_ZLIB), true)
+ifneq ($(USE_SYSTEM_ZLIB), false)
 LDFLAGS  += -lz
 endif
 
-ifeq ($(USE_SYSTEM_LIBBZ2), true)
+ifneq ($(USE_SYSTEM_LIBBZ2), false)
 LDFLAGS  += -lbz2
 endif
 
@@ -208,12 +208,19 @@ LIBKHMER_OBJS= \
 	trace_logger.o \
 	murmur3.o
 
-ifeq ($(USE_SYSTEM_ZLIB), true)
-LIBKHMER_OBJS += $(ZLIB_OBJS)
+PRECOMILE_OBJS ?=
+PRECLEAN_TARGS ?=
+
+ifeq ($(USE_SYSTEM_ZLIB), false)
+LIBKHMER_OBJS  += $(ZLIB_OBJS)
+PRECOMILE_OBJS += $(ZLIB_OBJS)
+PRECLEAN_TARGS += zlibclean
 endif
 
-ifeq ($(USE_SYSTEM_LIBBZ2), true)
-LIBKHMER_OBJS += $(BZIP2_OBJS)
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
+LIBKHMER_OBJS  += $(BZIP2_OBJS)
+PRECOMILE_OBJS += $(BZIP2_OBJS)
+PRECLEAN_TARGS += libbz2clean
 endif
 
 KHMER_HEADERS= \
@@ -234,10 +241,13 @@ KHMER_HEADERS= \
 # The all rule comes first!
 all: $(LIBKHMERSO) libkhmer.a khmer.pc
 
-clean:
-	rm -f *.o *.a *.$(SHARED_EXT)* khmer.pc $(TEST_PROGS)
+zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
+libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
+
+clean: $(PRECLEAN_TARGS)
+	rm -f *.o *.a *.$(SHARED_EXT)* khmer.pc $(TEST_PROGS)
 
 install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
@@ -268,7 +278,7 @@ $(BZIP2_OBJS):
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o: %.cc $(ZLIB_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
+%.o: %.cc $(PRECOMILE_OBJS) $(KHMER_HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
