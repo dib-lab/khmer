@@ -3,6 +3,21 @@
 What's New In khmer 2.0?
 ########################
 
+
+Script Updates
+==============
+
+Digital normalization script now supports mixed paired and unpaired read input
+------------------------------------------------------------------------------
+
+`normalize-by-median.py` now supports mixed paired and unpaired (or 
+"broken-paired") input. Behavior can be forced to either treat all reads as 
+singletons or to require all reads be properly paired using `--force-single` or 
+`--paired`, respectively. If `--paired` is set, -u can be used to include a 
+file of unpaired reads. The unpaired reads will be examined after all of the
+other sequence files.
+
+
 Incompatible changes
 ====================
 
