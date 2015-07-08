@@ -14,16 +14,16 @@ import khmer.utils
 
 def estimate_optimal_with_K_and_M(K, M):
     """
-    Utility function for estimating optimal counting table args where N is the
+    Utility function for estimating optimal counting table args where K is the
     number of unique kmer and M is the allotted amount of memory
     """
-    N = math.log(2)*(M/float(K))
+    N = math.log(2) * (M / float(K))
     intN = int(N)
     if intN == 0:
         intN = 1
-    X = int(M/intN)
-    M = X*intN
-    f2 = (1-math.exp(-K/float(X)))**intN
+    X = int(M / intN)
+    M = X * intN
+    f2 = (1 - math.exp(-K / float(X))) ** intN
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
     return res(intN, X, M, f2)
@@ -31,7 +31,7 @@ def estimate_optimal_with_K_and_M(K, M):
 
 def estimate_optimal_with_K_and_f(K, f):
     """
-    Utility function for estimating optimal memory where N is the number of
+    Utility function for estimating optimal memory where K is the number of
     unique kmers and f is the desired false positive rate
     """
     N = math.log(f, 0.5)
@@ -39,9 +39,9 @@ def estimate_optimal_with_K_and_f(K, f):
     if intN == 0:
         intN = 1
 
-    H1 = int(-K/(math.log(1-f**(1/float(intN)))))
+    H1 = int(-K / (math.log(1 - f ** (1 / float(intN)))))
     M1 = H1 * intN
-    f1 = (1-math.exp(-K/float(H1)))**intN
+    f1 = (1 - math.exp(-K / float(H1))) ** intN
 
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
@@ -63,7 +63,8 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'expected_memory_usage')
 
     for fp_rate in range(1, 10):
-        Z, H, M, f = estimate_optimal_with_K_and_f(unique_kmers, fp_rate/10.0)
+        Z, H, M, f = estimate_optimal_with_K_and_f(
+            unique_kmers, fp_rate / 10.0)
         to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
@@ -75,7 +76,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
 
     for mem in mem_list:
         Z, H, M, f = estimate_optimal_with_K_and_M(unique_kmers,
-                                                   mem*1000000000)
+                                                   mem * 1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
     return "\n".join(to_print)
 
