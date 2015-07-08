@@ -12,6 +12,21 @@ import math
 import khmer.utils
 
 
+def optimal_size(K, M=None, f=None):
+    """
+    Utility function for estimating optimal counting table args where:
+      - N: number of unique kmers [required]
+      - M: the allotted amount of memory [optional, conflicts with f]
+      - f: the desired false positive rate [optional, conflicts with M]
+    """
+    if all((K is not None, M is not None, f is None)):
+        return estimate_optimal_with_K_and_M(K, M)
+    elif all((K is not None, M is None, f is not None)):
+        return estimate_optimal_with_K_and_f(K, f)
+    else:
+        raise TypeError("K and either M or f must be defined.")
+
+
 def estimate_optimal_with_K_and_M(K, M):
     """
     Utility function for estimating optimal counting table args where N is the
