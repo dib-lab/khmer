@@ -29,6 +29,10 @@ else
 	TESTATTR ?= '!known_failing,!jenkins,!huge,!linux'
 endif
 
+
+MODEXT=$(shell python -c "import sysconfig;print(sysconfig.get_config_var('SO'))")
+EXTENSION_MODULE = khmer/_khmer$(MODEXT)
+
 ## all         : default task; compile C++ code, build shared object library
 all: sharedobj
 
@@ -44,9 +48,9 @@ install-dependencies:
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: khmer/_khmer.so
+sharedobj: $(EXTENSION_MODULE)
 
-khmer/_khmer.so: $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -68,7 +72,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmer*.so
+	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
@@ -160,7 +164,7 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: $(PYSOURCES) $(wildcard tests/*.py) $(wildcard khmer/_khmer*.so)
+.coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
 		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
 
