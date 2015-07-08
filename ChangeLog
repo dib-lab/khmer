@@ -1,3 +1,8 @@
+2015-07-08  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/{counting,hashbits,hashtable,labelhash,subset}.cc: print hexadecimal
+   representation of the signature read from the file.
+
 2015-07-06  Luiz Irber  <khmer@luizirber.org>
 
    * sandbox/collect-reads.py: Set a default value for coverage based
