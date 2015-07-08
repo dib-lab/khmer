@@ -12,12 +12,27 @@ import math
 import khmer.utils
 
 
+def optimal_size(K, M=None, f=None):
+    """
+    Utility function for estimating optimal counting table args where:
+      - N: number of unique kmers [required]
+      - M: the allotted amount of memory [optional, conflicts with f]
+      - f: the desired false positive rate [optional, conflicts with M]
+    """
+    if all((K is not None, M is not None, f is None)):
+        return estimate_optimal_with_K_and_M(K, M)
+    elif all((K is not None, M is None, f is not None)):
+        return estimate_optimal_with_K_and_f(K, f)
+    else:
+        raise TypeError("K and either M or f must be defined.")
+
+
 def estimate_optimal_with_K_and_M(K, M):
     """
     Utility function for estimating optimal counting table args where K is the
     number of unique kmer and M is the allotted amount of memory
     """
-<<<<<<< HEAD
+
     N = math.log(2) * (M / float(K))
     intN = int(N)
     if intN == 0:
@@ -25,15 +40,6 @@ def estimate_optimal_with_K_and_M(K, M):
     X = int(M / intN)
     M = X * intN
     f2 = (1 - math.exp(-K / float(X))) ** intN
-=======
-    Z = math.log(2) * (M / float(N))
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H = int(M / intZ)
-    M = H * intZ
-    f2 = (1 - math.exp(-N / float(H))) ** intZ
->>>>>>> 0b4c59ecf47724ed03032176dfc596973ef8dca7
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
     return res(intN, X, M, f2)
@@ -49,15 +55,9 @@ def estimate_optimal_with_K_and_f(K, f):
     if intN == 0:
         intN = 1
 
-<<<<<<< HEAD
     H1 = int(-K / (math.log(1 - f ** (1 / float(intN)))))
     M1 = H1 * intN
     f1 = (1 - math.exp(-K / float(H1))) ** intN
-=======
-    H1 = int(-N / (math.log(1 - f ** (1 / float(intZ)))))
-    M1 = H1 * intZ
-    f1 = (1 - math.exp(-N / float(H1))) ** intZ
->>>>>>> 0b4c59ecf47724ed03032176dfc596973ef8dca7
 
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
@@ -79,12 +79,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'expected_memory_usage')
 
     for fp_rate in range(1, 10):
-<<<<<<< HEAD
-        Z, H, M, f = estimate_optimal_with_K_and_f(
-=======
-        Z, H, M, f = estimate_optimal_with_N_and_f(
->>>>>>> 0b4c59ecf47724ed03032176dfc596973ef8dca7
-            unique_kmers, fp_rate / 10.0)
+        Z, H, M, f = optimal_size(unique_kmers, f=fp_rate/10.0)
         to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
@@ -95,12 +90,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'size_hashtable(H)\texpected_fp')
 
     for mem in mem_list:
-<<<<<<< HEAD
-        Z, H, M, f = estimate_optimal_with_K_and_M(unique_kmers,
-=======
-        Z, H, M, f = estimate_optimal_with_N_and_M(unique_kmers,
->>>>>>> 0b4c59ecf47724ed03032176dfc596973ef8dca7
-                                                   mem * 1000000000)
+        Z, H, M, f = optimal_size(unique_kmers, M=mem*1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
     return "\n".join(to_print)
 
