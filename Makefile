@@ -24,9 +24,9 @@ CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR='!known_failing,!jenkins,!huge'
+	TESTATTR ?= '!known_failing,!jenkins,!huge'
 else
-	TESTATTR='!known_failing,!jenkins,!huge'
+	TESTATTR ?='!known_failing,!jenkins,!huge'
 endif
 
 ## all         : default task; compile C++ code, build shared object library
@@ -161,8 +161,7 @@ diff_pylint_report: pylint_report.txt
 # statement). So we run nose inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(wildcard khmer/_khmer*.so)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
-		-m nose --with-xunit --attr=\!known_failing,\!huge \
-		--processes=0
+		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
 
 coverage.xml: .coverage
 	coverage xml
