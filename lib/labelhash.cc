@@ -225,7 +225,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     // TODO: MAKE THREADSAFE!
 
                     if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
-                        printdbg(tag was not labeled: adding to labels...)
+printdbg(tag was not labeled: adding to labels...)
                         //ACQUIRE_TAG_COLORS_SPIN_LOCK
                         link_tag_and_label(kmer, current_label);
                         //RELEASE_TAG_COLORS_SPIN_LOCK
@@ -251,7 +251,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 #endif
             //
             if (since >= graph->_tag_density) {
-                printdbg(exceeded tag density: drop a tag and label --
+printdbg(exceeded tag density: drop a tag and label --
                          getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
@@ -272,7 +272,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             }
             printdbg(moving to next iter)
         } // iteration over kmers
-    printdbg(finished iteration: dropping last tag)
+printdbg(finished iteration: dropping last tag)
     if (since >= graph->_tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
         graph->all_tags.insert(kmer);	// insert the last k-mer, too.
@@ -424,16 +424,19 @@ void LabelHash::load_labels_and_tags(std::string filename)
     unsigned long n_labeltags = 1;
     try {
         unsigned int save_ksize = 0;
-	char signature[4];
+        char signature[4];
         unsigned char version = 0, ht_type = 0;
 
-	infile.read(signature, 4);
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-	if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
-            err << "Incorrect file signature " << signature
-                << " while reading labels/tags from " << filename
+            err << "Incorrect file signature 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " while reading labels/tags from " << filename
                 << " Should be: " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
