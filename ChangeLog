@@ -177,6 +177,11 @@
 
 2015-07-08  Luiz Irber  <khmer@luizirber.org>
 
+   * Makefile: Adapt Makefile rules for py3 changes.
+   * jenkins-build.sh: Read PYTHON_EXECUTABLE and TEST_ATTR from environment.
+
+2015-07-08  Luiz Irber  <khmer@luizirber.org>
+
    * lib/{counting,hashbits,hashtable,labelhash,subset}.cc: print hexadecimal
    representation of the signature read from the file.
 
