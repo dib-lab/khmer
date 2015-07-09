@@ -114,7 +114,7 @@ def test_normalize_by_median_sanity_check_2():
     args = ['-U', '83', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "*** INFO: set memory ceiling using atuo optimaztion." in err, err
+    assert "*** INFO: set memory ceiling using auto optimization." in err, err
     assert "*** Ceiling is: 399 bytes" in err, err
 
 
