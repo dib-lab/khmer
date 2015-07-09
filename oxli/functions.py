@@ -105,7 +105,7 @@ def do_sanity_checking(args, desired_max_fp):
                 print("*** Estimating false positive rate to be {0}".format(
                       res.fp_rate), file=sys.stderr)
             else:
-                print("*** INFO: set memory ceiling using atuo optimaztion.",
+                print("*** INFO: set memory ceiling using atuo optimization.",
                       file=sys.stderr)
                 print("*** Ceiling is: {0} bytes\n".format(res.mem_use),
                       file=sys.stderr)
