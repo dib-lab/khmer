@@ -111,7 +111,7 @@ def main():
           args.ksize, cardinality),
           file=sys.stderr)
 
-    if(args.diagnostics):
+    if args.diagnostics:
         to_print = output_gen(cardinality, args.error_rate)
         print(to_print)
 
