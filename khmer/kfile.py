@@ -149,7 +149,7 @@ def check_valid_file_exists(in_files):
     """
     for in_file in in_files:
         if os.path.exists(in_file):
-            if os.stat(in_file).st_size > 0:
+            if os.stat(in_file).st_size >= 0:
                 return
             else:
                 print('WARNING: Input file %s is empty' %

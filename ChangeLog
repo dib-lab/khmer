@@ -1,3 +1,8 @@
+2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
+   non-empty
+
 2015-07-08  Luiz Irber  <khmer@luizirber.org>
 
    * lib/{counting,hashbits,hashtable,labelhash,subset}.cc: print hexadecimal
