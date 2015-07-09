@@ -19,13 +19,13 @@ def estimate_optimal_with_N_and_M(N, M):
     Utility function for estimating optimal counting table args where N is the
     number of unique kmer and M is the allotted amount of memory
     """
-    Z = math.log(2)*(M/float(N))
+    Z = math.log(2) * (M / float(N))
     intZ = int(Z)
     if intZ == 0:
         intZ = 1
-    H = int(M/intZ)
-    M = H*intZ
-    f2 = (1-math.exp(-N/float(H)))**intZ
+    H = int(M / intZ)
+    M = H * intZ
+    f2 = (1 - math.exp(-N / float(H))) ** intZ
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
     return res(intZ, H, M, f2)
@@ -41,9 +41,9 @@ def estimate_optimal_with_N_and_f(N, f):
     if intZ == 0:
         intZ = 1
 
-    H1 = int(-N/(math.log(1-f**(1/float(intZ)))))
+    H1 = int(-N / (math.log(1 - f ** (1 / float(intZ)))))
     M1 = H1 * intZ
-    f1 = (1-math.exp(-N/float(H1)))**intZ
+    f1 = (1 - math.exp(-N / float(H1))) ** intZ
 
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
@@ -65,7 +65,8 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'expected_memory_usage')
 
     for fp_rate in range(1, 10):
-        Z, H, M, f = estimate_optimal_with_N_and_f(unique_kmers, fp_rate/10.0)
+        Z, H, M, f = estimate_optimal_with_N_and_f(
+            unique_kmers, fp_rate / 10.0)
         to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
@@ -77,7 +78,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
 
     for mem in mem_list:
         Z, H, M, f = estimate_optimal_with_N_and_M(unique_kmers,
-                                                   mem*1000000000)
+                                                   mem * 1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
     return "\n".join(to_print)
 

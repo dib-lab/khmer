@@ -10,8 +10,7 @@ namespace khmer
 {
 
 struct del_alignment_node_t {
-    del_alignment_node_t& operator()(AlignmentNode* p)
-    {
+    del_alignment_node_t& operator()(AlignmentNode* p) {
         delete p;
         return *this;
     }

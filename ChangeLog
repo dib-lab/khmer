@@ -1,9 +1,22 @@
-2015-07-07  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/functions.py: moved optimization/sanity check func to oxli
    * scripts/normalize-by-median.py,oxli/build_graph.py: added
    optimization/sanity checking via oxli estimation funcs
    * tests/test_normalize_by_median.py: updated tests to cover estimation funcs
+
+2015-07-08  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/{counting,hashbits,hashtable,labelhash,subset}.cc: print hexadecimal
+   representation of the signature read from the file.
+
+2015-07-06  Luiz Irber  <khmer@luizirber.org>
+
+   * sandbox/collect-reads.py: Set a default value for coverage based
+   on the docstring.
+   * sandbox/count-kmers-single.py, tests/test_{functions,script_arguments}.py:
+   Replace xrange and cStringIO (not Python 3 compatible).
+   * lib/*.{hh,cc}, oxli/functions.py, tests/*.py: make format.
 
 2015-07-05  Jaob Fenton  <bocajnotnef@gmail.com>
 

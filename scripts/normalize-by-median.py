@@ -284,7 +284,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
-        if args.unique_kmers is not 0:
+        if args.unique_kmers != 0:
             print('Warning: You have specified a number of unique kmers'
                   ' but are loading a precreated counting table--'
                   'argument optimization will NOT be done.', file=sys.stderr)

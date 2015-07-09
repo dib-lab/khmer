@@ -64,7 +64,7 @@ def test_normalize_by_median_unpaired_final_read():
     shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '-k', '17', '-p',  infile]
+    args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
