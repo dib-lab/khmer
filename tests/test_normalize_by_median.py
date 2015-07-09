@@ -101,7 +101,7 @@ def test_normalize_by_median_sanity_check_1():
         (status, out, err) = utils.runscript(script, args, in_dir)
     except AssertionError as e:
         out = str(e)
-        assert "Warning: The given tablesize is be too small!" in out, out
+        assert "Warning: The given tablesize is too small!" in out, out
 
 
 def test_normalize_by_median_sanity_check_2():

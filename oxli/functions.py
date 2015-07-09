@@ -93,14 +93,14 @@ def do_sanity_checking(args, desired_max_fp):
             if res.fp_rate > desired_max_fp:
                 print("""
 *** ERROR: The given restrictions yield an estimate false positive rate of {0},
-*** which is above the recommended false positive ceiling of 0.1!
-*** Aborting!""".format(res.fp_rate), file=sys.stderr)
+*** which is above the recommended false positive ceiling of {1}!
+*** Aborting!""".format(res.fp_rate, desired_max_fp), file=sys.stderr)
                 sys.exit(1)
         else:
             res = estimate_optimal_with_N_and_f(args.unique_kmers,
                                                 desired_max_fp)
             if args.max_tablesize and args.max_tablesize < res.htable_size:
-                print("*** Warning: The given tablesize is be too small!",
+                print("*** Warning: The given tablesize is too small!",
                       file=sys.stderr)
                 print("*** Estimating false positive rate to be {0}".format(
                       res.fp_rate), file=sys.stderr)
