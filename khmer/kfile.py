@@ -117,8 +117,8 @@ def check_space_for_hashtable(args, hashtype, force,
     """Check we have enough size to write a hash table."""
     hash_size = khmer_args._calculate_tablesize(args, hashtype)
 
-    cwd = os.getcwd()
-    dir_path = os.path.dirname(os.path.realpath(cwd))
+    #cwd = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(args.output_filename))
     target = os.statvfs(dir_path)
     if _testhook_free_space is None:
         free_space = target.f_frsize * target.f_bavail

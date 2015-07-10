@@ -24,7 +24,7 @@ from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
 from khmer.kfile import check_file_writable
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -84,7 +84,6 @@ def main():
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    check_space(args.input_sequence_filename, args.force)
     check_space_for_hashtable(args, 'countgraph', args.force)
 
     check_file_writable(base)
