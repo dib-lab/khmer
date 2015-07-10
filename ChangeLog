@@ -8,6 +8,10 @@
    default
    * tests/test_oxli_functions.py: changed to use renamed estimate functions
 
+2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/functions.py: added '--force' check to sanity check
+
 2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/functions.py: moved optimization/sanity check func to oxli
