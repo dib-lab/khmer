@@ -94,7 +94,7 @@ def do_sanity_checking(args, desired_max_fp):
                 print("""
 *** ERROR: The given restrictions yield an estimate false positive rate of {0},
 *** which is above the recommended false positive ceiling of {1}!"""
-.format(res.fp_rate, desired_max_fp), file=sys.stderr)
+                      .format(res.fp_rate, desired_max_fp), file=sys.stderr)
                 if not args.force:
                     print("*** Aborting...!", file=sys.stderr)
                     sys.exit(1)
