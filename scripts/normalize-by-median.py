@@ -26,7 +26,7 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
-
+from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -251,6 +251,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_fp = args.report
     force_single = args.force_single
 
+    # if optimization args are given, do optimization
+    args = oxutils.do_sanity_checking(args, 0.1)
+
     # check for similar filenames
     # if we're using a single output file only check for identical filenames
     # otherwise, check for identical BASE names as well.
@@ -281,6 +284,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
+        if args.unique_kmers != 0:
+            print('Warning: You have specified a number of unique kmers'
+                  ' but are loading a precreated counting table--'
+                  'argument optimization will NOT be done.', file=sys.stderr)
     else:
         print('making countgraph', file=sys.stderr)
         htable = khmer_args.create_countgraph(args)
