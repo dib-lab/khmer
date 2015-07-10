@@ -1,5 +1,15 @@
 2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
+   * oxli/functions.py: changed estimate functions to use correct letter
+   abbreviations
+   * sandbox/estimate_optimal_hash.py: changed to use renamed estimate 
+   functions
+   * sandbox/unique-kmers.py: changed to not output recommended HT args by
+   default
+   * tests/test_oxli_functions.py: changed to use renamed estimate functions
+
+2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
+
    * oxli/functions.py: added '--force' check to sanity check
 
 2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
@@ -22,7 +32,7 @@
    Replace xrange and cStringIO (not Python 3 compatible).
    * lib/*.{hh,cc}, oxli/functions.py, tests/*.py: make format.
 
-2015-07-05  Jaob Fenton  <bocajnotnef@gmail.com>
+2015-07-05  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 
    updates
