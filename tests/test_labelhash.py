@@ -106,7 +106,7 @@ def test_get_label_dict_save_load_wrong_ksize():
     try:
         lb.load_labels_and_tags(savepath)
         assert 0, "this should not succeed - different ksize"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
         assert "Incorrect k-mer size 19" in str(err)
 
@@ -136,7 +136,7 @@ def test_save_load_corrupted():
         try:
             lb.load_labels_and_tags(truncated)
             assert 0, "this should not succeed -- truncated file len %d" % (i,)
-        except IOError as err:
+        except OSError as err:
             print('expected failure for', i, ': ', str(err))
 
 
@@ -155,7 +155,7 @@ def test_save_fail_readonly():
     try:
         lb_pre.save_labels_and_tags(savepath)
         assert 0, "this should fail: read-only file"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
 
 
@@ -410,7 +410,7 @@ def test_load_wrong_filetype():
     try:
         lb.load_labels_and_tags(filename)
         assert 0, "this should not succeed - bad file type"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
         assert "Incorrect file format type" in str(err)
 
@@ -419,7 +419,7 @@ def test_load_wrong_filetype():
     try:
         lb.load_labels_and_tags(filename)
         assert 0, "this should not succeed - bad file signature"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
         assert "Incorrect file signature" in str(err)
 
@@ -432,6 +432,6 @@ def test_load_wrong_fileversion():
     try:
         lb.load_labels_and_tags(filename)
         assert 0, "this should not succeed - bad file type"
-    except IOError as err:
+    except OSError as err:
         print(str(err))
         assert "Incorrect file format version" in str(err)

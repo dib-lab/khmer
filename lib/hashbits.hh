@@ -26,8 +26,7 @@ protected:
     HashIntoType _n_overlap_kmers;
     Byte ** _counts;
 
-    virtual void _allocate_counters()
-    {
+    virtual void _allocate_counters() {
         _n_tables = _tablesizes.size();
 
         _counts = new Byte*[_n_tables];
@@ -44,8 +43,7 @@ protected:
 public:
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
         : khmer::Hashtable(ksize),
-          _tablesizes(tablesizes)
-    {
+          _tablesizes(tablesizes) {
         _occupied_bins = 0;
         _n_unique_kmers = 0;
         _n_overlap_kmers = 0;
@@ -53,8 +51,7 @@ public:
         _allocate_counters();
     }
 
-    ~Hashbits()
-    {
+    ~Hashbits() {
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 delete[] _counts[i];
@@ -69,13 +66,11 @@ public:
     }
 
     // Accessors for protected/private table info members
-    std::vector<HashIntoType> get_tablesizes() const
-    {
+    std::vector<HashIntoType> get_tablesizes() const {
         return _tablesizes;
     }
 
-    const size_t n_tables() const
-    {
+    const size_t n_tables() const {
         return _n_tables;
     }
 
@@ -99,14 +94,12 @@ public:
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const
-    {
+                                          HashIntoType stop=0) const {
         // @@ CTB need to be able to *save* this...
         return _occupied_bins/_n_tables;
     }
 
-    virtual const HashIntoType n_unique_kmers() const
-    {
+    virtual const HashIntoType n_unique_kmers() const {
         return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
     }
 
@@ -114,8 +107,7 @@ public:
     inline
     virtual
     BoundedCounterType
-    test_and_set_bits(const char * kmer)
-    {
+    test_and_set_bits(const char * kmer) {
         HashIntoType hash = _hash(kmer, _ksize);
         return test_and_set_bits(hash);
     }
@@ -128,8 +120,7 @@ public:
     inline
     virtual
     BoundedCounterType
-    test_and_set_bits( HashIntoType khash )
-    {
+    test_and_set_bits( HashIntoType khash ) {
         bool is_new_kmer = false;
 
         for (size_t i = 0; i < _n_tables; i++) {
@@ -153,19 +144,16 @@ public:
     } // test_and_set_bits
 
     virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,
-            HashIntoType stop=0) const
-    {
+            HashIntoType stop=0) const {
         return _n_overlap_kmers;	// @@ CTB need to be able to *save* this...
     }
 
-    virtual void count(const char * kmer)
-    {
+    virtual void count(const char * kmer) {
         HashIntoType hash = _hash(kmer, _ksize);
         count(hash);
     }
 
-    virtual void count(HashIntoType khash)
-    {
+    virtual void count(HashIntoType khash) {
         bool is_new_kmer = false;
 
         for (size_t i = 0; i < _n_tables; i++) {
@@ -183,8 +171,7 @@ public:
         }
     }
 
-    virtual bool check_overlap(HashIntoType khash, Hashbits &ht2)
-    {
+    virtual bool check_overlap(HashIntoType khash, Hashbits &ht2) {
 
         for (size_t i = 0; i < ht2._n_tables; i++) {
             HashIntoType bin = khash % ht2._tablesizes[i];
@@ -197,14 +184,12 @@ public:
         return true;
     }
 
-    virtual void count_overlap(const char * kmer, Hashbits &ht2)
-    {
+    virtual void count_overlap(const char * kmer, Hashbits &ht2) {
         HashIntoType hash = _hash(kmer, _ksize);
         count_overlap(hash,ht2);
     }
 
-    virtual void count_overlap(HashIntoType khash, Hashbits &ht2)
-    {
+    virtual void count_overlap(HashIntoType khash, Hashbits &ht2) {
         bool is_new_kmer = false;
 
         for (size_t i = 0; i < _n_tables; i++) {
@@ -226,15 +211,13 @@ public:
     }
 
     // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * kmer) const
-    {
+    virtual const BoundedCounterType get_count(const char * kmer) const {
         HashIntoType hash = _hash(kmer, _ksize);
         return get_count(hash);
     }
 
     // get the count for the given k-mer hash.
-    virtual const BoundedCounterType get_count(HashIntoType khash) const
-    {
+    virtual const BoundedCounterType get_count(HashIntoType khash) const {
         for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType bin = khash % _tablesizes[i];
             HashIntoType byte = bin / 8;
@@ -247,8 +230,7 @@ public:
         return 1;
     }
     // accessors to get table info
-    const HashIntoType n_entries() const
-    {
+    const HashIntoType n_entries() const {
         return _tablesizes[0];
     }
 

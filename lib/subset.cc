@@ -99,7 +99,12 @@ size_t SubsetPartition::output_partitioned_file(
     //
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
+
         seq = read.sequence;
 
         if (_ht->check_and_normalize_read(seq)) {
@@ -205,7 +210,11 @@ unsigned int SubsetPartition::find_unpart(
     //
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (_ht->check_and_normalize_read(seq)) {
@@ -1283,8 +1292,11 @@ void SubsetPartition::merge_from_disk(string other_filename)
         infile.read((char *) &ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
-            err << "Incorrect file signature " << signature
-                << " while reading subset pmap from " << other_filename
+            err << "Incorrect file signature 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " while reading subset pmap from " << other_filename
                 << " Should be: " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {

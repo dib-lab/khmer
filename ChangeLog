@@ -1,8 +1,94 @@
+2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/functions.py: moved optimization/sanity check func to oxli
+   * scripts/normalize-by-median.py,oxli/build_graph.py: added
+   optimization/sanity checking via oxli estimation funcs
+   * tests/test_normalize_by_median.py: updated tests to cover estimation funcs
+
+2015-07-08  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/{counting,hashbits,hashtable,labelhash,subset}.cc: print hexadecimal
+   representation of the signature read from the file.
+
+2015-07-06  Luiz Irber  <khmer@luizirber.org>
+
+   * sandbox/collect-reads.py: Set a default value for coverage based
+   on the docstring.
+   * sandbox/count-kmers-single.py, tests/test_{functions,script_arguments}.py:
+   Replace xrange and cStringIO (not Python 3 compatible).
+   * lib/*.{hh,cc}, oxli/functions.py, tests/*.py: make format.
+
+2015-07-05  Jaob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 
+   updates
+
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * Makefile: fix cppcheck invocation
+   * khmer/_khmer.cc: switch to prefix increment for non-primitive objects,
+   use a C++ cast, adjust scope
+   * lib/hashtable.{hh,cc}: make copy constructor no-op explicit. adjust scope
+   * lib/{ht-diff,test-HashTables,test-Parser}.cc: remove unused test code
+   * lib/labelhash.cc,hllcounter.cc: astyle reformatting
+   * lib/read_parsers.hh: more explicit constructors
+
+2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * sandbox/{collect-variants,optimal_args_hashbits,sweep-files}.py:
+   update API usage
+
+2015-07-05  Titus Brown  <titus@idyll.org>
+
+   * sandbox/{count-kmers.py,count-kmers-single.py}: added scripts to output
+   k-mer counts.
+   * tests/test_sandbox_scripts.py: added tests for count-kmers.py and
+   count-kmers-single.py.
+   * sandbox/README.rst: added count-kmers.py and count-kmers-single.py to
+   sandbox/README.
+
+2015-07-05  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/*.{cc,hh},sandbox/*.py,khmer/_khmer.cc,tests/test_*.py: Simplify
+   exception hierarchy, and ensure all C++ exceptions are converted to python
+   errors.
+   * scripts/normalize-by-median.py: Clarify error message.
+   * tests/khmer_tst_utils.py: Add longify function, converts int => long on
+   py2, and passes thru list unmodified on py3.
+
+2015-06-30  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/{test_script_arguments,test_functions}.py: changed tests to use
+   stderr redirection to prevent leaks
+   * tests/test_normalize_by_median.py: changed to not duplicate a test
+   * tests/test_script_arguments.py: changed tests to use stderr redirection
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * tests/test_normalize_by_median.py: disabled running
+   test_normalize_by_median_report_fp during normal test running.
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * khmer/khmer_args.py: removed incorrect warning for default max_tablesize
+   when -M is used.
+   * tests/test_scripts.py: added test for correct max_tablesize behavior.
+
+2015-06-30  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: changed 'stop=TRUE' to 'stop=FALSE', so that tests do not
+   stop running at first failure.
+
+2015-06-30  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/{extract-paired-reads,split-paired-reads}.py: Fix creation of
+   default output files even when output files were provided on CLI.
+
 2015-06-29  Sherine Awad  <drmahmoud@ucdavis.edu>
 
-   * Fix bug in naming in interleave-reads.py
-   * Add a test function for the new behavior
-   * Add 3 test files needed for the testing
+   * khmer/utils.py: Fix bug in naming in interleave-reads.py
+   * tests/test_scripts.py: Add a test function for the new behavior
+   * tests/test-data/*.fq: Add 3 test files needed for the testing
 
 2015-06-28  Jacob Fenton  <bocajnotnef@gmail.com>
 
@@ -13,6 +99,11 @@
 
    * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox 
    methods for estimating memory usage based on desired fp rate, etc.
+
+2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
+
+   * doc/dev/binary-file-formats.rst: Fix issue in ksize documentation for
+   Countgraph
 
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
 

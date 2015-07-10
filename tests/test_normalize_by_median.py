@@ -52,7 +52,7 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-    assert "IOErrors" not in err
+    assert "I/O Errors" not in err
 
 
 def test_normalize_by_median_unpaired_final_read():
@@ -64,13 +64,58 @@ def test_normalize_by_median_unpaired_final_read():
     shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '-k', '17', '-p',  infile]
+    args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
     except AssertionError as e:
         out = str(e)
         assert "ERROR: Unpaired reads when require_paired" in out, out
+
+
+def test_normalize_by_median_sanity_check_0():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '1024', '--max-mem', '60',  infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
+    except AssertionError as e:
+        out = str(e)
+        assert "recommended false positive ceiling of 0.1!" in out, out
+
+
+def test_normalize_by_median_sanity_check_1():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '83', '--max-tablesize', '17', infile]
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+    except AssertionError as e:
+        out = str(e)
+        assert "Warning: The given tablesize is too small!" in out, out
+
+
+def test_normalize_by_median_sanity_check_2():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-U', '83', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "*** INFO: set memory ceiling using auto optimization." in err, err
+    assert "*** Ceiling is: 399 bytes" in err, err
 
 
 def test_normalize_by_median_unforced_badfile():
@@ -124,7 +169,7 @@ def test_normalize_by_median_stdout_3():
 
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'in /dev/stdout' in err, err
-    assert "IOErrors" not in err
+    assert "I/O Errors" not in err
 
 
 @attr('known_failing')
@@ -151,6 +196,7 @@ def test_normalize_by_median_known_good():
         assert False
 
 
+@attr('huge')
 def test_normalize_by_median_report_fp():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -364,7 +410,7 @@ def test_normalize_by_median_force():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert '*** Skipping' in err
-    assert '** IOErrors' in err
+    assert '** I/O Errors' in err
 
 
 def test_normalize_by_median_no_bigcount():
@@ -572,7 +618,6 @@ def test_diginorm_basic_functionality_4():
     # should be kept.
 
     CUTOFF = ['-C', '1']
-    PAIRING = ['-p']
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -581,7 +626,8 @@ def test_diginorm_basic_functionality_4():
                     infile)
 
     script = 'normalize-by-median.py'
-    args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
+    args = list(CUTOFF) + ['-k', '15', infile]
+
     _, out, err = utils.runscript(script, args, in_dir)
     print(out)
     print(err)
@@ -597,7 +643,7 @@ def test_diginorm_basic_functionality_4():
                         'd/2']), seqs
 
 
-def test_diginorm_basic_functionality_4():
+def test_diginorm_basic_functionality_5():
     # each of these pairs has both a multicopy sequence ('ACTTCA...') and
     # a random sequence.  With 'C=1' and '-p', all should be
     CUTOFF = ['-C', '1']

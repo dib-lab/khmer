@@ -13,10 +13,14 @@ DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
+	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
+	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
+	 --file-list=- --platform=unix64 --std=c++11 --inline-suppr \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
-	 -Ithird-party/smhasher
+	 -Ithird-party/smhasher -I/usr/include/python3.4m -DHAVE_SSIZE_T \
+	 -D__linux__ -D__x86_64__ -D__LP64__ -I/usr/include \
+	 -I/usr/include/x86_64-linux-gnu/ -I/usr/include/linux \
+	 -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include/
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
