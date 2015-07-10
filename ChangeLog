@@ -2,6 +2,8 @@
 
    * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
    non-empty
+   * tests/test_normalize_by_median.py: added test
+   * oxli/functions.py: fixed bad function name
 
 2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 

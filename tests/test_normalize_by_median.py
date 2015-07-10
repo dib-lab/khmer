@@ -520,6 +520,7 @@ def test_normalize_by_median_streaming():
     with open(outfile) as fp:
         linecount = sum(1 for _ in fp)
     assert linecount == 400
+    assert "WARNING: Input file fifo is empty" not in err, err
 
 
 def test_diginorm_basic_functionality_1():
