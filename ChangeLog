@@ -4,7 +4,7 @@
    abbreviations
    * sandbox/estimate_optimal_hash.py: changed to use renamed estimate 
    functions
-   * sandbox/unique-kmers.py: changed to not output reccomended HT args by
+   * sandbox/unique-kmers.py: changed to not output recommended HT args by
    default
    * tests/test_oxli_functions.py: changed to use renamed estimate functions
 
