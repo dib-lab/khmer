@@ -47,6 +47,9 @@ def get_parser():
     :option:`-p`/:option:`--force-paired` will require the input file to
     be properly interleaved; by default, this is not required.
 
+    :option:`-0`/:option:'`--output-orphans` will separate orphans into 
+    the specified file
+
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
@@ -70,7 +73,9 @@ def get_parser():
                         dest='output_directory', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
-
+    parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
+                        default=None, help='Output "orphaned" reads to this '
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
                         'file', type=argparse.FileType('w'))
@@ -126,6 +131,10 @@ def main():
         # Use default filename created above
         fp_out2 = open(out2, 'w')
 
+    if args.output_orphaned:
+        fp_out0 = args.output_orphaned
+        out0 = fp_out0.name
+
     counter1 = 0
     counter2 = 0
     index = None
@@ -151,17 +160,22 @@ def main():
             counter2 += 1
         else:
             name = record1.name
+            fp_out = fp_out1
+
             if check_is_left(name):
-                write_record(record1, fp_out1)
                 counter1 += 1
             elif check_is_right(name):
-                write_record(record1, fp_out2)
                 counter2 += 1
+                fp_out = fp_out1
             else:
                 print("Unrecognized format for read pair information: %s" %
                       name, file=sys.stderr)
                 print("Exiting.", file=sys.stderr)
                 sys.exit(1)
+            if args.output_orphaned:
+                fp_out = fp_out0
+            
+            write_record(record1, fp_out)
 
     print("DONE; split %d sequences (%d left, %d right)" %
           (counter1 + counter2, counter1, counter2), file=sys.stderr)
