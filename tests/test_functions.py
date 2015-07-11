@@ -14,6 +14,7 @@ from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
 from khmer.kfile import check_input_files
+from cStringIO import StringIO
 
 
 def test_forward_hash():
@@ -153,19 +154,32 @@ def test_extract_hashbits_info():
 def test_check_file_status_kfile():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     check_file_status_exited = False
+
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
         check_input_files(fn, False)
     except SystemExit:
-        check_file_status_exited = True
-    assert check_file_status_exited
+        assert "does not exist" in capture.getvalue(), capture.getvalue()
+    finally:
+        sys.stderr = old_stderr
 
 
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
+
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
         check_input_files(fn, True)
     except OSError:
         assert False
+    finally:
+        sys.stderr = old_stderr
+
+    assert "does not exist" in capture.getvalue(), capture.getvalue()
 
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])

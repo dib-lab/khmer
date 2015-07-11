@@ -53,8 +53,8 @@ Magic string        4       0   ``OXLI`` (``SAVED_SIGNATURE``)
 Version             1       4   ``0x04`` (``SAVED_FORMAT_VERSION``)
 File Type           1       5   ``0x01`` (``SAVED_COUNTING_HT``)
 Use Bigcount        1       6   ``0x01`` if bigcounts is used, else ``0x00``
-K-size              1       7   k-mer length, ``ht._ksize``. [``uint8_t``]
-Number of Tables    1       8   Number of Count-min Sketch tables,
+K-size              4       7   k-mer length, ``ht._ksize``. [``uint32_t``]
+Number of Tables    1      11   Number of Count-min Sketch tables,
                                 ``ht._n_tables``. [``uint8_t``]
 ================== ===== ===== ==============================================
 

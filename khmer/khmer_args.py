@@ -132,15 +132,15 @@ def add_loadhash_args(parser):
 
 def _calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type: %s" % (hashtype,)
+        raise Exception("unknown graph type: %s" % (hashtype,))
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
-                        float(multiplier)
+                float(multiplier)
         elif hashtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
-                        float(multiplier)
+                float(multiplier)
     else:
         tablesize = args.max_tablesize
 
@@ -177,7 +177,7 @@ def report_on_config(args, hashtype='countgraph'):
     """
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception, "unknown graph type: %s" % (hashtype,)
+        raise Exception("unknown graph type: %s" % (hashtype,))
 
     if args.quiet:
         return
@@ -195,17 +195,17 @@ def report_on_config(args, hashtype='countgraph'):
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize)".format(
-                args.n_tables * args.max_tablesize))
+                args.n_tables * tablesize))
     elif hashtype == 'nodegraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize / 8)".format(args.n_tables *
-                                                    args.max_tablesize / 8)
+                                                    tablesize / 8)
         )
 
     print_error("-" * 8)
 
-    if DEFAULT_MAX_TABLESIZE == args.max_tablesize and \
+    if DEFAULT_MAX_TABLESIZE == tablesize and \
        not getattr(args, 'loadtable', None):
         print_error('''\
 
