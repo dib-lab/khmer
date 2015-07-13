@@ -74,8 +74,9 @@ def get_parser():
                         'split reads to specified directory. Creates '
                         'directory if necessary')
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
-                        default=None, help='Output "orphaned" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        nargs='?', default=False, const=True, 
+                        help='Output "orphaned" reads to this file',
+                        type=argparse.FileType('w'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
                         'file', type=argparse.FileType('w'))
@@ -101,21 +102,28 @@ def main():
     filenames = [infile]
     check_input_files(infile, args.force)
     check_space(filenames, args.force)
-
+    out0 = None
+    fp_out0 = None
     # decide where to put output files - specific directory? or just default?
     if infile == '/dev/stdin' or infile == '-':
-        if not (args.output_first and args.output_second):
+        if not (args.output_first and args.output_second
+                and args.output_orphaned is not True
+                and args.output_orphaned is not False):
             print >>sys.stderr, ("Accepting input from stdin; "
                                  "output filenames must be provided.")
             sys.exit(1)
     elif args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
-        out1 = args.output_directory + '/' + os.path.basename(infile) + '.1'
-        out2 = args.output_directory + '/' + os.path.basename(infile) + '.2'
+        out1 = os.path.join(args.output_directory, os.path.basename(infile) + '.1')
+        out2 = os.path.join(args.output_directory, os.path.basename(infile) + '.2')
+        if args.output_orphaned is True:
+            out0 = os.path.join(args.output_directory, os.path.basename(infile) + '.0')
     else:
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
+        if args.output_orphaned is True:
+            out0 = os.path.basename(infile) + '.0'
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
@@ -131,9 +139,11 @@ def main():
         # Use default filename created above
         fp_out2 = open(out2, 'w')
 
-    if args.output_orphaned:
+    if args.output_orphaned is not True and args.output_orphaned is not False:
         fp_out0 = args.output_orphaned
         out0 = fp_out0.name
+    elif args.output_orhpaned is True:
+        fp_out0 = open(out0, 'w')
 
     counter1 = 0
     counter2 = 0
@@ -172,7 +182,7 @@ def main():
                       name, file=sys.stderr)
                 print("Exiting.", file=sys.stderr)
                 sys.exit(1)
-            if args.output_orphaned:
+            if fp_out0 is not None:
                 fp_out = fp_out0
             
             write_record(record1, fp_out)
