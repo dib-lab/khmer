@@ -102,7 +102,7 @@ def do_sanity_checking(args, desired_max_fp):
     if args.unique_kmers != 0:
         if args.max_memory_usage:
             # verify that this is a sane memory usage restriction
-            res = estimate_optimal_with_N_and_M(args.unique_kmers,
+            res = estimate_optimal_with_K_and_M(args.unique_kmers,
                                                 args.max_memory_usage)
             if res.fp_rate > desired_max_fp:
                 print("""
@@ -113,7 +113,7 @@ def do_sanity_checking(args, desired_max_fp):
                     print("*** Aborting...!", file=sys.stderr)
                     sys.exit(1)
         else:
-            res = estimate_optimal_with_N_and_f(args.unique_kmers,
+            res = estimate_optimal_with_K_and_f(args.unique_kmers,
                                                 desired_max_fp)
             if args.max_tablesize and args.max_tablesize < res.htable_size:
                 print("*** Warning: The given tablesize is too small!",
