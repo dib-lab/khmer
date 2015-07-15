@@ -495,7 +495,7 @@ def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
     ofile.close()
 
 
-def test_normalize_by_median_streaming():
+def test_normalize_by_median_streaming_0():
     CUTOFF = '20'
 
     infile = utils.get_test_data('100-reads.fq.gz')
@@ -520,7 +520,32 @@ def test_normalize_by_median_streaming():
     with open(outfile) as fp:
         linecount = sum(1 for _ in fp)
     assert linecount == 400
-    assert "WARNING: Input file fifo is empty" not in err, err
+
+
+def test_normalize_by_median_streaming_1():
+    CUTOFF = '20'
+
+    infile = utils.get_test_data('test-filter-abund-Ns.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    outfile = utils.get_temp_filename('outfile')
+
+    # Use a fifo to copy stdout to a file for checking
+    os.mkfifo(fifo)
+    thread = threading.Thread(target=write_by_chunks, args=(infile, fifo))
+    thread.start()
+
+    # Execute diginorm
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '17', '-o', outfile, fifo]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    # Merge the thread
+    thread.join()
+
+    assert os.path.exists(outfile), outfile
+    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'fifo is empty' not in err, err
 
 
 def test_diginorm_basic_functionality_1():
