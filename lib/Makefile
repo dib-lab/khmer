@@ -144,6 +144,8 @@ SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
 SONAME_FLAGS = -Wl,-soname=$(SONAME)
 endif
 
+# The ABI version of liboxli
+LIBVERSION = 1
 LIBKHMERSO=liboxli.$(SHARED_EXT).$(LIB_VERSION)
 
 CXXFLAGS += -DVERSION=$(VERSION)
