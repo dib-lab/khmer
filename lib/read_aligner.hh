@@ -112,7 +112,7 @@ struct AlignmentNode {
         :prev(_prev), base(_emission), seq_idx(_seq_idx),
          state(_state), trans(_trans), fwd_hash(_fwd_hash),
          rc_hash(_rc_hash), score(0), f_score(0), h_score(0), trusted(false),
-         num_indels(0), length(_length) {}
+         cov(0), num_indels(0), length(_length) {}
 
     bool operator== (const AlignmentNode& rhs) const {
         return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
