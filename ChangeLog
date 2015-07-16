@@ -1,3 +1,13 @@
+2015-07-16  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/{kfile,khmer_args}.py: refactored information passing, made it so
+   space checks happen in the right directory
+   * oxli/build_graph.py,sandbox/collect-reads.py,scripts/{count-overlap,
+   abundance-dist-single,filter-abund-single,load-into-counting,
+   make-initial-stoptags,normalize-by-median,partition-graph,
+   sample-reads-randomly,trim-low-abund}.py,tests/test_script_arguments.py:
+   changed to use new arg structure
+
 2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/functions.py: changed estimate functions to use correct letter
