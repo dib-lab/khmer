@@ -71,6 +71,8 @@ def get_parser():
     parser.add_argument('--stream-out', '-S', default=False,
                         action='store_true')
 
+    parser.add_argument('--diagnostics', default=False, action='store_true')
+
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
 
@@ -108,9 +110,10 @@ def main():
     print('Total estimated number of unique {0}-mers: {1}'.format(
           args.ksize, cardinality),
           file=sys.stderr)
-    
-    to_print = output_gen(cardinality, args.error_rate)
-    print(to_print)
+
+    if args.diagnostics:
+        to_print = output_gen(cardinality, args.error_rate)
+        print(to_print)
 
     if report_fp:
         print(cardinality, args.ksize, 'total', file=report_fp)
