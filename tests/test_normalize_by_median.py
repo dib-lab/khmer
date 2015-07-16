@@ -32,6 +32,20 @@ def test_normalize_by_median_indent():
     assert os.path.exists(outfile)
 
 
+def test_normalize_by_median_empty_file():
+    infile = utils.get_temp_filename('empty')
+    shutil.copyfile(utils.get_test_data('empty-file'), infile)
+    script = 'normalize-by-median.py'
+    in_dir = os.path.dirname(infile)
+
+    args = [infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'WARNING:' in err, err
+    assert 'is empty' in err, err
+    assert 'SKIPPED' in err, err
+
+
 def test_normalize_by_median():
     CUTOFF = '1'
 
