@@ -27,7 +27,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.khmer_args import info
 from khmer.utils import write_record, broken_paired_reader
 
@@ -84,8 +84,6 @@ def main():
 
     for _ in args.filenames:
         check_input_files(_, args.force)
-
-    check_space(args.filenames, args.force)
 
     # seed the random number generator?
     if args.random_seed:

@@ -25,8 +25,7 @@ import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
-from khmer.kfile import (check_input_files, check_space,
-                         check_space_for_hashtable)
+from khmer.kfile import (check_input_files, check_space_for_hashtable)
 
 
 def get_parser():
@@ -78,7 +77,6 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)
-    check_space([args.input_sequence_filename], args.force)
     if args.savetable:
         check_space_for_hashtable(args, 'countgraph', args.force)
 
