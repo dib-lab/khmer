@@ -46,13 +46,16 @@ def test_check_space():
 
 
 def test_check_tablespace():
+    outfile = utils.get_test_data('truncated.fq')
     save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(args, 'countgraph', force=False,
+        khmer.kfile.check_space_for_hashtable(outfile, 'countgraph',
+                                              False, args.n_tables,
+                                              args.max_tablesize,
                                               _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
@@ -78,11 +81,15 @@ def test_check_space_force():
 def test_check_tablespace_force():
     save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
+    outfile = utils.get_test_data('truncated')
+
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(args, 'countgraph', True,
+        khmer.kfile.check_space_for_hashtable(outfile, 'countgraph', True,
+                                              args.n_tables,
+                                              args.max_tablesize,
                                               _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
@@ -265,7 +272,9 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     try:
-        nodegraph = khmer_args._calculate_tablesize(args, 'foograph')
+        nodegraph = khmer_args._calculate_tablesize(max_tablesize, n_tables,
+                                                    'foograph',
+                                                    max_memory_use=max_mem)
         assert 0, "previous statement should fail"
     except AssertionError:
         raise

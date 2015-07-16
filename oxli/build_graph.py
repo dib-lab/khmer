@@ -55,8 +55,8 @@ def main(args):
     args = functions.do_sanity_checking(args, 0.01)
 
     check_space(args.input_filenames, args.force)
-    check_space_for_hashtable(output_filename, 'nodegraph', args.force,
-                              args.n_tables, ars.max_tablesize,
+    check_space_for_hashtable(args.output_filename, 'nodegraph', args.force,
+                              args.n_tables, args.max_tablesize,
                               args.max_memory_usage)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)

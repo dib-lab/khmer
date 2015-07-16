@@ -84,7 +84,7 @@ def main():
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    check_space_for_hashtable(args.output_countingtable_filename, 'countgraph', 
+    check_space_for_hashtable(args.output_countingtable_filename, 'countgraph',
                               args.force, args.n_tables, args.max_tablesize,
                               args.max_memory_usage)
 
@@ -125,7 +125,9 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args, 'countgraph', args.force)
+            check_space_for_hashtable(base, 'countgraph', args.force,
+                                      args.n_tables, args.max_tablesize,
+                                      args.max_memory_usage)
             print('mid-save', base, file=sys.stderr)
 
             htable.save(base)

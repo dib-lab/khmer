@@ -77,7 +77,9 @@ def main():
         check_input_files(name, False)
 
     check_space(args.input_sequence_filename, False)
-    check_space_for_hashtable(args, 'countgraph', False)
+    check_space_for_hashtable(args.output_countingtable_filename, 'countgraph',
+                              False, args.n_tables, args.max_tablesize,
+                              args.max_memory_usage)
 
     print('Saving k-mer counting table to %s' % base)
     print('Loading sequences from %s' % repr(filenames))

@@ -158,7 +158,9 @@ def create_nodegraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = _calculate_tablesize(args, 'nodegraph', multiplier=multiplier)
+    tablesize = _calculate_tablesize(args.max_tablesize, args.n_tables,
+                                     'nodegraph', multiplier,
+                                     args.max_memory_usage)
     return khmer.Hashbits(ksize, tablesize, args.n_tables)
 
 
@@ -169,7 +171,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = _calculate_tablesize(args.max_tablesize, args.n_tables, 
+    tablesize = _calculate_tablesize(args.max_tablesize, args.n_tables,
                                      'countgraph', multiplier=multiplier,
                                      max_memory_use=args.max_memory_usage)
     return khmer.CountingHash(ksize, tablesize, args.n_tables)
@@ -188,8 +190,9 @@ def report_on_config(args, hashtype='countgraph'):
     if args.quiet:
         return
 
-    tablesize = _calculate_tablesize(args.max_tablesize, args.n_tables, 
-            hashtype, max_memory_use=args.max_memory_usage)
+    tablesize = _calculate_tablesize(args.max_tablesize, args.n_tables,
+                                     hashtype,
+                                     max_memory_use=args.max_memory_usage)
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))

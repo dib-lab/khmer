@@ -126,7 +126,9 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        check_space_for_hashtable(args.savetable, 'countgraph', args.force,
+                                  args.n_tables, args.max_tablesize,
+                                  args.max_memory_usage)
 
     if args.loadtable:
         print('loading countgraph from', args.loadtable, file=sys.stderr)
