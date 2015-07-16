@@ -84,7 +84,9 @@ def main():
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    check_space_for_hashtable(args, 'countgraph', args.force)
+    check_space_for_hashtable(args.output_countingtable_filename, 'countgraph', 
+                              args.force, args.n_tables, args.max_tablesize,
+                              args.max_memory_usage)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
