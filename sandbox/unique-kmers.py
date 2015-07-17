@@ -23,6 +23,7 @@ import textwrap
 
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
+from khmer.utils import write_record
 from oxli.functions import optimal_args_output_gen as output_gen
 from khmer import __version__
 import screed
