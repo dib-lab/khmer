@@ -3282,7 +3282,7 @@ def test_unique_kmers_diagnostics():
             'size_hashtable(H)\texpected_memory_usage' in out)
 
 
-def test_unique_kmers_stream_out():
+def test_unique_kmers_stream_out_fasta():
     infile = utils.get_temp_filename('random-20-a.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
 
@@ -3300,6 +3300,27 @@ def test_unique_kmers_stream_out():
     out = out.read()
     assert '>45' in out
     assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
+
+
+def test_unique_kmers_stream_out_fastq_with_N():
+    infile = utils.get_temp_filename('test-filter-abund-Ns.fq')
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    args = '-k 20 -e 0.01 --stream-out -'
+
+    _, out, err = utils.runscriptredirect('unique-kmers.py', args, infile,
+                                          os.path.dirname(infile))
+
+    err.seek(0)
+    err = err.read()
+    assert 'Estimated number of unique 20-mers in -: 94' in err
+    assert 'Total estimated number of unique 20-mers: 94' in err
+
+    out.seek(0)
+    out = out.read()
+    assert '@895:1:37:17593:9954 1::FOO_withN' in out
+    assert "GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGNGACAGCAGCCGCAGCTGTCGTCA" in out
+    assert "##########################################################" in out
 
 
 def test_unique_kmers_multiple_inputs():
