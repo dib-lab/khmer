@@ -1,3 +1,10 @@
+2015-08-10  Luiz Irber  <khmer@luizirber.org>
+
+   * scripts/unique-kmers.py: use consume_fasta again.
+   * khmer/_khmer.cc: expose output_records option on HLLCounter consume_fasta.
+   * lib/hllcounter.{cc,hh}: implement output_records in HLLCounter
+   consume_fasta, add utility function write_record.
+
 2015-08-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/khmer_args.py: pep8
