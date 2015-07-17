@@ -1,5 +1,12 @@
 2015-07-17  Luiz Irber  <khmer@luizirber.org>
 
+   * scripts/unique-kmers.py: use consume_fasta again.
+   * khmer/_khmer.cc: expose output_records option on HLLCounter consume_fasta.
+   * lib/hllcounter.{cc,hh}: implement output_records in HLLCounter
+   consume_fasta, add utility function write_record.
+
+2015-07-17  Luiz Irber  <khmer@luizirber.org>
+
    * scripts/unique-kmers.py: fix import bug and initialize to_print earlier.
    * tests/test_scripts: add tests for unique-kmers.py.
    * sandbox/unique-kmers.py: moved to scripts.
