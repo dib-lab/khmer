@@ -3238,10 +3238,12 @@ def test_unique_kmers_defaults():
 
     args = ['-k', '20', '-e', '0.01', infile]
 
-    _, out, err = utils.runscript('unique-kmers.py', args, os.path.dirname(infile))
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
 
     err = err.splitlines()
-    assert 'Estimated number of unique 20-mers in {0}: 3950'.format(infile) in err
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
     assert 'Total estimated number of unique 20-mers: 3950' in err
 
 
@@ -3252,10 +3254,12 @@ def test_unique_kmers_report_fp():
 
     args = ['-k', '20', '-e', '0.01', '-R', outfile, infile]
 
-    _, out, err = utils.runscript('unique-kmers.py', args, os.path.dirname(infile))
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
 
     err = err.splitlines()
-    assert 'Estimated number of unique 20-mers in {0}: 3950'.format(infile) in err
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
     assert 'Total estimated number of unique 20-mers: 3950' in err
 
     with open(outfile, 'r') as report_fp:
@@ -3270,7 +3274,8 @@ def test_unique_kmers_diagnostics():
 
     args = ['-k', '20', '-e', '0.01', '--diagnostics', infile]
 
-    _, out, err = utils.runscript('unique-kmers.py', args, os.path.dirname(infile))
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
 
     out = out.splitlines()
     assert ('expected_fp\tnumber_hashtable(Z)\t'
@@ -3283,10 +3288,12 @@ def test_unique_kmers_stream_out():
 
     args = ['-k', '20', '-e', '0.01', '--stream-out', infile]
 
-    _, out, err = utils.runscript('unique-kmers.py', args, os.path.dirname(infile))
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
 
     err = err.splitlines()
-    assert 'Estimated number of unique 20-mers in {0}: 3950'.format(infile) in err
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
     assert 'Total estimated number of unique 20-mers: 3950' in err
 
     out = out.splitlines()
@@ -3304,11 +3311,14 @@ def test_unique_kmers_stream_out_multiple_inputs():
     args = ['-k', '20', '-e', '0.01', '--stream-out']
     args += infiles
 
-    _, out, err = utils.runscript('unique-kmers.py', args, os.path.dirname(infile))
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
 
     err = err.splitlines()
-    assert 'Estimated number of unique 20-mers in {0}: 3950'.format(infiles[0]) in err
-    assert 'Estimated number of unique 20-mers in {0}: 232'.format(infiles[1]) in err
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infiles[0])
+            in err)
+    assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
+            in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
 
     out = out.splitlines()

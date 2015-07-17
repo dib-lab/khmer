@@ -28,6 +28,7 @@ from oxli.functions import optimal_args_output_gen as output_gen
 from khmer import __version__
 import screed
 
+
 def get_parser():
     descr = "Estimate number of unique k-mers, with precision <= ERROR_RATE."
     epilog = ("""
@@ -76,7 +77,6 @@ def get_parser():
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-
 
     return parser
 
