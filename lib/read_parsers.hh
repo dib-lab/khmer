@@ -22,28 +22,28 @@ namespace read_parsers
 {
 
 struct NoMoreReadsAvailable : public  khmer_file_exception {
-    explicit NoMoreReadsAvailable(const char *msg) :
+    explicit NoMoreReadsAvailable(const std::string& msg) :
         khmer_file_exception(msg) {}
     NoMoreReadsAvailable() :
         khmer_file_exception("No more reads available in this stream.") {}
 };
 
 struct InvalidRead : public  khmer_value_exception {
-    explicit InvalidRead(const char *msg) :
+    explicit InvalidRead(const std::string& msg) :
         khmer_value_exception(msg) {}
     InvalidRead() :
         khmer_value_exception("Invalid FASTA/Q read") {}
 };
 
 struct UnknownPairReadingMode : public  khmer_value_exception {
-    explicit UnknownPairReadingMode(const char *msg) :
+    explicit UnknownPairReadingMode(const std::string& msg) :
         khmer_value_exception(msg) {}
     UnknownPairReadingMode() :
         khmer_value_exception("Unknown pair reading mode supplied.") {}
 };
 
 struct InvalidReadPair : public  khmer_value_exception {
-    explicit InvalidReadPair(const char *msg) :
+    explicit InvalidReadPair(const std::string& msg) :
         khmer_value_exception(msg) {}
     InvalidReadPair() :
         khmer_value_exception("Invalid read pair detected.") {}
@@ -56,7 +56,8 @@ struct Read {
     std:: string    quality;
     // TODO? Add description field.
 
-    inline void reset ( ) {
+    inline void reset ( )
+    {
         name.clear( );
         annotations.clear( );
         sequence.clear( );
@@ -89,7 +90,8 @@ struct IParser {
     //	     upon return.
     // TODO: Eliminate all calls to 'get_next_read'.
     // Or switch to C++11 w/ move constructors
-    inline Read		get_next_read( ) {
+    inline Read		get_next_read( )
+    {
         Read the_read;
         imprint_next_read( the_read );
         return the_read;
@@ -101,7 +103,8 @@ struct IParser {
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
-    size_t		    get_num_reads() {
+    size_t		    get_num_reads()
+    {
         return _num_reads;
     }
 

@@ -40,7 +40,8 @@ protected:
 
     Byte ** _counts;
 
-    virtual void _allocate_counters() {
+    virtual void _allocate_counters()
+    {
         _n_tables = _tablesizes.size();
 
         _counts = new Byte*[_n_tables];
@@ -54,7 +55,8 @@ public:
 
     CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _n_unique_kmers(0) {
+        _bigcount_spin_lock(false), _n_unique_kmers(0)
+    {
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
@@ -62,12 +64,14 @@ public:
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0) {
+        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
+    {
 
         _allocate_counters();
     }
 
-    virtual ~CountingHash() {
+    virtual ~CountingHash()
+    {
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 if (_counts[i]) {
@@ -85,32 +89,38 @@ public:
 
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
-    Byte ** get_raw_tables() {
+    Byte ** get_raw_tables()
+    {
         return _counts;
     }
 
-    virtual BoundedCounterType test_and_set_bits(const char * kmer) {
+    virtual BoundedCounterType test_and_set_bits(const char * kmer)
+    {
         BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
         count(kmer);
         return !x;
     }
 
-    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) {
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash)
+    {
         BoundedCounterType x = get_count(khash);
         count(khash);
         return !x;
     }
 
-    std::vector<HashIntoType> get_tablesizes() const {
+    std::vector<HashIntoType> get_tablesizes() const
+    {
         return _tablesizes;
     }
 
     virtual const HashIntoType n_unique_kmers() const;
 
-    void set_use_bigcount(bool b) {
+    void set_use_bigcount(bool b)
+    {
         _use_bigcount = b;
     }
-    bool get_use_bigcount() {
+    bool get_use_bigcount()
+    {
         return _use_bigcount;
     }
 
@@ -118,17 +128,20 @@ public:
     virtual void load(std::string);
 
     // accessors to get table info
-    const HashIntoType n_entries() const {
+    const HashIntoType n_entries() const
+    {
         return _tablesizes[0];
     }
 
-    const size_t n_tables() const {
+    const size_t n_tables() const
+    {
         return _n_tables;
     }
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const {
+                                          HashIntoType stop=0) const
+    {
         HashIntoType n = 0;
         if (stop == 0) {
             stop = _tablesizes[0];
@@ -141,12 +154,14 @@ public:
         return n;
     }
 
-    virtual void count(const char * kmer) {
+    virtual void count(const char * kmer)
+    {
         HashIntoType hash = _hash(kmer, _ksize);
         count(hash);
     }
 
-    virtual void count(HashIntoType khash) {
+    virtual void count(HashIntoType khash)
+    {
         bool is_new_kmer = true;
         unsigned int  n_full	  = 0;
 
@@ -188,13 +203,15 @@ public:
     } // count
 
     // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * kmer) const {
+    virtual const BoundedCounterType get_count(const char * kmer) const
+    {
         HashIntoType hash = _hash(kmer, _ksize);
         return get_count(hash);
     }
 
     // get the count for the given k-mer hash.
-    virtual const BoundedCounterType get_count(HashIntoType khash) const {
+    virtual const BoundedCounterType get_count(HashIntoType khash) const
+    {
         unsigned int	  max_count	= _max_count;
         BoundedCounterType  min_count	= max_count;
         for (unsigned int i = 0; i < _n_tables; i++) {

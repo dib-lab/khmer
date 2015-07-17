@@ -81,7 +81,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'expected_memory_usage')
 
     for fp_rate in range(1, 10):
-        Z, H, M, f = optimal_size(unique_kmers, f=fp_rate/10.0)
+        Z, H, M, f = optimal_size(unique_kmers, f=fp_rate / 10.0)
         to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
@@ -92,7 +92,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'size_hashtable(H)\texpected_fp')
 
     for mem in mem_list:
-        Z, H, M, f = optimal_size(unique_kmers, M=mem*1000000000)
+        Z, H, M, f = optimal_size(unique_kmers, M=mem * 1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
     return "\n".join(to_print)
 

@@ -113,13 +113,15 @@ struct AlignmentNode {
          rc_hash(_rc_hash), score(0), f_score(0), h_score(0), trusted(false),
          num_indels(0), length(_length) {}
 
-    bool operator== (const AlignmentNode& rhs) const {
+    bool operator== (const AlignmentNode& rhs) const
+    {
         return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
                uniqify_rc(fwd_hash, rc_hash) == uniqify_rc(rhs.fwd_hash, rhs.rc_hash)
                && trans == rhs.trans;
     }
 
-    bool operator< (const AlignmentNode& rhs) const {
+    bool operator< (const AlignmentNode& rhs) const
+    {
         return f_score < rhs.f_score;
     }
 };
@@ -127,7 +129,8 @@ struct AlignmentNode {
 class AlignmentNodeCompare
 {
 public:
-    bool operator()(AlignmentNode* o1, AlignmentNode* o2) {
+    bool operator()(AlignmentNode* o1, AlignmentNode* o2)
+    {
         if (o1->f_score < o2->f_score) {
             return true;
         } else {
@@ -192,7 +195,8 @@ private:
     size_t m_trusted_cutoff;
     double m_bits_theta;
 
-    HashIntoType comp_bitmask(WordLength k) {
+    HashIntoType comp_bitmask(WordLength k)
+    {
         HashIntoType ret = 0;
         for (size_t i = 0; i < k; i++) {
             ret = (ret << 2) | 3;
@@ -211,7 +215,8 @@ public:
               log2(.955), log2(.04), log2(.004),
               log2(.001), trans_default),
           m_trusted_cutoff(trusted_cutoff),
-          m_bits_theta(bits_theta) {
+          m_bits_theta(bits_theta)
+    {
 #if READ_ALIGNER_DEBUG
         std::cerr << "Trusted cutoff: " << m_trusted_cutoff
                   << " bits theta: " << bits_theta
