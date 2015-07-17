@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
-#
+# pylint: disable=missing-docstring,invalid-name,unused-variable
 
 import os
 import shutil

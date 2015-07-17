@@ -1,9 +1,19 @@
+2015-07-17  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * oxli/{functions,build_graph}.py,scripts/{load-graph,normalize-by-median,
+   abundance-dist}.py,tests/test_{normalize_by_median,subset_graph,hashbits,
+   oxli_function}.py: pylint cleanup
+
+2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>  
+
+   * Makefile, tests/test_read_aligner.py: import khmer when pylinting
+
 2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * lib/read_parser.{cc,hh}: use std::string everywhere to match existing
    exceptions
 
-2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
    non-empty
@@ -23,7 +33,7 @@
 
    * oxli/functions.py: added '--force' check to sanity check
 
-2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/functions.py: moved optimization/sanity check func to oxli
    * scripts/normalize-by-median.py,oxli/build_graph.py: added

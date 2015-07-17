@@ -5,7 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring
 """
 Produce the k-mer abundance distribution for the given file.
 
@@ -22,7 +22,6 @@ import argparse
 import os
 from khmer.kfile import check_input_files
 from khmer.khmer_args import info
-from khmer.utils import write_record
 
 
 def get_parser():
