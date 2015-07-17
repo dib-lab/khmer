@@ -69,7 +69,7 @@ def test_hashtable_n_entries():
 
 
 def test_complete_no_collision():
-    kh = khmer._CountingHash(4, [4**4])
+    kh = khmer._CountingHash(4, [4 ** 4])
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -318,7 +318,7 @@ def test_very_short_read():
 class Test_ConsumeString(object):
 
     def setup(self):
-        self.kh = khmer._CountingHash(4, [4**4])
+        self.kh = khmer._CountingHash(4, [4 ** 4])
 
     def test_n_occupied(self):
         assert self.kh.n_occupied() == 0

@@ -23,6 +23,7 @@ import imp
 from . import khmer_tst_utils as utils
 import khmer
 import screed
+from .test_scripts import _make_counting
 
 
 def scriptpath(script):
@@ -240,7 +241,7 @@ def test_collect_reads():
     infile = utils.get_test_data('test-reads.fa')
     script = 'collect-reads.py'
     args = ['-M', '1e7', outfile, infile]
-    
+
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert status == 0
@@ -255,3 +256,32 @@ def test_saturate_by_median():
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert status == 0
+
+
+def test_count_kmers_1():
+    infile = utils.get_temp_filename('input.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    ctfile = _make_counting(infile)
+
+    script = scriptpath('count-kmers.py')
+    args = [ctfile, infile]
+
+    status, out, err = utils.runscript(script, args, os.path.dirname(infile),
+                                       sandbox=True)
+
+    out = out.splitlines()
+    assert 'TTGTAACCTGTGTGGGGTCG,1' in out
+
+
+def test_count_kmers_2_single():
+    infile = utils.get_temp_filename('input.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    script = scriptpath('count-kmers-single.py')
+    args = ['-x', '1e7', '-k', '20', '-N', '2', infile]
+
+    status, out, err = utils.runscript(script, args, os.path.dirname(infile),
+                                       sandbox=True)
+
+    out = out.splitlines()
+    assert 'TTGTAACCTGTGTGGGGTCG,1' in out

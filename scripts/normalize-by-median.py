@@ -26,7 +26,7 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
-
+from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
@@ -138,7 +138,7 @@ def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
     """
     try:
         yield
-    except (IOError, ValueError) as error:
+    except (IOError, OSError, ValueError) as error:
         print('** ERROR: ' + str(error), file=sys.stderr)
         print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
         if not single_out:
@@ -251,6 +251,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_fp = args.report
     force_single = args.force_single
 
+    # if optimization args are given, do optimization
+    args = oxutils.do_sanity_checking(args, 0.1)
+
     # check for similar filenames
     # if we're using a single output file only check for identical filenames
     # otherwise, check for identical BASE names as well.
@@ -281,6 +284,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('loading k-mer counting table from ' + args.loadtable,
               file=sys.stderr)
         htable = khmer.load_counting_hash(args.loadtable)
+        if args.unique_kmers != 0:
+            print('Warning: You have specified a number of unique kmers'
+                  ' but are loading a precreated counting table--'
+                  'argument optimization will NOT be done.', file=sys.stderr)
     else:
         print('making countgraph', file=sys.stderr)
         htable = khmer_args.create_countgraph(args)
@@ -356,7 +363,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.force and len(corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
-        print("** IOErrors occurred in the following files:", file=sys.stderr)
+        print("** I/O Errors occurred in the following files:",
+              file=sys.stderr)
         print("\t", " ".join(corrupt_files), file=sys.stderr)
 
 

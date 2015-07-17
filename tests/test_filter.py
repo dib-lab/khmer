@@ -41,7 +41,7 @@ class Test_Filter(object):
         try:
             ht.consume_fasta("nonexistent")
             assert 0, "should fail"
-        except IOError as err:
+        except OSError as err:
             print(str(err))
         ht.output_fasta_kmer_pos_freq(filename, outname)
         try:

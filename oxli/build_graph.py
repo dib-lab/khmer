@@ -51,6 +51,9 @@ def main(args):
     for fname in args.input_filenames:
         check_input_files(fname, args.force)
 
+    # if optimization args are given, do optimization
+    args = functions.do_sanity_checking(args, 0.01)
+
     check_space(args.input_filenames, args.force)
     check_space_for_hashtable(args, 'nodegraph', args.force)
 

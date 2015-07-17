@@ -81,8 +81,7 @@ protected:
     size_t length;
     bool initialized;
 public:
-    KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k)
-    {
+    KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k) {
         bitmask = 0;
         for (unsigned char i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
@@ -97,8 +96,7 @@ public:
         initialized = false;
     }
 
-    HashIntoType first(HashIntoType& f, HashIntoType& r)
-    {
+    HashIntoType first(HashIntoType& f, HashIntoType& r) {
         HashIntoType x;
         x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
 
@@ -110,8 +108,7 @@ public:
         return x;
     }
 
-    HashIntoType next(HashIntoType& f, HashIntoType& r)
-    {
+    HashIntoType next(HashIntoType& f, HashIntoType& r) {
         if (done()) {
             throw khmer_exception();
         }
@@ -146,27 +143,22 @@ public:
         return uniqify_rc(_kmer_f, _kmer_r);
     }
 
-    HashIntoType first()
-    {
+    HashIntoType first() {
         return first(_kmer_f, _kmer_r);
     }
-    HashIntoType next()
-    {
+    HashIntoType next() {
         return next(_kmer_f, _kmer_r);
     }
 
-    bool done()
-    {
+    bool done() {
         return index >= length;
     }
 
-    unsigned int get_start_pos() const
-    {
+    unsigned int get_start_pos() const {
         return index - _ksize;
     }
 
-    unsigned int get_end_pos() const
-    {
+    unsigned int get_end_pos() const {
         return index;
     }
 }; // class KMerIterator
@@ -185,11 +177,10 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    Hashtable( WordLength ksize )
+    explicit Hashtable( WordLength ksize )
         : _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT ),
-          _ksize( ksize )
-    {
+          _ksize( ksize ) {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
             throw khmer_exception();
@@ -200,13 +191,11 @@ protected:
 
     }
 
-    virtual ~Hashtable( )
-    {
+    virtual ~Hashtable( ) {
         delete partition;
     }
 
-    void _init_bitstuff()
-    {
+    void _init_bitstuff() {
         bitmask = 0;
         for (unsigned int i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
@@ -214,8 +203,7 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
-    {
+    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const {
         // left-shift the previous hash over
         h = h << 2;
 
@@ -232,8 +220,7 @@ protected:
         return uniqify_rc(h, r);
     }
 
-    void _clear_all_partitions()
-    {
+    void _clear_all_partitions() {
         if (partition != NULL) {
             partition->_clear_all_partitions();
         }
@@ -241,7 +228,8 @@ protected:
 
     uint32_t _all_tags_spin_lock;
 
-    NONCOPYABLE(Hashtable);
+    explicit Hashtable(const Hashtable&);
+    const Hashtable& operator=(const Hashtable&);
 
 public:
     SubsetPartition * partition;
@@ -250,8 +238,7 @@ public:
     SeenSet repart_small_tags;
 
     // accessor to get 'k'
-    const WordLength ksize() const
-    {
+    const WordLength ksize() const {
         return _ksize;
     }
 
@@ -302,8 +289,7 @@ public:
     virtual const HashIntoType n_unique_kmers() const = 0;
 
     // partitioning stuff
-    void _validate_pmap()
-    {
+    void _validate_pmap() {
         if (partition) {
             partition->_validate_pmap();
         }
@@ -313,44 +299,37 @@ public:
     virtual void load_tagset(std::string, bool clear_tags=true);
 
     // for debugging/testing purposes only!
-    void _set_tag_density(unsigned int d)
-    {
+    void _set_tag_density(unsigned int d) {
         if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
             throw khmer_exception();
         }
         _tag_density = d;
     }
 
-    unsigned int _get_tag_density() const
-    {
+    unsigned int _get_tag_density() const {
         return _tag_density;
     }
 
-    void add_tag(HashIntoType tag)
-    {
+    void add_tag(HashIntoType tag) {
         all_tags.insert(tag);
     }
-    void add_stop_tag(HashIntoType tag)
-    {
+    void add_stop_tag(HashIntoType tag) {
         stop_tags.insert(tag);
     }
 
     // Partitioning stuff.
 
-    size_t n_tags() const
-    {
+    size_t n_tags() const {
         return all_tags.size();
     }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
-    void add_kmer_to_tags(HashIntoType kmer)
-    {
+    void add_kmer_to_tags(HashIntoType kmer) {
         all_tags.insert(kmer);
     }
 
-    void clear_tags()
-    {
+    void clear_tags() {
         all_tags.clear();
     }
 
@@ -440,8 +419,7 @@ public:
                                    unsigned long long& count,
                                    SeenSet& keeper,
                                    const unsigned long long threshold=0,
-                                   bool break_on_circum=false) const
-    {
+                                   bool break_on_circum=false) const {
         HashIntoType r, f;
         _hash(kmer, _ksize, f, r);
         calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
@@ -458,8 +436,7 @@ public:
 
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
-    unsigned int kmer_degree(const char * kmer_s) const
-    {
+    unsigned int kmer_degree(const char * kmer_s) const {
         HashIntoType kmer_f, kmer_r;
         _hash(kmer_s, _ksize, kmer_f, kmer_r);
 

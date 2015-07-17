@@ -99,9 +99,11 @@ void Hashbits::load(std::string infilename)
         infile.read((char *) &ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
-            err << "Does not start with signature for a khmer " <<
-                "file: " << signature << " Should be: " <<
-                SAVED_SIGNATURE;
+            err << "Does not start with signature for a khmer file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
@@ -187,7 +189,11 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 
     IParser* parser = IParser::get_parser(filename.c_str());
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         total_reads++;
     }
 //block size for curve
@@ -217,7 +223,11 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         currSeq = read.sequence;
 
         unsigned int this_n_consumed;
