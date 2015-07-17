@@ -94,7 +94,7 @@ def test_normalize_by_median_sanity_check_0():
     shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-U', '1024', '--max-mem', '60',  infile]
+    args = ['-U', '1024', '--max-mem', '60', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
         raise Exception("Shouldn't get to this")
