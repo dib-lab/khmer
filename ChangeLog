@@ -1,3 +1,9 @@
+2015-07-17  Luiz Irber  <khmer@luizirber.org>
+
+   * scripts/unique-kmers.py: fix import bug and initialize to_print earlier.
+   * tests/test_scripts: add tests for unique-kmers.py.
+   * sandbox/unique-kmers.py: moved to scripts.
+
 2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
