@@ -22,7 +22,6 @@ def main():
                 n += 1
                 print('>%s.%s %s' % (prefix, n, record.name))
                 x = "\n".join(textwrap.wrap(record.sequence, 80))
-                print ('%s' % (x))
-
+                print (x)
 if __name__ == '__main__':
     main()

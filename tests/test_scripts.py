@@ -60,7 +60,6 @@ def test_load_into_counting_max_memory_usage_parameter():
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
-    
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
@@ -3043,7 +3042,6 @@ def test_trim_low_abund_highfpr():
 def test_trim_low_abund_trimtest():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-    
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "1",
@@ -3230,5 +3228,4 @@ def test_multirename_fasta():
     args = ['assembly', infile1]
     _, out, err = utils.runscript('multi-rename.py', args)
     r = open(infile2).read()
-    for k in r:
-        assert k in out, (k, out)
+    assert r in out
