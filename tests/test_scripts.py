@@ -3286,29 +3286,30 @@ def test_unique_kmers_stream_out():
     infile = utils.get_temp_filename('random-20-a.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
 
-    args = ['-k', '20', '-e', '0.01', '--stream-out', infile]
+    args = '-k 20 -e 0.01 --stream-out -'
 
-    _, out, err = utils.runscript('unique-kmers.py', args,
-                                  os.path.dirname(infile))
+    _, out, err = utils.runscriptredirect('unique-kmers.py', args, infile,
+                                          os.path.dirname(infile))
 
-    err = err.splitlines()
-    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
-            in err)
+    err.seek(0)
+    err = err.read()
+    assert 'Estimated number of unique 20-mers in -: 3950' in err
     assert 'Total estimated number of unique 20-mers: 3950' in err
 
-    out = out.splitlines()
+    out.seek(0)
+    out = out.read()
     assert '>45' in out
     assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
 
 
-def test_unique_kmers_stream_out_multiple_inputs():
+def test_unique_kmers_multiple_inputs():
     infiles = []
     for fname in ('random-20-a.fa', 'paired-mixed.fa'):
         infile = utils.get_temp_filename(fname)
         shutil.copyfile(utils.get_test_data(fname), infile)
         infiles.append(infile)
 
-    args = ['-k', '20', '-e', '0.01', '--stream-out']
+    args = ['-k', '20', '-e', '0.01']
     args += infiles
 
     _, out, err = utils.runscript('unique-kmers.py', args,
@@ -3320,12 +3321,3 @@ def test_unique_kmers_stream_out_multiple_inputs():
     assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
             in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
-
-    out = out.splitlines()
-    # from random-20-a.fa
-    assert '>45' in out
-    assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
-
-    # from paired-mixed.fa
-    assert '>850:2:1:1123:19958/1' in out
-    assert "GCGATAAAAAGTCGTTGAGATAATCCGCGATTTCTCGCA" in out
