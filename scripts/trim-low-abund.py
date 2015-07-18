@@ -5,6 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=no-member,missing-docstring
 """
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
 
@@ -34,7 +35,7 @@ from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
 
 DEFAULT_NORMALIZE_LIMIT = 20
-DEFAULT_CUTOFF = 2
+DEFAULT_cutoff = 2
 
 
 def trim_record(read, trim_at):
@@ -77,7 +78,7 @@ def get_parser():
 
     parser.add_argument('--cutoff', '-C', type=int,
                         help='remove k-mers below this abundance',
-                        default=DEFAULT_CUTOFF)
+                        default=DEFAULT_cutoff)
 
     parser.add_argument('--normalize-to', '-Z', type=int,
                         help='base cutoff on this median k-mer abundance',
@@ -130,13 +131,13 @@ def main():
 
     if args.loadtable:
         print('loading countgraph from', args.loadtable, file=sys.stderr)
-        ct = khmer.load_counting_hash(args.loadtable)
+        counting_table = khmer.load_counting_hash(args.loadtable)
     else:
         print('making countgraph', file=sys.stderr)
-        ct = khmer_args.create_countgraph(args)
+        counting_table = khmer_args.create_countgraph(args)
 
-    K = ct.ksize()
-    CUTOFF = args.cutoff
+    ksize = counting_table.ksize()
+    cutoff = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
@@ -168,13 +169,13 @@ def main():
         pass2fp = open(pass2filename, 'w')
 
         save_pass2 = 0
-        n = 0
+        count = 0
 
-        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_iter = broken_paired_reader(screed_iter, min_length=ksize,
                                            force_single=args.ignore_pairs)
-        for n, is_pair, read1, read2 in paired_iter:
-            if n % 10000 == 0:
-                print('...', n, filename, save_pass2, n_reads, n_bp,
+        for count, is_pair, read1, read2 in paired_iter:
+            if count % 10000 == 0:
+                print('...', count, filename, save_pass2, n_reads, n_bp,
                       written_reads, written_bp, file=sys.stderr)
 
             # we want to track paired reads here, to make sure that pairs
@@ -187,22 +188,24 @@ def main():
                 seq1 = read1.sequence.replace('N', 'A')
                 seq2 = read2.sequence.replace('N', 'A')
 
-                med1, _, _ = ct.get_median_count(seq1)
-                med2, _, _ = ct.get_median_count(seq2)
+                med1, _, _ = counting_table.get_median_count(seq1)
+                med2, _, _ = counting_table.get_median_count(seq2)
 
                 if med1 < NORMALIZE_LIMIT or med2 < NORMALIZE_LIMIT:
-                    ct.consume(seq1)
-                    ct.consume(seq2)
+                    counting_table.consume(seq1)
+                    counting_table.consume(seq2)
                     write_record_pair(read1, read2, pass2fp)
                     save_pass2 += 2
                 else:
-                    _, trim_at1 = ct.trim_on_abundance(seq1, CUTOFF)
-                    _, trim_at2 = ct.trim_on_abundance(seq2, CUTOFF)
+                    _, trim_at1 = counting_table.trim_on_abundance(seq1,
+                                                                   cutoff)
+                    _, trim_at2 = counting_table.trim_on_abundance(seq2,
+                                                                   cutoff)
 
-                    if trim_at1 >= K:
+                    if trim_at1 >= ksize:
                         read1 = trim_record(read1, trim_at1)
 
-                    if trim_at2 >= K:
+                    if trim_at2 >= ksize:
                         read2 = trim_record(read2, trim_at2)
 
                     if trim_at1 != len(seq1):
@@ -219,17 +222,17 @@ def main():
 
                 seq = read1.sequence.replace('N', 'A')
 
-                med, _, _ = ct.get_median_count(seq)
+                med, _, _ = counting_table.get_median_count(seq)
 
                 # has this portion of the graph saturated? if not,
                 # consume & save => pass2.
                 if med < NORMALIZE_LIMIT:
-                    ct.consume(seq)
+                    counting_table.consume(seq)
                     write_record(read1, pass2fp)
                     save_pass2 += 1
                 else:                       # trim!!
-                    _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
-                    if trim_at >= K:
+                    _, trim_at = counting_table.trim_on_abundance(seq, cutoff)
+                    if trim_at >= ksize:
                         new_read = trim_record(read1, trim_at)
                         write_record(new_read, trimfp)
 
@@ -242,7 +245,7 @@ def main():
         pass2fp.close()
 
         print('%s: kept aside %d of %d from first pass, in %s' %
-              (filename, save_pass2, n, filename),
+              (filename, save_pass2, count, filename),
               file=sys.stderr)
         save_pass2_total += save_pass2
 
@@ -260,14 +263,14 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        for n, read in enumerate(screed.open(pass2filename,
-                                             parse_description=False)):
-            if n % 10000 == 0:
-                print('... x 2', n, pass2filename,
+        for count, read in enumerate(screed.open(pass2filename,
+                                                 parse_description=False)):
+            if count % 10000 == 0:
+                print('... x 2', count, pass2filename,
                       written_reads, written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
-            med, _, _ = ct.get_median_count(seq)
+            med, _, _ = counting_table.get_median_count(seq)
 
             # do we retain low-abundance components unchanged?
             if med < NORMALIZE_LIMIT and args.variable_coverage:
@@ -280,8 +283,8 @@ def main():
 
             # otherwise, examine/trim/truncate.
             else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
-                _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
-                if trim_at >= K:
+                _, trim_at = counting_table.trim_on_abundance(seq, cutoff)
+                if trim_at >= ksize:
                     new_read = trim_record(read, trim_at)
                     write_record(new_read, trimfp)
 
@@ -320,7 +323,8 @@ def main():
               file=sys.stderr)
 
     fp_rate = \
-        khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(counting_table, args.force,
+                                       max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
           file=sys.stderr)
@@ -330,7 +334,7 @@ def main():
     if args.savetable:
         print("Saving k-mer counting table to",
               args.savetable, file=sys.stderr)
-        ct.save(args.savetable)
+        counting_table.save(args.savetable)
 
 
 if __name__ == '__main__':
