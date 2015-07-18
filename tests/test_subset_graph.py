@@ -6,7 +6,7 @@ from __future__ import absolute_import
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,invalid-name,unused-variable,no-member
 import khmer
 import screed
 

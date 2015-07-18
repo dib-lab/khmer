@@ -147,7 +147,8 @@ def extract_countinghash_info(filename):
 
 def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
-    Check to see that collision rate is within threshold.
+
+    Also check to see that collision rate is within threshold.
 
     Keyword argument:
     hashtable: the hashtable object to inspect
