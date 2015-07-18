@@ -102,6 +102,8 @@ def main():
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             if not args.force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
         output_filename = output_file.name
     else:

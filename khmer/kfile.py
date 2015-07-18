@@ -34,6 +34,8 @@ def check_input_files(file_path, force):
               file_path, file=sys.stderr)
 
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             print("Exiting", file=sys.stderr)
             sys.exit(1)
         else:
@@ -47,12 +49,16 @@ def check_input_files(file_path, force):
         print("ERROR: Input file %s does not exist; exiting" %
               file_path, file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
             print("ERROR: Input file %s is empty; exiting." %
                   file_path, file=sys.stderr)
             if not force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
 
 
@@ -109,6 +115,8 @@ def check_space(in_files, force, _testhook_free_space=None):
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
@@ -135,6 +143,8 @@ def check_space_for_hashtable(outfile_name, hash_size, force,
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
