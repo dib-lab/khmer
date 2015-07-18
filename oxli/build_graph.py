@@ -5,7 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=missing-docstring
 """
 Build a graph from the given sequences, save in <ptname>.
 

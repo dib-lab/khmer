@@ -5,7 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=missing-docstring
 """
 Eliminate surplus reads.
 
@@ -32,22 +32,20 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
-from khmer.utils import write_record, check_is_pair, broken_paired_reader
+from khmer.utils import write_record, broken_paired_reader
 
 
 DEFAULT_DESIRED_COVERAGE = 20
 
 
-def WithDiagnostics(ifilename, norm, reader, fp):
+def with_diagnostics(ifilename, norm, reader, fp_file):
     """
-    Generator/context manager to do boilerplate output of statistics using a
-    Normalizer object.
+    Generator/context manager to do boilerplate output of statistics.
+
+    uses a Normalizer object.
     """
-
-    index = 0
-
     # per read diagnostic output
-    for index, record in enumerate(norm(reader)):
+    for _, record in enumerate(norm(reader)):
 
         if norm.total % 100000 == 0:
             print('... kept {kept} of {total} or {perc:2}% so far'
@@ -71,18 +69,17 @@ def WithDiagnostics(ifilename, norm, reader, fp):
                                                  float(norm.total) * 100.)),
               file=sys.stderr)
 
-    if fp:
+    if fp_file:
         print("{total} {kept} {discarded}"
               .format(total=norm.total, kept=norm.total - norm.discarded,
                       discarded=1. - (norm.discarded / float(norm.total))),
-              file=fp)
-        fp.flush()
+              file=fp_file)
+        fp_file.flush()
 
 
 class Normalizer(object):
-    """
-    Digital normalization algorithm.
-    """
+
+    """Digital normalization algorithm."""
 
     def __init__(self, desired_coverage, htable):
         self.htable = htable
@@ -101,10 +98,9 @@ class Normalizer(object):
         * if any read's median k-mer count is below desired coverage, keep all;
         * consume and yield kept reads.
         """
-
         desired_coverage = self.desired_coverage
 
-        for index, is_paired, read0, read1 in reader:
+        for _, is_paired, read0, read1 in reader:
             passed_filter = False
 
             self.total += 1
@@ -132,10 +128,8 @@ class Normalizer(object):
 
 
 @contextmanager
-def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
-    """
-    Context manager to do boilerplate handling of IOErrors.
-    """
+def catch_io_errors(ifile, out, single_out, force, corrupt_files):
+    """Context manager to do boilerplate handling of IOErrors."""
     try:
         yield
     except (IOError, OSError, ValueError) as error:
@@ -243,6 +237,7 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
+
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
@@ -296,8 +291,6 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('making countgraph', file=sys.stderr)
         htable = khmer_args.create_countgraph(args)
 
-    input_filename = None
-
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, htable)
 
@@ -305,8 +298,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # if we don't know if they're paired, default to allowing but not
     # forcing pairing.
     files = []
-    for e in filenames:
-        files.append([e, args.paired])
+    for element in filenames:
+        files.append([element, args.paired])
     if args.unpaired_reads:
         files.append([args.unpaired_reads, False])
 
@@ -331,8 +324,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             outfp = open(output_name, 'w')
 
         # failsafe context manager in case an input file breaks
-        with CatchIOErrors(filename, outfp, args.single_output_file,
-                           args.force, corrupt_files):
+        with catch_io_errors(filename, outfp, args.single_output_file,
+                             args.force, corrupt_files):
 
             screed_iter = screed.open(filename, parse_description=False)
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
@@ -340,7 +333,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                                           require_paired=require_paired)
 
             # actually do diginorm
-            for record in WithDiagnostics(filename, norm, reader, report_fp):
+            for record in with_diagnostics(filename, norm, reader, report_fp):
                 if record is not None:
                     write_record(record, outfp)
 

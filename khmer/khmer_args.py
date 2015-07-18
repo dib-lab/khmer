@@ -86,7 +86,6 @@ def build_counting_args(descr=None, epilog=None):
 
 def build_hashbits_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for hashbits based scripts."""
-
     parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
     parser.hashtype = 'nodegraph'
 
