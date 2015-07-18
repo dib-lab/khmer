@@ -24,7 +24,7 @@ import threading
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config, info)
+                              report_on_config, info, calculate_tablesize)
 from khmer.kfile import (check_input_files, check_space_for_hashtable)
 
 
@@ -78,10 +78,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     check_input_files(args.input_sequence_filename, args.force)
     if args.savetable:
-        check_space_for_hashtable(args.savetable, 'countgraph', args.force,
-                                  args.n_tables, args.max_tablesize,
-                                  args.max_memory_usage)
-
+        tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
+                                        'countgraph',
+                                        max_memory_use=args.max_memory_usage)
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
         print('ERROR: %s exists; not squashing.' %

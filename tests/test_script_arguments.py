@@ -53,10 +53,12 @@ def test_check_tablespace():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(outfile, 'countgraph',
-                                              False, args.n_tables,
-                                              args.max_tablesize,
-                                              _testhook_free_space=0)
+        mem_args = args.max_memory_usage
+        tablesize = khmer_args.calculate_tablesize(args.max_tablesize,
+                                                   args.n_tables, 'countgraph',
+                                                   max_memory_use=mem_args)
+        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
+                                              False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
         print(str(e))
@@ -87,10 +89,12 @@ def test_check_tablespace_force():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(outfile, 'countgraph', True,
-                                              args.n_tables,
-                                              args.max_tablesize,
-                                              _testhook_free_space=0)
+        mem_args = args.max_memory_usage
+        tablesize = khmer_args.calculate_tablesize(args.max_tablesize,
+                                                   args.n_tables, 'countgraph',
+                                                   max_memory_use=mem_args)
+        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
+                                              True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
         print(str(e))
@@ -272,9 +276,9 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     try:
-        nodegraph = khmer_args._calculate_tablesize(max_tablesize, n_tables,
-                                                    'foograph',
-                                                    max_memory_use=max_mem)
+        nodegraph = khmer_args.calculate_tablesize(max_tablesize, n_tables,
+                                                   'foograph',
+                                                   max_memory_use=max_mem)
         assert 0, "previous statement should fail"
     except AssertionError:
         raise

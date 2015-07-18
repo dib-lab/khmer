@@ -28,7 +28,7 @@ from screed import Record
 from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+                              report_on_config, calculate_tablesize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -126,9 +126,10 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args.savetable, 'countgraph', args.force,
-                                  args.n_tables, args.max_tablesize,
-                                  args.max_memory_usage)
+        tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
+                                        'countgraph',
+                                        max_memory_use=args.max_memory_usage)
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     if args.loadtable:
         print('loading countgraph from', args.loadtable, file=sys.stderr)
