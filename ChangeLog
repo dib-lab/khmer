@@ -1,4 +1,4 @@
-2015-07-16  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-17  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/{kfile,khmer_args}.py: refactored information passing, made it so
    space checks happen in the right directory
@@ -7,6 +7,17 @@
    make-initial-stoptags,normalize-by-median,partition-graph,
    sample-reads-randomly,trim-low-abund}.py,tests/test_script_arguments.py:
    changed to use new arg structure
+
+2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * lib/read_parser.{cc,hh}: use std::string everywhere to match existing
+   exceptions
+
+2015-07-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/kfile.py: changed check_valid_file_exists to recognize fifos as
+   non-empty
+   * tests/test_normalize_by_median.py: added test
 
 2015-07-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
