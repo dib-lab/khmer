@@ -358,7 +358,7 @@ def test_filter_abund_4_fq_casava_18():
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     assert 'pair:foo 1::N' in seqs, seqs
 
 
@@ -418,7 +418,7 @@ def test_filter_abund_2_singlefile_fq_casava_18():
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     assert 'pair:foo 1::N' in seqs, seqs
 
 
@@ -508,7 +508,7 @@ def test_filter_abund_7_retain_Ns():
     assert os.path.exists(outfile), outfile
 
     # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    names = set([r.name for r in screed.open(outfile)])
     assert '895:1:37:17593:9954 1::FOO_withN' in names, names
 
     # check to see if that 'N' was properly changed to an 'A'
@@ -541,7 +541,7 @@ def test_filter_abund_single_8_retain_Ns():
     assert os.path.exists(outfile), outfile
 
     # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    names = set([r.name for r in screed.open(outfile)])
     assert '895:1:37:17593:9954 1::FOO_withN' in names, names
 
     # check to see if that 'N' was properly changed to an 'A'
@@ -618,7 +618,7 @@ def test_filter_stoptags_fq():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
     # make sure that record names are carried through unparsed
-    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    names = [r.name for r in screed.open(outfile)]
     names = set(names)
     assert 'seq 1::BAR' in names
 
@@ -1215,7 +1215,7 @@ def test_extract_partitions_header_whitespace():
     assert dist.strip() == '1 11960 11960 11960', dist.strip()
 
     parts = [r.name.split('\t')[1]
-             for r in screed.open(partfile, parse_description=False)]
+             for r in screed.open(partfile)]
     assert len(parts) == 13538, len(parts)
     parts = set(parts)
     assert len(parts) == 12602, len(parts)
@@ -1244,12 +1244,12 @@ def test_extract_partitions_fq():
     dist = open(distfile).readline()
     assert dist.strip() == '99 1 1 99'
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     parts = [r.name.split('\t')[1] for r in screed_iter]
 
     assert len(parts) == 99, len(parts)
@@ -1574,7 +1574,7 @@ def test_do_partition_2_fq():
 
     partfile = os.path.join(in_dir, 'random-20-a.fq.part')
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
@@ -1801,8 +1801,8 @@ def test_extract_paired_reads_2_fq():
     assert os.path.exists(outfile2), outfile2
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile1, parse_description=False),
-                    screed.open(outfile1, parse_description=False)):
+    for r, q in zip(screed.open(ex_outfile1),
+                    screed.open(outfile1)):
         n += 1
         assert r.name == q.name, (r.name, q.name, n)
         assert r.sequence == q.sequence
@@ -1810,8 +1810,8 @@ def test_extract_paired_reads_2_fq():
     assert n > 0
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile2, parse_description=False),
-                    screed.open(outfile2, parse_description=False)):
+    for r, q in zip(screed.open(ex_outfile2),
+                    screed.open(outfile2)):
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
@@ -2346,8 +2346,7 @@ def test_sample_reads_randomly_fq():
                   '850:2:1:2562:1308/1',
                   '850:2:1:3123:15968/2'}
 
-    seqs = set([r.name for r in screed.open(outfile,
-                                            parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     print(list(sorted(seqs)))
     assert seqs == answer
 
@@ -2372,8 +2371,7 @@ def test_fastq_to_fasta():
     assert len(out.splitlines()) == 2, len(out.splitlines())
     assert "No lines dropped" in err
 
-    names = [r.name for r in screed.open(clean_outfile,
-                                         parse_description=False)]
+    names = [r.name for r in screed.open(clean_outfile)]
     assert '895:1:1:1246:14654 1:N:0:NNNNN' in names, names
 
     args = [n_infile, '-n', '-o', n_outfile]
@@ -2419,7 +2417,7 @@ def test_extract_long_sequences_fa():
     countlines = sum(1 for line in open(fa_outfile))
     assert countlines == 22, countlines
 
-    names = [r.name for r in screed.open(fa_outfile, parse_description=False)]
+    names = [r.name for r in screed.open(fa_outfile)]
     assert "895:1:37:17593:9954/1" in names
     assert "895:1:37:17593:9954/2" in names
 
@@ -2441,7 +2439,7 @@ def test_extract_long_sequences_fq():
     countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
 
-    names = [r.name for r in screed.open(fq_outfile, parse_description=False)]
+    names = [r.name for r in screed.open(fq_outfile)]
     assert "895:1:37:17593:9954 1::foo" in names
     assert "895:1:37:17593:9954 2::foo" in names
 
@@ -2961,7 +2959,7 @@ def test_trim_low_abund_keep_paired_casava18():
     outfile = infile + '.abundtrim'
     assert os.path.exists(outfile), outfile
 
-    seqs = [r.name for r in screed.open(outfile, parse_description=False)]
+    seqs = [r.name for r in screed.open(outfile)]
     assert seqs[-2:] == ['pair:foo 1::N', 'pair:foo 2::N'], seqs
 
 

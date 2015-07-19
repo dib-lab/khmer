@@ -440,7 +440,7 @@ def test_normalize_by_median_paired_fq():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
 
-    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    names = [r.name for r in screed.open(outfile)]
     assert len(names) == 6, names
     assert '895:1:37:17593:9954 1::FOO' in names, names
     assert '895:1:37:17593:9954 2::FOO' in names, names

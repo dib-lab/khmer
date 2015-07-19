@@ -90,8 +90,7 @@ def main():
     # write headers:
     output.writerow(['name', 'median', 'average', 'stddev', 'seqlen'])
 
-    for record in screed.open(input_filename,
-                              parse_description=False):
+    for record in screed.open(input_filename):
         seq = record.sequence.upper()
         if 'N' in seq:
             seq = seq.replace('N', 'A')

@@ -10,6 +10,14 @@
    * doc/whats-new-2.0.rst: added information about change in columnar output,
    along with other minor corrections.
    * scripts/normalize-by-median.py: corrected epilog.
+   * khmer/thread_utils.py,
+   sandbox/{calc-best-assembly.py,extract-single-partition.py},
+   scripts/{count-median.py,extract-long-sequences.py,extract-paired-reads.py,
+   extract-partitions.py,fastq-to-fasta.py,
+   interleave-reads.py,normalize-by-median.py,readstats.py,
+   sample-reads-randomly.py,split-paired-reads.py,trim-low-abund.py},
+   tests/{test_normalize_by_median.py,test_scripts.py}: remove explicit
+   'parse_description' from screed open calls.
 
 2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
 
