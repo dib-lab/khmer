@@ -23,13 +23,6 @@ WANT_EXTRA_SANITY_CHECKING=false
 # when optimization is turned on).
 WANT_DEBUGGING=false
 
-# Compile with performance metrics turned on?
-# Set this variable to true if you want to use instrumentation provided
-# in the sources for performance measurement purposes
-# and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_METRICS=false
-
-
 PREFIX=/usr/local
 
 ### NOTE: No user-serviceable parts below this line! ###
@@ -81,10 +74,6 @@ PROFILING_LIBS=-pg
 CXXFLAGS+= -pg
 LIBS+= $(PROFILING_LIBS)
 endif
-endif
-
-ifeq ($(WITH_INTERNAL_METRICS), true)
-CXXFLAGS+= -DWITH_INTERNAL_METRICS
 endif
 
 # Place POSIX threads last in linking order, if needed.
@@ -186,7 +175,6 @@ LIBKHMER_OBJS= \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
-	trace_logger.o \
 	murmur3.o \
 	$(BZIP2_OBJS) \
 	$(ZLIB_PIC_OBJS)
@@ -204,7 +192,6 @@ KHMER_HEADERS= \
 	read_aligner.hh \
 	read_parsers.hh \
 	subset.hh \
-	trace_logger.hh
 
 TEST_PROGS = test-Colors test-read-aligner test-compile
 
