@@ -7,7 +7,8 @@
    count-overlap.py,filter-abund-single.py,load-into-counting.py}: changed
    default behavior to output data in CSV format and report total k-mers.
    * tests/test_scripts.py: updated/removed tests for CSV.
-   * doc/whats-new-2.0.rst: added information about change in columnar output.
+   * doc/whats-new-2.0.rst: added information about change in columnar output,
+   along with other minor corrections.
    * scripts/normalize-by-median.py: corrected epilog.
 
 2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>

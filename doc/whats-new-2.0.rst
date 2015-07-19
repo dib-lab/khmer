@@ -13,9 +13,17 @@ Digital normalization script now supports mixed paired and unpaired read input
 `normalize-by-median.py` now supports mixed paired and unpaired (or
 "broken-paired") input. Behavior can be forced to either treat all
 reads as singletons or to require all reads be properly paired using
-`--force-single` or `--paired`, respectively. If `--paired` is set, -u
-can be used to include a file of unpaired reads. The unpaired reads
-will be examined after all of the other sequence files.
+:option:`--force-single` or :option:`--paired`, respectively. If
+:option:`--paired` is set, :option:`--unpaired-reads` can be used to
+include a file of unpaired reads. The unpaired reads will be examined
+after all of the other sequence files.
+
+Reservoir sampling script extracts paired reads by default
+----------------------------------------------------------
+
+`sample-reads-randomly.py` now retains pairs in the output, by
+default.  This can be overridden to match previous behavior
+with :option:`--force_single`.
 
 Incompatible changes
 ====================
