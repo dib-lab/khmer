@@ -18,6 +18,9 @@
    sample-reads-randomly.py,split-paired-reads.py,trim-low-abund.py},
    tests/{test_normalize_by_median.py,test_scripts.py}: remove explicit
    'parse_description' from screed open calls.
+   * khmer/_khmer.cc,lib/Makefile,lib/hashtable.{cc,hh},setup.py: removed
+   WITH_INTERNAL_METRICS and trace_logger/perf_metrics references.
+   * lib/perf_metrics.{cc,hh},lib/trace_logger.{cc,hh}: removed unused files.
 
 2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
 
