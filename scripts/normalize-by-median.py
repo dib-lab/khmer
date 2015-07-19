@@ -120,7 +120,6 @@ class WithDiagnostics(object):
                   file=report_fp)
             report_fp.flush()
 
-
 class Normalizer(object):
 
     """Digital normalization algorithm."""

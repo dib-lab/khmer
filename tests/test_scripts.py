@@ -42,7 +42,7 @@ def test_check_space():
 
 def test_load_into_counting():
     script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -56,7 +56,7 @@ def test_load_into_counting():
 
 def test_load_into_counting_tablesize_warning():
     script = 'load-into-counting.py'
-    args = ['-k', '20', '-t']
+    args = ['-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -70,7 +70,7 @@ def test_load_into_counting_tablesize_warning():
 
 def test_load_into_counting_max_memory_usage_parameter():
     script = 'load-into-counting.py'
-    args = ['-M', '2e3', '-k', '20', '-t']
+    args = ['-M', '2e3', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -87,7 +87,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
 def test_load_into_counting_abundance_dist_nobig():
     script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-b']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -109,7 +109,7 @@ def test_load_into_counting_abundance_dist_nobig():
 
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('test-nonwritable')
     with open(outfile, 'w') as fout:
@@ -128,7 +128,7 @@ def test_load_into_counting_nonwritable():
 @attr('huge')
 def test_load_into_counting_toobig():
     script = 'load-into-counting.py'
-    args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
+    args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -157,7 +157,7 @@ def test_load_into_counting_fail():
 
 def test_load_into_counting_multifile():
     script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -172,7 +172,7 @@ def test_load_into_counting_multifile():
 
 def test_load_into_counting_tsv():
     script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.ct')
     tabfile = outfile + '.info.tsv'
@@ -195,7 +195,7 @@ def test_load_into_counting_tsv():
 
 def test_load_into_counting_json():
     script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.ct')
     jsonfile = outfile + '.info.json'
@@ -369,7 +369,7 @@ def test_filter_abund_1_singlefile():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', infile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -390,7 +390,7 @@ def test_filter_abund_2_singlefile():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '--savetable',
             tabfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
@@ -636,14 +636,14 @@ def test_count_median():
 
     assert os.path.exists(outfile), outfile
 
-    data = [x.strip() for x in open(outfile)]
+    data = [x.strip() for x in open(outfile).readlines()[1:]]
     data = set(data)
     assert len(data) == 2, data
-    assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
+    assert 'seq,1001,1001.0,0.0,18' in data, data
+    assert '895:1:37:17593:9954/1,1,103.803741455,303.702941895,114' in data
 
 
-def test_count_median_fq():
+def test_count_median_fq_csv():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
 
@@ -658,31 +658,11 @@ def test_count_median_fq():
 
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert len(data) == 2, data
-    assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
-
-
-def test_count_median_fq_csv():
-    infile = utils.get_temp_filename('test.fa')
-    outfile = infile + '.counts'
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
-    counting_ht = _make_counting(infile, K=8)
-
-    script = 'count-median.py'
-    args = ['--csv', counting_ht, infile, outfile]
-    utils.runscript(script, args)
-
-    assert os.path.exists(outfile), outfile
-
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
     assert len(data) == 4, data
     assert 'name,median,average,stddev,seqlen' in data
     assert 'seq,1001,1001.0,0.0,18' in data
 
-    # verify that sequence names remain unparsed with '--csv'
+    # verify that sequence names remain unparsed
     names = set([line.split(',')[0] for line in data])
     assert '895:1:37:17593:9954 1::FOO' in names, names
 
@@ -1414,16 +1394,6 @@ def test_abundance_dist():
 
     with open(outfile) as fp:
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
-        line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
-
-    os.remove(outfile)
-    args = ['-z', '--csv', htfile, infile, outfile]
-    utils.runscript(script, args, in_dir)
-
-    with open(outfile) as fp:
-        line = fp.readline().strip()
         assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
         line = fp.readline().strip()
         assert line == '1,96,96,0.98', line
@@ -1445,31 +1415,11 @@ def test_abundance_dist_nobigcount():
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '255 2 98 1.0', line
-
-
-def test_abundance_dist_single():
-    infile = utils.get_temp_filename('test.fa')
-    outfile = utils.get_temp_filename('test.dist')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile,
-            outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    assert 'Total number of unique k-mers: 98' in err, err
-
-    with open(outfile) as fp:
-        line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
-        line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '255,2,98,1.0', line
 
 
 def test_abundance_dist_threaded():
@@ -1480,17 +1430,18 @@ def test_abundance_dist_threaded():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--threads', '18',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--threads', '18',
             infile, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
 def test_abundance_dist_single_csv():
@@ -1501,7 +1452,7 @@ def test_abundance_dist_single_csv():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--csv', infile,
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile,
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
@@ -1526,10 +1477,11 @@ def test_abundance_dist_single_nobigcount():
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '255 2 98 1.0', line
+        assert line == '255,2,98,1.0', line
 
 
 def test_abundance_dist_single_nosquash():
@@ -1540,14 +1492,15 @@ def test_abundance_dist_single_nosquash():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
 def test_abundance_dist_single_savetable():
@@ -1559,15 +1512,16 @@ def test_abundance_dist_single_savetable():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--savetable',
             tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
 def test_do_partition():
@@ -2588,33 +2542,6 @@ def test_count_overlap_invalid_datafile():
     assert "OSError" in err
 
 
-def test_count_overlap():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, ksize=20)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', seqfile2, outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
-    assert '# of unique k-mers in dataset2: 759020' in data, data
-    assert '# of overlap unique k-mers: 245547' in data
-    assert os.path.exists(curvefile), curvefile
-    data = [x.strip() for x in open(curvefile)]
-    data = set(data)
-    assert '178630 1134' in data, data
-    assert '496280 2904' in data
-    assert '752031 238558' in data
-
-
 def test_count_overlap_csv():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
@@ -2626,7 +2553,7 @@ def test_count_overlap_csv():
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
-            '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
+            '10000000', htfile + '.pt', seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile

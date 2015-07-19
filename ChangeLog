@@ -1,3 +1,14 @@
+2015-07-27  Titus Brown  <titus@idyll.org>
+
+
+   * khmer/khmer_args.py: added link to PeerJ paper for semi-streaming
+   citations.
+   * scripts/{abundance-dist-single.py,abundance-dist.py,count-median.py,
+   count-overlap.py,filter-abund-single.py,load-into-counting.py}: changed
+   default behavior to output data in CSV format and report total k-mers.
+   * tests/test_scripts.py: updated/removed tests for CSV.
+   * doc/whats-new-2.0.rst: added information about change in columnar output.
+
 2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/getting-started.rst: added instructions for second contribution
