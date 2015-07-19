@@ -171,7 +171,6 @@ LIBKHMER_OBJS= \
 	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
-	perf_metrics.o \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
@@ -187,7 +186,6 @@ KHMER_HEADERS= \
 	khmer.hh \
 	kmer_hash.hh \
 	labelhash.hh \
-	perf_metrics.hh \
 	primes.hh \
 	read_aligner.hh \
 	read_parsers.hh \
