@@ -78,9 +78,7 @@ def main():
         check_input_files(name, False)
 
     check_space(args.input_sequence_filename, False)
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    'countgraph',
-                                    max_memory_use=args.max_memory_usage)
+    tablesize = calculate_tablesize(args, 'countgraph')
     check_space_for_hashtable(args.output_countingtable_filename, tablesize,
                               False)
 

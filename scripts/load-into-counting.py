@@ -84,9 +84,7 @@ def main():
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    'countgraph',
-                                    max_memory_use=args.max_memory_usage)
+    tablesize = calculate_tablesize(args, 'countgraph')
     check_space_for_hashtable(args.output_countingtable_filename, tablesize,
                               args.force)
 
@@ -128,9 +126,7 @@ def main():
 
         if index > 0 and index % 10 == 0:
             mem_args = args.max_memory_usage
-            tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                            'countgraph',
-                                            max_memory_use=mem_args)
+            tablesize = calculate_tablesize(args, 'countgraph')
             check_space_for_hashtable(base, tablesize, args.force)
             print('mid-save', base, file=sys.stderr)
 

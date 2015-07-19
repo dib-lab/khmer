@@ -54,9 +54,7 @@ def test_check_tablespace():
 
     try:
         mem_args = args.max_memory_usage
-        tablesize = khmer_args.calculate_tablesize(args.max_tablesize,
-                                                   args.n_tables, 'countgraph',
-                                                   max_memory_use=mem_args)
+        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_hashtable(outfile, tablesize,
                                               False, _testhook_free_space=0)
         assert 0, "this should fail"
@@ -90,9 +88,7 @@ def test_check_tablespace_force():
 
     try:
         mem_args = args.max_memory_usage
-        tablesize = khmer_args.calculate_tablesize(args.max_tablesize,
-                                                   args.n_tables, 'countgraph',
-                                                   max_memory_use=mem_args)
+        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_hashtable(outfile, tablesize,
                                               True, _testhook_free_space=0)
         assert True, "this should pass"
@@ -276,9 +272,7 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     try:
-        nodegraph = khmer_args.calculate_tablesize(max_tablesize, n_tables,
-                                                   'foograph',
-                                                   max_memory_use=max_mem)
+        nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
         assert 0, "previous statement should fail"
     except AssertionError:
         raise

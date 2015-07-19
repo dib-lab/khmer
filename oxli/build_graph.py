@@ -55,9 +55,7 @@ def main(args):
     # if optimization args are given, do optimization
     args = functions.do_sanity_checking(args, 0.01)
 
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    'nodegraph',
-                                    max_memory_use=args.max_memory_usage)
+    tablesize = calculate_tablesize(args, 'nodegraph')
     check_space_for_hashtable(args.output_filename, tablesize, args.force)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)

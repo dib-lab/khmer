@@ -132,20 +132,19 @@ def add_loadhash_args(parser):
                         action=LoadAction)
 
 
-def calculate_tablesize(max_tablesize, n_tables, hashtype, multiplier=1.0,
-                        max_memory_use=None):
+def calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
         raise Exception("unknown graph type: %s" % (hashtype,))
 
-    if max_memory_use:
+    if args.max_memory_usage:
         if hashtype == 'countgraph':
-            tablesize = max_memory_use / n_tables / \
+            tablesize = args.max_memory_usage / args.n_tables / \
                 float(multiplier)
         elif hashtype == 'nodegraph':
-            tablesize = 8. * max_memory_use / n_tables / \
+            tablesize = 8. * args.max_memory_usage / args.n_tables / \
                 float(multiplier)
     else:
-        tablesize = max_tablesize
+        tablesize = args.max_tablesize
 
     return tablesize
 
@@ -157,9 +156,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    'nodegraph', multiplier,
-                                    args.max_memory_usage)
+    tablesize = calculate_tablesize(args, 'nodegraph', multiplier)
     return khmer.Hashbits(ksize, tablesize, args.n_tables)
 
 
@@ -170,9 +167,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    'countgraph', multiplier=multiplier,
-                                    max_memory_use=args.max_memory_usage)
+    tablesize = calculate_tablesize(args, 'countgraph', multiplier=multiplier)
     return khmer.CountingHash(ksize, tablesize, args.n_tables)
 
 
@@ -189,9 +184,7 @@ def report_on_config(args, hashtype='countgraph'):
     if args.quiet:
         return
 
-    tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                    hashtype,
-                                    max_memory_use=args.max_memory_usage)
+    tablesize = calculate_tablesize(args, hashtype)
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))

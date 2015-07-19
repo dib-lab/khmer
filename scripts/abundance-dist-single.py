@@ -78,9 +78,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     check_input_files(args.input_sequence_filename, args.force)
     if args.savetable:
-        tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                        'countgraph',
-                                        max_memory_use=args.max_memory_usage)
+        tablesize = calculate_tablesize(args, 'countgraph')
         check_space_for_hashtable(args.savetable, tablesize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):

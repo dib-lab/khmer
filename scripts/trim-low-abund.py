@@ -126,9 +126,7 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        tablesize = calculate_tablesize(args.max_tablesize, args.n_tables,
-                                        'countgraph',
-                                        max_memory_use=args.max_memory_usage)
+        tablesize = calculate_tablesize(args, 'countgraph')
         check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     if args.loadtable:
