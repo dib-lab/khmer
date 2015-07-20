@@ -5,16 +5,9 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
-"""
-Estimate number of unique k-mers, with precision <= ERROR_RATE.
+# pylint: disable=missing-docstring,no-member
 
-% python sandbox/unique-kmers.py [ -k <k size> ] [ -e <ERROR_RATE> ] <data1> <data2> ...
-
-Use '-h' for parameter help.
-"""
 from __future__ import print_function
-
 
 import argparse
 import os
@@ -26,6 +19,7 @@ from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
 from oxli.functions import optimal_args_output_gen as output_gen
 from khmer import __version__
 import screed
+
 
 def get_parser():
     descr = "Estimate number of unique k-mers, with precision <= ERROR_RATE."
@@ -75,7 +69,6 @@ def get_parser():
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-
 
     return parser
 
