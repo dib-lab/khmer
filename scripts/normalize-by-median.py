@@ -38,43 +38,84 @@ from khmer.utils import write_record, broken_paired_reader
 DEFAULT_DESIRED_COVERAGE = 20
 
 
-def with_diagnostics(ifilename, norm, reader, fp_file):
+class WithDiagnostics(object):
     """
     Generator/context manager to do boilerplate output of statistics.
 
     uses a Normalizer object.
     """
-    # per read diagnostic output
-    for _, record in enumerate(norm(reader)):
+    def __init__(self, norm, report_fp=None, report_frequency=100000):
+        self.norm = norm
+        self.report_fp = report_fp
+        if report_fp:
+            report_fp.write('total,kept,f_kept\n')
 
-        if norm.total % 100000 == 0:
-            print('... kept {kept} of {total} or {perc:2}% so far'
-                  .format(kept=norm.total - norm.discarded,
+        self.report_frequency = report_frequency
+        self.next_report_at = self.report_frequency
+        self.last_report_at = self.report_frequency
+
+    def __call__(self, reader, ifilename):
+        norm = self.norm
+        report_fp = self.report_fp
+
+        reads_per_file = norm.total
+
+        # per read diagnostic output
+        for _, record in enumerate(norm(reader)):
+
+            if norm.total >= self.next_report_at:
+                self.next_report_at += self.report_frequency
+                self.last_report_at = norm.total
+
+                total = norm.total
+                kept = norm.total - norm.discarded
+                perc_kept = kept / float(total)
+
+                print('... kept {kept} of {total} or {perc_kept:.1%} so far'
+                      .format(kept=kept,
+                              total=norm.total,
+                              perc_kept=perc_kept),
+                      file=sys.stderr)
+                print('... in file ' + ifilename, file=sys.stderr)
+
+                if report_fp:
+                    print("{total},{kept},{f_kept:.4}"
+                          .format(total=norm.total,
+                                  f_kept=perc_kept,
+                                  kept=kept),
+                          file=report_fp)
+                    report_fp.flush()
+
+            yield record
+
+        # per file diagnostic output
+        if norm.total == reads_per_file:
+            print('SKIPPED empty file ' + ifilename, file=sys.stderr)
+        else:
+            total = norm.total
+            kept = norm.total - norm.discarded
+            perc_kept = kept / float(total)
+
+            print('DONE with {inp}; kept {kept} of {total} or {perc_kept:.1%}'
+                  .format(inp=ifilename,
+                          kept=kept,
                           total=norm.total,
-                          perc=int(100. - norm.discarded /
-                                   float(norm.total) * 100.)),
+                          perc_kept=perc_kept),
                   file=sys.stderr)
 
-            print('... in file ' + ifilename, file=sys.stderr)
+        # make sure there's at least one report per file, at the end of each
+        # file.
+        if report_fp and norm.total != self.last_report_at:
+            total = norm.total
+            kept = norm.total - norm.discarded
+            perc_kept = kept / float(total)
 
-        yield record
-
-    # per file diagnostic output
-    if norm.total == 0:
-        print('SKIPPED empty file ' + ifilename, file=sys.stderr)
-    else:
-        print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
-              .format(inp=ifilename, kept=norm.total - norm.discarded,
-                      total=norm.total, perc=int(100. - norm.discarded /
-                                                 float(norm.total) * 100.)),
-              file=sys.stderr)
-
-    if fp_file:
-        print("{total} {kept} {discarded}"
-              .format(total=norm.total, kept=norm.total - norm.discarded,
-                      discarded=1. - (norm.discarded / float(norm.total))),
-              file=fp_file)
-        fp_file.flush()
+            print("{total},{kept},{f_kept:.4}"
+                  .format(total=norm.total,
+                          f_kept=perc_kept,
+                          kept=kept),
+                  file=report_fp)
+            report_fp.flush()
 
 
 class Normalizer(object):
@@ -217,9 +258,12 @@ def get_parser():
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
+    parser.add_argument('--report-frequency',
+                        metavar='report_frequency', type=int,
+                        default=100000)
     parser.add_argument('-f', '--force', dest='force',
-                        help='continue on next file if read errors are \
-                         encountered', action='store_true')
+                        help='continue past file reading errors',
+                        action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_file',
                         type=argparse.FileType('w'),
@@ -286,6 +330,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, htable)
+    with_diagnostics = WithDiagnostics(norm, report_fp, args.report_frequency)
 
     # make a list of all filenames and if they're paired or not;
     # if we don't know if they're paired, default to allowing but not
@@ -326,7 +371,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                                           require_paired=require_paired)
 
             # actually do diginorm
-            for record in with_diagnostics(filename, norm, reader, report_fp):
+            for record in with_diagnostics(reader, filename):
                 if record is not None:
                     write_record(record, outfp)
 
