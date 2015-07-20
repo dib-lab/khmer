@@ -3295,7 +3295,6 @@ def test_unique_kmers_stream_out():
     err = err.read()
     assert 'Estimated number of unique 20-mers in -: 3950' in err
     assert 'Total estimated number of unique 20-mers: 3950' in err
-    assert 'Writing to stdout' in err, err
 
     out.seek(0)
     out = out.read()

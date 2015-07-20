@@ -9,7 +9,7 @@
 """
 Estimate number of unique k-mers, with precision <= ERROR_RATE.
 
-% python scripts/unique-kmers.py [ -k <k size> ] [ -e <ERROR_RATE> ] <data1> 
+% python scripts/unique-kmers.py [ -k <k size> ] [ -e <ERROR_RATE> ] <data1>
 <data2> ...
 
 Use '-h' for parameter help.
