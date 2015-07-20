@@ -1,4 +1,4 @@
-2015-07-18  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-20  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/{kfile,khmer_args}.py: refactored information passing, made it so
    space checks happen in the right directory
@@ -7,6 +7,14 @@
    make-initial-stoptags,normalize-by-median,partition-graph,
    sample-reads-randomly,trim-low-abund}.py,tests/test_script_arguments.py:
    changed to use new arg structure
+
+2015-07-20  Titus Brown  <titus@idyll.org>
+
+   * khmer/__init__.py: cleaned up FP rate reporting.
+   * scripts/normalize-by-median.py: corrected epilog; refactored reporting
+   to be a bit cleaner; use CSV for reporting file;
+   added --report-frequency arg.
+   * tests/test_normalize_by_median.py: updated/added tests for reporting.
 
 2015-07-17  Jacob Fenton  <bocajnotnef@gmail.com>
    * oxli/{functions,build_graph}.py,scripts/{load-graph,normalize-by-median,
