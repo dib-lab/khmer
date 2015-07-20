@@ -3,9 +3,8 @@
 What's New In khmer 2.0?
 ########################
 
-
-Script Updates
-==============
+New behavior
+============
 
 Digital normalization script now supports mixed paired and unpaired read input
 ------------------------------------------------------------------------------
@@ -56,4 +55,5 @@ Scripts now output columnar data in CSV format by default
 All scripts that output any kind of columnar data now do so in CSV format,
 with headers.  Previously this had to be enabled with :options:`--csv`.
 (Affects `abundance-dist-single.py`, `abundance-dist.py`, `count-median.py`,
-and `count-overlap.py`.)
+and `count-overlap.py`.) `normalize-by-median.py` also now outputs CSV
+when :option:`-R` is used.
