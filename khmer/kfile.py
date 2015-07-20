@@ -136,7 +136,7 @@ def check_space_for_hashtable(outfile_name, hash_size, force,
     if size_diff > 0:
         print("ERROR: Not enough free space on disk "
               "for saved table files;"
-              "       Need at least %s GB more."
+              "       Need at least %.1f GB more."
               % (float(size_diff) / 1e9,), file=sys.stderr)
         print("       Table size: %.1f GB"
               % (float(hash_size) / 1e9,), file=sys.stderr)
