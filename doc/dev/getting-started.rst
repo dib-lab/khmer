@@ -341,8 +341,8 @@ third, or fourth, or nth contribution).
 
 So, assuming you've found an issue you'd like to work on there's a couple
 things to make sure your local copy of the repository is ready for a new
-issue--specifically, we need to make sure it's in sync with the remote repo so
-you aren't working on a old copy. So::
+issue--specifically, we need to make sure it's in sync with the remote
+repository so you aren't working on a old copy. So::
 
         git checkout master
         git fetch --all
@@ -350,7 +350,7 @@ you aren't working on a old copy. So::
 
 What this does is it pulls down updates from GitHub about any changes that may
 have been made to the master branch since your last contribution (usually
-including the merge of your last contributuion). Then we merge those changes
+including the merge of your last contribution). Then we merge those changes
 into your local copy of the master branch. Next::
 
         git checkout -b new-branch-name
