@@ -180,11 +180,11 @@ def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
 
 
 def longify(listofints):
-    '''List of ints => list of longs, only on py2
+    """List of ints => list of longs, only on py2.
 
     Takes a list of numeric types, and returns longs on python2, or the
     original list on python3.
-    '''
+    """
     # For map(long, [list of ints]) cross-version hackery
     if sys.version_info.major < 3:
         return map(long, listofints)

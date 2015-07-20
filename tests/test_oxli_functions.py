@@ -57,31 +57,31 @@ def test_estimate_functions_namedtup():
 
 
 def test_optimal_size_function():
-    res = functions.optimal_size(99, M=1024)
+    res = functions.optimal_size(99, mem_cap=1024)
     assert res.num_htables == 7, res[0]
     assert res.htable_size == 146, res[1]
     assert res.mem_use == 1022, res[2]
     assert abs(.008 - res.fp_rate) < .001, res[3]
 
-    res = functions.optimal_size(99, f=0.00701925498897)
+    res = functions.optimal_size(99, fp_rate=0.00701925498897)
     assert res.num_htables == 7, res[0]
     assert res.htable_size == 145, res[1]
     assert res.mem_use == 1015, res[2]
     assert abs(.008 - res.fp_rate) < .002, res[3]
 
     try:
-        functions.optimal_size(99, M=1024, f=0.00701925498897)
+        functions.optimal_size(99, mem_cap=1024, fp_rate=0.00701925498897)
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
-        assert "K and either M or f must be defined." in str(err)
+        assert "num_kmers and either mem_cap or fp_rate" in str(err)
 
     try:
         functions.optimal_size(99)
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
-        assert "K and either M or f must be defined." in str(err)
+        assert "num_kmers and either mem_cap or fp_rate" in str(err)
 
 
 def test_output_gen():
