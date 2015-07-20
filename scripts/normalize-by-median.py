@@ -50,6 +50,9 @@ class WithDiagnostics(object):
         if report_fp:
             report_fp.write('total,kept,f_kept\n')
 
+        self.total = 0
+        self.kept = 0
+
         self.report_frequency = report_frequency
         self.next_report_at = self.report_frequency
         self.last_report_at = self.report_frequency
@@ -58,62 +61,62 @@ class WithDiagnostics(object):
         norm = self.norm
         report_fp = self.report_fp
 
-        reads_per_file = norm.total
+        reads_start = self.total
+        total = self.total
+        kept = self.kept
 
-        # per read diagnostic output
-        for _, record in enumerate(norm(reader)):
+        try:
+            for _, is_paired, read0, read1 in reader:
+                if is_paired:
+                    total += 2
+                else:
+                    total += 1
 
-            if norm.total >= self.next_report_at:
-                self.next_report_at += self.report_frequency
-                self.last_report_at = norm.total
+                # do diginorm
+                for record in norm(is_paired, read0, read1):
+                    kept += 1
+                    yield record
 
-                total = norm.total
-                kept = norm.total - norm.discarded
-                perc_kept = kept / float(total)
+                # report!
+                if total >= self.next_report_at:
+                    self.next_report_at += self.report_frequency
+                    self.last_report_at = total
 
-                print('... kept {kept} of {total} or {perc_kept:.1%} so far'
-                      .format(kept=kept,
-                              total=norm.total,
-                              perc_kept=perc_kept),
-                      file=sys.stderr)
-                print('... in file ' + ifilename, file=sys.stderr)
+                    perc_kept = kept / float(total)
 
-                if report_fp:
-                    print("{total},{kept},{f_kept:.4}"
-                          .format(total=norm.total,
-                                  f_kept=perc_kept,
-                                  kept=kept),
-                          file=report_fp)
-                    report_fp.flush()
+                    print('... kept {kept} of {tot} or {perc_kept:.1%} so far'
+                          .format(kept=kept, tot=total, perc_kept=perc_kept),
+                          file=sys.stderr)
+                    print('... in file ' + ifilename, file=sys.stderr)
 
-            yield record
+                    if report_fp:
+                        print("{total},{kept},{f_kept:.4}"
+                              .format(total=total, f_kept=perc_kept,
+                                      kept=kept),
+                              file=report_fp)
+                        report_fp.flush()
+        finally:
+            self.total = total
+            self.kept = kept
 
         # per file diagnostic output
-        if norm.total == reads_per_file:
+        if total == reads_start:
             print('SKIPPED empty file ' + ifilename, file=sys.stderr)
         else:
-            total = norm.total
-            kept = norm.total - norm.discarded
             perc_kept = kept / float(total)
 
             print('DONE with {inp}; kept {kept} of {total} or {perc_kept:.1%}'
-                  .format(inp=ifilename,
-                          kept=kept,
-                          total=norm.total,
+                  .format(inp=ifilename, kept=kept, total=total,
                           perc_kept=perc_kept),
                   file=sys.stderr)
 
         # make sure there's at least one report per file, at the end of each
         # file.
-        if report_fp and norm.total != self.last_report_at:
-            total = norm.total
-            kept = norm.total - norm.discarded
+        if report_fp and total != self.last_report_at:
             perc_kept = kept / float(total)
 
             print("{total},{kept},{f_kept:.4}"
-                  .format(total=norm.total,
-                          f_kept=perc_kept,
-                          kept=kept),
+                  .format(total=total, f_kept=perc_kept, kept=kept),
                   file=report_fp)
             report_fp.flush()
 
@@ -126,10 +129,7 @@ class Normalizer(object):
         self.htable = htable
         self.desired_coverage = desired_coverage
 
-        self.total = 0
-        self.discarded = 0
-
-    def __call__(self, reader):
+    def __call__(self, is_paired, read0, read1):
         """
         Actually does digital normalization - the core algorithm.
 
@@ -141,31 +141,23 @@ class Normalizer(object):
         """
         desired_coverage = self.desired_coverage
 
-        for _, is_paired, read0, read1 in reader:
-            passed_filter = False
+        passed_filter = False
 
-            self.total += 1
+        batch = []
+        batch.append(read0)
+        if read1 is not None:
+            batch.append(read1)
 
-            if is_paired:
-                self.total += 1
+        for record in batch:
+            seq = record.sequence.replace('N', 'A')
+            if not self.htable.median_at_least(seq, desired_coverage):
+                passed_filter = True
 
-            batch = []
-            batch.append(read0)
-            if read1 is not None:
-                batch.append(read1)
-
+        if passed_filter:
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                if not self.htable.median_at_least(seq, desired_coverage):
-                    passed_filter = True
-
-            if passed_filter:
-                for record in batch:
-                    seq = record.sequence.replace('N', 'A')
-                    self.htable.consume(seq)
-                    yield record
-            else:
-                self.discarded += len(batch)
+                self.htable.consume(seq)
+                yield record
 
 
 @contextmanager

@@ -215,7 +215,7 @@ def test_normalize_by_median_report_fp():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     infile2 = utils.get_temp_filename('test2.fa')
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
-    
+
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
 
@@ -231,6 +231,28 @@ def test_normalize_by_median_report_fp():
     assert line == '1001,1,0.000999', line
     line = report.readline().strip()
     assert line == '2002,1,0.0004995', line
+
+
+def test_normalize_by_median_report_fp_hifreq():
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    script = 'normalize-by-median.py'
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile,
+            '--report-frequency', '100']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile)
+    report = open(outfile, 'r')
+    line = report.readline().strip()
+    assert line == 'total,kept,f_kept', line
+    line = report.readline().strip()
+    assert line == '100,1,0.01', line
+    line = report.readline().strip()
+    assert line == '200,1,0.005', line
 
 
 @attr('huge')
@@ -249,7 +271,7 @@ def test_normalize_by_median_report_fp_huge():
     report = open(outfile, 'r')
     line = report.readline()            # skip header
     line = report.readline()
-    assert "100000,25261,0.25261" in line, line
+    assert "100000,25261,0.2526" in line, line
 
 
 def test_normalize_by_median_unpaired_and_paired():
