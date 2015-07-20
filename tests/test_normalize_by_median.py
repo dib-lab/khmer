@@ -211,6 +211,9 @@ def test_normalize_by_median_known_good():
 
 
 def test_normalize_by_median_report_fp():
+    # this tests basic reporting of diginorm stats => report.out, including
+    # a test of aggregate stats for two input files.
+
     infile = utils.get_temp_filename('test.fa')
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     infile2 = utils.get_temp_filename('test2.fa')
@@ -234,6 +237,9 @@ def test_normalize_by_median_report_fp():
 
 
 def test_normalize_by_median_report_fp_hifreq():
+    # this tests high-frequency reporting of diginorm stats for a single
+    # file => report.out.
+
     infile = utils.get_temp_filename('test.fa')
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
@@ -257,6 +263,9 @@ def test_normalize_by_median_report_fp_hifreq():
 
 @attr('huge')
 def test_normalize_by_median_report_fp_huge():
+    # this tests reporting of diginorm stats => report.out for a large
+    # file, with the default reporting interval of once every 100k.
+
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
