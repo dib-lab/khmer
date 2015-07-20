@@ -5,11 +5,12 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=invalid-name,missing-docstring,no-member
 """
 Estimate number of unique k-mers, with precision <= ERROR_RATE.
 
-% python sandbox/unique-kmers.py [ -k <k size> ] [ -e <ERROR_RATE> ] <data1> <data2> ...
+% python scripts/unique-kmers.py [ -k <k size> ] [ -e <ERROR_RATE> ] <data1> 
+<data2> ...
 
 Use '-h' for parameter help.
 """

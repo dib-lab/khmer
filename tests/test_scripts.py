@@ -3295,6 +3295,7 @@ def test_unique_kmers_stream_out():
     err = err.read()
     assert 'Estimated number of unique 20-mers in -: 3950' in err
     assert 'Total estimated number of unique 20-mers: 3950' in err
+    assert 'Writing to stdout' in err, err
 
     out.seek(0)
     out = out.read()
@@ -3316,8 +3317,8 @@ def test_unique_kmers_multiple_inputs():
                                   os.path.dirname(infile))
 
     err = err.splitlines()
-    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infiles[0])
-            in err)
+    assert ('Estimated number of unique 20-mers in {0}: 3950'
+            .format(infiles[0]) in err)
     assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
             in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
