@@ -1,3 +1,7 @@
+2015-07-20  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/getting-started.rst: added instructions for second contribution
+
 2015-07-20  Titus Brown  <titus@idyll.org>
 
    * khmer/__init__.py: cleaned up FP rate reporting.

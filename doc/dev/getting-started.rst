@@ -332,3 +332,33 @@ Here are a few suggestions:
 
 * You can also help other people out by watching for new issues or
   looking at pull requests.  Remember to be nice and polite!
+
+Your second contribution...
+---------------------------
+
+These are just a few quick pointers on getting started on your second (or
+third, or fourth, or nth contribution).
+
+So, assuming you've found an issue you'd like to work on there's a couple
+things to make sure your local copy of the repository is ready for a new
+issue--specifically, we need to make sure it's in sync with the remote repo so
+you aren't working on a old copy. So::
+
+        git checkout master
+        git fetch --all
+        git pull
+
+What this does is it pulls down updates from GitHub about any changes that may
+have been made to the master branch since your last contribution (usually
+including the merge of your last contributuion). Then we merge those changes
+into your local copy of the master branch. Next::
+
+        git checkout -b new-branch-name
+        make clean test
+
+Here we check out a new branch for your changes and then we kick off a set of
+tests to make sure everything is a-okay with the code--though the master
+branch *should* always be clean it's always good to check before starting work
+(so that any existing errors don't confound your work later).
+
+After that you can get to coding!
