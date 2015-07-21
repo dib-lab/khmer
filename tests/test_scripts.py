@@ -3279,7 +3279,7 @@ def test_unique_kmers_diagnostics():
 
     out = out.splitlines()
     assert ('expected_fp\tnumber_hashtable(Z)\t'
-            'size_hashtable(H)\texpected_memory_usage' in out)
+            'size_hashtable(H)\texpected_memory_usage' in err)
 
 
 def test_unique_kmers_stream_out():

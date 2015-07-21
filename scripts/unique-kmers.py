@@ -41,12 +41,28 @@ def get_parser():
 
     :option:`-k`/:option:`--ksize` should be set to the desired k-mer size.
 
-    Output is sent to STDOUT, but a report file can be generated with
-    :option:`-R`/:option:`--report`.
+    Informational output is sent to STDERR, but a report file can be generated
+    with :option:`-R`/:option:`--report`.
+
+    :option:`--stream-out`:option: will write the sequences taken in to STDOUT.
+    This is useful for workflowing--count unique kmers in a stream, do digital
+    normalization, count unique kmers again.
+
+    :option:`--diagnostics`:option: will provide detailed options for tablesize
+    and memory limitations for various FP rates. This is useful for configuring
+    other khmer scripts. This will be written to STDERR.
 
     Example::
 
         unique-kmers.py -k 17 tests/test-data/test-abund-read{,-2,-3}.fa
+
+    Example::
+
+        unique-kmers.py -k 17 --diagnostics tests/test-data/test-abund-read.fa
+
+    Example::
+
+        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | normalize-by-median.py -k 17 -o normalized /dev/stdin | unique-kmers.py -k 17
 
     Example::
 
@@ -115,7 +131,7 @@ def main():
 
     to_print = output_gen(cardinality, args.error_rate)
     if args.diagnostics:
-        print(to_print)
+        print(to_print, file=sys.stderr)
 
     if report_fp:
         print(cardinality, args.ksize, 'total', file=report_fp)
