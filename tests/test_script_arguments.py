@@ -53,7 +53,6 @@ def test_check_tablespace():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        mem_args = args.max_memory_usage
         tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_hashtable(outfile, tablesize,
                                               False, _testhook_free_space=0)
@@ -87,7 +86,6 @@ def test_check_tablespace_force():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        mem_args = args.max_memory_usage
         tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_hashtable(outfile, tablesize,
                                               True, _testhook_free_space=0)

@@ -122,7 +122,7 @@ def check_space(in_files, force, _testhook_free_space=None):
 
 def check_space_for_hashtable(outfile_name, hash_size, force,
                               _testhook_free_space=None):
-    """Check we have enough size to write a hash table."""
+    """Check that we have enough size to write the specified hash table."""
 
     dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)

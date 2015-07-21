@@ -71,7 +71,6 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
-        mem_args = args.max_memory_usage
         tablesize = calculate_tablesize(args, 'countgraph')
         check_space_for_hashtable(args.savetable, tablesize, args.force)
 

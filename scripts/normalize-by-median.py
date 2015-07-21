@@ -306,7 +306,6 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_space(args.input_filenames, args.force)
     if args.savetable:
         tablesize = calculate_tablesize(args, 'countgraph')
-
         check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     # load or create counting table.

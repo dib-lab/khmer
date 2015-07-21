@@ -125,7 +125,6 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            mem_args = args.max_memory_usage
             tablesize = calculate_tablesize(args, 'countgraph')
             check_space_for_hashtable(base, tablesize, args.force)
             print('mid-save', base, file=sys.stderr)
