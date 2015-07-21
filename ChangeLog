@@ -1,3 +1,10 @@
+2015-07-20  Titus Brown  <titus@idyll.org>
+
+   * scripts/interleave-reads.py: force exactly two input files.
+   * scripts/test_scripts.py: remove test_interleave_reads_broken_fq_4 for
+   only one input file for interleave-reads.py.
+   * scripts/split-paired-reads.py: fix print statement; clarify output.
+
 2015-07-17  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * oxli/{functions,build_graph}.py,scripts/{load-graph,normalize-by-median,

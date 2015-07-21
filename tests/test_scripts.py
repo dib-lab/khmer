@@ -1720,21 +1720,6 @@ def test_interleave_reads_broken_fq_3():
     assert "ERROR: This doesn't look like paired data!" in err
 
 
-def test_interleave_reads_broken_fq_4():
-    # test input files
-    infile1 = utils.get_test_data('paired-mixed-broken.fq')
-
-    # actual output file
-    outfile = utils.get_temp_filename('out.fq')
-
-    script = 'interleave-reads.py'
-    args = [infile1, '-o', outfile]
-
-    status, out, err = utils.runscript(script, args, fail_ok=True)
-    assert status == 1
-    assert "ERROR: given only one filename, that doesn't contain _R1_" in err
-
-
 def test_interleave_reads_2_fa():
     # test input files
     infile1 = utils.get_test_data('paired.fa.1')
