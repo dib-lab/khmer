@@ -27,7 +27,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.khmer_args import info
 from khmer.utils import write_record, broken_paired_reader
 
@@ -85,8 +85,6 @@ def main():
     for _ in args.filenames:
         check_input_files(_, args.force)
 
-    check_space(args.filenames, args.force)
-
     # seed the random number generator?
     if args.random_seed:
         random.seed(args.random_seed)
@@ -104,6 +102,8 @@ def main():
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             if not args.force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
         output_filename = output_file.name
     else:

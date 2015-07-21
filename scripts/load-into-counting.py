@@ -22,9 +22,9 @@ import textwrap
 import khmer
 from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args
+    add_threading_args, calculate_tablesize
 from khmer.kfile import check_file_writable
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_hashtable
 
 
@@ -84,8 +84,9 @@ def main():
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    check_space(args.input_sequence_filename, args.force)
-    check_space_for_hashtable(args, 'countgraph', args.force)
+    tablesize = calculate_tablesize(args, 'countgraph')
+    check_space_for_hashtable(args.output_countingtable_filename, tablesize,
+                              args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
@@ -124,7 +125,8 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args, 'countgraph', args.force)
+            tablesize = calculate_tablesize(args, 'countgraph')
+            check_space_for_hashtable(base, tablesize, args.force)
             print('mid-save', base, file=sys.stderr)
 
             htable.save(base)
