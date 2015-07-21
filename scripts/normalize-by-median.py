@@ -28,7 +28,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+                              report_on_config, info, calculate_tablesize)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -305,7 +305,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        tablesize = calculate_tablesize(args, 'countgraph')
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     # load or create counting table.
     if args.loadtable:

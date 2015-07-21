@@ -18,7 +18,7 @@ import textwrap
 import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -82,8 +82,6 @@ def main():
         infiles.append(args.stoptags)
     for _ in infiles:
         check_input_files(_, args.force)
-
-    check_space(infiles, args.force)
 
     print('loading htable %s.pt' % graphbase, file=sys.stderr)
     htable = khmer.load_hashbits(graphbase + '.pt')
