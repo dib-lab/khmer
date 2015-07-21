@@ -343,6 +343,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         else:
             output_name = args.single_output_file.name
         outfp = args.single_output_file
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
 
     #
     # main loop: iterate over all files given, do diginorm.

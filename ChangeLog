@@ -4,6 +4,12 @@
    * scripts/test_scripts.py: remove test_interleave_reads_broken_fq_4 for
    only one input file for interleave-reads.py.
    * scripts/split-paired-reads.py: fix print statement; clarify output.
+   * scripts/normalize-by-median.py: if stdin is supplied for input,
+   check that -o specifies output file.
+   * scripts/sample-reads-randomly.py: if stdin is supplied for input,
+   check that -o specifies output file.
+   * khmer/kfile.py: change 'check_input_files' to no longer warn that
+   '-' doesn't exist'.
 
 2015-07-20  Titus Brown  <titus@idyll.org>
 
