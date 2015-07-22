@@ -1432,6 +1432,22 @@ def test_abundance_dist():
         assert line == '1001,2,98,1.0', line
 
 
+def test_abundance_dist_stdout():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = 'abundance-dist.py'
+    args = ['-z', '--csv', htfile, infile, "-"]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert '1,96,96,0.98' in out, out
+    assert '1001,2,98,1.0' in out, out
+
+
 def test_abundance_dist_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')

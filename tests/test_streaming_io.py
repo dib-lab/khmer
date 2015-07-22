@@ -344,6 +344,30 @@ def test_filter_abund_2_fail():
            in err
 
 
+def test_abundance_dist_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.dist')
+
+    countgraph = _make_counting(in1, K=17)
+
+    cmd = """
+       cat {in1} |
+       {scripts}/abundance-dist.py -z {countgraph} - - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1,
+                     countgraph=countgraph)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    with open(out1) as fp:
+        line = fp.readline().strip()
+        assert line == '1 96 96 0.98', line
+        line = fp.readline().strip()
+        assert line == '1001 2 98 1.0', line
+
+
 def test_trim_low_abund_1():
     in1 = utils.get_test_data('test-abund-read-2.fa')
     out1 = utils.get_temp_filename('out.abundtrim')
