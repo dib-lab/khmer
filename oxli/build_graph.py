@@ -20,7 +20,8 @@ import sys
 
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (report_on_config, info, add_threading_args)
+from khmer.khmer_args import (report_on_config, info, add_threading_args,
+                              calculate_tablesize)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 from oxli import functions
@@ -54,8 +55,8 @@ def main(args):
     # if optimization args are given, do optimization
     args = functions.do_sanity_checking(args, 0.01)
 
-    check_space(args.input_filenames, args.force)
-    check_space_for_hashtable(args, 'nodegraph', args.force)
+    tablesize = calculate_tablesize(args, 'nodegraph')
+    check_space_for_hashtable(args.output_filename, tablesize, args.force)
 
     print('Saving k-mer presence table to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
