@@ -99,7 +99,7 @@ def test_interleave_split_2_fail():
     print(out)
     print(err)
     assert "Accepting input from stdin; output filenames must be provided." \
-           in err
+           in str(err)
 
 
 def test_extract_paired_pe():
@@ -153,7 +153,7 @@ def test_extract_paired_se_fail():
     print(out)
     print(err)
     assert "Accepting input from stdin; output filenames must be provided." \
-           in err
+           in str(err)
 
 
 def test_norm_by_median_1():
@@ -192,7 +192,7 @@ def test_norm_by_median_2_fail():
     print(out)
     print(err)
     assert "Accepting input from stdin; output filename must be provided with"\
-           in err
+           in str(err)
 
 
 def test_sample_reads_randomly_1():
@@ -227,7 +227,7 @@ def test_sample_reads_randomly_2_fail():
     print(out)
     print(err)
     assert "Accepting input from stdin; output filename must be provided with"\
-           in err
+           in str(err)
 
 
 def test_extract_long_sequences_1():
@@ -341,7 +341,7 @@ def test_filter_abund_2_fail():
     print(err)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
-           in err
+           in str(err)
 
 
 def test_abundance_dist_1():
@@ -404,7 +404,7 @@ def test_trim_low_abund_2_fail():
     print(err)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
-           in err
+           in str(err)
 
 
 def test_count_median_1():
