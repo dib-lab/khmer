@@ -108,6 +108,17 @@ def test_invalid_file_warn():
         sys.stderr = save_stderr
 
 
+def test_check_valid_stdin_nowarn():
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
+    try:
+        khmer.kfile.check_valid_file_exists(["-"])
+        assert sys.stderr.getvalue().count("\n") == 0
+    except SystemExit as e:
+        print(str(e))
+    finally:
+        sys.stderr = save_stderr
+
+
 FakeArgparseObject = collections.namedtuple('FakeArgs',
                                             ['ksize', 'n_tables',
                                              'max_tablesize',

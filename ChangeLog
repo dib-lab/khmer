@@ -14,6 +14,8 @@
    * khmer/kfile.py: change 'check_input_files' to no longer warn that
    '-' doesn't exist'.
    * tests/test-data/paired.fq.2: removed extraneous newline from end.
+   * tests/{test_normalize_by_median,test_script_arguments,test_scripts}.py:
+   added tests for new code.
 
 2015-07-21  Jacob Fenton  <bocajnotnef@gmail.com>
 

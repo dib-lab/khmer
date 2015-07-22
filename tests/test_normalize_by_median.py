@@ -113,6 +113,7 @@ def test_normalize_by_median_sanity_check_1():
     args = ['-U', '83', '--max-tablesize', '17', infile]
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
     except AssertionError as e:
         out = str(e)
         assert "Warning: The given tablesize is too small!" in out, out
@@ -336,8 +337,23 @@ def test_normalize_by_median_double_file_name():
 
     try:
         (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("Shouldn't get to this")
     except AssertionError as e:
         assert "Duplicate filename--Cannot handle this!" in str(e), str(e)
+
+
+def test_normalize_by_median_stdin_no_out():
+    infile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ["-"]
+
+    try:
+        (status, out, err) = utils.runscript(script, args, in_dir)
+        raise Exception("should not reach this")
+    except AssertionError as e:
+        assert "Accepting input from stdin; output filename" in str(e), str(e)
 
 
 def test_normalize_by_median_overwrite():

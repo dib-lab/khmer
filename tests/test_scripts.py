@@ -2076,6 +2076,15 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     assert "is not part of a pair" in err
 
 
+def test_split_paired_reads_2_stdin_no_out():
+    script = 'split-paired-reads.py'
+    args = ['-']
+
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filenames must " in err
+
+
 def test_split_paired_reads_2_mixed_fq():
     # test input file
     infile = utils.get_temp_filename('test.fq')
@@ -2382,6 +2391,17 @@ def test_sample_reads_randomly_fq():
                                             parse_description=False)])
     print(list(sorted(seqs)))
     assert seqs == answer
+
+
+def test_sample_reads_randomly_stdin_no_out():
+    script = 'sample-reads-randomly.py'
+    args = ['-']
+
+    try:
+        utils.runscript(script, args)
+        raise Exception("Shouldn't get to this")
+    except AssertionError, e:
+        assert "Accepting input from stdin; output filename" in str(e), str(e)
 
 
 def test_fastq_to_fasta():
@@ -2874,12 +2894,20 @@ def test_trim_low_abund_1_duplicate_filename_err():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
-    try:
-        utils.runscript('trim-low-abund.py', args, in_dir)
-        raise Exception("should not reach this")
-    except AssertionError:
-        # an error should be raised by passing 'infile' twice.
-        pass
+    (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Error: Cannot input the same filename multiple times." in str(err)
+
+
+def test_trim_low_abund_1_stdin_err():
+    args = ["-"]
+
+    (status, out, err) = utils.runscript('trim-low-abund.py', args,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
 
 
 def test_trim_low_abund_2():
