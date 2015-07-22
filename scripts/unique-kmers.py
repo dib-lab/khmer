@@ -93,10 +93,10 @@ def get_parser():
 
     parser.add_argument('--stream-out', '-S', default=False,
                         action='store_true',
-                        help='write input sequences to stdout')
+                        help='write input sequences to STDOUT')
 
     parser.add_argument('--diagnostics', default=False, action='store_true',
-                        help='print out reccomended tablesize args and'
+                        help='print out reccomended tablesize argumentss and'
                              'restrictions')
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
