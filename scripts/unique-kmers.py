@@ -35,7 +35,7 @@ def get_parser():
     epilog = ("""
     A HyperLogLog counter is used to do cardinality estimation. Since this counter
     is based on a tradeoff between precision and memory consumption,
-    :option:`-e`/:option:`--error-rate` can be used to control how much
+    the :option:`-e`/:option:`--error-rate` can be used to control how much
     memory will be used. In practice the memory footprint is small even
     at low error rates (< 0.01).
 
@@ -86,7 +86,7 @@ def get_parser():
     parser.add_argument('--error-rate', '-e', type=float, default=0.01,
                         help='Acceptable error rate')
 
-    parser.add_argument('-R', '--report',
+    parser.add_argument('--report', '-R',
                         metavar='filename', type=argparse.FileType('w'),
                         help='generate informational report and write to'
                         ' filename')
