@@ -158,7 +158,7 @@ def check_valid_file_exists(in_files):
     """
     for in_file in in_files:
         if in_file == '-' or in_file == '/dev/stdin':
-            continue
+            pass
         if os.path.exists(in_file):
             mode = os.stat(in_file).st_mode
             if os.stat(in_file).st_size > 0 or S_ISBLK(mode) or S_ISFIFO(mode):

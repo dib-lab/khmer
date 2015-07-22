@@ -314,6 +314,20 @@ def test_filter_abund_2():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
+def test_filter_abund_2_stdin():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = 'filter-abund.py'
+    args = ['-C', '1', counting_ht, '-']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
+
 # make sure that FASTQ records are retained.
 
 
