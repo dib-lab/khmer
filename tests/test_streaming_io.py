@@ -405,3 +405,26 @@ def test_trim_low_abund_2_fail():
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err
+
+
+def test_count_median_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.counts')
+
+    countgraph = _make_counting(in1, K=8)
+    cmd = """
+       cat {in1} |
+       {scripts}/count-median.py --csv {countgraph} - - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), countgraph=countgraph,
+                     in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1), out1
+    data = [x.strip() for x in open(out1)]
+    data = set(data)
+    assert len(data) == 3, data
+    assert 'seq,1001,1001.0,0.0,18' in data
+    assert '895:1:37:17593:9954/1,1,103.803741455,303.702941895,114' in data

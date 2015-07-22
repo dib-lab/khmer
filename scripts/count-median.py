@@ -91,7 +91,10 @@ def main():
     ksize = htable.ksize()
 
     print('writing to', output_filename, file=sys.stderr)
-    output = open(output_filename, 'w')
+    if output_filename in ('-', '/dev/stdin'):
+       output = sys.stdout
+    else:
+       output = open(output_filename, 'w')
 
     if args.csv:
         output = csv.writer(output)

@@ -665,7 +665,7 @@ def test_count_median_fq():
 
 
 def test_count_median_fq_csv():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.get_temp_filename('test.fq')
     outfile = infile + '.counts'
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
@@ -686,6 +686,21 @@ def test_count_median_fq_csv():
     # verify that sequence names remain unparsed with '--csv'
     names = set([line.split(',')[0] for line in data])
     assert '895:1:37:17593:9954 1::FOO' in names, names
+
+
+def test_count_median_fq_csv_stdout():
+    infile = utils.get_temp_filename('test.fq')
+    outfile = '-'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = 'count-median.py'
+    args = ['--csv', counting_ht, infile, outfile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'name,median,average,stddev,seqlen' in out
+    assert 'seq,1001,1001.0,0.0,18' in out
 
 
 def test_load_graph():
