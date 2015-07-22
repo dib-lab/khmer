@@ -110,7 +110,7 @@ def main():
     hash_fp_csv = csv.writer(hash_fp)
     # write headers:
     hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                              'cumulative_fraction'])
+                          'cumulative_fraction'])
 
     sofar = 0
     for _, i in enumerate(abundances):
