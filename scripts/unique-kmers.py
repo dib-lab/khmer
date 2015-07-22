@@ -45,12 +45,12 @@ def get_parser():
     with :option:`-R`/:option:`--report`.
 
     :option:`--stream-out`:option: will write the sequences taken in to STDOUT.
-    This is useful for workflowing--count unique kmers in a stream, do digital
-    normalization, count unique kmers again.
+    This is useful for workflows: count unique kmers in a stream, do digital
+    normalization, and then count unique kmers again.
 
     :option:`--diagnostics`:option: will provide detailed options for tablesize
-    and memory limitations for various FP rates. This is useful for configuring
-    other khmer scripts. This will be written to STDERR.
+    and memory limitations for various false positive rates. This is useful for
+    configuring other khmer scripts. This will be written to STDERR.
 
     Example::
 
@@ -62,11 +62,13 @@ def get_parser():
 
     Example::
 
-        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | normalize-by-median.py -k 17 -o normalized /dev/stdin | unique-kmers.py -k 17
+        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | \
+        normalize-by-median.py -k 17 -o normalized /dev/stdin
 
     Example::
 
-""" "        unique-kmers.py -R unique_count -k 30 tests/test-data/test-abund-read-paired.fa")  # noqa
+        unique-kmers.py -R unique_count -k 30 \
+        tests/test-data/test-abund-read-paired.fa""")  # noqa
     parser = argparse.ArgumentParser(
         description=descr, epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
