@@ -1,4 +1,4 @@
-2015-07-21  Titus Brown  <titus@idyll.org>
+2015-07-22  Titus Brown  <titus@idyll.org>
 
    * tests/test_streaming_io.py: new shell cmd tests for streaming/piping.
    * scripts/interleave-reads.py: force exactly two input files.
@@ -17,6 +17,10 @@
    * tests/test-data/paired.fq.2: removed extraneous newline from end.
    * tests/{test_normalize_by_median,test_script_arguments,test_scripts}.py:
    added tests for new code.
+
+2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/test_read_parsers.py: added workaround for bug in OSX Python
 
 2015-07-21  Jacob Fenton  <bocajnotnef@gmail.com>
 
