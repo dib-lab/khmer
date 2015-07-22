@@ -1,3 +1,16 @@
+#
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
+# Contact: khmer-project@idyll.org
+#
+
+##
+## important note -- these tests do not contribute to code coverage, because
+## of the use of subprocess to execute.  Most script tests should go into
+## test_scripts.py for this reason.
+##
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -231,3 +244,19 @@ def test_extract_long_sequences_1():
 
     countlines = sum(1 for line in open(out1))
     assert countlines == 22, countlines
+
+
+def test_fastq_to_fasta_1():
+    in1 = utils.get_test_data('test-fastq-reads.fq')
+    out1 = utils.get_temp_filename('clean.fa')
+    out_test = utils.get_test_data('test-fastq-reads.fa')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/fastq-to-fasta.py - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+    assert files_are_equal(out1, out_test), diff_files(out1, out_test)
