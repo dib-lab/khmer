@@ -428,3 +428,18 @@ def test_count_median_1():
     assert len(data) == 3, data
     assert 'seq,1001,1001.0,0.0,18' in data
     assert '895:1:37:17593:9954/1,1,103.803741455,303.702941895,114' in data
+
+
+def test_readstats_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.stats')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/readstats.py --csv - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+    assert '18114,1001,18.1,-' in open(out1).read(), open(out1).read()
