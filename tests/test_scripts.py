@@ -2445,7 +2445,7 @@ def test_sample_reads_randomly_stdin_no_out():
     try:
         utils.runscript(script, args)
         raise Exception("Shouldn't get to this")
-    except AssertionError, e:
+    except AssertionError as e:
         assert "Accepting input from stdin; output filename" in str(e), str(e)
 
 
