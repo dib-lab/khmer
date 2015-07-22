@@ -22,9 +22,17 @@ import os.path
 import difflib
 
 
-def scriptpath():
+def scriptpath(scriptname='interleave-reads.py'):
+    # note - it doesn't matter what the scriptname is here, as long as
+    # it's some khmer script from this version.
+
     path = os.path.join(os.path.dirname(__file__), "../scripts")
-    return path
+    if os.path.exists(os.path.join(path, scriptname)):
+        return path
+
+    for path in os.environ['PATH'].split(':'):
+        if os.path.exists(os.path.join(path, scriptname)):
+            return path
 
 
 def files_are_equal(a, b):
