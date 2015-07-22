@@ -16,23 +16,10 @@ from __future__ import unicode_literals
 import khmer
 import screed
 from . import khmer_tst_utils as utils
+from .khmer_tst_utils import scriptpath, run_shell_cmd
 from .test_scripts import _make_counting
-import subprocess
 import os.path
 import difflib
-
-
-def scriptpath(scriptname='interleave-reads.py'):
-    # note - it doesn't matter what the scriptname is here, as long as
-    # it's some khmer script from this version.
-
-    path = os.path.join(os.path.dirname(__file__), "../scripts")
-    if os.path.exists(os.path.join(path, scriptname)):
-        return path
-
-    for path in os.environ['PATH'].split(':'):
-        if os.path.exists(os.path.join(path, scriptname)):
-            return path
 
 
 def files_are_equal(a, b):
@@ -48,23 +35,6 @@ def diff_files(a, b):
 
     results = "\n".join(difflib.context_diff(al, bl, fromfile=a, tofile=b))
     return results
-
-
-def run_shell_cmd(cmd, fail_ok=False):
-    print('running: ', cmd)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    (out, err) = p.communicate()
-
-    out = out.decode('utf-8')
-    err = err.decode('utf-8')
-
-    if p.returncode != 0 and not fail_ok:
-        print('out:', out)
-        print('err:', err)
-        raise AssertionError("exit code is non zero: %d" % p.returncode)
-
-    return (p.returncode, out, err)
 
 
 def test_interleave_split_1():

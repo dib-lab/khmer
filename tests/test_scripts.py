@@ -19,7 +19,6 @@ import shutil
 from io import StringIO
 import traceback
 from nose.plugins.attrib import attr
-import subprocess
 import threading
 import bz2
 import io
@@ -2728,29 +2727,30 @@ def execute_streaming_diginorm(ifilename):
     return in_dir + '/outfile'
 
 
-def execute_load_graph_streaming(filename):
+def _execute_load_graph_streaming(filename):
     '''Helper function for the matrix of streaming tests using screed via
     filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
 
-    script = 'load-graph.py'
-    args = '-x 1e7 -N 2 -k 20 out -'
-
+    scripts = utils.scriptpath()
     infile = utils.get_temp_filename('temp')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data(filename), infile)
-    (status, out, err) = utils.runscriptredirect(script, args, infile, in_dir)
+
+    args = '-x 1e7 -N 2 -k 20 out -'
+
+    cmd = 'cat {infile} | {scripts}/load-graph.py {args}'.format(
+        infile=infile, scripts=scripts, args=args)
+
+    (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
 
     if status != 0:
-        for line in out:
-            print(out)
-        for line in err:
-            print(err)
+        print(out)
+        print(err)
         assert status == 0, status
-    err.seek(0)
-    err = err.read()
+
     assert 'Total number of unique k-mers: 3960' in err, err
 
     ht_file = os.path.join(in_dir, 'out.pt')
@@ -2826,34 +2826,34 @@ def test_screed_streaming_gzipfa():
 
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
 
 
 def test_readstats():
