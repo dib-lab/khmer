@@ -44,11 +44,11 @@ def get_parser():
     Informational output is sent to STDERR, but a report file can be generated
     with :option:`-R`/:option:`--report`.
 
-    :option:`--stream-out`:option: will write the sequences taken in to STDOUT.
-    This is useful for workflows: count unique kmers in a stream, do digital
-    normalization, and then count unique kmers again.
+    :option:`--stream-out` will write the sequences taken in to STDOUT.
+    This is useful for workflows: count unique kmers in a stream, then do 
+    digital normalization.
 
-    :option:`--diagnostics`:option: will provide detailed options for tablesize
+    :option:`--diagnostics` will provide detailed options for tablesize
     and memory limitations for various false positive rates. This is useful for
     configuring other khmer scripts. This will be written to STDERR.
 
@@ -87,15 +87,20 @@ def get_parser():
                         help='Acceptable error rate')
 
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='filename', type=argparse.FileType('w'),
+                        help='generate informational report and write to'
+                        ' filename')
 
     parser.add_argument('--stream-out', '-S', default=False,
-                        action='store_true')
+                        action='store_true',
+                        help='write input sequences to stdout')
 
-    parser.add_argument('--diagnostics', default=False, action='store_true')
+    parser.add_argument('--diagnostics', default=False, action='store_true',
+                        help='print out reccomended tablesize args and'
+                             'restrictions')
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
-                        help='Input FAST[AQ] sequence filename.', nargs='+')
+                        help='Input FAST[AQ] sequence filename(s).', nargs='+')
 
     return parser
 
