@@ -9,6 +9,7 @@
    check that -o specifies output file.
    * scripts/sample-reads-randomly.py: if stdin is supplied for input,
    check that -o specifies output file.
+   * scripts/extract-long-sequences.py: switched -o to use argparse.FileType.
    * khmer/kfile.py: change 'check_input_files' to no longer warn that
    '-' doesn't exist'.
    * tests/test-data/paired.fq.2: removed extraneous newline from end.
