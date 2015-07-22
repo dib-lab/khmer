@@ -5,17 +5,18 @@
 # Contact: khmer-project@idyll.org
 #
 
-##
-## important note -- these tests do not contribute to code coverage, because
-## of the use of subprocess to execute.  Most script tests should go into
-## test_scripts.py for this reason.
-##
+# important note -- these tests do not contribute to code coverage, because
+# of the use of subprocess to execute.  Most script tests should go into
+# test_scripts.py for this reason.
 
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import khmer
+import screed
 from . import khmer_tst_utils as utils
+from .test_scripts import _make_counting
 import subprocess
 import os.path
 import difflib
@@ -260,3 +261,84 @@ def test_fastq_to_fasta_1():
 
     run_shell_cmd(cmd)
     assert files_are_equal(out1, out_test), diff_files(out1, out_test)
+
+
+def test_load_into_counting_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.ct')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/load-into-counting.py -x 1e3 -N 2 -k 20 -t {out1} - \
+       2> /dev/null
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+    print(cmd)
+
+    (status, out, err) = run_shell_cmd(cmd)
+    assert os.path.exists(out1)
+    khmer.load_counting_hash(out1)
+
+
+def test_load_graph_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.ct')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/load-graph.py -x 1e3 -N 2 -k 20 {out1} - \
+       2> /dev/null
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+    print(cmd)
+
+    (status, out, err) = run_shell_cmd(cmd)
+    assert os.path.exists(out1 + '.pt')
+    khmer.load_hashbits(out1 + '.pt')
+
+
+def test_filter_abund_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundfilt')
+
+    countgraph = _make_counting(in1, K=17)
+
+    cmd = """
+       cat {in1} |
+       {scripts}/filter-abund.py {countgraph} - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1,
+                     countgraph=countgraph)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    seqs = set([r.sequence for r in screed.open(out1)])
+
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_filter_abund_2_fail():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundfilt')
+
+    countgraph = _make_counting(in1, K=17)
+
+    cmd = """
+       cat {in1} |
+       {scripts}/filter-abund.py {countgraph} - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1,
+                     countgraph=countgraph)
+
+    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    print(out)
+    print(err)
+    assert status != 0
+    assert "Accepting input from stdin; output filename must be provided with"\
+           in err
