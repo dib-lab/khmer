@@ -62,12 +62,12 @@ def get_parser():
 
     Example::
 
-        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | \
+        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | \\
         normalize-by-median.py -k 17 -o normalized /dev/stdin
 
     Example::
 
-        unique-kmers.py -R unique_count -k 30 \
+        unique-kmers.py -R unique_count -k 30 \\
         tests/test-data/test-abund-read-paired.fa""")  # noqa
     parser = argparse.ArgumentParser(
         description=descr, epilog=textwrap.dedent(epilog),
