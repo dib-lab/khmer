@@ -48,6 +48,9 @@ def run_shell_cmd(cmd, fail_ok=False):
                          stderr=subprocess.PIPE)
     (out, err) = p.communicate()
 
+    out = out.decode('utf-8')
+    err = err.decode('utf-8')
+
     if p.returncode != 0 and not fail_ok:
         print('out:', out)
         print('err:', err)
