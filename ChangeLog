@@ -1,3 +1,7 @@
+2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/test_read_parsers.py: added workaround for bug in OSX Python
+
 2015-07-21  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/{kfile,khmer_args}.py: refactored information passing, made it so
