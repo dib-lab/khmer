@@ -342,3 +342,42 @@ def test_filter_abund_2_fail():
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err
+
+
+def test_trim_low_abund_1():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundtrim')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/trim-low-abund.py -k 17 -x 1e7 -N 2 - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    seqs = set([r.sequence for r in screed.open(out1)])
+
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_2_fail():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundtrim')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/trim-low-abund.py -k 17 -x 1e7 -N 2 - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    print(out)
+    print(err)
+    assert status != 0
+    assert "Accepting input from stdin; output filename must be provided with"\
+           in err
