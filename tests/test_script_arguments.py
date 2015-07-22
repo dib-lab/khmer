@@ -112,7 +112,8 @@ def test_check_valid_stdin_nowarn():
     save_stderr, sys.stderr = sys.stderr, io.StringIO()
     try:
         khmer.kfile.check_valid_file_exists(["-"])
-        assert sys.stderr.getvalue().count("\n") == 0
+        err = sys.stderr.getvalue()
+        assert err.count("\n") == 0, err
     except SystemExit as e:
         print(str(e))
     finally:
