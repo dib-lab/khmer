@@ -870,15 +870,15 @@ def test_bad_primes_list():
 
 
 def test_consume_absentfasta_with_reads_parser():
-    presencetable = khmer._Hashbits(31, [1])
+    nodegraph = khmer._Hashbits(31, [1])
     try:
-        presencetable.consume_fasta_with_reads_parser()
+        nodegraph.consume_fasta_with_reads_parser()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        presencetable.consume_fasta_with_reads_parser(readparser)
+        nodegraph.consume_fasta_with_reads_parser(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))
@@ -896,10 +896,10 @@ def test_bad_primes():
 
 
 def test_consume_fasta_and_tag_with_badreads_parser():
-    presencetable = khmer.Hashbits(6, 1e6, 2)
+    nodegraph = khmer.Hashbits(6, 1e6, 2)
     try:
         readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        presencetable.consume_fasta_and_tag_with_reads_parser(readsparser)
+        nodegraph.consume_fasta_and_tag_with_reads_parser(readsparser)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
