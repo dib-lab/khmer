@@ -1,3 +1,12 @@
+2015-07-22  Titus Brown  <titus@idyll.org>
+
+  * sandbox/bloom-count-intersection.py,scripts/count-overlap.py,
+  tests/test-data/overlap.out: removed overlap scripts and test files.
+  * doc/user/scripts.rst: removed count-overlap.py documentation.
+  * tests/test_scripts.py: removed count-overlap.py tests.
+  * khmer/_khmer.cc,lib/hashbits.{cc,hh}: removed overlap functionality.
+  * sandbox/README.rst: updated with removal of bloom-count-intersection.py.
+
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_read_parsers.py: added workaround for bug in OSX Python

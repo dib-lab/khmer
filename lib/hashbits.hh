@@ -23,7 +23,6 @@ protected:
     size_t _n_tables;
     HashIntoType _occupied_bins;
     HashIntoType _n_unique_kmers;
-    HashIntoType _n_overlap_kmers;
     Byte ** _counts;
 
     virtual void _allocate_counters()
@@ -48,7 +47,6 @@ public:
     {
         _occupied_bins = 0;
         _n_unique_kmers = 0;
-        _n_overlap_kmers = 0;
 
         _allocate_counters();
     }
@@ -81,21 +79,6 @@ public:
 
     virtual void save(std::string);
     virtual void load(std::string);
-
-    // for overlap k-mer counting
-    void consume_fasta_overlap(const std::string &filename,
-                               HashIntoType curve[2][100],
-                               khmer::Hashbits &ht2,
-                               unsigned int &total_reads,
-                               unsigned long long &n_consumed);
-
-    // just for overlap k-mer counting!
-    unsigned int check_and_process_read_overlap(std::string &read,
-            bool &is_valid,
-            khmer::Hashbits &ht2);
-    // for overlap k-mer counting!
-    unsigned int consume_string_overlap(const std::string &s,
-                                        khmer::Hashbits &ht2);
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
@@ -152,12 +135,6 @@ public:
         return 0; // kmer already seen
     } // test_and_set_bits
 
-    virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,
-            HashIntoType stop=0) const
-    {
-        return _n_overlap_kmers;	// @@ CTB need to be able to *save* this...
-    }
-
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
@@ -180,48 +157,6 @@ public:
         }
         if (is_new_kmer) {
             _n_unique_kmers +=1;
-        }
-    }
-
-    virtual bool check_overlap(HashIntoType khash, Hashbits &ht2)
-    {
-
-        for (size_t i = 0; i < ht2._n_tables; i++) {
-            HashIntoType bin = khash % ht2._tablesizes[i];
-            HashIntoType byte = bin / 8;
-            unsigned char bit = bin % 8;
-            if (!( ht2._counts[i][byte] & (1<<bit))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    virtual void count_overlap(const char * kmer, Hashbits &ht2)
-    {
-        HashIntoType hash = _hash(kmer, _ksize);
-        count_overlap(hash,ht2);
-    }
-
-    virtual void count_overlap(HashIntoType khash, Hashbits &ht2)
-    {
-        bool is_new_kmer = false;
-
-        for (size_t i = 0; i < _n_tables; i++) {
-            HashIntoType bin = khash % _tablesizes[i];
-            HashIntoType byte = bin / 8;
-            unsigned char bit = bin % 8;
-            if (!( _counts[i][byte] & (1<<bit))) {
-                _occupied_bins += 1;
-                is_new_kmer = true;
-            }
-            _counts[i][byte] |= (1 << bit);
-        }
-        if (is_new_kmer) {
-            _n_unique_kmers +=1;
-            if (check_overlap(khash,ht2)) {
-                _n_overlap_kmers +=1;
-            }
         }
     }
 

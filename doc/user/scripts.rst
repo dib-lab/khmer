@@ -55,9 +55,6 @@ k-mer counting and abundance filtering
 .. autoprogram:: count-median:get_parser()
         :prog: count-median.py
 
-.. autoprogram:: count-overlap:get_parser()
-        :prog: count-overlap.py
-
 .. _scripts-partitioning:
 
 Partitioning

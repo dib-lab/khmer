@@ -3326,53 +3326,6 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
 
 static
 PyObject *
-hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
-{
-    Hashbits * hashbits = me->hashbits;
-    khmer_KHashbits_Object * ht2_argu;
-    const char * filename;
-    Hashbits * ht2;
-
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashbits_Type,
-                          &ht2_argu)) {
-        return NULL;
-    }
-
-    ht2 = ht2_argu->hashbits;
-
-// call the C++ function, and trap signals => Python
-
-    HashIntoType        curve[2][100];
-
-    try {
-	unsigned long long  n_consumed;
-	unsigned int        total_reads;
-        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads,
-                                        n_consumed);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    HashIntoType n = hashbits->n_unique_kmers();
-    HashIntoType n_overlap = hashbits->n_overlap_kmers();
-
-    PyObject * x = PyList_New(200);
-
-    for (unsigned int i = 0; i < 100; i++) {
-        PyList_SetItem(x, i, Py_BuildValue("K", curve[0][i]));
-    }
-    for (unsigned int i = 0; i < 100; i++) {
-        PyList_SetItem(x, i + 100, Py_BuildValue("K", curve[1][i]));
-    }
-    return Py_BuildValue("KKO", n, n_overlap, x);
-}
-
-static
-PyObject *
 hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 {
     Hashbits * hashbits = me->hashbits;
@@ -3396,7 +3349,6 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 }
 
 static PyMethodDef khmer_hashbits_methods[] = {
-    { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
     {
         "update",
         (PyCFunction) hashbits_update, METH_VARARGS,
