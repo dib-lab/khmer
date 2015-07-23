@@ -92,9 +92,9 @@ def main():
 
     print('writing to', output_filename, file=sys.stderr)
     if output_filename in ('-', '/dev/stdout'):
-       output = sys.stdout
+        output = sys.stdout
     else:
-       output = open(output_filename, 'w')
+        output = open(output_filename, 'w')
 
     if args.csv:
         output = csv.writer(output)

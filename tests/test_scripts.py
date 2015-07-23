@@ -313,6 +313,7 @@ def test_filter_abund_2():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
+
 def test_filter_abund_2_stdin():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
