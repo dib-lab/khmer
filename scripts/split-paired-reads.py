@@ -75,7 +75,8 @@ def get_parser():
                         'directory if necessary')
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
                         nargs='?', default=False, const=True, 
-                        help='Output "orphaned" reads to this file',
+                        help='Allow "orphaned" reads and extract them to ' + \
+                        'this file',
                         type=argparse.FileType('w'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
@@ -83,8 +84,6 @@ def get_parser():
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
                         'file', type=argparse.FileType('w'))
-    parser.add_argument('-p', '--force-paired', action='store_true',
-                        help='Require that reads be interleaved')
 
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
@@ -139,14 +138,19 @@ def main():
         # Use default filename created above
         fp_out2 = open(out2, 'w')
 
+    # put orphaned reads here!
+    allow_orphans = False
     if args.output_orphaned is not True and args.output_orphaned is not False:
         fp_out0 = args.output_orphaned
         out0 = fp_out0.name
-    elif args.output_orhpaned is True:
+        allow_orphans = True
+    elif args.output_orphaned is True:
         fp_out0 = open(out0, 'w')
+        allow_orphans = True
 
     counter1 = 0
     counter2 = 0
+    counter3 = 0
     index = None
 
     screed_iter = screed.open(infile, parse_description=False)
@@ -157,40 +161,25 @@ def main():
         if index % 10000 == 0:
             print('...', index, file=sys.stderr)
 
-        # are we requiring pairs?
-        if args.force_paired and not is_pair:
-            print('ERROR, %s is not part of a pair' %
-                  record1.name, file=sys.stderr)
-            sys.exit(1)
-
         if is_pair:
             write_record(record1, fp_out1)
             counter1 += 1
             write_record(record2, fp_out2)
             counter2 += 1
+        elif allow_orphans:
+            write_record(record1, fp_out0)
+            counter3 += 1
         else:
-            name = record1.name
-            fp_out = fp_out1
+            print('ERROR, %s is not part of a pair' %
+                  record1.name, file=sys.stderr)
+            sys.exit(1)
 
-            if check_is_left(name):
-                counter1 += 1
-            elif check_is_right(name):
-                counter2 += 1
-                fp_out = fp_out1
-            else:
-                print("Unrecognized format for read pair information: %s" %
-                      name, file=sys.stderr)
-                print("Exiting.", file=sys.stderr)
-                sys.exit(1)
-            if fp_out0 is not None:
-                fp_out = fp_out0
-            
-            write_record(record1, fp_out)
-
-    print("DONE; split %d sequences (%d left, %d right)" %
-          (counter1 + counter2, counter1, counter2), file=sys.stderr)
+    print("DONE; split %d sequences (%d left, %d right, %d orphans)" %
+          (counter1 + counter2, counter1, counter2, counter3), file=sys.stderr)
     print("/1 reads in %s" % out1, file=sys.stderr)
     print("/2 reads in %s" % out2, file=sys.stderr)
+    if allow_orphans:
+        print("orphans in %s" % out0, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

@@ -2083,7 +2083,7 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = ['-p', infile]
+    args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status == 1
@@ -2097,11 +2097,11 @@ def test_split_paired_reads_2_mixed_fq():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = [infile]
+    args = ['-0', '/dev/null', infile]
 
     status, out, err = utils.runscript(script, args, in_dir)
     assert status == 0
-    assert "split 11 sequences (7 left, 4 right)" in err, err
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
 
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
@@ -2115,7 +2115,7 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status == 1
-    assert "Unrecognized format" in err
+    assert "ERROR, 895:1:37:17593:9954 is not part of a pair" in err, err
 
 
 def test_split_paired_reads_3_output_dir():
