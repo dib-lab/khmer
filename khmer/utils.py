@@ -35,7 +35,7 @@ def check_is_pair(record1, record2):
     Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
     and 'seq::... 2::...'.
 
-    Also handles the default format of the SRA toolkit's fastq-dump: 
+    Also handles the default format of the SRA toolkit's fastq-dump:
     'Accession seq/1'
     """
     if hasattr(record1, 'quality') or hasattr(record2, 'quality'):
