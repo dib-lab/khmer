@@ -210,8 +210,62 @@ def test_normalize_by_median_known_good():
         assert False
 
 
-@attr('huge')
 def test_normalize_by_median_report_fp():
+    # this tests basic reporting of diginorm stats => report.out, including
+    # a test of aggregate stats for two input files.
+
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile2 = utils.get_temp_filename('test2.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    script = 'normalize-by-median.py'
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile, infile2]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile)
+    report = open(outfile, 'r')
+    line = report.readline().strip()
+    assert line == 'total,kept,f_kept', line
+    line = report.readline().strip()
+    assert line == '1001,1,0.000999', line
+    line = report.readline().strip()
+    assert line == '2002,1,0.0004995', line
+
+
+def test_normalize_by_median_report_fp_hifreq():
+    # this tests high-frequency reporting of diginorm stats for a single
+    # file => report.out.
+
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    script = 'normalize-by-median.py'
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile,
+            '--report-frequency', '100']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile)
+    report = open(outfile, 'r')
+    line = report.readline().strip()
+    assert line == 'total,kept,f_kept', line
+    line = report.readline().strip()
+    assert line == '100,1,0.01', line
+    line = report.readline().strip()
+    assert line == '200,1,0.005', line
+
+
+@attr('huge')
+def test_normalize_by_median_report_fp_huge():
+    # this tests reporting of diginorm stats => report.out for a large
+    # file, with the default reporting interval of once every 100k.
+
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
@@ -224,8 +278,9 @@ def test_normalize_by_median_report_fp():
 
     assert "fp rate estimated to be 0.623" in err, err
     report = open(outfile, 'r')
+    line = report.readline()            # skip header
     line = report.readline()
-    assert "100000 25261 0.25261" in line, line
+    assert "100000,25261,0.2526" in line, line
 
 
 def test_normalize_by_median_unpaired_and_paired():
@@ -262,12 +317,12 @@ def test_normalize_by_median_count_kmers_PE():
     args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
-    assert 'kept 1 of 2 or 50%' in err, err
+    assert 'kept 1 of 2 or 50.0%' in err, err
 
     args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 99' in err, err
-    assert 'kept 2 of 2 or 100%' in err, err
+    assert 'kept 2 of 2 or 100.0%' in err, err
 
 
 def test_normalize_by_median_double_file_name():
