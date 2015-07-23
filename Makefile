@@ -26,7 +26,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
 	TESTATTR='!known_failing,!jenkins,!huge'
 else
-	TESTATTR='!known_failing,!jenkins,!huge'
+	TESTATTR='!known_failing,!jenkins,!huge,!linux'
 endif
 
 ## all         : default task; compile C++ code, build shared object library
