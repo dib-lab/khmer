@@ -8,12 +8,24 @@
 #ifndef LABELHASH_HH
 #define LABELHASH_HH
 
+#include <stddef.h>
+#include <stdint.h>
+#include <map>
 #include <string>
+#include <utility>
 
-#include "khmer.hh"
 #include "hashbits.hh"
 #include "hashtable.hh"
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer {
+class Hashtable;
+
+namespace read_parsers {
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 namespace khmer
 {

@@ -7,15 +7,19 @@
 #ifndef READ_ALIGNER_HH
 #define READ_ALIGNER_HH
 
-#include "khmer.hh"
-#include "counting.hh"
-
-#include <limits>
+#include <math.h>
+#include <stddef.h>
 #include <algorithm>
-#include <set>
-#include <vector>
-#include <queue>
+#include <limits>
 #include <memory>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "counting.hh"
+#include "khmer.hh"
+#include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0
 

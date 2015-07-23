@@ -5,14 +5,26 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "read_parsers.hh"
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+#include <fstream>
 
-#include <cstring>
 #include "khmer_exception.hh"
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
+#include "read_parsers.hh"
+#include "seqan/basic/allocator_interface.h"
+#include "seqan/basic/iterator_adapt_std.h"
+#include "seqan/basic/iterator_base.h"
+#include "seqan/basic/iterator_interface.h"
+#include "seqan/seq_io/read_fasta_fastq.h"
+#include "seqan/seq_io/sequence_stream.h"
+#include "seqan/sequence/adapt_std_string.h"
+#include "seqan/sequence/sequence_interface.h"
+#include "seqan/sequence/sequence_lexical.h"
+#include "seqan/sequence/string_alloc.h"
+#include "seqan/sequence/string_base.h"
+#include "seqan/stream/adapt_fstream.h"
+#include "seqan/stream/record_reader_single.h"
 
 namespace khmer
 {

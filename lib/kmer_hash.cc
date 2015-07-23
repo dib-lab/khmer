@@ -5,14 +5,16 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include <math.h>
-#include <string>
-#include <iostream>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include <algorithm>
+#include <string>
 
-#include "khmer.hh"
-#include "kmer_hash.hh"
 #include "MurmurHash3.h"
+#include "khmer.hh"
+#include "khmer_exception.hh"
+#include "kmer_hash.hh"
 
 using namespace std;
 

@@ -8,10 +8,17 @@
 #ifndef HLLCOUNTER_HH
 #define HLLCOUNTER_HH
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer {
+namespace read_parsers {
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 
 namespace khmer

@@ -9,22 +9,33 @@
 #define HASHTABLE_HH
 
 
-#include <vector>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <fstream>
 #include <iostream>
 #include <list>
-#include <queue>
-
-#include <fstream>
-#include <string>
-#include <set>
 #include <map>
 #include <queue>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
+#include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
-#include "kmer_hash.hh"
+
+namespace khmer {
+class CountingHash;
+class Hashtable;
+
+namespace read_parsers {
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 #define MAX_KEEPER_SIZE int(1e6)
 

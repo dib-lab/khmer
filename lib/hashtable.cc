@@ -5,14 +5,20 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
-#include "hashtable.hh"
-#include "read_parsers.hh"
-#include "counting.hh"
-
-#include <algorithm>
-#include <sstream>
 #include <errno.h>
+#include <math.h>
+#include <algorithm>
+#include <deque>
+#include <fstream>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <queue>
+#include <set>
+
+#include "counting.hh"
+#include "hashtable.hh"
+#include "khmer.hh"
+#include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;
