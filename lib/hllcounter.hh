@@ -14,8 +14,10 @@
 #include "khmer.hh"
 #include "read_parsers.hh"
 
-namespace khmer {
-namespace read_parsers {
+namespace khmer
+{
+namespace read_parsers
+{
 struct IParser;
 }  // namespace read_parsers
 }  // namespace khmer

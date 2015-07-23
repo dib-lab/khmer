@@ -19,10 +19,12 @@
 #include "khmer.hh"
 #include "read_parsers.hh"
 
-namespace khmer {
+namespace khmer
+{
 class Hashtable;
 
-namespace read_parsers {
+namespace read_parsers
+{
 struct IParser;
 }  // namespace read_parsers
 }  // namespace khmer

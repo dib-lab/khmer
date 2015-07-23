@@ -28,11 +28,13 @@
 #include "read_parsers.hh"
 #include "subset.hh"
 
-namespace khmer {
+namespace khmer
+{
 class CountingHash;
 class Hashtable;
 
-namespace read_parsers {
+namespace read_parsers
+{
 struct IParser;
 }  // namespace read_parsers
 }  // namespace khmer

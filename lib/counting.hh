@@ -20,10 +20,12 @@
 #include "khmer.hh"
 #include "kmer_hash.hh"
 
-namespace khmer {
+namespace khmer
+{
 class Hashbits;
 
-namespace read_parsers {
+namespace read_parsers
+{
 struct IParser;
 }  // namespace read_parsers
 }  // namespace khmer
