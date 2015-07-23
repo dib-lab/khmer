@@ -215,6 +215,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         except IOError as err:
             handle_error(err, input_filename)
             if not args.force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 print('** Exiting!', file=sys.stderr)
                 sys.exit(1)
             else:

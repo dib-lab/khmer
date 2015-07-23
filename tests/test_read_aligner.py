@@ -6,7 +6,7 @@
 from __future__ import print_function
 
 import khmer
-from nose.tools import assert_almost_equals
+from unittest.case import TestCase
 
 
 # DISABLING TESTS until model probabilities are finalized
@@ -221,4 +221,4 @@ def test_readalign_new():
         eq_(graphAlign, query["graph_aln"])
         eq_(readAlign, query["read_aln"])
         eq_(trunc, query["truncated"])
-        # assert_almost_equals(score, query["score"])
+        # TestCase.assertAlmostEqual(score, query["score"])

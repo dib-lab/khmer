@@ -21,7 +21,8 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import build_counting_args, report_on_config, info
+from khmer.khmer_args import (build_counting_args, report_on_config, info,
+                              calculate_tablesize)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 import argparse
@@ -77,7 +78,9 @@ def main():
         check_input_files(name, False)
 
     check_space(args.input_sequence_filename, False)
-    check_space_for_hashtable(args, 'countgraph', False)
+    tablesize = calculate_tablesize(args, 'countgraph')
+    check_space_for_hashtable(args.output_countingtable_filename, tablesize,
+                              False)
 
     print('Saving k-mer counting table to %s' % base)
     print('Loading sequences from %s' % repr(filenames))
