@@ -230,7 +230,7 @@ protected:
     uint32_t _all_tags_spin_lock;
 
     explicit Hashtable(const Hashtable&);
-    const Hashtable& operator=(const Hashtable&);
+    Hashtable& operator=(const Hashtable&);
 
 public:
     SubsetPartition * partition;
