@@ -50,8 +50,7 @@ def check_is_pair(record1, record2):
         subpart1 = lhs1.split('/', 1)[0]
         subpart2 = lhs2.split('/', 1)[0]
 
-        assert subpart1
-        if subpart1 == subpart2:
+        if subpart1 and subpart1 == subpart2:
             return True
 
     # handle '@name 1:rst'
@@ -60,11 +59,10 @@ def check_is_pair(record1, record2):
 
     # handle @name seq/1
     elif lhs1 == lhs2 and rhs1.endswith('/1') and rhs2.endswith('/2'):
-        subpart1 = lhs1.split('/', 1)[0]
-        subpart2 = lhs2.split('/', 1)[0]
+        subpart1 = rhs1.split('/', 1)[0]
+        subpart2 = rhs2.split('/', 1)[0]
 
-        assert subpart1
-        if subpart1 == subpart2:
+        if subpart1 and subpart1 == subpart2:
             return True
 
     return False
