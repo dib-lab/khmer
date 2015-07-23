@@ -1,8 +1,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
 #
-# This file is part of khmer, htabletps://github.com/dib-lab/khmer/, and is
-# Copyrightable (C) Michigan State University, 2009-2015. It is licensed under
+# This file is part of khmer, htps://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
@@ -31,79 +31,79 @@ def test_toobig():
 
 
 def test__get_set_tag_density():
-    htableable = khmer._Hashbits(32, [1])
+    htable = khmer._Hashbits(32, [1])
 
-    orig = htableable._get_tag_density()
+    orig = htable._get_tag_density()
     assert orig != 2
-    htableable._set_tag_density(2)
-    assert htableable._get_tag_density() == 2
+    htable._set_tag_density(2)
+    assert htable._get_tag_density() == 2
 
 
 def test_update_from():
-    htableable = khmer.Hashbits(5, 1000, 4)
-    other_htableable = khmer.Hashbits(5, 1000, 4)
+    htable = khmer.Hashbits(5, 1000, 4)
+    other_htable = khmer.Hashbits(5, 1000, 4)
 
-    assert htableable.get('AAAAA') == 0
-    assert htableable.get('GCGCG') == 0
-    assert other_htableable.get('AAAAA') == 0
-    assert other_htableable.get('GCGCG') == 0
+    assert htable.get('AAAAA') == 0
+    assert htable.get('GCGCG') == 0
+    assert other_htable.get('AAAAA') == 0
+    assert other_htable.get('GCGCG') == 0
 
-    other_htableable.count('AAAAA')
+    other_htable.count('AAAAA')
 
-    assert htableable.get('AAAAA') == 0
-    assert htableable.get('GCGCG') == 0
-    assert other_htableable.get('AAAAA') == 1
-    assert other_htableable.get('GCGCG') == 0
+    assert htable.get('AAAAA') == 0
+    assert htable.get('GCGCG') == 0
+    assert other_htable.get('AAAAA') == 1
+    assert other_htable.get('GCGCG') == 0
 
-    htableable.count('GCGCG')
+    htable.count('GCGCG')
 
-    assert htableable.get('AAAAA') == 0
-    assert htableable.get('GCGCG') == 1
-    assert other_htableable.get('AAAAA') == 1
-    assert other_htableable.get('GCGCG') == 0
+    assert htable.get('AAAAA') == 0
+    assert htable.get('GCGCG') == 1
+    assert other_htable.get('AAAAA') == 1
+    assert other_htable.get('GCGCG') == 0
 
-    htableable.update(other_htableable)
+    htable.update(other_htable)
 
-    assert htableable.get('AAAAA') == 1
-    assert htableable.get('GCGCG') == 1
-    assert other_htableable.get('AAAAA') == 1
-    assert other_htableable.get('GCGCG') == 0
+    assert htable.get('AAAAA') == 1
+    assert htable.get('GCGCG') == 1
+    assert other_htable.get('AAAAA') == 1
+    assert other_htable.get('GCGCG') == 0
 
 
 def test_update_from_diff_ksize_2():
-    htableable = khmer.Hashbits(5, 1000, 4)
-    other_htableable = khmer.Hashbits(4, 1000, 4)
+    htable = khmer.Hashbits(5, 1000, 4)
+    other_htable = khmer.Hashbits(4, 1000, 4)
 
     try:
-        htableable.update(other_htableable)
+        htable.update(other_htable)
         assert 0, "should not be reached"
     except ValueError as err:
         print(str(err))
 
     try:
-        other_htableable.update(htableable)
+        other_htable.update(htable)
         assert 0, "should not be reached"
     except ValueError as err:
         print(str(err))
 
 
 def test_update_from_diff_tablesize():
-    htableable = khmer.Hashbits(5, 100, 4)
-    other_htableable = khmer.Hashbits(5, 1000, 4)
+    htable = khmer.Hashbits(5, 100, 4)
+    other_htable = khmer.Hashbits(5, 1000, 4)
 
     try:
-        htableable.update(other_htableable)
+        htable.update(other_htable)
         assert 0, "should not be reached"
     except ValueError as err:
         print(str(err))
 
 
 def test_update_from_diff_num_tables():
-    htableable = khmer.Hashbits(5, 1000, 3)
-    other_htableable = khmer.Hashbits(5, 1000, 4)
+    htable = khmer.Hashbits(5, 1000, 3)
+    other_htable = khmer.Hashbits(5, 1000, 4)
 
     try:
-        htableable.update(other_htableable)
+        htable.update(other_htable)
         assert 0, "should not be reached"
     except ValueError as err:
         print(str(err))
@@ -113,17 +113,17 @@ def test_n_occupied_1():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 100000  # size of hashtableable
-    num_htableables = 1  # number of hashtableables
+    htable_size = 100000  # size of hashtable
+    num_htables = 1  # number of hashtables
 
     # test modified c++ n_occupied code
-    htableable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     for _, record in enumerate(fasta_iter(open(filename))):
-        htableable.consume(record['sequence'])
+        htable.consume(record['sequence'])
 
     # this number calculated independently
-    assert htableable.n_occupied() == 3884, htableable.n_occupied()
+    assert htable.n_occupied() == 3884, htable.n_occupied()
 
 
 def test_bloom_python_1():
@@ -131,10 +131,10 @@ def test_bloom_python_1():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 100000  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 100000  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htableable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     n_unique = 0
     for _, record in enumerate(fasta_iter(open(filename))):
@@ -142,15 +142,15 @@ def test_bloom_python_1():
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - ksize):
             kmer = sequence[n:n + ksize]
-            if not htableable.get(kmer):
+            if not htable.get(kmer):
                 n_unique += 1
-            htableable.count(kmer)
+            htable.count(kmer)
 
     assert n_unique == 3960
-    assert htableable.n_occupied() == 3885, htableable.n_occupied()
+    assert htable.n_occupied() == 3885, htable.n_occupied()
 
     # this number equals n_unique
-    assert htableable.n_unique_kmers() == 3960, htableable.n_unique_kmers()
+    assert htable.n_unique_kmers() == 3960, htable.n_unique_kmers()
 
 
 def test_bloom_c_1():
@@ -159,64 +159,64 @@ def test_bloom_c_1():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 100000  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 100000  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htableable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     for _, record in enumerate(fasta_iter(open(filename))):
-        htableable.consume(record['sequence'])
+        htable.consume(record['sequence'])
 
-    assert htableable.n_occupied() == 3885
-    assert htableable.n_unique_kmers() == 3960
+    assert htable.n_occupied() == 3885
+    assert htable.n_unique_kmers() == 3960
 
 
 def test_n_occupied_2():  # simple one
     ksize = 4
     htable_size = 10  # use 11
-    num_htableables = 1
+    num_htables = 1
 
-    htableable = khmer._Hashbits(ksize, [11])
-    htableable.count('AAAA')  # 00 00 00 00 = 0
-    assert htableable.n_occupied() == 1
+    htable = khmer._Hashbits(ksize, [11])
+    htable.count('AAAA')  # 00 00 00 00 = 0
+    assert htable.n_occupied() == 1
 
-    htableable.count('ACTG')  # 00 10 01 11 =
-    assert htableable.n_occupied() == 2
+    htable.count('ACTG')  # 00 10 01 11 =
+    assert htable.n_occupied() == 2
 
-    htableable.count('AACG')  # 00 00 10 11 = 11  # collision 1
+    htable.count('AACG')  # 00 00 10 11 = 11  # collision 1
 
-    assert htableable.n_occupied() == 2
-    htableable.count('AGAC')   # 00  11 00 10 # collision 2
-    assert htableable.n_occupied() == 2, htableable.n_occupied()
+    assert htable.n_occupied() == 2
+    htable.count('AGAC')   # 00  11 00 10 # collision 2
+    assert htable.n_occupied() == 2, htable.n_occupied()
 
 
 def test_bloom_c_2():  # simple one
     ksize = 4
 
-    # use only 1 hashtableable, no bloom filter
-    htableable = khmer._Hashbits(ksize, [11])
-    htableable.count('AAAA')  # 00 00 00 00 = 0
-    htableable.count('ACTG')  # 00 10 01 11 =
-    assert htableable.n_unique_kmers() == 2
-    htableable.count('AACG')  # 00 00 10 11 = 11  # collision  with 1st kmer
-    assert htableable.n_unique_kmers() == 2
-    htableable.count('AGAC')   # 00  11 00 10 # collision  with 2nd kmer
-    assert htableable.n_unique_kmers() == 2
+    # use only 1 hashtable, no bloom filter
+    htable = khmer._Hashbits(ksize, [11])
+    htable.count('AAAA')  # 00 00 00 00 = 0
+    htable.count('ACTG')  # 00 10 01 11 =
+    assert htable.n_unique_kmers() == 2
+    htable.count('AACG')  # 00 00 10 11 = 11  # collision  with 1st kmer
+    assert htable.n_unique_kmers() == 2
+    htable.count('AGAC')   # 00  11 00 10 # collision  with 2nd kmer
+    assert htable.n_unique_kmers() == 2
 
-    # use two hashtableables with 11,13
-    other_htableable = khmer._Hashbits(ksize, [11, 13])
-    other_htableable.count('AAAA')  # 00 00 00 00 = 0
+    # use two hashtables with 11,13
+    other_htable = khmer._Hashbits(ksize, [11, 13])
+    other_htable.count('AAAA')  # 00 00 00 00 = 0
 
-    other_htableable.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
-    assert other_htableable.n_unique_kmers() == 2
+    other_htable.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
+    assert other_htable.n_unique_kmers() == 2
     # 00 00 10 11 = 11  # collision with only 1st kmer
-    other_htableable.count('AACG')
-    assert other_htableable.n_unique_kmers() == 3
-    other_htableable.count('AGAC')
+    other_htable.count('AACG')
+    assert other_htable.n_unique_kmers() == 3
+    other_htable.count('AGAC')
     # 00  11 00 10  3*16 +2 = 50
     # collision with both 2nd and 3rd kmers
 
-    assert other_htableable.n_unique_kmers() == 3
+    assert other_htable.n_unique_kmers() == 3
 
 
 def test_filter_if_present():
@@ -361,10 +361,10 @@ def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
@@ -383,10 +383,10 @@ def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
@@ -411,10 +411,10 @@ def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
 
     # connecting k-mer at the beginning/end of a read: breaks up into two.
     htable.add_stop_tag('TTGCATACGTTGAGCCAGCG')
@@ -517,10 +517,10 @@ def test_find_unpart():
     filename2 = utils.get_test_data('random-20-a.even.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
     htable.consume_fasta_and_tag(filename)
 
     subset = htable.do_subset_partition(0, 0)
@@ -539,10 +539,10 @@ def test_find_unpart_notraverse():
     filename2 = utils.get_test_data('random-20-a.even.fa')
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
     htable.consume_fasta_and_tag(filename)
 
     subset = htable.do_subset_partition(0, 0)
@@ -561,10 +561,10 @@ def test_find_unpart_fail():
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
 
     ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtableable
-    num_htableables = 3  # number of hashtableables
+    htable_size = 1e4  # size of hashtable
+    num_htables = 3  # number of hashtables
 
-    htable = khmer.Hashbits(ksize, htable_size, num_htableables)
+    htable = khmer.Hashbits(ksize, htable_size, num_htables)
     htable.consume_fasta_and_tag(filename)
 
     subset = htable.do_subset_partition(0, 0)
