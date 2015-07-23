@@ -249,7 +249,7 @@ def get_parser():
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
                         metavar='report_frequency', type=int,
                         default=100000)
