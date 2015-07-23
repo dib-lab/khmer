@@ -1,5 +1,8 @@
 2015-07-22  Titus Brown  <titus@idyll.org>
 
+
+  * lib/{hashbits.cc,khmer.hh},tests/test_hashbits.py: updated save/load
+  of hashbits/nodegraph structures to save _n_occupied and _n_unique_kmers.
   * sandbox/bloom-count-intersection.py,scripts/count-overlap.py,
   tests/test-data/overlap.out: removed overlap scripts and test files.
   * doc/user/scripts.rst: removed count-overlap.py documentation.

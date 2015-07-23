@@ -904,3 +904,22 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         print(str(e))
     except ValueError as e:
         print(str(e))
+
+
+def test_n_unique_save_load():
+    filename = utils.get_test_data('random-20-a.fa')
+
+    nodegraph = khmer.Hashbits(20, 100000, 3)
+
+    for _, record in enumerate(screed.open(filename)):
+        nodegraph.consume(record['sequence'])
+
+    assert nodegraph.n_occupied() == 3885
+    assert nodegraph.n_unique_kmers() == 3960
+
+    savefile = utils.get_temp_filename('out')
+    nodegraph.save(savefile)
+
+    ng2 = khmer.load_hashbits(savefile)
+    assert ng2.n_occupied() == 3885, ng2.n_occupied()
+    assert ng2.n_unique_kmers() == 3960, ng2.n_unique_kmers()
