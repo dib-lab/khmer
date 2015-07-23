@@ -12,7 +12,6 @@ from __future__ import absolute_import
 import khmer
 from khmer import ReadParser
 
-from screed.fasta import fasta_iter
 import screed
 
 from . import khmer_tst_utils as utils
@@ -121,7 +120,7 @@ def test_n_occupied_1():
     # test modified c++ n_occupied code
     nodegraph = khmer.Hashbits(ksize, htable_size, num_nodegraphs)
 
-    for _, record in enumerate(fasta_iter(open(filename))):
+    for _, record in enumerate(screed.open(filename)):
         nodegraph.consume(record['sequence'])
 
     # this number calculated independently
@@ -139,7 +138,7 @@ def test_bloom_python_1():
     nodegraph = khmer.Hashbits(ksize, htable_size, num_nodegraphs)
 
     n_unique = 0
-    for _, record in enumerate(fasta_iter(open(filename))):
+    for _, record in enumerate(screed.open(filename)):
         sequence = record['sequence']
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - ksize):
@@ -166,7 +165,7 @@ def test_bloom_c_1():
 
     nodegraph = khmer.Hashbits(ksize, htable_size, num_nodegraphs)
 
-    for _, record in enumerate(fasta_iter(open(filename))):
+    for _, record in enumerate(screed.open(filename)):
         nodegraph.consume(record['sequence'])
 
     assert nodegraph.n_occupied() == 3885
@@ -231,7 +230,7 @@ def test_filter_if_present():
     nodegraph.consume_fasta(maskfile)
     nodegraph.filter_if_present(inputfile, outfile)
 
-    records = list(fasta_iter(open(outfile)))
+    records = list(screed.open(outfile))
     assert len(records) == 1
     assert records[0]['name'] == '3'
 
