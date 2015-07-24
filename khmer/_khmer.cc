@@ -4590,29 +4590,23 @@ hllcounter_getcounters(khmer_KHLLCounter_Object * me)
 static PyMethodDef khmer_hllcounter_methods[] = {
     {
         "add", (PyCFunction)hllcounter_add,
-        METH_VARARGS,
-        "Add a k-mer to the counter."
+        METH_VARARGS
     },
     {
         "estimate_cardinality", (PyCFunction)hllcounter_estimate_cardinality,
-        METH_VARARGS,
-        "Return the current estimation."
+        METH_VARARGS
     },
     {
         "consume_string", (PyCFunction)hllcounter_consume_string,
-        METH_VARARGS,
-        "Break a sequence into k-mers and add each k-mer to the counter."
+        METH_VARARGS
     },
     {
         "consume_fasta", (PyCFunction)hllcounter_consume_fasta,
-        METH_VARARGS,
-        "Read sequences from file, break into k-mers, "
-        "and add each k-mer to the counter."
+        METH_VARARGS
     },
     {
         "merge", (PyCFunction)hllcounter_merge,
-        METH_VARARGS,
-        "Merge other counter into this one."
+        METH_VARARGS
     },
     {NULL} /* Sentinel */
 };

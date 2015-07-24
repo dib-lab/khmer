@@ -287,4 +287,27 @@ class HLLCounter(_HLLCounter):
     """
 
     def __len__(self):
-        return self.estimate_cardinality()
+        """Return the current estimation."""
+        return _HLLCounter.estimate_cardinality(self)
+
+    def estimate_cardinality(self):
+        """Return the current estimation."""
+        return _HLLCounter.estimate_cardinality(self)
+
+    def add(self, kmer):
+        """Add a k-mer to the counter."""
+        return _HLLCounter.add(self, kmer)
+
+    def consume_string(self, string):
+        """Break a sequence into k-mers and add each k-mer to the counter."""
+        return _HLLCounter.consume_string(self, string)
+
+    def consume_fasta(self, fasta):
+        """
+        Reads sequences from file, breaks into kmers and adds kmers to counter.
+        """
+        return _HLLCounter.consume_fasta(self, fasta)
+
+    def merge(self, other_counter):
+        """Merge the other counter into this one."""
+        return _HLLCounter.merge(self, other_counter)
