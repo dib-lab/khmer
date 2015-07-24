@@ -1626,6 +1626,41 @@ def test_do_partition_2_fq():
     assert '46 1::FIZ' in names
 
 
+def test_interleave_read_stdout():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    old_stdout = sys.stdout
+    # sys.stdout = capture = StringIO
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2]
+
+    (stats, out, err) = utils.runscript(script, args)
+
+    sys.stdout = old_stdout
+
+    splitout = out.splitlines()
+    with open(outfile, 'w') as ofile:
+        for (index, line) in enumerate(splitout):
+            if index > 1:
+                ofile.write(line + '\n')
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
 def test_interleave_read_seq1_fq():
     # create input files
     infile1 = utils.get_test_data('paired-slash1.fq.1')
@@ -2354,6 +2389,52 @@ def test_sample_reads_randomly_force_single():
     assert seqs == answer
 
 
+def test_sample_reads_randomly_force_single_outfile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    script = 'sample-reads-randomly.py'
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single', '-o',
+            in_dir + '/randreads.out']
+
+    args.append(infile)
+    utils.runscript(script, args, in_dir)
+
+    outfile = in_dir + '/randreads.out'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print(list(sorted(seqs)))
+
+    if sys.version_info.major == 2:
+        answer = {'850:2:1:2399:20086/2',
+                  '850:2:1:2273:13309/1',
+                  '850:2:1:2065:16816/1',
+                  '850:2:1:1984:7162/2',
+                  '850:2:1:2691:14602/1',
+                  '850:2:1:1762:5439/1',
+                  '850:2:1:2503:4494/2',
+                  '850:2:1:2263:11143/2',
+                  '850:2:1:1792:15774/2',
+                  '850:2:1:2084:17145/1'}
+    else:
+        answer = {'850:2:1:1199:4197/1',
+                  '850:2:1:1251:16575/2',
+                  '850:2:1:1267:6790/2',
+                  '850:2:1:1601:4443/1',
+                  '850:2:1:1625:19325/1',
+                  '850:2:1:1832:14607/2',
+                  '850:2:1:1946:20852/2',
+                  '850:2:1:2401:4896/2',
+                  '850:2:1:2562:1308/1',
+                  '850:2:1:3123:15968/2'}
+
+    assert seqs == answer
+
+
 def test_sample_reads_randomly_fq():
     infile = utils.get_temp_filename('test.fq.gz')
     in_dir = os.path.dirname(infile)
@@ -2446,6 +2527,108 @@ def test_fastq_to_fasta():
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) > 2
     assert "4 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--gzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "0 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--bzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "0 lines dropped" in err
+
+
+def test_fastq_to_fasta_streaming_compressed_gzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.gz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--gzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    gzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x1f\x8b\x08"  # gzip magic signature
+    file_start = gzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
+
+
+def test_fastq_to_fasta_streaming_compressed_bzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.bz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--bzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    bzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x42\x5a\x68"  # bzip magic signature
+    file_start = bzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
 
 
 def test_extract_long_sequences_fa():
@@ -3154,7 +3337,7 @@ def test_trim_low_abund_stdout():
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
-    assert 'GGTTGACGGGGCTCAGGG' in out
+    assert 'GGTTGACGGGGCTCAGGG' in out, err
 
 
 def test_roundtrip_casava_format_1():

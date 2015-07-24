@@ -19,7 +19,6 @@ By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
 from __future__ import print_function
 
 # TODO: take fa as well?
-#      support gzip option?
 
 import screed
 import sys
@@ -29,6 +28,7 @@ import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
+from khmer.kfile import add_output_compression_type, get_file_writer
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
 
@@ -64,6 +64,7 @@ def get_parser():
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -103,6 +104,11 @@ def main():
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
+    if args.output is None:
+        outfp = get_file_writer(sys.stdout, args.gzip, args.bzip)
+    else:
+        outfp = get_file_writer(args.output, args.gzip, args.bzip)
+
     counter = 0
     screed_iter_1 = screed.open(s1_file, parse_description=False)
     screed_iter_2 = screed.open(s2_file, parse_description=False)
@@ -131,10 +137,13 @@ def main():
                   "%s %s" % (read1.name, read2.name), file=sys.stderr)
             sys.exit(1)
 
-        write_record_pair(read1, read2, args.output)
+        write_record_pair(read1, read2, outfp)
 
     print('final: interleaved %d pairs' % counter, file=sys.stderr)
-    print('output written to', args.output.name, file=sys.stderr)
+    if outfp is not sys.stdout:
+        print('output written to', outfp.name, file=sys.stderr)
+    else:
+        print('output written to stdout', file=sys.stderr)
 
 if __name__ == '__main__':
     main()

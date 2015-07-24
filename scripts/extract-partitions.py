@@ -25,7 +25,9 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type,
+                         get_file_writer)
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -78,6 +80,7 @@ def get_parser():
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -213,9 +216,11 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     # open a bunch of output files for the different groups
     group_fps = {}
-    for _ in range(group_n):
-        group_fp = open('%s.group%04d.%s' % (args.prefix, _, suffix), 'w')
-        group_fps[_] = group_fp
+    for index in range(group_n):
+        fname = '%s.group%04d.%s' % (args.prefix, index, suffix)
+        group_fp = get_file_writer(open(fname, 'w'), args.gzip,
+                                   args.bzip)
+        group_fps[index] = group_fp
 
     # write 'em all out!
 

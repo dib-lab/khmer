@@ -12,7 +12,9 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import errno
-from stat import S_ISBLK, S_ISFIFO
+from stat import S_ISBLK, S_ISFIFO, S_ISCHR
+import gzip
+import bz2file
 from khmer import khmer_args
 
 
@@ -167,3 +169,45 @@ def check_valid_file_exists(in_files):
         else:
             print('WARNING: Input file %s not found' %
                   in_file, file=sys.stderr)
+
+
+def is_block(fthing):
+    """Takes in a file object and checks to see if it's a block or fifo"""
+
+    if fthing is sys.stdout or fthing is sys.stdin:
+        return True
+    else:
+        mode = os.stat(fthing.name).st_mode
+        return S_ISBLK(mode) or S_ISCHR(mode)
+
+
+def add_output_compression_type(parser):
+    """Adds compression arguments to a parset object"""
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--gzip', default=False, action='store_true',
+                       help='Compress output using gzip')
+    group.add_argument('--bzip', default=False, action='store_true',
+                       help='Compress output using bzip2')
+
+
+def get_file_writer(file_handle, do_gzip, do_bzip):
+    """Generate and return a file object with specified compression"""
+
+    ofile = None
+
+    if do_gzip and do_bzip:
+        raise Exception("Cannot specify both bzip and gzip compression!")
+
+    if is_block(file_handle):
+        pass
+    else:
+        assert type(file_handle) == file, type(file_handle)  # Sanity check
+
+    if do_gzip:
+        ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
+    elif do_bzip:
+        ofile = bz2file.open(file_handle, mode='w')
+    else:
+        ofile = file_handle
+
+    return ofile

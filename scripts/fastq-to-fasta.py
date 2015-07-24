@@ -14,10 +14,12 @@ Convert FASTQ files to FASTA format.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import sys
 import argparse
 import screed
+from khmer.kfile import (add_output_compression_type, get_file_writer,
+                         is_block)
 
 
 def get_parser():
@@ -28,20 +30,23 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
+                        type=argparse.FileType('w'),
                         help='The name of the output'
                         ' FASTA sequence file.',
-                        type=argparse.FileType('w'),
                         default=sys.stdout)
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to drop reads containing \'N\'s in ' +
                         'input_sequence file.')
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    print(('fastq from ', args.input_sequence), file=sys.stderr)
 
+    print(('fastq from ', args.input_sequence), file=sys.stderr)
+    output_is_block = is_block(args.output)
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
     for n, record in enumerate(screed.open(args.input_sequence,
                                            parse_description=False)):
@@ -56,8 +61,8 @@ def main():
                 n_count += 1
                 continue
 
-        args.output.write('>' + name + '\n')
-        args.output.write(sequence + '\n')
+        outfp.write('>' + name + '\n')
+        outfp.write(sequence + '\n')
 
     print('\n' + 'lines from ' + args.input_sequence, file=sys.stderr)
 
@@ -67,7 +72,10 @@ def main():
     else:
         print('No lines dropped from file.', file=sys.stderr)
 
-    print('Wrote output to', args.output, file=sys.stderr)
+    if output_is_block:
+        print('Wrote output to block device', file=sys.stderr)
+    else:
+        print('Wrote output to', args.output.name, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

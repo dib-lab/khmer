@@ -1,3 +1,12 @@
+2015-07-23  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/kfile.py: added infastructure for doing compressed output
+   * scripts/{count-median,extract-long-sequences,extract-paired-reads,
+   extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
+   interleave-reads,normalize-by-median,sample-reads-randomly,
+   split-paired-reads,trim-low-abund}.py: added compression
+   * tests/test_{functions,scripts}.py: added tests
+
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_read_parsers.py: added workaround for bug in OSX Python

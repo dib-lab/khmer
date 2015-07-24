@@ -24,9 +24,9 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type, get_file_writer)
 from khmer import __version__
-#
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -64,7 +64,8 @@ def get_parser():
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('-o', '--out', dest='single_output_filename',
-                        default='', metavar="optional_output_filename",
+                        type=argparse.FileType('w'),
+                        metavar="filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
@@ -72,6 +73,7 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -116,12 +118,13 @@ def main():
     # the filtering loop
     for infile in infiles:
         print('filtering', infile, file=sys.stderr)
-        if args.single_output_filename != '':
+        if args.single_output_filename:
             outfile = args.single_output_filename
-            outfp = open(outfile, 'a')
+            outfp = get_file_writer(outfile, args.gzip, args.bzip)
         else:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'w')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
         tsp.start(verbose_loader(infile), outfp)

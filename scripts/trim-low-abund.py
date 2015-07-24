@@ -31,7 +31,8 @@ from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
                               report_on_config, calculate_tablesize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -85,7 +86,7 @@ def get_parser():
 
     parser.add_argument('-o', '--out', metavar="filename",
                         type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
@@ -104,6 +105,7 @@ def get_parser():
     parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true')
     parser.add_argument('--tempdir', '-T', type=str, default='./')
+    add_output_compression_type(parser)
 
     return parser
 
@@ -159,9 +161,11 @@ def main():
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
         if args.out is None:
-            trimfp = open(os.path.basename(filename) + '.abundtrim', 'w')
+            trimfp = get_file_writer(open(os.path.basename(filename)
+                                     + '.abundtrim', 'w'),
+                                     args.gzip, args.bzip)
         else:
-            trimfp = args.out
+            trimfp = get_file_writer(args.out, args.gzip, args.bzip)
 
         pass2list.append((filename, pass2filename, trimfp))
 

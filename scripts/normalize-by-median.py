@@ -31,7 +31,8 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info, calculate_tablesize)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer)
 from khmer.utils import write_record, broken_paired_reader
 
 
@@ -39,11 +40,13 @@ DEFAULT_DESIRED_COVERAGE = 20
 
 
 class WithDiagnostics(object):
+
     """
     Generator/context manager to do boilerplate output of statistics.
 
     uses a Normalizer object.
     """
+
     def __init__(self, norm, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp
@@ -257,15 +260,16 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_file',
                         type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+                        default=None, dest='single_output_file',
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     add_loadhash_args(parser)
+    add_output_compression_type(parser)
     return parser
 
 
@@ -343,8 +347,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             output_name = '/dev/stdout'
         else:
             output_name = args.single_output_file.name
-        outfp = args.single_output_file
-
+        outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
     #
     # main loop: iterate over all files given, do diginorm.
     #
@@ -353,6 +356,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
             outfp = open(output_name, 'w')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,

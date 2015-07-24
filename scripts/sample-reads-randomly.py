@@ -27,7 +27,8 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_input_files
+from khmer.kfile import (check_input_files, add_output_compression_type,
+                         get_file_writer)
 from khmer.khmer_args import info
 from khmer.utils import write_record, broken_paired_reader
 
@@ -69,12 +70,13 @@ def get_parser():
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
-                        metavar='output_file',
-                        type=argparse.FileType('w'), default=None)
+                        type=argparse.FileType('w'),
+                        metavar="filename", default=None)
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -96,8 +98,8 @@ def main():
     # Figure out what the output filename is going to be
     #
 
-    output_file = args.output_file
-    if output_file:
+    if args.output_file:
+        output_filename = args.output_file.name
         if num_samples > 1:
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
@@ -105,7 +107,6 @@ def main():
                 print("NOTE: This can be overridden using the --force"
                       " argument", file=sys.stderr)
                 sys.exit(1)
-        output_filename = output_file.name
     else:
         filename = args.filenames[0]
         output_filename = os.path.basename(filename) + '.subset'
@@ -162,8 +163,8 @@ def main():
     if len(reads) == 1:
         print('Writing %d sequences to %s' %
               (len(reads[0]), output_filename), file=sys.stderr)
-        if not output_file:
-            output_file = open(output_filename, 'w')
+        output_file = get_file_writer(
+            open(output_filename, 'w'), args.gzip, args.bzip)
 
         for records in reads[0]:
             write_record(records[0], output_file)
@@ -174,7 +175,8 @@ def main():
             n_filename = output_filename + '.%d' % n
             print('Writing %d sequences to %s' %
                   (len(reads[n]), n_filename), file=sys.stderr)
-            output_file = open(n_filename, 'w')
+            output_file = get_file_writer(open(n_filename, 'w'), args.gzip,
+                                          args.bzip)
             for records in reads[n]:
                 write_record(records[0], output_file)
                 if records[1] is not None:

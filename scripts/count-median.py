@@ -29,7 +29,9 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type, get_file_writer)
+
 from khmer.khmer_args import info
 
 
@@ -60,7 +62,8 @@ def get_parser():
                         help='input k-mer count table filename')
     parser.add_argument('input', metavar='input_sequence_filename',
                         help='input FAST[AQ] sequence filename')
-    parser.add_argument('output', metavar='output_summary_filename',
+    parser.add_argument('output', metavar='filename',
+                        type=argparse.FileType('w'),
                         help='output summary filename')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
@@ -69,6 +72,7 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help="Use the CSV format for the histogram."
                         "Includes column headers.")
+    add_output_compression_type(parser)
     return parser
 
 
@@ -91,7 +95,7 @@ def main():
     ksize = htable.ksize()
 
     print('writing to', output_filename, file=sys.stderr)
-    output = open(output_filename, 'w')
+    output = get_file_writer(output_filename, args.gzip, args.bzip)
 
     if args.csv:
         output = csv.writer(output)
