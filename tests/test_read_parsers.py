@@ -323,6 +323,7 @@ def test_read_pair_iterator_in_error_mode():
     assert all(matches)  # Assert ALL the matches. :-]
 
 
+@attr('linux')
 def test_read_pair_iterator_in_error_mode_xfail():
 
     rparser = \
@@ -335,6 +336,21 @@ def test_read_pair_iterator_in_error_mode_xfail():
         failed = False
     except ValueError as exc:
         assert "Invalid read pair" in str(exc), str(exc)
+    assert failed
+
+
+def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
+
+    rparser = \
+        ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
+
+    failed = True
+    try:
+        for rpair in rparser.iter_read_pairs():
+            pass
+        failed = False
+    except ValueError as exc:
+        pass
     assert failed
 
 
