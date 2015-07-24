@@ -75,10 +75,10 @@ def get_parser():
         formatter_class=ComboFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    
+
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
-    
+
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
