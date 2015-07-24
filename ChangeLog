@@ -6,6 +6,8 @@
    interleave-reads,normalize-by-median,sample-reads-randomly,
    split-paired-reads,trim-low-abund}.py: added compression
    * tests/test_{functions,scripts}.py: added tests
+   * scripts/{load-graph,partition-graph}.py: made load-graph no longer add .pt
+   to graph outfiles, changed partition-graph to not expect .pt's
 
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
