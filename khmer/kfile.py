@@ -125,7 +125,6 @@ def check_space(in_files, force, _testhook_free_space=None):
 def check_space_for_hashtable(outfile_name, hash_size, force,
                               _testhook_free_space=None):
     """Check that we have enough size to write the specified hash table."""
-
     dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
 
@@ -172,8 +171,7 @@ def check_valid_file_exists(in_files):
 
 
 def is_block(fthing):
-    """Takes in a file object and checks to see if it's a block or fifo"""
-
+    """Take in a file object and checks to see if it's a block or fifo."""
     if fthing is sys.stdout or fthing is sys.stdin:
         return True
     else:
@@ -182,7 +180,7 @@ def is_block(fthing):
 
 
 def add_output_compression_type(parser):
-    """Adds compression arguments to a parset object"""
+    """Add compression arguments to a parset object."""
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--gzip', default=False, action='store_true',
                        help='Compress output using gzip')
@@ -191,8 +189,7 @@ def add_output_compression_type(parser):
 
 
 def get_file_writer(file_handle, do_gzip, do_bzip):
-    """Generate and return a file object with specified compression"""
-
+    """Generate and return a file object with specified compression."""
     ofile = None
 
     if do_gzip and do_bzip:
