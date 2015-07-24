@@ -82,7 +82,7 @@ def main():
     graphbase = args.graphbase
 
     # @RamRS: This might need some more work
-    infiles = [graphbase + '.pt', graphbase + '.tagset']
+    infiles = [graphbase, graphbase + '.tagset']
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
@@ -90,8 +90,8 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading k-mer presence table %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    print('loading k-mer presence table %s' % graphbase, file=sys.stderr)
+    htable = khmer.load_hashbits(graphbase)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
     htable.load_tagset(graphbase + '.tagset')

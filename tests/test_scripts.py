@@ -700,7 +700,7 @@ def test_load_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -733,7 +733,7 @@ def test_oxli_build_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -761,7 +761,7 @@ def test_load_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -784,7 +784,7 @@ def test_oxli_build_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -835,7 +835,7 @@ def test_load_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -858,7 +858,7 @@ def test_oxli_build_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -904,7 +904,7 @@ def test_load_graph_max_memory_usage_parameter():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     try:
@@ -929,7 +929,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -1027,7 +1027,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1051,7 +1051,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1064,7 +1064,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -1083,7 +1083,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1098,7 +1098,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1114,7 +1114,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -2766,7 +2766,7 @@ def test_count_overlap_invalid_datafile():
     outfile = utils.get_temp_filename('overlap.out', in_dir)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', htfile + '.pt', outfile]
+            htfile, htfile, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert "OSError" in err
 
@@ -2782,7 +2782,7 @@ def test_count_overlap():
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', seqfile2, outfile]
+            htfile, seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
@@ -2809,7 +2809,7 @@ def test_count_overlap_csv():
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
-            '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
+            '10000000', '--csv', htfile, seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
@@ -2885,7 +2885,7 @@ def execute_load_graph_streaming(filename):
     err = err.read()
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = os.path.join(in_dir, 'out.pt')
+    ht_file = os.path.join(in_dir, 'out')
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = os.path.join(in_dir, 'out.tagset')
