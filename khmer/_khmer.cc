@@ -4461,16 +4461,22 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         PyObject * args)
 {
     const char * filename;
+    PyObject * output_records_o = NULL;
+    bool output_records = false;
 
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
+    if (!PyArg_ParseTuple(args, "s|O", &filename, &output_records_o)) {
         return NULL;
+    }
+
+    if (output_records_o != NULL && PyObject_IsTrue(output_records_o)) {
+       output_records = true;
     }
 
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta(filename, total_reads, n_consumed);
+        me->hllcounter->consume_fasta(filename, output_records, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

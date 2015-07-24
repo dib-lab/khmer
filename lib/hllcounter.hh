@@ -26,9 +26,11 @@ public:
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
     void consume_fasta(std::string const &,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     void consume_fasta(read_parsers::IParser *,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     unsigned int check_and_process_read(std::string &,

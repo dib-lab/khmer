@@ -117,11 +117,7 @@ def main():
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        for record in screed.open(input_filename):
-            seq = record.sequence.upper().replace('N', 'A')
-            hllcpp.consume_string(seq)
-            if args.stream_out:
-                write_record(record, sys.stdout)
+        hllcpp.consume_fasta(input_filename, args.stream_out)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(

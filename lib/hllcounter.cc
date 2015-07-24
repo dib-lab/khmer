@@ -232,6 +232,19 @@ int get_rho(HashIntoType w, int max_width)
     return max_width - floor(log2(w));
 }
 
+void write_record(const read_parsers::Read& read, std::ostream& output)
+{
+    if (read.quality.length() != 0) {
+        output << "@" << read.name << std::endl
+               << read.sequence << std::endl
+               << "+" << std::endl
+               << read.quality << std::endl;
+    } else {
+        output << ">" << read.name << std::endl
+               << read.sequence << std::endl;
+    }
+}
+
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
     if (error_rate < 0) {
@@ -347,18 +360,20 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
 
 void HLLCounter::consume_fasta(
     std::string const &filename,
+    bool output_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(parser, total_reads, n_consumed);
+    consume_fasta(parser, output_records, total_reads, n_consumed);
 
     delete parser;
 }
 
 void HLLCounter::consume_fasta(
     read_parsers::IParser *parser,
+    bool output_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
 {
@@ -372,7 +387,7 @@ void HLLCounter::consume_fasta(
 
     #pragma omp parallel
     {
-        #pragma omp single
+        #pragma omp master
         {
             counters = (HLLCounter**)calloc(omp_get_num_threads(),
             sizeof(HLLCounter*));
@@ -396,6 +411,10 @@ void HLLCounter::consume_fasta(
                     break;
                 }
 
+                if (output_records) {
+                    write_record(read, std::cout);
+                }
+
                 #pragma omp task default(none) firstprivate(read) \
                 shared(counters, n_consumed_partial, total_reads_partial)
                 {
@@ -413,7 +432,7 @@ void HLLCounter::consume_fasta(
         }
         #pragma omp taskwait
 
-        #pragma omp single
+        #pragma omp master
         {
             for (int i=0; i < omp_get_num_threads(); ++i)
             {
@@ -450,8 +469,11 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
     }
 
     for (unsigned int i = 0; i < read.length(); i++) {
-        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
-        if (!is_valid_dna( read[ i ] )) {
+        read[i] &= 0xdf; // toupper - knock out the "lowercase bit"
+        if (read[i] == 'N') {
+            read[i] = 'A';
+        }
+        if (!is_valid_dna( read[i] )) {
             is_valid = false;
             break;
         }
