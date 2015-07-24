@@ -87,7 +87,7 @@ def main():
     print('HT sizes:', hashsizes, file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
-    if args.output_histogram_filename in ('-', '/dev/stdin'):
+    if args.output_histogram_filename in ('-', '/dev/stdout'):
         pass
     elif os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
