@@ -23,7 +23,8 @@ import sys
 import textwrap
 
 import khmer
-from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
+from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import write_record
 from oxli.functions import optimal_args_output_gen as output_gen
 from khmer import __version__
@@ -74,9 +75,10 @@ def get_parser():
         formatter_class=ComboFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-
-    parser.add_argument('--version', action='version',
+    
+    parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
@@ -96,7 +98,7 @@ def get_parser():
                         help='write input sequences to STDOUT')
 
     parser.add_argument('--diagnostics', default=False, action='store_true',
-                        help='print out reccomended tablesize argumentss and'
+                        help='print out recommended tablesize argumentss and'
                              'restrictions')
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
