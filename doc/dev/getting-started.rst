@@ -7,6 +7,8 @@
 Getting started with khmer development
 ======================================
 
+.. contents::
+
 This document is for people who would like to contribute to khmer.  It
 walks first-time contributors through making their own copy of khmer,
 building it, and submitting changes for review and merge into the master
@@ -336,29 +338,22 @@ Here are a few suggestions:
 Your second contribution...
 ---------------------------
 
-These are just a few quick pointers on getting started on your second (or
-third, or fourth, or nth contribution).
+Here are a few pointers on getting started on your second (or third,
+or fourth, or nth contribution).
 
-So, assuming you've found an issue you'd like to work on there's a couple
-things to make sure your local copy of the repository is ready for a new
-issue--specifically, we need to make sure it's in sync with the remote
-repository so you aren't working on a old copy. So::
+So, assuming you've found an issue you'd like to work on there are a
+couple things to do to make sure your local copy of the repository is
+ready for a new issue--specifically, we need to make sure it's in sync
+with the remote repository so you aren't working on a old copy. So::
 
         git checkout master
         git fetch --all
         git pull
 
-What this does is it pulls down updates from GitHub about any changes that may
-have been made to the master branch since your last contribution (usually
-including the merge of your last contribution). Then we merge those changes
-into your local copy of the master branch. Next::
+This puts you on the latest master branch and pulls down updates from
+GitHub with any changes that may have been made since your last
+contribution (usually including the merge of your last
+contribution). Then we merge those changes into your local copy of the
+master branch.
 
-        git checkout -b new-branch-name
-        make clean test
-
-Here we check out a new branch for your changes and then we kick off a set of
-tests to make sure everything is a-okay with the code--though the master
-branch *should* always be clean it's always good to check before starting work
-(so that any existing errors don't confound your work later).
-
-After that you can get to coding!
+Now, you can go back to `Claiming an issue and starting to develop`_.
