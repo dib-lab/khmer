@@ -12,7 +12,7 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import errno
-from stat import S_ISBLK, S_ISCHR
+from stat import S_ISBLK, S_ISFIFO, S_ISCHR
 import gzip
 import bz2file
 from khmer import khmer_args
