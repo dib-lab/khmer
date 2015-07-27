@@ -1,3 +1,7 @@
+"""
+A collection of functions for use throughout khmer/oxli
+"""
+
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -14,45 +18,64 @@ import khmer.utils
 import sys
 
 
-def estimate_optimal_with_N_and_M(N, M):
+def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal counting table args where N is the
-    number of unique kmer and M is the allotted amount of memory
+    Utility function for estimating optimal counting table args where:
+      - num_kmers: number of unique kmers [required]
+      - mem_cap: the allotted amount of memory [optional, conflicts with f]
+      - fp_rate: the desired false positive rate [optional, conflicts with M]
     """
-    Z = math.log(2) * (M / float(N))
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
-    H = int(M / intZ)
-    M = H * intZ
-    f2 = (1 - math.exp(-N / float(H))) ** intZ
+    if all((num_kmers is not None, mem_cap is not None, fp_rate is None)):
+        return estimate_optimal_with_K_and_M(num_kmers, mem_cap)
+    elif all((num_kmers is not None, mem_cap is None, fp_rate is not None)):
+        return estimate_optimal_with_K_and_f(num_kmers, fp_rate)
+    else:
+        raise TypeError("num_kmers and either mem_cap or fp_rate"
+                        " must be defined.")
+
+
+def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
+    """
+    Utility function for estimating optimal counting table args where num_kmers
+    is the number of unique kmer and mem_cap is the allotted amount of memory
+    """
+
+    n_tables = math.log(2) * (mem_cap / float(num_kmers))
+    int_n_tables = int(n_tables)
+    if int_n_tables == 0:
+        int_n_tables = 1
+    ht_size = int(mem_cap / int_n_tables)
+    mem_cap = ht_size * int_n_tables
+    fp_rate = (1 - math.exp(-num_kmers / float(ht_size))) ** int_n_tables
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
-    return res(intZ, H, M, f2)
+    return res(int_n_tables, ht_size, mem_cap, fp_rate)
 
 
-def estimate_optimal_with_N_and_f(N, f):
+def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     """
-    Utility function for estimating optimal memory where N is the number of
-    unique kmers and f is the desired false positive rate
+    Utility function for estimating optimal memory where num_kmers  is the
+    number of unique kmers and des_fp_rate is the desired false positive rate
     """
-    Z = math.log(f, 0.5)
-    intZ = int(Z)
-    if intZ == 0:
-        intZ = 1
+    n_tables = math.log(des_fp_rate, 0.5)
+    int_n_tables = int(n_tables)
+    if int_n_tables == 0:
+        int_n_tables = 1
 
-    H1 = int(-N / (math.log(1 - f ** (1 / float(intZ)))))
-    M1 = H1 * intZ
-    f1 = (1 - math.exp(-N / float(H1))) ** intZ
+    ht_size = int(-num_kmers / (math.log(1 - des_fp_rate ** (1 /
+                  float(int_n_tables)))))
+    mem_cap = ht_size * int_n_tables
+    fp_rate = (1 - math.exp(-num_kmers / float(ht_size))) ** int_n_tables
 
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
                                 "fp_rate"])
-    return res(intZ, H1, M1, f1)
+    return res(int_n_tables, ht_size, mem_cap, fp_rate)
 
 
 def optimal_args_output_gen(unique_kmers, fp_rate):
     """
     Assembles output string for optimal arg sandbox scripts
+    takes in unique_kmers and desired fp_rate
     """
     to_print = []
 
@@ -65,9 +88,12 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'expected_memory_usage')
 
     for fp_rate in range(1, 10):
-        Z, H, M, f = estimate_optimal_with_N_and_f(
-            unique_kmers, fp_rate / 10.0)
-        to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(f, Z, H, M))
+        num_tables, table_size, mem_cap, fp_rate = \
+            optimal_size(unique_kmers, fp_rate=fp_rate/10.0)
+        to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(fp_rate,
+                                                                 num_tables,
+                                                                 table_size,
+                                                                 mem_cap))
 
     mem_list = [1, 5, 10, 20, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
 
@@ -77,33 +103,46 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
                     'size_hashtable(H)\texpected_fp')
 
     for mem in mem_list:
-        Z, H, M, f = estimate_optimal_with_N_and_M(unique_kmers,
-                                                   mem * 1000000000)
-        to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(M, Z, H, f))
+        num_tables, table_size, mem_cap, fp_rate =\
+            optimal_size(unique_kmers, mem_cap=mem*1000000000)
+        to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(mem_cap,
+                                                                 num_tables,
+                                                                 table_size,
+                                                                 fp_rate))
     return "\n".join(to_print)
 
 
 def do_sanity_checking(args, desired_max_fp):
+    """
+    simple function to check if the restrictions in the args (if there are any)
+    make sense--If not, complain. If no restrictions are given, add some that
+    make sense.
+    Takes in args and desired max FP rate
+    """
     # if optimization args are given, do optimization
     if args.unique_kmers != 0:
         if args.max_memory_usage:
             # verify that this is a sane memory usage restriction
-            res = estimate_optimal_with_N_and_M(args.unique_kmers,
+            res = estimate_optimal_with_K_and_M(args.unique_kmers,
                                                 args.max_memory_usage)
             if res.fp_rate > desired_max_fp:
                 print("""
 *** ERROR: The given restrictions yield an estimate false positive rate of {0},
-*** which is above the recommended false positive ceiling of {1}!
-*** Aborting!""".format(res.fp_rate, desired_max_fp), file=sys.stderr)
-                sys.exit(1)
+*** which is above the recommended false positive ceiling of {1}!"""
+                      .format(res.fp_rate, desired_max_fp), file=sys.stderr)
+                if not args.force:
+                    print("NOTE: This can be overridden using the --force"
+                          " argument", file=sys.stderr)
+                    print("*** Aborting...!", file=sys.stderr)
+                    sys.exit(1)
         else:
-            res = estimate_optimal_with_N_and_f(args.unique_kmers,
+            res = estimate_optimal_with_K_and_f(args.unique_kmers,
                                                 desired_max_fp)
             if args.max_tablesize and args.max_tablesize < res.htable_size:
                 print("*** Warning: The given tablesize is too small!",
                       file=sys.stderr)
                 print("*** Estimating false positive rate to be {0}".format(
-                      res.fp_rate), file=sys.stderr)
+                    res.fp_rate), file=sys.stderr)
             else:
                 print("*** INFO: set memory ceiling using auto optimization.",
                       file=sys.stderr)
@@ -117,6 +156,8 @@ def do_sanity_checking(args, desired_max_fp):
 def build_graph(ifilenames, graph, num_threads=1, tags=False):
     """
     Algorithm to construct a counting graph from a set of input files
+    takes in list of input files, existing graph
+    optionally, number of threads and if there should be tags
     """
 
     if tags:

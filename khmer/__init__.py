@@ -147,7 +147,8 @@ def extract_countinghash_info(filename):
 
 def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
-    Check to see that collision rate is within threshold.
+
+    Also check to see that collision rate is within threshold.
 
     Keyword argument:
     hashtable: the hashtable object to inspect
@@ -171,8 +172,8 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
         print("** Do not use these results!!", file=sys.stderr)
         print("**", file=sys.stderr)
         print("** (estimated false positive rate of %.3f;" % fp_all,
-              file=sys.stderr)
-        print("max allowable %.3f" % max_false_pos, file=sys.stderr)
+              file=sys.stderr, end=' ')
+        print("max recommended %.3f)" % max_false_pos, file=sys.stderr)
         print("**", file=sys.stderr)
 
         if not force:
