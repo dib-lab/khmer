@@ -57,3 +57,11 @@ with headers.  Previously this had to be enabled with :options:`--csv`.
 (Affects `abundance-dist-single.py`, `abundance-dist.py`, `count-median.py`,
 and `count-overlap.py`.) `normalize-by-median.py` also now outputs CSV
 when :option:`-R` is used.
+
+load-graph.py no longer appends .pt to the specified filename
+-------------------------------------------------------------
+
+Previously, `load-graph.py` appended a `.pt` extension to the specified output
+filename and partition-graph appended a `.pt` to the given input filename. 
+Now, `load-graph.py` writes to the specified output filename and
+`partition-graph.py` does not append a `.pt` to the given input filename.
