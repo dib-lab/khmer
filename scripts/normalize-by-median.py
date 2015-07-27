@@ -39,13 +39,11 @@ DEFAULT_DESIRED_COVERAGE = 20
 
 
 class WithDiagnostics(object):
-
     """
     Generator/context manager to do boilerplate output of statistics.
 
     uses a Normalizer object.
     """
-
     def __init__(self, norm, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp

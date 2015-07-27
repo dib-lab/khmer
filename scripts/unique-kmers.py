@@ -46,7 +46,7 @@ def get_parser():
     with :option:`-R`/:option:`--report`.
 
     :option:`--stream-out` will write the sequences taken in to STDOUT.
-    This is useful for workflows: count unique kmers in a stream, then do 
+    This is useful for workflows: count unique kmers in a stream, then do
     digital normalization.
 
     :option:`--diagnostics` will provide detailed options for tablesize
@@ -98,7 +98,7 @@ def get_parser():
                         help='write input sequences to STDOUT')
 
     parser.add_argument('--diagnostics', default=False, action='store_true',
-                        help='print out recommended tablesize argumentss and'
+                        help='print out recommended tablesize arguments and '
                              'restrictions')
 
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
