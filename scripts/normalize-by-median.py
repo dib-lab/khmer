@@ -166,16 +166,16 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
     try:
         yield
     except (IOError, OSError, ValueError) as error:
-        print('** ERROR: ' + str(error), file=sys.stderr)
-        print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
+        log_err('** ERROR: ' + str(error))
+        log_err('** Failed on {name}: ', name=ifile))
         if not single_out:
             os.remove(out.name)
         if not force:
-            print('** Exiting!', file=sys.stderr)
+            log_err('** Exiting!')
 
             sys.exit(1)
         else:
-            print('*** Skipping error file, moving on...', file=sys.stderr)
+            log_err('*** Skipping error file, moving on...')
             corrupt_files.append(ifile)
 
 
@@ -378,7 +378,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             umers=htable.n_unique_kmers())
 
     if args.savetable:
-        print('...saving to ' + args.savetable, file=sys.stderr)
+        log_inf('...saving to ' + args.savetable)
         htable.save(args.savetable)
 
     fp_rate = \
@@ -388,10 +388,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     log_inf('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
-        print("** WARNING: Finished with errors!", file=sys.stderr)
-        print("** I/O Errors occurred in the following files:",
-              file=sys.stderr)
-        print("\t", " ".join(corrupt_files), file=sys.stderr)
+        log_err("** WARNING: Finished with errors!")
+        log_err("** I/O Errors occurred in the following files:")
+        log_err("\t", " ".join(corrupt_files))
 
 
 if __name__ == '__main__':

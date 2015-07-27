@@ -1,3 +1,8 @@
+2015-07-27  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scrips/normalize-by-median.py,khmer/khmer_logger.py: added logging
+   framework, prorotyped in normalize-by-median
+
 2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/getting-started.rst: added instructions for second contribution
