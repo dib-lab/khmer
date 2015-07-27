@@ -31,14 +31,14 @@ def log_err(message, **kwargs):
 
 
 def log_dbg(message, **kwagrs):
-    """For non-critical debug output to stdout."""
+    """For non-critical debug output to stderr."""
     global __QUIET__
     if not __QUIET__:
         print(message.format(**kwargs), file=sys.stdout)
 
 
 def log_wrn(message, **kwargs):
-    """For critical warning output to stdout."""
+    """For critical warning output to stderr."""
     print(message.format(**kwargs), file=sys.stdout)
 
 
