@@ -104,10 +104,7 @@ def main():
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
-    if args.output is None:
-        outfp = get_file_writer(sys.stdout, args.gzip, args.bzip)
-    else:
-        outfp = get_file_writer(args.output, args.gzip, args.bzip)
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
 
     counter = 0
     screed_iter_1 = screed.open(s1_file)

@@ -115,13 +115,14 @@ def main():
 
         return None, None
 
+    if args.single_output_filename:
+            outfile = args.single_output_filename
+            outfp = get_file_writer(outfile, args.gzip, args.bzip)
+
     # the filtering loop
     for infile in infiles:
         print('filtering', infile, file=sys.stderr)
-        if args.single_output_filename:
-            outfile = args.single_output_filename
-            outfp = get_file_writer(outfile, args.gzip, args.bzip)
-        else:
+        if not args.single_output_filename:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'w')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)

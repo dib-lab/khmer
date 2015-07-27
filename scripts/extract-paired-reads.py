@@ -74,7 +74,7 @@ def get_parser():
                         type=argparse.FileType('w'),
                         default=None, help='Output paired reads to this '
                         'file')
-    parser.add_argument('-s', '--output-single', metavar="filename",
+    parser.add_argument('--output-single', '-s', metavar="filename",
                         type=argparse.FileType('w'), default=None,
                         help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
