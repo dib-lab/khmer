@@ -1,3 +1,7 @@
+2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/getting-started.rst: added instructions for second contribution
+
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_read_parsers.py: added workaround for bug in OSX Python
