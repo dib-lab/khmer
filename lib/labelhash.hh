@@ -24,7 +24,8 @@ protected:
     // Does the given tag already have the given label?
     bool _cmap_contains_label(const TagLabelPtrMap& cmap,
                               HashIntoType& kmer,
-                              Label& the_label) {
+                              Label& the_label)
+    {
         std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
         ret = cmap.equal_range(kmer);
         for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
@@ -38,7 +39,8 @@ protected:
     // Does the given label already have a tag associated with it?
     bool _cmap_contains_tag(const LabelTagMap& cmap,
                             Label& the_label,
-                            HashIntoType& kmer) {
+                            HashIntoType& kmer)
+    {
         std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(the_label);
         for (LabelTagMap::const_iterator it=ret.first; it!=ret.second; ++it) {
@@ -51,7 +53,8 @@ protected:
 
     unsigned int _get_tag_labels(const HashIntoType& tag,
                                  const TagLabelPtrMap& cmap,
-                                 LabelPtrSet& found_labels) {
+                                 LabelPtrSet& found_labels)
+    {
         unsigned int num_labels = 0;
         std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
         ret = cmap.equal_range(tag);
@@ -64,7 +67,8 @@ protected:
 
     unsigned int _get_tags_from_label(const Label& label,
                                       const LabelTagMap& cmap,
-                                      TagSet& labeled_tags) {
+                                      TagSet& labeled_tags)
+    {
         unsigned int num_tags = 0;
         std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
         ret = cmap.equal_range(label);
@@ -80,7 +84,8 @@ protected:
 public:
     khmer::Hashtable * graph;
 
-    explicit LabelHash(Hashtable * ht) : graph(ht) {
+    explicit LabelHash(Hashtable * ht) : graph(ht)
+    {
         _tag_labels_spin_lock = 0;
 
     }
@@ -91,12 +96,14 @@ public:
     LabelTagMap label_tag_ptrs;
     LabelPtrMap label_ptrs;
 
-    size_t n_labels() const {
+    size_t n_labels() const
+    {
         return label_ptrs.size();
     }
 
 
-    Label * check_and_allocate_label(Label new_label) {
+    Label * check_and_allocate_label(Label new_label)
+    {
         Label * c;
         if (label_ptrs.count(new_label)) {
             c = label_ptrs[new_label];

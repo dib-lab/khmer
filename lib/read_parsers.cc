@@ -33,11 +33,11 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
         message = message + filename + " for reading.";
-        throw InvalidStream(message.c_str());
+        throw InvalidStream(message);
     } else if (seqan::atEnd(_private->stream)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
-        throw InvalidStream(message.c_str());
+        throw InvalidStream(message);
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
@@ -171,7 +171,7 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
     default:
         std::ostringstream oss;
         oss << "Unknown pair reading mode: " << mode;
-        throw UnknownPairReadingMode(oss.str().c_str());
+        throw UnknownPairReadingMode(oss.str());
     }
 }
 

@@ -26,9 +26,9 @@ def pretty_compare(a, b):
             line3.append('x')
 
     for i in range(0, len(line1), 60):
-        print("".join(line1[i:i+60]))
-        print("".join(line3[i:i+60]))
-        print("".join(line2[i:i+60]))
+        print("".join(line1[i:i + 60]))
+        print("".join(line3[i:i + 60]))
+        print("".join(line2[i:i + 60]))
 
 
 def eq_(v1, v2):
@@ -98,7 +98,7 @@ def test_align_middle():
 
 
 def test_align_middle_trunc():
-    return # @CTB
+    return  # @CTB
 
     ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
@@ -122,7 +122,7 @@ def test_align_middle_trunc():
 
 
 def test_align_middle_trunc_2():
-    return # @CTB
+    return  # @CTB
 
     ch = khmer.CountingHash(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
@@ -192,7 +192,7 @@ def test_align_fwd_middle():
 
 
 def test_align_fwd_middle_trunc():
-    return # @CTB
+    return  # @CTB
     ch = khmer.CountingHash(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -246,7 +246,7 @@ def test_align_fwd_covs_1():
     score, g, r, is_t, covs = aligner.align_forward(read)
 
     for start in range(0, len(read) - K + 1):
-        print(ch.get(read[start:start+K]), end=' ')
+        print(ch.get(read[start:start + K]), end=' ')
     print('')
 
     assert len(covs) == len(read)
@@ -270,7 +270,7 @@ def test_align_fwd_covs_2():
 
     print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print(ch.get(read[start:start+K]), end=' ')
+        print(ch.get(read[start:start + K]), end=' ')
     print('')
 
     assert len(covs) == len(read)
@@ -295,7 +295,7 @@ def test_align_fwd_covs_3():
 
     print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print(ch.get(read[start:start+K]), end=' ')
+        print(ch.get(read[start:start + K]), end=' ')
     print('')
 
     assert len(covs) == len(read)
@@ -321,7 +321,7 @@ def test_align_fwd_covs_4():
 
     print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print(ch.get(read[start:start+K]), end=' ')
+        print(ch.get(read[start:start + K]), end=' ')
     print('')
 
     assert len(covs) == len(read)
@@ -345,7 +345,7 @@ def test_align_fwd_covs_5():
 
     print(covs, g)
     for start in range(0, len(read) - K + 1):
-        print(ch.get(read[start:start+K]), end=' ')
+        print(ch.get(read[start:start + K]), end=' ')
     print('')
 
     assert len(covs) == len(read)
@@ -356,7 +356,7 @@ def test_align_fwd_covs_5():
 
 
 def test_simple_readalign():
-    return # @CTB
+    return  # @CTB
     ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 2, 0)
     for i in range(20):
@@ -376,7 +376,7 @@ def test_simple_readalign():
 
 
 def test_readalign():
-    return # @CTB
+    return  # @CTB
     ch = khmer.CountingHash(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for i in range(20):
@@ -518,9 +518,11 @@ queries = [
         "AAAAAAAAAAAAAAAAAAAAAAAAAA",
         "score": 5.331560863368736,
         "graph_aln":
-        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTT",
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTC"
+        "TGTTTCTACTGCAAACTTT",
         "read_aln":
-        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGAAAATAATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGAAAATAATTAAAAAAAAAAAAAAAAAAAA"
+        "AAAAAAAAAAAAAAAAAAA",
         "truncated": False
     },
     {
@@ -536,56 +538,61 @@ queries = [
         "TAACAACCTCTTTAC",
         "truncated": False
     },
-    { # the motif of 32 bases are identical match to HT seqs, the rest are random
-      # "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT" is the from HT seqs
+    {  # the motif of 32 bases are identical match to HT seqs, the rest are
+        # random. TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT" is the from HT seqs
         "seq":
-        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
+        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAA"
+        "TGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTT"
+        "TAATTTACTGCGGTCACGCGGAACT",
         "score": 68.17022311739733,
         "graph_aln":
-        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
+        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAA"
+        "TGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTT"
+        "TAATTTACTGCGGTCACGCGGAACT",
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
         "truncated": True,
         "description": "truncated-alignment-bc-missing-kmers"
-   },
+    },
     {   # Testing for min distance between correctable SNPs
         # 1st SNP is at position 2+K from beginning, 2nd SNP at position 2+K+K
         "seq":
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
-     "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+        "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
         "score": 265.608525171,
-        "graph_aln": 
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
-     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
-       "read_aln":
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
-     "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
+        "graph_aln":
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+        "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
+        "read_aln":
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+        "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
         "truncated": False,
         "description": "2 SNPs, one K apart",
     },
     {   # Testing for min distance between correctable SNPs
         # 1st SNP is at position 2+K from beginning, 2nd SNP at position
-     # 2+K+K-1
+        # 2+K+K-1
         "seq":
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACCTTTGATTATCAATTTTGCCGCTTTAACTGG"
-     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACCTTTGATTATCAATTTTGCCGCTTTAACTGG"
+        "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
         "score": 265.608525171,
-        "graph_aln": 
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
-     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
-       "read_aln":
-     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTAG"
-     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
-     "CTCTTTAC",
+        "graph_aln":
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+        "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
+        "read_aln":
+        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTAG"
+        "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+        "CTCTTTAC",
         "truncated": False,
         "description": "2 SNPs, K-2 apart",
     }
 
 ]
+
 
 def check_query(aligner, query):
     score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
@@ -595,22 +602,23 @@ def check_query(aligner, query):
     print(trunc, query["truncated"])
     print(score, query["score"])
     assert graphAlign == query["graph_aln"], "\n%r != \n%r" % \
-               (graphAlign, query["graph_aln"])
+        (graphAlign, query["graph_aln"])
     assert readAlign == query["read_aln"], "\n%r != \n%r" % \
-               (readAlign, query["read_aln"])
+        (readAlign, query["read_aln"])
     eq_(trunc, query["truncated"])
     if query["score"] > 0:
         assert_almost_equals(score, query["score"])
 
+
 def test_readalign_new():
-    return # @CTB
+    return  # @CTB
     ch = khmer.CountingHash(32, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for seq in ht_seqs:
         ch.consume(seq)
 
     for query in queries:
-        if query.has_key("description"):
+        if "description" in query:
             check_query.description = query["description"]
         yield check_query, aligner, query
 

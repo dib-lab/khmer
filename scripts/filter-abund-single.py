@@ -26,7 +26,7 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
-                              add_threading_args, info)
+                              add_threading_args, info, calculate_tablesize)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 #
@@ -71,7 +71,9 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        tablesize = calculate_tablesize(args, 'countgraph')
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
+
     report_on_config(args)
 
     print('making countgraph', file=sys.stderr)

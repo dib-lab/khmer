@@ -34,6 +34,8 @@ def check_input_files(file_path, force):
               file_path, file=sys.stderr)
 
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             print("Exiting", file=sys.stderr)
             sys.exit(1)
         else:
@@ -47,12 +49,16 @@ def check_input_files(file_path, force):
         print("ERROR: Input file %s does not exist; exiting" %
               file_path, file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
             print("ERROR: Input file %s is empty; exiting." %
                   file_path, file=sys.stderr)
             if not force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
 
 
@@ -109,17 +115,18 @@ def check_space(in_files, force, _testhook_free_space=None):
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
-def check_space_for_hashtable(args, hashtype, force,
+def check_space_for_hashtable(outfile_name, hash_size, force,
                               _testhook_free_space=None):
-    """Check we have enough size to write a hash table."""
-    hash_size = khmer_args._calculate_tablesize(args, hashtype)
+    """Check that we have enough size to write the specified hash table."""
 
-    cwd = os.getcwd()
-    dir_path = os.path.dirname(os.path.realpath(cwd))
+    dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
+
     if _testhook_free_space is None:
         free_space = target.f_frsize * target.f_bavail
     else:
@@ -129,13 +136,15 @@ def check_space_for_hashtable(args, hashtype, force,
     if size_diff > 0:
         print("ERROR: Not enough free space on disk "
               "for saved table files;"
-              "       Need at least %s GB more."
+              "       Need at least %.1f GB more."
               % (float(size_diff) / 1e9,), file=sys.stderr)
         print("       Table size: %.1f GB"
               % (float(hash_size) / 1e9,), file=sys.stderr)
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
@@ -149,7 +158,8 @@ def check_valid_file_exists(in_files):
     """
     for in_file in in_files:
         if os.path.exists(in_file):
-            if os.stat(in_file).st_size > 0:
+            mode = os.stat(in_file).st_mode
+            if os.stat(in_file).st_size > 0 or S_ISBLK(mode) or S_ISFIFO(mode):
                 return
             else:
                 print('WARNING: Input file %s is empty' %

@@ -24,7 +24,7 @@ import csv
 import khmer
 import textwrap
 from khmer import khmer_args
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 
 
@@ -59,8 +59,6 @@ def main():
 
     for infile in [args.ptfile, args.fafile]:
         check_input_files(infile, args.force)
-
-    check_space([args.ptfile, args.fafile], args.force)
 
     print('loading k-mer presence table from', args.ptfile, file=sys.stderr)
     ht1 = khmer.load_hashbits(args.ptfile)
