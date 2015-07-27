@@ -44,6 +44,7 @@ class WithDiagnostics(object):
 
     uses a Normalizer object.
     """
+
     def __init__(self, norm, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp
@@ -119,6 +120,7 @@ class WithDiagnostics(object):
                   .format(total=total, f_kept=perc_kept, kept=kept),
                   file=report_fp)
             report_fp.flush()
+
 
 class Normalizer(object):
 

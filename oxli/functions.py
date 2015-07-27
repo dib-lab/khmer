@@ -62,8 +62,8 @@ def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     if int_n_tables == 0:
         int_n_tables = 1
 
-    ht_size = int(-num_kmers / (math.log(1 - des_fp_rate ** (1 /
-                  float(int_n_tables)))))
+    ht_size = int(-num_kmers / (
+        math.log(1 - des_fp_rate ** (1 / float(int_n_tables)))))
     mem_cap = ht_size * int_n_tables
     fp_rate = (1 - math.exp(-num_kmers / float(ht_size))) ** int_n_tables
 
@@ -89,7 +89,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
 
     for fp_rate in range(1, 10):
         num_tables, table_size, mem_cap, fp_rate = \
-            optimal_size(unique_kmers, fp_rate=fp_rate/10.0)
+            optimal_size(unique_kmers, fp_rate=fp_rate / 10.0)
         to_print.append('{:11.3f}\t{:19}\t{:17e}\t{:21e}'.format(fp_rate,
                                                                  num_tables,
                                                                  table_size,
@@ -104,7 +104,7 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
 
     for mem in mem_list:
         num_tables, table_size, mem_cap, fp_rate =\
-            optimal_size(unique_kmers, mem_cap=mem*1000000000)
+            optimal_size(unique_kmers, mem_cap=mem * 1000000000)
         to_print.append('{:21e}\t{:19}\t{:17e}\t{:11.3f}'.format(mem_cap,
                                                                  num_tables,
                                                                  table_size,
