@@ -33,6 +33,7 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
 from khmer.utils import write_record, broken_paired_reader
+from khmer.khmer_logger import Logger
 
 
 DEFAULT_DESIRED_COVERAGE = 20
@@ -44,7 +45,7 @@ class WithDiagnostics(object):
 
     uses a Normalizer object.
     """
-    def __init__(self, norm, report_fp=None, report_frequency=100000):
+    def __init__(self, norm, logger, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp
         if report_fp:
@@ -56,6 +57,8 @@ class WithDiagnostics(object):
         self.report_frequency = report_frequency
         self.next_report_at = self.report_frequency
         self.last_report_at = self.report_frequency
+
+        self.logger = logger
 
     def __call__(self, reader, ifilename):
         norm = self.norm
@@ -105,10 +108,9 @@ class WithDiagnostics(object):
         else:
             perc_kept = kept / float(total)
 
-            print('DONE with {inp}; kept {kept} of {total} or {perc_kept:.1%}'
-                  .format(inp=ifilename, kept=kept, total=total,
-                          perc_kept=perc_kept),
-                  file=sys.stderr)
+            self.logger.log_inf('DONE with {inp}; kept {kept} of {total} or '
+                                '{perc_kept:.1%}', inp=ifilename, kept=kept,
+                                total=total, perc_kept=perc_kept)
 
         # make sure there's at least one report per file, at the end of each
         # file.
@@ -271,10 +273,12 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
-    info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
+    info('normalize-by-median.py', ['diginorm'])
     report_on_config(args)
+
+    logger = Logger(args.quiet)
 
     report_fp = args.report
     force_single = args.force_single
@@ -294,9 +298,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
         basename = os.path.basename(pathfilename)
         if basename in basenames:
-            print('ERROR: Duplicate filename--Cannot handle this!',
-                  file=sys.stderr)
-            print('** Exiting!', file=sys.stderr)
+            logger.log_err('ERROR: Duplicate filename--Cannot handle this!')
+            logger.log_err('** Exiting!')
             sys.exit(1)
 
         basenames.append(basename)
@@ -310,20 +313,20 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     # load or create counting table.
     if args.loadtable:
-        print('loading k-mer counting table from ' + args.loadtable,
-              file=sys.stderr)
+        logger.log_inf('loading k-mer counting table from ' + args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
         if args.unique_kmers != 0:
-            print('Warning: You have specified a number of unique kmers'
-                  ' but are loading a precreated counting table--'
-                  'argument optimization will NOT be done.', file=sys.stderr)
+            logger.log_inf('Warning: You have specified a number of unique'
+                           'kmers but are loading a precreated counting'
+                           'table-- argument optimization will NOT be done.')
     else:
-        print('making countgraph', file=sys.stderr)
+        logger.log_inf('making countgraph')
         htable = khmer_args.create_countgraph(args)
 
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, htable)
-    with_diagnostics = WithDiagnostics(norm, report_fp, args.report_frequency)
+    with_diagnostics = WithDiagnostics(norm, logger, report_fp,
+                                       args.report_frequency)
 
     # make a list of all filenames and if they're paired or not;
     # if we don't know if they're paired, default to allowing but not
@@ -368,15 +371,14 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 if record is not None:
                     write_record(record, outfp)
 
-            print('output in ' + output_name, file=sys.stderr)
+            logger.log_inf('output in ' + output_name)
             if output_name is not '/dev/stdout':
                 outfp.close()
 
     # finished - print out some diagnostics.
 
-    print('Total number of unique k-mers: {0}'
-          .format(htable.n_unique_kmers()),
-          file=sys.stderr)
+    logger.log_inf('Total number of unique k-mers: {umers}',
+                   umers=htable.n_unique_kmers())
 
     if args.savetable:
         print('...saving to ' + args.savetable, file=sys.stderr)
@@ -386,8 +388,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
-    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
-          file=sys.stderr)
+    logger.log_inf('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
         print("** WARNING: Finished with errors!", file=sys.stderr)
