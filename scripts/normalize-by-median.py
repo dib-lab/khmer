@@ -167,7 +167,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
         yield
     except (IOError, OSError, ValueError) as error:
         log_err('** ERROR: ' + str(error))
-        log_err('** Failed on {name}: ', name=ifile))
+        log_err('** Failed on {name}: ', name=ifile)
         if not single_out:
             os.remove(out.name)
         if not force:
@@ -390,7 +390,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if args.force and len(corrupt_files) > 0:
         log_err("** WARNING: Finished with errors!")
         log_err("** I/O Errors occurred in the following files:")
-        log_err("\t", " ".join(corrupt_files))
+        log_err("\t" + " ".join(corrupt_files))
 
 
 if __name__ == '__main__':
