@@ -3337,7 +3337,7 @@ def test_trim_low_abund_stdout():
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
-    assert 'GGTTGACGGGGCTCAGGG' in out, err
+    assert 'GGTTGACGGGGCTCAGGG' in out
 
 
 def test_roundtrip_casava_format_1():

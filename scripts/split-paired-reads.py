@@ -73,13 +73,11 @@ def get_parser():
                         'directory if necessary')
 
     parser.add_argument('-1', '--output-first', metavar='output_first',
-                        type=argparse.FileType('w'),
                         default=None, help='Output "left" reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
-                        type=argparse.FileType('w'),
                         default=None, help='Output "right" reads to this '
-                        'file')
+                        'file', type=argparse.FileType('w'))
     parser.add_argument('-p', '--force-paired', action='store_true',
                         help='Require that reads be interleaved')
 
