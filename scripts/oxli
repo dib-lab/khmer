@@ -6,6 +6,11 @@
 # Contact: khmer-project@idyll.org
 #
 
+__requires__ = 'khmer'
+import sys
+from pkg_resources import load_entry_point
+
 if __name__ == '__main__':
-   import oxli
-   oxli.main()
+    sys.exit(
+        load_entry_point('khmer', 'console_scripts', 'oxli')()
+    )
