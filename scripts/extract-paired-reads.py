@@ -127,7 +127,7 @@ def main():
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(infile, parse_description=False)
+    screed_iter = screed.open(infile)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)

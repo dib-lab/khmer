@@ -49,7 +49,7 @@ def main():
     args = get_parser().parse_args()
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:
-        for record in screed.open(filename, parse_description=False):
+        for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
     print('wrote to: ' + args.output.name, file=sys.stderr)

@@ -110,8 +110,8 @@ def main():
         outfp = get_file_writer(args.output, args.gzip, args.bzip)
 
     counter = 0
-    screed_iter_1 = screed.open(s1_file, parse_description=False)
-    screed_iter_2 = screed.open(s2_file, parse_description=False)
+    screed_iter_1 = screed.open(s1_file)
+    screed_iter_2 = screed.open(s2_file)
     for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
         if read1 is None or read2 is None:
             print(("ERROR: Input files contain different number"

@@ -169,7 +169,7 @@ def main():
 
         pass2list.append((filename, pass2filename, trimfp))
 
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
 
         save_pass2 = 0
@@ -265,8 +265,7 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        for n, read in enumerate(screed.open(pass2filename,
-                                             parse_description=False)):
+        for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
                 print('... x 2', n, pass2filename,
                       written_reads, written_bp, file=sys.stderr)

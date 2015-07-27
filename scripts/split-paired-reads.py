@@ -132,7 +132,7 @@ def main():
     counter2 = 0
     index = None
 
-    screed_iter = screed.open(infile, parse_description=False)
+    screed_iter = screed.open(infile)
 
     # walk through all the reads in broken-paired mode.
     paired_iter = broken_paired_reader(screed_iter)

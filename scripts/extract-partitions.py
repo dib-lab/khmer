@@ -36,8 +36,7 @@ DEFAULT_THRESHOLD = 5
 
 
 def read_partition_file(filename):
-    for record_index, record in enumerate(screed.open
-                                          (filename, parse_description=False)):
+    for record_index, record in enumerate(screed.open(filename)):
         _, partition_id = record.name.rsplit('\t', 1)
         yield record_index, record, int(partition_id)
 

@@ -48,8 +48,7 @@ def main():
     output_is_block = is_block(args.output)
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence,
-                                           parse_description=False)):
+    for n, record in enumerate(screed.open(args.input_sequence)):
         if n % 10000 == 0:
             print('...', n, file=sys.stderr)
 
