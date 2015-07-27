@@ -1,4 +1,4 @@
-2015-07-23  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-27  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: added infastructure for doing compressed output
    * scripts/{count-median,extract-long-sequences,extract-paired-reads,
@@ -8,6 +8,10 @@
    * tests/test_{functions,scripts}.py: added tests
    * scripts/{load-graph,partition-graph}.py: made load-graph no longer add .pt
    to graph outfiles, changed partition-graph to not expect .pt's
+
+2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/getting-started.rst: added instructions for second contribution
 
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
