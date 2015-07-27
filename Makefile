@@ -7,8 +7,6 @@
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
-DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
-	screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -40,7 +38,8 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --requirement requirements-dev.txt
+	pip install --upgrade --requirement requirements.txt
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
@@ -68,7 +67,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so
+	rm -f khmer/_khmer.*so
 	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
@@ -225,6 +224,9 @@ libtest: FORCE
 test: FORCE
 	./setup.py develop
 	./setup.py nosetests --attr ${TESTATTR}
+
+test-all: FORCE
+	tox
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \

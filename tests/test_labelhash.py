@@ -402,7 +402,7 @@ def test_label_tag_correctness_save_load():
     assert 3 in labels
 
 
-def test_load_wrong_filetype():
+def test_load_wrong_filetype1():
     lb = LabelHash(20, 1e7, 4)
 
     # try to load a tagset
@@ -414,10 +414,14 @@ def test_load_wrong_filetype():
         print(str(err))
         assert "Incorrect file format type" in str(err)
 
+
+def test_load_wrong_filetype2():
+
+    lb = LabelHash(20, 1e7, 4)
     # try to load a nonsense file
-    filename = utils.get_test_data('all-A.fa')
+    filename2 = utils.get_test_data('all-A.fa')
     try:
-        lb.load_labels_and_tags(filename)
+        lb.load_labels_and_tags(filename2)
         assert 0, "this should not succeed - bad file signature"
     except OSError as err:
         print(str(err))
