@@ -1336,8 +1336,7 @@ def test_extract_partitions_no_output_groups():
     args = ['-n', 'extracted', partfile]
 
     # We expect a sys.exit -> we need the test to be tolerant
-    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status != 0
+    status, out, err = utils.runscript(script, args, in_dir)
     assert "NOT outputting groups! Beware!" in err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
