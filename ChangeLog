@@ -1,3 +1,8 @@
+2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/abundance-dist.py: disallowed forcing on the input file check for
+   the counting table file
+
 2015-07-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * .mailmap, Makefile: generate a list of authors
