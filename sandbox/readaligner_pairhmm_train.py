@@ -6,6 +6,10 @@ import argparse
 import collections
 from math import log
 import json
+try:
+    import pysam
+except:
+    pass
 
 cigar_to_state = {0: 'M', 1: 'Ir', 2: 'Ig'}
 
@@ -35,8 +39,6 @@ def main():
     parser.add_argument("--json", action='store_true', help="output JSON")
 
     args = parser.parse_args()
-
-    import pysamFOO
 
     ht = khmer.load_counting_hash(args.ht)
     samfile = pysam.Samfile(args.bam_file)
