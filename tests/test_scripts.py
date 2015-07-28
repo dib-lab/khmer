@@ -760,6 +760,13 @@ def test_oxli_build_graph():
     assert x == (1, 0), x
 
 
+def test_oxli_nocommand():
+    script = 'oxli'
+
+    (status, out, err) = utils.runscript(script, [])
+    assert status == 0
+
+
 def test_load_graph_no_tags():
     script = 'load-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
