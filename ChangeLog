@@ -1,4 +1,5 @@
-2015-07-23  Titus Brown  <t@titus-air-2.attlocal.net>
+2015-07-28  Kevin Murray <spam@kdmurray.id.au>
+            Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added fix for SRA-style FASTQ output.
    * tests/test_scripts.py: tested against a broken version of SRA format.
