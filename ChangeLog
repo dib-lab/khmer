@@ -1,3 +1,10 @@
+2015-07-28  Luiz Irber  <khmer@luizirber.org>
+
+   * sandbox/unique-kmers.py: moved to scripts.
+   * scripts/unique-kmers.py: fix import bug and initialize to_print earlier.
+   * tests/test_scripts.py: add tests for unique-kmers.py.
+   * doc/user/scripts.rst: added unique-kmers.py to script page
+
 2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * scripts/abundance-dist.py: disallowed forcing on the input file check for
