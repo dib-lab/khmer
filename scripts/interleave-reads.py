@@ -104,8 +104,8 @@ def main():
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
     counter = 0
-    screed_iter_1 = screed.open(s1_file, parse_description=False)
-    screed_iter_2 = screed.open(s2_file, parse_description=False)
+    screed_iter_1 = screed.open(s1_file)
+    screed_iter_2 = screed.open(s2_file)
     for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
         if read1 is None or read2 is None:
             print(("ERROR: Input files contain different number"
