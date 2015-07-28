@@ -52,7 +52,7 @@ def main():
     if (len(sys.argv) < 2):
         args = get_parser().parse_args(['--help'])
     else:
-    	args = get_parser().parse_args()
+        args = get_parser().parse_args()
     args.func(args)
 
 if __name__ == '__main__':
