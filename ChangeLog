@@ -3,6 +3,13 @@
    * scrips/normalize-by-median.py,khmer/khmer_logger.py: added logging
    framework, prototyped in normalize-by-median
 
+2015-07-28  Kevin Murray <spam@kdmurray.id.au> and Titus Brown
+<titus@idyll.org>
+
+   * khmer/utils.py: added fix for SRA-style FASTQ output.
+   * tests/test_scripts.py: tested against a broken version of SRA format.
+   * tests/test-data/paired-broken4.fq.{1,2}: added test files.
+
 2015-07-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
             Titus Brown  <titus@idyll.org>
 
