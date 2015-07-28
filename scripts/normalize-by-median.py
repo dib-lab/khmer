@@ -86,8 +86,8 @@ class WithDiagnostics(object):
                     perc_kept = kept / float(total)
 
                     log_info('... kept {kept} of {tot} or {perc_kept:.1%} so'
-                             'far'.format(kept=kept, tot=total,
-                                          perc_kept=perc_kept))
+                             'far', kept=kept, tot=total,
+                             perc_kept=perc_kept)
                     log_info('... in file ' + ifilename)
 
                     if report_fp:
