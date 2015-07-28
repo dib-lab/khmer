@@ -1,3 +1,8 @@
+2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/abundance-dist.py: disallowed forcing on the input file check for
+   the counting table file
+
 2015-07-27  Titus Brown  <titus@idyll.org>
 
    * khmer/khmer_args.py,CITATION: added entry for PeerJ paper on
