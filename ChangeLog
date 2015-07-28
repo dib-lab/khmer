@@ -1,6 +1,6 @@
 2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * khmer/kfile.py: added infastructure for doing compressed output
+   * khmer/kfile.py: added infrastructure for doing compressed output
    * scripts/{count-median,extract-long-sequences,extract-paired-reads,
    extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
    interleave-reads,normalize-by-median,sample-reads-randomly,
@@ -8,6 +8,7 @@
    * tests/test_{functions,scripts}.py: added tests
    * scripts/{load-graph,partition-graph}.py: made load-graph no longer add .pt
    to graph outfiles, changed partition-graph to not expect .pt's
+   * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
 
 2015-07-28  Kevin Murray <spam@kdmurray.id.au> and Titus Brown
 <titus@idyll.org>
