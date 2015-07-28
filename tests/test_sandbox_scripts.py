@@ -104,6 +104,7 @@ def test_sweep_reads():
         script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
+    assert status != 0
     assert 'ERROR' in err, err
     assert 'skipping' in err, err
 
@@ -150,6 +151,7 @@ def test_sweep_reads_fq():
         script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
+    assert status != 0
     assert 'ERROR' in err, err
     assert 'skipping' in err, err
 

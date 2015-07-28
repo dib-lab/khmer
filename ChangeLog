@@ -26,6 +26,8 @@
    throwing plain Exceptions when a ValueError or RuntimeError would do.
    * oxli/__init__.py: give default help instead of an error when `oxli` is
    called with no arguments.
+   * tests/test_{normalize_by_median,sandbox_scripts,scripts,streaming_io}.py:
+   always check status code if calling `runscripts` with `fail_ok=True`.
 
 2015-07-27  Titus Brown  <titus@idyll.org>
 

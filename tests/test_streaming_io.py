@@ -77,10 +77,8 @@ def test_interleave_split_2_fail():
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
-    print(out)
-    print(err)
     assert "Accepting input from stdin; output filenames must be provided." \
-           in str(err)
+           in err, err
 
 
 def test_extract_paired_pe():
@@ -131,10 +129,8 @@ def test_extract_paired_se_fail():
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
-    print(out)
-    print(err)
     assert "Accepting input from stdin; output filenames must be provided." \
-           in str(err)
+           in err, err
 
 
 def test_norm_by_median_1():
@@ -170,10 +166,8 @@ def test_norm_by_median_2_fail():
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
-    print(out)
-    print(err)
     assert "Accepting input from stdin; output filename must be provided with"\
-           in str(err)
+           in err, err
 
 
 def test_sample_reads_randomly_1():
@@ -205,10 +199,8 @@ def test_sample_reads_randomly_2_fail():
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
-    print(out)
-    print(err)
     assert "Accepting input from stdin; output filename must be provided with"\
-           in str(err)
+           in err, err
 
 
 def test_extract_long_sequences_1():
@@ -318,11 +310,9 @@ def test_filter_abund_2_fail():
                      countgraph=countgraph)
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
-    print(out)
-    print(err)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
-           in str(err)
+           in err, err
 
 
 def test_abundance_dist_1():
@@ -383,11 +373,9 @@ def test_trim_low_abund_2_fail():
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
 
     (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
-    print(out)
-    print(err)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
-           in str(err)
+           in err, err
 
 
 def test_count_median_1():

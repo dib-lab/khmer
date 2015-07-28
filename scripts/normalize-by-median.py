@@ -389,7 +389,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable.save(args.savetable)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),

@@ -1336,7 +1336,8 @@ def test_extract_partitions_no_output_groups():
     args = ['-n', 'extracted', partfile]
 
     # We expect a sys.exit -> we need the test to be tolerant
-    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
     assert "NOT outputting groups! Beware!" in err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
@@ -1401,8 +1402,9 @@ def test_extract_partitions_no_groups():
     script = 'extract-partitions.py'
     args = ['extracted', empty_file]
 
-    _, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert "ERROR: Input file", "is empty; Exiting." in err
+    assert status != 0
     # No group files should be created
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
 
@@ -2396,6 +2398,7 @@ def test_sample_reads_randomly_stdin_no_out():
     args = ['-']
 
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0
     assert "Accepting input from stdin; output filename" in err, err
 
 
@@ -2585,6 +2588,7 @@ def test_count_overlap_invalid_datafile():
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
     assert "OSError" in err
 
 
