@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2015. It is licensed under
@@ -8,6 +6,10 @@ from __future__ import absolute_import
 #
 
 # pylint: disable=C0111,C0103,E1103,W0612
+
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import sys
 import os
