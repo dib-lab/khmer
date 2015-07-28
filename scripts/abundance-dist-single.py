@@ -58,14 +58,9 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--csv', default=False, action='store_true',
-                        help='Use the CSV format for the histogram. '
-                        'Includes column headers.')
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers to stderr")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -87,11 +82,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
-        if args.csv:
-            hist_fp_csv = csv.writer(hist_fp)
-            # write headers:
-            hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                                  'cumulative_fraction'])
+        hist_fp_csv = csv.writer(hist_fp)
+        # write headers:
+        hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                              'cumulative_fraction'])
 
     print('making countgraph', file=sys.stderr)
     counting_hash = khmer_args.create_countgraph(args, multiplier=1.1)
@@ -122,9 +116,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for thread in threads:
         thread.join()
 
-    if args.report_total_kmers:
-        print('Total number of unique k-mers: {0}'.format(
-            counting_hash.n_unique_kmers()), file=sys.stderr)
+    print('Total number of unique k-mers: {0}'.format(
+        counting_hash.n_unique_kmers()), file=sys.stderr)
 
     abundance_lists = []
 
@@ -174,10 +167,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sofar += i
         frac = sofar / float(total)
 
-        if args.csv:
-            hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
-        else:
-            print(_, i, sofar, round(frac, 3), file=hist_fp)
+        hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
 
         if sofar == total:
             break

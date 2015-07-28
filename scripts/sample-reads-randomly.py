@@ -135,7 +135,7 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
 
         for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,

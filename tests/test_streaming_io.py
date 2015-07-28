@@ -250,7 +250,7 @@ def test_load_into_counting_1():
 
     cmd = """
        cat {in1} |
-       {scripts}/load-into-counting.py -x 1e3 -N 2 -k 20 -t {out1} - \
+       {scripts}/load-into-counting.py -x 1e3 -N 2 -k 20 {out1} - \
        2> /dev/null
     """
 
@@ -330,6 +330,7 @@ def test_abundance_dist_1():
     out1 = utils.get_temp_filename('out.dist')
 
     countgraph = _make_counting(in1, K=17)
+    assert os.path.exists(countgraph)
 
     cmd = """
        cat {in1} |
@@ -344,9 +345,10 @@ def test_abundance_dist_1():
     assert os.path.exists(out1)
     with open(out1) as fp:
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
 
 
 def test_trim_low_abund_1():
@@ -395,7 +397,7 @@ def test_count_median_1():
     countgraph = _make_counting(in1, K=8)
     cmd = """
        cat {in1} |
-       {scripts}/count-median.py --csv {countgraph} - - > {out1}
+       {scripts}/count-median.py {countgraph} - - > {out1}
     """
 
     cmd = cmd.format(scripts=scriptpath(), countgraph=countgraph,

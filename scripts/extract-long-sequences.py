@@ -46,7 +46,7 @@ def main():
     args = get_parser().parse_args()
     outfp = args.output
     for filename in args.input_filenames:
-        for record in screed.open(filename, parse_description=False):
+        for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
     print('wrote to: ' + outfp.name, file=sys.stderr)

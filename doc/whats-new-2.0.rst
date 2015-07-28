@@ -3,20 +3,26 @@
 What's New In khmer 2.0?
 ########################
 
-
-Script Updates
-==============
+New behavior
+============
 
 Digital normalization script now supports mixed paired and unpaired read input
 ------------------------------------------------------------------------------
 
-`normalize-by-median.py` now supports mixed paired and unpaired (or 
-"broken-paired") input. Behavior can be forced to either treat all reads as 
-singletons or to require all reads be properly paired using `--force-single` or 
-`--paired`, respectively. If `--paired` is set, -u can be used to include a 
-file of unpaired reads. The unpaired reads will be examined after all of the
-other sequence files.
+`normalize-by-median.py` now supports mixed paired and unpaired (or
+"broken-paired") input. Behavior can be forced to either treat all
+reads as singletons or to require all reads be properly paired using
+:option:`--force-single` or :option:`--paired`, respectively. If
+:option:`--paired` is set, :option:`--unpaired-reads` can be used to
+include a file of unpaired reads. The unpaired reads will be examined
+after all of the other sequence files.
 
+Reservoir sampling script extracts paired reads by default
+----------------------------------------------------------
+
+`sample-reads-randomly.py` now retains pairs in the output, by
+default.  This can be overridden to match previous behavior
+with :option:`--force_single`.
 
 Incompatible changes
 ====================
@@ -42,3 +48,12 @@ this project.
 
 Files of the above types made in previous versions of khmer are not compatible
 with v2.0; the reverse is also true.
+
+Scripts now output columnar data in CSV format by default
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All scripts that output any kind of columnar data now do so in CSV format,
+with headers.  Previously this had to be enabled with :options:`--csv`.
+(Affects `abundance-dist-single.py`, `abundance-dist.py`, `count-median.py`,
+and `count-overlap.py`.) `normalize-by-median.py` also now outputs CSV
+when :option:`-R` is used.
