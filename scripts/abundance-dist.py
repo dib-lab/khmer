@@ -57,10 +57,9 @@ def get_parser():
 def main():
     info('abundance-dist.py', ['counting'])
     args = get_parser().parse_args()
-    infiles = [args.input_counting_table_filename,
-               args.input_sequence_filename]
-    for infile in infiles:
-        check_input_files(infile, args.force)
+
+    check_input_files(args.input_counting_table_filename, False)
+    check_input_files(args.input_sequence_filename, args.force)
 
     print('hashtable from', args.input_counting_table_filename,
           file=sys.stderr)
