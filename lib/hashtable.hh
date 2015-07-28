@@ -40,29 +40,6 @@
 
 namespace khmer
 {
-#ifdef WITH_INTERNAL_METRICS
-struct HashTablePerformanceMetrics : public IPerformanceMetrics {
-
-    enum {
-        MKEY_TIME_NORM_READ,
-        MKEY_TIME_HASH_KMER,
-        MKEY_TIME_UPDATE_TALLIES
-    };
-
-    uint64_t	clock_nsecs_norm_read;
-    uint64_t	cpu_nsecs_norm_read;
-    uint64_t	clock_nsecs_hash_kmer;
-    uint64_t	cpu_nsecs_hash_kmer;
-    uint64_t	clock_nsecs_update_tallies;
-    uint64_t	cpu_nsecs_update_tallies;
-
-    HashTablePerformanceMetrics( );
-    virtual ~HashTablePerformanceMetrics( );
-
-    virtual void	accumulate_timer_deltas( uint32_t metrics_key );
-
-};
-#endif
 
 //
 // Sequence iterator class, test.  Not really a C++ iterator yet.

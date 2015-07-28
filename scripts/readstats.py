@@ -130,7 +130,7 @@ def analyze_file(filename):
     """Run over the given file and count base pairs and sequences."""
     bps = 0
     seqs = 0
-    input_iter = screed.open(filename, parse_description=False)
+    input_iter = screed.open(filename)
     for record in input_iter:
         if seqs % 100000 == 0:
             print('...', filename, seqs, file=sys.stderr)

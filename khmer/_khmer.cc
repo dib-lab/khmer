@@ -75,45 +75,6 @@ extern "C" {
     MOD_INIT(_khmer);
 }
 
-// Configure module logging.
-//#define WITH_INTERNAL_TRACING
-namespace khmer
-{
-
-namespace python
-{
-
-#ifdef WITH_INTERNAL_TRACING
-#warning "Internal tracing of Python extension module is enabled."
-static uint8_t const    _MODULE_TRACE_LEVEL = TraceLogger:: TLVL_DEBUG9;
-static void     _trace_logger(
-    uint8_t level, char const * format, ...
-)
-{
-    static FILE *   _stream_handle  = NULL;
-
-    if (NULL == _stream_handle) {
-        _stream_handle = fopen( "pymod.log", "w" );
-    }
-
-    va_list varargs;
-
-    if (_MODULE_TRACE_LEVEL <= level) {
-        va_start( varargs, format );
-        vfprintf( _stream_handle, format, varargs );
-        va_end( varargs );
-        fflush( _stream_handle );
-    }
-
-}
-#endif
-
-
-} // namespace python
-
-} // namespace khmer
-
-
 /***********************************************************************/
 
 //

@@ -359,7 +359,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
 
-            screed_iter = screed.open(filename, parse_description=False)
+            screed_iter = screed.open(filename)
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)

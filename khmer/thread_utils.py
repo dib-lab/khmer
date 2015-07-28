@@ -26,7 +26,7 @@ DEFAULT_GROUPSIZE = 100
 
 def verbose_loader(filename):
     """Screed iterator that additionally prints progress info to stderr."""
-    screed_iter = screed.open(filename, parse_description=False)
+    screed_iter = screed.open(filename)
     for n, record in enumerate(screed_iter):
         if n % 100000 == 0:
             print('... filtering', n, file=sys.stderr)
