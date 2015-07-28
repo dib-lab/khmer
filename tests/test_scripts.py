@@ -2395,11 +2395,8 @@ def test_sample_reads_randomly_stdin_no_out():
     script = 'sample-reads-randomly.py'
     args = ['-']
 
-    try:
-        utils.runscript(script, args)
-        raise Exception("Shouldn't get to this")
-    except AssertionError as e:
-        assert "Accepting input from stdin; output filename" in str(e), str(e)
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert "Accepting input from stdin; output filename" in err, err
 
 
 def test_fastq_to_fasta():

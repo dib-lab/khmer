@@ -219,7 +219,7 @@ def get_n_primes_near_x(number, target):
         i -= 2
 
     if len(primes) != number:
-        raise Exception("unable to find %d prime numbers < %d" % (number,
+        raise RuntimeError("unable to find %d prime numbers < %d" % (number,
                                                                   target))
 
     return primes

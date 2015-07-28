@@ -265,9 +265,7 @@ def test_report_on_config_bad_hashtype():
     try:
         khmer_args.report_on_config(args, 'foograph')
         assert 0, "the previous statement should raise an exception"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
 
 
@@ -284,7 +282,5 @@ def test_fail_calculate_foograph_size():
     try:
         nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
         assert 0, "previous statement should fail"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
