@@ -195,11 +195,6 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
     if do_gzip and do_bzip:
         raise Exception("Cannot specify both bzip and gzip compression!")
 
-    if is_block(file_handle):
-        pass
-    else:
-        assert type(file_handle) == file, type(file_handle)  # Sanity check
-
     if do_gzip:
         ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
     elif do_bzip:
