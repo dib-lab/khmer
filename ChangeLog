@@ -3,6 +3,23 @@
    * scripts/abundance-dist.py: disallowed forcing on the input file check for
    the counting table file
 
+2015-07-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
+            Titus Brown  <titus@idyll.org>
+
+   * lib/read_aligner.{cc,hh},tests/{test_read_aligner.py,
+   test-data/readaligner-{default,k12}.json},khmer/__init__.py: refactor,
+   read aligner parameters are now configurable & save/load-able. Can do
+   whole-genome variant finding.
+   * khmer/_khmer.cc,tests/test_read_aligner.py: ReadAligner.align_forward
+   method added
+   * sandbox/correct-errors.py -> sandbox/correct-reads.py: total rewrite
+   * sandbox/error-correct-pass2.py: new script
+   * sandbox/readaligner_pairhmm_train.py: new script
+   * tests/test_sandbox_scripts.py, doc/release-notes/release-1.4.rst:
+   spelling fixes, import re-arrangement
+   * sandbox/{Makefile.read_aligner_training,readaligner_pairhmm_train.py}:
+   Added script to train the aligner
+
 2015-07-27  Titus Brown  <titus@idyll.org>
 
    * khmer/khmer_args.py,CITATION: added entry for PeerJ paper on
