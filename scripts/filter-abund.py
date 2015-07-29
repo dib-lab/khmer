@@ -121,8 +121,8 @@ def main():
 
         return None, None
 
-    if args.single_output_filename:
-            outfile = args.single_output_filename
+    if args.single_output_file:
+            outfile = args.single_output_file.name
             outfp = get_file_writer(outfile, args.gzip, args.bzip)
 
     # the filtering loop
@@ -131,7 +131,7 @@ def main():
         if args.single_output_file:
             outfile = args.single_output_file.name
             outfp = get_file_writer(args.single_output_file, args.gzip,
-                    args.bzip)
+                                    args.bzip)
         else:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'w')

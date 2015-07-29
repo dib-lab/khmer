@@ -35,6 +35,8 @@ def get_parser():
                         ' FASTA sequence file.',
                         default=sys.stdout)
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
+                        help='Option to keep reads containing \'N\'s in '
+                             'input_sequence file. Default is to drop reads')
     add_output_compression_type(parser)
     return parser
 

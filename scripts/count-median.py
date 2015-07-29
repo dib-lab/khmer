@@ -88,7 +88,7 @@ def main():
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
     print('writing to', output_filename, file=sys.stderr)
-    output = get_file_writer(output_filename, args.gzip, args.bzip)
+    output = get_file_writer(output, args.gzip, args.bzip)
 
     output = csv.writer(output)
     # write headers:
