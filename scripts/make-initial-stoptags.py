@@ -84,7 +84,7 @@ def main():
         check_input_files(_, args.force)
 
     print('loading htable %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    htable = khmer.load_nodegraph(graphbase + '.pt')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:

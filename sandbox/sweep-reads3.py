@@ -20,7 +20,7 @@ import sys
 import os.path
 import screed
 import khmer
-from khmer.khmer_args import (build_hashbits_args, DEFAULT_MAX_TABLESIZE)
+from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
 
 
 def output_single(r):
@@ -63,7 +63,7 @@ def main():
 
     query_list = []
     for n, inp_name in enumerate(inputlist):
-        # create a hashbits data structure
+        # create a nodegraph data structure
         ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
         outfile = os.path.basename(inp_name) + '.sweep3'

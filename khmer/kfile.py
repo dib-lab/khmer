@@ -121,7 +121,7 @@ def check_space(in_files, force, _testhook_free_space=None):
             sys.exit(1)
 
 
-def check_space_for_hashtable(outfile_name, hash_size, force,
+def check_space_for_graph(outfile_name, hash_size, force,
                               _testhook_free_space=None):
     """Check that we have enough size to write the specified hash table."""
 

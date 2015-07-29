@@ -20,10 +20,10 @@ import os
 import khmer
 import textwrap
 
-from khmer.khmer_args import (build_counting_args, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, create_countgraph)
 import argparse
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 1
 
@@ -171,7 +171,7 @@ def get_parser():
                         ' file with the specified filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
     return parser
 
 
@@ -187,7 +187,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, False)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', False)
+        check_space_for_graph(args, 'countgraph', False)
 
     # list to save error files along with throwing exceptions
     if args.force:
@@ -195,7 +195,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.loadtable:
         print('loading k-mer counting table from', args.loadtable)
-        htable = khmer.load_counting_hash(args.loadtable)
+        htable = khmer.load_countinggraph(args.loadtable)
     else:
         print('making countgraph')
         htable = create_countgraph(args)

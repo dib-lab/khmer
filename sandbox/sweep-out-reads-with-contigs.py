@@ -21,7 +21,7 @@ def main():
     if len(sys.argv) == 4:
         outfile = sys.argv[3]
 
-    # create a hashbits data structure
+    # create a nodegraph data structure
     ht = khmer.Hashbits(K, 1, 1)
 
     # tag every k-mer in the contigs

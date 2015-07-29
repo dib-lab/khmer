@@ -61,7 +61,7 @@ def main():
 
     if args.loadhash:
         print('loading hashtable from', args.loadhash)
-        ht = khmer.load_counting_hash(args.loadhash)
+        ht = khmer.load_countinggraph(args.loadhash)
     else:
         print('making hashtable')
         ht = khmer.CountingHash(K, HT_SIZE, N_HT)

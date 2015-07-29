@@ -38,7 +38,7 @@ from collections import defaultdict
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info)
 from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
@@ -161,7 +161,7 @@ class ReadBufferManager(object):
 
 
 def get_parser():
-    parser = build_hashbits_args('Takes a partitioned reference file \
+    parser = build_nodegraph_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = EPILOG

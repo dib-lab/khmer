@@ -30,7 +30,7 @@ def main():
     outfp = open(histout, 'w')
 
     print('hashtable from', hashfile)
-    ht = khmer.load_counting_hash(hashfile)
+    ht = khmer.load_countinggraph(hashfile)
 
     hist = {}
 

@@ -17,7 +17,7 @@ from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
-# tests/test_{functions,counting_hash,labelhash,counting_single}.py
+# tests/test_{functions,countinggraph,labelhash,counting_single}.py
 
 from khmer._khmer import new_hashtable
 # sandbox/{occupy,ctb-iterative-bench{-2-old}}.py
@@ -47,11 +47,11 @@ __version__ = get_versions()['version']
 del get_versions
 
 
-def load_hashbits(filename):
-    """Load a hashbits object from the given filename and return it.
+def load_nodegraph(filename):
+    """Load a nodegraph object from the given filename and return it.
 
     Keyword argument:
-    filename -- the name of the hashbits file
+    filename -- the name of the nodegraph file
     """
     hashtable = _Hashbits(1, [1])
     hashtable.load(filename)
@@ -59,11 +59,11 @@ def load_hashbits(filename):
     return hashtable
 
 
-def load_counting_hash(filename):
-    """Load a counting_hash object from the given filename and return it.
+def load_countinggraph(filename):
+    """Load a countinggraph object from the given filename and return it.
 
     Keyword argument:
-    filename -- the name of the counting_hash file
+    filename -- the name of the countinggraph file
     """
     hashtable = _CountingHash(1, [1])
     hashtable.load(filename)
@@ -71,14 +71,14 @@ def load_counting_hash(filename):
     return hashtable
 
 
-def extract_hashbits_info(filename):
-    """Open the given hashbits file and return a tuple of information.
+def extract_nodegraph_info(filename):
+    """Open the given nodegraph file and return a tuple of information.
 
     Returns: the k-mer size, the table size, the number of tables, the version
     of the table format, and the type of table flag.
 
     Keyword argument:
-    filename -- the name of the hashbits file to inspect
+    filename -- the name of the nodegraph file to inspect
     """
     ksize = None
     n_tables = None
@@ -92,13 +92,13 @@ def extract_hashbits_info(filename):
     ulonglong_size = len(pack('Q', 0))
 
     try:
-        with open(filename, 'rb') as hashbits:
-            signature, = unpack('4s', hashbits.read(4))
-            version, = unpack('B', hashbits.read(1))
-            ht_type, = unpack('B', hashbits.read(1))
-            ksize, = unpack('I', hashbits.read(uint_size))
-            n_tables, = unpack('B', hashbits.read(uchar_size))
-            table_size, = unpack('Q', hashbits.read(ulonglong_size))
+        with open(filename, 'rb') as nodegraph:
+            signature, = unpack('4s', nodegraph.read(4))
+            version, = unpack('B', nodegraph.read(1))
+            ht_type, = unpack('B', nodegraph.read(1))
+            ksize, = unpack('I', nodegraph.read(uint_size))
+            n_tables, = unpack('B', nodegraph.read(uchar_size))
+            table_size, = unpack('Q', nodegraph.read(ulonglong_size))
         if signature != b"OXLI":
             raise ValueError("Node graph '{}' is missing file type "
                              "signature".format(filename) + str(signature))
@@ -109,13 +109,13 @@ def extract_hashbits_info(filename):
 
 
 def extract_countinghash_info(filename):
-    """Open the given counting_hash file and return a tuple of information.
+    """Open the given countinggraph file and return a tuple of information.
 
     Return: the k-mer size, the table size, the number of tables, the bigcount
     flag, the version of the table format, and the type of table flag.
 
     Keyword argument:
-    filename -- the name of the counting_hash file to inspect
+    filename -- the name of the countinggraph file to inspect
     """
     ksize = None
     n_tables = None

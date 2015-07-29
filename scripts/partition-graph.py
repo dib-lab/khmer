@@ -119,7 +119,7 @@ def main():
     print('--', file=sys.stderr)
 
     print('loading ht %s.pt' % basename, file=sys.stderr)
-    htable = khmer.load_hashbits(basename + '.pt')
+    htable = khmer.load_nodegraph(basename + '.pt')
     htable.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?

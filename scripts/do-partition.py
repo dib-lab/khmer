@@ -23,7 +23,7 @@ import os.path
 import os
 import textwrap
 from khmer import khmer_args
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
                               add_threading_args)
 import glob
 from khmer.kfile import check_input_files, check_space
@@ -88,7 +88,7 @@ def get_parser():
     but should probably not be used for large data sets, because
     :program:`do-partition.py` doesn't provide save/resume functionality.
     """
-    parser = build_hashbits_args(
+    parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
         epilog=textwrap.dedent(epilog))
     add_threading_args(parser)

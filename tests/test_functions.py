@@ -122,22 +122,22 @@ def test_extract_countinghash_info():
             assert 0, '...failed to remove ' + fn + str(err)
 
 
-def test_extract_hashbits_info_badfile():
+def test_extract_nodegraph_info_badfile():
     try:
-        khmer.extract_hashbits_info(
+        khmer.extract_nodegraph_info(
             utils.get_test_data('test-abund-read-2.fa'))
         assert 0, 'this should fail'
     except ValueError:
         pass
 
 
-def test_extract_hashbits_info():
-    fn = utils.get_temp_filename('test_extract_hashbits.pt')
+def test_extract_nodegraph_info():
+    fn = utils.get_temp_filename('test_extract_nodegraph.pt')
     for size in [1e6, 2e6, 5e6, 1e7]:
         ht = khmer.Hashbits(25, size, 4)
         ht.save(fn)
 
-        info = khmer.extract_hashbits_info(fn)
+        info = khmer.extract_nodegraph_info(fn)
         ksize, table_size, n_tables, _, _ = info
         print(ksize, table_size, n_tables)
 

@@ -23,7 +23,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config)
 
 # counting hash parameters.
@@ -91,7 +91,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer presence table %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    htable = khmer.load_nodegraph(graphbase + '.pt')
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
     htable.load_tagset(graphbase + '.tagset')
