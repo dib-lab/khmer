@@ -1,3 +1,8 @@
+2015-07-29  Amanda Charbonneau  <charbo24@msu.edu>
+
+   * scripts/fastq-to-fasta.py: Changed '-n' default description to match
+   behaviour
+
 2015-07-28  Titus Brown  <titus@idyll.org>
 
    * tests/test_streaming_io.py: new shell cmd tests for streaming/piping.
