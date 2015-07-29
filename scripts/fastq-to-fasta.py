@@ -20,7 +20,7 @@ import argparse
 import screed
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          is_block)
-
+from khmer.utils import write_record
 
 def get_parser():
     parser = argparse.ArgumentParser(
@@ -30,7 +30,7 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         help='The name of the output'
                         ' FASTA sequence file.',
                         default=sys.stdout)
@@ -60,8 +60,8 @@ def main():
                 n_count += 1
                 continue
 
-        outfp.write('>' + name + '\n')
-        outfp.write(sequence + '\n')
+        del record['quality']
+        write_record(record, outfp)
 
     print('\n' + 'lines from ' + args.input_sequence, file=sys.stderr)
 

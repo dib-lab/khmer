@@ -183,7 +183,7 @@ def is_block(fthing):
 
 
 def add_output_compression_type(parser):
-    """Add compression arguments to a parset object."""
+    """Add compression arguments to a parser object."""
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--gzip', default=False, action='store_true',
                        help='Compress output using gzip')
