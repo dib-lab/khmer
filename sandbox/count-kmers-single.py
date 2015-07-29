@@ -51,13 +51,13 @@ def main():
     check_input_files(args.input_sequence_filename, False)
 
     print ('making k-mer counting table', file=sys.stderr)
-    countinggraph = khmer.CountingHash(args.ksize, args.max_tablesize,
+    countinggraph = khmer.Countgraph(args.ksize, args.max_tablesize,
                                             args.n_tables)
     # @CTB countinggraph.set_use_bigcount(args.bigcount)
 
     kmer_size = countinggraph.ksize()
     hashsizes = countinggraph.hashsizes()
-    tracking = khmer._Hashbits(  # pylint: disable=protected-access
+    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
     print ('kmer_size: %s' % countinggraph.ksize(), file=sys.stderr)

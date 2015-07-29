@@ -58,7 +58,7 @@ def main():
     outfp = open(outfile, 'w')
 
     # create a nodegraph data structure
-    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Nodegraph(K, HT_SIZE, N_HT)
 
     # load contigs, connect into N partitions
     print('loading input reads from', inp)

@@ -61,7 +61,7 @@ def main():
           (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
     ksize = args.ksize
-    htable = khmer.Hashbits(ksize, 1, 1)
+    htable = khmer.Nodegraph(ksize, 1, 1)
 
     for _ in pmap_files:
         check_input_files(_, args.force)

@@ -64,7 +64,7 @@ def main():
     query_list = []
     for n, inp_name in enumerate(inputlist):
         # create a nodegraph data structure
-        ht = khmer.Hashbits(K, HT_SIZE, N_HT)
+        ht = khmer.Nodegraph(K, HT_SIZE, N_HT)
 
         outfile = os.path.basename(inp_name) + '.sweep3'
         outfp = open(outfile, 'w')

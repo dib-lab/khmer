@@ -15,7 +15,7 @@ from argparse import _VersionAction
 
 import screed
 import khmer
-from khmer import extract_countinghash_info, extract_nodegraph_info
+from khmer import extract_countgraph_info, extract_nodegraph_info
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info
@@ -78,7 +78,7 @@ def build_graph_args(descr=None, epilog=None, parser=None):
 def build_counting_args(descr=None, epilog=None):
     """Build an ArgumentParser with args for countinggraph based scripts."""
     parser = build_graph_args(descr=descr, epilog=epilog)
-    parser.hashtype = 'countgraph'
+    parser.graphtype = 'countgraph'
 
     return parser
 
@@ -86,11 +86,11 @@ def build_counting_args(descr=None, epilog=None):
 def build_nodegraph_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for nodegraph based scripts."""
     parser = build_graph_args(descr=descr, epilog=epilog, parser=parser)
-    parser.hashtype = 'nodegraph'
+    parser.graphtype = 'nodegraph'
 
     return parser
 
-# add an argument for loadhash with warning about parameters
+# add an argument for loadgraph with warning about parameters
 
 
 def add_loadgraph_args(parser):
@@ -110,13 +110,13 @@ def add_loadgraph_args(parser):
 ** Your values for ksize, n_tables, and tablesize
 ** will be ignored.'''.format(hashfile=values))
 
-            if hasattr(parser, 'hashtype'):
+            if hasattr(parser, 'graphtype'):
                 info = None
-                if parser.hashtype == 'nodegraph':
+                if parser.graphtype == 'nodegraph':
                     info = extract_nodegraph_info(
                         getattr(namespace, self.dest))
-                elif parser.hashtype == 'countgraph':
-                    info = extract_countinghash_info(
+                elif parser.graphtype == 'countgraph':
+                    info = extract_countgraph_info(
                         getattr(namespace, self.dest))
                 if info:
                     K = info[0]
@@ -131,15 +131,15 @@ def add_loadgraph_args(parser):
                         action=LoadAction)
 
 
-def calculate_tablesize(args, hashtype, multiplier=1.0):
-    if hashtype not in ('countgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (hashtype,))
+def calculate_tablesize(args, graphtype, multiplier=1.0):
+    if graphtype not in ('countgraph', 'nodegraph'):
+        raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
-        if hashtype == 'countgraph':
+        if graphtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
                 float(multiplier)
-        elif hashtype == 'nodegraph':
+        elif graphtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
                 float(multiplier)
     else:
@@ -156,7 +156,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0):
         sys.exit(1)
 
     tablesize = calculate_tablesize(args, 'nodegraph', multiplier)
-    return khmer.Hashbits(ksize, tablesize, args.n_tables)
+    return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
 def create_countgraph(args, ksize=None, multiplier=1.0):
@@ -167,20 +167,20 @@ def create_countgraph(args, ksize=None, multiplier=1.0):
         sys.exit(1)
 
     tablesize = calculate_tablesize(args, 'countgraph', multiplier=multiplier)
-    return khmer.CountingHash(ksize, tablesize, args.n_tables)
+    return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
-def report_on_config(args, hashtype='countgraph'):
+def report_on_config(args, graphtype='countgraph'):
     """Print out configuration.
 
     Summarize the configuration produced by the command-line arguments
     made available by this module.
     """
     from khmer.utils import print_error
-    if hashtype not in ('countgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (hashtype,))
+    if graphtype not in ('countgraph', 'nodegraph'):
+        raise ValueError("unknown graph type: %s" % (graphtype,))
 
-    tablesize = calculate_tablesize(args, hashtype)
+    tablesize = calculate_tablesize(args, graphtype)
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
@@ -189,12 +189,12 @@ def report_on_config(args, hashtype='countgraph'):
         " - max tablesize = {0:5.2g} \t(-x)".format(tablesize)
     )
     print_error("")
-    if hashtype == 'countgraph':
+    if graphtype == 'countgraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize)".format(
                 args.n_tables * tablesize))
-    elif hashtype == 'nodegraph':
+    elif graphtype == 'nodegraph':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize / 8)".format(args.n_tables *

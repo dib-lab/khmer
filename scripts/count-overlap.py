@@ -51,7 +51,7 @@ def get_parser():
 def main():
     info('count-overlap.py', ['counting'])
     args = get_parser().parse_args()
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
 
     for infile in [args.ptfile, args.fafile]:
         check_input_files(infile, args.force)
