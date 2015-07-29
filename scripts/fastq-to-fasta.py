@@ -22,6 +22,7 @@ from khmer.kfile import (add_output_compression_type, get_file_writer,
                          is_block)
 from khmer.utils import write_record
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
