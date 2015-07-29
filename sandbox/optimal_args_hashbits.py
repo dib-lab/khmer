@@ -39,7 +39,7 @@ def get_parser():
 def main():
     info('optimal_args_nodegraph.py', ['graph', 'SeqAn'])
     args = get_parser().parse_args()
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
 
 
     filenames = args.input_filenames

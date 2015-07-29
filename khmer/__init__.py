@@ -10,18 +10,14 @@ from __future__ import print_function
 from math import log
 import json
 
-from khmer._khmer import CountingHash as _CountingHash
+from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import LabelHash as _LabelHash
-from khmer._khmer import Hashbits as _Hashbits
+from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 
-from khmer._khmer import forward_hash  # figuregen/*.py
-# tests/test_{functions,countinggraph,labelhash,counting_single}.py
-
-from khmer._khmer import new_hashtable
-# sandbox/{occupy,ctb-iterative-bench{-2-old}}.py
-# tests/{test_c_wrapper,test_counting_single}.py
+from khmer._khmer import forward_hash
+# tests/test_{functions,countinggraph,counting_single}.py
 
 from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 
@@ -53,10 +49,10 @@ def load_nodegraph(filename):
     Keyword argument:
     filename -- the name of the nodegraph file
     """
-    hashtable = _Hashbits(1, [1])
-    hashtable.load(filename)
+    nodegraph = _Nodegraph(1, [1])
+    nodegraph.load(filename)
 
-    return hashtable
+    return nodegraph
 
 
 def load_countinggraph(filename):
@@ -65,10 +61,10 @@ def load_countinggraph(filename):
     Keyword argument:
     filename -- the name of the countinggraph file
     """
-    hashtable = _CountingHash(1, [1])
-    hashtable.load(filename)
+    countgraph = _Countgraph(1, [1])
+    countgraph.load(filename)
 
-    return hashtable
+    return countgraph
 
 
 def extract_nodegraph_info(filename):
@@ -108,7 +104,7 @@ def extract_nodegraph_info(filename):
     return ksize, round(table_size, -2), n_tables, version, ht_type
 
 
-def extract_countinghash_info(filename):
+def extract_countgraph_info(filename):
     """Open the given countinggraph file and return a tuple of information.
 
     Return: the k-mer size, the table size, the number of tables, the bigcount
@@ -129,14 +125,14 @@ def extract_countinghash_info(filename):
     ulonglong_size = len(pack('Q', 0))
 
     try:
-        with open(filename, 'rb') as countinghash:
-            signature, = unpack('4s', countinghash.read(4))
-            version, = unpack('B', countinghash.read(1))
-            ht_type, = unpack('B', countinghash.read(1))
-            use_bigcount, = unpack('B', countinghash.read(1))
-            ksize, = unpack('I', countinghash.read(uint_size))
-            n_tables, = unpack('B', countinghash.read(1))
-            table_size, = unpack('Q', countinghash.read(ulonglong_size))
+        with open(filename, 'rb') as countgraph:
+            signature, = unpack('4s', countgraph.read(4))
+            version, = unpack('B', countgraph.read(1))
+            ht_type, = unpack('B', countgraph.read(1))
+            use_bigcount, = unpack('B', countgraph.read(1))
+            ksize, = unpack('I', countgraph.read(uint_size))
+            n_tables, = unpack('B', countgraph.read(1))
+            table_size, = unpack('Q', countgraph.read(ulonglong_size))
         if signature != b'OXLI':
             raise ValueError("Counting table '{}' is missing file type "
                              "signature. ".format(filename) + str(signature))
@@ -147,17 +143,17 @@ def extract_countinghash_info(filename):
         ht_type
 
 
-def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
-    """Do a quick & dirty expected collision rate calculation on a hashtable.
+def calc_expected_collisions(graph, force=False, max_false_pos=.2):
+    """Do a quick & dirty expected collision rate calculation on a graph
 
     Also check to see that collision rate is within threshold.
 
     Keyword argument:
-    hashtable: the hashtable object to inspect
+    graph: the countgraph or nodegraph object to inspect
     """
-    sizes = hashtable.hashsizes()
+    sizes = graph.hashsizes()
     n_ht = float(len(sizes))
-    occupancy = float(hashtable.n_occupied())
+    occupancy = float(graph.n_occupied())
     min_size = min(sizes)
 
     fp_one = occupancy / min_size
@@ -233,11 +229,11 @@ def get_n_primes_near_x(number, target):
 # Additional functionality can be added to these classes as appropriate.
 
 
-class CountingHash(_CountingHash):
+class Countgraph(_Countgraph):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        c = _CountingHash.__new__(cls, k, primes)
+        c = _Countgraph.__new__(cls, k, primes)
         c.primes = primes
         return c
 
@@ -245,7 +241,7 @@ class CountingHash(_CountingHash):
 class LabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
-        hb = Hashbits(k, starting_size, n_tables)
+        hb = Nodegraph(k, starting_size, n_tables)
         c = _LabelHash.__new__(cls, hb)
         c.graph = hb
         return c
@@ -255,17 +251,17 @@ class CountingLabelHash(_LabelHash):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        hb = _CountingHash(k, primes)
+        hb = _Countgraph(k, primes)
         c = _LabelHash.__new__(cls, hb)
         c.graph = hb
         return c
 
 
-class Hashbits(_Hashbits):
+class Nodegraph(_Nodegraph):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        c = _Hashbits.__new__(cls, k, primes)
+        c = _Nodegraph.__new__(cls, k, primes)
         c.primes = primes
         return c
 
@@ -296,7 +292,7 @@ class ReadAligner(_ReadAligner):
 
     """Sequence to graph aligner.
 
-    ReadAligner uses a CountingHash (the counts of k-mers in the target DNA
+    ReadAligner uses a Countgraph (the counts of k-mers in the target DNA
     sequences) as an implicit De Bruijn graph. Input DNA sequences are aligned
     to this graph via a paired Hidden Markov Model.
 

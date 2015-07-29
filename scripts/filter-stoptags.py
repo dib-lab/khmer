@@ -65,7 +65,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading stop tags, with K', args.ksize, file=sys.stderr)
-    htable = khmer.Hashbits(args.ksize, 1, 1)
+    htable = khmer.Nodegraph(args.ksize, 1, 1)
     htable.load_stop_tags(stoptags)
 
     def process_fn(record):

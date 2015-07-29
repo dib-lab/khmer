@@ -78,11 +78,10 @@ def main():
 
     kmer_size = countinggraph.ksize()
     hashsizes = countinggraph.hashsizes()
-    tracking = khmer._Hashbits(  # pylint: disable=protected-access
+    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
     print('K:', kmer_size, file=sys.stderr)
-    print('HT sizes:', hashsizes, file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):

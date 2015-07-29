@@ -581,7 +581,7 @@ def test_filter_stoptags():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer._Hashbits(K, [1])
+    kh = khmer._Nodegraph(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -612,7 +612,7 @@ def test_filter_stoptags_fq():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer._Hashbits(K, [1])
+    kh = khmer._Nodegraph(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh

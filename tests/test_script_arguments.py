@@ -254,7 +254,7 @@ def test_create_nodegraph_4_multiplier():
         sum(nodegraph.hashsizes())
 
 
-def test_report_on_config_bad_hashtype():
+def test_report_on_config_bad_graphtype():
     ksize = khmer_args.DEFAULT_K
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE

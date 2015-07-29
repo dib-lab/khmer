@@ -64,7 +64,7 @@ def main():
         ht = khmer.load_countinggraph(args.loadhash)
     else:
         print('making hashtable')
-        ht = khmer.CountingHash(K, HT_SIZE, N_HT)
+        ht = khmer.Countgraph(K, HT_SIZE, N_HT)
 
     aligner = khmer.ReadAligner(ht, args.trusted_cutoff, args.bits_theta)
 
