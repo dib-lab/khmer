@@ -50,18 +50,18 @@ using namespace read_parsers;
 //
 
 #if PY_MAJOR_VERSION >= 3
-  #define MOD_ERROR_VAL NULL
-  #define MOD_SUCCESS_VAL(val) val
-  #define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
-  #define MOD_DEF(ob, name, doc, methods) \
+#define MOD_ERROR_VAL NULL
+#define MOD_SUCCESS_VAL(val) val
+#define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
           static struct PyModuleDef moduledef = { \
             PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
           ob = PyModule_Create(&moduledef);
 #else
-  #define MOD_ERROR_VAL
-  #define MOD_SUCCESS_VAL(val)
-  #define MOD_INIT(name) void init##name(void)
-  #define MOD_DEF(ob, name, doc, methods) \
+#define MOD_ERROR_VAL
+#define MOD_SUCCESS_VAL(val)
+#define MOD_INIT(name) void init##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
           ob = Py_InitModule3(name, methods, doc);
 #endif
 
@@ -1660,7 +1660,7 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
     Py_END_ALLOW_THREADS
 
     khmer_PrePartitionInfo_Object * ppi_obj = (khmer_PrePartitionInfo_Object *) \
-	PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
+            PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
 
     ppi_obj->PrePartitionInfo = ppi;
 
@@ -1763,7 +1763,7 @@ hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
     PyObject * x = PyList_New(hashtable->all_tags.size());
     unsigned long long i = 0;
     for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end();
-	    ++si) {
+            ++si) {
         std::string s = _revhash(*si, k);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
@@ -2814,7 +2814,8 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
         Py_buffer buffer;
-        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i], sizes[i], 0, PyBUF_FULL_RO);
+        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i], sizes[i], 0,
+                                    PyBUF_FULL_RO);
         if (res == -1) {
             return NULL;
         }
@@ -2962,8 +2963,8 @@ count_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
     unsigned long long * counts;
     try {
         counts = counting->fasta_count_kmers_by_position(inputfile,
-                                                         max_read_len,
-                                        (unsigned short) limit_by_count_int);
+                 max_read_len,
+                 (unsigned short) limit_by_count_int);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -3305,8 +3306,8 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
     HashIntoType        curve[2][100];
 
     try {
-	unsigned long long  n_consumed;
-	unsigned int        total_reads;
+        unsigned long long  n_consumed;
+        unsigned int        total_reads;
         hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads,
                                         n_consumed);
     } catch (khmer_file_exception &exc) {
@@ -3859,7 +3860,7 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
     //unsigned int num_traversed = 0;
     //Py_BEGIN_ALLOW_THREADS
     hb->sweep_label_neighborhood(seq, found_labels, range, break_on_stop_tags,
-                                     stop_big_traversals);
+                                 stop_big_traversals);
     //Py_END_ALLOW_THREADS
 
     //printf("...%u kmers traversed\n", num_traversed);
@@ -4165,7 +4166,7 @@ static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
 }
 
 static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
-                                            PyObject * args)
+        PyObject * args)
 {
     ReadAligner * aligner = me->aligner;
 
@@ -4187,8 +4188,8 @@ static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
     const char* alignment = aln->graph_alignment.c_str();
     const char* readAlignment = aln->read_alignment.c_str();
     PyObject * x = PyList_New(aln->covs.size());
-    for (size_t i = 0; i < aln->covs.size(); i++ ){
-      PyList_SET_ITEM(x, i, PyLong_FromLong(aln->covs[i]));
+    for (size_t i = 0; i < aln->covs.size(); i++ ) {
+        PyList_SET_ITEM(x, i, PyLong_FromLong(aln->covs[i]));
     }
 
     PyObject * ret = Py_BuildValue("dssOO", aln->score, alignment,
@@ -4810,7 +4811,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
 
     try {
         PyObject * hash;
-	hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
+        hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
         return hash;
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
@@ -4949,7 +4950,7 @@ MOD_INIT(_khmer)
     }
 
     if (PyType_Ready(&khmer_PrePartitionInfo_Type) < 0) {
-	    return MOD_ERROR_VAL;
+        return MOD_ERROR_VAL;
     }
 
     khmer_KSubsetPartition_Type.tp_methods = khmer_subset_methods;
@@ -5012,7 +5013,8 @@ MOD_INIT(_khmer)
     }
 
     Py_INCREF(&khmer_KNodegraph_Type);
-    if (PyModule_AddObject(m, "Nodegraph", (PyObject *)&khmer_KNodegraph_Type) < 0) {
+    if (PyModule_AddObject(m, "Nodegraph",
+                           (PyObject *)&khmer_KNodegraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
