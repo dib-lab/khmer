@@ -1,12 +1,12 @@
-2015-07-29  Amanda Charbonneau  <charbo24@msu.edu>
-
-   * scripts/fastq-to-fasta.py: Changed '-n' default description to match
-   behaviour
-
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
    * Makefile: Adapt Makefile rules for py3 changes.
    * jenkins-build.sh: Read PYTHON_EXECUTABLE and TEST_ATTR from environment.
+
+2015-07-29  Amanda Charbonneau  <charbo24@msu.edu>
+
+   * scripts/fastq-to-fasta.py: Changed '-n' default description to match
+   behaviour
 
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
