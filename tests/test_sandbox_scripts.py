@@ -103,7 +103,7 @@ def test_sweep_reads():
             contigfile, readfile, 'junkfile.fa']
 
     status, out, err = utils.runscript(
-        script, args, in_dir, fail_ok=True, sandbox=True)
+        script, args, in_dir, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -149,7 +149,7 @@ def test_sweep_reads_fq():
             contigfile, readfile, 'junkfile.fa']
 
     status, out, err = utils.runscript(
-        script, args, in_dir, fail_ok=True, sandbox=True)
+        script, args, in_dir, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err

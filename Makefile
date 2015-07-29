@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
@@ -24,10 +24,14 @@ CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR='!known_failing,!jenkins,!huge'
+	TESTATTR ?= '!known_failing,!jenkins,!huge'
 else
-	TESTATTR='!known_failing,!jenkins,!huge,!linux'
+	TESTATTR ?= '!known_failing,!jenkins,!huge,!linux'
 endif
+
+
+MODEXT=$(shell python -c "import sysconfig;print(sysconfig.get_config_var('SO'))")
+EXTENSION_MODULE = khmer/_khmer$(MODEXT)
 
 ## all         : default task; compile C++ code, build shared object library
 all: sharedobj
@@ -44,9 +48,9 @@ install-dependencies:
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: khmer/_khmermodule.so
+sharedobj: $(EXTENSION_MODULE)
 
-khmer/_khmermodule.so: $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -68,7 +72,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so
+	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
@@ -160,9 +164,9 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
+.coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
-		-m nose --with-xunit --attr=\!known_failing --processes=0
+		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
 
 coverage.xml: .coverage
 	coverage xml
@@ -178,7 +182,8 @@ coverage-report: .coverage
 
 coverage-gcovr.xml: coverage-debug .coverage
 	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
-          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*'
+          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*' \
+	  --exclude-unreachable-branches
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
@@ -280,5 +285,24 @@ convert-release-notes:
 	for file in doc/release-notes/*.md; do \
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
+
+list-authors:
+	@echo '\author[1]{Michael R. Crusoe}'
+	@git log --format='\author[]{%aN}' | sort -uk2 | \
+		grep -v 'root\|crusoe\|titus'
+	@echo '\author[]{C. Titus Brown}'
+	@echo '\affil[1]{mcrusoe@msu.edu}'
+	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
+		awk -F\\ '{print "\\"$$3}' | grep -v \
+		'root\|crusoe\|titus\|waffle\|boyce\|pickett.rodney'
+	# R. Boyce requested to be removed 2015/05/21
+	# via pers correspondence to MRC
+	# P Rodney requested to be removed 2015/06/22 via pers correspondence
+	# to MRC
+	@echo '\affil[]{titus@idyll.org}'
+
+list-author-emails:
+	@echo 'name, E-Mail Address'
+	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
 
 FORCE:

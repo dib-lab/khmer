@@ -3,8 +3,17 @@
 // Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 //
-#include "read_aligner.hh"
+#include <ctype.h>
+#include <algorithm>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <utility>
+
+#include "hashtable.hh"
 #include "khmer_exception.hh"
+#include "read_aligner.hh"
 
 namespace khmer
 {

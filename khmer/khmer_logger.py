@@ -1,4 +1,3 @@
-from __future__ import print_function, unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
@@ -7,6 +6,7 @@ from __future__ import print_function, unicode_literals
 #
 # Lightweight logging framework for khmer
 
+from __future__ import print_function, unicode_literals
 import sys
 
 global __QUIET__

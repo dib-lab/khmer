@@ -1,12 +1,13 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
@@ -18,7 +19,6 @@ import shutil
 from io import StringIO
 import traceback
 from nose.plugins.attrib import attr
-import subprocess
 import threading
 import bz2
 import io
@@ -312,6 +312,21 @@ def test_filter_abund_2():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_filter_abund_2_stdin():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = 'filter-abund.py'
+    args = ['-C', '1', counting_ht, '-']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
 
 # make sure that FASTQ records are retained.
 
@@ -644,7 +659,7 @@ def test_count_median():
 
 
 def test_count_median_fq_csv():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.get_temp_filename('test.fq')
     outfile = infile + '.counts'
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
@@ -665,6 +680,21 @@ def test_count_median_fq_csv():
     # verify that sequence names remain unparsed
     names = set([line.split(',')[0] for line in data])
     assert '895:1:37:17593:9954 1::FOO' in names, names
+
+
+def test_count_median_fq_csv_stdout():
+    infile = utils.get_temp_filename('test.fq')
+    outfile = '-'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = 'count-median.py'
+    args = [counting_ht, infile, outfile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'name,median,average,stddev,seqlen' in out
+    assert 'seq,1001,1001.0,0.0,18' in out
 
 
 def test_load_graph():
@@ -728,6 +758,13 @@ def test_oxli_build_graph():
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
+
+
+def test_oxli_nocommand():
+    script = 'oxli'
+
+    (status, out, err) = utils.runscript(script, [])
+    assert status == 0
 
 
 def test_load_graph_no_tags():
@@ -1306,7 +1343,7 @@ def test_extract_partitions_no_output_groups():
     args = ['-n', 'extracted', partfile]
 
     # We expect a sys.exit -> we need the test to be tolerant
-    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir)
     assert "NOT outputting groups! Beware!" in err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
@@ -1371,8 +1408,9 @@ def test_extract_partitions_no_groups():
     script = 'extract-partitions.py'
     args = ['extracted', empty_file]
 
-    _, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert "ERROR: Input file", "is empty; Exiting." in err
+    assert status != 0
     # No group files should be created
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
 
@@ -1399,6 +1437,22 @@ def test_abundance_dist():
         assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
         assert line == '1001,2,98,1.0', line
+
+
+def test_abundance_dist_stdout():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = 'abundance-dist.py'
+    args = ['-z', htfile, infile, "-"]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert '1,96,96,0.98' in out, out
+    assert '1001,2,98,1.0' in out, out
 
 
 def test_abundance_dist_nobigcount():
@@ -1672,21 +1726,6 @@ def test_interleave_reads_broken_fq_3():
     status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
     assert "ERROR: This doesn't look like paired data!" in err
-
-
-def test_interleave_reads_broken_fq_4():
-    # test input files
-    infile1 = utils.get_test_data('paired-mixed-broken.fq')
-
-    # actual output file
-    outfile = utils.get_temp_filename('out.fq')
-
-    script = 'interleave-reads.py'
-    args = [infile1, '-o', outfile]
-
-    status, out, err = utils.runscript(script, args, fail_ok=True)
-    assert status == 1
-    assert "ERROR: given only one filename, that doesn't contain _R1_" in err
 
 
 def test_interleave_reads_broken_fq_5():
@@ -2060,6 +2099,15 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     assert "is not part of a pair" in err
 
 
+def test_split_paired_reads_2_stdin_no_out():
+    script = 'split-paired-reads.py'
+    args = ['-']
+
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filenames must " in err
+
+
 def test_split_paired_reads_2_mixed_fq():
     # test input file
     infile = utils.get_temp_filename('test.fq')
@@ -2367,6 +2415,15 @@ def test_sample_reads_randomly_fq():
     assert seqs == answer
 
 
+def test_sample_reads_randomly_stdin_no_out():
+    script = 'sample-reads-randomly.py'
+    args = ['-']
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0
+    assert "Accepting input from stdin; output filename" in err, err
+
+
 def test_fastq_to_fasta():
 
     script = 'fastq-to-fasta.py'
@@ -2553,6 +2610,7 @@ def test_count_overlap_invalid_datafile():
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
             htfile + '.pt', htfile + '.pt', outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
     assert "OSError" in err
 
 
@@ -2618,29 +2676,30 @@ def execute_streaming_diginorm(ifilename):
     return in_dir + '/outfile'
 
 
-def execute_load_graph_streaming(filename):
+def _execute_load_graph_streaming(filename):
     '''Helper function for the matrix of streaming tests using screed via
     filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
 
-    script = 'load-graph.py'
-    args = '-x 1e7 -N 2 -k 20 out -'
-
+    scripts = utils.scriptpath()
     infile = utils.get_temp_filename('temp')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data(filename), infile)
-    (status, out, err) = utils.runscriptredirect(script, args, infile, in_dir)
+
+    args = '-x 1e7 -N 2 -k 20 out -'
+
+    cmd = 'cat {infile} | {scripts}/load-graph.py {args}'.format(
+        infile=infile, scripts=scripts, args=args)
+
+    (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
 
     if status != 0:
-        for line in out:
-            print(out)
-        for line in err:
-            print(err)
+        print(out)
+        print(err)
         assert status == 0, status
-    err.seek(0)
-    err = err.read()
+
     assert 'Total number of unique k-mers: 3960' in err, err
 
     ht_file = os.path.join(in_dir, 'out.pt')
@@ -2716,34 +2775,34 @@ def test_screed_streaming_gzipfa():
 
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
 
 
 def test_readstats():
@@ -2829,12 +2888,20 @@ def test_trim_low_abund_1_duplicate_filename_err():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
-    try:
-        utils.runscript('trim-low-abund.py', args, in_dir)
-        raise Exception("should not reach this")
-    except AssertionError:
-        # an error should be raised by passing 'infile' twice.
-        pass
+    (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Error: Cannot input the same filename multiple times." in str(err)
+
+
+def test_trim_low_abund_1_stdin_err():
+    args = ["-"]
+
+    (status, out, err) = utils.runscript('trim-low-abund.py', args,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
 
 
 def test_trim_low_abund_2():
@@ -3171,3 +3238,74 @@ def test_roundtrip_commented_format():
     r = open(infile).read()
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
+
+
+def test_unique_kmers_defaults():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+
+def test_unique_kmers_report_fp():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    outfile = utils.get_temp_filename('report.unique')
+
+    args = ['-k', '20', '-e', '0.01', '-R', outfile, infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+    with open(outfile, 'r') as report_fp:
+        outf = report_fp.read().splitlines()
+        assert '3950 20 (total)' in outf
+        assert '3950 20 total' in outf
+
+
+def test_unique_kmers_diagnostics():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', '--diagnostics', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    out = out.splitlines()
+    assert ('expected_fp\tnumber_hashtable(Z)\t'
+            'size_hashtable(H)\texpected_memory_usage' in err)
+
+
+def test_unique_kmers_multiple_inputs():
+    infiles = []
+    for fname in ('random-20-a.fa', 'paired-mixed.fa'):
+        infile = utils.get_temp_filename(fname)
+        shutil.copyfile(utils.get_test_data(fname), infile)
+        infiles.append(infile)
+
+    args = ['-k', '20', '-e', '0.01']
+    args += infiles
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'
+            .format(infiles[0]) in err)
+    assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
+            in err)
+    assert 'Total estimated number of unique 20-mers: 4170' in err
