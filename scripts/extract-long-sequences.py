@@ -35,9 +35,8 @@ def get_parser():
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
     parser.add_argument('-o', '--output', help='The name of the output'
-                        ' sequence file.',
-                        type=argparse.FileType('w'), metavar="filename",
-                        default=sys.stdout)
+                        ' sequence file.', default=sys.stdout,
+                        metavar='output', type=argparse.FileType('w'))
     parser.add_argument('-l', '--length', help='The minimum length of'
                         ' the sequence file.',
                         type=int, default=200)

@@ -109,6 +109,10 @@ def main():
                 sys.exit(1)
     else:
         filename = args.filenames[0]
+        if filename in ('/dev/stdin', '-'):
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:

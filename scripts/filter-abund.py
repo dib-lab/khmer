@@ -63,9 +63,9 @@ def get_parser():
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
-    parser.add_argument('-o', '--out', dest='single_output_filename',
+    parser.add_argument('-o', '--out', dest='single_output_file',
                         type=argparse.FileType('w'),
-                        metavar="filename",
+                        metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
@@ -83,6 +83,12 @@ def main():
 
     check_input_files(args.input_table, args.force)
     infiles = args.input_filename
+    if ('-' in infiles or '/dev/stdin' in infiles) and not \
+       args.single_output_file:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
+
     for filename in infiles:
         check_input_files(filename, args.force)
 
@@ -122,7 +128,11 @@ def main():
     # the filtering loop
     for infile in infiles:
         print('filtering', infile, file=sys.stderr)
-        if not args.single_output_filename:
+        if args.single_output_file:
+            outfile = args.single_output_file.name
+            outfp = get_file_writer(args.single_output_file, args.gzip,
+                    args.bzip)
+        else:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'w')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
@@ -131,6 +141,7 @@ def main():
         tsp.start(verbose_loader(infile), outfp)
 
         print('output in', outfile, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

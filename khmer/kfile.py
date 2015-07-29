@@ -29,6 +29,7 @@ def check_input_files(file_path, force):
 
     if file_path == '-':
         return
+
     try:
         mode = os.stat(file_path).st_mode
     except OSError:
@@ -43,8 +44,8 @@ def check_input_files(file_path, force):
         else:
             return
 
-    # block devices will be nonzero
-    if S_ISBLK(mode) or S_ISFIFO(mode):
+    # block devices/stdin will be nonzero
+    if S_ISBLK(mode) or S_ISFIFO(mode) or S_ISCHR(mode):
         return
 
     if not os.path.exists(file_path):
@@ -158,7 +159,9 @@ def check_valid_file_exists(in_files):
     or non-existent.
     """
     for in_file in in_files:
-        if os.path.exists(in_file):
+        if in_file == '-':
+            pass
+        elif os.path.exists(in_file):
             mode = os.stat(in_file).st_mode
             if os.stat(in_file).st_size > 0 or S_ISBLK(mode) or S_ISFIFO(mode):
                 return

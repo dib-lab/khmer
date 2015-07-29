@@ -100,10 +100,10 @@ def main():
     check_space(filenames, args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin' or infile == '-':
+    if infile in ('/dev/stdin', '-'):
         if not (args.output_first and args.output_second):
-            print("Accepting input from stdin; output filenames must be "
-                  "provided.", file=sys.stderr)
+            print("Accepting input from stdin; output filenames must "
+                  "be provided.", file=sys.stderr)
             sys.exit(1)
     elif args.output_directory:
         if not os.path.exists(args.output_directory):
@@ -167,8 +167,8 @@ def main():
 
     print("DONE; split %d sequences (%d left, %d right)" %
           (counter1 + counter2, counter1, counter2), file=sys.stderr)
-    print("/1 reads in %s" % out1, file=sys.stderr)
-    print("/2 reads in %s" % out2, file=sys.stderr)
+    print("left (/1) reads in %s" % out1, file=sys.stderr)
+    print("right (/2) reads in %s" % out2, file=sys.stderr)
 
 if __name__ == '__main__':
     main()
