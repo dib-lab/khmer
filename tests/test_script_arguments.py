@@ -55,7 +55,7 @@ def test_check_tablespace():
     try:
         tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_graph(outfile, tablesize,
-                                              False, _testhook_free_space=0)
+                                          False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
         print(str(e))
@@ -88,7 +88,7 @@ def test_check_tablespace_force():
     try:
         tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
         khmer.kfile.check_space_for_graph(outfile, tablesize,
-                                              True, _testhook_free_space=0)
+                                          True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
         print(str(e))

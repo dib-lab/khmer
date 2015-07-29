@@ -84,7 +84,7 @@ def main():
 
     tablesize = calculate_tablesize(args, 'countgraph')
     check_space_for_graph(args.output_countingtable_filename, tablesize,
-                              args.force)
+                          args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")

@@ -115,7 +115,7 @@ def main():
     countgraph_fp_csv = csv.writer(countgraph_fp)
     # write headers:
     countgraph_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                          'cumulative_fraction'])
+                                'cumulative_fraction'])
 
     sofar = 0
     for _, i in enumerate(abundances):
