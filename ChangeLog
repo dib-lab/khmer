@@ -1,6 +1,5 @@
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
-   * Makefile: fix the name of the compiled CPython extension
    * khmer/_khmer.cc: add more CPyChecker inspired fixes
    * lib/*.{cc,hh}: clean up includes and forward declarations
 

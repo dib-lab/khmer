@@ -12,19 +12,6 @@
 
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
-#include "seqan/basic/allocator_interface.h"
-#include "seqan/basic/iterator_adapt_std.h"
-#include "seqan/basic/iterator_base.h"
-#include "seqan/basic/iterator_interface.h"
-#include "seqan/seq_io/read_fasta_fastq.h"
-#include "seqan/seq_io/sequence_stream.h"
-#include "seqan/sequence/adapt_std_string.h"
-#include "seqan/sequence/sequence_interface.h"
-#include "seqan/sequence/sequence_lexical.h"
-#include "seqan/sequence/string_alloc.h"
-#include "seqan/sequence/string_base.h"
-#include "seqan/stream/adapt_fstream.h"
-#include "seqan/stream/record_reader_single.h"
 
 namespace khmer
 {
