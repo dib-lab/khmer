@@ -1,3 +1,8 @@
+2015-07-29  Amanda Charbonneau  <charbo24@msu.edu>
+
+   * scripts/fastq-to-fasta.py: Changed '-n' default description to match
+   behaviour
+
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
    * tests/test_{scripts,streaming_io}.py: Fix the build + add a test
