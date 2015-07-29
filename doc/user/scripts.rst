@@ -58,6 +58,9 @@ k-mer counting and abundance filtering
 .. autoprogram:: count-overlap:get_parser()
         :prog: count-overlap.py
 
+.. autoprogram:: unique-kmers:get_parser()
+        :prog: unique-kmers.py
+
 .. _scripts-partitioning:
 
 Partitioning

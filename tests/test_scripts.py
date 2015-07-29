@@ -3238,3 +3238,94 @@ def test_roundtrip_commented_format():
     r = open(infile).read()
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
+
+
+def test_unique_kmers_defaults():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+
+def test_unique_kmers_report_fp():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    outfile = utils.get_temp_filename('report.unique')
+
+    args = ['-k', '20', '-e', '0.01', '-R', outfile, infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+    with open(outfile, 'r') as report_fp:
+        outf = report_fp.read().splitlines()
+        assert '3950 20 (total)' in outf
+        assert '3950 20 total' in outf
+
+
+def test_unique_kmers_diagnostics():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', '--diagnostics', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    out = out.splitlines()
+    assert ('expected_fp\tnumber_hashtable(Z)\t'
+            'size_hashtable(H)\texpected_memory_usage' in err)
+
+
+def test_unique_kmers_stream_out():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = '-k 20 -e 0.01 --stream-out -'
+
+    _, out, err = utils.runscriptredirect('unique-kmers.py', args, infile,
+                                          os.path.dirname(infile))
+
+    err.seek(0)
+    err = err.read()
+    assert 'Estimated number of unique 20-mers in -: 3950' in err
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+    out.seek(0)
+    out = out.read()
+    assert '>45' in out
+    assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
+
+
+def test_unique_kmers_multiple_inputs():
+    infiles = []
+    for fname in ('random-20-a.fa', 'paired-mixed.fa'):
+        infile = utils.get_temp_filename(fname)
+        shutil.copyfile(utils.get_test_data(fname), infile)
+        infiles.append(infile)
+
+    args = ['-k', '20', '-e', '0.01']
+    args += infiles
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'
+            .format(infiles[0]) in err)
+    assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
+            in err)
+    assert 'Total estimated number of unique 20-mers: 4170' in err
