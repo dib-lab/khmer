@@ -3290,26 +3290,6 @@ def test_unique_kmers_diagnostics():
             'size_hashtable(H)\texpected_memory_usage' in err)
 
 
-def test_unique_kmers_stream_out():
-    infile = utils.get_temp_filename('random-20-a.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
-
-    args = '-k 20 -e 0.01 --stream-out -'
-
-    _, out, err = utils.runscriptredirect('unique-kmers.py', args, infile,
-                                          os.path.dirname(infile))
-
-    err.seek(0)
-    err = err.read()
-    assert 'Estimated number of unique 20-mers in -: 3950' in err
-    assert 'Total estimated number of unique 20-mers: 3950' in err
-
-    out.seek(0)
-    out = out.read()
-    assert '>45' in out
-    assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
-
-
 def test_unique_kmers_multiple_inputs():
     infiles = []
     for fname in ('random-20-a.fa', 'paired-mixed.fa'):

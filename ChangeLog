@@ -3,6 +3,10 @@
    * scripts/fastq-to-fasta.py: Changed '-n' default description to match
    behaviour
 
+2015-07-29  Luiz Irber  <khmer@luizirber.org>
+
+   * tests/test_{scripts,streaming_io}.py: Fix the build + add a test
+
 2015-07-28  Titus Brown  <titus@idyll.org>
 
    * tests/test_streaming_io.py: new shell cmd tests for streaming/piping.
