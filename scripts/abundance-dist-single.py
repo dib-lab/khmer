@@ -25,7 +25,7 @@ import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info, calculate_tablesize)
-from khmer.kfile import (check_input_files, check_space_for_hashtable)
+from khmer.kfile import (check_input_files, check_space_for_graph)
 
 
 def get_parser():
@@ -74,7 +74,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     check_input_files(args.input_sequence_filename, args.force)
     if args.savetable:
         tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+        check_space_for_graph(args.savetable, tablesize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
         print('ERROR: %s exists; not squashing.' %
@@ -88,15 +88,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                               'cumulative_fraction'])
 
     print('making countgraph', file=sys.stderr)
-    counting_hash = khmer_args.create_countgraph(args, multiplier=1.1)
-    counting_hash.set_use_bigcount(args.bigcount)
+    countinggraph = khmer_args.create_countgraph(args, multiplier=1.1)
+    countinggraph.set_use_bigcount(args.bigcount)
 
     print('building k-mer tracking table', file=sys.stderr)
     tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
-    print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
+    print('kmer_size:', countinggraph.ksize(), file=sys.stderr)
     print('k-mer counting table sizes:',
-          counting_hash.hashsizes(), file=sys.stderr)
+          countinggraph.hashsizes(), file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     # start loading
@@ -107,7 +107,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=counting_hash.consume_fasta_with_reads_parser,
+                target=countinggraph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -117,12 +117,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         thread.join()
 
     print('Total number of unique k-mers: {0}'.format(
-        counting_hash.n_unique_kmers()), file=sys.stderr)
+        countinggraph.n_unique_kmers()), file=sys.stderr)
 
     abundance_lists = []
 
     def __do_abundance_dist__(read_parser):
-        abundances = counting_hash.abundance_distribution_with_reads_parser(
+        abundances = countinggraph.abundance_distribution_with_reads_parser(
             read_parser, tracking)
         abundance_lists.append(abundances)
 
@@ -175,7 +175,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     if args.savetable:
         print('Saving k-mer counting table ', args.savetable, file=sys.stderr)
         print('...saving to', args.savetable, file=sys.stderr)
-        counting_hash.save(args.savetable)
+        countinggraph.save(args.savetable)
 
     print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
 

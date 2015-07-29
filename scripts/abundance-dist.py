@@ -63,21 +63,21 @@ def main():
     for infile in infiles:
         check_input_files(infile, False)
 
-    print('hashtable from', args.input_counting_table_filename,
+    print('Counting graph from', args.input_counting_table_filename,
           file=sys.stderr)
-    counting_hash = khmer.load_counting_hash(
+    countinggraph = khmer.load_countinggraph(
         args.input_counting_table_filename)
 
-    if not counting_hash.get_use_bigcount() and args.bigcount:
+    if not countinggraph.get_use_bigcount() and args.bigcount:
         print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
               " reporting is ENABLED--counts higher than 255 will not be "
               "reported.",
               file=sys.stderr)
 
-    counting_hash.set_use_bigcount(args.bigcount)
+    countinggraph.set_use_bigcount(args.bigcount)
 
-    kmer_size = counting_hash.ksize()
-    hashsizes = counting_hash.hashsizes()
+    kmer_size = countinggraph.ksize()
+    hashsizes = countinggraph.hashsizes()
     tracking = khmer._Hashbits(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
@@ -98,7 +98,7 @@ def main():
               args.output_histogram_filename, file=sys.stderr)
 
     print('preparing hist...', file=sys.stderr)
-    abundances = counting_hash.abundance_distribution(
+    abundances = countinggraph.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
 
@@ -110,12 +110,12 @@ def main():
         sys.exit(1)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
-        hash_fp = sys.stdout
+        countgraph_fp = sys.stdout
     else:
-        hash_fp = open(args.output_histogram_filename, 'w')
-    hash_fp_csv = csv.writer(hash_fp)
+        countgraph_fp = open(args.output_histogram_filename, 'w')
+    countgraph_fp_csv = csv.writer(countgraph_fp)
     # write headers:
-    hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
+    countgraph_fp_csv.writerow(['abundance', 'count', 'cumulative',
                           'cumulative_fraction'])
 
     sofar = 0
@@ -126,7 +126,7 @@ def main():
         sofar += i
         frac = sofar / float(total)
 
-        hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+        countgraph_fp_csv.writerow([_, i, sofar, round(frac, 3)])
 
         if sofar == total:
             break

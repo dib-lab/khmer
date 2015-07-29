@@ -15,7 +15,7 @@ from argparse import _VersionAction
 
 import screed
 import khmer
-from khmer import extract_countinghash_info, extract_hashbits_info
+from khmer import extract_countinghash_info, extract_nodegraph_info
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info
@@ -44,7 +44,7 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
-def build_hash_args(descr=None, epilog=None, parser=None):
+def build_graph_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
     if parser is None:
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
@@ -76,16 +76,16 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
 
 def build_counting_args(descr=None, epilog=None):
-    """Build an ArgumentParser with args for counting_hash based scripts."""
-    parser = build_hash_args(descr=descr, epilog=epilog)
+    """Build an ArgumentParser with args for countinggraph based scripts."""
+    parser = build_graph_args(descr=descr, epilog=epilog)
     parser.hashtype = 'countgraph'
 
     return parser
 
 
-def build_hashbits_args(descr=None, epilog=None, parser=None):
-    """Build an ArgumentParser with args for hashbits based scripts."""
-    parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
+def build_nodegraph_args(descr=None, epilog=None, parser=None):
+    """Build an ArgumentParser with args for nodegraph based scripts."""
+    parser = build_graph_args(descr=descr, epilog=epilog, parser=parser)
     parser.hashtype = 'nodegraph'
 
     return parser
@@ -93,7 +93,7 @@ def build_hashbits_args(descr=None, epilog=None, parser=None):
 # add an argument for loadhash with warning about parameters
 
 
-def add_loadhash_args(parser):
+def add_loadgraph_args(parser):
 
     class LoadAction(argparse.Action):
 
@@ -113,7 +113,7 @@ def add_loadhash_args(parser):
             if hasattr(parser, 'hashtype'):
                 info = None
                 if parser.hashtype == 'nodegraph':
-                    info = extract_hashbits_info(
+                    info = extract_nodegraph_info(
                         getattr(namespace, self.dest))
                 elif parser.hashtype == 'countgraph':
                     info = extract_countinghash_info(

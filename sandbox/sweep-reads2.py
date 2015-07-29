@@ -20,7 +20,7 @@ import sys
 import khmer
 import os.path
 import screed
-from khmer.khmer_args import (build_hashbits_args, DEFAULT_MAX_TABLESIZE)
+from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
 
 
 def main():
@@ -57,7 +57,7 @@ def main():
     outfile = os.path.basename(readsfile) + '.sweep2'
     outfp = open(outfile, 'w')
 
-    # create a hashbits data structure
+    # create a nodegraph data structure
     ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     # load contigs, connect into N partitions

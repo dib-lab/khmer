@@ -623,7 +623,7 @@ def test_badget():
 
 
 def test_load_notexist_should_fail():
-    savepath = utils.get_temp_filename('temphashbitssave0.htable')
+    savepath = utils.get_temp_filename('tempnodegraphsave0.htable')
 
     hi = khmer._CountingHash(12, [1])
     try:
@@ -635,7 +635,7 @@ def test_load_notexist_should_fail():
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('temphashbitssave0.ct')
+    savepath = utils.get_temp_filename('tempnodegraphsave0.ct')
 
     hi = khmer.CountingHash(12, 1000, 2)
 
@@ -708,7 +708,7 @@ def test_save_load_tagset_trunc():
 
 
 def _build_testfiles():
-    # hashbits file
+    # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
     hi = khmer.Hashbits(12, 2)
@@ -746,7 +746,7 @@ def _build_testfiles():
     htable.save_stop_tags('/tmp/goodversion-k32.stoptags')
 
 
-def test_hashbits_file_version_check():
+def test_nodegraph_file_version_check():
     htable = khmer._Hashbits(12, [1])
 
     inpath = utils.get_test_data('badversion-k12.htable')
@@ -758,7 +758,7 @@ def test_hashbits_file_version_check():
         print(str(e))
 
 
-def test_hashbits_file_type_check():
+def test_nodegraph_file_type_check():
     kh = khmer._CountingHash(12, [1])
     savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)

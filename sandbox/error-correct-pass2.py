@@ -58,7 +58,7 @@ def main():
     args = parser.parse_args()
 
     print('loading counts')
-    ht = khmer.load_counting_hash(args.counts_table)
+    ht = khmer.load_countinggraph(args.counts_table)
 
     aligner = khmer.ReadAligner(ht,
                                 args.trusted_cov,

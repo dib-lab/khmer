@@ -82,7 +82,7 @@ def test_load_into_counting_max_memory_usage_parameter():
     assert os.path.exists(outfile)
     assert "WARNING: tablesize is default!" not in err
 
-    kh = khmer.load_counting_hash(outfile)
+    kh = khmer.load_countinggraph(outfile)
     assert sum(kh.hashsizes()) < 3e8
 
 
@@ -718,7 +718,7 @@ def test_load_graph():
     assert os.path.exists(tagset_file), tagset_file
 
     try:
-        ht = khmer.load_hashbits(ht_file)
+        ht = khmer.load_nodegraph(ht_file)
     except OSError as err:
         assert 0, str(err)
     ht.load_tagset(tagset_file)
@@ -750,7 +750,7 @@ def test_oxli_build_graph():
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
 
-    ht = khmer.load_hashbits(ht_file)
+    ht = khmer.load_nodegraph(ht_file)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set
@@ -785,7 +785,7 @@ def test_load_graph_no_tags():
     tagset_file = outfile + '.tagset'
     assert not os.path.exists(tagset_file), tagset_file
 
-    assert khmer.load_hashbits(ht_file)
+    assert khmer.load_nodegraph(ht_file)
 
     # can't think of a good way to make sure this worked, beyond just
     # loading the ht file...
@@ -808,7 +808,7 @@ def test_oxli_build_graph_no_tags():
     tagset_file = outfile + '.tagset'
     assert not os.path.exists(tagset_file), tagset_file
 
-    assert khmer.load_hashbits(ht_file)
+    assert khmer.load_nodegraph(ht_file)
 
     # can't think of a good way to make sure this worked, beyond just
     # loading the ht file...
@@ -926,7 +926,7 @@ def test_load_graph_max_memory_usage_parameter():
     assert os.path.exists(ht_file), ht_file
 
     try:
-        ht = khmer.load_hashbits(ht_file)
+        ht = khmer.load_nodegraph(ht_file)
     except OSError as err:
         assert 0, str(err)
 
@@ -1045,7 +1045,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1069,7 +1069,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1082,7 +1082,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -1101,7 +1101,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1116,7 +1116,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1132,7 +1132,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase)
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -2940,7 +2940,7 @@ def _execute_load_graph_streaming(filename):
     tagset_file = os.path.join(in_dir, 'out.tagset')
     assert os.path.exists(tagset_file), tagset_file
 
-    ht = khmer.load_hashbits(ht_file)
+    ht = khmer.load_nodegraph(ht_file)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set

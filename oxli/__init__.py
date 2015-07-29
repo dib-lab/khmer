@@ -36,7 +36,7 @@ def get_parser():
                               description="Load sequences into the "
                               "compressible graph format plus optional tagset")
 
-    khmer_args.build_hashbits_args("Load sequences into the compressible"
+    khmer_args.build_nodegraph_args("Load sequences into the compressible"
                                    "graph format plus optional tagset.",
                                    None, parser=parser_build_graph)
     build_graph.build_parser(parser_build_graph)

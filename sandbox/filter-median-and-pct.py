@@ -41,7 +41,7 @@ def main():
     print('file with ht: %s' % counting_ht)
 
     print('loading hashtable')
-    ht = khmer.load_counting_hash(counting_ht)
+    ht = khmer.load_countinggraph(counting_ht)
     K = ht.ksize()
 
     xxxfp = None

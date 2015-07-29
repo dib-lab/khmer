@@ -96,7 +96,7 @@ def main():
 
     print('loading counting table:', args.input_table,
           file=sys.stderr)
-    htable = khmer.load_counting_hash(args.input_table)
+    htable = khmer.load_countinggraph(args.input_table)
     ksize = htable.ksize()
 
     print("K:", ksize, file=sys.stderr)

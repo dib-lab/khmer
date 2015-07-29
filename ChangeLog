@@ -1,3 +1,10 @@
+2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/*.py,tests/*.py,sandbox/*.py,khmer/*.py,oxli/*.py:
+     counting_hash, hashtable->countgraph; hashbits->nodegraph;
+     check_space_for_hashtable->check_space_for_graph; hash_args->graph_args
+
+
 2015-08-04  Titus Brown  <titus@idyll.org> and Camille Scott
 <camille.scott.w@gmail.com>
 

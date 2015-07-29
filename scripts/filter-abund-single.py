@@ -28,7 +28,7 @@ from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_tablesize)
 from khmer.kfile import (check_input_files, check_space,
-                         check_space_for_hashtable,
+                         check_space_for_graph,
                          add_output_compression_type,
                          get_file_writer)
 
@@ -75,7 +75,7 @@ def main():
 
     if args.savetable:
         tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+        check_space_for_graph(args.savetable, tablesize, args.force)
 
     report_on_config(args)
 

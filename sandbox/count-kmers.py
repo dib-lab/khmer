@@ -49,11 +49,11 @@ def main():
 
     print ('hashtable from', args.input_counting_table_filename,
            file=sys.stderr)
-    counting_hash = khmer.load_counting_hash(
+    countinggraph = khmer.load_countinggraph(
         args.input_counting_table_filename)
 
-    kmer_size = counting_hash.ksize()
-    hashsizes = counting_hash.hashsizes()
+    kmer_size = countinggraph.ksize()
+    hashsizes = countinggraph.hashsizes()
     tracking = khmer._Hashbits(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
@@ -68,10 +68,10 @@ def main():
                 kmer = seq[i:i+kmer_size]
                 if not tracking.get(kmer):
                     tracking.count(kmer)
-                    writer.writerow([kmer, str(counting_hash.get(kmer))])
+                    writer.writerow([kmer, str(countinggraph.get(kmer))])
 
     print ('Total number of unique k-mers: {0}'.format(
-        counting_hash.n_unique_kmers()), file=sys.stderr)
+        countinggraph.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':

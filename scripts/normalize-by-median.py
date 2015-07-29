@@ -27,12 +27,13 @@ import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
 from oxli import functions as oxutils
-from khmer.khmer_args import (build_counting_args, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_tablesize)
 import argparse
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
+                         check_valid_file_exists)
 from khmer.utils import write_record, broken_paired_reader
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
@@ -269,7 +270,7 @@ def get_parser():
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
     add_output_compression_type(parser)
     return parser
 
@@ -311,13 +312,13 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_space(args.input_filenames, args.force)
     if args.savetable:
         tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+        check_space_for_graph(args.savetable, tablesize, args.force)
 
     # load or create counting table.
     if args.loadtable:
         log_info('loading k-mer counting table from {table}',
                  table=args.loadtable)
-        htable = khmer.load_counting_hash(args.loadtable)
+        htable = khmer.load_countinggraph(args.loadtable)
         if args.unique_kmers != 0:
             log_info('Warning: You have specified the number of unique kmers'
                      ' but are loading a precreated counting table --'

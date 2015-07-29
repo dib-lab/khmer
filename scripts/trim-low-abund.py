@@ -27,10 +27,10 @@ import argparse
 from screed import Record
 from khmer import khmer_args
 
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_tablesize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 
@@ -96,7 +96,7 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
     parser.add_argument('-s', '--savetable', metavar="filename", default='',
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
@@ -129,7 +129,7 @@ def main():
     check_space(args.input_filenames, args.force)
     if args.savetable:
         tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+        check_space_for_graph(args.savetable, tablesize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
        and not args.output:
@@ -139,7 +139,7 @@ def main():
 
     if args.loadtable:
         print('loading countgraph from', args.loadtable, file=sys.stderr)
-        ct = khmer.load_counting_hash(args.loadtable)
+        ct = khmer.load_countinggraph(args.loadtable)
     else:
         print('making countgraph', file=sys.stderr)
         ct = khmer_args.create_countgraph(args)

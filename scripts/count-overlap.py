@@ -25,7 +25,7 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from khmer.kfile import check_input_files
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info)
 
 
 def get_parser():
@@ -34,7 +34,7 @@ def get_parser():
     containing the increase of overlap k-mers as the number of sequences in the
     second database increases.
     """
-    parser = build_hashbits_args(
+    parser = build_nodegraph_args(
         descr='Count the overlap k-mers which are the k-mers appearing in two '
         'sequence datasets.', epilog=textwrap.dedent(epilog))
     parser.add_argument('ptfile', metavar='input_presence_table_filename',
@@ -57,7 +57,7 @@ def main():
         check_input_files(infile, args.force)
 
     print('loading k-mer presence table from', args.ptfile, file=sys.stderr)
-    ht1 = khmer.load_hashbits(args.ptfile)
+    ht1 = khmer.load_nodegraph(args.ptfile)
     kmer_size = ht1.ksize()
 
     output = open(args.report_filename, 'w')

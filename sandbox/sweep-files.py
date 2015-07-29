@@ -36,7 +36,7 @@ from collections import defaultdict, deque
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info)
 
 DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
@@ -46,7 +46,7 @@ MIN_KSIZE = 21
 
 
 def get_parser():
-    parser = build_hashbits_args('Takes a partitioned reference file \
+    parser = build_nodegraph_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = EPILOG

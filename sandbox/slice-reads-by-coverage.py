@@ -39,7 +39,7 @@ def main():
         print("min_coverage > max_coverage!? exiting!", file=sys.stderr)
         sys.exit(1)
 
-    htable = khmer.load_counting_hash(args.input_counting_table)
+    htable = khmer.load_countinggraph(args.input_counting_table)
     output_file = args.output_readfile
     output_fp = open(output_file, 'w')
 

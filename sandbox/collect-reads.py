@@ -24,7 +24,7 @@ from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config, info,
                               calculate_tablesize)
 from khmer.kfile import check_input_files, check_space
-from khmer.kfile import check_space_for_hashtable
+from khmer.kfile import check_space_for_graph
 import argparse
 import screed
 
@@ -79,7 +79,7 @@ def main():
 
     check_space(args.input_sequence_filename, False)
     tablesize = calculate_tablesize(args, 'countgraph')
-    check_space_for_hashtable(args.output_countingtable_filename, tablesize,
+    check_space_for_graph(args.output_countingtable_filename, tablesize,
                               False)
 
     print('Saving k-mer counting table to %s' % base)
