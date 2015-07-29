@@ -5,6 +5,11 @@
 
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
+   * Makefile: Adapt Makefile rules for py3 changes.
+   * jenkins-build.sh: Read PYTHON_EXECUTABLE and TEST_ATTR from environment.
+
+2015-07-29  Luiz Irber  <khmer@luizirber.org>
+
    * tests/test_{scripts,streaming_io}.py: Fix the build + add a test
 
 2015-07-28  Titus Brown  <titus@idyll.org>
@@ -174,11 +179,6 @@
    optimization/sanity checking via oxli estimation funcs.
    * tests/test_normalize_by_median.py: updated tests to cover estimation
    functions.
-
-2015-07-08  Luiz Irber  <khmer@luizirber.org>
-
-   * Makefile: Adapt Makefile rules for py3 changes.
-   * jenkins-build.sh: Read PYTHON_EXECUTABLE and TEST_ATTR from environment.
 
 2015-07-08  Luiz Irber  <khmer@luizirber.org>
 
