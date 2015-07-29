@@ -1,3 +1,34 @@
+2015-07-28  Titus Brown  <titus@idyll.org>
+
+   * tests/test_streaming_io.py: new shell cmd tests for streaming/piping.
+   * tests/khmer_tst_utils.py: refactor/replace runtestredirect(...) with
+   scriptpath(...) and run_shell_cmd(...).
+   * scripts/test_scripts.py: remove test_interleave_reads_broken_fq_4 for
+   only one input file for interleave-reads.py; replace runscriptredirect call
+   with run_shell_cmd.
+   * scripts/interleave-reads.py: force exactly two input files.
+   * scripts/split-paired-reads.py: fix print statement; clarify output.
+   * scripts/{normalize-by-median.py,sample-reads-randomly.py,
+   trim-low-abund.py}: if stdin is supplied for input, check that -o
+   specifies output file.
+   * scripts/filter-abund.py: if stdin is supplied for input, check that -o
+   specifies output file; switched -o to use argparse.FileType.
+   * scripts/extract-long-sequences.py: switched -o to use argparse.FileType.
+   * scripts/{abundance-dist,count-median}.py: added '-' handling for output.
+   * khmer/kfile.py: change 'check_input_files' to no longer warn that
+   '-' doesn't exist'.
+   * tests/test-data/paired.fq.2: removed extraneous newline from end.
+   * tests/{test_normalize_by_median,test_script_arguments,test_scripts}.py:
+   added tests for new code.
+   * scripts/oxli: added script for running tests in development directory.
+   * khmer/{__init__,khmer_args}.py,tests/{test_normalize_by_median,
+   test_script_arguments}.py: refactored out use of AssertionError by not
+   throwing plain Exceptions when a ValueError or RuntimeError would do.
+   * oxli/__init__.py: give default help instead of an error when `oxli` is
+   called with no arguments.
+   * tests/test_{normalize_by_median,sandbox_scripts,scripts,streaming_io}.py:
+   always check status code if calling `runscripts` with `fail_ok=True`.
+
 2015-07-28  Luiz Irber  <khmer@luizirber.org>
 
    * sandbox/unique-kmers.py: moved to scripts.

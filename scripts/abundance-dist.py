@@ -85,7 +85,9 @@ def main():
     print('HT sizes:', hashsizes, file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
-    if os.path.exists(args.output_histogram_filename):
+    if args.output_histogram_filename in ('-', '/dev/stdout'):
+        pass
+    elif os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
             print('ERROR: %s exists; not squashing.' %
                   args.output_histogram_filename,
@@ -107,7 +109,10 @@ def main():
               file=sys.stderr)
         sys.exit(1)
 
-    hash_fp = open(args.output_histogram_filename, 'w')
+    if args.output_histogram_filename in ('-', '/dev/stdout'):
+        hash_fp = sys.stdout
+    else:
+        hash_fp = open(args.output_histogram_filename, 'w')
     hash_fp_csv = csv.writer(hash_fp)
     # write headers:
     hash_fp_csv.writerow(['abundance', 'count', 'cumulative',

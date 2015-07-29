@@ -57,7 +57,8 @@ def get_parser():
     parser.add_argument('input', metavar='input_sequence_filename',
                         help='input FAST[AQ] sequence filename')
     parser.add_argument('output', metavar='output_summary_filename',
-                        help='output summary filename')
+                        help='output summary filename',
+                        type=argparse.FileType('w'))
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -71,7 +72,8 @@ def main():
 
     htfile = args.ctfile
     input_filename = args.input
-    output_filename = args.output
+    output = args.output
+    output_filename = str(output)
 
     infiles = [htfile, input_filename]
     for infile in infiles:
@@ -82,9 +84,7 @@ def main():
     print('loading k-mer counting table from', htfile, file=sys.stderr)
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
-
     print('writing to', output_filename, file=sys.stderr)
-    output = open(output_filename, 'w')
 
     output = csv.writer(output)
     # write headers:

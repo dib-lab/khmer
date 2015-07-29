@@ -250,7 +250,7 @@ def get_parser():
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
                         metavar='report_frequency', type=int,
                         default=100000)
@@ -345,6 +345,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         else:
             output_name = args.single_output_file.name
         outfp = args.single_output_file
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
 
     #
     # main loop: iterate over all files given, do diginorm.
@@ -384,7 +389,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable.save(args.savetable)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
