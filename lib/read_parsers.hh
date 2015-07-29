@@ -9,9 +9,15 @@
 #define READ_PARSERS_HH
 
 #include <regex.h>
-#include <iostream>
+#include <stddef.h>
+#include <stdint.h>
 #include <cstdlib>
+#include <iostream>
+#include <string>
+#include <utility>
+
 #include "khmer.hh"
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -146,6 +152,7 @@ public:
 
 private:
     struct Handle;
+
     Handle* _private;
 
 };

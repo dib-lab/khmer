@@ -1,3 +1,8 @@
+2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/_khmer.cc: add more CPyChecker inspired fixes
+   * lib/*.{cc,hh}: clean up includes and forward declarations
+
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
    * Makefile: Adapt Makefile rules for py3 changes.
