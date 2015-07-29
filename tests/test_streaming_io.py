@@ -414,3 +414,38 @@ def test_readstats_1():
 
     run_shell_cmd(cmd)
     assert '18114,1001,18.1,-' in open(out1).read(), open(out1).read()
+
+
+def test_unique_kmers_stream_out_fasta():
+    infile = utils.get_test_data('random-20-a.fa')
+
+    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-out {infile}"
+    cmd = cmd.format(scripts=scriptpath(), infile=infile)
+
+    (status, out, err) = run_shell_cmd(cmd)
+
+    expected = ('Estimated number of unique 20-mers in {infile}: 3950'
+                .format(infile=infile))
+    assert expected in err
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+    assert '>45' in out
+    assert "ATACGCCACTCGACTTGGCTCGCCCTCGATCTAAAATAGCGGTCGTGTTGGGTTAACAA" in out
+
+
+def test_unique_kmers_stream_out_fastq_with_N():
+    infile = utils.get_test_data('test-filter-abund-Ns.fq')
+
+    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-out {infile}"
+    cmd = cmd.format(scripts=scriptpath(), infile=infile)
+
+    (status, out, err) = run_shell_cmd(cmd)
+
+    expected = ('Estimated number of unique 20-mers in {infile}: 94'
+                .format(infile=infile))
+    assert expected in err
+    assert 'Total estimated number of unique 20-mers: 94' in err
+
+    assert '@895:1:37:17593:9954 1::FOO_withN' in out
+    assert "GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGNGACAGCAGCCGCAGCTGTCGTCA" in out
+    assert "##########################################################" in out
