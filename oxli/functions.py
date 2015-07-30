@@ -112,14 +112,13 @@ def optimal_args_output_gen(unique_kmers, fp_rate):
     return "\n".join(to_print)
 
 
-def do_sanity_checking(args, desired_max_fp):
+def check_fp_rate(args, desired_max_fp):
     """
     simple function to check if the restrictions in the args (if there are any)
     make sense--If not, complain. If no restrictions are given, add some that
     make sense.
     Takes in args and desired max FP rate
     """
-    # if optimization args are given, do optimization
     if args.unique_kmers != 0:
         if args.max_memory_usage:
             # verify that this is a sane memory usage restriction
@@ -144,7 +143,7 @@ def do_sanity_checking(args, desired_max_fp):
                 print("*** Estimating false positive rate to be {0}".format(
                     res.fp_rate), file=sys.stderr)
             else:
-                print("*** INFO: set memory ceiling using auto optimization.",
+                print("*** INFO: set memory ceiling automatically.",
                       file=sys.stderr)
                 print("*** Ceiling is: {0} bytes\n".format(res.mem_use),
                       file=sys.stderr)
