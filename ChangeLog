@@ -1,3 +1,8 @@
+2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/coding-guidelines-and-review.rst: added codespell as a possible
+   spelling tool
+
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * khmer/_khmer.cc: add more CPyChecker inspired fixes
