@@ -232,19 +232,6 @@ int get_rho(HashIntoType w, int max_width)
     return max_width - floor(log2(w));
 }
 
-void write_record(const read_parsers::Read& read, std::ostream& output)
-{
-    if (read.quality.length() != 0) {
-        output << "@" << read.name << std::endl
-               << read.sequence << std::endl
-               << "+" << std::endl
-               << read.quality << std::endl;
-    } else {
-        output << ">" << read.name << std::endl
-               << read.sequence << std::endl;
-    }
-}
-
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
     if (error_rate < 0) {
@@ -412,7 +399,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (output_records) {
-                    write_record(read, std::cout);
+                    read.write_to(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
