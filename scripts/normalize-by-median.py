@@ -89,7 +89,7 @@ class WithDiagnostics(object):
                     log_info('... kept {kept} of {tot} or {perc_kept:.1%} so'
                              'far', kept=kept, tot=total,
                              perc_kept=perc_kept)
-                    log_info('... in file ' + ifilename)
+                    log_info('... in file {name}', name=ifilename)
 
                     if report_fp:
                         print("{total},{kept},{f_kept:.4}"
@@ -103,7 +103,7 @@ class WithDiagnostics(object):
 
         # per file diagnostic output
         if total == reads_start:
-            log_info('SKIPPED empty file ' + ifilename)
+            log_info('SKIPPED empty file {name}', name=ifilename)
         else:
             perc_kept = kept / float(total)
 
@@ -167,7 +167,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
     try:
         yield
     except (IOError, OSError, ValueError) as error:
-        log_error('** ERROR: ' + str(error))
+        log_error('** ERROR: {error}', error=str(error))
         log_error('** Failed on {name}: ', name=ifile)
         if not single_out:
             os.remove(out.name)
@@ -312,7 +312,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     # load or create counting table.
     if args.loadtable:
-        log_info('loading k-mer counting table from ' + args.loadtable)
+        log_info('loading k-mer counting table from {table}',
+                 table=args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
         if args.unique_kmers != 0:
             log_info('Warning: You have specified the number of unique kmers'
@@ -374,7 +375,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 if record is not None:
                     write_record(record, outfp)
 
-            log_info('output in ' + output_name)
+            log_info('output in {name}', name=output_name)
             if output_name is not '/dev/stdout':
                 outfp.close()
 
@@ -384,7 +385,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
              umers=htable.n_unique_kmers())
 
     if args.savetable:
-        log_info('...saving to ' + args.savetable)
+        log_info('...saving to {name}', name=args.savetable)
         htable.save(args.savetable)
 
     fp_rate = \
