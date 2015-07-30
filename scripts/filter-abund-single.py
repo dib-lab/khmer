@@ -75,16 +75,16 @@ def main():
     report_on_config(args)
 
     print('making countgraph', file=sys.stderr)
-    htable = khmer_args.create_countgraph(args)
+    graph = khmer_args.create_countgraph(args)
 
-    # first, load reads into hash table
+    # first, load reads into graph
     rparser = khmer.ReadParser(args.datafile)
     threads = []
     print('consuming input, round 1 --', args.datafile, file=sys.stderr)
     for _ in range(args.threads):
         cur_thread = \
             threading.Thread(
-                target=htable.consume_fasta_with_reads_parser,
+                target=graph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(cur_thread)
@@ -94,9 +94,9 @@ def main():
         _.join()
 
     print('Total number of unique k-mers: {0}'.format(
-        htable.n_unique_kmers()), file=sys.stderr)
+        graph.n_unique_kmers()), file=sys.stderr)
 
-    fp_rate = khmer.calc_expected_collisions(htable, args.force)
+    fp_rate = khmer.calc_expected_collisions(graph, args.force)
     print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     # now, trim.
@@ -107,7 +107,7 @@ def main():
         seq = record.sequence
         seqN = seq.replace('N', 'A')
 
-        _, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
+        _, trim_at = graph.trim_on_abundance(seqN, args.cutoff)
 
         if trim_at >= args.ksize:
             # be sure to not to change the 'N's in the trimmed sequence -
@@ -130,7 +130,7 @@ def main():
         print('Saving k-mer counting table filename',
               args.savetable, file=sys.stderr)
         print('...saving to', args.savetable, file=sys.stderr)
-        htable.save(args.savetable)
+        graph.save(args.savetable)
     print('wrote to: ', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
