@@ -282,7 +282,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_fp = args.report
     force_single = args.force_single
 
-    # if optimization args are given, do optimization
+    # if estimates of k-mer numbers are given, choose table sizes.
     args = oxutils.do_sanity_checking(args, 0.1)
 
     # check for similar filenames
@@ -315,9 +315,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         log_info('loading k-mer counting table from ' + args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
         if args.unique_kmers != 0:
-            log_info('Warning: You have specified a number of unique kmers but'
-                     ' are loading a precreated counting table-- argument'
-                     ' optimization will NOT be done.')
+            log_info('Warning: You have specified the number of unique kmers'
+                     ' but are loading a precreated counting table --'
+                     ' counting table size will NOT be set automatically.')
     else:
         log_info('making countgraph')
         htable = khmer_args.create_countgraph(args)
