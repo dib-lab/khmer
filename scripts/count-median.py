@@ -29,9 +29,7 @@ import csv
 import textwrap
 
 import khmer
-from khmer.kfile import (check_input_files, check_space,
-                         add_output_compression_type, get_file_writer)
-
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 
@@ -65,7 +63,6 @@ def get_parser():
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
-    add_output_compression_type(parser)
     return parser
 
 
@@ -88,7 +85,6 @@ def main():
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
     print('writing to', output_filename, file=sys.stderr)
-    output = get_file_writer(output, args.gzip, args.bzip)
 
     output = csv.writer(output)
     # write headers:
