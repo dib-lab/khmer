@@ -10,6 +10,11 @@
    to graph outfiles, changed partition-graph to not expect .pt's
    * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
 
+2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/_khmer.cc: add more CPyChecker inspired fixes
+   * lib/*.{cc,hh}: clean up includes and forward declarations
+
 2015-07-29  Luiz Irber  <khmer@luizirber.org>
 
    * Makefile: Adapt Makefile rules for py3 changes.
