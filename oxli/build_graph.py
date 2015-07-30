@@ -24,7 +24,7 @@ from khmer.khmer_args import (report_on_config, info, add_threading_args,
                               calculate_tablesize)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
-from oxli import functions as oxfuncs
+from oxli import functions
 
 
 def build_parser(parser):
@@ -52,9 +52,8 @@ def main(args):
     for fname in args.input_filenames:
         check_input_files(fname, args.force)
 
-    # if automatic arg info is given, set args automagically
-    if args.unique_kmers:
-        args = oxfuncs.check_fp_rate(args, 0.01)
+    # if optimization args are given, do optimization
+    args = functions.do_sanity_checking(args, 0.01)
 
     tablesize = calculate_tablesize(args, 'nodegraph')
     check_space_for_hashtable(args.output_filename, tablesize, args.force)
@@ -71,8 +70,8 @@ def main(args):
     print('making nodegraph', file=sys.stderr)
     htable = khmer_args.create_nodegraph(args)
 
-    oxfuncs.build_graph(filenames, htable, args.threads,
-                        not args.no_build_tagset)
+    functions.build_graph(filenames, htable, args.threads,
+                          not args.no_build_tagset)
 
     print('Total number of unique k-mers: {0}'.format(htable.n_unique_kmers()),
           file=sys.stderr)
