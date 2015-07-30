@@ -74,10 +74,10 @@ def get_parser():
 
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
     parser.add_argument('-p', '--force-paired', action='store_true',
                         help='Require that reads be interleaved')
 
@@ -120,13 +120,13 @@ def main():
         out1 = fp_out1.name
     else:
         # Use default filename created above
-        fp_out1 = get_file_writer(open(out1, 'w'), args.gzip, args.bzip)
+        fp_out1 = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
     if args.output_second:
         fp_out2 = get_file_writer(args.output_second, args.gzip, args.bzip)
         out2 = fp_out2.name
     else:
         # Use default filename created above
-        fp_out2 = get_file_writer(open(out2, 'w'), args.gzip, args.bzip)
+        fp_out2 = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
 
     counter1 = 0
     counter2 = 0

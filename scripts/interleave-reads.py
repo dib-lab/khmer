@@ -57,7 +57,7 @@ def get_parser():
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         default=sys.stdout)
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)

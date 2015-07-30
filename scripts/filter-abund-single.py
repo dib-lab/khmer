@@ -124,7 +124,7 @@ def main():
     # the filtering loop
     print('filtering', args.datafile, file=sys.stderr)
     outfile = os.path.basename(args.datafile) + '.abundfilt'
-    outfile = open(outfile, 'w')
+    outfile = open(outfile, 'wb')
     outfp = get_file_writer(outfile, args.gzip, args.bzip)
 
     tsp = ThreadedSequenceProcessor(process_fn)

@@ -71,11 +71,11 @@ def get_parser():
                         'directory if necessary')
 
     parser.add_argument('--output-paired', '-p', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         default=None, help='Output paired reads to this '
                         'file')
     parser.add_argument('--output-single', '-s', metavar="filename",
-                        type=argparse.FileType('w'), default=None,
+                        type=argparse.FileType('wb'), default=None,
                         help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
@@ -112,13 +112,13 @@ def main():
         out2 = paired_fp.name
     else:
         # Don't override, just open the default filename from above
-        paired_fp = get_file_writer(open(out2, 'w'), args.gzip, args.bzip)
+        paired_fp = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
     if args.output_single:
         single_fp = get_file_writer(args.output_single, args.gzip, args.bzip)
         out1 = args.output_single.name
     else:
         # Don't override, just open the default filename from above
-        single_fp = get_file_writer(open(out1, 'w'), args.gzip, args.bzip)
+        single_fp = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
 
     print('reading file "%s"' % infile, file=sys.stderr)
     print('outputting interleaved pairs to "%s"' % out2, file=sys.stderr)

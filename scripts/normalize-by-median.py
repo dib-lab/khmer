@@ -260,7 +260,7 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         default=None, dest='single_output_file',
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
@@ -361,7 +361,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     for filename, require_paired in files:
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
-            outfp = open(output_name, 'w')
+            outfp = open(output_name, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         # failsafe context manager in case an input file breaks

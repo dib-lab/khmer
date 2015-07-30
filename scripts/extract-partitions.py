@@ -139,8 +139,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             break
 
     if args.output_unassigned:
-        unassigned_fp = open('%s.unassigned.%s' % (args.prefix, suffix), 'w')
-
+        ofile =  open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
+        unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
     count = {}
     for filename in args.part_filenames:
         for index, read, pid in read_partition_file(filename):
@@ -217,7 +217,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     group_fps = {}
     for index in range(group_n):
         fname = '%s.group%04d.%s' % (args.prefix, index, suffix)
-        group_fp = get_file_writer(open(fname, 'w'), args.gzip,
+        group_fp = get_file_writer(open(fname, 'wb'), args.gzip,
                                    args.bzip)
         group_fps[index] = group_fp
 

@@ -85,7 +85,7 @@ def get_parser():
                         default=DEFAULT_NORMALIZE_LIMIT)
 
     parser.add_argument('-o', '--out', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '

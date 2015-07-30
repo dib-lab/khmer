@@ -70,7 +70,7 @@ def get_parser():
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         metavar="filename", default=None)
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
@@ -173,7 +173,7 @@ def main():
                                           args.bzip)
         else:
             output_file = get_file_writer(
-                open(output_filename, 'w'), args.gzip, args.bzip)
+                open(output_filename, 'wb'), args.gzip, args.bzip)
 
         for records in reads[0]:
             write_record(records[0], output_file)
@@ -184,7 +184,7 @@ def main():
             n_filename = output_filename + '.%d' % n
             print('Writing %d sequences to %s' %
                   (len(reads[n]), n_filename), file=sys.stderr)
-            output_file = get_file_writer(open(n_filename, 'w'), args.gzip,
+            output_file = get_file_writer(open(n_filename, 'wb'), args.gzip,
                                           args.bzip)
             for records in reads[n]:
                 write_record(records[0], output_file)

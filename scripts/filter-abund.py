@@ -64,7 +64,7 @@ def get_parser():
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('-o', '--out', dest='single_output_file',
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
@@ -134,7 +134,7 @@ def main():
                                     args.bzip)
         else:
             outfile = os.path.basename(infile) + '.abundfilt'
-            outfp = open(outfile, 'w')
+            outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
