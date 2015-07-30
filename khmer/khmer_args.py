@@ -106,7 +106,7 @@ def add_loadgraph_args(parser):
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved k-mer table from
-** {hashfile}, but have set k-mer table parameters.
+** {hashfile}, but have set k-mer graph size parameters.
 ** Your values for ksize, n_tables, and tablesize
 ** will be ignored.'''.format(hashfile=values))
 

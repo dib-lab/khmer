@@ -11,7 +11,7 @@ Produce the k-mer abundance distribution for the given file.
 
 % python scripts/abundance-dist-single.py <data> <histout>
 
-The script does not load a prebuilt k-mer counting table.
+The script does not load a prebuilt k-mer countgraph.
 
 Use '-h' for parameter help.
 """
