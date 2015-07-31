@@ -139,7 +139,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             break
 
     if args.output_unassigned:
-        ofile =  open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
+        ofile = open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
         unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
     count = {}
     for filename in args.part_filenames:

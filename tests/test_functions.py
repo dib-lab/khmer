@@ -30,12 +30,14 @@ def test_forward_hash():
 def test_get_file_writer_fail():
     somefile = utils.get_temp_filename("potato")
     somefile = open(somefile, "w")
-
+    stopped = True
     try:
         get_file_writer(somefile, True, True)
-        assert False, "Shouldn't get to this"
+        stopped = False
     except Exception as err:
         assert "Cannot specify both bzip and gzip" in str(err), str(err)
+
+    assert stopped, "Expected exception"
 
 
 def test_forward_hash_no_rc():

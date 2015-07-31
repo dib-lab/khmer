@@ -1,6 +1,8 @@
 2015-07-29  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: added infrastructure for doing compressed output
+   * khmer/thread_utils.py: switched threaded_sequence_processor to make use of
+   write_record
    * scripts/{count-median,extract-long-sequences,extract-paired-reads,
    extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
    interleave-reads,normalize-by-median,sample-reads-randomly,

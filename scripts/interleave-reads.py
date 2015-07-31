@@ -24,9 +24,10 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files, check_space, is_block
 from khmer.khmer_args import info
-from khmer.kfile import add_output_compression_type, get_file_writer
+from khmer.kfile import (add_output_compression_type, get_file_writer,
+                         describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
 
@@ -125,10 +126,7 @@ def main():
         write_record_pair(read1, read2, outfp)
 
     print('final: interleaved %d pairs' % counter, file=sys.stderr)
-    if outfp is not sys.stdout:
-        print('output written to', outfp.name, file=sys.stderr)
-    else:
-        print('output written to stdout', file=sys.stderr)
+    print('output written to', describe_file_handle(outfp), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

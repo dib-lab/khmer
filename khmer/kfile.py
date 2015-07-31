@@ -182,6 +182,13 @@ def is_block(fthing):
         return S_ISBLK(mode) or S_ISCHR(mode)
 
 
+def describe_file_handle(fthing):
+    if is_block(fthing):
+        return "block device"
+    else:
+        return fthing.name
+
+
 def add_output_compression_type(parser):
     """Add compression arguments to a parser object."""
     group = parser.add_mutually_exclusive_group()

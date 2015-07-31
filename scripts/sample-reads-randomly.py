@@ -96,7 +96,6 @@ def main():
 
     #
     # Figure out what the output filename is going to be
-    #
 
     if args.output_file:
         output_filename = args.output_file.name
@@ -168,12 +167,11 @@ def main():
         print('Writing %d sequences to %s' %
               (len(reads[0]), output_filename), file=sys.stderr)
 
-        if args.output_file:
-            output_file = get_file_writer(args.output_file, args.gzip,
-                                          args.bzip)
-        else:
-            output_file = get_file_writer(
-                open(output_filename, 'wb'), args.gzip, args.bzip)
+        output_file = args.output_file
+        if not output_file:
+            output_file = open(output_filename, 'wb')
+
+        output_file = get_file_writer(output_file, args.gzip, args.bzip)
 
         for records in reads[0]:
             write_record(records[0], output_file)

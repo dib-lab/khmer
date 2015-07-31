@@ -19,7 +19,7 @@ import sys
 import argparse
 import screed
 from khmer.kfile import (add_output_compression_type, get_file_writer,
-                         is_block)
+                         is_block, describe_file_handle)
 from khmer.utils import write_record
 
 
@@ -46,7 +46,6 @@ def main():
     args = get_parser().parse_args()
 
     print(('fastq from ', args.input_sequence), file=sys.stderr)
-    output_is_block = is_block(args.output)
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
     for n, record in enumerate(screed.open(args.input_sequence)):
@@ -72,10 +71,8 @@ def main():
     else:
         print('No lines dropped from file.', file=sys.stderr)
 
-    if output_is_block:
-        print('Wrote output to block device', file=sys.stderr)
-    else:
-        print('Wrote output to', args.output.name, file=sys.stderr)
+    print('Wrote output to', describe_file_handle(args.output),
+          file=sys.stderr)
 
 if __name__ == '__main__':
     main()
