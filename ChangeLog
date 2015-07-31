@@ -1,7 +1,13 @@
-2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-07-31  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added codespell as a possible
    spelling tool
+
+2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile,Makefile,lib/*.pc.in,lib/test-compile.cc: Misc debian-based
+   compatiablity changes
+   * lib/get_version.py: Add crunchbang, chmod +x
 
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
