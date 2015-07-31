@@ -101,16 +101,13 @@ def main():
     filenames = [infile]
     check_input_files(infile, args.force)
     check_space(filenames, args.force)
-    out0 = None
-    fp_out0 = None
 
     basename = os.path.basename(infile)
 
     # decide where to put output files - specific directory? or just default?
     if infile in ('/dev/stdin', '-'):
         if not (args.output_first and args.output_second) or \
-           (args.output_orphaned is not True
-            and args.output_orphaned is not False):
+           args.output_orphaned is True:
             print("Accepting input from stdin; "
                   "output filenames must be provided.", file=sys.stderr)
             sys.exit(1)
@@ -141,15 +138,15 @@ def main():
         # Use default filename created above
         fp_out2 = open(out2, 'w')
 
-    # put orphaned reads here!
+    # put orphaned reads here, if -0!
     allow_orphans = False
-    if args.output_orphaned is not True and args.output_orphaned is not False:
-        fp_out0 = args.output_orphaned
-        out0 = fp_out0.name
+    if args.output_orphaned:
         allow_orphans = True
-    elif args.output_orphaned is True:
-        fp_out0 = open(out0, 'w')
-        allow_orphans = True
+        if args.output_orphaned is not True: # filename specified?
+            fp_out0 = args.output_orphaned
+            out0 = fp_out0.name
+        else:
+            fp_out0 = open(out0, 'w')
 
     counter1 = 0
     counter2 = 0
