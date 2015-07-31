@@ -64,8 +64,6 @@ def get_parser():
                         metavar="FORMAT", choices=[str('json'), str('tsv')],
                         help="What format should the machine readable run "
                         "summary be in? (json or tsv, disabled by default)")
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers to stderr")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -135,10 +133,9 @@ def main():
         total_num_reads += rparser.num_reads
 
     n_kmers = htable.n_unique_kmers()
-    if args.report_total_kmers:
-        print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
-        with open(base + '.info', 'a') as info_fp:
-            print('Total number of unique k-mers:', n_kmers, file=info_fp)
+    print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
+    with open(base + '.info', 'a') as info_fp:
+        print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
     print('saving', base, file=sys.stderr)
     htable.save(base)

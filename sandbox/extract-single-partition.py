@@ -11,7 +11,7 @@ from screed.fasta import fasta_iter
 
 
 def read_partition_file(fp):
-    for n, record in enumerate(fasta_iter(fp, parse_description=False)):
+    for n, record in enumerate(fasta_iter(fp)):
         name = record['name']
         name, partition_id = name.rsplit('\t', 1)
         yield n, name, int(partition_id), record['sequence']

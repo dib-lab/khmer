@@ -108,6 +108,18 @@ def test_invalid_file_warn():
         sys.stderr = save_stderr
 
 
+def test_check_valid_stdin_nowarn():
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
+    try:
+        khmer.kfile.check_valid_file_exists(["-"])
+        err = sys.stderr.getvalue()
+        assert err.count("\n") == 0, err
+    except SystemExit as e:
+        print(str(e))
+    finally:
+        sys.stderr = save_stderr
+
+
 FakeArgparseObject = collections.namedtuple('FakeArgs',
                                             ['ksize', 'n_tables',
                                              'max_tablesize',
@@ -253,9 +265,7 @@ def test_report_on_config_bad_hashtype():
     try:
         khmer_args.report_on_config(args, 'foograph')
         assert 0, "the previous statement should raise an exception"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
 
 
@@ -272,7 +282,5 @@ def test_fail_calculate_foograph_size():
     try:
         nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
         assert 0, "previous statement should fail"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)

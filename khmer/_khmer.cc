@@ -75,45 +75,6 @@ extern "C" {
     MOD_INIT(_khmer);
 }
 
-// Configure module logging.
-//#define WITH_INTERNAL_TRACING
-namespace khmer
-{
-
-namespace python
-{
-
-#ifdef WITH_INTERNAL_TRACING
-#warning "Internal tracing of Python extension module is enabled."
-static uint8_t const    _MODULE_TRACE_LEVEL = TraceLogger:: TLVL_DEBUG9;
-static void     _trace_logger(
-    uint8_t level, char const * format, ...
-)
-{
-    static FILE *   _stream_handle  = NULL;
-
-    if (NULL == _stream_handle) {
-        _stream_handle = fopen( "pymod.log", "w" );
-    }
-
-    va_list varargs;
-
-    if (_MODULE_TRACE_LEVEL <= level) {
-        va_start( varargs, format );
-        vfprintf( _stream_handle, format, varargs );
-        va_end( varargs );
-        fflush( _stream_handle );
-    }
-
-}
-#endif
-
-
-} // namespace python
-
-} // namespace khmer
-
-
 /***********************************************************************/
 
 //
@@ -525,7 +486,9 @@ static PyGetSetDef khmer_ReadParser_accessors[] = {
     {NULL, NULL, NULL, NULL, NULL} /* Sentinel */
 };
 
-static PyTypeObject khmer_ReadParser_Type = {
+static PyTypeObject khmer_ReadParser_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object")
+= {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
     "_khmer.ReadParser",                        /* tp_name */
     sizeof(khmer_ReadParser_Object),           /* tp_basicsize */
@@ -578,6 +541,10 @@ void _init_ReadParser_Type_constants()
     int result;
 
     PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ALLOW_UNPAIRED", value);
     Py_XDECREF(value);
@@ -587,6 +554,10 @@ void _init_ReadParser_Type_constants()
     }
 
     value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_IGNORE_UNPAIRED", value );
     Py_XDECREF(value);
@@ -596,6 +567,10 @@ void _init_ReadParser_Type_constants()
     }
 
     value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ERROR_ON_UNPAIRED", value);
     Py_XDECREF(value);
@@ -1470,10 +1445,17 @@ hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
 
     khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
             PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
+
+    if (subset_obj == NULL) {
+        delete subset_p;
+        return NULL;
+    }
+
     subset_obj->subset = subset_p;
 
-    return (PyObject *)subset_obj;
+    return (PyObject *) subset_obj;
 }
+
 
 static
 PyObject *
@@ -1497,12 +1479,13 @@ hashtable_merge_subset(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    khmer_KSubsetPartition_Object * subset_obj;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type, &subset_obj)) {
+    khmer_KSubsetPartition_Object * subset_obj = NULL;
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
-    SubsetPartition * subset_p;
-    subset_p = subset_obj->subset;
+
+    SubsetPartition * subset_p = subset_obj->subset;
 
     hashtable->partition->merge(subset_p);
 
@@ -1969,9 +1952,11 @@ hashtable_subset_count_partitions(khmer_KHashtable_Object * me, PyObject * args)
 {
     khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type, &subset_obj)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
+
 
     size_t n_partitions = 0, n_unassigned = 0;
     subset_obj->subset->count_partitions(n_partitions, n_unassigned);
@@ -1986,12 +1971,12 @@ hashtable_subset_partition_size_distribution(khmer_KHashtable_Object * me,
         PyObject * args)
 {
     khmer_KSubsetPartition_Object * subset_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type, &subset_obj)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
-    subset_p = subset_obj->subset;
+    SubsetPartition * subset_p = subset_obj->subset;
 
     PartitionCountDistribution d;
 
@@ -2083,12 +2068,12 @@ hashtable_save_subset_partitionmap(khmer_KHashtable_Object * me,
     const char * filename = NULL;
     khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "O!s", &khmer_KSubsetPartition_Type, &subset_obj, &filename)) {
+    if (!PyArg_ParseTuple(args, "O!s", &khmer_KSubsetPartition_Type,
+                          &subset_obj, &filename)) {
         return NULL;
     }
 
-    SubsetPartition * subset_p;
-    subset_p = subset_obj->subset;
+    SubsetPartition * subset_p = subset_obj->subset;
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -2141,10 +2126,16 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
     }
 
     khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
-           PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
+            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
+
+    if (subset_obj == NULL) {
+        delete subset_p;
+        return NULL;
+    }
+
     subset_obj->subset = subset_p;
 
-    return (PyObject*) subset_obj;
+    return (PyObject *) subset_obj;
 }
 
 static
@@ -2185,11 +2176,14 @@ hashtable__validate_subset_partitionmap(khmer_KHashtable_Object * me,
 {
     khmer_KSubsetPartition_Object * subset_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type, &subset_obj)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
+                          &subset_obj)) {
         return NULL;
     }
 
-    subset_obj->subset->_validate_pmap();
+    SubsetPartition * subset_p = subset_obj->subset;
+
+    subset_p->_validate_pmap();
 
     Py_RETURN_NONE;
 }
@@ -2729,7 +2723,7 @@ count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
 {
     khmer::CountingHash * counting = me->counting;
 
-    char * seq = NULL;
+    const char * seq = NULL;
     khmer::BoundedCounterType max_count = 0; // unsigned short int
 
     if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
@@ -4151,12 +4145,14 @@ hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
     SubsetPartition * subset_p;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
-        &counting_o, &distance, &threshold, &frequency)) {
+    if (!PyArg_ParseTuple(args, "OO!III",
+                          &subset_o,
+                          &khmer_KCountingHash_Type, &counting_o,
+                          &distance, &threshold, &frequency)) {
         return NULL;
     }
 
-    if (subset_o != Py_None) {
+    if (PyObject_TypeCheck(subset_o, &khmer_KSubsetPartition_Type)) {
         subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
     } else {
         subset_p = hashtable->partition;
@@ -4202,8 +4198,110 @@ static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
     return ret;
 }
 
+static PyObject * readaligner_align_forward(khmer_ReadAligner_Object * me,
+                                            PyObject * args)
+{
+    ReadAligner * aligner = me->aligner;
+
+    const char * read;
+
+    if (!PyArg_ParseTuple(args, "s", &read)) {
+        return NULL;
+    }
+
+    /*if (strlen(read) < (unsigned int)aligner->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }*/
+
+    Alignment * aln;
+    aln = aligner->AlignForward(read);
+
+    const char* alignment = aln->graph_alignment.c_str();
+    const char* readAlignment = aln->read_alignment.c_str();
+    PyObject * x = PyList_New(aln->covs.size());
+    for (size_t i = 0; i < aln->covs.size(); i++ ){
+      PyList_SET_ITEM(x, i, PyLong_FromLong(aln->covs[i]));
+    }
+
+    PyObject * ret = Py_BuildValue("dssOO", aln->score, alignment,
+                                   readAlignment,
+                                   (aln->truncated)? Py_True : Py_False,
+                                   x);
+    delete aln;
+    Py_DECREF(x);
+
+    return ret;
+}
+
+static PyObject* khmer_ReadAligner_get_scoring_matrix(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "dddd", matrix.trusted_match, matrix.trusted_mismatch,
+                          matrix.untrusted_match, matrix.untrusted_mismatch);
+}
+
+static PyObject* khmer_ReadAligner_get_transition_probabilities(
+    khmer_ReadAligner_Object * me, PyObject * args)
+{
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    ScoringMatrix matrix = me->aligner->getScoringMatrix();
+
+    return Py_BuildValue( "(dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd)",
+                          matrix.tsc[0], matrix.tsc[1], matrix.tsc[2],
+                          matrix.tsc[3], matrix.tsc[4], matrix.tsc[5],
+                          matrix.tsc[6], matrix.tsc[7], matrix.tsc[8],
+                          matrix.tsc[9], matrix.tsc[10], matrix.tsc[11],
+                          matrix.tsc[12], matrix.tsc[13], matrix.tsc[14],
+                          matrix.tsc[15], matrix.tsc[16], matrix.tsc[17],
+                          matrix.tsc[18], matrix.tsc[19], matrix.tsc[20],
+                          matrix.tsc[21], matrix.tsc[22], matrix.tsc[23],
+                          matrix.tsc[24], matrix.tsc[25], matrix.tsc[26],
+                          matrix.tsc[27]);
+}
+
 static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align", (PyCFunction)readaligner_align, METH_VARARGS, ""},
+    {"align_forward", (PyCFunction)readaligner_align_forward, METH_VARARGS, ""},
+    {
+        "get_scoring_matrix", (PyCFunction)khmer_ReadAligner_get_scoring_matrix,
+        METH_VARARGS,
+        "Get the scoring matrix in use.\n\n\
+Returns a tuple of floats: (trusted_match, trusted_mismatch, untrusted_match, \
+untrusted_mismatch)"
+    },
+    {
+        "get_transition_probabilities",
+        (PyCFunction)khmer_ReadAligner_get_transition_probabilities,
+        METH_VARARGS,
+        "Get the transition probabilties in use.\n\n\
+HMM state notation abbreviations:\n\
+    M_t - trusted match; M_u - untrusted match\n\
+    Ir_t - trusted read insert; Ir_u - untrusted read insert\n\
+    Ig_t - trusted graph insert; Ig_u - untrusted graph insert\n\
+\
+Returns a sparse matrix as a tuple of six tuples.\n\
+The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.\n\
+Transition are notated as 'StartState-NextState':\n\
+(\n\
+  ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),\n\
+  (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),\n\
+  (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),\n\
+  ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),\n\
+  (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),\n\
+  (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)\n\
+)"
+    },
     {NULL} /* Sentinel */
 };
 
@@ -4232,15 +4330,31 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
         khmer_KCountingHash_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
+        double scoring_matrix[] = { 0, 0, 0, 0 };
+        double * transitions = new double[28];
 
-        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHash_Type, &ch,
-                             &trusted_cov_cutoff, &bits_theta)) {
+        if(!PyArg_ParseTuple(
+                    args,
+                    "O!Hd|(dddd)((dddddd)(dddd)(dddd)(dddddd)(dddd)(dddd))",
+                    &khmer_KCountingHash_Type, &ch, &trusted_cov_cutoff,
+                    &bits_theta, &scoring_matrix[0], &scoring_matrix[1],
+                    &scoring_matrix[2], &scoring_matrix[3], &transitions[0],
+                    &transitions[1], &transitions[2], &transitions[3],
+                    &transitions[4], &transitions[5], &transitions[6],
+                    &transitions[7], &transitions[8], &transitions[9],
+                    &transitions[10], &transitions[11], &transitions[12],
+                    &transitions[13], &transitions[14], &transitions[15],
+                    &transitions[16], &transitions[17], &transitions[18],
+                    &transitions[19], &transitions[20], &transitions[21],
+                    &transitions[22], &transitions[23], &transitions[24],
+                    &transitions[25], &transitions[26], &transitions[27])) {
             Py_DECREF(self);
             return NULL;
         }
 
         self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
-                                        bits_theta);
+                                        bits_theta, scoring_matrix,
+                                        transitions);
     }
 
     return (PyObject *) self;
@@ -4266,7 +4380,7 @@ static PyTypeObject khmer_ReadAlignerType = {
     0,                          /*tp_getattro*/
     0,                          /*tp_setattro*/
     0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,         /*tp_flags*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,         /*tp_flags*/
     "ReadAligner object",           /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */

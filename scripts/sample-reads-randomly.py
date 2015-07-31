@@ -108,6 +108,10 @@ def main():
         output_filename = output_file.name
     else:
         filename = args.filenames[0]
+        if filename in ('/dev/stdin', '-'):
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
@@ -131,7 +135,7 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
 
         for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,

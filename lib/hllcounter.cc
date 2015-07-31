@@ -5,18 +5,18 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "hllcounter.hh"
-
 #include <math.h>
+#include <stdlib.h>
 #include <algorithm>
+#include <map>
 #include <numeric>
-#include <inttypes.h>
-#include <sstream>
+#include <utility>
 
+#include "hllcounter.hh"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
-#include "khmer_exception.hh"
 
 #ifdef _OPENMP
 #include <omp.h>

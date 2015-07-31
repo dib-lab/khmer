@@ -5,67 +5,24 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
-#include "hashtable.hh"
-#include "read_parsers.hh"
-#include "counting.hh"
-
-#include <algorithm>
-#include <sstream>
 #include <errno.h>
+#include <math.h>
+#include <algorithm>
+#include <deque>
+#include <fstream>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <queue>
+#include <set>
+
+#include "counting.hh"
+#include "hashtable.hh"
+#include "khmer.hh"
+#include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
-
-#ifdef WITH_INTERNAL_METRICS
-HashTablePerformanceMetrics::
-HashTablePerformanceMetrics( )
-    : IPerformanceMetrics( ),
-      clock_nsecs_norm_read( 0 ),
-      cpu_nsecs_norm_read( 0 ),
-      clock_nsecs_hash_kmer( 0 ),
-      cpu_nsecs_hash_kmer( 0 ),
-      clock_nsecs_update_tallies( 0 ),
-      cpu_nsecs_update_tallies( 0 )
-{ }
-
-
-HashTablePerformanceMetrics::
-~HashTablePerformanceMetrics( )
-{ }
-
-
-void
-HashTablePerformanceMetrics::
-accumulate_timer_deltas( uint32_t metrics_key )
-{
-
-    switch (metrics_key) {
-    case MKEY_TIME_NORM_READ:
-        clock_nsecs_norm_read +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_norm_read   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    case MKEY_TIME_HASH_KMER:
-        clock_nsecs_hash_kmer +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_hash_kmer   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    case MKEY_TIME_UPDATE_TALLIES:
-        clock_nsecs_update_tallies +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_update_tallies   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    default:
-        throw InvalidPerformanceMetricsKey( );
-    }
-
-}
-#endif
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
