@@ -31,8 +31,8 @@ standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful.
 
 Code, scripts, and documentation must have their spelling checked. 
 
-Python-based `codespell` is the preferred tool. `codespell` can be installed
-via the following::
+Python-based `codespell` can be applied to multiple files easily. `codespell` 
+can be installed via the following::
 
         mkdir ~/bin
         git clone git@github.com:lucasdemarchi/codespell.git
