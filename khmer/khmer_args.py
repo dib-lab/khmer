@@ -15,6 +15,7 @@ from argparse import _VersionAction
 
 import screed
 import khmer
+from khmer_logger import log_info
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
 from khmer.utils import print_error
@@ -241,15 +242,15 @@ def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
     import khmer
 
-    sys.stderr.write("\n")
-    sys.stderr.write("|| This is the script '%s' in khmer.\n"
-                     "|| You are running khmer version %s\n" %
-                     (scriptname, khmer.__version__,))
-    sys.stderr.write("|| You are also using screed version %s\n||\n"
-                     % screed.__version__)
+    log_info("\n")
+    log_info("|| This is the script {name} in khmer.\n"
+             "|| You are running khmer version {version}",
+             name=scriptname, version=khmer.__version__)
+    log_info("|| You are also using screed version {version}\n||",
+             version=screed.__version__)
 
-    sys.stderr.write("|| If you use this script in a publication, please "
-                     "cite EACH of the following:\n||\n")
+    log_info("|| If you use this script in a publication, please "
+             "cite EACH of the following:\n||")
 
     if algorithm_list is None:
         algorithm_list = []
@@ -257,17 +258,14 @@ def info(scriptname, algorithm_list=None):
     algorithm_list.insert(0, 'software')
 
     for alg in algorithm_list:
-        sys.stderr.write("||   * ")
-        algstr = _algorithms[alg].encode(
+        algstr = "||   * "  + _algorithms[alg].encode(
             'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
-            sys.stderr.write(algstr)
+            log_info(algstr)
         except UnicodeEncodeError:
-            sys.stderr.write(
-                algstr.encode(sys.getfilesystemencoding(), 'replace'))
-        sys.stderr.write("\n")
+            log_info(algstr.encode(sys.getfilesystemencoding(), 'replace'))
 
-    sys.stderr.write("||\n|| Please see http://khmer.readthedocs.org/en/"
-                     "latest/citations.html for details.\n\n")
+    log_info("||\n|| Please see http://khmer.readthedocs.org/en/"
+             "latest/citations.html for details.\n")
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
