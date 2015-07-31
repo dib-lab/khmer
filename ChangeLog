@@ -12,6 +12,12 @@
    to graph outfiles, changed partition-graph to not expect .pt's
    * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
 
+2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile,Makefile,lib/*.pc.in,lib/test-compile.cc: Misc debian-based
+   compatiablity changes
+   * lib/get_version.py: Add crunchbang, chmod +x
+
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * khmer/_khmer.cc: add more CPyChecker inspired fixes

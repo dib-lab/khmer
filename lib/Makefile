@@ -1,3 +1,8 @@
+# Should we use the standard system zlib and libbz2?
+
+USE_SYSTEM_ZLIB ?= false
+USE_SYSTEM_LIBBZ2 ?= false
+
 # Profile?
 # Set this variable to true if you wish to profile the codes.
 WANT_PROFILING=false
@@ -28,41 +33,56 @@ PREFIX=/usr/local
 ### NOTE: No user-serviceable parts below this line! ###
 
 INCLUDES= -I ../third-party/seqan/core/include/ 	\
-	  -I ../third-party/zlib/ 			\
-	  -I ../third-party/bzip2/ 			\
 	  -I ../third-party/smhasher/
 
-CXXFLAGS=$(INCLUDES)
-CXX_WARNING_FLAGS=-Wall
-CXX_OPTIMIZATION_FLAGS=-O3
-CXX_SHARED_LIB_FLAGS=-fPIC
-CXXFLAGS+= 				\
-	   $(CXX_WARNING_FLAGS) 	\
-	   $(CXX_OPTIMIZATION_FLAGS)	\
-	   $(CXX_SHARED_LIB_FLAGS)
+ifeq ($(USE_SYSTEM_ZLIB), false)
+INCLUDES += -I ../third-party/zlib/
+endif
 
-CFLAGS=$(INCLUDES)
-C_WARNING_FLAGS=-Wall
-C_OPTIMIZATION_FLAGS=-O3
-C_SHARED_LIB_FLAGS=-fPIC
-CFLAGS+= $(C_WARNING_FLAGS) $(C_OPTIMIZATION_FLAGS) $(C_SHARED_LIB_FLAGS)
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
+INCLUDES += -I ../third-party/bzip2/
+endif
 
-LIBS=
+# Warnings in common to C and C++
+WARNINGS=-Wall
+
+# Flags in common to C and C++
+COMMON_FLAGS=-O3 -fPIC
+SEQAN_FLAGS=-DSEQAN_HAS_ZLIB=1 -DSEQAN_HAS_BZIP2=1
+
+# Base C/CXXFLAGS
+CPPFLAGS ?=
+CPPFLAGS += $(SEQAN_FLAGS)
+
+CXXFLAGS ?=
+CXXFLAGS += $(COMMON_FLAGS) $(WARNINGS)
+CXXFLAGS += -Wstrict-null-sentinel
+CXXFLAGS += $(INCLUDES) $(CPPFLAGS)
+
+CFLAGS	 ?=
+CXXFLAGS += $(COMMON_FLAGS) $(WARNINGS)
+CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
+CFLAGS   += $(INCLUDES) $(CPPFLAGS)
+
+LDFLAGS  ?=
+ifneq ($(USE_SYSTEM_ZLIB), false)
+LDFLAGS  += -lz
+endif
+
+ifneq ($(USE_SYSTEM_LIBBZ2), false)
+LDFLAGS  += -lbz2
+endif
 
 ifeq ($(WANT_DEBUGGING), true)
-CXX_DEBUG_FLAGS=-g
-CXXFLAGS+= $(CXX_DEBUG_FLAGS)
-CFLAGS+= $(CXX_DEBUG_FLAGS)
-else
-CXX_DEBUG_FLAGS=
+DEBUG_FLAGS=-g
+CXXFLAGS += $(DEBUG_FLAGS)
+CFLAGS   += $(DEBUG_FLAGS)
 endif
 
 ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
 DEFINE_KHMER_EXTRA_SANITY_CHECKS=-DKHMER_EXTRA_SANITY_CHECKS
-CXXFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
-CFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
-else
-DEFINE_KHMER_EXTRA_SANITY_CHECKS=
+CXXFLAGS += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
+CFLAGS   += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
 endif
 
 ifeq ($(WANT_PROFILING), true)
@@ -70,15 +90,15 @@ ifeq ($(PROFILER_OF_CHOICE), TAU)
 CXX=tau_cxx.sh
 endif
 ifeq ($(PROFILER_OF_CHOICE), gprof)
-PROFILING_LIBS=-pg
-CXXFLAGS+= -pg
-LIBS+= $(PROFILING_LIBS)
+CXXFLAGS += -pg
+CFLAGS   += -pg
+LDFLAGS  += -pg
 endif
 endif
 
 # Place POSIX threads last in linking order, if needed.
 ifneq ($(shell uname), Linux)
-LIBS+= -pthread
+LDFLAGS  += -pthread
 endif
 
 
@@ -88,47 +108,52 @@ HAVE_OPENMP=$(shell 						\
 	      rm -f chkomp)
 
 ifeq ($(HAVE_OPENMP), true)
-	CFLAGS += -fopenmp
-	CXXFLAGS += -fopenmp
+CXXFLAGS +=-fopenmp
+CFLAGS   +=-fopenmp
 endif
 
-VERSION = $(shell python get_version.py)
+ifneq ($(PACKAGE_VERSION),)
+VERSION = $(PACKAGE_VERSION)
+else
+VERSION = $(shell ./get_version.py)
+endif
 
-LIBVERSION = $(shell python get_version.py | sed -e 's/^\([^-]*\)-.*/\1/')
-LIBKHMERSO=libkhmer.so.$(LIBVERSION)
+MAJOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\1/')
+MINOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
 
-CXXFLAGS+= -DVERSION=$(VERSION)
+LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
+
+ifeq ($(shell uname), Darwin)
+SHARED_EXT   = dylib
+SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) -compatibility_version $(MAJOR_VERSION) -current_version $(LIB_VERSION)
+else
+SHARED_EXT   = so
+SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME_FLAGS = -Wl,-soname=$(SONAME)
+endif
+
+# The ABI version of liboxli
+LIBVERSION = 1
+LIBKHMERSO=liboxli.$(SHARED_EXT).$(LIB_VERSION)
+
+CXXFLAGS += -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
-CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CXXFLAGS += -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CFLAGS   += -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 export CXX
 export CFLAGS
 export CXXFLAGS
-export LIBS
+export LDFLAGS
 export VERSION
 
 
 #### Third party dependencies ####
-# ZLIB
+# ZLIB, use .lo not .o, so we get -fPIC and other library-related flags
 ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
-	adler32.o \
-	crc32.o \
-	deflate.o \
-	infback.o \
-	inffast.o \
-	inflate.o \
-	inftrees.o \
-	trees.o \
-	zutil.o \
-	compress.o \
-	uncompr.o \
-	gzclose.o \
-	gzlib.o \
-	gzread.o \
-	gzwrite.o
-ZLIB_PIC_OBJS_BASE=\
 	adler32.lo \
 	crc32.lo \
 	deflate.lo \
@@ -146,7 +171,6 @@ ZLIB_PIC_OBJS_BASE=\
 	gzwrite.lo
 
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
-ZLIB_PIC_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_PIC_OBJS_BASE))
 
 # BZ2
 BZIP2_DIR=../third-party/bzip2
@@ -162,7 +186,7 @@ BZIP2_OBJS_BASE= \
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 
-#### khmer proper below here ####
+#### oxli proper below here ####
 
 LIBKHMER_OBJS= \
 	counting.o \
@@ -174,9 +198,22 @@ LIBKHMER_OBJS= \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
-	murmur3.o \
-	$(BZIP2_OBJS) \
-	$(ZLIB_PIC_OBJS)
+	murmur3.o
+
+PRECOMILE_OBJS ?=
+PRECLEAN_TARGS ?=
+
+ifeq ($(USE_SYSTEM_ZLIB), false)
+LIBKHMER_OBJS  += $(ZLIB_OBJS)
+PRECOMILE_OBJS += $(ZLIB_OBJS)
+PRECLEAN_TARGS += zlibclean
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
+LIBKHMER_OBJS  += $(BZIP2_OBJS)
+PRECOMILE_OBJS += $(BZIP2_OBJS)
+PRECLEAN_TARGS += libbz2clean
+endif
 
 KHMER_HEADERS= \
 	counting.hh \
@@ -191,37 +228,34 @@ KHMER_HEADERS= \
 	read_parsers.hh \
 	subset.hh \
 
-TEST_PROGS = test-Colors test-read-aligner test-compile
-
 # START OF RULES #
 
 # The all rule comes first!
-all: $(LIBKHMERSO) libkhmer.a khmer.pc
+all: $(LIBKHMERSO) liboxli.a oxli.pc
 
-clean:
-	rm -f *.o *.a *.so* khmer.pc $(TEST_PROGS)
+zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
+libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
-test: $(TEST_PROGS)
+clean: $(PRECLEAN_TARGS)
+	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
 
-install: $(LIBKHMERSO) libkhmer.a khmer.pc $(KHMER_HEADERS)
-	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/
-	cp -r $(KHMER_HEADERS) \
-		../third-party/smhasher/MurmurHash3.h \
-		$(PREFIX)/include/
-	cp khmer.pc $(PREFIX)/lib/pkgconfig/
-	cp $(LIBKHMERSO) libkhmer.a $(PREFIX)/lib
-	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/libkhmer.so
+install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
+	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
+	cp -r $(KHMER_HEADERS) 				\
+		../third-party/smhasher/MurmurHash3.h 	\
+		$(PREFIX)/include/oxli/
+	cp oxli.pc $(PREFIX)/lib/pkgconfig/
+	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib
+	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
+	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
-khmer.pc: khmer.pc.in
+oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
-
-$(ZLIB_PIC_OBJS):
-	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_PIC_OBJS_BASE))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
@@ -230,17 +264,14 @@ $(BZIP2_OBJS):
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o: %.cc $(ZLIB_OBJS) $(ZLIB_PIC_OBJS) $(BZIP2_OBJS) $(KHMER_HEADERS)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+%.o: %.cc $(PRECOMILE_OBJS) $(KHMER_HEADERS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $(LIBKHMER_OBJS)
-	ln -sf $(LIBKHMERSO) libkhmer.so
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
+	ln -sf $(LIBKHMERSO) $(SONAME)
+	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
-libkhmer.a: $(LIBKHMER_OBJS)
-	ar rcs $@ $(LIBKHMER_OBJS)
+liboxli.a: $(LIBKHMER_OBJS)
+	ar rcs $@ $^
 	ranlib $@
-
-# catch-all rule for test drivers
-test-%: test-%.cc libkhmer.a
-	$(CXX) $(CXXFLAGS) -I . -o $@ $< libkhmer.a
