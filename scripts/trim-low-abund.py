@@ -28,7 +28,7 @@ from screed import Record
 from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+                              report_on_config, calculate_tablesize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -126,7 +126,14 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        tablesize = calculate_tablesize(args, 'countgraph')
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
+
+    if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
+       and not args.out:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
 
     if args.loadtable:
         print('loading countgraph from', args.loadtable, file=sys.stderr)
@@ -164,7 +171,7 @@ def main():
 
         pass2list.append((filename, pass2filename, trimfp))
 
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
 
         save_pass2 = 0
@@ -260,8 +267,7 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        for n, read in enumerate(screed.open(pass2filename,
-                                             parse_description=False)):
+        for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
                 print('... x 2', n, pass2filename,
                       written_reads, written_bp, file=sys.stderr)
@@ -301,14 +307,18 @@ def main():
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print('read %d reads, %d bp' % (n_reads, n_bp,))
-    print('wrote %d reads, %d bp' % (written_reads, written_bp,))
+    print('read %d reads, %d bp' % (n_reads, n_bp,), file=sys.stderr)
+    print('wrote %d reads, %d bp' % (written_reads, written_bp,),
+          file=sys.stderr)
     print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
-                                                      n_passes))
+                                                      n_passes),
+          file=sys.stderr)
     print('removed %d reads and trimmed %d reads (%.2f%%)' %
-          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed))
+          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed),
+          file=sys.stderr)
     print('trimmed or removed %.2f%% of bases (%d total)' %
-          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp),
+          file=sys.stderr)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads

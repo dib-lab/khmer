@@ -5,10 +5,18 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "labelhash.hh"
-
-#include <sstream>
 #include <errno.h>
+#include <string.h>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <set>
+
+#include "hashbits.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "labelhash.hh"
+#include "read_parsers.hh"
+#include "subset.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 
@@ -225,7 +233,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     // TODO: MAKE THREADSAFE!
 
                     if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
-printdbg(tag was not labeled: adding to labels...)
+                        printdbg(tag was not labeled: adding to labels...)
                         //ACQUIRE_TAG_COLORS_SPIN_LOCK
                         link_tag_and_label(kmer, current_label);
                         //RELEASE_TAG_COLORS_SPIN_LOCK
@@ -251,7 +259,7 @@ printdbg(tag was not labeled: adding to labels...)
 #endif
             //
             if (since >= graph->_tag_density) {
-printdbg(exceeded tag density: drop a tag and label --
+                printdbg(exceeded tag density: drop a tag and label --
                          getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
@@ -272,7 +280,7 @@ printdbg(exceeded tag density: drop a tag and label --
             }
             printdbg(moving to next iter)
         } // iteration over kmers
-printdbg(finished iteration: dropping last tag)
+    printdbg(finished iteration: dropping last tag)
     if (since >= graph->_tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
         graph->all_tags.insert(kmer);	// insert the last k-mer, too.

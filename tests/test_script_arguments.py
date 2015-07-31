@@ -46,14 +46,16 @@ def test_check_space():
 
 
 def test_check_tablespace():
+    outfile = utils.get_test_data('truncated.fq')
     save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(args, 'countgraph', force=False,
-                                              _testhook_free_space=0)
+        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
+        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
+                                              False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
         print(str(e))
@@ -78,12 +80,15 @@ def test_check_space_force():
 def test_check_tablespace_force():
     save_stderr, sys.stderr = sys.stderr, io.StringIO()
 
+    outfile = utils.get_test_data('truncated')
+
     parser = khmer_args.build_counting_args()
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        khmer.kfile.check_space_for_hashtable(args, 'countgraph', True,
-                                              _testhook_free_space=0)
+        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
+        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
+                                              True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
         print(str(e))
@@ -97,6 +102,18 @@ def test_invalid_file_warn():
         khmer.kfile.check_valid_file_exists(["nonexistent", "nonexistent2"])
         assert sys.stderr.getvalue().count("\n") == 2,  \
             "Should produce two warning lines"
+    except SystemExit as e:
+        print(str(e))
+    finally:
+        sys.stderr = save_stderr
+
+
+def test_check_valid_stdin_nowarn():
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
+    try:
+        khmer.kfile.check_valid_file_exists(["-"])
+        err = sys.stderr.getvalue()
+        assert err.count("\n") == 0, err
     except SystemExit as e:
         print(str(e))
     finally:
@@ -248,9 +265,7 @@ def test_report_on_config_bad_hashtype():
     try:
         khmer_args.report_on_config(args, 'foograph')
         assert 0, "the previous statement should raise an exception"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
 
 
@@ -265,9 +280,7 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     try:
-        nodegraph = khmer_args._calculate_tablesize(args, 'foograph')
+        nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
         assert 0, "previous statement should fail"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)

@@ -26,7 +26,7 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
-                              add_threading_args, info)
+                              add_threading_args, info, calculate_tablesize)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_hashtable)
 #
@@ -58,8 +58,6 @@ def get_parser():
                         "k-mer counting table to")
     parser.add_argument('datafile', metavar='input_sequence_filename',
                         help="FAST[AQ] sequence file to trim")
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers to stderr")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -71,7 +69,9 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        tablesize = calculate_tablesize(args, 'countgraph')
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
+
     report_on_config(args)
 
     print('making countgraph', file=sys.stderr)
@@ -93,9 +93,8 @@ def main():
     for _ in threads:
         _.join()
 
-    if args.report_total_kmers:
-        print('Total number of unique k-mers: {0}'.format(
-            htable.n_unique_kmers()), file=sys.stderr)
+    print('Total number of unique k-mers: {0}'.format(
+        htable.n_unique_kmers()), file=sys.stderr)
 
     fp_rate = khmer.calc_expected_collisions(htable, args.force)
     print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)

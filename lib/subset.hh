@@ -8,13 +8,17 @@
 #ifndef SUBSET_HH
 #define SUBSET_HH
 
+#include <stddef.h>
+#include <queue>
+#include <string>
+
 #include "khmer.hh"
 
 namespace khmer
 {
 class CountingHash;
-class Hashtable;
 class Hashbits;
+class Hashtable;
 
 struct pre_partition_info {
     HashIntoType kmer;
@@ -40,11 +44,13 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    explicit SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht) {
+    explicit SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
+    {
         ;
     };
 
-    ~SubsetPartition() {
+    ~SubsetPartition()
+    {
         _clear_all_partitions();
     }
 
@@ -56,7 +62,8 @@ public:
     PartitionID get_partition_id(std::string kmer_s);
     PartitionID get_partition_id(HashIntoType kmer);
 
-    PartitionID * get_new_partition() {
+    PartitionID * get_new_partition()
+    {
         PartitionID* pp = new PartitionID(next_partition_id);
         next_partition_id++;
         return pp;

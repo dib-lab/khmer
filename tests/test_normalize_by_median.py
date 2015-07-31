@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
-#
+# pylint: disable=missing-docstring,invalid-name,unused-variable
 
 import os
 import shutil
@@ -30,6 +30,20 @@ def test_normalize_by_median_indent():
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
     assert os.path.exists(outfile)
+
+
+def test_normalize_by_median_empty_file():
+    infile = utils.get_temp_filename('empty')
+    shutil.copyfile(utils.get_test_data('empty-file'), infile)
+    script = 'normalize-by-median.py'
+    in_dir = os.path.dirname(infile)
+
+    args = [infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'WARNING:' in err, err
+    assert 'is empty' in err, err
+    assert 'SKIPPED' in err, err
 
 
 def test_normalize_by_median():
@@ -65,12 +79,9 @@ def test_normalize_by_median_unpaired_final_read():
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', '-p', infile]
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-        raise Exception("Shouldn't get to this")
-    except AssertionError as e:
-        out = str(e)
-        assert "ERROR: Unpaired reads when require_paired" in out, out
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "ERROR: Unpaired reads when require_paired" in err, err
 
 
 def test_normalize_by_median_sanity_check_0():
@@ -80,13 +91,10 @@ def test_normalize_by_median_sanity_check_0():
     shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-U', '1024', '--max-mem', '60',  infile]
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-        raise Exception("Shouldn't get to this")
-    except AssertionError as e:
-        out = str(e)
-        assert "recommended false positive ceiling of 0.1!" in out, out
+    args = ['-U', '1024', '--max-mem', '60', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "recommended false positive ceiling of 0.1!" in err, err
 
 
 def test_normalize_by_median_sanity_check_1():
@@ -97,11 +105,9 @@ def test_normalize_by_median_sanity_check_1():
 
     script = 'normalize-by-median.py'
     args = ['-U', '83', '--max-tablesize', '17', infile]
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-    except AssertionError as e:
-        out = str(e)
-        assert "Warning: The given tablesize is too small!" in out, out
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "Warning: The given tablesize is too small!" in err, err
 
 
 def test_normalize_by_median_sanity_check_2():
@@ -126,12 +132,9 @@ def test_normalize_by_median_unforced_badfile():
     in_dir = os.path.dirname(infile)
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', infile]
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-        raise Exception("Shouldn't get to this")
-    except AssertionError as e:
-        out = str(e)
-        assert "ERROR: [Errno 2] No such file or directory:" in out, out
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "ERROR: [Errno 2] No such file or directory:" in err, err
 
     if os.path.exists(outfile):
         assert False, '.keep file should have been removed: '
@@ -147,12 +150,9 @@ def test_normalize_by_median_contradictory_args():
     script = 'normalize-by-median.py'
     args = ['-C', '1', '-k', '17', '--force-single', '-p', '-R',
             outfile, infile]
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-        raise Exception("Shouldn't get to this")
-    except AssertionError as e:
-        out = str(e)
-        assert "cannot both be set" in out, out
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "cannot both be set" in err, err
 
 
 def test_normalize_by_median_stdout_3():
@@ -196,8 +196,62 @@ def test_normalize_by_median_known_good():
         assert False
 
 
-@attr('huge')
 def test_normalize_by_median_report_fp():
+    # this tests basic reporting of diginorm stats => report.out, including
+    # a test of aggregate stats for two input files.
+
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile2 = utils.get_temp_filename('test2.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    script = 'normalize-by-median.py'
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile, infile2]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile)
+    report = open(outfile, 'r')
+    line = report.readline().strip()
+    assert line == 'total,kept,f_kept', line
+    line = report.readline().strip()
+    assert line == '1001,1,0.000999', line
+    line = report.readline().strip()
+    assert line == '2002,1,0.0004995', line
+
+
+def test_normalize_by_median_report_fp_hifreq():
+    # this tests high-frequency reporting of diginorm stats for a single
+    # file => report.out.
+
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('report.out')
+
+    script = 'normalize-by-median.py'
+    args = ['-C', '1', '-k', '17', '-R', outfile, infile,
+            '--report-frequency', '100']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile)
+    report = open(outfile, 'r')
+    line = report.readline().strip()
+    assert line == 'total,kept,f_kept', line
+    line = report.readline().strip()
+    assert line == '100,1,0.01', line
+    line = report.readline().strip()
+    assert line == '200,1,0.005', line
+
+
+@attr('huge')
+def test_normalize_by_median_report_fp_huge():
+    # this tests reporting of diginorm stats => report.out for a large
+    # file, with the default reporting interval of once every 100k.
+
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
@@ -210,8 +264,9 @@ def test_normalize_by_median_report_fp():
 
     assert "fp rate estimated to be 0.623" in err, err
     report = open(outfile, 'r')
+    line = report.readline()            # skip header
     line = report.readline()
-    assert "100000 25261 0.25261" in line, line
+    assert "100000,25261,0.2526" in line, line
 
 
 def test_normalize_by_median_unpaired_and_paired():
@@ -248,12 +303,12 @@ def test_normalize_by_median_count_kmers_PE():
     args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
-    assert 'kept 1 of 2 or 50%' in err, err
+    assert 'kept 1 of 2 or 50.0%' in err, err
 
     args = ['-C', CUTOFF, '-k', '17', '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 99' in err, err
-    assert 'kept 2 of 2 or 100%' in err, err
+    assert 'kept 2 of 2 or 100.0%' in err, err
 
 
 def test_normalize_by_median_double_file_name():
@@ -265,10 +320,21 @@ def test_normalize_by_median_double_file_name():
     script = 'normalize-by-median.py'
     args = [utils.get_test_data('test-abund-read-2.fa'), infile]
 
-    try:
-        (status, out, err) = utils.runscript(script, args, in_dir)
-    except AssertionError as e:
-        assert "Duplicate filename--Cannot handle this!" in str(e), str(e)
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "Duplicate filename--Cannot handle this!" in err, err
+
+
+def test_normalize_by_median_stdin_no_out():
+    infile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ["-"]
+
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
+    assert "Accepting input from stdin; output filename" in err, err
 
 
 def test_normalize_by_median_overwrite():
@@ -371,7 +437,7 @@ def test_normalize_by_median_paired_fq():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
 
-    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    names = [r.name for r in screed.open(outfile)]
     assert len(names) == 6, names
     assert '895:1:37:17593:9954 1::FOO' in names, names
     assert '895:1:37:17593:9954 2::FOO' in names, names
@@ -387,7 +453,8 @@ def test_normalize_by_median_impaired():
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
-    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status != 0
     assert 'ERROR: Unpaired reads ' in err, err
 
 
@@ -462,6 +529,7 @@ def test_normalize_by_median_emptycountingtable():
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '--loadtable', infile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status != 0
     assert 'ValueError' in err, (status, out, err)
 
 
@@ -476,10 +544,7 @@ def test_normalize_by_median_fpr():
     args = ['-f', '-k 17', '-x ' + str(MAX_TABLESIZE_PARAM), infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-
-    print(out)
-    print(err)
-
+    assert status != 0
     assert os.path.exists(infile + '.keep'), infile
     assert '** ERROR: the graph structure is too small' in err, err
 
@@ -495,7 +560,7 @@ def write_by_chunks(infile, outfile, CHUNKSIZE=8192):
     ofile.close()
 
 
-def test_normalize_by_median_streaming():
+def test_normalize_by_median_streaming_0():
     CUTOFF = '20'
 
     infile = utils.get_test_data('100-reads.fq.gz')
@@ -520,6 +585,32 @@ def test_normalize_by_median_streaming():
     with open(outfile) as fp:
         linecount = sum(1 for _ in fp)
     assert linecount == 400
+
+
+def test_normalize_by_median_streaming_1():
+    CUTOFF = '20'
+
+    infile = utils.get_test_data('test-filter-abund-Ns.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    outfile = utils.get_temp_filename('outfile')
+
+    # Use a fifo to copy stdout to a file for checking
+    os.mkfifo(fifo)
+    thread = threading.Thread(target=write_by_chunks, args=(infile, fifo))
+    thread.start()
+
+    # Execute diginorm
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '17', '-o', outfile, fifo]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    # Merge the thread
+    thread.join()
+
+    assert os.path.exists(outfile), outfile
+    assert 'Total number of unique k-mers: 98' in err, err
+    assert 'fifo is empty' not in err, err
 
 
 def test_diginorm_basic_functionality_1():

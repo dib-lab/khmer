@@ -24,7 +24,7 @@ import argparse
 import khmer
 import sys
 from khmer.khmer_args import (add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 
 # Debugging Support
 import re
@@ -110,8 +110,6 @@ def main():
     filenames = [basename + '.pt', basename + '.tagset']
     for _ in filenames:
         check_input_files(_, args.force)
-
-    check_space(filenames, args.force)
 
     print('--', file=sys.stderr)
     print('SUBSET SIZE', args.subset_size, file=sys.stderr)

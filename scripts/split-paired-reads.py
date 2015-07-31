@@ -77,13 +77,13 @@ def get_parser():
                         nargs='?', default=False, const=True, 
                         help='Allow "orphaned" reads and extract them to ' + \
                         'this file',
-                        type=argparse.FileType('w'))
+                        type=argparse.FileType('wb'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
 
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
@@ -103,26 +103,29 @@ def main():
     check_space(filenames, args.force)
     out0 = None
     fp_out0 = None
+
+    basename = os.path.basename(infile)
+
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin' or infile == '-':
-        if not (args.output_first and args.output_second
-                and args.output_orphaned is not True
-                and args.output_orphaned is not False):
-            print >>sys.stderr, ("Accepting input from stdin; "
-                                 "output filenames must be provided.")
+    if infile in ('/dev/stdin', '-'):
+        if not (args.output_first and args.output_second) or \
+           (args.output_orphaned is not True
+            and args.output_orphaned is not False):
+            print("Accepting input from stdin; "
+                  "output filenames must be provided.", file=sys.stderr)
             sys.exit(1)
     elif args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
-        out1 = os.path.join(args.output_directory, os.path.basename(infile) + '.1')
-        out2 = os.path.join(args.output_directory, os.path.basename(infile) + '.2')
+        out1 = os.path.join(args.output_directory, basename + '.1')
+        out2 = os.path.join(args.output_directory, basename + '.2')
         if args.output_orphaned is True:
-            out0 = os.path.join(args.output_directory, os.path.basename(infile) + '.0')
+            out0 = os.path.join(args.output_directory, basename + '.0')
     else:
-        out1 = os.path.basename(infile) + '.1'
-        out2 = os.path.basename(infile) + '.2'
+        out1 = basename + '.1'
+        out2 = basename + '.2'
         if args.output_orphaned is True:
-            out0 = os.path.basename(infile) + '.0'
+            out0 = basename + '.0'
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
@@ -153,7 +156,7 @@ def main():
     counter3 = 0
     index = None
 
-    screed_iter = screed.open(infile, parse_description=False)
+    screed_iter = screed.open(infile)
 
     # walk through all the reads in broken-paired mode.
     paired_iter = broken_paired_reader(screed_iter)

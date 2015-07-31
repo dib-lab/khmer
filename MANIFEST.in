@@ -10,6 +10,7 @@ include third-party/zlib/zconf.h.in third-party/zlib/zlib.pc.in
 exclude third-party/zlib/Makefile third-party/zlib/zconf.h
 recursive-include scripts filter-abund.xml normalize-by-median.xml README.txt
 graft tests
+include scripts/oxli
 global-exclude *.orig
 global-exclude *.pyc
 

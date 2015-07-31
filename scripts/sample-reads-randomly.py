@@ -27,7 +27,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.khmer_args import info
 from khmer.utils import write_record, broken_paired_reader
 
@@ -85,8 +85,6 @@ def main():
     for _ in args.filenames:
         check_input_files(_, args.force)
 
-    check_space(args.filenames, args.force)
-
     # seed the random number generator?
     if args.random_seed:
         random.seed(args.random_seed)
@@ -104,10 +102,16 @@ def main():
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             if not args.force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
         output_filename = output_file.name
     else:
         filename = args.filenames[0]
+        if filename in ('/dev/stdin', '-'):
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
@@ -131,7 +135,7 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
 
         for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,

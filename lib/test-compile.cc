@@ -6,9 +6,10 @@
 //
 
 // Author:  Kevin Murray, spam@kdmurray.id.au
-// This file is used to test compilation with libkhmer.a/libkhmer.so
+// This file is used to test compilation with libkhmer.a/libkhmer.so, after
+// installation
 
-#include  <counting.hh>
+#include <oxli/counting.hh>
 
 int main()
 {

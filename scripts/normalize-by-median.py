@@ -5,7 +5,7 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=missing-docstring
 """
 Eliminate surplus reads.
 
@@ -28,70 +28,109 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+                              report_on_config, info, calculate_tablesize)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
-from khmer.utils import write_record, check_is_pair, broken_paired_reader
+from khmer.utils import write_record, broken_paired_reader
 
 
 DEFAULT_DESIRED_COVERAGE = 20
 
 
-def WithDiagnostics(ifilename, norm, reader, fp):
+class WithDiagnostics(object):
     """
-    Generator/context manager to do boilerplate output of statistics using a
-    Normalizer object.
+    Generator/context manager to do boilerplate output of statistics.
+
+    uses a Normalizer object.
     """
 
-    index = 0
+    def __init__(self, norm, report_fp=None, report_frequency=100000):
+        self.norm = norm
+        self.report_fp = report_fp
+        if report_fp:
+            report_fp.write('total,kept,f_kept\n')
 
-    # per read diagnostic output
-    for index, record in enumerate(norm(reader)):
+        self.total = 0
+        self.kept = 0
 
-        if norm.total % 100000 == 0:
-            print('... kept {kept} of {total} or {perc:2}% so far'
-                  .format(kept=norm.total - norm.discarded,
-                          total=norm.total,
-                          perc=int(100. - norm.discarded /
-                                   float(norm.total) * 100.)),
+        self.report_frequency = report_frequency
+        self.next_report_at = self.report_frequency
+        self.last_report_at = self.report_frequency
+
+    def __call__(self, reader, ifilename):
+        norm = self.norm
+        report_fp = self.report_fp
+
+        reads_start = self.total
+        total = self.total
+        kept = self.kept
+
+        try:
+            for _, is_paired, read0, read1 in reader:
+                if is_paired:
+                    total += 2
+                else:
+                    total += 1
+
+                # do diginorm
+                for record in norm(is_paired, read0, read1):
+                    kept += 1
+                    yield record
+
+                # report!
+                if total >= self.next_report_at:
+                    self.next_report_at += self.report_frequency
+                    self.last_report_at = total
+
+                    perc_kept = kept / float(total)
+
+                    print('... kept {kept} of {tot} or {perc_kept:.1%} so far'
+                          .format(kept=kept, tot=total, perc_kept=perc_kept),
+                          file=sys.stderr)
+                    print('... in file ' + ifilename, file=sys.stderr)
+
+                    if report_fp:
+                        print("{total},{kept},{f_kept:.4}"
+                              .format(total=total, f_kept=perc_kept,
+                                      kept=kept),
+                              file=report_fp)
+                        report_fp.flush()
+        finally:
+            self.total = total
+            self.kept = kept
+
+        # per file diagnostic output
+        if total == reads_start:
+            print('SKIPPED empty file ' + ifilename, file=sys.stderr)
+        else:
+            perc_kept = kept / float(total)
+
+            print('DONE with {inp}; kept {kept} of {total} or {perc_kept:.1%}'
+                  .format(inp=ifilename, kept=kept, total=total,
+                          perc_kept=perc_kept),
                   file=sys.stderr)
 
-            print('... in file ' + ifilename, file=sys.stderr)
+        # make sure there's at least one report per file, at the end of each
+        # file.
+        if report_fp and total != self.last_report_at:
+            perc_kept = kept / float(total)
 
-        yield record
-
-    # per file diagnostic output
-    if norm.total == 0:
-        print('SKIPPED empty file ' + ifilename, file=sys.stderr)
-    else:
-        print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
-              .format(inp=ifilename, kept=norm.total - norm.discarded,
-                      total=norm.total, perc=int(100. - norm.discarded /
-                                                 float(norm.total) * 100.)),
-              file=sys.stderr)
-
-    if fp:
-        print("{total} {kept} {discarded}"
-              .format(total=norm.total, kept=norm.total - norm.discarded,
-                      discarded=1. - (norm.discarded / float(norm.total))),
-              file=fp)
-        fp.flush()
+            print("{total},{kept},{f_kept:.4}"
+                  .format(total=total, f_kept=perc_kept, kept=kept),
+                  file=report_fp)
+            report_fp.flush()
 
 
 class Normalizer(object):
-    """
-    Digital normalization algorithm.
-    """
+
+    """Digital normalization algorithm."""
 
     def __init__(self, desired_coverage, htable):
         self.htable = htable
         self.desired_coverage = desired_coverage
 
-        self.total = 0
-        self.discarded = 0
-
-    def __call__(self, reader):
+    def __call__(self, is_paired, read0, read1):
         """
         Actually does digital normalization - the core algorithm.
 
@@ -101,41 +140,30 @@ class Normalizer(object):
         * if any read's median k-mer count is below desired coverage, keep all;
         * consume and yield kept reads.
         """
-
         desired_coverage = self.desired_coverage
 
-        for index, is_paired, read0, read1 in reader:
-            passed_filter = False
+        passed_filter = False
 
-            self.total += 1
+        batch = []
+        batch.append(read0)
+        if read1 is not None:
+            batch.append(read1)
 
-            if is_paired:
-                self.total += 1
+        for record in batch:
+            seq = record.sequence.replace('N', 'A')
+            if not self.htable.median_at_least(seq, desired_coverage):
+                passed_filter = True
 
-            batch = []
-            batch.append(read0)
-            if read1 is not None:
-                batch.append(read1)
-
+        if passed_filter:
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                if not self.htable.median_at_least(seq, desired_coverage):
-                    passed_filter = True
-
-            if passed_filter:
-                for record in batch:
-                    seq = record.sequence.replace('N', 'A')
-                    self.htable.consume(seq)
-                    yield record
-            else:
-                self.discarded += len(batch)
+                self.htable.consume(seq)
+                yield record
 
 
 @contextmanager
-def CatchIOErrors(ifile, out, single_out, force, corrupt_files):
-    """
-    Context manager to do boilerplate handling of IOErrors.
-    """
+def catch_io_errors(ifile, out, single_out, force, corrupt_files):
+    """Context manager to do boilerplate handling of IOErrors."""
     try:
         yield
     except (IOError, OSError, ValueError) as error:
@@ -172,10 +200,7 @@ def get_parser():
 
     With :option:`-s`/:option:`--savetable`, the k-mer counting table
     will be saved to the specified file after all sequences have been
-    processed. With :option:`-d`, the k-mer counting table will be
-    saved every d files for multifile runs; if :option:`-s` is set,
-    the specified name will be used, and if not, the name `backup.ct`
-    will be used.  :option:`-l`/:option:`--loadtable` will load the
+    processed. :option:`-l`/:option:`--loadtable` will load the
     specified k-mer counting table before processing the specified
     files.  Note that these tables are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
@@ -225,10 +250,13 @@ def get_parser():
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='report_filename', type=argparse.FileType('w'))
+    parser.add_argument('--report-frequency',
+                        metavar='report_frequency', type=int,
+                        default=100000)
     parser.add_argument('-f', '--force', dest='force',
-                        help='continue on next file if read errors are \
-                         encountered', action='store_true')
+                        help='continue past file reading errors',
+                        action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_file',
                         type=argparse.FileType('w'),
@@ -243,6 +271,7 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
+
     info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
@@ -277,7 +306,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+        tablesize = calculate_tablesize(args, 'countgraph')
+        check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     # load or create counting table.
     if args.loadtable:
@@ -292,17 +322,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print('making countgraph', file=sys.stderr)
         htable = khmer_args.create_countgraph(args)
 
-    input_filename = None
-
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, htable)
+    with_diagnostics = WithDiagnostics(norm, report_fp, args.report_frequency)
 
     # make a list of all filenames and if they're paired or not;
     # if we don't know if they're paired, default to allowing but not
     # forcing pairing.
     files = []
-    for e in filenames:
-        files.append([e, args.paired])
+    for element in filenames:
+        files.append([element, args.paired])
     if args.unpaired_reads:
         files.append([args.unpaired_reads, False])
 
@@ -316,6 +345,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         else:
             output_name = args.single_output_file.name
         outfp = args.single_output_file
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
 
     #
     # main loop: iterate over all files given, do diginorm.
@@ -327,16 +361,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             outfp = open(output_name, 'w')
 
         # failsafe context manager in case an input file breaks
-        with CatchIOErrors(filename, outfp, args.single_output_file,
-                           args.force, corrupt_files):
+        with catch_io_errors(filename, outfp, args.single_output_file,
+                             args.force, corrupt_files):
 
-            screed_iter = screed.open(filename, parse_description=False)
+            screed_iter = screed.open(filename)
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
 
             # actually do diginorm
-            for record in WithDiagnostics(filename, norm, reader, report_fp):
+            for record in with_diagnostics(reader, filename):
                 if record is not None:
                     write_record(record, outfp)
 
@@ -355,7 +389,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable.save(args.savetable)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),

@@ -7,12 +7,14 @@
 """This is khmer; please see http://khmer.readthedocs.org/."""
 
 from __future__ import print_function
+from math import log
+import json
 
 from khmer._khmer import CountingHash as _CountingHash
 from khmer._khmer import LabelHash as _LabelHash
 from khmer._khmer import Hashbits as _Hashbits
 from khmer._khmer import HLLCounter as _HLLCounter
-from khmer._khmer import ReadAligner
+from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
 # tests/test_{functions,counting_hash,labelhash,counting_single}.py
@@ -147,7 +149,8 @@ def extract_countinghash_info(filename):
 
 def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
     """Do a quick & dirty expected collision rate calculation on a hashtable.
-    Check to see that collision rate is within threshold.
+
+    Also check to see that collision rate is within threshold.
 
     Keyword argument:
     hashtable: the hashtable object to inspect
@@ -171,8 +174,8 @@ def calc_expected_collisions(hashtable, force=False, max_false_pos=.2):
         print("** Do not use these results!!", file=sys.stderr)
         print("**", file=sys.stderr)
         print("** (estimated false positive rate of %.3f;" % fp_all,
-              file=sys.stderr)
-        print("max allowable %.3f" % max_false_pos, file=sys.stderr)
+              file=sys.stderr, end=' ')
+        print("max recommended %.3f)" % max_false_pos, file=sys.stderr)
         print("**", file=sys.stderr)
 
         if not force:
@@ -218,8 +221,8 @@ def get_n_primes_near_x(number, target):
         i -= 2
 
     if len(primes) != number:
-        raise Exception("unable to find %d prime numbers < %d" % (number,
-                                                                  target))
+        raise RuntimeError("unable to find %d prime numbers < %d" % (number,
+                                                                     target))
 
     return primes
 
@@ -287,3 +290,101 @@ class HLLCounter(_HLLCounter):
 
     def __len__(self):
         return self.estimate_cardinality()
+
+
+class ReadAligner(_ReadAligner):
+
+    """Sequence to graph aligner.
+
+    ReadAligner uses a CountingHash (the counts of k-mers in the target DNA
+    sequences) as an implicit De Bruijn graph. Input DNA sequences are aligned
+    to this graph via a paired Hidden Markov Model.
+
+    The HMM is configured upon class instantiation; default paramaters for the
+    HMM are provided in 'defaultTransitionProbablitites' and
+    'defaultScoringMatrix'.
+
+    The main method is 'align'.
+    """
+
+    defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
+        (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
+         log(0.0150068, 2), log(0.0000017, 2), log(0.0000003, 2)),  # M_
+        (log(0.5196194, 2), log(0.4647955, 2), log(0.0059060, 2),
+         log(0.0096792, 2)),  # Ir_
+        (log(0.7611255, 2), log(0.2294619, 2), log(0.0072673, 2),
+         log(0.0021453, 2)),  # Ig_
+        (log(0.0799009, 2), log(0.0000262, 2), log(0.0001836, 2),
+         log(0.9161349, 2), log(0.0033370, 2), log(0.0004173, 2)),  # Mu_
+        (log(0.1434529, 2), log(0.0036995, 2), log(0.2642928, 2),
+         log(0.5885548, 2)),  # Iru_
+        (log(0.1384551, 2), log(0.0431328, 2), log(0.6362921, 2),
+         log(0.1821200, 2))  # Igu_
+    )
+
+    defaultScoringMatrix = [
+        log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
+
+    def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
+                **kwargs):
+
+        if 'filename' in kwargs:
+            with open(kwargs.pop('filename')) as paramfile:
+                params = json.load(paramfile)
+            scoring_matrix = params['scoring_matrix']
+            transition_probabilities = params['transition_probabilities']
+        else:
+            if 'scoring_matrix' in kwargs:
+                scoring_matrix = kwargs.pop('scoring_matrix')
+            else:
+                scoring_matrix = ReadAligner.defaultScoringMatrix
+            if 'transition_probabilities' in kwargs:
+                transition_probabilities = kwargs.pop(
+                    'transition_probabilities')
+            else:
+                transition_probabilities = \
+                    ReadAligner.defaultTransitionProbabilities
+        r = _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
+                                 bits_theta, scoring_matrix,
+                                 transition_probabilities)
+        r.graph = counting_table
+        return r
+
+    def __init__(self, *args, **kwargs):
+        """
+        ReadAligner initialization.
+
+        HMM state notation abbreviations:
+        M_t - trusted match; M_u - untrusted match
+        Ir_t - trusted read insert; Ir_u - untrusted read insert
+        Ig_t - trusted graph insert; Ig_u - untrusted graph insert
+
+        Keyword arguments:
+        filename - a path to a JSON encoded file providing the scoring matrix
+            for the HMM in an entry named 'scoring_matrix' and the transition
+            probababilties for the HMM in an entry named
+            'transition_probabilities'. If provided the remaining keyword
+            arguments are ignored. (default: None)
+        scoring_matrix - a list of floats: trusted match, trusted mismatch,
+            unstrusted match, untrusted mismatch. (default:
+                ReadAligner.defaultScoringMatrix)
+        transition_probabilities - A sparse matrix as a tuple of six tuples.
+            The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.
+            Transition are notated as 'StartState-NextState':
+            (
+              ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),
+              (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),
+              (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),
+              ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),
+              (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),
+              (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)
+            )
+            (default: ReadAligner.defaultTransitionProbabilities)
+
+
+        Note: the underlying CPython implementation creates the ReadAligner
+        during the __new__ process and so the class initialization actually
+        occurs there. Instatiation is documented here in __init__ as this is
+        the traditional way.
+        """
+        _ReadAligner.__init__(self)

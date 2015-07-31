@@ -8,10 +8,19 @@
 #ifndef HLLCOUNTER_HH
 #define HLLCOUNTER_HH
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer
+{
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 
 namespace khmer
@@ -38,20 +47,25 @@ public:
     void merge(HLLCounter &);
     virtual ~HLLCounter() {}
 
-    double get_alpha() {
+    double get_alpha()
+    {
         return alpha;
     }
-    int get_p() {
+    int get_p()
+    {
         return p;
     }
-    int get_m() {
+    int get_m()
+    {
         return m;
     }
     void set_ksize(WordLength new_ksize);
-    int get_ksize() {
+    int get_ksize()
+    {
         return _ksize;
     }
-    std::vector<int> get_M() {
+    std::vector<int> get_M()
+    {
         return M;
     }
     double get_erate();

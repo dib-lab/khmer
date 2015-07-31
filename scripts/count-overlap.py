@@ -24,7 +24,7 @@ import csv
 import khmer
 import textwrap
 from khmer import khmer_args
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 
 
@@ -43,10 +43,6 @@ def get_parser():
                         help="input sequence filename")
     parser.add_argument('report_filename', metavar='output_report_filename',
                         help='output report filename')
-    parser.add_argument('--csv', default=False, action='store_true',
-                        help='Use the CSV format for the curve output '
-                        'in ${output_report_filename}.curve, '
-                        'including column headers.')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -60,18 +56,15 @@ def main():
     for infile in [args.ptfile, args.fafile]:
         check_input_files(infile, args.force)
 
-    check_space([args.ptfile, args.fafile], args.force)
-
     print('loading k-mer presence table from', args.ptfile, file=sys.stderr)
     ht1 = khmer.load_hashbits(args.ptfile)
     kmer_size = ht1.ksize()
 
     output = open(args.report_filename, 'w')
     f_curve_obj = open(args.report_filename + '.curve', 'w')
-    if args.csv:
-        f_curve_obj_csv = csv.writer(f_curve_obj)
-        # write headers:
-        f_curve_obj_csv.writerow(['input_seq', 'overlap_kmer'])
+    f_curve_obj_csv = csv.writer(f_curve_obj)
+    # write headers:
+    f_curve_obj_csv.writerow(['input_seq', 'overlap_kmer'])
 
     ht2 = khmer_args.create_nodegraph(args, ksize=kmer_size)
 
@@ -88,10 +81,7 @@ dataset2: %s
     output.write(printout1)
 
     for i in range(100):
-        if args.csv:
-            f_curve_obj_csv.writerow([list_curve[100 + i], list_curve[i]])
-        else:
-            print(list_curve[100 + i], list_curve[i], file=f_curve_obj)
+        f_curve_obj_csv.writerow([list_curve[100 + i], list_curve[i]])
 
     print('wrote to: ' + args.report_filename, file=sys.stderr)
 

@@ -5,18 +5,18 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "hllcounter.hh"
-
 #include <math.h>
+#include <stdlib.h>
 #include <algorithm>
+#include <map>
 #include <numeric>
-#include <inttypes.h>
-#include <sstream>
+#include <utility>
 
+#include "hllcounter.hh"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
-#include "khmer_exception.hh"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -381,12 +381,14 @@ void HLLCounter::consume_fasta(
             total_reads_partial = (unsigned int*)calloc(omp_get_num_threads(),
             sizeof(unsigned int));
 
-            for (int i=0; i < omp_get_num_threads(); i++) {
+            for (int i=0; i < omp_get_num_threads(); i++)
+            {
                 HLLCounter *newc = new HLLCounter(this->p, this->_ksize);
                 counters[i] = newc;
             }
 
-            while (!parser->is_complete()) {
+            while (!parser->is_complete())
+            {
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
@@ -413,7 +415,8 @@ void HLLCounter::consume_fasta(
 
         #pragma omp single
         {
-            for (int i=0; i < omp_get_num_threads(); ++i) {
+            for (int i=0; i < omp_get_num_threads(); ++i)
+            {
                 this->merge(*counters[i]);
                 delete counters[i];
                 n_consumed += n_consumed_partial[i];

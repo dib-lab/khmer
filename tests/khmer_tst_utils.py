@@ -53,7 +53,27 @@ def cleanup():
     cleanup_list = []
 
 
+def scriptpath(scriptname='interleave-reads.py'):
+    "Return the path to the scripts, in both dev and install situations."
+
+    # note - it doesn't matter what the scriptname is here, as long as
+    # it's some khmer script present in this version of khmer.
+
+    path = os.path.join(os.path.dirname(__file__), "../scripts")
+
+    if os.path.exists(os.path.join(path, scriptname)):
+        return path
+
+    for path in os.environ['PATH'].split(':'):
+        if os.path.exists(os.path.join(path, scriptname)):
+            return path
+
+
 def _runscript(scriptname, sandbox=False):
+    """
+    Find & run a script with exec (i.e. not via os.system or subprocess).
+    """
+
     import pkg_resources
     ns = {"__name__": "__main__"}
     ns['sys'] = globals()['sys']
@@ -64,17 +84,16 @@ def _runscript(scriptname, sandbox=False):
         return 0
     except pkg_resources.ResolutionError as err:
         if sandbox:
-            paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
+            path = os.path.join(os.path.dirname(__file__), "../sandbox")
         else:
-            paths = [os.path.join(os.path.dirname(__file__),
-                                  "../scripts")]
-            paths.extend(os.environ['PATH'].split(':'))
-        for path in paths:
-            scriptfile = os.path.join(path, scriptname)
+            path = scriptpath()
+
+        scriptfile = os.path.join(path, scriptname)
+        if os.path.isfile(scriptfile):
             if os.path.isfile(scriptfile):
                 exec(compile(open(scriptfile).read(), scriptfile, 'exec'), ns)
                 return 0
-        if sandbox:
+        elif sandbox:
             raise nose.SkipTest("sandbox tests are only run in a repository.")
 
     return -1
@@ -85,7 +104,8 @@ def runscript(scriptname, args, in_directory=None,
     """Run a Python script using exec().
 
     Run the given Python script, with the given args, in the given directory,
-    using 'execfile'.
+    using 'exec'.  Mimic proper shell functionality with argv, and capture
+    stdout and stderr.
 
     When using :attr:`fail_ok`=False in tests, specify the expected error.
     """
@@ -132,59 +152,36 @@ def runscript(scriptname, args, in_directory=None,
     return status, out, err
 
 
-def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
-                      fail_ok=False, sandbox=False):
-    """Run a Python script using subprocess().
-
-    Run the given Python script, with the given args, in the given directory,
-    using 'subprocess'.
-    """
+def run_shell_cmd(cmd, fail_ok=False, in_directory=None):
     cwd = os.getcwd()
+    if in_directory:
+        os.chdir(in_directory)
 
-    status = -1
+    print('running: ', cmd)
+    try:
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        (out, err) = p.communicate()
 
-    if sandbox:
-        paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
-    else:
-        paths = [os.path.join(os.path.dirname(__file__), "../scripts")]
-        paths.extend(os.environ['PATH'].split(':'))
-    for path in paths:
-        scriptfile = os.path.join(path, scriptname)
-        if os.path.isfile(scriptfile):
-            if in_directory:
-                os.chdir(in_directory)
-            sysargs = 'cat ' + stdinfilename + ' | python ' + scriptfile + \
-                " " + args
-            out = open(
-                os.path.join(in_directory, "out"), 'w+', encoding='utf-8')
-            err = open(
-                os.path.join(in_directory, "err"), 'w+', encoding='utf-8')
-            print('running:', scriptname, 'in:', in_directory)
-            print('arguments', sysargs)
-            status = subprocess.call(args=sysargs, stdout=out, stderr=err,
-                                     shell=True)
-            os.chdir(cwd)
-            if status != 0 and not fail_ok:
-                out.seek(0)
-                out = out.read()
-                err.seek(0)
-                err = err.read()
-                print(out)
-                print(err)
-                assert False, (status, out, err)
+        out = out.decode('utf-8')
+        err = err.decode('utf-8')
 
-            return status, out, err
+        if p.returncode != 0 and not fail_ok:
+            print('out:', out)
+            print('err:', err)
+            raise AssertionError("exit code is non zero: %d" % p.returncode)
 
-        if sandbox:
-            raise nose.SkipTest("sandbox tests are only run in a repository.")
+        return (p.returncode, out, err)
+    finally:
+        os.chdir(cwd)
 
 
 def longify(listofints):
-    '''List of ints => list of longs, only on py2
+    """List of ints => list of longs, only on py2.
 
     Takes a list of numeric types, and returns longs on python2, or the
     original list on python3.
-    '''
+    """
     # For map(long, [list of ints]) cross-version hackery
     if sys.version_info.major < 3:
         return map(long, listofints)
