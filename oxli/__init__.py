@@ -11,6 +11,7 @@ Single entry point script for khmer
 """
 
 import argparse
+import sys
 import textwrap
 from khmer import khmer_args
 from oxli import build_graph
@@ -48,7 +49,10 @@ def main():
     """
     main function; does the parsing and kicks off the subcommand
     """
-    args = get_parser().parse_args()
+    if (len(sys.argv) < 2):
+        args = get_parser().parse_args(['--help'])
+    else:
+        args = get_parser().parse_args()
     args.func(args)
 
 if __name__ == '__main__':

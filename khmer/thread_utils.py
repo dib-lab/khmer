@@ -13,7 +13,7 @@ import threading
 import sys
 import screed
 from khmer import utils
-
+from khmer.utils import write_record
 # stdlib queue module was renamed on Python 3
 try:
     import queue
@@ -26,7 +26,7 @@ DEFAULT_GROUPSIZE = 100
 
 def verbose_loader(filename):
     """Screed iterator that additionally prints progress info to stderr."""
-    screed_iter = screed.open(filename, parse_description=False)
+    screed_iter = screed.open(filename)
     for n, record in enumerate(screed_iter):
         if n % 100000 == 0:
             print('... filtering', n, file=sys.stderr)
@@ -189,11 +189,13 @@ class ThreadedSequenceProcessor(object):
             except queue.Empty:
                 continue
 
-            for name, seq, quality in g.seqlist:
-                if quality:  # write FASTQ; CTB hack.
-                    outfp.write('@%s\n%s\n+\n%s\n' % (name, seq, quality))
+            for name, seq, qual in g.seqlist:
+                if qual:
+                    record = screed.Record(name=name, sequence=seq,
+                                           quality=qual)
                 else:
-                    outfp.write('>%s\n%s\n' % (name, seq,))
+                    record = screed.Record(name=name, sequence=seq)
+                write_record(record, outfp)
 
         if self.verbose:
             print("DONE writing.\nprocessed %d / wrote %d / removed %d" %

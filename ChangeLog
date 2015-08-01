@@ -1,4 +1,4 @@
-2015-07-22  Titus Brown  <titus@idyll.org>
+2015-08-01  Titus Brown  <titus@idyll.org>
 
 
   * lib/{hashbits.cc,khmer.hh},tests/test_hashbits.py: updated save/load
@@ -10,9 +10,156 @@
   * khmer/_khmer.cc,lib/hashbits.{cc,hh}: removed overlap functionality.
   * sandbox/README.rst: updated with removal of bloom-count-intersection.py.
 
+2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/kfile.py: added infrastructure for doing compressed output
+   * khmer/thread_utils.py: switched threaded_sequence_processor to make use of
+   write_record
+   * scripts/{extract-long-sequences,extract-paired-reads,
+   extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
+   interleave-reads,normalize-by-median,sample-reads-randomly,
+   split-paired-reads,trim-low-abund}.py: added output compression
+   * tests/{test_functions,test_scripts,test_normalize_by_median}.py: added
+   tests
+   * scripts/{load-graph,partition-graph,find-knots.py,
+   make-initial-stoptags}.py,oxli/build_graph.py: made load-graph no longer
+   add .pt to graph outfiles, changed partition-graph to not expect .pt's
+   * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
+   * doc/dev/scripts-and-sandbox.rst: updated scripts/ requirements.
+
+2015-08-01  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * sandbox/multi-rename.py: updated output of long FASTA sequences to
+   wrap text at 80 characters.
+   * tests/test_sandbox_scripts.py: Added a test for multi-rename.py.
+
+2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile,Makefile,lib/*.pc.in,lib/test-compile.cc: Misc debian-based
+   compatiablity changes
+   * lib/get_version.py: Add crunchbang, chmod +x
+
+2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/_khmer.cc: add more CPyChecker inspired fixes
+   * lib/*.{cc,hh}: clean up includes and forward declarations
+
+2015-07-29  Luiz Irber  <khmer@luizirber.org>
+
+   * Makefile: Adapt Makefile rules for py3 changes.
+   * jenkins-build.sh: Read PYTHON_EXECUTABLE and TEST_ATTR from environment.
+
+2015-07-29  Amanda Charbonneau  <charbo24@msu.edu>
+
+   * scripts/fastq-to-fasta.py: Changed '-n' default description to match
+   behaviour
+
+2015-07-29  Luiz Irber  <khmer@luizirber.org>
+
+   * tests/test_{scripts,streaming_io}.py: Fix the build + add a test
+
+2015-07-28  Titus Brown  <titus@idyll.org>
+
+   * tests/test_streaming_io.py: new shell cmd tests for streaming/piping.
+   * tests/khmer_tst_utils.py: refactor/replace runtestredirect(...) with
+   scriptpath(...) and run_shell_cmd(...).
+   * scripts/test_scripts.py: remove test_interleave_reads_broken_fq_4 for
+   only one input file for interleave-reads.py; replace runscriptredirect call
+   with run_shell_cmd.
+   * scripts/interleave-reads.py: force exactly two input files.
+   * scripts/split-paired-reads.py: fix print statement; clarify output.
+   * scripts/{normalize-by-median.py,sample-reads-randomly.py,
+   trim-low-abund.py}: if stdin is supplied for input, check that -o
+   specifies output file.
+   * scripts/filter-abund.py: if stdin is supplied for input, check that -o
+   specifies output file; switched -o to use argparse.FileType.
+   * scripts/extract-long-sequences.py: switched -o to use argparse.FileType.
+   * scripts/{abundance-dist,count-median}.py: added '-' handling for output.
+   * khmer/kfile.py: change 'check_input_files' to no longer warn that
+   '-' doesn't exist'.
+   * tests/test-data/paired.fq.2: removed extraneous newline from end.
+   * tests/{test_normalize_by_median,test_script_arguments,test_scripts}.py:
+   added tests for new code.
+   * scripts/oxli: added script for running tests in development directory.
+   * khmer/{__init__,khmer_args}.py,tests/{test_normalize_by_median,
+   test_script_arguments}.py: refactored out use of AssertionError by not
+   throwing plain Exceptions when a ValueError or RuntimeError would do.
+   * oxli/__init__.py: give default help instead of an error when `oxli` is
+   called with no arguments.
+   * tests/test_{normalize_by_median,sandbox_scripts,scripts,streaming_io}.py:
+   always check status code if calling `runscripts` with `fail_ok=True`.
+
+2015-07-28  Luiz Irber  <khmer@luizirber.org>
+
+   * sandbox/unique-kmers.py: moved to scripts.
+   * scripts/unique-kmers.py: fix import bug and initialize to_print earlier.
+   * tests/test_scripts.py: add tests for unique-kmers.py.
+   * doc/user/scripts.rst: added unique-kmers.py to script page
+
+2015-07-28  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * scripts/abundance-dist.py: disallowed forcing on the input file check for
+   the counting table file
+
+2015-07-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * .mailmap, Makefile: generate a list of authors
+
+2015-07-28  Kevin Murray  <spam@kdmurray.id.au>
+            Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added fix for SRA-style FASTQ output.
+   * tests/test_scripts.py: tested against a broken version of SRA format.
+   * tests/test-data/paired-broken4.fq.{1,2}: added test files.
+
+2015-07-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
+            Titus Brown  <titus@idyll.org>
+
+   * lib/read_aligner.{cc,hh},tests/{test_read_aligner.py,
+   test-data/readaligner-{default,k12}.json},khmer/__init__.py: refactor,
+   read aligner parameters are now configurable & save/load-able. Can do
+   whole-genome variant finding.
+   * khmer/_khmer.cc,tests/test_read_aligner.py: ReadAligner.align_forward
+   method added
+   * sandbox/correct-errors.py -> sandbox/correct-reads.py: total rewrite
+   * sandbox/error-correct-pass2.py: new script
+   * sandbox/readaligner_pairhmm_train.py: new script
+   * tests/test_sandbox_scripts.py, doc/release-notes/release-1.4.rst:
+   spelling fixes, import re-arrangement
+   * sandbox/{Makefile.read_aligner_training,readaligner_pairhmm_train.py}:
+   Added script to train the aligner
+
+2015-07-27  Titus Brown  <titus@idyll.org>
+
+   * khmer/khmer_args.py,CITATION: added entry for PeerJ paper on
+   semi-streaming to citations.
+   * scripts/{abundance-dist-single.py,abundance-dist.py,count-median.py,
+   count-overlap.py,filter-abund-single.py,load-into-counting.py}: changed
+   default behavior to output data in CSV format and report total k-mers.
+   * tests/test_scripts.py: updated/removed tests for CSV.
+   * doc/whats-new-2.0.rst: added information about change in columnar output,
+   along with other minor corrections.
+   * scripts/normalize-by-median.py: corrected epilog.
+   * khmer/thread_utils.py,
+   sandbox/{calc-best-assembly.py,extract-single-partition.py},
+   scripts/{count-median.py,extract-long-sequences.py,extract-paired-reads.py,
+   extract-partitions.py,fastq-to-fasta.py,
+   interleave-reads.py,normalize-by-median.py,readstats.py,
+   sample-reads-randomly.py,split-paired-reads.py,trim-low-abund.py},
+   tests/{test_normalize_by_median.py,test_scripts.py}: remove explicit
+   'parse_description' from screed open calls.
+   * khmer/_khmer.cc,lib/Makefile,lib/hashtable.{cc,hh},setup.py: removed
+   WITH_INTERNAL_METRICS and trace_logger/perf_metrics references.
+   * lib/perf_metrics.{cc,hh},lib/trace_logger.{cc,hh}: removed unused files.
+
+2015-07-24  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/getting-started.rst: added instructions for second contribution
+
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_read_parsers.py: added workaround for bug in OSX Python
+   * Makefile: respect that workaround when running the tests
 
 2015-07-21  Jacob Fenton  <bocajnotnef@gmail.com>
 

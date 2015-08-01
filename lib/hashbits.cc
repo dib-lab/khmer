@@ -5,13 +5,13 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include <iostream>
-#include "hashtable.hh"
-#include "hashbits.hh"
-#include "read_parsers.hh"
-
-#include <sstream>
 #include <errno.h>
+#include <sstream> // IWYU pragma: keep
+
+#include "hashbits.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;

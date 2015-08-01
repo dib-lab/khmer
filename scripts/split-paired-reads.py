@@ -25,6 +25,7 @@ import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
+from khmer.kfile import add_output_compression_type, get_file_writer
 from khmer.utils import (write_record, check_is_left, check_is_right,
                          broken_paired_reader)
 
@@ -73,10 +74,10 @@ def get_parser():
 
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('w'))
+                        'file', type=argparse.FileType('wb'))
     parser.add_argument('-p', '--force-paired', action='store_true',
                         help='Require that reads be interleaved')
 
@@ -84,6 +85,7 @@ def get_parser():
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -98,10 +100,10 @@ def main():
     check_space(filenames, args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin' or infile == '-':
+    if infile in ('/dev/stdin', '-'):
         if not (args.output_first and args.output_second):
-            print >>sys.stderr, ("Accepting input from stdin; "
-                                 "output filenames must be provided.")
+            print("Accepting input from stdin; output filenames must "
+                  "be provided.", file=sys.stderr)
             sys.exit(1)
     elif args.output_directory:
         if not os.path.exists(args.output_directory):
@@ -114,23 +116,23 @@ def main():
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
-        fp_out1 = args.output_first
+        fp_out1 = get_file_writer(args.output_first, args.gzip, args.bzip)
         out1 = fp_out1.name
     else:
         # Use default filename created above
-        fp_out1 = open(out1, 'w')
+        fp_out1 = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
     if args.output_second:
-        fp_out2 = args.output_second
+        fp_out2 = get_file_writer(args.output_second, args.gzip, args.bzip)
         out2 = fp_out2.name
     else:
         # Use default filename created above
-        fp_out2 = open(out2, 'w')
+        fp_out2 = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
 
     counter1 = 0
     counter2 = 0
     index = None
 
-    screed_iter = screed.open(infile, parse_description=False)
+    screed_iter = screed.open(infile)
 
     # walk through all the reads in broken-paired mode.
     paired_iter = broken_paired_reader(screed_iter)
@@ -165,8 +167,8 @@ def main():
 
     print("DONE; split %d sequences (%d left, %d right)" %
           (counter1 + counter2, counter1, counter2), file=sys.stderr)
-    print("/1 reads in %s" % out1, file=sys.stderr)
-    print("/2 reads in %s" % out2, file=sys.stderr)
+    print("left (/1) reads in %s" % out1, file=sys.stderr)
+    print("right (/2) reads in %s" % out2, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

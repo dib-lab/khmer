@@ -8,6 +8,7 @@
 from __future__ import print_function
 import screed
 import sys
+import textwrap
 
 CUTOFF = 200
 
@@ -19,8 +20,8 @@ def main():
         for record in screed.open(filename):
             if len(record.sequence) >= CUTOFF:
                 n += 1
-                print('>%s.%s %s\n%s' % (prefix, n, record.name, record.sequence))
-
-
+                print('>%s.%s %s' % (prefix, n, record.name))
+                x = "\n".join(textwrap.wrap(record.sequence, 80))
+                print (x)
 if __name__ == '__main__':
     main()

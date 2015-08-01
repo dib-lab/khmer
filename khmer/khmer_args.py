@@ -134,7 +134,7 @@ def add_loadhash_args(parser):
 
 def calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception("unknown graph type: %s" % (hashtype,))
+        raise ValueError("unknown graph type: %s" % (hashtype,))
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
@@ -179,7 +179,7 @@ def report_on_config(args, hashtype='countgraph'):
     """
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception("unknown graph type: %s" % (hashtype,))
+        raise ValueError("unknown graph type: %s" % (hashtype,))
 
     if args.quiet:
         return
@@ -226,7 +226,8 @@ _algorithms = {
     'software': 'MR Crusoe et al., '
     '2014. http://dx.doi.org/10.6084/m9.figshare.979190',
     'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
-    'streaming': 'Q Zhang, S Awad, CT Brown, unpublished',
+    'streaming': 'Q Zhang, S Awad, CT Brown, '
+    'https://dx.doi.org/10.7287/peerj.preprints.890v1',
     'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
     'counting': 'Q Zhang et al., '
     'http://dx.doi.org/10.1371/journal.pone.0101271',

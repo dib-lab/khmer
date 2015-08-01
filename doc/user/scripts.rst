@@ -55,6 +55,9 @@ k-mer counting and abundance filtering
 .. autoprogram:: count-median:get_parser()
         :prog: count-median.py
 
+.. autoprogram:: unique-kmers:get_parser()
+        :prog: unique-kmers.py
+
 .. _scripts-partitioning:
 
 Partitioning

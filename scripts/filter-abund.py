@@ -24,9 +24,9 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type, get_file_writer)
 from khmer import __version__
-#
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -63,8 +63,9 @@ def get_parser():
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
-    parser.add_argument('-o', '--out', dest='single_output_filename',
-                        default='', metavar="optional_output_filename",
+    parser.add_argument('-o', '--out', dest='single_output_file',
+                        type=argparse.FileType('wb'),
+                        metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
@@ -72,6 +73,7 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -81,6 +83,12 @@ def main():
 
     check_input_files(args.input_table, args.force)
     infiles = args.input_filename
+    if ('-' in infiles or '/dev/stdin' in infiles) and not \
+       args.single_output_file:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
+
     for filename in infiles:
         check_input_files(filename, args.force)
 
@@ -113,20 +121,27 @@ def main():
 
         return None, None
 
+    if args.single_output_file:
+        outfile = args.single_output_file.name
+        outfp = get_file_writer(outfile, args.gzip, args.bzip)
+
     # the filtering loop
     for infile in infiles:
         print('filtering', infile, file=sys.stderr)
-        if args.single_output_filename != '':
-            outfile = args.single_output_filename
-            outfp = open(outfile, 'a')
+        if args.single_output_file:
+            outfile = args.single_output_file.name
+            outfp = get_file_writer(args.single_output_file, args.gzip,
+                                    args.bzip)
         else:
             outfile = os.path.basename(infile) + '.abundfilt'
-            outfp = open(outfile, 'w')
+            outfp = open(outfile, 'wb')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
         tsp.start(verbose_loader(infile), outfp)
 
         print('output in', outfile, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

@@ -8,8 +8,14 @@
 #ifndef HASHBITS_HH
 #define HASHBITS_HH
 
+#include <stddef.h>
+#include <string.h>
+#include <string>
 #include <vector>
+
 #include "hashtable.hh"
+#include "khmer.hh"
+#include "kmer_hash.hh"
 
 namespace khmer
 {
