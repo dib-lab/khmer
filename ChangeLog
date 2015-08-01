@@ -1,4 +1,4 @@
-2015-07-31  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
+2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
 <titus@idyll.org>
 
    * scripts/normalize-by-median.py,khmer/khmer_logger.py: added logging
@@ -7,6 +7,12 @@
    * khmer/khmer_args.py: Made info function use logging functions.
    * tests/khmer_tst_utils.py: removed info reporting in runscript from 'out'
    returned.
+
+2015-07-27  Sherine Awad  <drmahmoud@ucdavis.edu>
+
+   * sandbox/multi-rename.py: updated output of long FASTA sequences to
+   wrap text at 80 characters.
+   * tests/test_sandbox_scripts.py: Added a test for multi-rename.py.
 
 2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
 
