@@ -253,7 +253,7 @@ def info(scriptname, algorithm_list=None):
     algorithm_list.insert(0, 'software')
 
     for alg in algorithm_list:
-        algstr = "||   * "  + _algorithms[alg].encode(
+        algstr = "||   * " + _algorithms[alg].encode(
             'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
             log_info(algstr)
