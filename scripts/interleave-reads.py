@@ -18,9 +18,6 @@ By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
 """
 from __future__ import print_function
 
-# TODO: take fa as well?
-#      support gzip option?
-
 import screed
 import sys
 import os
@@ -56,7 +53,8 @@ def get_parser():
         epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('infiles', nargs='+')
+    parser.add_argument('left')
+    parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
                         type=argparse.FileType('w'),
                         default=sys.stdout)
@@ -71,23 +69,12 @@ def main():
     info('interleave-reads.py')
     args = get_parser().parse_args()
 
-    for _ in args.infiles:
-        check_input_files(_, args.force)
+    check_input_files(args.left, args.force)
+    check_input_files(args.right, args.force)
+    check_space([args.left, args.right], args.force)
 
-    check_space(args.infiles, args.force)
-
-    s1_file = args.infiles[0]
-    if len(args.infiles) == 2:
-        s2_file = args.infiles[1]
-    else:
-        s2_file = s1_file.replace('_R1_', '_R2_')
-        if s1_file == s2_file:
-            print(("ERROR: given only one filename, that "
-                   "doesn't contain _R1_. Exiting."), file=sys.stderr)
-            sys.exit(1)
-
-        print(("given only one file; "
-               "guessing that R2 file is %s" % s2_file), file=sys.stderr)
+    s1_file = args.left
+    s2_file = args.right
 
     fail = False
     if not os.path.exists(s1_file):
@@ -104,8 +91,8 @@ def main():
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
     counter = 0
-    screed_iter_1 = screed.open(s1_file, parse_description=False)
-    screed_iter_2 = screed.open(s2_file, parse_description=False)
+    screed_iter_1 = screed.open(s1_file)
+    screed_iter_2 = screed.open(s2_file)
     for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
         if read1 is None or read2 is None:
             print(("ERROR: Input files contain different number"

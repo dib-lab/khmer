@@ -5,13 +5,21 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "hashbits.hh"
-#include "subset.hh"
-#include "read_parsers.hh"
-
-#include <sstream>
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
+#include <string.h>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <map>
+#include <set>
+#include <utility>
+
+#include "counting.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "kmer_hash.hh"
+#include "read_parsers.hh"
+#include "subset.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200

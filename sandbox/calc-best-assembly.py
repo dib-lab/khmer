@@ -42,22 +42,23 @@ def main():
         stats.append((total, filename))
 
         if not args.quiet:
-            print("assembly %s has %d bp > %d" % (filename,
-                                                                total,
-                                                                args.cutoff), file=sys.stderr)
+            print("assembly %s has %d bp > %d" % (filename, total,
+                                                  args.cutoff),
+                  file=sys.stderr)
 
     stats.sort(reverse=True)
 
     best_total, winner_file = stats[0]
     print('----', file=sys.stderr)
     print("assembly %s wins: %d total bp > %d" % (winner_file,
-                                                                best_total,
-                                                                args.cutoff), file=sys.stderr)
+                                                  best_total,
+                                                  args.cutoff),
+          file=sys.stderr)
 
     if args.output_file:
-        for record in screed.open(winner_file, parse_description=False):
-            print('>%s\n%s' % (record.name,
-                                                   record.sequence), file=args.output_file)
+        for record in screed.open(winner_file):
+            print('>%s\n%s' % (record.name, record.sequence),
+                  file=args.output_file)
 
     print(winner_file)
 

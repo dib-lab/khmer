@@ -44,6 +44,7 @@ class WithDiagnostics(object):
 
     uses a Normalizer object.
     """
+
     def __init__(self, norm, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp
@@ -249,7 +250,7 @@ def get_parser():
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
                         metavar='report_frequency', type=int,
                         default=100000)
@@ -344,6 +345,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         else:
             output_name = args.single_output_file.name
         outfp = args.single_output_file
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
 
     #
     # main loop: iterate over all files given, do diginorm.
@@ -358,7 +364,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
 
-            screed_iter = screed.open(filename, parse_description=False)
+            screed_iter = screed.open(filename)
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
@@ -383,7 +389,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable.save(args.savetable)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),

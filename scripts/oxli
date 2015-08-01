@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+#
+# This file is a part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) The Regents of the University of California, 2015. It is
+# licensed under the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
+
+__requires__ = 'khmer'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('khmer', 'console_scripts', 'oxli')()
+    )
