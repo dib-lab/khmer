@@ -122,8 +122,8 @@ def main():
         return None, None
 
     if args.single_output_file:
-            outfile = args.single_output_file.name
-            outfp = get_file_writer(outfile, args.gzip, args.bzip)
+        outfile = args.single_output_file.name
+        outfp = get_file_writer(outfile, args.gzip, args.bzip)
 
     # the filtering loop
     for infile in infiles:

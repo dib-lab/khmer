@@ -40,7 +40,6 @@ DEFAULT_DESIRED_COVERAGE = 20
 
 
 class WithDiagnostics(object):
-
     """
     Generator/context manager to do boilerplate output of statistics.
 
