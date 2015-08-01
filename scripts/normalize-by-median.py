@@ -31,7 +31,8 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info, calculate_tablesize)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer, is_block, describe_file_handle)
 from khmer.utils import write_record, broken_paired_reader
 
 
@@ -258,15 +259,16 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_file',
-                        type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+                        type=argparse.FileType('wb'),
+                        default=None, dest='single_output_file',
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     add_loadhash_args(parser)
+    add_output_compression_type(parser)
     return parser
 
 
@@ -340,11 +342,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     output_name = None
 
     if args.single_output_file:
-        if args.single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
-        else:
-            output_name = args.single_output_file.name
-        outfp = args.single_output_file
+        outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
     else:
         if '-' in filenames or '/dev/stdin' in filenames:
             print("Accepting input from stdin; output filename must "
@@ -358,7 +356,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     for filename, require_paired in files:
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
-            outfp = open(output_name, 'w')
+            outfp = open(output_name, 'wb')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,
@@ -374,8 +373,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 if record is not None:
                     write_record(record, outfp)
 
-            print('output in ' + output_name, file=sys.stderr)
-            if output_name is not '/dev/stdout':
+            print('output in ' + describe_file_handle(outfp), file=sys.stderr)
+            if not is_block(outfp):
                 outfp.close()
 
     # finished - print out some diagnostics.
