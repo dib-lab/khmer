@@ -37,19 +37,16 @@ def get_parser():
     left- and right- reads separated. This reformats the former to the latter.
 
     The directory into which the left- and right- reads are output may be
-    specified using :option:`-o`/:option:`--output-dir`. This directory will be
+    specified using :option:`-d`/:option:`--output-dir`. This directory will be
     created if it does not already exist.
 
     Alternatively, you can specify the filenames directly with
     :option:`-1`/:option:`--output-first` and
     :option:`-2`/:option:`--output-second`, which will override the
-    :option:`-o`/:option:`--output-dir` setting on a file-specific basis.
+    :option:`-d`/:option:`--output-dir` setting on a file-specific basis.
 
-    :option:`-p`/:option:`--force-paired` will require the input file to
-    be properly interleaved; by default, this is not required.
-
-    :option:`-0`/:option:'`--output-orphans` will separate orphans into 
-    the specified file
+    :option:`-0`/:option:'`--output-orphans` will allow broken-paired format,
+    and orphaned reads will be saved separately, to the specified file.
 
     Example::
 
@@ -70,13 +67,12 @@ def get_parser():
 
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
-    parser.add_argument('-o', '--output-dir', metavar="output_directory",
+    parser.add_argument('-d', '--output-dir', metavar="output_directory",
                         dest='output_directory', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
-                        nargs='?', default=False, const=True, 
-                        help='Allow "orphaned" reads and extract them to ' + \
+                        help='Allow "orphaned" reads and extract them to ' +
                         'this file',
                         type=argparse.FileType('wb'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
@@ -107,8 +103,7 @@ def main():
 
     # decide where to put output files - specific directory? or just default?
     if infile in ('/dev/stdin', '-'):
-        if not (args.output_first and args.output_second) or \
-           args.output_orphaned is True:
+        if not (args.output_first and args.output_second):
             print("Accepting input from stdin; "
                   "output filenames must be provided.", file=sys.stderr)
             sys.exit(1)
@@ -117,13 +112,9 @@ def main():
             os.makedirs(args.output_directory)
         out1 = os.path.join(args.output_directory, basename + '.1')
         out2 = os.path.join(args.output_directory, basename + '.2')
-        if args.output_orphaned is True:
-            out0 = os.path.join(args.output_directory, basename + '.0')
     else:
         out1 = basename + '.1'
         out2 = basename + '.2'
-        if args.output_orphaned is True:
-            out0 = basename + '.0'
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
@@ -143,11 +134,8 @@ def main():
     allow_orphans = False
     if args.output_orphaned:
         allow_orphans = True
-        if args.output_orphaned is not True: # filename specified?
-            fp_out0 = args.output_orphaned
-            out0 = fp_out0.name
-        else:
-            fp_out0 = open(out0, 'w')
+        fp_out0 = args.output_orphaned
+        out0 = fp_out0.name
 
     counter1 = 0
     counter2 = 0
@@ -157,7 +145,8 @@ def main():
     screed_iter = screed.open(infile)
 
     # walk through all the reads in broken-paired mode.
-    paired_iter = broken_paired_reader(screed_iter)
+    paired_iter = broken_paired_reader(screed_iter,
+                                       require_paired=not allow_orphans)
     for index, is_pair, record1, record2 in paired_iter:
         if index % 10000 == 0:
             print('...', index, file=sys.stderr)
@@ -170,10 +159,6 @@ def main():
         elif allow_orphans:
             write_record(record1, fp_out0)
             counter3 += 1
-        else:
-            print('ERROR, %s is not part of a pair' %
-                  record1.name, file=sys.stderr)
-            sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %
           (counter1 + counter2, counter1, counter2, counter3), file=sys.stderr)
