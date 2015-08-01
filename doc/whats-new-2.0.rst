@@ -61,7 +61,8 @@ when :option:`-R` is used.
 load-graph.py no longer appends .pt to the specified filename
 -------------------------------------------------------------
 
-Previously, `load-graph.py` appended a `.pt` extension to the specified output
-filename and partition-graph appended a `.pt` to the given input filename. 
-Now, `load-graph.py` writes to the specified output filename and
-`partition-graph.py` does not append a `.pt` to the given input filename.
+Previously, `load-graph.py` appended a `.pt` extension to the
+specified output filename and partition-graph appended a `.pt` to the
+given input filename.  Now, `load-graph.py` writes to the specified
+output filename and `partition-graph.py` does not append a `.pt` to
+the given input filename.

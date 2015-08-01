@@ -116,5 +116,6 @@ development/PR checklist::
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
    - [ ] support '-' (STDIN) as an input file, if appropriate
    - [ ] support designation of an output file (including STDOUT), if appropriate
+   - [ ] script reads and writes sequences in compressed format
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
    - [ ] script has been removed from sandbox/README.rst
