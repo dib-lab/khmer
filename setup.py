@@ -178,9 +178,7 @@ SETUP_METADATA = \
         "url": 'https://khmer.readthedocs.org/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9'],
-        # testing screed download link
-
+        "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
