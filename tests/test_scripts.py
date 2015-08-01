@@ -3063,7 +3063,7 @@ def test_trim_low_abund_highfpr():
 def test_trim_low_abund_trimtest():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-   
+
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "1",
