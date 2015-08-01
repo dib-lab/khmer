@@ -1,8 +1,8 @@
 2015-07-27  Sherine Awad  <drmahmoud@ucdavis.edu>
 
-   * Add a line break in multi-rename.py 
-   * Add a test module for the multirename.py 
-   * Move multi-rename.py to scripts 
+   * sandbox/multi-rename.py: Add a line break in multi-rename.py 
+   * sandbox/multi-rename.py: Add a test module for the multirename.py 
+   * sandbox/multi-rename.py: Move multi-rename.py to scripts 
 
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
