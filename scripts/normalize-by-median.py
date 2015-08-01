@@ -235,6 +235,8 @@ def get_parser():
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
@@ -275,7 +277,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     args = get_parser().parse_args()
     configure_logging(args.quiet)
     info('normalize-by-median.py', ['diginorm'])
-    report_on_config(args)
+    if not args.quiet:
+        report_on_config(args)
 
     report_fp = args.report
     force_single = args.force_single

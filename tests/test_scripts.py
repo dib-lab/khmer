@@ -2441,7 +2441,7 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2, len(out.splitlines())
+    assert len(out.splitlines()) == 0, len(out.splitlines())
     assert "No lines dropped" in err
 
     names = [r.name for r in screed.open(clean_outfile)]
@@ -2449,27 +2449,27 @@ def test_fastq_to_fasta():
 
     args = [n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "No lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [n_infile, '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2, out
+    assert len(out.splitlines()) == 0, out
     assert "4 lines dropped" in err, err
 
     args = [clean_infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "0 lines dropped" in err
 
     args = [n_infile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "4 lines dropped" in err
 
 

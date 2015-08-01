@@ -81,10 +81,8 @@ def test_normalize_by_median_quiet():
     args = ['-C', CUTOFF, '-k', '17', '--quiet', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of unique k-mers: 98' not in err, err
-    assert 'DONE with' not in err, err
-    assert 'output in' not in err, err
-    assert 'fp rate estimated to be' not in err, err
+    assert len(out) == 0, out
+    assert len(err) == 0, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile

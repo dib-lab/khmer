@@ -52,8 +52,6 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
-    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
-                        action='store_true')
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
@@ -181,9 +179,6 @@ def report_on_config(args, hashtype='countgraph'):
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (hashtype,))
-
-    if args.quiet:
-        return
 
     tablesize = calculate_tablesize(args, hashtype)
 
