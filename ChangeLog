@@ -7,10 +7,11 @@
    extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
    interleave-reads,normalize-by-median,sample-reads-randomly,
    split-paired-reads,trim-low-abund}.py: added compression
-   * tests/test_{functions,scripts}.py: added tests
+   * tests/{test_functions,test_scripts}.py: added tests
    * scripts/{load-graph,partition-graph}.py: made load-graph no longer add .pt
    to graph outfiles, changed partition-graph to not expect .pt's
    * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
+   * doc/dev/scripts-and-sandbox.rst: updated scripts/ requirements.
 
 2015-08-01  Sherine Awad  <drmahmoud@ucdavis.edu>
 
