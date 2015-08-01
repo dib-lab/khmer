@@ -287,3 +287,15 @@ def test_count_kmers_2_single():
 
     out = out.splitlines()
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
+
+
+def test_multirename_fasta():
+    infile1 = utils.get_temp_filename('test-multi.fa')
+    multioutfile = utils.get_temp_filename('out.fa')
+    infile2 = utils.get_temp_filename('out.fa')
+    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
+    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    args = ['assembly', infile1]
+    _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
+    r = open(infile2).read()
+    assert r in out
