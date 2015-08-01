@@ -1,7 +1,6 @@
 2015-07-27  Sherine Awad  <drmahmoud@ucdavis.edu>
 
-   * sandbox/multi-rename.py: Moved multi-rename.py to scripts & added
-   a test function.
+   * tests/test_sandbox_scripts.py: Added a test for multi-rename.py.
 
 2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
 

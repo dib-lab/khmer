@@ -3240,18 +3240,6 @@ def test_roundtrip_commented_format():
     assert r == r2, (r, r2)
 
 
-def test_multirename_fasta():
-    infile1 = utils.get_temp_filename('test-multi.fa')
-    multioutfile = utils.get_temp_filename('out.fa')
-    infile2 = utils.get_temp_filename('out.fa')
-    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
-    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
-    args = ['assembly', infile1]
-    _, out, err = utils.runscript('multi-rename.py', args)
-    r = open(infile2).read()
-    assert r in out
-
-
 def test_unique_kmers_defaults():
     infile = utils.get_temp_filename('random-20-a.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
