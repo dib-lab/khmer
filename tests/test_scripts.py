@@ -2122,8 +2122,8 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status == -1, status
-    assert "Unpaired reads when" in err
+    assert status == 1, status
+    assert "Unpaired reads found" in err
 
 
 def test_split_paired_reads_2_stdin_no_out():
@@ -2159,8 +2159,8 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status == -1
-    #assert "ERROR, 895:1:37:17593:9954 is not part of a pair" in err, err
+    assert status == 1
+    assert "Unpaired reads found starting at 895:1:37:17593:9954" in err, err
 
 
 def test_split_paired_reads_3_output_dir():

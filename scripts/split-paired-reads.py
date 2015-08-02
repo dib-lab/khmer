@@ -26,8 +26,8 @@ import khmer
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 from khmer.kfile import add_output_compression_type, get_file_writer
-from khmer.utils import (write_record, check_is_left, check_is_right,
-                         broken_paired_reader)
+from khmer.utils import (write_record, broken_paired_reader,
+                         UnpairedReadsError)
 
 
 def get_parser():
@@ -147,18 +147,24 @@ def main():
     # walk through all the reads in broken-paired mode.
     paired_iter = broken_paired_reader(screed_iter,
                                        require_paired=not allow_orphans)
-    for index, is_pair, record1, record2 in paired_iter:
-        if index % 10000 == 0:
-            print('...', index, file=sys.stderr)
 
-        if is_pair:
-            write_record(record1, fp_out1)
-            counter1 += 1
-            write_record(record2, fp_out2)
-            counter2 += 1
-        elif allow_orphans:
-            write_record(record1, fp_out0)
-            counter3 += 1
+    try:
+        for index, is_pair, record1, record2 in paired_iter:
+            if index % 10000 == 0:
+                print('...', index, file=sys.stderr)
+
+            if is_pair:
+                write_record(record1, fp_out1)
+                counter1 += 1
+                write_record(record2, fp_out2)
+                counter2 += 1
+            elif allow_orphans:
+                write_record(record1, fp_out0)
+                counter3 += 1
+    except UnpairedReadsError as e:
+        print("Unpaired reads found starting at {name}; exiting".format(
+            name=e.r1.name), file=sys.stderr)
+        sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %
           (counter1 + counter2, counter1, counter2, counter3), file=sys.stderr)
