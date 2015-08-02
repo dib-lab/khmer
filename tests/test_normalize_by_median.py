@@ -69,6 +69,30 @@ def test_normalize_by_median():
     assert "I/O Errors" not in err
 
 
+def test_normalize_by_median_quiet():
+    CUTOFF = '1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '17', '--quiet', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert len(out) == 0, out
+    assert len(err) == 0, err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert "I/O Errors" not in err
+
+
 def test_normalize_by_median_unpaired_final_read():
     CUTOFF = '1'
 
