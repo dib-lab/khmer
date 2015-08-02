@@ -15,10 +15,10 @@ from argparse import _VersionAction
 
 import screed
 import khmer
-from khmer_logger import log_info
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
-from khmer.utils import print_error
+from .utils import print_error
+from .khmer_logger import log_info
 
 
 DEFAULT_K = 32
