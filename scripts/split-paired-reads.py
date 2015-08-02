@@ -23,11 +23,12 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
-from khmer.kfile import add_output_compression_type, get_file_writer
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type,
+                         get_file_writer, is_block, describe_file_handle)
 
 
 def get_parser():
@@ -134,8 +135,8 @@ def main():
     allow_orphans = False
     if args.output_orphaned:
         allow_orphans = True
-        fp_out0 = args.output_orphaned
-        out0 = fp_out0.name
+        fp_out0 = get_file_writer(args.output_orphaned, args.gzip, args.bzip)
+        out0 = describe_file_handle(args.output_orphaned)
 
     counter1 = 0
     counter2 = 0
