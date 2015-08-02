@@ -1645,21 +1645,13 @@ def test_interleave_read_stdout():
     # actual output file
     outfile = utils.get_temp_filename('out.fq')
 
-    old_stdout = sys.stdout
-    # sys.stdout = capture = StringIO
-
     script = 'interleave-reads.py'
     args = [infile1, infile2]
 
     (stats, out, err) = utils.runscript(script, args)
 
-    sys.stdout = old_stdout
-
-    splitout = out.splitlines()
     with open(outfile, 'w') as ofile:
-        for (index, line) in enumerate(splitout):
-            if index > 1:
-                ofile.write(line + '\n')
+        ofile.write(out)
 
     n = 0
     for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
@@ -2555,12 +2547,12 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-o', clean_outfile, '--gzip']
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile, '--bzip']
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
 

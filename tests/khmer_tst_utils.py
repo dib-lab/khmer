@@ -119,17 +119,19 @@ def runscript(scriptname, args, in_directory=None,
         oldargs = sys.argv
         sys.argv = sysargs
 
-        print('running:', scriptname, 'in:', in_directory)
-        print('arguments', sysargs)
-
         oldout, olderr = sys.stdout, sys.stderr
         sys.stdout = StringIO()
         sys.stderr = StringIO()
 
         if in_directory:
             os.chdir(in_directory)
+        else:
+            in_directory = cwd
 
         try:
+            print('running:', scriptname, 'in:', in_directory, file=oldout)
+            print('arguments', sysargs, file=oldout)
+
             status = _runscript(scriptname, sandbox=sandbox)
         except nose.SkipTest:
             raise
