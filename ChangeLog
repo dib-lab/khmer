@@ -1,3 +1,13 @@
+2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
+<titus@idyll.org>
+
+   * scripts/normalize-by-median.py,khmer/khmer_logger.py: added logging
+   framework, prototyped in normalize-by-median; added -q/--quiet to
+   * tests/test_normalize_by_median.py: associated tests.
+   * khmer/khmer_args.py: Made info function use logging functions.
+   * tests/khmer_tst_utils.py: removed info reporting in runscript from 'out'
+   returned.
+
 2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/kfile.py: added infrastructure for doing compressed output
@@ -24,7 +34,7 @@
 2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/Makefile,Makefile,lib/*.pc.in,lib/test-compile.cc: Misc debian-based
-   compatiablity changes
+   compatibility changes
    * lib/get_version.py: Add crunchbang, chmod +x
 
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>
