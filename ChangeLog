@@ -8,7 +8,24 @@
    * tests/khmer_tst_utils.py: removed info reporting in runscript from 'out'
    returned.
 
-2015-07-27  Sherine Awad  <drmahmoud@ucdavis.edu>
+2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/kfile.py: added infrastructure for doing compressed output
+   * khmer/thread_utils.py: switched threaded_sequence_processor to make use of
+   write_record
+   * scripts/{extract-long-sequences,extract-paired-reads,
+   extract-partitions,fastq-to-fasta,filter-abund-single,filter-abund,
+   interleave-reads,normalize-by-median,sample-reads-randomly,
+   split-paired-reads,trim-low-abund}.py: added output compression
+   * tests/{test_functions,test_scripts,test_normalize_by_median}.py: added
+   tests
+   * scripts/{load-graph,partition-graph,find-knots.py,
+   make-initial-stoptags}.py,oxli/build_graph.py: made load-graph no longer
+   add .pt to graph outfiles, changed partition-graph to not expect .pt's
+   * doc/whats-new-2.0.rst: doc'd changes to load-graph and partition-graph
+   * doc/dev/scripts-and-sandbox.rst: updated scripts/ requirements.
+
+2015-08-01  Sherine Awad  <drmahmoud@ucdavis.edu>
 
    * sandbox/multi-rename.py: updated output of long FASTA sequences to
    wrap text at 80 characters.

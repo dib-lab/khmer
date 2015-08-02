@@ -24,8 +24,10 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files, check_space, is_block
 from khmer.khmer_args import info
+from khmer.kfile import (add_output_compression_type, get_file_writer,
+                         describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
 
@@ -56,12 +58,13 @@ def get_parser():
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('w'),
+                        type=argparse.FileType('wb'),
                         default=sys.stdout)
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -89,6 +92,8 @@ def main():
         sys.exit(1)
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
+
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
 
     counter = 0
     screed_iter_1 = screed.open(s1_file)
@@ -118,10 +123,10 @@ def main():
                   "%s %s" % (read1.name, read2.name), file=sys.stderr)
             sys.exit(1)
 
-        write_record_pair(read1, read2, args.output)
+        write_record_pair(read1, read2, outfp)
 
     print('final: interleaved %d pairs' % counter, file=sys.stderr)
-    print('output written to', args.output.name, file=sys.stderr)
+    print('output written to', describe_file_handle(outfp), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

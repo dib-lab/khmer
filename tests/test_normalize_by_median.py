@@ -192,7 +192,7 @@ def test_normalize_by_median_stdout_3():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
-    assert 'in /dev/stdout' in err, err
+    assert 'in block device' in err, err
     assert "I/O Errors" not in err
 
 
