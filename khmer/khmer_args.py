@@ -237,8 +237,7 @@ def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
     import khmer
 
-    log_info("\n")
-    log_info("|| This is the script {name} in khmer.\n"
+    log_info("\n|| This is the script {name} in khmer.\n"
              "|| You are running khmer version {version}",
              name=scriptname, version=khmer.__version__)
     log_info("|| You are also using screed version {version}\n||",
