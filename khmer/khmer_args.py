@@ -17,7 +17,8 @@ import screed
 import khmer
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
-from khmer.utils import print_error
+from .utils import print_error
+from .khmer_logger import log_info
 
 
 DEFAULT_K = 32
@@ -51,8 +52,6 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
-    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
-                        action='store_true')
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
@@ -134,7 +133,7 @@ def add_loadhash_args(parser):
 
 def calculate_tablesize(args, hashtype, multiplier=1.0):
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception("unknown graph type: %s" % (hashtype,))
+        raise ValueError("unknown graph type: %s" % (hashtype,))
 
     if args.max_memory_usage:
         if hashtype == 'countgraph':
@@ -179,10 +178,7 @@ def report_on_config(args, hashtype='countgraph'):
     """
     from khmer.utils import print_error
     if hashtype not in ('countgraph', 'nodegraph'):
-        raise Exception("unknown graph type: %s" % (hashtype,))
-
-    if args.quiet:
-        return
+        raise ValueError("unknown graph type: %s" % (hashtype,))
 
     tablesize = calculate_tablesize(args, hashtype)
 
@@ -226,7 +222,8 @@ _algorithms = {
     'software': 'MR Crusoe et al., '
     '2014. http://dx.doi.org/10.6084/m9.figshare.979190',
     'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
-    'streaming': 'Q Zhang, S Awad, CT Brown, unpublished',
+    'streaming': 'Q Zhang, S Awad, CT Brown, '
+    'https://dx.doi.org/10.7287/peerj.preprints.890v1',
     'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
     'counting': 'Q Zhang et al., '
     'http://dx.doi.org/10.1371/journal.pone.0101271',
@@ -240,15 +237,14 @@ def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
     import khmer
 
-    sys.stderr.write("\n")
-    sys.stderr.write("|| This is the script '%s' in khmer.\n"
-                     "|| You are running khmer version %s\n" %
-                     (scriptname, khmer.__version__,))
-    sys.stderr.write("|| You are also using screed version %s\n||\n"
-                     % screed.__version__)
+    log_info("\n|| This is the script {name} in khmer.\n"
+             "|| You are running khmer version {version}",
+             name=scriptname, version=khmer.__version__)
+    log_info("|| You are also using screed version {version}\n||",
+             version=screed.__version__)
 
-    sys.stderr.write("|| If you use this script in a publication, please "
-                     "cite EACH of the following:\n||\n")
+    log_info("|| If you use this script in a publication, please "
+             "cite EACH of the following:\n||")
 
     if algorithm_list is None:
         algorithm_list = []
@@ -256,17 +252,14 @@ def info(scriptname, algorithm_list=None):
     algorithm_list.insert(0, 'software')
 
     for alg in algorithm_list:
-        sys.stderr.write("||   * ")
-        algstr = _algorithms[alg].encode(
+        algstr = "||   * " + _algorithms[alg].encode(
             'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
-            sys.stderr.write(algstr)
+            log_info(algstr)
         except UnicodeEncodeError:
-            sys.stderr.write(
-                algstr.encode(sys.getfilesystemencoding(), 'replace'))
-        sys.stderr.write("\n")
+            log_info(algstr.encode(sys.getfilesystemencoding(), 'replace'))
 
-    sys.stderr.write("||\n|| Please see http://khmer.readthedocs.org/en/"
-                     "latest/citations.html for details.\n\n")
+    log_info("||\n|| Please see http://khmer.readthedocs.org/en/"
+             "latest/citations.html for details.\n")
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

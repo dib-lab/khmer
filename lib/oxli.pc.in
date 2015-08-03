@@ -4,11 +4,11 @@ libdir=${exec_prefix}/lib
 sharedlibdir=${libdir}
 includedir=${prefix}/include
 
-Name: khmer
+Name: oxli
 Description: The unsupported core C++ library from the khmer project
 URL: http://khmer.readthedocs.org/
 Version: @VERSION@
 
 Requires:
-Libs: -L${libdir} -L${sharedlibdir} -lkhmer
+Libs: -L${libdir} -L${sharedlibdir} -loxli
 Cflags: -I${includedir}

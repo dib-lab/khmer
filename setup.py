@@ -106,7 +106,7 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
+    "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
     "hllcounter"])
 
@@ -178,9 +178,7 @@ SETUP_METADATA = \
         "url": 'https://khmer.readthedocs.org/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9'],
-        # testing screed download link
-
+        "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},

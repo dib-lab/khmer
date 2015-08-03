@@ -77,14 +77,14 @@ def main():
     graphbase = args.graphbase
 
     # @RamRS: This might need some more work
-    infiles = [graphbase + '.pt', graphbase + '.tagset']
+    infiles = [graphbase, graphbase + '.tagset']
     if args.stoptags:
         infiles.append(args.stoptags)
     for _ in infiles:
         check_input_files(_, args.force)
 
     print('loading htable %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    htable = khmer.load_hashbits(graphbase)
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:

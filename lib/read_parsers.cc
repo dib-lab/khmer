@@ -5,14 +5,13 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "read_parsers.hh"
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+#include <fstream>
 
-#include <cstring>
 #include "khmer_exception.hh"
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
+#include "read_parsers.hh"
 
 namespace khmer
 {

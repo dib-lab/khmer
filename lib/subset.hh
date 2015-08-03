@@ -8,13 +8,17 @@
 #ifndef SUBSET_HH
 #define SUBSET_HH
 
+#include <stddef.h>
+#include <queue>
+#include <string>
+
 #include "khmer.hh"
 
 namespace khmer
 {
 class CountingHash;
-class Hashtable;
 class Hashbits;
+class Hashtable;
 
 struct pre_partition_info {
     HashIntoType kmer;

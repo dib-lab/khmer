@@ -40,11 +40,7 @@ def get_parser():
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
 
     The output file contains sequence id, median, average, stddev, and
-    seq length; fields are separated by spaces. For khmer 1.x
-    count-median.py will split sequence names at the first space which
-    means that some sequence formats (e.g. paired FASTQ in Casava 1.8
-    format) will yield uninformative names.  Use :option:`--csv` to
-    fix this behavior.
+    seq length, in comma-separated value (CSV) format.
 
     Example::
 
@@ -61,14 +57,12 @@ def get_parser():
     parser.add_argument('input', metavar='input_sequence_filename',
                         help='input FAST[AQ] sequence filename')
     parser.add_argument('output', metavar='output_summary_filename',
-                        help='output summary filename')
+                        help='output summary filename',
+                        type=argparse.FileType('w'))
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--csv', default=False, action='store_true',
-                        help="Use the CSV format for the histogram."
-                        "Includes column headers.")
     return parser
 
 
@@ -78,7 +72,8 @@ def main():
 
     htfile = args.ctfile
     input_filename = args.input
-    output_filename = args.output
+    output = args.output
+    output_filename = str(output)
 
     infiles = [htfile, input_filename]
     for infile in infiles:
@@ -89,21 +84,13 @@ def main():
     print('loading k-mer counting table from', htfile, file=sys.stderr)
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
-
     print('writing to', output_filename, file=sys.stderr)
-    output = open(output_filename, 'w')
 
-    if args.csv:
-        output = csv.writer(output)
-        # write headers:
-        output.writerow(['name', 'median', 'average', 'stddev', 'seqlen'])
+    output = csv.writer(output)
+    # write headers:
+    output.writerow(['name', 'median', 'average', 'stddev', 'seqlen'])
 
-    parse_description = True            # @legacy behavior: split seq headers
-    if args.csv:
-        parse_description = False       # only enable if we're doing csv out
-
-    for record in screed.open(input_filename,
-                              parse_description=parse_description):
+    for record in screed.open(input_filename):
         seq = record.sequence.upper()
         if 'N' in seq:
             seq = seq.replace('N', 'A')
@@ -111,10 +98,7 @@ def main():
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
             ave, stdev = [round(x, 9) for x in (ave, stdev)]
-            if args.csv:
-                output.writerow([record.name, medn, ave, stdev, len(seq)])
-            else:
-                print(record.name, medn, ave, stdev, len(seq), file=output)
+            output.writerow([record.name, medn, ave, stdev, len(seq)])
 
 if __name__ == '__main__':
     main()

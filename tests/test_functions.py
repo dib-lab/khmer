@@ -13,7 +13,7 @@ import collections
 from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
-from khmer.kfile import check_input_files
+from khmer.kfile import check_input_files, get_file_writer
 try:
     from StringIO import StringIO
 except ImportError:
@@ -25,6 +25,19 @@ def test_forward_hash():
     assert khmer.forward_hash('TTTT', 4) == 0
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
+
+
+def test_get_file_writer_fail():
+    somefile = utils.get_temp_filename("potato")
+    somefile = open(somefile, "w")
+    stopped = True
+    try:
+        get_file_writer(somefile, True, True)
+        stopped = False
+    except Exception as err:
+        assert "Cannot specify both bzip and gzip" in str(err), str(err)
+
+    assert stopped, "Expected exception"
 
 
 def test_forward_hash_no_rc():
@@ -86,9 +99,7 @@ def test_get_primes_fal():
     try:
         primes = khmer.get_n_primes_near_x(5, 5)
         assert 0, "previous statement should fail"
-    except AssertionError:
-        raise
-    except Exception as err:
+    except RuntimeError as err:
         assert "unable to find 5 prime numbers < 5" in str(err)
 
 

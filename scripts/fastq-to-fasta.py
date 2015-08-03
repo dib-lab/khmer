@@ -14,10 +14,13 @@ Convert FASTQ files to FASTA format.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import sys
 import argparse
 import screed
+from khmer.kfile import (add_output_compression_type, get_file_writer,
+                         is_block, describe_file_handle)
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -28,23 +31,24 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
+                        type=argparse.FileType('wb'),
                         help='The name of the output'
                         ' FASTA sequence file.',
-                        type=argparse.FileType('w'),
                         default=sys.stdout)
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
-                        help='Option to drop reads containing \'N\'s in ' +
-                        'input_sequence file.')
+                        help='Option to keep reads containing \'N\'s in '
+                             'input_sequence file. Default is to drop reads')
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    print(('fastq from ', args.input_sequence), file=sys.stderr)
 
+    print(('fastq from ', args.input_sequence), file=sys.stderr)
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence,
-                                           parse_description=False)):
+    for n, record in enumerate(screed.open(args.input_sequence)):
         if n % 10000 == 0:
             print('...', n, file=sys.stderr)
 
@@ -56,8 +60,8 @@ def main():
                 n_count += 1
                 continue
 
-        args.output.write('>' + name + '\n')
-        args.output.write(sequence + '\n')
+        del record['quality']
+        write_record(record, outfp)
 
     print('\n' + 'lines from ' + args.input_sequence, file=sys.stderr)
 
@@ -67,7 +71,8 @@ def main():
     else:
         print('No lines dropped from file.', file=sys.stderr)
 
-    print('Wrote output to', args.output, file=sys.stderr)
+    print('Wrote output to', describe_file_handle(args.output),
+          file=sys.stderr)
 
 if __name__ == '__main__':
     main()
