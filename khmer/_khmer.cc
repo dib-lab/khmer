@@ -4275,32 +4275,12 @@ static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align_forward", (PyCFunction)readaligner_align_forward, METH_VARARGS, ""},
     {
         "get_scoring_matrix", (PyCFunction)khmer_ReadAligner_get_scoring_matrix,
-        METH_VARARGS,
-        "Get the scoring matrix in use.\n\n\
-Returns a tuple of floats: (trusted_match, trusted_mismatch, untrusted_match, \
-untrusted_mismatch)"
+        METH_VARARGS
     },
     {
         "get_transition_probabilities",
         (PyCFunction)khmer_ReadAligner_get_transition_probabilities,
-        METH_VARARGS,
-        "Get the transition probabilties in use.\n\n\
-HMM state notation abbreviations:\n\
-    M_t - trusted match; M_u - untrusted match\n\
-    Ir_t - trusted read insert; Ir_u - untrusted read insert\n\
-    Ig_t - trusted graph insert; Ig_u - untrusted graph insert\n\
-\
-Returns a sparse matrix as a tuple of six tuples.\n\
-The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.\n\
-Transition are notated as 'StartState-NextState':\n\
-(\n\
-  ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),\n\
-  (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),\n\
-  (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),\n\
-  ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),\n\
-  (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),\n\
-  (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)\n\
-)"
+        METH_VARARGS
     },
     {NULL} /* Sentinel */
 };

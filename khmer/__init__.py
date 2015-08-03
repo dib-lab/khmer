@@ -411,3 +411,42 @@ class ReadAligner(_ReadAligner):
         the traditional way.
         """
         _ReadAligner.__init__(self)
+
+    def align_forward(self, read):
+        return _ReadAligner.align_forward(self, read)
+
+    def align(self, read):
+        return _ReadAligner.align(self, read)
+
+    def get_scoring_matrix(self):
+        """
+        Get the scoring matrix in use.
+
+        Returns a tuple of floats:
+        (trusted_match, trusted_mismatch, untrusted_match,untrusted_mismatch)
+        """
+        return _ReadAligner.get_scoring_matrix(self)
+
+    def get_transition_probabilities(self):
+        """
+        Get the transition probabilties in use.
+
+        HMM state notation abbreviations:
+        M_t - trusted match;            M_u - untrusted match
+        Ir_t - trusted read insert;     Ir_u - untrusted read insert
+        Ig_t - trusted graph insert;    Ig_u - untrusted graph insert
+
+        Returns a sparse matrix as a tuple of six tuples.
+        The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.
+        Transition are notated as 'StartState-NextState':
+
+        {
+            ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),
+            (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),
+            (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),
+            ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),
+            (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),
+            (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)
+        }
+        """
+        return _ReadAligner.get_transition_probabilities(self)
