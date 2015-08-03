@@ -4,11 +4,13 @@ make clean
 
 rm -Rf .env dist cov-int
 
-if type python2> /dev/null 2>&1
-then
-    PYTHON_EXECUTABLE=$(which python2)
-else
-    PYTHON_EXECUTABLE=$(which python)
+if [ -z "${PYTHON_EXECUTABLE}" ]; then
+    if type python2> /dev/null 2>&1
+    then
+        PYTHON_EXECUTABLE=$(which python2)
+    else
+        PYTHON_EXECUTABLE=$(which python)
+    fi
 fi
 virtualenv -p ${PYTHON_EXECUTABLE} .env
 
@@ -32,7 +34,7 @@ then
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 	python setup.py build_ext --build-temp $PWD --debug --inplace \
 		--libraries gcov develop
-	make coverage-gcovr.xml coverage.xml
+	make coverage-gcovr.xml coverage.xml TESTATTR='!known_failing,!huge'
 	./setup.py install
 else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
@@ -70,5 +72,10 @@ fi
 # takes too long to run on every build
 #bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
 
-make lib
+unset CFLAGS
+unset LDFLAGS
+unset CPPFLAGS
+unset CXXFLAGS
+
+# Don't do lib too, as we already compile as part of libtest
 make libtest

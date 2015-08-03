@@ -8,19 +8,38 @@
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
-#include "hashtable.hh"
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <map>
+#include <string>
+#include <utility>
 #include <vector>
+
+#include "hashtable.hh"
+#include "khmer.hh"
+#include "kmer_hash.hh"
+
+namespace khmer
+{
+class Hashbits;
+
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
-class CountingHashIntersect;
 class CountingHashFile;
 class CountingHashFileReader;
 class CountingHashFileWriter;
 class CountingHashGzFileReader;
 class CountingHashGzFileWriter;
+class CountingHashIntersect;
 
 class CountingHash : public khmer::Hashtable
 {

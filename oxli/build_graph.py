@@ -76,8 +76,8 @@ def main(args):
     print('Total number of unique k-mers: {0}'.format(htable.n_unique_kmers()),
           file=sys.stderr)
 
-    print('saving k-mer presence table in', base + '.pt', file=sys.stderr)
-    htable.save(base + '.pt')
+    print('saving k-mer presence table in', base, file=sys.stderr)
+    htable.save(base)
 
     if not args.no_build_tagset:
         print('saving tagset in', base + '.tagset', file=sys.stderr)
@@ -95,7 +95,7 @@ def main(args):
     print('\nfalse positive rate estimated to be %1.3f' % fp_rate,
           file=info_fp)
 
-    print('wrote to', base + '.info and', base + '.pt', file=sys.stderr)
+    print('wrote to ' + base + '.info and ' + base, file=sys.stderr)
     if not args.no_build_tagset:
         print('and ' + base + '.tagset', file=sys.stderr)
 

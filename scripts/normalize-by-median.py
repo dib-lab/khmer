@@ -31,8 +31,10 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info, calculate_tablesize)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer, is_block, describe_file_handle)
 from khmer.utils import write_record, broken_paired_reader
+from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
 DEFAULT_DESIRED_COVERAGE = 20
@@ -44,6 +46,7 @@ class WithDiagnostics(object):
 
     uses a Normalizer object.
     """
+
     def __init__(self, norm, report_fp=None, report_frequency=100000):
         self.norm = norm
         self.report_fp = report_fp
@@ -84,10 +87,10 @@ class WithDiagnostics(object):
 
                     perc_kept = kept / float(total)
 
-                    print('... kept {kept} of {tot} or {perc_kept:.1%} so far'
-                          .format(kept=kept, tot=total, perc_kept=perc_kept),
-                          file=sys.stderr)
-                    print('... in file ' + ifilename, file=sys.stderr)
+                    log_info('... kept {kept} of {tot} or {perc_kept:.1%} so'
+                             'far', kept=kept, tot=total,
+                             perc_kept=perc_kept)
+                    log_info('... in file {name}', name=ifilename)
 
                     if report_fp:
                         print("{total},{kept},{f_kept:.4}"
@@ -101,14 +104,13 @@ class WithDiagnostics(object):
 
         # per file diagnostic output
         if total == reads_start:
-            print('SKIPPED empty file ' + ifilename, file=sys.stderr)
+            log_info('SKIPPED empty file {name}', name=ifilename)
         else:
             perc_kept = kept / float(total)
 
-            print('DONE with {inp}; kept {kept} of {total} or {perc_kept:.1%}'
-                  .format(inp=ifilename, kept=kept, total=total,
-                          perc_kept=perc_kept),
-                  file=sys.stderr)
+            log_info('DONE with {inp}; kept {kept} of {total} or '
+                     '{perc_kept:.1%}', inp=ifilename, kept=kept, total=total,
+                     perc_kept=perc_kept)
 
         # make sure there's at least one report per file, at the end of each
         # file.
@@ -166,16 +168,16 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
     try:
         yield
     except (IOError, OSError, ValueError) as error:
-        print('** ERROR: ' + str(error), file=sys.stderr)
-        print('** Failed on {name}: '.format(name=ifile), file=sys.stderr)
+        log_error('** ERROR: {error}', error=str(error))
+        log_error('** Failed on {name}: ', name=ifile)
         if not single_out:
             os.remove(out.name)
         if not force:
-            print('** Exiting!', file=sys.stderr)
+            log_error('** Exiting!')
 
             sys.exit(1)
         else:
-            print('*** Skipping error file, moving on...', file=sys.stderr)
+            log_error('*** Skipping error file, moving on...')
             corrupt_files.append(ifile)
 
 
@@ -234,6 +236,8 @@ def get_parser():
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
@@ -249,7 +253,7 @@ def get_parser():
                         help='save the k-mer counting table to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
+                        metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
                         metavar='report_frequency', type=int,
                         default=100000)
@@ -257,29 +261,31 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_file',
-                        type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+                        type=argparse.FileType('wb'),
+                        default=None, dest='single_output_file',
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     add_loadhash_args(parser)
+    add_output_compression_type(parser)
     return parser
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
-    info('normalize-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
-
-    report_on_config(args)
+    configure_logging(args.quiet)
+    info('normalize-by-median.py', ['diginorm'])
+    if not args.quiet:
+        report_on_config(args)
 
     report_fp = args.report
     force_single = args.force_single
 
-    # if optimization args are given, do optimization
+    # if estimates of k-mer numbers are given, choose table sizes.
     args = oxutils.do_sanity_checking(args, 0.1)
 
     # check for similar filenames
@@ -294,9 +300,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
         basename = os.path.basename(pathfilename)
         if basename in basenames:
-            print('ERROR: Duplicate filename--Cannot handle this!',
-                  file=sys.stderr)
-            print('** Exiting!', file=sys.stderr)
+            log_error('ERROR: Duplicate filename--Cannot handle this!')
+            log_error('** Exiting!')
             sys.exit(1)
 
         basenames.append(basename)
@@ -310,15 +315,15 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     # load or create counting table.
     if args.loadtable:
-        print('loading k-mer counting table from ' + args.loadtable,
-              file=sys.stderr)
+        log_info('loading k-mer counting table from {table}',
+                 table=args.loadtable)
         htable = khmer.load_counting_hash(args.loadtable)
         if args.unique_kmers != 0:
-            print('Warning: You have specified a number of unique kmers'
-                  ' but are loading a precreated counting table--'
-                  'argument optimization will NOT be done.', file=sys.stderr)
+            log_info('Warning: You have specified the number of unique kmers'
+                     ' but are loading a precreated counting table --'
+                     ' counting table size will NOT be set automatically.')
     else:
-        print('making countgraph', file=sys.stderr)
+        log_info('making countgraph')
         htable = khmer_args.create_countgraph(args)
 
     # create an object to handle diginorm of all files
@@ -339,11 +344,12 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     output_name = None
 
     if args.single_output_file:
-        if args.single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
-        else:
-            output_name = args.single_output_file.name
-        outfp = args.single_output_file
+        outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
 
     #
     # main loop: iterate over all files given, do diginorm.
@@ -352,13 +358,14 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     for filename, require_paired in files:
         if not args.single_output_file:
             output_name = os.path.basename(filename) + '.keep'
-            outfp = open(output_name, 'w')
+            outfp = open(output_name, 'wb')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
 
-            screed_iter = screed.open(filename, parse_description=False)
+            screed_iter = screed.open(filename)
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
@@ -368,32 +375,29 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 if record is not None:
                     write_record(record, outfp)
 
-            print('output in ' + output_name, file=sys.stderr)
-            if output_name is not '/dev/stdout':
+            log_info('output in {name}', name=describe_file_handle(outfp))
+            if not is_block(outfp):
                 outfp.close()
 
     # finished - print out some diagnostics.
 
-    print('Total number of unique k-mers: {0}'
-          .format(htable.n_unique_kmers()),
-          file=sys.stderr)
+    log_info('Total number of unique k-mers: {umers}',
+             umers=htable.n_unique_kmers())
 
     if args.savetable:
-        print('...saving to ' + args.savetable, file=sys.stderr)
+        log_info('...saving to {name}', name=args.savetable)
         htable.save(args.savetable)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
-    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
-          file=sys.stderr)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
-        print("** WARNING: Finished with errors!", file=sys.stderr)
-        print("** I/O Errors occurred in the following files:",
-              file=sys.stderr)
-        print("\t", " ".join(corrupt_files), file=sys.stderr)
+        log_error("** WARNING: Finished with errors!")
+        log_error("** I/O Errors occurred in the following files:")
+        log_error("\t" + " ".join(corrupt_files))
 
 
 if __name__ == '__main__':

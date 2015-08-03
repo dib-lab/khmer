@@ -7,6 +7,8 @@
 Getting started with khmer development
 ======================================
 
+.. contents::
+
 This document is for people who would like to contribute to khmer.  It
 walks first-time contributors through making their own copy of khmer,
 building it, and submitting changes for review and merge into the master
@@ -332,3 +334,26 @@ Here are a few suggestions:
 
 * You can also help other people out by watching for new issues or
   looking at pull requests.  Remember to be nice and polite!
+
+Your second contribution...
+---------------------------
+
+Here are a few pointers on getting started on your second (or third,
+or fourth, or nth contribution).
+
+So, assuming you've found an issue you'd like to work on there are a
+couple things to do to make sure your local copy of the repository is
+ready for a new issue--specifically, we need to make sure it's in sync
+with the remote repository so you aren't working on a old copy. So::
+
+        git checkout master
+        git fetch --all
+        git pull
+
+This puts you on the latest master branch and pulls down updates from
+GitHub with any changes that may have been made since your last
+contribution (usually including the merge of your last
+contribution). Then we merge those changes into your local copy of the
+master branch.
+
+Now, you can go back to `Claiming an issue and starting to develop`_.

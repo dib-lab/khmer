@@ -9,22 +9,35 @@
 #define HASHTABLE_HH
 
 
-#include <vector>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <fstream>
 #include <iostream>
 #include <list>
-#include <queue>
-
-#include <fstream>
-#include <string>
-#include <set>
 #include <map>
 #include <queue>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
+#include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
-#include "kmer_hash.hh"
+
+namespace khmer
+{
+class CountingHash;
+class Hashtable;
+
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -40,29 +53,6 @@
 
 namespace khmer
 {
-#ifdef WITH_INTERNAL_METRICS
-struct HashTablePerformanceMetrics : public IPerformanceMetrics {
-
-    enum {
-        MKEY_TIME_NORM_READ,
-        MKEY_TIME_HASH_KMER,
-        MKEY_TIME_UPDATE_TALLIES
-    };
-
-    uint64_t	clock_nsecs_norm_read;
-    uint64_t	cpu_nsecs_norm_read;
-    uint64_t	clock_nsecs_hash_kmer;
-    uint64_t	cpu_nsecs_hash_kmer;
-    uint64_t	clock_nsecs_update_tallies;
-    uint64_t	cpu_nsecs_update_tallies;
-
-    HashTablePerformanceMetrics( );
-    virtual ~HashTablePerformanceMetrics( );
-
-    virtual void	accumulate_timer_deltas( uint32_t metrics_key );
-
-};
-#endif
 
 //
 // Sequence iterator class, test.  Not really a C++ iterator yet.
@@ -242,7 +232,7 @@ protected:
     uint32_t _all_tags_spin_lock;
 
     explicit Hashtable(const Hashtable&);
-    const Hashtable& operator=(const Hashtable&);
+    Hashtable& operator=(const Hashtable&);
 
 public:
     SubsetPartition * partition;

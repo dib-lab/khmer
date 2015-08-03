@@ -5,10 +5,18 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "labelhash.hh"
-
-#include <sstream>
 #include <errno.h>
+#include <string.h>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <set>
+
+#include "hashbits.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "labelhash.hh"
+#include "read_parsers.hh"
+#include "subset.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 
