@@ -1,3 +1,7 @@
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/test_counting_single.py: removed redundant test
+
 2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
 <titus@idyll.org>
 
