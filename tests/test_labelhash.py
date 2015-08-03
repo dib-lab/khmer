@@ -6,7 +6,7 @@ from __future__ import absolute_import
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=missing-docstring,protected-access
+# pylint: disable=missing-docstring,protected-access,no-member
 import os
 import khmer
 from khmer import LabelHash, CountingLabelHash
