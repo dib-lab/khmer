@@ -268,8 +268,8 @@ def test_load_graph_1():
     print(cmd)
 
     (status, out, err) = run_shell_cmd(cmd)
-    assert os.path.exists(out1 + '.pt')
-    khmer.load_hashbits(out1 + '.pt')
+    assert os.path.exists(out1)
+    khmer.load_hashbits(out1)
 
 
 def test_filter_abund_1():

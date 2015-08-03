@@ -710,7 +710,7 @@ def test_load_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -743,7 +743,7 @@ def test_oxli_build_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -778,7 +778,7 @@ def test_load_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -801,7 +801,7 @@ def test_oxli_build_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -852,7 +852,7 @@ def test_load_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -875,7 +875,7 @@ def test_oxli_build_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -921,7 +921,7 @@ def test_load_graph_max_memory_usage_parameter():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     try:
@@ -946,7 +946,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -1044,7 +1044,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1068,7 +1068,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1081,7 +1081,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -1100,7 +1100,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1115,7 +1115,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1131,7 +1131,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_hashbits(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1632,6 +1632,33 @@ def test_do_partition_2_fq():
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
+
+
+def test_interleave_read_stdout():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2]
+
+    (stats, out, err) = utils.runscript(script, args)
+
+    with open(outfile, 'w') as ofile:
+        ofile.write(out)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
 
 
 def test_interleave_read_seq1_fq():
@@ -2372,6 +2399,52 @@ def test_sample_reads_randomly_force_single():
     assert seqs == answer
 
 
+def test_sample_reads_randomly_force_single_outfile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    script = 'sample-reads-randomly.py'
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single', '-o',
+            in_dir + '/randreads.out']
+
+    args.append(infile)
+    utils.runscript(script, args, in_dir)
+
+    outfile = in_dir + '/randreads.out'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print(list(sorted(seqs)))
+
+    if sys.version_info.major == 2:
+        answer = {'850:2:1:2399:20086/2',
+                  '850:2:1:2273:13309/1',
+                  '850:2:1:2065:16816/1',
+                  '850:2:1:1984:7162/2',
+                  '850:2:1:2691:14602/1',
+                  '850:2:1:1762:5439/1',
+                  '850:2:1:2503:4494/2',
+                  '850:2:1:2263:11143/2',
+                  '850:2:1:1792:15774/2',
+                  '850:2:1:2084:17145/1'}
+    else:
+        answer = {'850:2:1:1199:4197/1',
+                  '850:2:1:1251:16575/2',
+                  '850:2:1:1267:6790/2',
+                  '850:2:1:1601:4443/1',
+                  '850:2:1:1625:19325/1',
+                  '850:2:1:1832:14607/2',
+                  '850:2:1:1946:20852/2',
+                  '850:2:1:2401:4896/2',
+                  '850:2:1:2562:1308/1',
+                  '850:2:1:3123:15968/2'}
+
+    assert seqs == answer
+
+
 def test_sample_reads_randomly_fq():
     infile = utils.get_temp_filename('test.fq.gz')
     in_dir = os.path.dirname(infile)
@@ -2441,7 +2514,7 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2, len(out.splitlines())
+    assert len(out.splitlines()) == 0, len(out.splitlines())
     assert "No lines dropped" in err
 
     names = [r.name for r in screed.open(clean_outfile)]
@@ -2449,28 +2522,130 @@ def test_fastq_to_fasta():
 
     args = [n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "No lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [n_infile, '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2, out
+    assert len(out.splitlines()) == 0, out
     assert "4 lines dropped" in err, err
 
     args = [clean_infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "0 lines dropped" in err
 
     args = [n_infile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "4 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--gzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 0
+    assert "0 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--bzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 0
+    assert "0 lines dropped" in err
+
+
+def test_fastq_to_fasta_streaming_compressed_gzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.gz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--gzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    gzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x1f\x8b\x08"  # gzip magic signature
+    file_start = gzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
+
+
+def test_fastq_to_fasta_streaming_compressed_bzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.bz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--bzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    bzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x42\x5a\x68"  # bzip magic signature
+    file_start = bzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
 
 
 def test_extract_long_sequences_fa():
@@ -2608,7 +2783,7 @@ def test_count_overlap_invalid_datafile():
     outfile = utils.get_temp_filename('overlap.out', in_dir)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', htfile + '.pt', outfile]
+            htfile, htfile, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
     assert "OSError" in err
@@ -2625,7 +2800,7 @@ def test_count_overlap_csv():
     htfile = _make_graph(seqfile1, ksize=20)
     script = 'count-overlap.py'
     args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
-            '10000000', htfile + '.pt', seqfile2, outfile]
+            '10000000', htfile, seqfile2, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
@@ -2702,7 +2877,7 @@ def _execute_load_graph_streaming(filename):
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = os.path.join(in_dir, 'out.pt')
+    ht_file = os.path.join(in_dir, 'out')
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = os.path.join(in_dir, 'out.tagset')
