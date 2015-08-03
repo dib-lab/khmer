@@ -1,3 +1,7 @@
+2015-08-02  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * Makefile: added oxli to pep257 make target
+
 2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
 <titus@idyll.org>
 
