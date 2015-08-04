@@ -41,7 +41,7 @@ can be installed via the following::
         export PATH=$PATH:~/bin/
 
 Note, if you want codespell to always be available you will need to add the
-`export` line to your `.bashrc` or equivalent.
+`export` line to your `${HOME}\.bashrc` or equivalent.
 
 To run codespell over only what has been changed on the branch `my-branch`::
 

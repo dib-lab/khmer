@@ -1,7 +1,16 @@
-2015-07-31  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added codespell as a possible
    spelling tool
+
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * Makefile: added oxli to pep257 make target, made clean target wipe out all
+   .pyc files in scripts/* and tests/* and oxli/*
+
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/test_counting_single.py: removed redundant test
 
 2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
 <titus@idyll.org>

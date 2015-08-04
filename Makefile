@@ -73,7 +73,7 @@ clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc
+	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
@@ -123,10 +123,10 @@ diff_pep8_report: pep8_report.txt
 ## pep257      : check Python code style
 pep257: $(PYSOURCES) $(wildcard tests/*.py)
 	pep257 --ignore=D100,D101,D102,D103 \
-		setup.py khmer/ scripts/ tests/ || true
+		setup.py khmer/ scripts/ tests/ oxli/ || true
 
 pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 setup.py khmer/ scripts/ tests/ \
+	pep257 setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep257_report.txt 2>&1 || true
 
 diff_pep257_report: pep257_report.txt
