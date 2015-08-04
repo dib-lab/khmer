@@ -1,5 +1,5 @@
-2015-08-04  Titus Brown  <titus@idyll.org> and
-Camille Scott  <camille.scott.w@gmail.com>
+2015-08-04  Titus Brown  <titus@idyll.org> and Camille Scott
+<camille.scott.w@gmail.com>
 
    * khmer/utils.py: added UnpairedReadsError exception.
    * scripts/{extract-paired-reads,split-paired-reads}.py: changed --output-dir

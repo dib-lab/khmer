@@ -46,7 +46,7 @@ def get_parser():
     :option:`-2`/:option:`--output-second`, which will override the
     :option:`-d`/:option:`--output-dir` setting on a file-specific basis.
 
-    :option:`-0`/:option:'`--output-orphans` will allow broken-paired format,
+    :option:`-0`/:option:'--output-orphans` will allow broken-paired format,
     and orphaned reads will be saved separately, to the specified file.
 
     Example::
