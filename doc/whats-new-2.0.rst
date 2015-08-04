@@ -1,7 +1,8 @@
 .. vim: set filetype=rst
 
+************************
 What's New In khmer 2.0?
-########################
+************************
 
 New behavior
 ============
@@ -9,7 +10,7 @@ New behavior
 Digital normalization script now supports mixed paired and unpaired read input
 ------------------------------------------------------------------------------
 
-`normalize-by-median.py` now supports mixed paired and unpaired (or
+:program:`normalize-by-median.py` now supports mixed paired and unpaired (or
 "broken-paired") input. Behavior can be forced to either treat all
 reads as singletons or to require all reads be properly paired using
 :option:`--force-single` or :option:`--paired`, respectively. If
@@ -20,7 +21,7 @@ after all of the other sequence files.
 Reservoir sampling script extracts paired reads by default
 ----------------------------------------------------------
 
-`sample-reads-randomly.py` now retains pairs in the output, by
+:program:`sample-reads-randomly.py` now retains pairs in the output, by
 default.  This can be overridden to match previous behavior
 with :option:`--force_single`.
 
@@ -69,9 +70,10 @@ Scripts now output columnar data in CSV format by default
 
 All scripts that output any kind of columnar data now do so in CSV format,
 with headers.  Previously this had to be enabled with :option:`--csv`.
-(Affects `abundance-dist-single.py`, `abundance-dist.py`, `count-median.py`,
-and `count-overlap.py`.) `normalize-by-median.py` also now outputs CSV
-when :option:`-R` is used.
+(Affects :program:`abundance-dist-single.py`, :program:`abundance-dist.py`,
+:program:`count-median.py`, and :program:`count-overlap.py`.)
+:program:`normalize-by-median.py` also now outputs CSV when :option:`-R` is
+used.
 
 load-graph.py no longer appends .pt to the specified filename
 -------------------------------------------------------------

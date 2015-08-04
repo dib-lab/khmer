@@ -1,13 +1,14 @@
 .. vim: set filetype=rst
 
 .. If you update this file then you may need to update the citations in
-   scripts/galaxy/macro.xml and khmer/khmer_args.py as well
+   khmer/khmer_args.py as well
 
+*********
 Citations
----------
+*********
 
 Software Citation
-^^^^^^^^^^^^^^^^^
+=================
 
 If you use the khmer software, you must cite:
 
@@ -38,10 +39,11 @@ To see a quick summary of papers for a given script just run it without using
 any command line arguments.
 
 Graph partitioning and/or compressible graph representation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
-The load-graph.py, partition-graph.py, find-knots.py, load-graph.py,
-and partition-graph.py scripts are part of the compressible graph
+The :program:`load-graph.py`, :program:`partition-graph.py`,
+:program:`find-knots.py`, :program:`load-graph.py`, and
+:program:`partition-graph.py` scripts are part of the compressible graph
 representation and partitioning algorithms described in:
 
    Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
@@ -84,10 +86,10 @@ representation and partitioning algorithms described in:
   }
 
 Digital normalization
-^^^^^^^^^^^^^^^^^^^^^
+=====================
 
-The normalize-by-median.py and count-median.py scripts are part of
-the digital normalization algorithm, described in:
+The :program:`normalize-by-median.py` and :program:`count-median.py` scripts
+are part of the digital normalization algorithm, described in:
 
    A Reference-Free Algorithm for Computational Normalization of
    Shotgun Sequencing Data
@@ -108,9 +110,9 @@ the digital normalization algorithm, described in:
   }
 
 Efficient k-mer error trimming
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-The script trim-low-abund.py is described in:
+The :program:`script trim-low-abund.py` is described in:
 
    Crossing the streams: a framework for streaming analysis of short DNA
    sequencing reads
@@ -121,17 +123,19 @@ The script trim-low-abund.py is described in:
 
   @unpublished{semistream,
       author = "Qingpeng Zhang and Sherine Awad and C. Titus Brown",
-      title = "Crossing the streams: a framework for streaming analysis of short DNA sequencing reads",
+      title = "Crossing the streams: a framework for streaming analysis of
+          short DNA sequencing reads",
       year = "2015",
       eprint = "PeerJ Preprints 3:e1100",
       url = "https://dx.doi.org/10.7287/peerj.preprints.890v1"
   }
 
 K-mer counting
-^^^^^^^^^^^^^^
+==============
 
-The abundance-dist.py, filter-abund.py, and load-into-counting.py scripts
-implement the probabilistic k-mer counting described in:
+The :program:`abundance-dist.py`, :program:`filter-abund.py`, and
+:program:`load-into-counting.py` scripts implement the probabilistic k-mer
+counting described in:
 
    These Are Not the K-mers You Are Looking For: Efficient Online K-mer
    Counting Using a Probabilistic Data Structure
@@ -179,7 +183,7 @@ implement the probabilistic k-mer counting described in:
   }
 
 FASTA and FASTQ reading
-^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 Several scripts use the SeqAn library for FASTQ and FASTA reading as described
 in:
