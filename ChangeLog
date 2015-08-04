@@ -1,3 +1,14 @@
+2015-08-04  Titus Brown  <titus@idyll.org> and
+Camille Scott  <camille.scott.w@gmail.com>
+
+   * khmer/utils.py: added UnpairedReadsError exception.
+   * scripts/{extract-paired-reads,split-paired-reads}.py: changed --output-dir
+   argument short form to use '-d'.
+   * scripts/{split-paired-reads.py} added -0 <filename> to allow orphans; made
+   '-p'/'--force-paired' default & removed from script.
+   * tests/{test_scripts,test_streaming_io}.py: updated and added tests for
+   new behavior.
+
 2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_counting_single.py: removed redundant test

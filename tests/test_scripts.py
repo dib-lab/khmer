@@ -2164,11 +2164,11 @@ def test_split_paired_reads_2_mixed_fq_orphans_to_file():
     assert status == 0
     assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
 
-    n_orphans = len([ 1 for record in screed.open(outfile) ])
+    n_orphans = len([1 for record in screed.open(outfile)])
     assert n_orphans == 5
-    n_left = len([ 1 for record in screed.open(infile + '.1') ])
+    n_left = len([1 for record in screed.open(infile + '.1')])
     assert n_left == 3
-    n_right = len([ 1 for record in screed.open(infile + '.2') ])
+    n_right = len([1 for record in screed.open(infile + '.2')])
     assert n_right == 3
     for filename in [outfile, infile + '.1', infile + '.2']:
         fp = gzip.open(filename)
@@ -2193,11 +2193,11 @@ def test_split_paired_reads_2_mixed_fq_gzfile():
     assert status == 0
     assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
 
-    n_orphans = len([ 1 for record in screed.open(outfile) ])
+    n_orphans = len([1 for record in screed.open(outfile)])
     assert n_orphans == 5
-    n_left = len([ 1 for record in screed.open(infile + '.1') ])
+    n_left = len([1 for record in screed.open(infile + '.1')])
     assert n_left == 3
-    n_right = len([ 1 for record in screed.open(infile + '.2') ])
+    n_right = len([1 for record in screed.open(infile + '.2')])
     assert n_right == 3
 
     for filename in [outfile, infile + '.1', infile + '.2']:
