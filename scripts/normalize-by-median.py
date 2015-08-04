@@ -182,7 +182,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
 
 
 def get_parser():
-    epilog = ("""
+    epilog = """
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
@@ -217,22 +217,24 @@ def get_parser():
 
     Example::
 
-""" "        normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
-    """
+        normalize-by-median.py -p -k 17 \\
+        tests/test-data/test-abund-read-paired.fa
 
     Example::
 
-""" "        normalize-by-median.py -p -k 17 -o - tests/test-data/paired.fq >> appended-output.fq"  # noqa
-    """
+        normalize-by-median.py -p -k 17 -o - tests/test-data/paired.fq \\
+        >> appended-output.fq
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
-    """
+        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq \\
+        tests/test-data/test-fastq-reads.fq
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -d 2 -s test.ct tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads")   # noqa
+        normalize-by-median.py -k 17 -d 2 -s test.ct \\
+        tests/test-data/test-abund-read-2.fa \\
+        tests/test-data/test-fastq-reads"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
@@ -276,7 +278,11 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
-    args = get_parser().parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        '//', '/').replace(':option:', '').replace(
+            ':program:', '').replace('::', ':')
+    args = parser.parse_args()
     configure_logging(args.quiet)
     info('normalize-by-median.py', ['diginorm'])
     if not args.quiet:

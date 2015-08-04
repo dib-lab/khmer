@@ -86,16 +86,19 @@ debug: FORCE
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html
 
-build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
+build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
 ## pdf         : render documentation as a PDF file
+# packages needed include: texlive-latex-recommended,
+# texlive-fonts-recommended, texlive-latex-extra
 pdf: build/sphinx/latex/khmer.pdf
 
-build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
+build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
+	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst)
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''

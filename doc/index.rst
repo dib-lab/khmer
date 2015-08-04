@@ -1,10 +1,8 @@
-.. khmer documentation master file, created by
-   sphinx-quickstart on Wed Aug  4 10:20:23 2010.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. vim: set filetype=rst
 
+#######################################
 khmer -- k-mer counting & filtering FTW
-=======================================
+#######################################
 
 :Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe,
           Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Humberto
@@ -43,8 +41,6 @@ NIFA, and is now funded by the National Human Genome Research
 Institute of the National Institutes of Health under Award Number
 `R01HG007513 <http://ged.msu.edu/downloads/2012-bigdata-nsf.pdf>`__ through
 May 2016, both to C. Titus Brown.
-
-Contents:
 
 .. toctree::
    :maxdepth: 1
