@@ -173,7 +173,6 @@ def broken_paired_reader(screed_iter, min_length=None,
         if require_paired:
             raise UnpairedReadsError("Unpaired reads when require_paired "
                                      "is set!", prev_record, None)
-            raise e
         yield n, False, prev_record, None
 
 
