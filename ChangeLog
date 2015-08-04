@@ -1,3 +1,8 @@
+2015-08-02  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * Makefile: added oxli to pep257 make target, made clean target wipe out all
+   .pyc files in scripts/* and tests/* and oxli/*
+
 2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * tests/test_counting_single.py: removed redundant test
