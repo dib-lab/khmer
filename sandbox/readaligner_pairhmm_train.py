@@ -42,12 +42,12 @@ from math import log
 import json
 from simplesam import Reader
 
-cigar_to_state = {0: 'M', 1: 'Ir', 2: 'Ig'}
+cigar_to_state = {'M': 'M', 'I': 'Ir', 'D': 'Ig'}
 
 
 def extract_cigar(cigar):
     ret = []
-    for t, length in cigar:
+    for length, t in cigar:
         for i in range(length):
             ret.append(cigar_to_state[t])
 
@@ -92,7 +92,7 @@ def main():
             dropped_seqs += 1
             continue
 
-        states = extract_cigar(cigar)
+        states = extract_cigar(rec.cigars)
 
         kmer = seq[:k]
         state = states[k] + trusted_str(ht.count(kmer), args.trusted_cutoff)
