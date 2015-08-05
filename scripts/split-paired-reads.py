@@ -132,9 +132,7 @@ def main():
         fp_out2 = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
 
     # put orphaned reads here, if -0!
-    allow_orphans = False
     if args.output_orphaned:
-        allow_orphans = True
         fp_out0 = get_file_writer(args.output_orphaned, args.gzip, args.bzip)
         out0 = describe_file_handle(args.output_orphaned)
 
@@ -147,7 +145,7 @@ def main():
 
     # walk through all the reads in broken-paired mode.
     paired_iter = broken_paired_reader(screed_iter,
-                                       require_paired=not allow_orphans)
+                                       require_paired=not args.output_orphaned)
 
     try:
         for index, is_pair, record1, record2 in paired_iter:
@@ -159,7 +157,7 @@ def main():
                 counter1 += 1
                 write_record(record2, fp_out2)
                 counter2 += 1
-            elif allow_orphans:
+            elif args.output_orphaned:
                 write_record(record1, fp_out0)
                 counter3 += 1
     except UnpairedReadsError as e:
@@ -171,7 +169,7 @@ def main():
           (counter1 + counter2, counter1, counter2, counter3), file=sys.stderr)
     print("/1 reads in %s" % out1, file=sys.stderr)
     print("/2 reads in %s" % out2, file=sys.stderr)
-    if allow_orphans:
+    if args.output_orphaned:
         print("orphans in %s" % out0, file=sys.stderr)
 
 if __name__ == '__main__':
