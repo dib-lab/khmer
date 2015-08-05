@@ -253,7 +253,7 @@ def main():
         max_buffers, max_reads, buf_size, output_pref, outdir, extension)
 
     # consume the partitioned fasta with which to label the graph
-    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
+    ht = khmer.GraphLabels(K, HT_SIZE, N_HT)
     try:
         print('consuming input sequences...', file=sys.stderr)
         if args.label_by_pid:

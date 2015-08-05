@@ -3635,26 +3635,17 @@ static PyMethodDef khmer_subset_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-/////////////////
-// LabelHash
-/////////////////
-
-// LabelHash addition
 typedef struct {
     PyObject_HEAD
     LabelHash * labelhash;
-} khmer_KLabelHash_Object;
+} khmer_KGraphLabels_Object;
 
-static PyObject * khmer_labelhash_new(PyTypeObject * type, PyObject *args,
-                                      PyObject *kwds);
+static PyObject * khmer_graphlabels_new(PyTypeObject * type, PyObject *args,
+                                        PyObject *kwds);
 
-#define is_labelhash_obj(v)  (Py_TYPE(v) == &khmer_KLabelHash_Type)
+#define is_graphlabels_obj(v)  (Py_TYPE(v) == &khmer_KGraphLabels_Type)
 
-//
-// khmer_labelhash_dealloc -- clean up a labelhash object.
-//
-
-static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
+static void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
 {
     delete obj->labelhash;
     obj->labelhash = NULL;
@@ -3662,11 +3653,11 @@ static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
-                                      PyObject *kwds)
+static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
+                                        PyObject *kwds)
 {
-    khmer_KLabelHash_Object *self;
-    self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
+    khmer_KGraphLabels_Object *self;
+    self = (khmer_KGraphLabels_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         PyObject * hashtable_o;
@@ -3703,7 +3694,7 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
 
 static
 PyObject *
-labelhash_get_label_dict(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_get_label_dict(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * hb = me->labelhash;
 
@@ -3728,7 +3719,7 @@ labelhash_get_label_dict(khmer_KLabelHash_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_consume_fasta_and_tag_with_labels(khmer_KLabelHash_Object * me,
+labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         PyObject * args)
 {
     LabelHash * hb = me->labelhash;
@@ -3769,7 +3760,7 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KLabelHash_Object * me,
 static
 PyObject *
 labelhash_consume_partitioned_fasta_and_tag_with_labels(
-    khmer_KLabelHash_Object * me, PyObject * args)
+    khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
@@ -3800,7 +3791,7 @@ labelhash_consume_partitioned_fasta_and_tag_with_labels(
 
 static
 PyObject *
-labelhash_consume_sequence_and_tag_with_labels(khmer_KLabelHash_Object * me,
+labelhash_consume_sequence_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         PyObject * args)
 {
     LabelHash * hb = me->labelhash;
@@ -3818,7 +3809,7 @@ labelhash_consume_sequence_and_tag_with_labels(khmer_KLabelHash_Object * me,
 
 static
 PyObject *
-labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
+labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
                                    PyObject * args)
 {
     LabelHash * hb = me->labelhash;
@@ -3882,7 +3873,8 @@ labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
 
 static
 PyObject *
-labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
+                                 PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
@@ -3946,7 +3938,7 @@ labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_get_tag_labels(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
@@ -3974,7 +3966,7 @@ labelhash_get_tag_labels(khmer_KLabelHash_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
@@ -3987,7 +3979,7 @@ labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_save_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
     LabelHash * labelhash = me->labelhash;
@@ -4008,7 +4000,7 @@ labelhash_save_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_load_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
+labelhash_load_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
     LabelHash * labelhash = me->labelhash;
@@ -4027,7 +4019,7 @@ labelhash_load_labels_and_tags(khmer_KLabelHash_Object * me, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyMethodDef khmer_labelhash_methods[] = {
+static PyMethodDef khmer_graphlabels_methods[] = {
     { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
     {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
@@ -4040,12 +4032,12 @@ static PyMethodDef khmer_labelhash_methods[] = {
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyTypeObject khmer_KLabelHash_Type = {
+static PyTypeObject khmer_KGraphLabels_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
     "_khmer.LabelHash",            /* tp_name */
-    sizeof(khmer_KLabelHash_Object), /* tp_basicsize */
+    sizeof(khmer_KGraphLabels_Object), /* tp_basicsize */
     0,                       /* tp_itemsize */
-    (destructor)khmer_labelhash_dealloc, /* tp_dealloc */
+    (destructor)khmer_graphlabels_dealloc, /* tp_dealloc */
     0,                       /* tp_print */
     0,                       /* tp_getattr */
     0,                       /* tp_setattr */
@@ -4068,7 +4060,7 @@ static PyTypeObject khmer_KLabelHash_Type = {
     0,                       /* tp_weaklistoffset */
     0,                       /* tp_iter */
     0,                       /* tp_iternext */
-    khmer_labelhash_methods, /* tp_methods */
+    khmer_graphlabels_methods, /* tp_methods */
     0,                       /* tp_members */
     0,                       /* tp_getset */
     0,                       /* tp_base */
@@ -4078,7 +4070,7 @@ static PyTypeObject khmer_KLabelHash_Type = {
     0,                       /* tp_dictoffset */
     0,                       /* tp_init */
     0,                       /* tp_alloc */
-    khmer_labelhash_new,      /* tp_new */
+    khmer_graphlabels_new,      /* tp_new */
 };
 
 static
@@ -4964,10 +4956,10 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KLabelHash_Type.tp_base = &khmer_KNodegraph_Type;
-    khmer_KLabelHash_Type.tp_methods = khmer_labelhash_methods;
-    khmer_KLabelHash_Type.tp_new = khmer_labelhash_new;
-    if (PyType_Ready(&khmer_KLabelHash_Type) < 0) {
+    khmer_KGraphLabels_Type.tp_base = &khmer_KNodegraph_Type;
+    khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
+    khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
+    if (PyType_Ready(&khmer_KGraphLabels_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -5018,9 +5010,9 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    Py_INCREF(&khmer_KLabelHash_Type);
-    if (PyModule_AddObject(m, "LabelHash",
-                           (PyObject *)&khmer_KLabelHash_Type) < 0) {
+    Py_INCREF(&khmer_KGraphLabels_Type);
+    if (PyModule_AddObject(m, "GraphLabels",
+                           (PyObject *)&khmer_KGraphLabels_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 

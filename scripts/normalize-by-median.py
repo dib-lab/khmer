@@ -33,7 +33,6 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
-                         check_valid_file_exists)
 from khmer.utils import write_record, broken_paired_reader
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 

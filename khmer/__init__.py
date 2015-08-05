@@ -11,7 +11,7 @@ from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
-from khmer._khmer import LabelHash as _LabelHash
+from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
@@ -238,21 +238,21 @@ class Countgraph(_Countgraph):
         return c
 
 
-class LabelHash(_LabelHash):
+class GraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
         hb = Nodegraph(k, starting_size, n_tables)
-        c = _LabelHash.__new__(cls, hb)
+        c = _GraphLabels.__new__(cls, hb)
         c.graph = hb
         return c
 
 
-class CountingLabelHash(_LabelHash):
+class CountingGraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         hb = _Countgraph(k, primes)
-        c = _LabelHash.__new__(cls, hb)
+        c = _GraphLabels.__new__(cls, hb)
         c.graph = hb
         return c
 

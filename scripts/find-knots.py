@@ -126,9 +126,9 @@ def main():
 
         print('** repartitioning subset... %s' % subset_file, file=sys.stderr)
         graph.repartition_largest_partition(subset, counting,
-                                             EXCURSION_DISTANCE,
-                                             EXCURSION_KMER_THRESHOLD,
-                                             EXCURSION_KMER_COUNT_THRESHOLD)
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
         print('** merging subset... %s' % subset_file, file=sys.stderr)
         graph.merge_subset(subset)

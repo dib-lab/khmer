@@ -120,7 +120,7 @@ def main():
 
     # Consume the database files and assign each a unique label in the
     # de Bruin graph; open a file and output queue for each file as well.
-    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
+    ht = khmer.GraphLabels(K, HT_SIZE, N_HT)
     try:
         print('consuming and labeling input sequences...', file=sys.stderr)
 

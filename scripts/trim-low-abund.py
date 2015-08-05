@@ -167,8 +167,8 @@ def main():
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
         if args.output is None:
-            trimfp = get_file_writer(open(os.path.basename(filename)
-                                     + '.abundtrim', 'wb'),
+            trimfp = get_file_writer(open(os.path.basename(filename) +
+                                          '.abundtrim', 'wb'),
                                      args.gzip, args.bzip)
         else:
             trimfp = get_file_writer(args.output, args.gzip, args.bzip)
