@@ -81,6 +81,73 @@ def test_interleave_split_2_fail():
            in err, err
 
 
+def test_interleave_split_3_out1():
+    in1 = utils.get_test_data('paired.fq.1')
+    in2 = utils.get_test_data('paired.fq.2')
+
+    out1 = utils.get_temp_filename('a.fa')
+    out2 = utils.get_temp_filename('b.fa')
+
+    cmd = """
+       {scripts}/interleave-reads.py {in1} {in2} -o -             |
+       {scripts}/split-paired-reads.py -1 - -2 {out2} - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(),
+                     in1=in1, in2=in2,
+                     out1=out1, out2=out2)
+
+    run_shell_cmd(cmd)
+
+    assert files_are_equal(in1, out1), diff_files(in1, out1)
+    assert files_are_equal(in2, out2), diff_files(in2, out2)
+
+
+def test_interleave_split_3_out2():
+    in1 = utils.get_test_data('paired.fq.1')
+    in2 = utils.get_test_data('paired.fq.2')
+
+    out1 = utils.get_temp_filename('a.fa')
+    out2 = utils.get_temp_filename('b.fa')
+
+    cmd = """
+       {scripts}/interleave-reads.py {in1} {in2} -o -             |
+       {scripts}/split-paired-reads.py -1 {out1} -2 - - > {out2}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(),
+                     in1=in1, in2=in2,
+                     out1=out1, out2=out2)
+
+    run_shell_cmd(cmd)
+
+    assert files_are_equal(in1, out1), diff_files(in1, out1)
+    assert files_are_equal(in2, out2), diff_files(in2, out2)
+
+
+def test_interleave_split_3_out0():
+    in1 = utils.get_test_data('paired-mixed-broken.fq')
+
+    out1 = utils.get_temp_filename('a.fa')
+    out2 = utils.get_temp_filename('b.fa')
+    out3 = utils.get_temp_filename('c.fa')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/split-paired-reads.py -1 {out1} -2 {out2} -0 - - > {out3}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(),
+                     in1=in1,
+                     out1=out1, out2=out2, out3=out3)
+
+    run_shell_cmd(cmd)
+
+    assert files_are_equal(in1, out3), diff_files(in1, out3)
+    assert len(open(out1, 'rb').read()) == 0
+    assert len(open(out2, 'rb').read()) == 0
+
+
 def test_extract_paired_pe():
     in1 = utils.get_test_data('paired-mixed.fq')
     out_test = utils.get_test_data('paired-mixed.fq.pe')

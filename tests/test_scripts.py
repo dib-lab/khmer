@@ -21,6 +21,7 @@ import traceback
 from nose.plugins.attrib import attr
 import threading
 import bz2
+import gzip
 import io
 
 from . import khmer_tst_utils as utils
@@ -1912,7 +1913,7 @@ def test_extract_paired_reads_3_output_dir():
     out_dir = utils.get_temp_filename('output')
 
     script = 'extract-paired-reads.py'
-    args = [infile, '-o', out_dir]
+    args = [infile, '-d', out_dir]
 
     utils.runscript(script, args)
 
@@ -2119,11 +2120,11 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = ['-p', infile]
+    args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status == 1
-    assert "is not part of a pair" in err
+    assert status == 1, status
+    assert "Unpaired reads found" in err
 
 
 def test_split_paired_reads_2_stdin_no_out():
@@ -2142,11 +2143,67 @@ def test_split_paired_reads_2_mixed_fq():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = [infile]
+    args = ['-0', '/dev/null', infile]
 
     status, out, err = utils.runscript(script, args, in_dir)
     assert status == 0
-    assert "split 11 sequences (7 left, 4 right)" in err, err
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+
+def test_split_paired_reads_2_mixed_fq_orphans_to_file():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        try:
+            fp.read()
+        except IOError as e:
+            assert "Not a gzipped file" in str(e), str(e)
+        fp.close()
+
+
+def test_split_paired_reads_2_mixed_fq_gzfile():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, '--gzip', infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        fp.read()                       # this will fail if not gzip file.
+        fp.close()
 
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
@@ -2160,7 +2217,7 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status == 1
-    assert "Unrecognized format" in err
+    assert "Unpaired reads found starting at 895:1:37:17593:9954" in err, err
 
 
 def test_split_paired_reads_3_output_dir():
@@ -2250,7 +2307,7 @@ def test_split_paired_reads_3_output_files_left():
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-o', output_dir, '-1', outfile1, infile]
+    args = ['-d', output_dir, '-1', outfile1, infile]
 
     utils.runscript(script, args)
 
@@ -2287,7 +2344,7 @@ def test_split_paired_reads_3_output_files_right():
     outfile2 = utils.get_temp_filename('yyy', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-2', outfile2, '-o', output_dir, infile]
+    args = ['-2', outfile2, '-d', output_dir, infile]
 
     utils.runscript(script, args)
 

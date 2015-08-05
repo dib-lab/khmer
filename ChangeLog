@@ -1,3 +1,16 @@
+2015-08-04  Titus Brown  <titus@idyll.org> and Camille Scott
+<camille.scott.w@gmail.com>
+
+   * khmer/utils.py: added UnpairedReadsError exception.
+   * scripts/{extract-paired-reads,split-paired-reads}.py: changed --output-dir
+   argument short form to use '-d'.
+   * scripts/{split-paired-reads.py} added -0 <filename> to allow orphans; made
+   '-p'/'--force-paired' default & removed from script.
+   * scripts/{normalize-by-median,filter-abund,trim-low-abund}.py: changed
+   long form of '-o' to be '--output'.
+   * tests/{test_scripts,test_streaming_io}.py: updated and added tests for
+   new behavior.
+
 2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.rst: added codespell as a possible

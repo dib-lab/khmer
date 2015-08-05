@@ -106,6 +106,13 @@ def check_is_right(name):
     return False
 
 
+class UnpairedReadsError(ValueError):
+    def __init__(self, msg, r1, r2):
+        super(ValueError, self).__init__(msg)
+        self.r1 = r1
+        self.r2 = r2
+
+
 def broken_paired_reader(screed_iter, min_length=None,
                          force_single=False, require_paired=False):
     """Read pairs from a stream.
@@ -152,8 +159,9 @@ def broken_paired_reader(screed_iter, min_length=None,
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    raise ValueError("Unpaired reads when require_paired"
-                                     " is set!")
+                    e = UnpairedReadsError("Unpaired reads when require_paired"
+                                           " is set!", prev_record, record)
+                    raise e
                 yield n, False, prev_record, None
                 n += 1
 
@@ -163,7 +171,8 @@ def broken_paired_reader(screed_iter, min_length=None,
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
         if require_paired:
-            raise ValueError("Unpaired reads when require_paired is set!")
+            raise UnpairedReadsError("Unpaired reads when require_paired "
+                                     "is set!", prev_record, None)
         yield n, False, prev_record, None
 
 
