@@ -63,7 +63,7 @@ def get_parser():
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
-    parser.add_argument('-o', '--out', dest='single_output_file',
+    parser.add_argument('-o', '--output', dest='single_output_file',
                         type=argparse.FileType('wb'),
                         metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '

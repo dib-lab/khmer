@@ -208,7 +208,7 @@ def get_parser():
     :program:`abundance-dist.py`.
 
     To append reads to an output file (rather than overwriting it), send output
-    to STDOUT with `--out -` and use UNIX file redirection syntax (`>>`) to
+    to STDOUT with `--output -` and use UNIX file redirection syntax (`>>`) to
     append to the file.
 
     Example::
@@ -260,7 +260,7 @@ def get_parser():
     parser.add_argument('-f', '--force', dest='force',
                         help='continue past file reading errors',
                         action='store_true')
-    parser.add_argument('-o', '--out', metavar="filename",
+    parser.add_argument('-o', '--output', metavar="filename",
                         type=argparse.FileType('wb'),
                         default=None, dest='single_output_file',
                         help='only output a single file with '

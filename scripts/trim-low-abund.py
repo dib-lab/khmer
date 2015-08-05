@@ -84,7 +84,7 @@ def get_parser():
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
-    parser.add_argument('-o', '--out', metavar="filename",
+    parser.add_argument('-o', '--output', metavar="output_filename",
                         type=argparse.FileType('wb'),
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
@@ -132,7 +132,7 @@ def main():
         check_space_for_hashtable(args.savetable, tablesize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
-       and not args.out:
+       and not args.output:
         print("Accepting input from stdin; output filename must "
               "be provided with -o.", file=sys.stderr)
         sys.exit(1)
@@ -166,12 +166,12 @@ def main():
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        if args.out is None:
+        if args.output is None:
             trimfp = get_file_writer(open(os.path.basename(filename)
                                      + '.abundtrim', 'wb'),
                                      args.gzip, args.bzip)
         else:
-            trimfp = get_file_writer(args.out, args.gzip, args.bzip)
+            trimfp = get_file_writer(args.output, args.gzip, args.bzip)
 
         pass2list.append((filename, pass2filename, trimfp))
 
