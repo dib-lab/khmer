@@ -26,7 +26,7 @@ import khmer
 from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
                               _VersionStdErrAction)
 from khmer.utils import write_record
-from oxli.functions import optimal_args_output_gen as output_gen
+from khmer.khmer_args import graphsize_args_report
 from khmer import __version__
 import screed
 
@@ -138,7 +138,7 @@ def main():
           args.ksize, cardinality),
           file=sys.stderr)
 
-    to_print = output_gen(cardinality, args.error_rate)
+    to_print = graphsize_args_report(cardinality, args.error_rate)
     if args.diagnostics:
         print(to_print, file=sys.stderr)
 

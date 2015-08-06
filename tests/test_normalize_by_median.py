@@ -32,6 +32,21 @@ def test_normalize_by_median_indent():
     assert os.path.exists(outfile)
 
 
+def test_normalize_by_median_loadtable_with_args():
+    infile = utils.get_test_data("test-abund-read-2.fa")
+    tablefile = utils.get_temp_filename("table")
+    in_dir = os.path.dirname(tablefile)
+
+    script = "load-into-counting.py"
+    args = [tablefile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    script = "normalize-by-median.py"
+    args = ["--ksize", "7", "--loadtable", tablefile, infile]
+    (status, out, err) = utils.runscript(script, args)
+    assert 'WARNING: You are loading a saved k-mer table from' in err, err
+
+
 def test_normalize_by_median_empty_file():
     infile = utils.get_temp_filename('empty')
     shutil.copyfile(utils.get_test_data('empty-file'), infile)
@@ -78,7 +93,7 @@ def test_normalize_by_median_quiet():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '-k', '17', '--quiet', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--quiet', '-M', '1e6', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(out) == 0, out
@@ -117,7 +132,7 @@ def test_normalize_by_median_sanity_check_0():
     script = 'normalize-by-median.py'
     args = ['-U', '1024', '--max-mem', '60', infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status != 0
+    assert status != 0, status
     assert "recommended false positive ceiling of 0.1!" in err, err
 
 
@@ -144,8 +159,28 @@ def test_normalize_by_median_sanity_check_2():
     args = ['-U', '83', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "*** INFO: set memory ceiling using auto optimization." in err, err
-    assert "*** Ceiling is: 399 bytes" in err, err
+    assert "*** INFO: set memory ceiling automatically." in err, err
+    assert "*** Ceiling is: 1e+06 bytes" in err, err
+
+
+def test_normalize_by_median_sanity_check_3():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    tablefile = utils.get_temp_filename('table', in_dir)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-s', tablefile, '-U', '83', '--fp-rate', '0.7', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert "Overriding default fp 0.1 with new fp: 0.7" in err, err
+
+    args = ['--loadtable', tablefile, '-U', '83', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "WARNING: You have asked that the graph size be auto" in err, err
+    assert "NOT be set automatically" in err, err
+    assert "loading an existing graph" in err, err
 
 
 def test_normalize_by_median_unforced_badfile():
