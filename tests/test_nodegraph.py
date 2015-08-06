@@ -886,7 +886,7 @@ def test_consume_absentfasta_with_reads_parser():
 
 def test_bad_primes():
     try:
-        countingtable = khmer._Nodegraph.__new__(
+        countgraph = khmer._Nodegraph.__new__(
             khmer._Nodegraph, 6, ["a", "b", "c"])
         assert 0, "this should fail"
     except TypeError as e:

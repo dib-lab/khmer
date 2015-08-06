@@ -67,7 +67,7 @@ def main():
 
     ksize = args.ksize
     filenames = args.input_filenames
-    htable = khmer.Nodegraph(ksize, 1, 1)
+    nodegraph = khmer.Nodegraph(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
@@ -78,12 +78,12 @@ def main():
     check_space(filenames, args.force)
 
     print('loading partition map from:', partitionmap_file, file=sys.stderr)
-    htable.load_partitionmap(partitionmap_file)
+    nodegraph.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
         print('outputting partitions for', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.part'
-        part_count = htable.output_partitions(infile, outfile)
+        part_count = nodegraph.output_partitions(infile, outfile)
         print('output %d partitions for %s' % (
             part_count, infile), file=sys.stderr)
         print('partitions are in', outfile, file=sys.stderr)

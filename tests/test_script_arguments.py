@@ -53,7 +53,7 @@ def test_check_tablespace():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
+        tablesize = khmer_args.calculate_graphsize(args, 'countgraph')
         khmer.kfile.check_space_for_graph(outfile, tablesize,
                                           False, _testhook_free_space=0)
         assert 0, "this should fail"
@@ -86,7 +86,7 @@ def test_check_tablespace_force():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
+        tablesize = khmer_args.calculate_graphsize(args, 'countgraph')
         khmer.kfile.check_space_for_graph(outfile, tablesize,
                                           True, _testhook_free_space=0)
         assert True, "this should pass"
@@ -280,7 +280,7 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
 
     try:
-        nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
+        nodegraph = khmer_args.calculate_graphsize(args, 'foograph')
         assert 0, "previous statement should fail"
     except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)

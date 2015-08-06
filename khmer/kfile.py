@@ -125,7 +125,7 @@ def check_space(in_files, force, _testhook_free_space=None):
 
 def check_space_for_graph(outfile_name, hash_size, force,
                           _testhook_free_space=None):
-    """Check that we have enough size to write the specified hash table."""
+    """Check that we have enough size to write the specified graph."""
     dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
 
@@ -137,7 +137,7 @@ def check_space_for_graph(outfile_name, hash_size, force,
     size_diff = hash_size - free_space
     if size_diff > 0:
         print("ERROR: Not enough free space on disk "
-              "for saved table files;"
+              "for saved graph files;"
               "       Need at least %.1f GB more."
               % (float(size_diff) / 1e9,), file=sys.stderr)
         print("       Table size: %.1f GB"

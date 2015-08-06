@@ -7,10 +7,10 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Sequence trimming by abundance w/o counting table.
+Sequence trimming by abundance w/o countgraph.
 
 Trim sequences at k-mers of the given abundance for the given file,
-without loading a prebuilt counting table.  Output sequences will be
+without loading a prebuilt countgraph.  Output sequences will be
 placed in 'infile.abundfilt'.
 
 % python scripts/filter-abund-single.py <data>
@@ -26,7 +26,7 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
-                              add_threading_args, info, calculate_tablesize)
+                              add_threading_args, info, calculate_graphsize)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
@@ -55,9 +55,9 @@ def get_parser():
 
     parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
-    parser.add_argument('--savetable', metavar="filename", default='',
+    parser.add_argument('--savegraph', metavar="filename", default='',
                         help="If present, the name of the file to save the "
-                        "k-mer counting table to")
+                        "k-mer countgraph to")
     parser.add_argument('datafile', metavar='input_sequence_filename',
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -73,9 +73,9 @@ def main():
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
 
-    if args.savetable:
-        tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_graph(args.savetable, tablesize, args.force)
+    if args.savegraph:
+        tablesize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, tablesize, args.force)
 
     report_on_config(args)
 
@@ -132,11 +132,11 @@ def main():
 
     print('output in', outfile, file=sys.stderr)
 
-    if args.savetable:
-        print('Saving k-mer counting table filename',
-              args.savetable, file=sys.stderr)
-        print('...saving to', args.savetable, file=sys.stderr)
-        graph.save(args.savetable)
+    if args.savegraph:
+        print('Saving k-mer countgraph filename',
+              args.savegraph, file=sys.stderr)
+        print('...saving to', args.savegraph, file=sys.stderr)
+        graph.save(args.savegraph)
     print('wrote to: ', outfile, file=sys.stderr)
 
 if __name__ == '__main__':

@@ -49,7 +49,7 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 def get_parser():
     epilog = """
-    Load an k-mer presence table/tagset pair created by load-graph, and a set
+    Load an k-mer nodegraph/tagset pair created by load-graph, and a set
     of pmap files created by partition-graph. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that
@@ -90,7 +90,7 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading k-mer presence table %s' % graphbase, file=sys.stderr)
+    print('loading k-mer nodegraph %s' % graphbase, file=sys.stderr)
     graph = khmer.load_nodegraph(graphbase)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)

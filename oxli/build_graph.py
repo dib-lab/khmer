@@ -21,7 +21,7 @@ import sys
 import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args,
-                              calculate_tablesize)
+                              calculate_graphsize)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_graph
 from oxli import functions
@@ -34,7 +34,7 @@ def build_parser(parser):
                         help='Do NOT construct tagset while loading sequences')
     parser.add_argument('output_filename',
                         metavar='output_presence_table_filename', help='output'
-                        ' k-mer presence table filename.')
+                        ' k-mer nodegraph filename.')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filename')
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -55,10 +55,10 @@ def main(args):
     # if optimization args are given, do optimization
     args = functions.do_sanity_checking(args, 0.01)
 
-    tablesize = calculate_tablesize(args, 'nodegraph')
+    tablesize = calculate_graphsize(args, 'nodegraph')
     check_space_for_graph(args.output_filename, tablesize, args.force)
 
-    print('Saving k-mer presence table to %s' % base, file=sys.stderr)
+    print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(filenames), file=sys.stderr)
     if args.no_build_tagset:
@@ -76,7 +76,7 @@ def main(args):
     print('Total number of unique k-mers: {0}'.format(htable.n_unique_kmers()),
           file=sys.stderr)
 
-    print('saving k-mer presence table in', base, file=sys.stderr)
+    print('saving k-mer nodegraph in', base, file=sys.stderr)
     htable.save(base)
 
     if not args.no_build_tagset:

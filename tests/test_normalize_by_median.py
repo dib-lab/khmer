@@ -26,7 +26,7 @@ def test_normalize_by_median_indent():
     hashfile = utils.get_test_data('normC20k20.ct')
     outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = 'normalize-by-median.py'
-    args = ['--loadtable', hashfile, '-o', outfile, infile]
+    args = ['--loadgraph', hashfile, '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
     assert os.path.exists(outfile)
@@ -514,7 +514,7 @@ def test_normalize_by_median_no_bigcount():
     counting_ht = _make_counting(infile, K=8)
 
     script = 'normalize-by-median.py'
-    args = ['-C', '1000', '-k 8', '--savetable', hashfile, infile]
+    args = ['-C', '1000', '-k 8', '--savegraph', hashfile, infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
@@ -542,7 +542,7 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
-def test_normalize_by_median_emptycountingtable():
+def test_normalize_by_median_emptycountgraph():
     CUTOFF = '1'
 
     infile = utils.get_temp_filename('test.fa')
@@ -551,7 +551,7 @@ def test_normalize_by_median_emptycountingtable():
     shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '--loadtable', infile, infile]
+    args = ['-C', CUTOFF, '--loadgraph', infile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
     assert 'ValueError' in err, (status, out, err)

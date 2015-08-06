@@ -20,7 +20,7 @@ import sys
 
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal counting table args where:
+    Utility function for estimating optimal countgraph args where:
       - num_kmers: number of unique kmers [required]
       - mem_cap: the allotted amount of memory [optional, conflicts with f]
       - fp_rate: the desired false positive rate [optional, conflicts with M]
@@ -36,7 +36,7 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
-    Utility function for estimating optimal counting table args where num_kmers
+    Utility function for estimating optimal countgraph args where num_kmers
     is the number of unique kmer and mem_cap is the allotted amount of memory
     """
 

@@ -134,10 +134,10 @@ def extract_countgraph_info(filename):
             n_tables, = unpack('B', countgraph.read(1))
             table_size, = unpack('Q', countgraph.read(ulonglong_size))
         if signature != b'OXLI':
-            raise ValueError("Counting table '{}' is missing file type "
+            raise ValueError("Count graph file '{}' is missing file type "
                              "signature. ".format(filename) + str(signature))
     except:
-        raise ValueError("Counting table '{}' is corrupt ".format(filename))
+        raise ValueError("Count graph file '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, use_bigcount, version, \
         ht_type
@@ -321,7 +321,7 @@ class ReadAligner(_ReadAligner):
     defaultScoringMatrix = [
         log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
 
-    def __new__(cls, counting_table, trusted_cov_cutoff, bits_theta,
+    def __new__(cls, count_graph, trusted_cov_cutoff, bits_theta,
                 **kwargs):
 
         if 'filename' in kwargs:
@@ -340,10 +340,10 @@ class ReadAligner(_ReadAligner):
             else:
                 transition_probabilities = \
                     ReadAligner.defaultTransitionProbabilities
-        r = _ReadAligner.__new__(cls, counting_table, trusted_cov_cutoff,
+        r = _ReadAligner.__new__(cls, count_graph, trusted_cov_cutoff,
                                  bits_theta, scoring_matrix,
                                  transition_probabilities)
-        r.graph = counting_table
+        r.graph = count_graph
         return r
 
     def __init__(self, *args, **kwargs):

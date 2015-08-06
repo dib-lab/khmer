@@ -27,11 +27,11 @@ from khmer.khmer_args import info
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
-        "the sequence file using a pre-made k-mer counting table.",
+        "the sequence file using a pre-made k-mer countgraph.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_counting_table_filename', help='The name of the'
-                        ' input k-mer counting table file.')
+    parser.add_argument('input_count_graph_filename', help='The name of the'
+                        ' input k-mer countgraph file.')
     parser.add_argument('input_sequence_filename', help='The name of the input'
                         ' FAST[AQ] sequence file.')
     parser.add_argument('output_histogram_filename', help='The columns are: '
@@ -58,15 +58,15 @@ def main():
     info('abundance-dist.py', ['counting'])
     args = get_parser().parse_args()
 
-    infiles = [args.input_counting_table_filename,
+    infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
     for infile in infiles:
         check_input_files(infile, False)
 
-    print('Counting graph from', args.input_counting_table_filename,
+    print('Counting graph from', args.input_count_graph_filename,
           file=sys.stderr)
     countinggraph = khmer.load_countinggraph(
-        args.input_counting_table_filename)
+        args.input_count_graph_filename)
 
     if not countinggraph.get_use_bigcount() and args.bigcount:
         print("WARNING: The loaded graph has bigcount DISABLED while bigcount"

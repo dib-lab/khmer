@@ -55,7 +55,7 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
-def test_load_into_counting_tablesize_warning():
+def test_load_into_count_graphsize_warning():
     script = 'load-into-counting.py'
     args = ['-k', '20']
 
@@ -401,12 +401,12 @@ def test_filter_abund_1_singlefile():
 def test_filter_abund_2_singlefile():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-    tabfile = utils.get_temp_filename('test-savetable.ct')
+    tabfile = utils.get_temp_filename('test-savegraph.ct')
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '--savegraph',
             tabfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
@@ -512,7 +512,7 @@ def test_filter_abund_7_retain_Ns():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
-    # copy test file over to test.fq & load into counting table
+    # copy test file over to test.fq & load into countgraph
     shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
     counting_ht = _make_counting(infile, K=17)
 
@@ -546,7 +546,7 @@ def test_filter_abund_single_8_retain_Ns():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
-    # copy test file over to test.fq & load into counting table
+    # copy test file over to test.fq & load into countgraph
     shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
 
     script = 'filter-abund-single.py'
@@ -1558,16 +1558,16 @@ def test_abundance_dist_single_nosquash():
         assert line == '1001,2,98,1.0', line
 
 
-def test_abundance_dist_single_savetable():
+def test_abundance_dist_single_savegraph():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
-    tabfile = utils.get_temp_filename('test-savetable.ct')
+    tabfile = utils.get_temp_filename('test-savegraph.ct')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--savegraph',
             tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
@@ -3331,7 +3331,7 @@ def test_trim_low_abund_trimtest_after_load():
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
     utils.runscript('load-into-counting.py', args, in_dir)
 
-    args = ["-Z", "2", "-C", "2", "-V", '--loadtable', saved_table, infile]
+    args = ["-Z", "2", "-C", "2", "-V", '--loadgraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'
@@ -3352,7 +3352,7 @@ def test_trim_low_abund_trimtest_after_load():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-def test_trim_low_abund_trimtest_savetable():
+def test_trim_low_abund_trimtest_savegraph():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -3361,7 +3361,7 @@ def test_trim_low_abund_trimtest_savetable():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2",
-            "-Z", "2", "-C", "2", "-V", '--savetable', saved_table, infile]
+            "-Z", "2", "-C", "2", "-V", '--savegraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'

@@ -65,8 +65,8 @@ def main():
     check_space(infiles, args.force)
 
     print('loading stop tags, with K', args.ksize, file=sys.stderr)
-    htable = khmer.Nodegraph(args.ksize, 1, 1)
-    htable.load_stop_tags(stoptags)
+    nodegraph = khmer.Nodegraph(args.ksize, 1, 1)
+    nodegraph.load_stop_tags(stoptags)
 
     def process_fn(record):
         name = record['name']
@@ -74,7 +74,7 @@ def main():
         if 'N' in seq:
             return None, None
 
-        trim_seq, trim_at = htable.trim_on_stoptags(seq)
+        trim_seq, trim_at = nodegraph.trim_on_stoptags(seq)
 
         if trim_at >= args.ksize:
             return name, trim_seq

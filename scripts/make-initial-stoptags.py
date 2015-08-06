@@ -42,15 +42,15 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 def get_parser():
     epilog = """
-    Loads a k-mer presence table/tagset pair created by load-graph.py, and does
+    Loads a k-mer nodegraph/tagset pair created by load-graph.py, and does
     a small set of traversals from graph waypoints; on these traversals, looks
     for k-mers that are repeatedly traversed in high-density regions of the
     graph, i.e. are highly connected. Outputs those k-mers as an initial set of
     stoptags, which can be fed into partition-graph.py, find-knots.py, and
     filter-stoptags.py.
 
-    The k-mer counting table size options parameters are for a k-mer counting
-    table to keep track of repeatedly-traversed k-mers. The subset size option
+    The k-mer countgraph size options parameters are for a k-mer countgraph
+    to keep track of repeatedly-traversed k-mers. The subset size option
     specifies the number of waypoints from which to traverse; for highly
     connected data sets, the default (1000) is probably ok.
     """
@@ -83,22 +83,21 @@ def main():
     for _ in infiles:
         check_input_files(_, args.force)
 
-    print('loading htable %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_nodegraph(graphbase)
+    print('loading nodegraph %s.pt' % graphbase, file=sys.stderr)
+    nodegraph = khmer.load_nodegraph(graphbase)
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print('loading stoptags from', args.stoptags, file=sys.stderr)
-        htable.load_stop_tags(args.stoptags)
+        nodegraph.load_stop_tags(args.stoptags)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
-    htable.load_tagset(graphbase + '.tagset')
+    nodegraph.load_tagset(graphbase + '.tagset')
 
-    ksize = htable.ksize()
     counting = khmer_args.create_countgraph(args)
 
     # divide up into SUBSET_SIZE fragments
-    divvy = htable.divide_tags_into_subsets(args.subset_size)
+    divvy = nodegraph.divide_tags_into_subsets(args.subset_size)
 
     # pick off the first one
     if len(divvy) == 1:
@@ -108,17 +107,17 @@ def main():
 
     # partition!
     print('doing pre-partitioning from', start, 'to', end, file=sys.stderr)
-    subset = htable.do_subset_partition(start, end)
+    subset = nodegraph.do_subset_partition(start, end)
 
     # now, repartition...
     print('repartitioning to find HCKs.', file=sys.stderr)
-    htable.repartition_largest_partition(subset, counting,
-                                         EXCURSION_DISTANCE,
-                                         EXCURSION_KMER_THRESHOLD,
-                                         EXCURSION_KMER_COUNT_THRESHOLD)
+    nodegraph.repartition_largest_partition(subset, counting,
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
     print('saving stop tags', file=sys.stderr)
-    htable.save_stop_tags(graphbase + '.stoptags')
+    nodegraph.save_stop_tags(graphbase + '.stoptags')
     print('wrote to:', graphbase + '.stoptags', file=sys.stderr)
 
 if __name__ == '__main__':

@@ -118,13 +118,13 @@ def get_parser():
     keeping (or discarding) each sequencing fragment. This helps with retention
     of repeats, especially.
 
-    With :option:`-s`/:option:`--savetable`, the k-mer counting table
+    With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
     will be saved to the specified file after all sequences have been
-    processed. With :option:`-d`, the k-mer counting table will be
+    processed. With :option:`-d`, the k-mer countgraph will be
     saved every d files for multifile runs; if :option:`-s` is set,
     the specified name will be used, and if not, the name `backup.ct`
-    will be used.  :option:`-l`/:option:`--loadtable` will load the
-    specified k-mer counting table before processing the specified
+    will be used.  :option:`-l`/:option:`--loadgraph` will load the
+    specified k-mer countgraph before processing the specified
     files.  Note that these tables are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
@@ -157,7 +157,7 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-s', '--savetable', metavar="filename", default='')
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
@@ -186,16 +186,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, False)
-    if args.savetable:
+    if args.savegraph:
         check_space_for_graph(args, 'countgraph', False)
 
     # list to save error files along with throwing exceptions
     if args.force:
         corrupt_files = []
 
-    if args.loadtable:
-        print('loading k-mer counting table from', args.loadtable)
-        htable = khmer.load_countinggraph(args.loadtable)
+    if args.loadgraph:
+        print('loading k-mer countgraph from', args.loadgraph)
+        htable = khmer.load_countinggraph(args.loadgraph)
     else:
         print('making countgraph')
         htable = create_countgraph(args)
@@ -233,10 +233,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                             kept=total - discarded, total=total,
                             perc=int(100. - discarded / float(total) * 100.)))
 
-    if args.savetable:
-        print('Saving k-mer counting table through', input_filename)
-        print('...saving to', args.savetable)
-        htable.save(args.savetable)
+    if args.savegraph:
+        print('Saving k-mer countgraph through', input_filename)
+        print('...saving to', args.savegraph)
+        htable.save(args.savegraph)
 
     # re: threshold, see Zhang et al.,
     # http://arxiv.org/abs/1309.2975

@@ -24,7 +24,7 @@ import threading
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config, info, calculate_tablesize)
+                              report_on_config, info, calculate_graphsize)
 from khmer.kfile import (check_input_files, check_space_for_graph)
 
 
@@ -58,8 +58,8 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--savetable', default='', metavar="filename",
-                        help="Save the k-mer counting table to the specified "
+    parser.add_argument('--savegraph', default='', metavar="filename",
+                        help="Save the k-mer countgraph to the specified "
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
@@ -72,9 +72,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)
-    if args.savetable:
-        tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_graph(args.savetable, tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
         print('ERROR: %s exists; not squashing.' %
@@ -91,11 +91,11 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     countinggraph = khmer_args.create_countgraph(args, multiplier=1.1)
     countinggraph.set_use_bigcount(args.bigcount)
 
-    print('building k-mer tracking table', file=sys.stderr)
+    print('building k-mer tracking graph', file=sys.stderr)
     tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
     print('kmer_size:', countinggraph.ksize(), file=sys.stderr)
-    print('k-mer counting table sizes:',
+    print('k-mer countgraph sizes:',
           countinggraph.hashsizes(), file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
@@ -172,10 +172,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         if sofar == total:
             break
 
-    if args.savetable:
-        print('Saving k-mer counting table ', args.savetable, file=sys.stderr)
-        print('...saving to', args.savetable, file=sys.stderr)
-        countinggraph.save(args.savetable)
+    if args.savegraph:
+        print('Saving k-mer countgraph ', args.savegraph, file=sys.stderr)
+        print('...saving to', args.savegraph, file=sys.stderr)
+        countinggraph.save(args.savegraph)
 
     print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
 

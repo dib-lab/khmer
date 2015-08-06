@@ -8,7 +8,7 @@
 # pylint: disable=missing-docstring,invalid-name
 """
 Produce k-mer counts for all the k-mers in the given sequence file,
-using the given counting table.
+using the given countgraph.
 
 % python sandbox/count-kmers-single.py <fasta/fastq>
 
@@ -50,7 +50,7 @@ def main():
 
     check_input_files(args.input_sequence_filename, False)
 
-    print ('making k-mer counting table', file=sys.stderr)
+    print ('making k-mer countgraph', file=sys.stderr)
     countinggraph = khmer.Countgraph(args.ksize, args.max_tablesize,
                                             args.n_tables)
     # @CTB countinggraph.set_use_bigcount(args.bigcount)
@@ -61,7 +61,7 @@ def main():
         kmer_size, hashsizes)
 
     print ('kmer_size: %s' % countinggraph.ksize(), file=sys.stderr)
-    print ('k-mer counting table sizes: %s' % (countinggraph.hashsizes(),),
+    print ('k-mer countgraph sizes: %s' % (countinggraph.hashsizes(),),
            file=sys.stderr)
 
     if args.output_file is None:

@@ -22,7 +22,7 @@ import textwrap
 import khmer
 from khmer import khmer_args
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args, calculate_tablesize
+    add_threading_args, calculate_graphsize
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
@@ -31,7 +31,7 @@ from khmer.kfile import check_space_for_graph
 def get_parser():
     epilog = """
     Note: with :option:`-b` the output will be the exact size of the
-    k-mer counting table and this script will use a constant amount of memory.
+    k-mer countgraph and this script will use a constant amount of memory.
     In exchange k-mer counts will stop at 255. The memory usage of this script
     with :option:`-b` will be about 1.15x the product of the :option:`-x` and
     :option:`-N` numbers.
@@ -48,11 +48,11 @@ def get_parser():
         load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
-    parser = build_counting_args("Build a k-mer counting table from the given"
+    parser = build_counting_args("Build a k-mer countgraph from the given"
                                  " sequences.", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
-    parser.add_argument('output_countingtable_filename', help="The name of the"
-                        " file to write the k-mer counting table to.")
+    parser.add_argument('output_countgraph_filename', help="The name of the"
+                        " file to write the k-mer countgraph to.")
     parser.add_argument('input_sequence_filename', nargs='+',
                         help="The names of one or more FAST[AQ] input "
                         "sequence files.")
@@ -76,20 +76,20 @@ def main():
     args = get_parser().parse_args()
     report_on_config(args)
 
-    base = args.output_countingtable_filename
+    base = args.output_countgraph_filename
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
         check_input_files(name, args.force)
 
-    tablesize = calculate_tablesize(args, 'countgraph')
-    check_space_for_graph(args.output_countingtable_filename, tablesize,
+    tablesize = calculate_graphsize(args, 'countgraph')
+    check_space_for_graph(args.output_countgraph_filename, tablesize,
                           args.force)
 
     check_file_writable(base)
     check_file_writable(base + ".info")
 
-    print('Saving k-mer counting table to %s' % base, file=sys.stderr)
+    print('Saving k-mer countgraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(filenames), file=sys.stderr)
 
@@ -98,8 +98,8 @@ def main():
         os.remove(base + '.info')
 
     print('making countgraph', file=sys.stderr)
-    htable = khmer_args.create_countgraph(args)
-    htable.set_use_bigcount(args.bigcount)
+    countgraph = khmer_args.create_countgraph(args)
+    countgraph.set_use_bigcount(args.bigcount)
 
     filename = None
 
@@ -113,7 +113,7 @@ def main():
         for _ in range(args.threads):
             cur_thrd = \
                 threading.Thread(
-                    target=htable.consume_fasta_with_reads_parser,
+                    target=countgraph.consume_fasta_with_reads_parser,
                     args=(rparser, )
                 )
             threads.append(cur_thrd)
@@ -123,26 +123,26 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            tablesize = calculate_tablesize(args, 'countgraph')
+            tablesize = calculate_graphsize(args, 'countgraph')
             check_space_for_graph(base, tablesize, args.force)
             print('mid-save', base, file=sys.stderr)
 
-            htable.save(base)
+            countgraph.save(base)
         with open(base + '.info', 'a') as info_fh:
             print('through', filename, file=info_fh)
         total_num_reads += rparser.num_reads
 
-    n_kmers = htable.n_unique_kmers()
+    n_kmers = countgraph.n_unique_kmers()
     print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
     with open(base + '.info', 'a') as info_fp:
         print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
     print('saving', base, file=sys.stderr)
-    htable.save(base)
+    countgraph.save(base)
 
     # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.2)
+        khmer.calc_expected_collisions(countgraph, args.force, max_false_pos=.2)
 
     with open(base + '.info', 'a') as info_fp:
         print('fp rate estimated to be %1.3f\n' % fp_rate, file=info_fp)

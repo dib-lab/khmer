@@ -36,23 +36,23 @@ def test_collision():
 
 
 def test_badcount():
-    countingtable = khmer._Countgraph(4, [5])
+    countgraph = khmer._Countgraph(4, [5])
     try:
-        countingtable.count()
+        countgraph.count()
         assert 0, "count should require one argument"
     except TypeError as err:
         print(str(err))
     try:
-        countingtable.count('ABCDE')
+        countgraph.count('ABCDE')
         assert 0, "count should require k-mer size to be equal"
     except ValueError as err:
         print(str(err))
 
 
 def test_hashtable_n_entries():
-    countingtable = khmer._Countgraph(4, [5])
+    countgraph = khmer._Countgraph(4, [5])
     try:
-        countingtable.n_entries("nope")
+        countgraph.n_entries("nope")
         assert 0, "n_entries should accept no arguments"
     except TypeError as err:
         print(str(err))

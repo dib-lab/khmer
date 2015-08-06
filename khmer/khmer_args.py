@@ -58,7 +58,7 @@ def build_graph_args(descr=None, epilog=None, parser=None):
 
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
-                        help='number of k-mer counting tables to use')
+                        help='number of k-mer countgraphs to use')
     parser.add_argument('-U', '--unique-kmers', type=int, default=0,
                         help='approximate number of unique kmers in the input'
                              ' set')
@@ -105,7 +105,7 @@ def add_loadgraph_args(parser):
                getattr(namespace, 'max_tablesize') != DEFAULT_MAX_TABLESIZE:
                 if values:
                     print_error('''
-** WARNING: You are loading a saved k-mer table from
+** WARNING: You are loading a saved k-mer graph from
 ** {hashfile}, but have set k-mer graph size parameters.
 ** Your values for ksize, n_tables, and tablesize
 ** will be ignored.'''.format(hashfile=values))
@@ -126,12 +126,12 @@ def add_loadgraph_args(parser):
                     setattr(namespace, 'n_tables', n)
                     setattr(namespace, 'max_tablesize', x)
 
-    parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
-                        help='load a precomputed k-mer table from disk',
+    parser.add_argument('-l', '--loadgraph', metavar="filename", default=None,
+                        help='load a precomputed k-mer graph from disk',
                         action=LoadAction)
 
 
-def calculate_tablesize(args, graphtype, multiplier=1.0):
+def calculate_graphsize(args, graphtype, multiplier=1.0):
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
@@ -155,7 +155,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args, 'nodegraph', multiplier)
+    tablesize = calculate_graphsize(args, 'nodegraph', multiplier)
     return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
@@ -166,7 +166,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args, 'countgraph', multiplier=multiplier)
+    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
     return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
@@ -180,7 +180,7 @@ def report_on_config(args, graphtype='countgraph'):
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
-    tablesize = calculate_tablesize(args, graphtype)
+    tablesize = calculate_graphsize(args, graphtype)
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
@@ -204,7 +204,7 @@ def report_on_config(args, graphtype='countgraph'):
     print_error("-" * 8)
 
     if DEFAULT_MAX_TABLESIZE == tablesize and \
-       not getattr(args, 'loadtable', None):
+       not getattr(args, 'loadgraph', None):
         print_error('''\
 
 ** WARNING: tablesize is default!
