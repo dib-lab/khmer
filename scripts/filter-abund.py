@@ -96,7 +96,7 @@ def main():
 
     print('loading countgraph:', args.input_graph,
           file=sys.stderr)
-    countgraph = khmer.load_countinggraph(args.input_graph)
+    countgraph = khmer.load_countgraph(args.input_graph)
     ksize = countgraph.ksize()
 
     print("K:", ksize, file=sys.stderr)

@@ -82,7 +82,7 @@ def test_load_into_counting_max_memory_usage_parameter():
     assert os.path.exists(outfile)
     assert "WARNING: tablesize is default!" not in err
 
-    kh = khmer.load_countinggraph(outfile)
+    kh = khmer.load_countgraph(outfile)
     assert sum(kh.hashsizes()) < 3e8
 
 

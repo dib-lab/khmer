@@ -88,15 +88,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                               'cumulative_fraction'])
 
     print('making countgraph', file=sys.stderr)
-    countinggraph = khmer_args.create_countgraph(args, multiplier=1.1)
-    countinggraph.set_use_bigcount(args.bigcount)
+    countgraph = khmer_args.create_countgraph(args, multiplier=1.1)
+    countgraph.set_use_bigcount(args.bigcount)
 
     print('building k-mer tracking graph', file=sys.stderr)
     tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
-    print('kmer_size:', countinggraph.ksize(), file=sys.stderr)
+    print('kmer_size:', countgraph.ksize(), file=sys.stderr)
     print('k-mer countgraph sizes:',
-          countinggraph.hashsizes(), file=sys.stderr)
+          countgraph.hashsizes(), file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     # start loading
@@ -107,7 +107,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countinggraph.consume_fasta_with_reads_parser,
+                target=countgraph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -117,12 +117,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         thread.join()
 
     print('Total number of unique k-mers: {0}'.format(
-        countinggraph.n_unique_kmers()), file=sys.stderr)
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
     abundance_lists = []
 
     def __do_abundance_dist__(read_parser):
-        abundances = countinggraph.abundance_distribution_with_reads_parser(
+        abundances = countgraph.abundance_distribution_with_reads_parser(
             read_parser, tracking)
         abundance_lists.append(abundances)
 
@@ -175,7 +175,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     if args.savegraph:
         print('Saving k-mer countgraph ', args.savegraph, file=sys.stderr)
         print('...saving to', args.savegraph, file=sys.stderr)
-        countinggraph.save(args.savegraph)
+        countgraph.save(args.savegraph)
 
     print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
 

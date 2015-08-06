@@ -521,7 +521,7 @@ def test_normalize_by_median_no_bigcount():
     print((out, err))
 
     assert os.path.exists(hashfile), hashfile
-    kh = khmer.load_countinggraph(hashfile)
+    kh = khmer.load_countgraph(hashfile)
 
     assert kh.get('GGTTGACG') == 255
 

@@ -140,10 +140,10 @@ def main():
 
     if args.loadgraph:
         print >>sys.stderr, 'loading k-mer countgraph from', args.loadgraph
-        ct = khmer.load_countinggraph(args.loadgraph)
+        ct = khmer.load_countgraph(args.loadgraph)
     else:
         print >>sys.stderr, 'making k-mer countgraph'
-        ct = khmer.new_countinggraph(K, args.min_tablesize, args.n_tables)
+        ct = khmer.new_countgraph(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print >>sys.stderr, 'created temporary directory %s; ' \

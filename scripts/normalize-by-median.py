@@ -317,7 +317,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if args.loadgraph:
         log_info('loading k-mer countgraph from {graph}',
                  graph=args.loadgraph)
-        countgraph = khmer.load_countinggraph(args.loadgraph)
+        countgraph = khmer.load_countgraph(args.loadgraph)
         if args.unique_kmers != 0:
             log_info('Warning: You have specified the number of unique kmers'
                      ' but are loading a precreated countgraph --'

@@ -82,7 +82,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer countgraph from', htfile, file=sys.stderr)
-    countgraph = khmer.load_countinggraph(htfile)
+    countgraph = khmer.load_countgraph(htfile)
     ksize = countgraph.ksize()
     print('writing to', output_filename, file=sys.stderr)
 

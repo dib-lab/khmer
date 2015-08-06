@@ -49,11 +49,11 @@ def main():
 
     print ('hashtable from', args.input_count_graph_filename,
            file=sys.stderr)
-    countinggraph = khmer.load_countinggraph(
+    countgraph = khmer.load_countgraph(
         args.input_count_graph_filename)
 
-    kmer_size = countinggraph.ksize()
-    hashsizes = countinggraph.hashsizes()
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
     tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
@@ -68,10 +68,10 @@ def main():
                 kmer = seq[i:i+kmer_size]
                 if not tracking.get(kmer):
                     tracking.count(kmer)
-                    writer.writerow([kmer, str(countinggraph.get(kmer))])
+                    writer.writerow([kmer, str(countgraph.get(kmer))])
 
     print ('Total number of unique k-mers: {0}'.format(
-        countinggraph.n_unique_kmers()), file=sys.stderr)
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':

@@ -51,17 +51,17 @@ def main():
     check_input_files(args.input_sequence_filename, False)
 
     print ('making k-mer countgraph', file=sys.stderr)
-    countinggraph = khmer.Countgraph(args.ksize, args.max_tablesize,
+    countgraph = khmer.Countgraph(args.ksize, args.max_tablesize,
                                             args.n_tables)
-    # @CTB countinggraph.set_use_bigcount(args.bigcount)
+    # @CTB countgraph.set_use_bigcount(args.bigcount)
 
-    kmer_size = countinggraph.ksize()
-    hashsizes = countinggraph.hashsizes()
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
     tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print ('kmer_size: %s' % countinggraph.ksize(), file=sys.stderr)
-    print ('k-mer countgraph sizes: %s' % (countinggraph.hashsizes(),),
+    print ('kmer_size: %s' % countgraph.ksize(), file=sys.stderr)
+    print ('k-mer countgraph sizes: %s' % (countgraph.hashsizes(),),
            file=sys.stderr)
 
     if args.output_file is None:
@@ -76,7 +76,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countinggraph.consume_fasta_with_reads_parser,
+                target=countgraph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -91,10 +91,10 @@ def main():
             kmer = seq[i:i+kmer_size]
             if not tracking.get(kmer):
                 tracking.count(kmer)
-                writer.writerow([kmer, str(countinggraph.get(kmer))])
+                writer.writerow([kmer, str(countgraph.get(kmer))])
 
     print ('Total number of unique k-mers: {0}'.format(
-        countinggraph.n_unique_kmers()), file=sys.stderr)
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':

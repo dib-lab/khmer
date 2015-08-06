@@ -318,7 +318,7 @@ def test_load_into_counting_1():
 
     (status, out, err) = run_shell_cmd(cmd)
     assert os.path.exists(out1)
-    khmer.load_countinggraph(out1)
+    khmer.load_countgraph(out1)
 
 
 def test_load_graph_1():

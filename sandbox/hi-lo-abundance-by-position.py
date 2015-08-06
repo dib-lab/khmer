@@ -22,7 +22,7 @@ def main():
     outfile = os.path.basename(filename)
 
     print('loading kh file', hashfile)
-    ht = khmer.load_countinggraph(hashfile)
+    ht = khmer.load_countgraph(hashfile)
 
     x = ht.fasta_count_kmers_by_position(filename, 100, 1)
     write_dist(x, open(outfile + '.pos.abund=1', 'w'))

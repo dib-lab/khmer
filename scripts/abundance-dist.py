@@ -65,19 +65,19 @@ def main():
 
     print('Counting graph from', args.input_count_graph_filename,
           file=sys.stderr)
-    countinggraph = khmer.load_countinggraph(
+    countgraph = khmer.load_countgraph(
         args.input_count_graph_filename)
 
-    if not countinggraph.get_use_bigcount() and args.bigcount:
+    if not countgraph.get_use_bigcount() and args.bigcount:
         print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
               " reporting is ENABLED--counts higher than 255 will not be "
               "reported.",
               file=sys.stderr)
 
-    countinggraph.set_use_bigcount(args.bigcount)
+    countgraph.set_use_bigcount(args.bigcount)
 
-    kmer_size = countinggraph.ksize()
-    hashsizes = countinggraph.hashsizes()
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
     tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
@@ -97,7 +97,7 @@ def main():
               args.output_histogram_filename, file=sys.stderr)
 
     print('preparing hist...', file=sys.stderr)
-    abundances = countinggraph.abundance_distribution(
+    abundances = countgraph.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
 

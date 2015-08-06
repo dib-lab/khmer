@@ -76,7 +76,7 @@ def build_graph_args(descr=None, epilog=None, parser=None):
 
 
 def build_counting_args(descr=None, epilog=None):
-    """Build an ArgumentParser with args for countinggraph based scripts."""
+    """Build an ArgumentParser with args for countgraph based scripts."""
     parser = build_graph_args(descr=descr, epilog=epilog)
     parser.graphtype = 'countgraph'
 

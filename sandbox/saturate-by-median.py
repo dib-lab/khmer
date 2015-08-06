@@ -195,7 +195,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.loadgraph:
         print('loading k-mer countgraph from', args.loadgraph)
-        htable = khmer.load_countinggraph(args.loadgraph)
+        htable = khmer.load_countgraph(args.loadgraph)
     else:
         print('making countgraph')
         htable = create_countgraph(args)

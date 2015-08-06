@@ -17,7 +17,7 @@ from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import forward_hash
-# tests/test_{functions,countinggraph,counting_single}.py
+# tests/test_{functions,countgraph,counting_single}.py
 
 from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 
@@ -55,11 +55,11 @@ def load_nodegraph(filename):
     return nodegraph
 
 
-def load_countinggraph(filename):
-    """Load a countinggraph object from the given filename and return it.
+def load_countgraph(filename):
+    """Load a countgraph object from the given filename and return it.
 
     Keyword argument:
-    filename -- the name of the countinggraph file
+    filename -- the name of the countgraph file
     """
     countgraph = _Countgraph(1, [1])
     countgraph.load(filename)
@@ -105,13 +105,13 @@ def extract_nodegraph_info(filename):
 
 
 def extract_countgraph_info(filename):
-    """Open the given countinggraph file and return a tuple of information.
+    """Open the given countgraph file and return a tuple of information.
 
     Return: the k-mer size, the table size, the number of tables, the bigcount
     flag, the version of the table format, and the type of table flag.
 
     Keyword argument:
-    filename -- the name of the countinggraph file to inspect
+    filename -- the name of the countgraph file to inspect
     """
     ksize = None
     n_tables = None

@@ -580,7 +580,7 @@ def test_save_load_large():
         orig.consume_fasta(inpath)
         orig.save(savepath)
 
-        loaded = khmer.load_countinggraph(savepath)
+        loaded = khmer.load_countgraph(savepath)
 
         orig_count = orig.n_occupied()
         loaded_count = loaded.n_occupied()
@@ -636,7 +636,7 @@ def test_load_truncated():
         fp.close()
 
         try:
-            ht = khmer.load_countinggraph(truncpath)
+            ht = khmer.load_countgraph(truncpath)
             assert 0, "this should not be reached!"
         except OSError as err:
             print(str(err))
@@ -710,7 +710,7 @@ def test_save_load_gz():
 def test_load_empty_files():
     def do_load_ct(fname):
         with assert_raises(OSError):
-            ct = khmer.load_countinggraph(fname)
+            ct = khmer.load_countgraph(fname)
 
     # Check empty files, compressed or not
     for ext in ['', '.gz']:
@@ -1427,13 +1427,13 @@ def test_abund_dist_gz_bigcount():
     f_out.close()
     # load the compressed bigcount table
     try:
-        countinggraph = khmer.load_countinggraph(outfile)
+        countgraph = khmer.load_countgraph(outfile)
     except OSError as err:
         assert 0, 'Should not produce OSError: ' + str(err)
-    hashsizes = countinggraph.hashsizes()
-    kmer_size = countinggraph.ksize()
+    hashsizes = countgraph.hashsizes()
+    kmer_size = countgraph.ksize()
     tracking = khmer._Nodegraph(kmer_size, hashsizes)
-    abundances = countinggraph.abundance_distribution(infile, tracking)
+    abundances = countgraph.abundance_distribution(infile, tracking)
     # calculate abundance distribution for compressed bigcount table
     flag = False
     # check if abundance is > 255

@@ -139,7 +139,7 @@ def main():
 
     if args.loadgraph:
         print('loading countgraph from', args.loadgraph, file=sys.stderr)
-        ct = khmer.load_countinggraph(args.loadgraph)
+        ct = khmer.load_countgraph(args.loadgraph)
     else:
         print('making countgraph', file=sys.stderr)
         ct = khmer_args.create_countgraph(args)
