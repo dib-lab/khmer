@@ -4,7 +4,12 @@ Coding guidelines and code review checklist
 This document is for anyone who want to contribute code to the khmer
 project, and describes our coding standards and code review checklist.
 
-----
+C++ standards
+-------------
+
+Any feature in C++11 is fine to use. Specifically we support features found in
+GCC 4.8.2. See https://github.com/dib-lab/khmer/issues/598 for an in-depth
+discussion.
 
 Coding standards
 ----------------
