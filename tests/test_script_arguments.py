@@ -123,7 +123,8 @@ def test_check_valid_stdin_nowarn():
 FakeArgparseObject = collections.namedtuple('FakeArgs',
                                             ['ksize', 'n_tables',
                                              'max_tablesize',
-                                             'max_memory_usage'])
+                                             'max_memory_usage',
+                                             'unique_kmers'])
 
 
 def test_create_countgraph_1():
@@ -132,7 +133,7 @@ def test_create_countgraph_1():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     countgraph = khmer_args.create_countgraph(args)
     expected_hashsz = utils.longify([2499997, 2499989, 2499983, 2499967])
@@ -148,7 +149,7 @@ def test_create_countgraph_2():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     countgraph = khmer_args.create_countgraph(args, ksize=15)
     assert countgraph.ksize() == 15
@@ -162,7 +163,7 @@ def test_create_countgraph_3():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -183,7 +184,7 @@ def test_create_countgraph_4_multiplier():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
     assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
@@ -196,7 +197,7 @@ def test_create_nodegraph_1():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     nodegraph = khmer_args.create_nodegraph(args)
     expected_hashsz = utils.longify([19999999, 19999981, 19999963, 19999927])
@@ -214,7 +215,7 @@ def test_create_nodegraph_2():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, ksize=15)
     assert nodegraph.ksize() == 15
@@ -228,7 +229,7 @@ def test_create_nodegraph_3():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -247,7 +248,7 @@ def test_create_nodegraph_4_multiplier():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
     assert sum(nodegraph.hashsizes()) / 8.0 < max_mem / 2.0, \
@@ -260,7 +261,7 @@ def test_report_on_config_bad_graphtype():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     try:
         khmer_args.report_on_config(args, 'foograph')
@@ -277,7 +278,7 @@ def test_fail_calculate_foograph_size():
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
 
-    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem)
+    args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     try:
         nodegraph = khmer_args.calculate_graphsize(args, 'foograph')

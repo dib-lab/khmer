@@ -55,6 +55,36 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_autoargs_0():
+    script = 'load-into-counting.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--fp-rate', '0.08', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert 'INFO: Overriding default fp 0.1 with new fp: 0.08' in err, err
+    assert ' tablesize is too small!' in err, err
+    assert 'Estimated FP rate with current config is: 0.9999546' in err, err
+    assert 'Recommended tablesize is: 1.77407e+07 bytes' in err, err
+
+
+def test_load_into_counting_autoargs_1():
+    script = 'load-into-counting.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--max-tablesize', '3e7', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert "Ceiling is: 4.80833e+07 bytes" in err, err
+    assert "set memory ceiling automatically." in err, err
+
+
 def test_load_into_count_graphsize_warning():
     script = 'load-into-counting.py'
     args = ['-k', '20']
@@ -743,6 +773,38 @@ def test_oxli_build_graph():
     (status, out, err) = utils.runscript(script, args)
 
     assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_nodegraph(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+def test_oxli_build_graph_unique_kmers_arg():
+    script = 'oxli'
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+    assert 'INFO: set memory ceiling automatically' in err, err
+    assert 'Ceiling is: 1e+06 bytes' in err, err
 
     ht_file = outfile
     assert os.path.exists(ht_file), ht_file
