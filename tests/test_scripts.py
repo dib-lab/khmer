@@ -21,6 +21,7 @@ import traceback
 from nose.plugins.attrib import attr
 import threading
 import bz2
+import gzip
 import io
 
 from . import khmer_tst_utils as utils
@@ -52,6 +53,36 @@ def test_load_into_counting():
     (status, out, err) = utils.runscript(script, args)
     assert 'Total number of unique k-mers: 83' in err, err
     assert os.path.exists(outfile)
+
+
+def test_load_into_counting_autoargs_0():
+    script = 'load-into-counting.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--fp-rate', '0.08', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert 'INFO: Overriding default fp 0.1 with new fp: 0.08' in err, err
+    assert ' tablesize is too small!' in err, err
+    assert 'Estimated FP rate with current config is: 0.9999546' in err, err
+    assert 'Recommended tablesize is: 1.77407e+07 bytes' in err, err
+
+
+def test_load_into_counting_autoargs_1():
+    script = 'load-into-counting.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--max-tablesize', '3e7', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert "Ceiling is: 4.80833e+07 bytes" in err, err
+    assert "set memory ceiling automatically." in err, err
 
 
 def test_load_into_counting_tablesize_warning():
@@ -742,6 +773,38 @@ def test_oxli_build_graph():
     (status, out, err) = utils.runscript(script, args)
 
     assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+def test_oxli_build_graph_unique_kmers_arg():
+    script = 'oxli'
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+    assert 'INFO: set memory ceiling automatically' in err, err
+    assert 'Ceiling is: 1e+06 bytes' in err, err
 
     ht_file = outfile
     assert os.path.exists(ht_file), ht_file
@@ -1645,21 +1708,13 @@ def test_interleave_read_stdout():
     # actual output file
     outfile = utils.get_temp_filename('out.fq')
 
-    old_stdout = sys.stdout
-    # sys.stdout = capture = StringIO
-
     script = 'interleave-reads.py'
     args = [infile1, infile2]
 
     (stats, out, err) = utils.runscript(script, args)
 
-    sys.stdout = old_stdout
-
-    splitout = out.splitlines()
     with open(outfile, 'w') as ofile:
-        for (index, line) in enumerate(splitout):
-            if index > 1:
-                ofile.write(line + '\n')
+        ofile.write(out)
 
     n = 0
     for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
@@ -1920,7 +1975,7 @@ def test_extract_paired_reads_3_output_dir():
     out_dir = utils.get_temp_filename('output')
 
     script = 'extract-paired-reads.py'
-    args = [infile, '-o', out_dir]
+    args = [infile, '-d', out_dir]
 
     utils.runscript(script, args)
 
@@ -2127,11 +2182,11 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = ['-p', infile]
+    args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status == 1
-    assert "is not part of a pair" in err
+    assert status == 1, status
+    assert "Unpaired reads found" in err
 
 
 def test_split_paired_reads_2_stdin_no_out():
@@ -2150,11 +2205,67 @@ def test_split_paired_reads_2_mixed_fq():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = [infile]
+    args = ['-0', '/dev/null', infile]
 
     status, out, err = utils.runscript(script, args, in_dir)
     assert status == 0
-    assert "split 11 sequences (7 left, 4 right)" in err, err
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+
+def test_split_paired_reads_2_mixed_fq_orphans_to_file():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        try:
+            fp.read()
+        except IOError as e:
+            assert "Not a gzipped file" in str(e), str(e)
+        fp.close()
+
+
+def test_split_paired_reads_2_mixed_fq_gzfile():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, '--gzip', infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        fp.read()                       # this will fail if not gzip file.
+        fp.close()
 
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
@@ -2168,7 +2279,7 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status == 1
-    assert "Unrecognized format" in err
+    assert "Unpaired reads found starting at 895:1:37:17593:9954" in err, err
 
 
 def test_split_paired_reads_3_output_dir():
@@ -2258,7 +2369,7 @@ def test_split_paired_reads_3_output_files_left():
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-o', output_dir, '-1', outfile1, infile]
+    args = ['-d', output_dir, '-1', outfile1, infile]
 
     utils.runscript(script, args)
 
@@ -2295,7 +2406,7 @@ def test_split_paired_reads_3_output_files_right():
     outfile2 = utils.get_temp_filename('yyy', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-2', outfile2, '-o', output_dir, infile]
+    args = ['-2', outfile2, '-d', output_dir, infile]
 
     utils.runscript(script, args)
 
@@ -2522,7 +2633,7 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2, len(out.splitlines())
+    assert len(out.splitlines()) == 0, len(out.splitlines())
     assert "No lines dropped" in err
 
     names = [r.name for r in screed.open(clean_outfile)]
@@ -2530,37 +2641,37 @@ def test_fastq_to_fasta():
 
     args = [n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "No lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [n_infile, '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2, out
+    assert len(out.splitlines()) == 0, out
     assert "4 lines dropped" in err, err
 
     args = [clean_infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "0 lines dropped" in err
 
     args = [n_infile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "4 lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile, '--gzip']
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile, '--bzip']
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
 

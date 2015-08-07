@@ -1,4 +1,4 @@
-2015-08-01  Titus Brown  <titus@idyll.org>
+2015-08-07  Titus Brown  <titus@idyll.org>
 
 
   * lib/{hashbits.cc,khmer.hh},tests/test_hashbits.py: updated save/load
@@ -9,6 +9,56 @@
   * tests/test_scripts.py: removed count-overlap.py tests.
   * khmer/_khmer.cc,lib/hashbits.{cc,hh}: removed overlap functionality.
   * sandbox/README.rst: updated with removal of bloom-count-intersection.py.
+
+2015-08-04  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out 
+   oxli and into khmer_args
+   * oxli/build_graph.py, tests/test_oxli_functions.py, 
+   sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py,
+   scripts/{normalize-by-median,unique-kmers}.py: changed to not break on
+   location change
+   * tests/{test_normalize_by_median,test_scripts}.py: added tests for
+   automatic arg setting
+   * tests/test_script_arguments: changed to play nice with unique_kmers as an
+   argument
+
+2015-08-04  Titus Brown  <titus@idyll.org> and Camille Scott
+<camille.scott.w@gmail.com>
+
+   * khmer/utils.py: added UnpairedReadsError exception.
+   * scripts/{extract-paired-reads,split-paired-reads}.py: changed --output-dir
+   argument short form to use '-d'.
+   * scripts/{split-paired-reads.py} added -0 <filename> to allow orphans; made
+   '-p'/'--force-paired' default & removed from script.
+   * scripts/{normalize-by-median,filter-abund,trim-low-abund}.py: changed
+   long form of '-o' to be '--output'.
+   * tests/{test_scripts,test_streaming_io}.py: updated and added tests for
+   new behavior.
+
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/coding-guidelines-and-review.rst: added codespell as a possible
+   spelling tool
+
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * Makefile: added oxli to pep257 make target, made clean target wipe out all
+   .pyc files in scripts/* and tests/* and oxli/*
+
+2015-08-03  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * tests/test_counting_single.py: removed redundant test
+
+2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com> and Titus Brown
+<titus@idyll.org>
+
+   * scripts/normalize-by-median.py,khmer/khmer_logger.py: added logging
+   framework, prototyped in normalize-by-median; added -q/--quiet to
+   * tests/test_normalize_by_median.py: associated tests.
+   * khmer/khmer_args.py: Made info function use logging functions.
+   * tests/khmer_tst_utils.py: removed info reporting in runscript from 'out'
+   returned.
 
 2015-08-01  Jacob Fenton  <bocajnotnef@gmail.com>
 
@@ -36,7 +86,7 @@
 2015-07-31  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/Makefile,Makefile,lib/*.pc.in,lib/test-compile.cc: Misc debian-based
-   compatiablity changes
+   compatibility changes
    * lib/get_version.py: Add crunchbang, chmod +x
 
 2015-07-29  Michael R. Crusoe  <crusoe@ucdavis.edu>

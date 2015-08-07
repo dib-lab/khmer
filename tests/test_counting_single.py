@@ -16,16 +16,6 @@ from nose.plugins.attrib import attr
 MAX_COUNT = 255
 
 
-def test_no_collision():
-    kh = khmer._CountingHash(4, [5])
-
-    kh.count('AAAA')
-    assert kh.get('AAAA') == 1
-
-    kh.count('TTTT')                    # reverse complement
-    assert kh.get('TTTT') == 2
-
-
 @attr('huge')
 def test_toobig():
     try:
