@@ -587,7 +587,6 @@ def test_load_gz():
 
 
 def test_save_load_gz():
-    return
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
 
@@ -952,7 +951,6 @@ def test_load_gz_notexist_should_fail():
 
 
 def test_load_gz_truncated_should_fail():
-    return
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
