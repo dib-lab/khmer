@@ -66,10 +66,7 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 def check_conflicting_args(args, hashtype):
     """
     Utility function that takes in an args object and checks if there's things
-    that conflict, e.g. --loadtable and --ksize being set
-
-    Designed to replace such checking being done in LoadActions and such to
-    reduce case matrix size
+    that conflict, e.g. --loadtable and --ksize being set.
     """
 
     if getattr(args, "quiet", None):
@@ -87,18 +84,18 @@ def check_conflicting_args(args, hashtype):
         for key, value in loadtable_htable_conflicts.items():
             if getattr(args, key, value) != value:
                 log_warn('''
-** WARNING: You are loading a saved k-mer table from
-** {hashfile}, but have set k-mer table parameters.
-** Your values for ksize, n_tables, and tablesize
-** will be ignored.'''.format(hashfile=args.loadtable))
+*** WARNING: You are loading a saved k-mer table from
+*** {hashfile}, but have set k-mer table parameters.
+*** Your values for ksize, n_tables, and tablesize
+*** will be ignored.'''.format(hashfile=args.loadtable))
                 break  # no repeat warnings
 
         for element in loadtable_autoarg_conflicts:
             if getattr(args, element, None):
                 log_warn("\n*** WARNING: You have asked that the graph size be"
                          " automatically calculated\n"
-                         "*** (by using -U or -M)\n"
-                         "*** But you are loading an existing graph.\n"
+                         "*** (by using -U or -M).\n"
+                         "*** But you are loading an existing graph!\n"
                          "*** Size will NOT be set automatically.")
                 break  # no repeat warnings
 
@@ -109,9 +106,9 @@ def check_conflicting_args(args, hashtype):
             ksize = infoset[0]
             max_tablesize = infoset[1]
             n_tables = infoset[2]
-            setattr(args, 'ksize', ksize)
-            setattr(args, 'n_tables', n_tables)
-            setattr(args, 'max_tablesize', max_tablesize)
+            args.ksize = ksize
+            args.n_tables = n_tables
+            args.max_tablesize = max_tablesize
 
 
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
