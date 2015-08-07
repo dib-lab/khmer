@@ -155,7 +155,7 @@ def test_extract_nodegraph_info():
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
-        assert table_size == size
+        assert table_size == size, table_size
         assert n_tables == 4
 
         try:
