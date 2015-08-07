@@ -2778,32 +2778,6 @@ count_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-count_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-    unsigned int nk = 1;
-
-    if (!PyArg_ParseTuple(args, "s|I", &long_str, &nk)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType kad = 0;
-
-    counting->get_kadian_count(long_str, kad, nk);
-
-    return Py_BuildValue("i", kad);
-}
-
-static
-PyObject *
 count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 {
     CountingHash * counting = self->counting;
@@ -3166,7 +3140,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "output_fasta_kmer_pos_freq", (PyCFunction)count_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "get_kadian_count", (PyCFunction)count_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },

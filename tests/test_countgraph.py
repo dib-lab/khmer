@@ -366,100 +366,6 @@ def test_median_at_least_exception():
         pass
 
 
-def test_simple_kadian():
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTATG")
-    #           ---------------^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 2, x
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTATG")
-    #           ---------------^---^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 2
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGtGCTAcG")
-    #           --------------^^---^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 1, x
-
-
-def test_simple_kadian_2():
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACaGCTATCTCTAGAGCTATG")
-    hi.consume("ACAGCTATCTCTAGAGCTATG")
-    #           --^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 2, x
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACaGCTATCTCTAGAcCTATG")
-    hi.consume("ACAGCTATCTCTAGACCTATG")
-    #           --^          --^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 1, x
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACTGCTATCgCTAGAGCTATG")
-    hi.consume("ACTGCTATCGCTAGAGCTATG")
-    #                  --^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
-    assert x == 2, x
-
-
-def test_2_kadian():
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 1
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACTGCTATCTCTAGAcCTATG")
-    hi.consume("ACTGCTATCTCTAGACCTATG")
-    #           ---------------^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
-    assert x == 2, x
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACTGCTATCTCTAGAcCTAtG")
-    hi.consume("ACTGCTATCTCTAGACCTATG")
-    #           ---------------^---^
-    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 2
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACTGCTATCTCTACtcCTAtG")
-    hi.consume("ACTGCTATCTCTACTCCTATG")
-    #           --------------^^---^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
-    assert x == 2, x
-
-    hi = khmer.Countgraph(6, 1e6, 2)
-    hi.consume("ACTGCTATCTCTAGAGCTATG")
-    # hi.consume("ACTGCTgTCTCTACtcCTAtG")
-    hi.consume("ACTGCTGTCTCTACTCCTATG")
-    #           ------^-------^^---^
-    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
-    assert x == 1, x
-
-
 def test_get_kmer_counts_too_short():
     hi = khmer.Countgraph(6, 1e6, 2)
 
@@ -1214,20 +1120,6 @@ def test_get_badmedian_count():
         print(str(err))
     try:
         countgraph.get_median_count("AAA")
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-
-
-def test_get_badkadian_count():
-    countgraph = khmer.Countgraph(4, 4 ** 4, 4)
-    try:
-        countgraph.get_kadian_count()
-        assert 0, "this should fail"
-    except TypeError as err:
-        print(str(err))
-    try:
-        countgraph.get_kadian_count("AAA")
         assert 0, "this should fail"
     except ValueError as err:
         print(str(err))

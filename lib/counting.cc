@@ -292,43 +292,6 @@ void CountingHash::load(std::string infilename)
     CountingHashFile::load(infilename, *this);
 }
 
-void CountingHash::get_kadian_count(
-    const std::string   &s,
-    BoundedCounterType  &kadian,
-    unsigned int    nk)
-{
-    std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        BoundedCounterType count = this->get_count(kmer);
-        counts.push_back(count);
-    }
-
-    if (!counts.size()) {
-        throw khmer_exception();
-    }
-    unsigned int kpos = nk * _ksize;
-
-    if (counts.size() < kpos) {
-        kadian = 0;
-
-        return;
-    }
-
-    sort(counts.begin(), counts.end());
-    kadian = counts[kpos - 1];
-
-#if 0
-    std::cout << "k " << kpos << ": ";
-    for (unsigned int i = 0; i < counts.size(); i++) {
-        std::cout << i << "-" << counts[i] << " ";
-    }
-    std::cout << "\n";
-#endif // 0
-}
-
 unsigned long CountingHash::trim_on_abundance(
     std::string     seq,
     BoundedCounterType  min_abund)

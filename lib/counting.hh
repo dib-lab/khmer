@@ -255,10 +255,6 @@ public:
 
     BoundedCounterType get_max_count(const std::string &s);
 
-    void get_kadian_count(const std::string &s,
-                          BoundedCounterType &kadian,
-                          unsigned int nk = 1);
-
     HashIntoType * abundance_distribution(read_parsers::IParser * parser,
                                           Hashbits * tracking);
     HashIntoType * abundance_distribution(std::string filename,
