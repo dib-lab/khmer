@@ -53,9 +53,9 @@ def test_check_tablespace():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
-        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
-                                              False, _testhook_free_space=0)
+        tablesize = khmer_args.calculate_graphsize(args, 'countgraph')
+        khmer.kfile.check_space_for_graph(outfile, tablesize,
+                                          False, _testhook_free_space=0)
         assert 0, "this should fail"
     except SystemExit as e:
         print(str(e))
@@ -86,9 +86,9 @@ def test_check_tablespace_force():
     args = parser.parse_args(['-M', '1e9'])
 
     try:
-        tablesize = khmer_args.calculate_tablesize(args, 'countgraph')
-        khmer.kfile.check_space_for_hashtable(outfile, tablesize,
-                                              True, _testhook_free_space=0)
+        tablesize = khmer_args.calculate_graphsize(args, 'countgraph')
+        khmer.kfile.check_space_for_graph(outfile, tablesize,
+                                          True, _testhook_free_space=0)
         assert True, "this should pass"
     except SystemExit as e:
         print(str(e))
@@ -255,7 +255,7 @@ def test_create_nodegraph_4_multiplier():
         sum(nodegraph.hashsizes())
 
 
-def test_report_on_config_bad_hashtype():
+def test_report_on_config_bad_graphtype():
     ksize = khmer_args.DEFAULT_K
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
@@ -281,7 +281,7 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     try:
-        nodegraph = khmer_args.calculate_tablesize(args, 'foograph')
+        nodegraph = khmer_args.calculate_graphsize(args, 'foograph')
         assert 0, "previous statement should fail"
     except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)

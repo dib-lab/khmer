@@ -1,3 +1,16 @@
+2015-08-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/*.py,tests/*.py,sandbox/*.py,khmer/*.py,oxli/*.py:
+   many function and variable renames:
+   counting_hash, countinghash, hashtable->countgraph;
+   CountingHash->Countgraph
+   hashbits->nodegraph; Hashbits->Nodegraph;
+   check_space_for_hashtable->check_space_for_graph;
+   hash_args->graph_args
+   * khmer/_khmer.cc: remove unused 'new_hashtable' method; match renames
+   * TODO: removed several items
+   * doc/dev/scripts-and-sandbox.rst: fixed hashbang
+
 2015-08-04  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out 

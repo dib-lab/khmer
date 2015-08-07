@@ -23,7 +23,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config)
 
 # counting hash parameters.
@@ -49,7 +49,7 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 def get_parser():
     epilog = """
-    Load an k-mer presence table/tagset pair created by load-graph, and a set
+    Load an k-mer nodegraph/tagset pair created by load-graph, and a set
     of pmap files created by partition-graph. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that
@@ -90,16 +90,16 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading k-mer presence table %s' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase)
+    print('loading k-mer nodegraph %s' % graphbase, file=sys.stderr)
+    graph = khmer.load_nodegraph(graphbase)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
-    htable.load_tagset(graphbase + '.tagset')
+    graph.load_tagset(graphbase + '.tagset')
 
     initial_stoptags = False    # @CTB regularize with make-initial
     if os.path.exists(graphbase + '.stoptags'):
         print('loading stoptags %s.stoptags' % graphbase, file=sys.stderr)
-        htable.load_stop_tags(graphbase + '.stoptags')
+        graph.load_stop_tags(graphbase + '.stoptags')
         initial_stoptags = True
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
@@ -115,34 +115,34 @@ def main():
             file=sys.stderr)
     print('---', file=sys.stderr)
 
-    # create counting hash
-    ksize = htable.ksize()
+    # create countgraph
+    ksize = graph.ksize()
     counting = khmer_args.create_countgraph(args, ksize=ksize)
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):
         print('<-', subset_file, file=sys.stderr)
-        subset = htable.load_subset_partitionmap(subset_file)
+        subset = graph.load_subset_partitionmap(subset_file)
 
         print('** repartitioning subset... %s' % subset_file, file=sys.stderr)
-        htable.repartition_largest_partition(subset, counting,
-                                             EXCURSION_DISTANCE,
-                                             EXCURSION_KMER_THRESHOLD,
-                                             EXCURSION_KMER_COUNT_THRESHOLD)
+        graph.repartition_largest_partition(subset, counting,
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
         print('** merging subset... %s' % subset_file, file=sys.stderr)
-        htable.merge_subset(subset)
+        graph.merge_subset(subset)
 
         print('** repartitioning, round 2... %s' %
               subset_file, file=sys.stderr)
-        size = htable.repartition_largest_partition(
+        size = graph.repartition_largest_partition(
             None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
             EXCURSION_KMER_COUNT_THRESHOLD)
 
         print('** repartitioned size:', size, file=sys.stderr)
 
         print('saving stoptags binary', file=sys.stderr)
-        htable.save_stop_tags(graphbase + '.stoptags')
+        graph.save_stop_tags(graphbase + '.stoptags')
         os.rename(subset_file, subset_file + '.processed')
         print('(%d of %d)\n' % (index, len(pmap_files)), file=sys.stderr)
 

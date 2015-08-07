@@ -27,10 +27,10 @@ import argparse
 from screed import Record
 from khmer import khmer_args
 
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config, calculate_tablesize)
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
+                              report_on_config, calculate_graphsize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 
@@ -96,9 +96,9 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
-    add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    add_loadgraph_args(parser)
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
 
     # expert options
@@ -127,9 +127,9 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
        and not args.output:
@@ -137,9 +137,9 @@ def main():
               "be provided with -o.", file=sys.stderr)
         sys.exit(1)
 
-    if args.loadtable:
-        print('loading countgraph from', args.loadtable, file=sys.stderr)
-        ct = khmer.load_counting_hash(args.loadtable)
+    if args.loadgraph:
+        print('loading countgraph from', args.loadgraph, file=sys.stderr)
+        ct = khmer.load_countgraph(args.loadgraph)
     else:
         print('making countgraph', file=sys.stderr)
         ct = khmer_args.create_countgraph(args)
@@ -167,8 +167,8 @@ def main():
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
         if args.output is None:
-            trimfp = get_file_writer(open(os.path.basename(filename)
-                                     + '.abundtrim', 'wb'),
+            trimfp = get_file_writer(open(os.path.basename(filename) +
+                                          '.abundtrim', 'wb'),
                                      args.gzip, args.bzip)
         else:
             trimfp = get_file_writer(args.output, args.gzip, args.bzip)
@@ -341,10 +341,10 @@ def main():
 
     print('output in *.abundtrim', file=sys.stderr)
 
-    if args.savetable:
-        print("Saving k-mer counting table to",
-              args.savetable, file=sys.stderr)
-        ct.save(args.savetable)
+    if args.savegraph:
+        print("Saving k-mer countgraph to",
+              args.savegraph, file=sys.stderr)
+        ct.save(args.savegraph)
 
 
 if __name__ == '__main__':

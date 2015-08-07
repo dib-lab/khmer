@@ -7,9 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Estimate optimal arguments using hashbits counting.
+Estimate optimal arguments using nodegraph counting.
 
-% python sandbox/optimal_args_hashbits.py  <data1> [ <data2> <...> ]
+% python sandbox/optimal_args_nodegraph.py  <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -21,14 +21,14 @@ import threading
 
 import khmer
 from khmer.khmer_args import (report_on_config, info, add_threading_args,
-                              build_hashbits_args)
+                              build_nodegraph_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space
 from khmer.khmer_args import graphsize_args_report
 
 
 def get_parser():
-    parser = build_hashbits_args(descr="Load sequences into the compressible "
+    parser = build_nodegraph_args(descr="Load sequences into the compressible "
                                  "graph format plus optional tagset.")
     add_threading_args(parser)
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
@@ -37,9 +37,9 @@ def get_parser():
 
 
 def main():
-    info('optimal_args_hashbits.py', ['graph', 'SeqAn'])
+    info('optimal_args_nodegraph.py', ['graph', 'SeqAn'])
     args = get_parser().parse_args()
-    report_on_config(args, hashtype='hashbits')
+    report_on_config(args, graphtype='nodegraph')
 
 
     filenames = args.input_filenames
@@ -52,7 +52,7 @@ def main():
     print('Counting kmers from sequences in %s' % repr(filenames),
           file=sys.stderr)
 
-    htable = khmer.new_hashbits(args.ksize, args.max_tablesize, args.n_tables)
+    htable = khmer.new_nodegraph(args.ksize, args.max_tablesize, args.n_tables)
     target_method = htable.consume_fasta_with_reads_parser
 
     for _, filename in enumerate(filenames):

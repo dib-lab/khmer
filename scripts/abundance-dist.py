@@ -27,11 +27,11 @@ from khmer.khmer_args import info
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
-        "the sequence file using a pre-made k-mer counting table.",
+        "the sequence file using a pre-made k-mer countgraph.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_counting_table_filename', help='The name of the'
-                        ' input k-mer counting table file.')
+    parser.add_argument('input_count_graph_filename', help='The name of the'
+                        ' input k-mer countgraph file.')
     parser.add_argument('input_sequence_filename', help='The name of the input'
                         ' FAST[AQ] sequence file.')
     parser.add_argument('output_histogram_filename', help='The columns are: '
@@ -58,31 +58,30 @@ def main():
     info('abundance-dist.py', ['counting'])
     args = get_parser().parse_args()
 
-    infiles = [args.input_counting_table_filename,
+    infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
     for infile in infiles:
         check_input_files(infile, False)
 
-    print('hashtable from', args.input_counting_table_filename,
+    print('Counting graph from', args.input_count_graph_filename,
           file=sys.stderr)
-    counting_hash = khmer.load_counting_hash(
-        args.input_counting_table_filename)
+    countgraph = khmer.load_countgraph(
+        args.input_count_graph_filename)
 
-    if not counting_hash.get_use_bigcount() and args.bigcount:
+    if not countgraph.get_use_bigcount() and args.bigcount:
         print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
               " reporting is ENABLED--counts higher than 255 will not be "
               "reported.",
               file=sys.stderr)
 
-    counting_hash.set_use_bigcount(args.bigcount)
+    countgraph.set_use_bigcount(args.bigcount)
 
-    kmer_size = counting_hash.ksize()
-    hashsizes = counting_hash.hashsizes()
-    tracking = khmer._Hashbits(  # pylint: disable=protected-access
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
+    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
     print('K:', kmer_size, file=sys.stderr)
-    print('HT sizes:', hashsizes, file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
@@ -98,7 +97,7 @@ def main():
               args.output_histogram_filename, file=sys.stderr)
 
     print('preparing hist...', file=sys.stderr)
-    abundances = counting_hash.abundance_distribution(
+    abundances = countgraph.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
 
@@ -110,13 +109,13 @@ def main():
         sys.exit(1)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
-        hash_fp = sys.stdout
+        countgraph_fp = sys.stdout
     else:
-        hash_fp = open(args.output_histogram_filename, 'w')
-    hash_fp_csv = csv.writer(hash_fp)
+        countgraph_fp = open(args.output_histogram_filename, 'w')
+    countgraph_fp_csv = csv.writer(countgraph_fp)
     # write headers:
-    hash_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                          'cumulative_fraction'])
+    countgraph_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                                'cumulative_fraction'])
 
     sofar = 0
     for _, i in enumerate(abundances):
@@ -126,7 +125,7 @@ def main():
         sofar += i
         frac = sofar / float(total)
 
-        hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+        countgraph_fp_csv.writerow([_, i, sofar, round(frac, 3)])
 
         if sofar == total:
             break

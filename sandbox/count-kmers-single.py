@@ -8,7 +8,7 @@
 # pylint: disable=missing-docstring,invalid-name
 """
 Produce k-mer counts for all the k-mers in the given sequence file,
-using the given counting table.
+using the given countgraph.
 
 % python sandbox/count-kmers-single.py <fasta/fastq>
 
@@ -24,7 +24,7 @@ import csv
 from khmer.khmer_args import (build_counting_args, report_on_config, info,
                               add_threading_args)
 from khmer.kfile import (check_input_files, check_space,
-                         check_space_for_hashtable)
+                         check_space_for_graph)
 import threading
 
 
@@ -50,18 +50,18 @@ def main():
 
     check_input_files(args.input_sequence_filename, False)
 
-    print ('making k-mer counting table', file=sys.stderr)
-    counting_hash = khmer.CountingHash(args.ksize, args.max_tablesize,
+    print ('making k-mer countgraph', file=sys.stderr)
+    countgraph = khmer.Countgraph(args.ksize, args.max_tablesize,
                                             args.n_tables)
-    # @CTB counting_hash.set_use_bigcount(args.bigcount)
+    # @CTB countgraph.set_use_bigcount(args.bigcount)
 
-    kmer_size = counting_hash.ksize()
-    hashsizes = counting_hash.hashsizes()
-    tracking = khmer._Hashbits(  # pylint: disable=protected-access
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
+    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print ('kmer_size: %s' % counting_hash.ksize(), file=sys.stderr)
-    print ('k-mer counting table sizes: %s' % (counting_hash.hashsizes(),),
+    print ('kmer_size: %s' % countgraph.ksize(), file=sys.stderr)
+    print ('k-mer countgraph sizes: %s' % (countgraph.hashsizes(),),
            file=sys.stderr)
 
     if args.output_file is None:
@@ -76,7 +76,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=counting_hash.consume_fasta_with_reads_parser,
+                target=countgraph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -91,10 +91,10 @@ def main():
             kmer = seq[i:i+kmer_size]
             if not tracking.get(kmer):
                 tracking.count(kmer)
-                writer.writerow([kmer, str(counting_hash.get(kmer))])
+                writer.writerow([kmer, str(countgraph.get(kmer))])
 
     print ('Total number of unique k-mers: {0}'.format(
-        counting_hash.n_unique_kmers()), file=sys.stderr)
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':
