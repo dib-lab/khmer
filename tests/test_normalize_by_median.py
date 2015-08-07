@@ -93,7 +93,7 @@ def test_normalize_by_median_quiet():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '-k', '17', '--quiet', '-M', '1e6', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--quiet', '-M', '2e6', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(out) == 0, out
