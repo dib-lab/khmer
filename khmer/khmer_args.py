@@ -49,7 +49,7 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal counting table args where:
+    Utility function for estimating optimal countgraph args where:
       - num_kmers: number of unique kmers [required]
       - mem_cap: the allotted amount of memory [optional, conflicts with f]
       - fp_rate: the desired false positive rate [optional, conflicts with M]
@@ -66,31 +66,31 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 def check_conflicting_args(args, hashtype):
     """
     Utility function that takes in an args object and checks if there's things
-    that conflict, e.g. --loadtable and --ksize being set.
+    that conflict, e.g. --loadgraph and --ksize being set.
     """
 
     if getattr(args, "quiet", None):
         configure_logging(args.quiet)
 
-    loadtable_htable_conflicts = {"ksize": DEFAULT_K,
+    loadgraph_table_conflicts = {"ksize": DEFAULT_K,
                                   "n_tables": DEFAULT_N_TABLES,
                                   "max_tablesize": DEFAULT_MAX_TABLESIZE}
 
-    loadtable_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
+    loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 
     if getattr(args, "loadgraph", None):
 
-        # check for htable config args
-        for key, value in loadtable_htable_conflicts.items():
+        # check for table config args
+        for key, value in loadgraph_table_conflicts.items():
             if getattr(args, key, value) != value:
                 log_warn('''
-*** WARNING: You are loading a saved k-mer table from
+*** WARNING: You are loading a saved k-mer countgraph from
 *** {hashfile}, but have set k-mer table parameters.
 *** Your values for ksize, n_tables, and tablesize
 *** will be ignored.'''.format(hashfile=args.loadgraph))
                 break  # no repeat warnings
 
-        for element in loadtable_autoarg_conflicts:
+        for element in loadgraph_autoarg_conflicts:
             if getattr(args, element, None):
                 log_warn("\n*** WARNING: You have asked that the graph size be"
                          " automatically calculated\n"
@@ -113,7 +113,7 @@ def check_conflicting_args(args, hashtype):
 
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
-    Utility function for estimating optimal counting table args where num_kmers
+    Utility function for estimating optimal countgraph args where num_kmers
     is the number of unique kmer and mem_cap is the allotted amount of memory
     """
 
