@@ -20,11 +20,11 @@ import math
 import threading
 
 import khmer
-from khmer.khmer_args import build_hashbits_args
-from khmer.khmer_args import (report_on_config, info, add_threading_args)
+from khmer.khmer_args import (report_on_config, info, add_threading_args,
+                              build_hashbits_args)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space
-from oxli.functions import optimal_args_output_gen as output_gen
+from khmer.khmer_args import graphsize_args_report
 
 
 def get_parser():
@@ -84,7 +84,7 @@ def main():
         if not False:
             sys.exit(1)
 
-    to_print = output_gen(unique_kmers,fp_rate)
+    to_print = graphsize_args_report(unique_kmers, fp_rate)
     
     print(to_print, file=info_optimal)
     
