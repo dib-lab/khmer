@@ -84,7 +84,7 @@ def check_conflicting_args(args, hashtype):
     if getattr(args, "loadtable", None):
 
         # check for htable config args
-        for key, value in loadtable_htable_conflicts.iteritems():
+        for key, value in loadtable_htable_conflicts.items():
             if getattr(args, key, value) != value:
                 log_warn('''
 ** WARNING: You are loading a saved k-mer table from
