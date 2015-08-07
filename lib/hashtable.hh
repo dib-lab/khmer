@@ -290,7 +290,12 @@ public:
                           BoundedCounterType &median,
                           float &average,
                           float &stddev);
+
+    // number of unique k-mers
     virtual const HashIntoType n_unique_kmers() const = 0;
+
+    // count number of occupied bins
+    virtual const HashIntoType n_occupied() const = 0;
 
     // partitioning stuff
     void _validate_pmap()
@@ -385,9 +390,6 @@ public:
 
     virtual std::vector<HashIntoType> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
-    virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const = 0;
-    virtual const HashIntoType n_entries() const = 0;
 
     void filter_if_present(const std::string &infilename,
                            const std::string &outputfilename);

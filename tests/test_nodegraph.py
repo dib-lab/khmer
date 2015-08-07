@@ -922,4 +922,4 @@ def test_n_unique_save_load():
 
     ng2 = khmer.load_nodegraph(savefile)
     assert ng2.n_occupied() == 3885, ng2.n_occupied()
-    assert ng2.n_unique_kmers() == 3960, ng2.n_unique_kmers()
+    assert ng2.n_unique_kmers() == 0    # this is intended behavior, sigh.

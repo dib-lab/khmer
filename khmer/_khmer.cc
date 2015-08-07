@@ -747,13 +747,11 @@ hashtable_n_occupied(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    HashIntoType start = 0, stop = 0;
-
-    if (!PyArg_ParseTuple(args, "|KK", &start, &stop)) {
+    if (!PyArg_ParseTuple(args, "")) {
         return NULL;
     }
 
-    HashIntoType n = hashtable->n_occupied(start, stop);
+    HashIntoType n = hashtable->n_occupied();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -767,19 +765,6 @@ hashtable_n_unique_kmers(khmer_KHashtable_Object * me, PyObject * args)
     HashIntoType n = hashtable->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
-}
-
-static
-PyObject *
-hashtable_n_entries(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(hashtable->n_entries());
 }
 
 static
@@ -2442,7 +2427,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "n_occupied", (PyCFunction)hashtable_n_occupied, METH_VARARGS,
         "Count the number of occupied bins."
     },
-    { "n_entries", (PyCFunction)hashtable_n_entries, METH_VARARGS, "" },
     {
         "count",
         (PyCFunction)hashtable_count, METH_VARARGS,

@@ -87,16 +87,14 @@ public:
     virtual void load(std::string);
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const
+    virtual const HashIntoType n_occupied() const
     {
-        // @@ CTB need to be able to *save* this...
         return _occupied_bins/_n_tables;
     }
 
     virtual const HashIntoType n_unique_kmers() const
     {
-        return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
+        return _n_unique_kmers;
     }
 
     // Get and set the hashbits for the given kmer.
@@ -186,11 +184,6 @@ public:
             }
         }
         return 1;
-    }
-    // accessors to get table info
-    const HashIntoType n_entries() const
-    {
-        return _tablesizes[0];
     }
 
     void update_from(const Hashbits &other);

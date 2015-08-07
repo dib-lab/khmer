@@ -121,8 +121,9 @@ def test_extract_countgraph_info():
         try:
             info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
+            raise
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _ = info
+        ksize, table_size, n_tables, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
@@ -151,7 +152,7 @@ def test_extract_nodegraph_info():
         ht.save(fn)
 
         info = khmer.extract_nodegraph_info(fn)
-        ksize, table_size, n_tables, _, _ = info
+        ksize, table_size, n_tables, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25

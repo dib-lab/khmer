@@ -56,6 +56,7 @@ protected:
     std::vector<HashIntoType> _tablesizes;
     size_t _n_tables;
     HashIntoType _n_unique_kmers;
+    HashIntoType _occupied_bins;
 
     Byte ** _counts;
 
@@ -74,7 +75,7 @@ public:
 
     CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
 
@@ -132,7 +133,10 @@ public:
         return _tablesizes;
     }
 
-    virtual const HashIntoType n_unique_kmers() const;
+    virtual const HashIntoType n_unique_kmers() const
+    { 
+        return _n_unique_kmers;
+    }
 
     void set_use_bigcount(bool b)
     {
@@ -146,26 +150,16 @@ public:
     virtual void save(std::string);
     virtual void load(std::string);
 
-    // accessors to get table info
-    const HashIntoType n_entries() const
-    {
-        return _tablesizes[0];
-    }
-
     const size_t n_tables() const
     {
         return _n_tables;
     }
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const
+    virtual const HashIntoType n_occupied() const
     {
         HashIntoType n = 0;
-        if (stop == 0) {
-            stop = _tablesizes[0];
-        }
-        for (HashIntoType i = start; i < stop; i++) {
+        for (HashIntoType i = 0; i < _tablesizes[0]; i++) {
             if (_counts[0][i % _tablesizes[0]]) {
                 n++;
             }

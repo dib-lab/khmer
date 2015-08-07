@@ -26,7 +26,6 @@ void Hashbits::save(std::string outfilename)
     unsigned int save_ksize = _ksize;
     unsigned char save_n_tables = _n_tables;
     unsigned long long save_tablesize;
-    unsigned long long save_n_unique_kmers = _n_unique_kmers;
     unsigned long long save_occupied_bins = _occupied_bins;
 
     ofstream outfile(outfilename.c_str(), ios::binary);
@@ -40,8 +39,6 @@ void Hashbits::save(std::string outfilename)
 
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
     outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
-    outfile.write((const char *) &save_n_unique_kmers,
-                  sizeof(save_n_unique_kmers));
     outfile.write((const char *) &save_occupied_bins,
                   sizeof(save_occupied_bins));
 
@@ -97,7 +94,6 @@ void Hashbits::load(std::string infilename)
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
-        unsigned long long save_n_unique_kmers = 0;
         unsigned long long save_occupied_bins = 0;
         char signature[4];
         unsigned char version, ht_type;
@@ -128,13 +124,10 @@ void Hashbits::load(std::string infilename)
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
         infile.read((char *) &save_n_tables, sizeof(save_n_tables));
-        infile.read((char *) &save_n_unique_kmers,
-                    sizeof(save_n_unique_kmers));
         infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
 
         _ksize = (WordLength) save_ksize;
         _n_tables = (unsigned int) save_n_tables;
-        _n_unique_kmers = save_n_unique_kmers;
         _occupied_bins = save_occupied_bins;
         _init_bitstuff();
 
