@@ -277,6 +277,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+# may need to `sudo apt-get install bear`
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext

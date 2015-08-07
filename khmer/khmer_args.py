@@ -18,7 +18,7 @@ from collections import namedtuple
 
 import screed
 import khmer
-from khmer import extract_countinghash_info, extract_hashbits_info
+from khmer import extract_countgraph_info, extract_nodegraph_info
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
@@ -49,7 +49,7 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
 
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal counting table args where:
+    Utility function for estimating optimal countgraph args where:
       - num_kmers: number of unique kmers [required]
       - mem_cap: the allotted amount of memory [optional, conflicts with f]
       - fp_rate: the desired false positive rate [optional, conflicts with M]
@@ -66,31 +66,31 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 def check_conflicting_args(args, hashtype):
     """
     Utility function that takes in an args object and checks if there's things
-    that conflict, e.g. --loadtable and --ksize being set.
+    that conflict, e.g. --loadgraph and --ksize being set.
     """
 
     if getattr(args, "quiet", None):
         configure_logging(args.quiet)
 
-    loadtable_htable_conflicts = {"ksize": DEFAULT_K,
+    loadgraph_table_conflicts = {"ksize": DEFAULT_K,
                                   "n_tables": DEFAULT_N_TABLES,
                                   "max_tablesize": DEFAULT_MAX_TABLESIZE}
 
-    loadtable_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
+    loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 
-    if getattr(args, "loadtable", None):
+    if getattr(args, "loadgraph", None):
 
-        # check for htable config args
-        for key, value in loadtable_htable_conflicts.items():
+        # check for table config args
+        for key, value in loadgraph_table_conflicts.items():
             if getattr(args, key, value) != value:
                 log_warn('''
-*** WARNING: You are loading a saved k-mer table from
+*** WARNING: You are loading a saved k-mer countgraph from
 *** {hashfile}, but have set k-mer table parameters.
 *** Your values for ksize, n_tables, and tablesize
-*** will be ignored.'''.format(hashfile=args.loadtable))
+*** will be ignored.'''.format(hashfile=args.loadgraph))
                 break  # no repeat warnings
 
-        for element in loadtable_autoarg_conflicts:
+        for element in loadgraph_autoarg_conflicts:
             if getattr(args, element, None):
                 log_warn("\n*** WARNING: You have asked that the graph size be"
                          " automatically calculated\n"
@@ -101,7 +101,7 @@ def check_conflicting_args(args, hashtype):
 
         infoset = None
         if hashtype == 'countgraph':
-            infoset = extract_countinghash_info(args.loadtable)
+            infoset = extract_countgraph_info(args.loadgraph)
         if info:
             ksize = infoset[0]
             max_tablesize = infoset[1]
@@ -113,7 +113,7 @@ def check_conflicting_args(args, hashtype):
 
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
-    Utility function for estimating optimal counting table args where num_kmers
+    Utility function for estimating optimal countgraph args where num_kmers
     is the number of unique kmer and mem_cap is the allotted amount of memory
     """
 
@@ -246,7 +246,7 @@ def _check_fp_rate(args, desired_max_fp):
     return args
 
 
-def build_hash_args(descr=None, epilog=None, parser=None):
+def build_graph_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
 
     if parser is None:
@@ -261,7 +261,7 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
-                        help='number of k-mer counting tables to use')
+                        help='number of tables to use in k-mer countgraph')
     parser.add_argument('-U', '--unique-kmers', type=float, default=0,
                         help='approximate number of unique kmers in the input'
                              ' set')
@@ -282,36 +282,35 @@ def build_hash_args(descr=None, epilog=None, parser=None):
 
 
 def build_counting_args(descr=None, epilog=None):
-    """Build an ArgumentParser with args for counting_hash based scripts."""
-    parser = build_hash_args(descr=descr, epilog=epilog)
+    """Build an ArgumentParser with args for countgraph based scripts."""
+    parser = build_graph_args(descr=descr, epilog=epilog)
 
     return parser
 
 
-def build_hashbits_args(descr=None, epilog=None, parser=None):
-    """Build an ArgumentParser with args for hashbits based scripts."""
-    parser = build_hash_args(descr=descr, epilog=epilog, parser=parser)
+def build_nodegraph_args(descr=None, epilog=None, parser=None):
+    """Build an ArgumentParser with args for nodegraph based scripts."""
+    parser = build_graph_args(descr=descr, epilog=epilog, parser=parser)
 
     return parser
 
-# add an argument for loadhash with warning about parameters
+# add an argument for loadgraph with warning about parameters
 
 
-def add_loadhash_args(parser):
+def add_loadgraph_args(parser):
+    parser.add_argument('-l', '--loadgraph', metavar="filename", default=None,
+                        help='load a precomputed k-mer graph from disk')
 
-    parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
-                        help='load a precomputed k-mer table from disk')
 
-
-def calculate_tablesize(args, hashtype, multiplier=1.0):
-    if hashtype not in ('countgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (hashtype,))
+def calculate_graphsize(args, graphtype, multiplier=1.0):
+    if graphtype not in ('countgraph', 'nodegraph'):
+        raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
-        if hashtype == 'countgraph':
+        if graphtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
                 float(multiplier)
-        elif hashtype == 'nodegraph':
+        elif graphtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
                 float(multiplier)
     else:
@@ -329,8 +328,8 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args, 'nodegraph', multiplier)
-    return khmer.Hashbits(ksize, tablesize, args.n_tables)
+    tablesize = calculate_graphsize(args, 'nodegraph', multiplier)
+    return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
@@ -342,34 +341,33 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_tablesize(args, 'countgraph', multiplier=multiplier)
-    return khmer.CountingHash(ksize, tablesize, args.n_tables)
+    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
+    return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
-def report_on_config(args, hashtype='countgraph'):
+def report_on_config(args, graphtype='countgraph'):
     """Print out configuration.
 
     Summarize the configuration produced by the command-line arguments
     made available by this module.
     """
+    check_conflicting_args(args, graphtype)
+    if graphtype not in ('countgraph', 'nodegraph'):
+        raise ValueError("unknown graph type: %s" % (graphtype,))
 
-    check_conflicting_args(args, hashtype)
-    if hashtype not in ('countgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (hashtype,))
-
-    tablesize = calculate_tablesize(args, hashtype)
+    tablesize = calculate_graphsize(args, graphtype)
 
     log_info("\nPARAMETERS:")
     log_info(" - kmer size =    {ksize} \t\t(-k)", ksize=args.ksize)
     log_info(" - n tables =     {ntables} \t\t(-N)", ntables=args.n_tables)
     log_info(" - max tablesize = {tsize:5.2g} \t(-x)", tsize=tablesize)
     log_info("")
-    if hashtype == 'countgraph':
+    if graphtype == 'countgraph':
         log_info(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize)".format(
                 args.n_tables * tablesize))
-    elif hashtype == 'nodegraph':
+    elif graphtype == 'nodegraph':
         log_info(
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize / 8)".format(args.n_tables *
@@ -379,7 +377,7 @@ def report_on_config(args, hashtype='countgraph'):
     log_info("-" * 8)
 
     if DEFAULT_MAX_TABLESIZE == tablesize and \
-       not getattr(args, 'loadtable', None):
+       not getattr(args, 'loadgraph', None):
         log_warn('''\
 
 ** WARNING: tablesize is default!

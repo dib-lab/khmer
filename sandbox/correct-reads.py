@@ -25,10 +25,10 @@ import shutil
 import textwrap
 import argparse
 
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists)
 
 DEFAULT_NORMALIZE_LIMIT = 20
@@ -98,9 +98,9 @@ def get_parser():
                         default=False,
                         help='Only correct sequences that have high coverage.')
 
-    add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    add_loadgraph_args(parser)
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
 
     # expert options
@@ -129,8 +129,8 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        check_space_for_hashtable(
+    if args.savegraph:
+        check_space_for_graph(
             args.n_tables * args.min_tablesize, args.force)
 
     K = args.ksize
@@ -138,12 +138,12 @@ def main():
     CUTOFF = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    if args.loadtable:
-        print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
-        ct = khmer.load_counting_hash(args.loadtable)
+    if args.loadgraph:
+        print >>sys.stderr, 'loading k-mer countgraph from', args.loadgraph
+        ct = khmer.load_countgraph(args.loadgraph)
     else:
-        print >>sys.stderr, 'making k-mer counting table'
-        ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
+        print >>sys.stderr, 'making k-mer countgraph'
+        ct = khmer.new_countgraph(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print >>sys.stderr, 'created temporary directory %s; ' \
@@ -338,9 +338,9 @@ def main():
 
     print >>sys.stderr, 'output in *.corr'
 
-    if args.savetable:
-        print >>sys.stderr, "Saving k-mer counting table to", args.savetable
-        ct.save(args.savetable)
+    if args.savegraph:
+        print >>sys.stderr, "Saving k-mer countgraph to", args.savegraph
+        ct.save(args.savegraph)
 
 
 if __name__ == '__main__':

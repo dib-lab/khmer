@@ -9,7 +9,7 @@ from __future__ import absolute_import
 # pylint: disable=missing-docstring,protected-access
 import os
 import khmer
-from khmer import LabelHash, CountingLabelHash
+from khmer import GraphLabels, CountingGraphLabels
 from screed.fasta import fasta_iter
 import screed
 
@@ -28,23 +28,23 @@ def teardown():
 @attr('huge')
 def test_toobig():
     try:
-        lh = LabelHash(20, 1e13, 1)
+        lh = GraphLabels(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
         print(str(err))
 
 
 def test_error_create():
-    from khmer import _LabelHash
+    from khmer import _GraphLabels
     try:
-        lh = _LabelHash(None)
+        lh = _GraphLabels(None)
         assert 0, "This should fail."
     except ValueError as err:
         print(str(err))
 
 
 def test_n_labels():
-    lh = LabelHash(20, 1e7, 4)
+    lh = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_fasta_and_tag_with_labels(filename)
 
@@ -53,7 +53,7 @@ def test_n_labels():
 
 
 def test_get_label_dict():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
 
@@ -66,7 +66,7 @@ def test_get_label_dict():
 
 
 def test_get_label_dict_save_load():
-    lb_pre = LabelHash(20, 1e7, 4)
+    lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
 
@@ -74,11 +74,11 @@ def test_get_label_dict_save_load():
     savepath = utils.get_temp_filename('saved.labels')
     lb_pre.save_labels_and_tags(savepath)
 
-    # trash the old LabelHash
+    # trash the old GraphLabels
     del lb_pre
 
     # create new, load labels & tags
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     lb.load_labels_and_tags(savepath)
 
     labels = lb.get_label_dict()
@@ -90,7 +90,7 @@ def test_get_label_dict_save_load():
 
 
 def test_get_label_dict_save_load_wrong_ksize():
-    lb_pre = LabelHash(19, 1e7, 4)
+    lb_pre = GraphLabels(19, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
 
@@ -98,11 +98,11 @@ def test_get_label_dict_save_load_wrong_ksize():
     savepath = utils.get_temp_filename('saved.labels')
     lb_pre.save_labels_and_tags(savepath)
 
-    # trash the old LabelHash
+    # trash the old GraphLabels
     del lb_pre
 
     # create new, load labels & tags
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     try:
         lb.load_labels_and_tags(savepath)
         assert 0, "this should not succeed - different ksize"
@@ -112,7 +112,7 @@ def test_get_label_dict_save_load_wrong_ksize():
 
 
 def test_save_load_corrupted():
-    lb_pre = LabelHash(20, 1e7, 4)
+    lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
 
@@ -120,10 +120,10 @@ def test_save_load_corrupted():
     savepath = utils.get_temp_filename('saved.labels')
     lb_pre.save_labels_and_tags(savepath)
 
-    # trash the old LabelHash
+    # trash the old GraphLabels
     del lb_pre
 
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
 
     # produce all possible truncated versions of this file
     data = open(savepath, 'rb').read()
@@ -141,7 +141,7 @@ def test_save_load_corrupted():
 
 
 def test_save_fail_readonly():
-    lb_pre = LabelHash(20, 1e7, 4)
+    lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
 
@@ -160,7 +160,7 @@ def test_save_fail_readonly():
 
 
 def test_get_tag_labels():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_fasta_and_tag_with_labels(filename)
     tag = 173473779682
@@ -171,7 +171,7 @@ def test_get_tag_labels():
 
 
 def test_consume_fasta_and_tag_with_labels():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
@@ -196,7 +196,7 @@ def test_consume_fasta_and_tag_with_labels():
 
 
 def test_consume_partitioned_fasta_and_tag_with_labels():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
 
     total_reads, n_consumed = lb.consume_partitioned_fasta_and_tag_with_labels(
@@ -213,7 +213,7 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
 
 
 def test_consume_sequence_and_tag_with_labels():
-    lb = LabelHash(20, 1e6, 4)
+    lb = GraphLabels(20, 1e6, 4)
     label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
@@ -226,7 +226,7 @@ def test_consume_sequence_and_tag_with_labels():
 
 
 def test_sweep_tag_neighborhood():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.graph.consume_fasta_and_tag(filename)
 
@@ -236,7 +236,7 @@ def test_sweep_tag_neighborhood():
 
 
 def test_sweep_label_neighborhood():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_fasta_and_tag_with_labels(filename)
 
@@ -254,7 +254,7 @@ def test_sweep_label_neighborhood():
 
 
 def test_label_tag_correctness():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
 
@@ -300,7 +300,7 @@ def test_label_tag_correctness():
 
 
 def test_counting_label_tag_correctness():
-    lb = CountingLabelHash(20, 1e7, 4)
+    lb = CountingGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
 
@@ -346,7 +346,7 @@ def test_counting_label_tag_correctness():
 
 
 def test_label_tag_correctness_save_load():
-    lb_pre = LabelHash(20, 1e7, 4)
+    lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
 
@@ -354,11 +354,11 @@ def test_label_tag_correctness_save_load():
     savepath = utils.get_temp_filename('saved.labels')
     lb_pre.save_labels_and_tags(savepath)
 
-    # trash the old LabelHash
+    # trash the old GraphLabels
     del lb_pre
 
     # create new, load labels & tags
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
     lb.load_labels_and_tags(savepath)
 
     # read A
@@ -403,7 +403,7 @@ def test_label_tag_correctness_save_load():
 
 
 def test_load_wrong_filetype():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
 
     # try to load a tagset
     filename = utils.get_test_data('goodversion-k32.tagset')
@@ -425,7 +425,7 @@ def test_load_wrong_filetype():
 
 
 def test_load_wrong_fileversion():
-    lb = LabelHash(20, 1e7, 4)
+    lb = GraphLabels(20, 1e7, 4)
 
     # try to load a tagset from an old version
     filename = utils.get_test_data('badversion-k32.tagset')

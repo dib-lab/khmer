@@ -26,10 +26,10 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
-from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info, calculate_tablesize)
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
+                              report_on_config, info, calculate_graphsize)
 import argparse
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
 from khmer.utils import write_record, broken_paired_reader
@@ -126,8 +126,8 @@ class Normalizer(object):
 
     """Digital normalization algorithm."""
 
-    def __init__(self, desired_coverage, htable):
-        self.htable = htable
+    def __init__(self, desired_coverage, countgraph):
+        self.countgraph = countgraph
         self.desired_coverage = desired_coverage
 
     def __call__(self, is_paired, read0, read1):
@@ -151,13 +151,13 @@ class Normalizer(object):
 
         for record in batch:
             seq = record.sequence.replace('N', 'A')
-            if not self.htable.median_at_least(seq, desired_coverage):
+            if not self.countgraph.median_at_least(seq, desired_coverage):
                 passed_filter = True
 
         if passed_filter:
             for record in batch:
                 seq = record.sequence.replace('N', 'A')
-                self.htable.consume(seq)
+                self.countgraph.consume(seq)
                 yield record
 
 
@@ -198,11 +198,11 @@ def get_parser():
     :option:`--force-single` will ignore all pairing information and treat
     reads individually.
 
-    With :option:`-s`/:option:`--savetable`, the k-mer counting table
+    With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
     will be saved to the specified file after all sequences have been
-    processed. :option:`-l`/:option:`--loadtable` will load the
-    specified k-mer counting table before processing the specified
-    files.  Note that these tables are are in the same format as those
+    processed. :option:`-l`/:option:`--loadgraph` will load the
+    specified k-mer countgraph before processing the specified
+    files.  Note that these graphs are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
 
@@ -248,8 +248,8 @@ def get_parser():
                         metavar="unpaired_reads_filename",
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='report_filename', type=argparse.FileType('w'))
@@ -268,7 +268,7 @@ def get_parser():
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
     add_output_compression_type(parser)
     return parser
 
@@ -304,21 +304,21 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
     # load or create counting table.
-    if args.loadtable:
-        log_info('loading k-mer counting table from {table}',
-                 table=args.loadtable)
-        htable = khmer.load_counting_hash(args.loadtable)
+    if args.loadgraph:
+        log_info('loading k-mer countgraph from {graph}',
+                 graph=args.loadgraph)
+        countgraph = khmer.load_countgraph(args.loadgraph)
     else:
         log_info('making countgraph')
-        htable = khmer_args.create_countgraph(args)
+        countgraph = khmer_args.create_countgraph(args)
 
     # create an object to handle diginorm of all files
-    norm = Normalizer(args.cutoff, htable)
+    norm = Normalizer(args.cutoff, countgraph)
     with_diagnostics = WithDiagnostics(norm, report_fp, args.report_frequency)
 
     # make a list of all filenames and if they're paired or not;
@@ -373,14 +373,14 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # finished - print out some diagnostics.
 
     log_info('Total number of unique k-mers: {umers}',
-             umers=htable.n_unique_kmers())
+             umers=countgraph.n_unique_kmers())
 
-    if args.savetable:
-        log_info('...saving to {name}', name=args.savetable)
-        htable.save(args.savetable)
+    if args.savegraph:
+        log_info('...saving to {name}', name=args.savegraph)
+        countgraph.save(args.savegraph)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, False, max_false_pos=.8)
+        khmer.calc_expected_collisions(countgraph, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
     log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)

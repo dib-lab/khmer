@@ -8,7 +8,7 @@
 # pylint: disable=missing-docstring,invalid-name
 """
 Produce k-mer counts for all the k-mers in the given sequence file,
-using the given counting table.
+using the given countgraph.
 
 % python sandbox/count-kmers.py <ct> <fasta/fastq> [ <fasta/fastq> ... ]
 
@@ -27,11 +27,11 @@ from khmer.khmer_args import info
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Output abundances of the k-mers in "
-        "the sequence files using a pre-made k-mer counting table.",
+        "the sequence files using a pre-made k-mer countgraph.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_counting_table_filename', help='The name of the'
-                        ' input k-mer counting table file.')
+    parser.add_argument('input_count_graph_filename', help='The name of the'
+                        ' input k-mer countgraph file.')
     parser.add_argument('input_sequence_filenames', help='The input'
                         ' FAST[AQ] sequence file(s).', nargs='+')
 
@@ -47,14 +47,14 @@ def main():
     info('count-kmers.py', ['counting'])
     args = get_parser().parse_args()
 
-    print ('hashtable from', args.input_counting_table_filename,
+    print ('hashtable from', args.input_count_graph_filename,
            file=sys.stderr)
-    counting_hash = khmer.load_counting_hash(
-        args.input_counting_table_filename)
+    countgraph = khmer.load_countgraph(
+        args.input_count_graph_filename)
 
-    kmer_size = counting_hash.ksize()
-    hashsizes = counting_hash.hashsizes()
-    tracking = khmer._Hashbits(  # pylint: disable=protected-access
+    kmer_size = countgraph.ksize()
+    hashsizes = countgraph.hashsizes()
+    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
     if args.output_file is None:
@@ -68,10 +68,10 @@ def main():
                 kmer = seq[i:i+kmer_size]
                 if not tracking.get(kmer):
                     tracking.count(kmer)
-                    writer.writerow([kmer, str(counting_hash.get(kmer))])
+                    writer.writerow([kmer, str(countgraph.get(kmer))])
 
     print ('Total number of unique k-mers: {0}'.format(
-        counting_hash.n_unique_kmers()), file=sys.stderr)
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ K = 32
 
 
 def main():
-    ht = khmer.Hashbits(32, 1, 1)
+    ht = khmer.Nodegraph(32, 1, 1)
     ht.load_tagset(sys.argv[1])
     print('loaded!')
     ht.print_tagset(os.path.basename(sys.argv[1]) + '.txt')
