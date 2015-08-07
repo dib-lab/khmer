@@ -311,7 +311,7 @@ public:
     CountingHashGzFileWriter(const std::string &outfilename,
                              const CountingHash &ht);
 };
-};
+}
 
 #endif // COUNTING_HH
 
