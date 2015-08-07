@@ -158,4 +158,4 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
     return h;
 }
 
-};
+}

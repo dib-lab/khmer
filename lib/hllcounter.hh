@@ -81,7 +81,7 @@ private:
     void init(int p, WordLength ksize);
 };
 
-};
+}
 
 #ifdef __cplusplus
 extern "C" {

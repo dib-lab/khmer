@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
@@ -80,7 +80,8 @@ clean: FORCE
 	rm -f diff-cover.html
 
 debug: FORCE
-	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
+	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
+		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug \
 		--inplace
 
 ## doc         : render documentation in HTML
