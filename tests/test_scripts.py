@@ -68,7 +68,7 @@ def test_load_into_counting_autoargs_0():
     assert 'INFO: Overriding default fp 0.1 with new fp: 0.08' in err, err
     assert ' tablesize is too small!' in err, err
     assert 'Estimated FP rate with current config is: 0.9999546' in err, err
-    assert 'Reccomended tablesize is: 1.77407e+07 bytes' in err, err
+    assert 'Recommended tablesize is: 1.77407e+07 bytes' in err, err
 
 
 def test_load_into_counting_autoargs_1():
@@ -791,7 +791,7 @@ def test_oxli_build_graph():
     assert x == (1, 0), x
 
 
-def test_oxli_build_graph_umers_arg():
+def test_oxli_build_graph_unique_kmers_arg():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
 

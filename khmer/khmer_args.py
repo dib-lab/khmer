@@ -192,7 +192,7 @@ def graphsize_args_report(unique_kmers, fp_rate):
     return "\n".join(to_print)
 
 
-def check_fp_rate(args, desired_max_fp):
+def _check_fp_rate(args, desired_max_fp):
     """
     Function to check if the desired_max_fp rate makes sense given specified
     number of unique kmers and max_memory restrictions present in the args.
@@ -228,7 +228,7 @@ def check_fp_rate(args, desired_max_fp):
                                             desired_max_fp)
         if args.max_tablesize and args.max_tablesize < res.htable_size:
             log_warn("\n*** Warning: The given tablesize is too small!")
-            log_warn("*** Reccomended tablesize is: {tsize:5g} bytes",
+            log_warn("*** Recommended tablesize is: {tsize:5g} bytes",
                      tsize=res.htable_size)
             log_warn("*** Current is: {tsize:5g} bytes",
                      tsize=args.max_tablesize)
@@ -323,9 +323,9 @@ def calculate_tablesize(args, hashtype, multiplier=1.0):
     return tablesize
 
 
-def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
+def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     """Creates and returns a nodegraph"""
-    args = check_fp_rate(args, fp_rate)
+    args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
@@ -338,7 +338,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
 
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     """Creates and returns a countgraph"""
-    args = check_fp_rate(args, fp_rate)
+    args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:

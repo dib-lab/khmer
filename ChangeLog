@@ -6,7 +6,7 @@
    sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py,
    scripts/{normalize-by-median,unique-kmers}.py: changed to not break on
    location change
-   * tests/{test_normazlie_by_median,test_scripts}.py: added tests for 
+   * tests/{test_normalize_by_median,test_scripts}.py: added tests for
    automatic arg setting
    * tests/test_script_arguments: changed to play nice with unique_kmers as an
    argument
