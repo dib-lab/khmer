@@ -153,6 +153,16 @@ One-time Preparation
        sudo brew install cppcheck
 
 
+#. ccache installation:
+
+   Debian and Ubuntu Linux distro users can install ``ccache`` to speed up
+   their compile times::
+
+       sudo apt-get install ccache
+       echo 'export PATH="/usr/lib/ccache:$PATH" # enable ccache' >> ~/.bashrc
+       export PATH="/usr/lib/ccache:$PATH"
+
+
 Building khmer and running the tests
 ------------------------------------
 
