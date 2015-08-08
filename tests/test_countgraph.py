@@ -1370,7 +1370,7 @@ def test_abund_dist_gz_bigcount_compressed_first():
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
     utils.runscript(script, args)  # create a bigcount table
     assert os.path.exists(htfile)
-    data = gzip.open(htfile, 'rb').read() # read compressed bigcount table
+    data = gzip.open(htfile, 'rb').read()  # read compressed bigcount table
 
     outfile = utils.get_temp_filename('test_ct')
     f_out = open(outfile, 'wb')  # output the bigcount table
