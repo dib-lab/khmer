@@ -343,7 +343,7 @@ def test_normalize_by_median_unpaired_and_paired():
     args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of unique k-mers: 4030' in err, err
+    assert 'Total number of unique k-mers: 4061' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile

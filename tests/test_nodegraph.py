@@ -121,7 +121,7 @@ def test_n_occupied_1():
     nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
 
     for _, record in enumerate(screed.open(filename)):
-        nodegraph.consume(record['sequence'])
+        nodegraph.consume(record.sequence)
 
     # this number calculated independently
     assert nodegraph.n_occupied() == 3884, nodegraph.n_occupied()
@@ -139,7 +139,7 @@ def test_bloom_python_1():
 
     n_unique = 0
     for _, record in enumerate(screed.open(filename)):
-        sequence = record['sequence']
+        sequence = record.sequence
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - ksize):
             kmer = sequence[n:n + ksize]
@@ -148,7 +148,7 @@ def test_bloom_python_1():
             nodegraph.count(kmer)
 
     assert n_unique == 3960
-    assert nodegraph.n_occupied() == 3885, nodegraph.n_occupied()
+    assert nodegraph.n_occupied() == 3884, nodegraph.n_occupied()
 
     # this number equals n_unique
     assert nodegraph.n_unique_kmers() == 3960, nodegraph.n_unique_kmers()
@@ -166,9 +166,9 @@ def test_bloom_c_1():
     nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
 
     for _, record in enumerate(screed.open(filename)):
-        nodegraph.consume(record['sequence'])
+        nodegraph.consume(record.sequence)
 
-    assert nodegraph.n_occupied() == 3885
+    assert nodegraph.n_occupied() == 3884
     assert nodegraph.n_unique_kmers() == 3960
 
 
@@ -906,20 +906,72 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         print(str(e))
 
 
-def test_n_unique_save_load():
+def test_n_occupied_save_load():
     filename = utils.get_test_data('random-20-a.fa')
 
     nodegraph = khmer.Nodegraph(20, 100000, 3)
 
     for _, record in enumerate(screed.open(filename)):
-        nodegraph.consume(record['sequence'])
+        nodegraph.consume(record.sequence)
 
-    assert nodegraph.n_occupied() == 3885
+    assert nodegraph.n_occupied() == 3884
     assert nodegraph.n_unique_kmers() == 3960
 
     savefile = utils.get_temp_filename('out')
     nodegraph.save(savefile)
 
     ng2 = khmer.load_nodegraph(savefile)
-    assert ng2.n_occupied() == 3885, ng2.n_occupied()
+    assert ng2.n_occupied() == 3884, ng2.n_occupied()
     assert ng2.n_unique_kmers() == 0    # this is intended behavior, sigh.
+
+
+def test_n_occupied_vs_countgraph():
+    filename = utils.get_test_data('random-20-a.fa')
+
+    nodegraph = khmer.Nodegraph(20, 100000, 3)
+    countgraph = khmer.Countgraph(20, 100000, 3)
+
+    assert nodegraph.n_occupied() == 0, nodegraph.n_occupied()
+    assert countgraph.n_occupied() == 0, countgraph.n_occupied()
+
+    assert nodegraph.n_unique_kmers() == 0, nodegraph.n_unique_kmers()
+    assert countgraph.n_unique_kmers() == 0, countgraph.n_unique_kmers()
+
+    for n, record in enumerate(screed.open(filename)):
+        nodegraph.consume(record.sequence)
+        countgraph.consume(record.sequence)
+
+    assert nodegraph.hashsizes() == nodegraph.hashsizes()
+
+    # these are all the same -- good :).
+    assert nodegraph.n_occupied() == 3884, nodegraph.n_occupied()
+    assert countgraph.n_occupied() == 3884, countgraph.n_occupied()
+
+    assert nodegraph.n_unique_kmers() == 3960, nodegraph.n_unique_kmers()
+    assert countgraph.n_unique_kmers() == 3960, countgraph.n_unique_kmers()
+
+
+def test_n_occupied_vs_countgraph_another_size():
+    filename = utils.get_test_data('random-20-a.fa')
+
+    nodegraph = khmer.Nodegraph(20, 10000, 3)
+    countgraph = khmer.Countgraph(20, 10000, 3)
+
+    assert nodegraph.n_occupied() == 0, nodegraph.n_occupied()
+    assert countgraph.n_occupied() == 0, countgraph.n_occupied()
+
+    assert nodegraph.n_unique_kmers() == 0, nodegraph.n_unique_kmers()
+    assert countgraph.n_unique_kmers() == 0, countgraph.n_unique_kmers()
+
+    for n, record in enumerate(screed.open(filename)):
+        nodegraph.consume(record.sequence)
+        countgraph.consume(record.sequence)
+
+    assert nodegraph.hashsizes() == nodegraph.hashsizes()
+
+    # these are all the same -- good :).
+    assert nodegraph.n_occupied() == 3269, nodegraph.n_occupied()
+    assert countgraph.n_occupied() == 3269, countgraph.n_occupied()
+
+    assert nodegraph.n_unique_kmers() == 3916, nodegraph.n_unique_kmers()
+    assert countgraph.n_unique_kmers() == 3916, countgraph.n_unique_kmers()

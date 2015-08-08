@@ -84,7 +84,8 @@ public:
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _tablesizes(tablesizes),
+        _n_unique_kmers(0), _occupied_bins(0)
     {
 
         _allocate_counters();
@@ -158,13 +159,7 @@ public:
     // count number of occupied bins
     virtual const HashIntoType n_occupied() const
     {
-        HashIntoType n = 0;
-        for (HashIntoType i = 0; i < _tablesizes[0]; i++) {
-            if (_counts[0][i % _tablesizes[0]]) {
-                n++;
-            }
-        }
-        return n;
+        return _occupied_bins;
     }
 
     virtual void count(const char * kmer)
@@ -175,14 +170,19 @@ public:
 
     virtual void count(HashIntoType khash)
     {
-        bool is_new_kmer = true;
+        bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
-            if (is_new_kmer && current_count != 0) {
-                is_new_kmer = false;
+            if (!is_new_kmer) {
+                if (current_count == 0) {
+                    is_new_kmer = true;
+                    if (i == 0) {
+                       __sync_add_and_fetch(&_occupied_bins, 1);
+                    }
+                }
             }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than

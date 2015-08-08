@@ -647,6 +647,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     }
 
     ht._ksize = (WordLength) save_ksize;
+    ht._occupied_bins = save_occupied_bins;
     ht._n_tables = (unsigned int) save_n_tables;
     ht._init_bitstuff();
 

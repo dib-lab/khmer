@@ -51,7 +51,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
 
@@ -126,7 +126,7 @@ def test_load_into_counting_abundance_dist_nobig():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
     htfile = outfile
