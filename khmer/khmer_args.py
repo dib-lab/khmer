@@ -440,7 +440,8 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
 
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
-                        help='number of tables to use in k-mer countgraph')
+                        help=argparse.SUPPRESS)
+
     parser.add_argument('-U', '--unique-kmers', type=float, default=0,
                         help='approximate number of unique kmers in the input'
                              ' set')
@@ -451,8 +452,7 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
-                       help='upper bound on tablesize to use; overrides ' +
-                       '--max-memory-usage/-M')
+                       help=argparse.SUPPRESS)
     group.add_argument('-M', '--max-memory-usage', type=memory_setting,
                        help='maximum amount of memory to use for data ' +
                        'structure')
