@@ -497,6 +497,26 @@ def test_save_load_large():
         do_test(ctfile)
 
 
+def test_save_load_occupied():
+    def do_test(ctfile):
+        inpath = utils.get_test_data('random-20-a.fa')
+        savepath = utils.get_temp_filename(ctfile)
+
+        orig = khmer.Countgraph(12, 1e5, 4)
+        orig.consume_fasta(inpath)
+        orig.save(savepath)
+
+        loaded = khmer.load_countgraph(savepath)
+
+        orig_count = orig.n_occupied()
+        loaded_count = loaded.n_occupied()
+        assert orig_count == 3886, orig_count
+        assert loaded_count == orig_count, loaded_count
+
+    for ctfile in ['temp.ct.gz', 'temp.ct']:
+        do_test(ctfile)
+
+
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
