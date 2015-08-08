@@ -149,23 +149,7 @@ public:
 
     virtual void count(HashIntoType khash)
     {
-        bool is_new_kmer = false;
-
-        for (size_t i = 0; i < _n_tables; i++) {
-            HashIntoType bin = khash % _tablesizes[i];
-            HashIntoType byte = bin / 8;
-            unsigned char bit = bin % 8;
-            if (!( _counts[i][byte] & (1<<bit))) {
-                if (i == 0) {
-                  __sync_add_and_fetch(&_occupied_bins, 1);
-                }
-                is_new_kmer = true;
-            }
-            _counts[i][byte] |= (1 << bit);
-        }
-        if (is_new_kmer) {
-            __sync_add_and_fetch(&_n_unique_kmers, 1);
-        }
+        test_and_set_bits(khash);
     }
 
     // get the count for the given k-mer.
