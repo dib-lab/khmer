@@ -596,7 +596,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;
-        unsigned long long save_occupied_bins = 0;
+    unsigned long long save_occupied_bins = 0;
     char signature [4];
     unsigned char version, ht_type, use_bigcount;
 
@@ -817,6 +817,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     unsigned int save_ksize = ht._ksize;
     unsigned char save_n_tables = ht._n_tables;
     unsigned long long save_tablesize;
+    unsigned long long save_occupied_bins = ht._occupied_bins;
 
     gzFile outfile = gzopen(outfilename.c_str(), "wb");
     if (outfile == NULL) {
@@ -843,6 +844,8 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
 
     gzwrite(outfile, (const char *) &save_ksize, sizeof(save_ksize));
     gzwrite(outfile, (const char *) &save_n_tables, sizeof(save_n_tables));
+    gzwrite(outfile, (const char *) &save_occupied_bins,
+            sizeof(save_occupied_bins));
 
     for (unsigned int i = 0; i < save_n_tables; i++) {
         save_tablesize = ht._tablesizes[i];
