@@ -735,14 +735,14 @@ def _build_testfiles():
     nodegraph.merge_subset(subset)
 
     EXCURSION_DISTANCE = 40
-    EXCURSION_ksizeMER_THRESHOLD = 82
-    EXCURSION_ksizeMER_COUNT_THRESHOLD = 1
+    EXCURSION_KMER_THRESHOLD = 82
+    EXCURSION_KMER_COUNT_THRESHOLD = 1
     counting = khmer.Countgraph(32, 4, 4)
 
     nodegraph.repartition_largest_partition(None, counting,
-                                         EXCURSION_DISTANCE,
-                                         EXCURSION_ksizeMER_THRESHOLD,
-                                         EXCURSION_ksizeMER_COUNT_THRESHOLD)
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
     nodegraph.save_stop_tags('/tmp/goodversion-k32.stoptags')
 
