@@ -111,13 +111,13 @@ class ThreadedSequenceProcessor(object):
                 # keep pairs together in batches, to retain the interleaving.
                 if is_pair(record, last_record):
                     batch.append(record)
-                    g = SequenceGroup(0, batch)
-                    self.inqueue.put(g)
+                    group = SequenceGroup(0, batch)
+                    self.inqueue.put(group)
 
                     batch = []
                 else:
-                    g = SequenceGroup(0, batch)
-                    self.inqueue.put(g)
+                    group = SequenceGroup(0, batch)
+                    self.inqueue.put(group)
                     batch = [record]
 
                 i = 0
@@ -129,15 +129,15 @@ class ThreadedSequenceProcessor(object):
 
         # submit last set of sequences
         if batch:
-            g = SequenceGroup(0, batch)
-            self.inqueue.put(g)
+            group = SequenceGroup(0, batch)
+            self.inqueue.put(group)
 
     def do_process(self):
         inq = self.inqueue
 
         while not self.done or not inq.empty():
             try:
-                g = inq.get(True, 1)
+                group = inq.get(True, 1)
             except queue.Empty:
                 continue
 
@@ -145,7 +145,7 @@ class ThreadedSequenceProcessor(object):
             bp_written = 0
 
             keep = []
-            for record in g.seqlist:
+            for record in group.seqlist:
                 name, sequence = self.process_fn(record)
                 bp_processed += len(record['sequence'])
                 if name:
@@ -160,7 +160,7 @@ class ThreadedSequenceProcessor(object):
             # the tallies are shared among workers, hence we lock
             with self.tallies_lock:
 
-                self.n_processed += len(g.seqlist)
+                self.n_processed += len(group.seqlist)
                 self.n_written += len(keep)
                 self.bp_processed += bp_processed
                 self.bp_written += bp_written
@@ -174,8 +174,9 @@ class ThreadedSequenceProcessor(object):
                            self.bp_processed - self.bp_written),
                           file=sys.stderr)
                     discarded = self.bp_processed - self.bp_written
-                    f = float(discarded) / float(self.bp_processed) * 100
-                    print("discarded %.1f%%" % f, file=sys.stderr)
+                    f_discarded = float(discarded) / float(
+                                  self.bp_processed) * 100
+                    print("discarded %.1f%%" % f_discarded, file=sys.stderr)
 
         # end of thread; exit, decrement worker count.
         with self.worker_count_lock:
@@ -185,11 +186,11 @@ class ThreadedSequenceProcessor(object):
         outq = self.outqueue
         while self.worker_count > 0 or not outq.empty():
             try:
-                g = outq.get(True, 1)
+                group = outq.get(True, 1)
             except queue.Empty:
                 continue
 
-            for name, seq, qual in g.seqlist:
+            for name, seq, qual in group.seqlist:
                 if qual:
                     record = screed.Record(name=name, sequence=seq,
                                            quality=qual)
@@ -205,7 +206,7 @@ class ThreadedSequenceProcessor(object):
                   (self.bp_processed, self.bp_written,
                    self.bp_processed - self.bp_written), file=sys.stderr)
             discarded = self.bp_processed - self.bp_written
-            f = float(discarded) / float(self.bp_processed) * 100
-            print("discarded %.1f%%" % f, file=sys.stderr)
+            f_discarded = float(discarded) / float(self.bp_processed) * 100
+            print("discarded %.1f%%" % f_discarded, file=sys.stderr)
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
