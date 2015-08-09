@@ -56,6 +56,7 @@ protected:
     std::vector<HashIntoType> _tablesizes;
     size_t _n_tables;
     HashIntoType _n_unique_kmers;
+    HashIntoType _occupied_bins;
 
     Byte ** _counts;
 
@@ -74,7 +75,7 @@ public:
 
     CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
 
@@ -83,7 +84,8 @@ public:
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _tablesizes(tablesizes),
+        _n_unique_kmers(0), _occupied_bins(0)
     {
 
         _allocate_counters();
@@ -132,7 +134,10 @@ public:
         return _tablesizes;
     }
 
-    virtual const HashIntoType n_unique_kmers() const;
+    virtual const HashIntoType n_unique_kmers() const
+    { 
+        return _n_unique_kmers;
+    }
 
     void set_use_bigcount(bool b)
     {
@@ -146,31 +151,15 @@ public:
     virtual void save(std::string);
     virtual void load(std::string);
 
-    // accessors to get table info
-    const HashIntoType n_entries() const
-    {
-        return _tablesizes[0];
-    }
-
     const size_t n_tables() const
     {
         return _n_tables;
     }
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const
+    virtual const HashIntoType n_occupied() const
     {
-        HashIntoType n = 0;
-        if (stop == 0) {
-            stop = _tablesizes[0];
-        }
-        for (HashIntoType i = start; i < stop; i++) {
-            if (_counts[0][i % _tablesizes[0]]) {
-                n++;
-            }
-        }
-        return n;
+        return _occupied_bins;
     }
 
     virtual void count(const char * kmer)
@@ -181,14 +170,19 @@ public:
 
     virtual void count(HashIntoType khash)
     {
-        bool is_new_kmer = true;
+        bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
-            if (is_new_kmer && current_count != 0) {
-                is_new_kmer = false;
+            if (!is_new_kmer) {
+                if (current_count == 0) {
+                    is_new_kmer = true;
+                    if (i == 0) {
+                       __sync_add_and_fetch(&_occupied_bins, 1);
+                    }
+                }
             }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than
@@ -254,10 +248,6 @@ public:
     BoundedCounterType get_min_count(const std::string &s);
 
     BoundedCounterType get_max_count(const std::string &s);
-
-    void get_kadian_count(const std::string &s,
-                          BoundedCounterType &kadian,
-                          unsigned int nk = 1);
 
     HashIntoType * abundance_distribution(read_parsers::IParser * parser,
                                           Hashbits * tracking);

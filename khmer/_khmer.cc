@@ -747,13 +747,11 @@ hashtable_n_occupied(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    HashIntoType start = 0, stop = 0;
-
-    if (!PyArg_ParseTuple(args, "|KK", &start, &stop)) {
+    if (!PyArg_ParseTuple(args, "")) {
         return NULL;
     }
 
-    HashIntoType n = hashtable->n_occupied(start, stop);
+    HashIntoType n = hashtable->n_occupied();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -767,19 +765,6 @@ hashtable_n_unique_kmers(khmer_KHashtable_Object * me, PyObject * args)
     HashIntoType n = hashtable->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
-}
-
-static
-PyObject *
-hashtable_n_entries(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(hashtable->n_entries());
 }
 
 static
@@ -2442,7 +2427,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "n_occupied", (PyCFunction)hashtable_n_occupied, METH_VARARGS,
         "Count the number of occupied bins."
     },
-    { "n_entries", (PyCFunction)hashtable_n_entries, METH_VARARGS, "" },
     {
         "count",
         (PyCFunction)hashtable_count, METH_VARARGS,
@@ -2774,32 +2758,6 @@ count_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
     }
 
     Py_RETURN_NONE;
-}
-
-static
-PyObject *
-count_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-    unsigned int nk = 1;
-
-    if (!PyArg_ParseTuple(args, "s|I", &long_str, &nk)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType kad = 0;
-
-    counting->get_kadian_count(long_str, kad, nk);
-
-    return Py_BuildValue("i", kad);
 }
 
 static
@@ -3166,7 +3124,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "output_fasta_kmer_pos_freq", (PyCFunction)count_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "get_kadian_count", (PyCFunction)count_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
@@ -3287,53 +3244,6 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
 
 static
 PyObject *
-hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
-{
-    Hashbits * hashbits = me->hashbits;
-    khmer_KHashbits_Object * ht2_argu;
-    const char * filename;
-    Hashbits * ht2;
-
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
-                          &ht2_argu)) {
-        return NULL;
-    }
-
-    ht2 = ht2_argu->hashbits;
-
-// call the C++ function, and trap signals => Python
-
-    HashIntoType        curve[2][100];
-
-    try {
-        unsigned long long  n_consumed;
-        unsigned int        total_reads;
-        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads,
-                                        n_consumed);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    HashIntoType n = hashbits->n_unique_kmers();
-    HashIntoType n_overlap = hashbits->n_overlap_kmers();
-
-    PyObject * x = PyList_New(200);
-
-    for (unsigned int i = 0; i < 100; i++) {
-        PyList_SetItem(x, i, Py_BuildValue("K", curve[0][i]));
-    }
-    for (unsigned int i = 0; i < 100; i++) {
-        PyList_SetItem(x, i + 100, Py_BuildValue("K", curve[1][i]));
-    }
-    return Py_BuildValue("KKO", n, n_overlap, x);
-}
-
-static
-PyObject *
 hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 {
     Hashbits * hashbits = me->hashbits;
@@ -3357,7 +3267,6 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 }
 
 static PyMethodDef khmer_hashbits_methods[] = {
-    { "count_overlap", (PyCFunction)hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
     {
         "update",
         (PyCFunction) hashbits_update, METH_VARARGS,

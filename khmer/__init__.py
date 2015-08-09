@@ -82,6 +82,7 @@ def extract_nodegraph_info(filename):
     signature = None
     version = None
     ht_type = None
+    occupied = None
 
     uint_size = len(pack('I', 0))
     uchar_size = len(pack('B', 0))
@@ -94,6 +95,7 @@ def extract_nodegraph_info(filename):
             ht_type, = unpack('B', nodegraph.read(1))
             ksize, = unpack('I', nodegraph.read(uint_size))
             n_tables, = unpack('B', nodegraph.read(uchar_size))
+            occupied, = unpack('Q', nodegraph.read(ulonglong_size))
             table_size, = unpack('Q', nodegraph.read(ulonglong_size))
         if signature != b"OXLI":
             raise ValueError("Node graph '{}' is missing file type "
@@ -101,7 +103,7 @@ def extract_nodegraph_info(filename):
     except:
         raise ValueError("Presence table '{}' is corrupt ".format(filename))
 
-    return ksize, round(table_size, -2), n_tables, version, ht_type
+    return ksize, round(table_size, -2), n_tables, version, ht_type, occupied
 
 
 def extract_countgraph_info(filename):
@@ -120,6 +122,7 @@ def extract_countgraph_info(filename):
     version = None
     ht_type = None
     use_bigcount = None
+    occupied = None
 
     uint_size = len(pack('I', 0))
     ulonglong_size = len(pack('Q', 0))
@@ -132,6 +135,7 @@ def extract_countgraph_info(filename):
             use_bigcount, = unpack('B', countgraph.read(1))
             ksize, = unpack('I', countgraph.read(uint_size))
             n_tables, = unpack('B', countgraph.read(1))
+            occupied, = unpack('Q', countgraph.read(ulonglong_size))
             table_size, = unpack('Q', countgraph.read(ulonglong_size))
         if signature != b'OXLI':
             raise ValueError("Count graph file '{}' is missing file type "
@@ -140,7 +144,7 @@ def extract_countgraph_info(filename):
         raise ValueError("Count graph file '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, use_bigcount, version, \
-        ht_type
+        ht_type, occupied
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):

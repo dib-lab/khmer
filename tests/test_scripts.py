@@ -51,7 +51,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
 
@@ -126,7 +126,7 @@ def test_load_into_counting_abundance_dist_nobig():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
     htfile = outfile
@@ -2892,47 +2892,6 @@ def test_sample_reads_randomly_S():
                   '895:1:1:1276:16426', '895:1:1:1355:13535'}
 
     assert seqs == answer
-
-
-def test_count_overlap_invalid_datafile():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    htfile = _make_graph(seqfile1, ksize=20)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile, htfile, outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status != 0
-    assert "OSError" in err
-
-
-def test_count_overlap_csv():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, ksize=20)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
-            '10000000', htfile, seqfile2, outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
-    assert '# of unique k-mers in dataset2: 759020' in data
-    assert '# of overlap unique k-mers: 245547' in data
-    assert os.path.exists(curvefile), curvefile
-    data = [x.strip() for x in open(curvefile)]
-    data = set(data)
-    assert '178630,1134' in data, data
-    assert '496280,2904' in data
-    assert '752031,238558' in data
 
 
 def execute_streaming_diginorm(ifilename):

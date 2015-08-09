@@ -1,3 +1,33 @@
+2015-08-07  Titus Brown  <titus@idyll.org>
+
+  * khmer/_khmer.cc,lib/hashbits.{cc,hh}: removed overlap functionality;
+  eliminated n_entries() as redundant with hashsizes(); removed arguments to
+  n_occupied(); removed get_kadian_count.
+  * lib/{hashbits.cc,counting.cc,khmer.hh},tests/test_hashbits.py: updated
+  save/load of countgraph/nodegraph structures to save _n_occupied.
+  * lib/{hashtable.hh,counting.hh,hashbits.hh}: promoted n_occupied() to
+  Hashtable class; fixed CountingHash unique_kmers calculation.
+  * lib/counting.{cc,hh}: removed get_kadian_count() and moved
+  n_unique_kmers(); updated countgraph writing to save n_occupied.
+  * khmer/__init__.py: modified extract_nodegraph_info and
+  extract_countgraph_info to read in & return n_occupied;
+  * sandbox/bloom-count-intersection.py,scripts/count-overlap.py,
+  tests/test-data/overlap.out: removed overlap scripts and test files.
+  * doc/user/scripts.rst: removed count-overlap.py documentation.
+  * tests/test_scripts.py: removed count-overlap.py tests.
+  * sandbox/README.rst: updated with removal of bloom-count-intersection.py.
+  * tests/test-data/normC20k20.ct: updated file contents to reflect new
+  format containing _n_occupied.
+  * tests/test_countgraph.py: removed get_kadian_count tests; added save/load
+  tests.
+  * tests/test_counting_single.py: remove n_entries() tests; replace
+  n_entries() calls with hashsizes() call.
+  * tests/test_functions.py: updated tests for new extract_*_info functions.
+  * tests/test_nodegraph.py: update htable etc. to nodegraph; added a
+  save/load test for n_occupied() on nodegraph.
+  * tests/{test_normalize_by_median,test_scripts}.py: fixed unique kmers
+  tests.
+
 2015-08-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * scripts/*.py,tests/*.py,sandbox/*.py,khmer/*.py,oxli/*.py:
