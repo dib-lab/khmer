@@ -138,6 +138,43 @@ def test_load_into_counting_abundance_dist_nobig():
     assert 'bigcount' in err, err
 
 
+def test_load_into_counting_abundance_dist_squashing():
+    graphfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = [graphfile, infile]
+    script = 'load-into-counting.py'
+    utils.runscript(script, args)
+
+    histogram = utils.get_temp_filename('histogram')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+    args = [graphfile, infile, histogram]
+
+    script = 'abundance-dist.py'
+    # make histogram
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(histogram)
+    # attempt to overwrite histogram; fail
+    failed = True
+    try:
+        (status, out, err) = utils.runscript(script, args)
+        failed = False
+    except AssertionError as error:
+        assert "exists; not squashing" in str(error), str(error)
+
+    assert failed, "Expected to fail"
+    # attempt to overwrite with squashing; should work
+    args = ['-s', graphfile, infile, histogram]
+    (status, out, err) = utils.runscript(script, args)
+    assert "squashing existing file" in err, err
+
+    histfile = open(histogram, 'r')
+    lines = histfile.readlines()
+    # stripping because boo whitespace
+    assert lines[1].strip() == "0,0,0,0.0", lines[1]
+    assert lines[2].strip() == "1,83,83,1.0", lines[2]
+
+
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
@@ -1218,6 +1255,27 @@ def test_partition_find_knots_execute():
     assert os.path.exists(stoptags_file)
 
 
+def test_partition_find_knots_existing_stoptags():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    script = 'partition-graph.py'
+    args = [graphbase]
+    utils.runscript(script, args)
+
+    script = 'make-initial-stoptags.py'
+    args = [graphbase]
+    utils.runscript(script, args)
+
+    script = 'find-knots.py'
+    args = [graphbase]
+    (status, out, err) = utils.runscript(script, args)
+
+    stoptags_file = graphbase + '.stoptags'
+    assert os.path.exists(stoptags_file)
+    assert "loading stoptags" in err, err
+    assert "these output stoptags will include the already" in err, err
+
+
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
@@ -1748,6 +1806,30 @@ def test_interleave_read_seq1_fq():
     assert n > 0
 
 
+def test_interleave_read_badleft_badright():
+    # create input files
+    infile1 = utils.get_test_data('paired-broken.fq.badleft')
+    infile2 = utils.get_test_data('paired-broken.fq.badright')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-broken.fq.paired_bad')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '-o', outfile]
+
+    utils.runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
 def test_interleave_reads_1_fq():
     # test input files
     infile1 = utils.get_test_data('paired.fq.1')
@@ -1886,6 +1968,40 @@ def test_make_initial_stoptags():
     # read the code before modifying
     args = ['test-reads']
 
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile1), outfile1
+
+
+def test_make_initial_stoptags_load_stoptags():
+    # gen input files using load-graph.py -t
+    # should keep test_data directory size down
+    # or something like that
+    # this assumes (obv.) load-graph works properly
+    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
+    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    in_dir = os.path.dirname(bzinfile)
+
+    genscript = 'load-graph.py'
+    genscriptargs = ['test-reads', 'test-reads.fq.bz2']
+    utils.runscript(genscript, genscriptargs, in_dir)
+
+    # test input file gen'd by load-graphs
+    infile = utils.get_temp_filename('test-reads.pt')
+    infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
+
+    # get file to compare against
+    ex_outfile = utils.get_test_data('test-reads.stoptags')
+
+    # actual output file
+    outfile1 = utils.get_temp_filename('test-reads.stoptags', in_dir)
+
+    script = 'make-initial-stoptags.py'
+    # make-initial-stoptags has weird file argument syntax
+    # read the code before modifying
+    args = ['test-reads']
+
+    utils.runscript(script, args, in_dir)
+    args = ['test-reads', '--stoptags', 'test-reads.stoptags']
     utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile1), outfile1
 
@@ -3547,6 +3663,22 @@ def test_unique_kmers_defaults():
     assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
             in err)
     assert 'Total estimated number of unique 20-mers: 3950' in err
+
+
+def test_unique_kmers_streaming():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', '--stream-out', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+    assert "CCAACCATGGTAGGTTAGGAAAGCCGCCAAATAAGTTCTTATACG" in out, out
 
 
 def test_unique_kmers_report_fp():

@@ -73,8 +73,8 @@ def check_conflicting_args(args, hashtype):
         configure_logging(args.quiet)
 
     loadgraph_table_conflicts = {"ksize": DEFAULT_K,
-                                  "n_tables": DEFAULT_N_TABLES,
-                                  "max_tablesize": DEFAULT_MAX_TABLESIZE}
+                                 "n_tables": DEFAULT_N_TABLES,
+                                 "max_tablesize": DEFAULT_MAX_TABLESIZE}
 
     loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 

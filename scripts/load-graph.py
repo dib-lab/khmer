@@ -30,6 +30,5 @@ def get_parser():
 
 if __name__ == '__main__':
     build_graph.main(get_parser().parse_args())
-    sys.exit(0)
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
