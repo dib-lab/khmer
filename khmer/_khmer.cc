@@ -4440,13 +4440,16 @@ hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
 }
 
 static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
-        PyObject * args)
+        PyObject * args, PyObject * kwds)
 {
     const char * filename;
     PyObject * output_records_o = NULL;
+    char * kwlist[] = {"filename", "stream_out", NULL};
+
     bool output_records = false;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &output_records_o)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist,
+          &filename, &output_records_o)) {
         return NULL;
     }
 
@@ -4593,9 +4596,10 @@ static PyMethodDef khmer_hllcounter_methods[] = {
     },
     {
         "consume_fasta", (PyCFunction)hllcounter_consume_fasta,
-        METH_VARARGS,
+        METH_VARARGS | METH_KEYWORDS,
         "Read sequences from file, break into k-mers, "
-        "and add each k-mer to the counter."
+        "and add each k-mer to the counter. If optional keyword 'stream_out' "
+        "is True, also prints each sequence to stdout."
     },
     {
         "merge", (PyCFunction)hllcounter_merge,
