@@ -49,19 +49,12 @@ def test_badcount():
         print(str(err))
 
 
-def test_hashtable_n_entries():
-    countgraph = khmer._Countgraph(4, [5])
-    try:
-        countgraph.n_entries("nope")
-        assert 0, "n_entries should accept no arguments"
-    except TypeError as err:
-        print(str(err))
-
-
 def test_complete_no_collision():
     kh = khmer._Countgraph(4, [4 ** 4])
 
-    for i in range(0, kh.n_entries()):
+    n_entries = kh.hashsizes()[0]
+
+    for i in range(0, n_entries):
         s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
@@ -69,7 +62,7 @@ def test_complete_no_collision():
     n_rc_filled = 0
     n_fwd_filled = 0
 
-    for i in range(0, kh.n_entries()):
+    for i in range(0, n_entries):
         s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
@@ -78,16 +71,17 @@ def test_complete_no_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == kh.n_entries(), n_rc_filled
+    assert n_rc_filled == n_entries, n_rc_filled
     assert n_palindromes == 16, n_palindromes
-    assert n_fwd_filled == kh.n_entries() // 2 + n_palindromes // 2, \
+    assert n_fwd_filled == n_entries // 2 + n_palindromes // 2, \
         n_fwd_filled
 
 
 def test_complete_2_collision():
     kh = khmer._Countgraph(4, [5])
 
-    for i in range(0, kh.n_entries()):
+    n_entries = kh.hashsizes()[0]
+    for i in range(0, n_entries):
         s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
@@ -102,13 +96,14 @@ def test_complete_2_collision():
     #        n_fwd_filled += 1
 
     assert n_rc_filled == 128, n_rc_filled
-    # @CTB assert n_fwd_filled == 100 # kt.n_entries() / 2, n_fwd_filled
 
 
 def test_complete_4_collision():
     kh = khmer._Countgraph(4, [3])
 
-    for i in range(0, kh.n_entries()):
+    n_entries = kh.hashsizes()[0]
+
+    for i in range(0, n_entries):
         s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
@@ -123,7 +118,6 @@ def test_complete_4_collision():
     #       n_fwd_filled += 1
 
     assert n_rc_filled == 64, n_rc_filled
-    # @CTB assert n_fwd_filled == kt.n_entries() / 2, n_fwd_filled
 
 
 def test_maxcount():
@@ -360,18 +354,6 @@ class Test_ConsumeString(object):
         assert dist[0] == 1, dist[0]
         assert dist[2] == 1
         assert sum(dist) == 2
-
-    def test_n_occupied_args(self):
-        assert self.kh.n_occupied() == 0
-        self.kh.consume('AAAA')
-        assert self.kh.n_occupied(0, 1) == 1
-        assert self.kh.n_occupied(1, 4 ** 4) == 0, self.kh.n_occupied()
-
-        hashvalue = khmer.forward_hash('AACT', 4)
-        self.kh.consume('AACT')
-        assert self.kh.n_occupied(0, hashvalue + 1) == 2
-        assert self.kh.n_occupied(hashvalue + 1, 4 ** 4) == 0
-        assert self.kh.n_occupied(hashvalue, hashvalue + 1) == 1
 
     def test_simple(self):
         n = self.kh.consume('AAAA')
