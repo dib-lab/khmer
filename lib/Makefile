@@ -56,7 +56,7 @@ CPPFLAGS += $(SEQAN_FLAGS)
 
 CXXFLAGS ?=
 CXXFLAGS += $(COMMON_FLAGS) $(WARNINGS)
-CXXFLAGS += -Wstrict-null-sentinel
+CXXFLAGS += -Wstrict-null-sentinel -std=c++11
 CXXFLAGS += $(INCLUDES) $(CPPFLAGS)
 
 CFLAGS	 ?=
@@ -195,6 +195,7 @@ LIBKHMER_OBJS= \
 	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
+	traversal.o \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
@@ -223,6 +224,7 @@ KHMER_HEADERS= \
 	khmer.hh \
 	kmer_hash.hh \
 	labelhash.hh \
+	traversal.hh \
 	primes.hh \
 	read_aligner.hh \
 	read_parsers.hh \

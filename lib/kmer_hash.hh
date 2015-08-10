@@ -79,6 +79,217 @@ HashIntoType _hash_murmur(const std::string& kmer);
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
+
+/**
+ * \class Kmer
+ *
+ * \brief Hold the hash values corresponding to a single k-mer.
+ *
+ * This class stores the forward, reverse complement, and
+ * uniqified hash values for a given k-mer. It also defines
+ * some basic operators and a utility function for getting
+ * the string representation of the sequence. This is meant
+ * to replace the original inelegant macros used for hashing.
+ *
+ * \author Camille Scott
+ *
+ * Contact: camille.scott.w@gmail.com
+ *
+ */
+class Kmer
+{
+
+public:
+
+    /// The forward hash
+    HashIntoType kmer_f;
+    /// The reverse (complement) hash
+    HashIntoType kmer_r;
+    /// The uniqified hash
+    HashIntoType kmer_u;
+
+    /** @param[in]   f forward hash.
+     *  @param[in]   r reverse (complement) hash.
+     *  @param[in]   u uniqified hash.
+     */
+    Kmer(HashIntoType f, HashIntoType r, HashIntoType u)
+    {
+        kmer_f = f;
+        kmer_r = r;
+        kmer_u = u;
+    }
+
+    /// @warning The default constructor builds an invalid k-mer.
+	Kmer()
+	{
+		kmer_f = kmer_r = kmer_u = 0;
+	}
+
+    /// Allows complete backwards compatibility
+    operator HashIntoType() const { return kmer_u; }
+
+    bool operator< (const Kmer &other) const {
+        return kmer_u < other.kmer_u;
+    }
+
+    std::string get_string_rep(WordLength K) {
+        return _revhash(kmer_u, K);
+    }
+
+};
+
+/**
+ * \Class KmerFactory
+ *
+ * \brief Build complete Kmer objects.
+ *
+ * The KmerFactory is a simple construct to emit complete
+ * Kmer objects. The design decision leading to this class
+ * stems from the issue of overloading the Kmer constructor
+ * while also giving it a K size: you get ambiguous signatures
+ * between the (kmer_u, K) and (kmer_f, kmer_r) cases. This
+ * implementation also allows a logical architecture wherein
+ * KmerIterator and Hashtable inherit directly from KmerFactory,
+ * extending the latter's purpose of "create k-mers" to 
+ * "emit k-mers from a sequence" and "create and store k-mers".
+ *
+ * \author Camille Scott
+ *
+ * Contact: camille.scott.w@gmail.com
+ *
+ */
+class KmerFactory
+{
+protected:
+    WordLength _ksize;
+
+public:
+
+    KmerFactory(WordLength K): _ksize(K) {}
+
+    /** @param[in]  kmer_u Uniqified hash value.
+     *  @return A complete Kmer object.
+     */
+    Kmer build_kmer(HashIntoType kmer_u)
+    {
+        HashIntoType kmer_f, kmer_r;
+		std:: string kmer_s = _revhash(kmer_u, _ksize);
+        _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    /** Call the uniqify function and build a complete Kmer.
+     *
+     *  @param[in]  kmer_f Forward hash value.
+     *  @param[in]  kmer_r Reverse complement hash value.
+     *  @return A complete Kmer object.
+     */
+    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
+    {
+        HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    /** Hash the given sequence and call the uniqify function
+     *  on its results to build a complete Kmer.
+     *
+     *  @param[in]  kmer_s String representation of a k-mer.
+     *  @return A complete Kmer object hashed from the given string.
+     */
+    Kmer build_kmer(std::string kmer_s)
+    {
+        HashIntoType kmer_f, kmer_r, kmer_u;
+        kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    /** Hash the given sequence and call the uniqify function
+     *  on its results to build a complete Kmer.
+     *
+     *  @param[in]  kmer_c The character array representation of a k-mer.
+     *  @return A complete Kmer object hashed from the given char array.
+     */ 
+    Kmer build_kmer(const char * kmer_c)
+    {
+        HashIntoType kmer_f, kmer_r, kmer_u;
+        kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
+        return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+};
+
+/**
+ * \Class KmerIterator
+ *
+ * \brief Emit Kmer objects generated from the given sequence.
+ *
+ * Given a string \f$S\f$ and a length \f$K > 0\f$, we define
+ * the k-mers of \f$S\f$ as the set \f$S_{i..i+K} \forall i \in \{0..|S|-K+1\}\f$,
+ * where \f$|S|\f$ is the length and \f$S_{j..k}\f$ is the half-open
+ * substring starting at \f$j\f$ and terminating at \f$k\f$.
+ *
+ * KmerIterator mimics a python-style generator function which
+ * emits the k-mers of the given sequence, in order, as Kmer objects.
+ *
+ * @warning This is not actually a valid C++ iterator, though it is close.
+ *
+ * \author Camille Scott
+ *
+ * Contact: camille.scott.w@gmail.com
+ *
+ */
+class KmerIterator: public KmerFactory
+{
+protected:
+    const char * _seq;
+
+    HashIntoType _kmer_f, _kmer_r;
+    HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
+    unsigned int index;
+    size_t length;
+    bool initialized;
+public:
+    KmerIterator(const char * seq, unsigned char k);
+
+    /** @param[in]  f The forward hash value.
+     *  @param[in]  r The reverse complement hash value.
+     *  @return The first Kmer of the sequence.
+     */
+    Kmer first(HashIntoType& f, HashIntoType& r);
+
+    /** @param[in]  f The current forward hash value
+     *  @param[in]  r The current reverse complement hash value
+     *  @return The next Kmer in the sequence
+     */
+    Kmer next(HashIntoType& f, HashIntoType& r);
+
+    Kmer first()
+    {
+        return first(_kmer_f, _kmer_r);
+    }
+
+    Kmer next()
+    {
+        return next(_kmer_f, _kmer_r);
+    }
+
+    /// @return Whether or not the iterator has completed.
+    bool done()
+    {
+        return index >= length;
+    }
+
+    unsigned int get_start_pos() const
+    {
+        return index - _ksize;
+    }
+
+    unsigned int get_end_pos() const
+    {
+        return index;
+    }
+}; // class KmerIterator
+
 };
 
 #endif // KMER_HASH_HH

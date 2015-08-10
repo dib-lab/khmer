@@ -129,7 +129,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    KMerIterator kmers(sp, _ksize);
+    KmerIterator kmers(sp, _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -181,7 +181,7 @@ void Hashtable::get_median_count(const std::string &s,
 bool Hashtable::median_at_least(const std::string &s,
                                 unsigned int cutoff)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
 
@@ -338,7 +338,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 {
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
     HashIntoType kmer;
 
     unsigned int since = _tag_density / 2 + 1;
@@ -501,7 +501,7 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
         if (check_and_normalize_read(seq)) {	// process?
             bool is_new_kmer;
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             HashIntoType kmer, last_kmer;
             bool is_first_kmer = true;
@@ -672,10 +672,10 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {	// process?
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
-            HashIntoType kmer = 0;
             bool is_first_kmer = true;
+            Kmer kmer(0,0,0);
             while (!kmers.done()) {
                 kmer = kmers.next();
 
@@ -687,8 +687,7 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
             }
 
             if (!is_first_kmer) {	// traverse
-                SeenSet keeper;
-
+                KmerSet keeper;
                 unsigned int n = traverse_from_kmer(kmer, radius, keeper);
                 if (n >= big_threshold) {
 #if VERBOSE_REPARTITION
@@ -713,150 +712,69 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(const HashIntoType kmer_f,
-        const HashIntoType kmer_r,
+void Hashtable::calc_connected_graph_size(Kmer start,
         unsigned long long& count,
-        SeenSet& keeper,
+        KmerSet& keeper,
         const unsigned long long threshold,
         bool break_on_circum)
 const
 {
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    const BoundedCounterType val = get_count(kmer);
+    const BoundedCounterType val = get_count(start);
 
     if (val == 0) {
         return;
     }
 
-    // have we already seen me? don't count; exit.
-    if (set_contains(keeper, kmer)) {
-        return;
+    Traverser traverser(this);
+    KmerQueue node_q;
+    node_q.push(start);
+
+    // Avoid high-circumference k-mers
+    auto filter = [&] (Kmer& n) { return !(break_on_circum &&
+                                  traverser.degree(n) > 4); };
+
+    while(!node_q.empty()) {
+      Kmer node = node_q.front();
+      node_q.pop();
+
+      // have we already seen me? don't count; exit.
+      if (set_contains(keeper, node)) {
+          continue;
+      }
+
+      // is this in stop_tags?
+      if (set_contains(stop_tags, node)) {
+          continue;
+      }
+
+      // keep track of both seen kmers, and counts.
+      keeper.insert(node);
+
+      count += 1;
+
+      // are we past the threshold? truncate search.
+      if (threshold && count >= threshold) {
+          return;
+      }
+
+      // otherwise, explore in all directions.
+      traverser.traverse_right(node, node_q, filter);
+      traverser.traverse_left(node, node_q, filter);
     }
-
-    // is this in stop_tags?
-    if (set_contains(stop_tags, kmer)) {
-        return;
-    }
-
-    // keep track of both seen kmers, and counts.
-    keeper.insert(kmer);
-
-    // is this a high-circumference k-mer? if so, don't count it; get outta here!
-    if (break_on_circum && \
-            kmer_degree(kmer_f, kmer_r) > 4) {
-        return;
-    }
-
-    count += 1;
-
-    // are we past the threshold? truncate search.
-    if (threshold && count >= threshold) {
-        return;
-    }
-
-    // otherwise, explore in all directions.
-
-    // NEXT.
-
-    HashIntoType f, r;
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    // PREVIOUS.
-
-
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 }
 
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
-const
 {
-    unsigned int neighbors = 0;
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_f, kmer_r);
+    return traverser.degree(node);
+}
 
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    HashIntoType f, r;
-
-    // NEXT.
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    return neighbors;
+unsigned int Hashtable::kmer_degree(const char * kmer_s)
+{
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_s);
+    return traverser.degree(node);
 }
 
 void Hashtable::filter_if_present(const std::string &infilename,
@@ -882,7 +800,7 @@ void Hashtable::filter_if_present(const std::string &infilename,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
             bool keep = true;
 
             while (!kmers.done()) {
@@ -909,146 +827,13 @@ void Hashtable::filter_if_present(const std::string &infilename,
     return;
 }
 
-
-unsigned int Hashtable::count_kmers_within_radius(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        unsigned int radius,
-        unsigned int max_count,
-        const SeenSet * seen)
-const
-{
-    HashIntoType f, r;
-    NodeQueue node_q;
-    std::queue<unsigned int> breadth_q;
-    unsigned int cur_breadth = 0;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-    unsigned int total = 0;
-
-    SeenSet keeper;		// keep track of traversed kmers
-    if (seen) {
-        keeper = *seen;
-    }
-
-    // start breadth-first search.
-
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
-    breadth_q.push(0);
-
-    while(!node_q.empty()) {
-        kmer_f = node_q.front();
-        node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
-        unsigned int breadth = breadth_q.front();
-        breadth_q.pop();
-
-        if (breadth > radius) {
-            break;
-        }
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
-            continue;
-        }
-
-        // keep track of seen kmers
-        keeper.insert(kmer);
-        total++;
-
-        if (max_count && total > max_count) {
-            break;
-        }
-
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw khmer_exception();
-        }
-        if (breadth > cur_breadth) {
-            cur_breadth = breadth;
-        }
-
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-    }
-
-    return total;
-}
-
 size_t Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     size_t i = _ksize - 2;
     while (!kmers.done()) {
@@ -1070,7 +855,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     unsigned int i = 0;
     unsigned int n = 0;
     unsigned int n_big = 0;
-    SeenSet keeper;
+    KmerSet keeper;
 
 #if VERBOSE_REPARTITION
     std::cout << all_tags.size() << " tags...\n";
@@ -1078,13 +863,15 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 
     for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
             ++si, i++) {
+
         n++;
-        unsigned int count = traverse_from_kmer(*si, distance, keeper);
+        Kmer tag = build_kmer(*si);
+        unsigned int count = traverse_from_kmer(tag, distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
-            SeenSet::const_iterator ti;
+            KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
                     stop_tags.insert(*ti);
@@ -1108,35 +895,29 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     }
 }
 
-unsigned int Hashtable::traverse_from_kmer(HashIntoType start,
+unsigned int Hashtable::traverse_from_kmer(Kmer start,
         unsigned int radius,
-        SeenSet &keeper)
+        KmerSet &keeper,
+        unsigned int max_count)
 const
 {
-    std::string kmer_s = _revhash(start, _ksize);
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
-    HashIntoType f, r;
-    NodeQueue node_q;
+    Traverser traverser(this);
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    bool is_first_kmer = true;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    // start breadth-first search.
+    auto filter = [&] (Kmer& n) { return !set_contains(keeper, n); };
 
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
@@ -1144,27 +925,21 @@ const
             break;
         }
 
-        if (total > MAX_KEEPER_SIZE) {
+        if (max_count && total > max_count) {
             break;
         }
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
+        if (set_contains(keeper, node)) {
             continue;
         }
 
-        if (set_contains(stop_tags, kmer)) {
+        if (set_contains(stop_tags, node)) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
-
-        // QUESTION: Huh? What's up with the following?
-        if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
-            continue;
-        }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
             throw khmer_exception();
@@ -1173,80 +948,11 @@ const
             cur_breadth = breadth;
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
+        nfound = traverser.traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        //r = next_r(kmer_r, 'A');
-
-        // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        is_first_kmer = false;
+        nfound = traverser.traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
     }
 
     return total;
@@ -1389,13 +1095,13 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-unsigned int Hashtable::count_and_transfer_to_stoptags(SeenSet &keeper,
+unsigned int Hashtable::count_and_transfer_to_stoptags(KmerSet &keeper,
         unsigned int threshold,
         CountingHash &counting)
 {
     unsigned int n_inserted = 0;
 
-    SeenSet::const_iterator ti;
+    KmerSet::const_iterator ti;
     for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
         if (counting.get_count(*ti) >= threshold) {
             stop_tags.insert(*ti);
@@ -1416,7 +1122,7 @@ const
         return;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     unsigned int i = 0;
     while(!kmers.done()) {
@@ -1444,7 +1150,7 @@ void Hashtable::extract_unique_paths(std::string seq,
 
     min_length = min_length - _ksize + 1; // adjust for k-mer size.
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     std::deque<bool> seen_queue;
     unsigned int n_already_seen = 0;
@@ -1544,7 +1250,7 @@ void Hashtable::get_kmers(const std::string &s,
 void Hashtable::get_kmer_hashes(const std::string &s,
                                 std::vector<HashIntoType> &kmers_vec) const
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -1556,7 +1262,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
