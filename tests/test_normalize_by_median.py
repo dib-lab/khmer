@@ -48,7 +48,7 @@ def test_normalize_by_median_loadgraph_with_args():
 
 
 def test_normalize_by_median_empty_file():
-    infile, in_dir = utils.get_temp_data('empty-file', 'empty')
+    infile, in_dir = utils.copy_test_data('empty-file', 'empty')
     script = 'normalize-by-median.py'
 
     args = [infile]
