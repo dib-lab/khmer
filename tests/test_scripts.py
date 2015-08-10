@@ -3624,22 +3624,6 @@ def test_unique_kmers_defaults():
     assert 'Total estimated number of unique 20-mers: 3950' in err
 
 
-def test_unique_kmers_streaming():
-    infile = utils.get_temp_filename('random-20-a.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
-
-    args = ['-k', '20', '-e', '0.01', '--stream-out', infile]
-
-    _, out, err = utils.runscript('unique-kmers.py', args,
-                                  os.path.dirname(infile))
-
-    err = err.splitlines()
-    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
-            in err)
-    assert 'Total estimated number of unique 20-mers: 3950' in err
-    assert "CCAACCATGGTAGGTTAGGAAAGCCGCCAAATAAGTTCTTATACG" in out, out
-
-
 def test_unique_kmers_report_fp():
     infile = utils.get_temp_filename('random-20-a.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)

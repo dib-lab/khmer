@@ -69,6 +69,8 @@ struct Read {
         sequence.clear( );
         quality.clear( );
     }
+
+    void write_to(std::ostream&);
 };
 
 typedef std:: pair< Read, Read >	ReadPair;
