@@ -24,6 +24,21 @@ Reservoir sampling script extracts paired reads by default
 default.  This can be overridden to match previous behavior
 with :option:`--force_single`.
 
+New scripts
+===========
+
+Estimate number of unique kmers
+-------------------------------
+
+`unique-kmers.py` estimates the k-mer cardinality of a dataset using the
+HyperLogLog probabilistic data structure. This allows very low memory
+consumption, which can be configured through an expected error rate.
+Even with low error rate (and higher memory consumption), it is still much
+more efficient than exact counting and alternative methods.
+It supports multicore processing (using OpenMP) and streaming,
+and so can be used in conjunction with other scripts (like
+`normalize-by-median.py` and `filter-abund.py`).
+
 Incompatible changes
 ====================
 
