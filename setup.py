@@ -102,23 +102,26 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
+    "traversal"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter"])
+    "hllcounter", "traversal"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
-EXTRA_COMPILE_ARGS = ['-O3', ]
+# Don't forget to update lib/Makefile with these flags!
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-O0']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
+                               '-stdlib=libc++'])
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])

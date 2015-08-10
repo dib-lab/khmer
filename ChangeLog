@@ -1,3 +1,28 @@
+2015-08-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/traversal.{cc,hh}: Add new files with unified traversal machinery.
+   Introduce Traverser class to handle finding neighbors and appropriate
+   bitmasking.
+   * khmer/_khmer.cc,lib/{counting,hashbits,hashtable,labelhash,subset}.{cc,hh}:
+   Updated relevant instances of HashIntoType and KMerIterator to use new Kmer
+   and KmerIterator, respectively.
+   * lib/Makefile: Add -std=c++11 flag.
+   * Makefile: Update -std=c++11 flag in libtest target.
+   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser. 
+   Change kmer_degree to use functions from traversal.cc. Remove redundant
+   count_kmers_with_radius in favor of calc_connected_graph_size. Update
+   traverse_from_kmer to use Traverser. Hashtable subclasses KmerFactory.
+   * lib/{hashtable.hh,kmer_hash.{cc,hh}}: Move KmerIterator from hashtable.hh
+   to kmer_hash.{cc,hh}. Add Kmer class to store forward, reverse, and
+   uniqified integer representations of k-mers, and to handle string
+   conversion. Update KmerIterator to emit objects of type Kmer and to subclass 
+   KmerFactory; add doxygen markup.
+   * lib/khmer.hh: Forward declare Kmer and typedef new Kmer data structures.
+   * lib/subset.{cc,hh}: Move constructor definition to .cc file. Remove
+   queue_neighbors in favor of new traversal machinery. Update find_all_tags, 
+   sweep_for_tags, and find_all_tags_truncate_on_abundance to use Traverser.
+   * setup.py: Add traversal.{cc,hh} to deps.
+
 2015-08-10  Luiz Irber  <khmer@luizirber.org>
 
    * scripts/unique-kmers.py: use consume_fasta again.

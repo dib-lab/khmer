@@ -4,6 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
+SHELL=bash
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
@@ -220,9 +221,9 @@ libtest: FORCE
 	test -f install_target/include/oxli/khmer.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-static -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-static -I install_target/include \
 		lib/test-compile.cc install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-dynamic -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-dynamic -I install_target/include \
 		-L install_target/lib lib/test-compile.cc -loxli
 	rm -rf install_target
 
@@ -244,7 +245,7 @@ coverity-build:
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
-		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
+		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr ${TESTATTR} ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
