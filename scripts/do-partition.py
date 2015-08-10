@@ -40,16 +40,6 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
 
-# Debugging Support
-if "Linux" == platform.system():
-    def __debug_vm_usage(msg):
-        print("===> DEBUG: " + msg, file=sys.stderr)
-        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print(vmstat)
-else:
-    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
-        pass
-
 
 def worker(queue, basename, stop_big_traversals):
     while True:

@@ -26,18 +26,6 @@ import sys
 from khmer.khmer_args import (add_threading_args, info)
 from khmer.kfile import check_input_files
 
-# Debugging Support
-import re
-import platform
-if "Linux" == platform.system():
-    def __debug_vm_usage(msg):
-        print("===> DEBUG: " + msg, file=sys.stderr)
-        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print(vmstat, file=sys.stderr)
-else:
-    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
-        pass
-
 # stdlib queue module was renamed on Python 3
 try:
     import queue
