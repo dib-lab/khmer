@@ -1,3 +1,11 @@
+2015-08-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * khmer/khmer_args.py: pep8
+   * scripts/{interleave-reads,load-graph}.py: Removed unreachable code
+   * tests/test-data/{paired-broken.fq.badleft,paired-broken.fq.badright,
+   paired-broken.fq.paired.bad}: added test data files
+   * tests/{test_normalize_by_median,test_scripts}.py: added tests
+
 2015-08-07  Titus Brown  <titus@idyll.org>
 
   * khmer/_khmer.cc,lib/hashbits.{cc,hh}: removed overlap functionality;

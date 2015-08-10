@@ -43,7 +43,7 @@ def test_normalize_by_median_loadgraph_with_args():
 
     script = "normalize-by-median.py"
     args = ["--ksize", "7", "--loadgraph", tablefile, infile]
-    (status, out, err) = utils.runscript(script, args)
+    (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'WARNING: You are loading a saved k-mer countgraph from' in err, err
 
 
