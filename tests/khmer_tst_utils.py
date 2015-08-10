@@ -45,6 +45,12 @@ def get_temp_filename(filename, tempdir=None):
     return os.path.join(tempdir, filename)
 
 
+def get_temp_data(datafile, filename, tempdir=None):
+    filename = get_temp_filename(filename, tempdir)
+    shutil.copyfile(get_test_data(datafile), filename)
+    return filename, os.path.dirname(filename)
+
+
 def cleanup():
     global cleanup_list
 

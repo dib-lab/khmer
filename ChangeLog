@@ -1,3 +1,8 @@
+2015-08-10  Jacob Fenton  <bocajntonef@gmail.com>
+
+   * tests/{khmer_tst_utils,test_normalize_by_median}.py: added new utility
+   function and proof-of-concept
+
 2015-08-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/khmer_args.py: pep8
