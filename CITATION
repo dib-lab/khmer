@@ -30,8 +30,8 @@ If you use the khmer software, you must cite:
       url = "http://dx.doi.org/10.6084/m9.figshare.979190"
   }
 
-If you use any of our published scientific methods, you should *also*
-cite the relevant paper(s), as directed below. Additionally some scripts use
+If you use any of our published scientific methods you should *also*
+cite the relevant paper(s) as directed below. Additionally some scripts use
 the `SeqAn library <http://www.seqan.de>`_ for read parsing: the full citation
 for that library is also included below.
 
