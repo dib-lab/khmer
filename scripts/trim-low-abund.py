@@ -61,7 +61,7 @@ def get_parser():
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use ``load-into-counting.py`` and ``filter-abund.py``.  However, read
+    use ``load-into-countgraph.py`` and ``filter-abund.py``.  However, read
     pairs will be kept together, in "broken-paired" format; you can use
     ``extract-paired-reads.py`` to extract read pairs and orphans.
 

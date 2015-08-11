@@ -1416,7 +1416,7 @@ def test_abund_dist_gz_bigcount():
     infile = utils.get_temp_filename('test.fa')
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     outfile = utils.get_temp_filename('test_ct.gz')
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     htfile = utils.get_temp_filename('test_ct')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
     utils.runscript(script, args)  # create a bigcount table

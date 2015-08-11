@@ -40,7 +40,7 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 table.ct data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 table.ct data/100k-filtered.fa
         filter-abund.py -C 2 table.ct data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(

@@ -41,7 +41,7 @@ def test_check_space():
 
 
 def test_load_into_counting():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -55,7 +55,7 @@ def test_load_into_counting():
 
 
 def test_load_into_counting_tablesize_warning():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -69,7 +69,7 @@ def test_load_into_counting_tablesize_warning():
 
 
 def test_load_into_counting_max_memory_usage_parameter():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-M', '2e3', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -86,7 +86,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
 
 def test_load_into_counting_abundance_dist_nobig():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-b']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -108,7 +108,7 @@ def test_load_into_counting_abundance_dist_nobig():
 
 
 def test_load_into_counting_nonwritable():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('test-nonwritable')
@@ -127,7 +127,7 @@ def test_load_into_counting_nonwritable():
 
 @attr('huge')
 def test_load_into_counting_toobig():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -141,7 +141,7 @@ def test_load_into_counting_toobig():
 
 
 def test_load_into_counting_fail():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out.ct')
@@ -156,7 +156,7 @@ def test_load_into_counting_fail():
 
 
 def test_load_into_counting_multifile():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -171,7 +171,7 @@ def test_load_into_counting_multifile():
 
 
 def test_load_into_counting_tsv():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -194,7 +194,7 @@ def test_load_into_counting_tsv():
 
 
 def test_load_into_counting_json():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -225,7 +225,7 @@ def test_load_into_counting_json():
 
 
 def test_load_into_counting_bad_summary_fmt():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -239,7 +239,7 @@ def test_load_into_counting_bad_summary_fmt():
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
     if not BIGCOUNT:
@@ -3272,7 +3272,7 @@ def test_trim_low_abund_trimtest_after_load():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
-    utils.runscript('load-into-counting.py', args, in_dir)
+    utils.runscript('load-into-countgraph.py', args, in_dir)
 
     args = ["-Z", "2", "-C", "2", "-V", '--loadtable', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
