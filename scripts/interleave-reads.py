@@ -49,8 +49,8 @@ def get_parser():
 
     Example::
 
-             interleave-reads.py tests/test-data/paired.fq.1 \
-                     tests/test-data/paired.fq.2 -o paired.fq"""
+             interleave-reads.py tests/test-data/paired.fq.1 \\
+                tests/test-data/paired.fq.2 -o paired.fq"""
     parser = argparse.ArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
         epilog=textwrap.dedent(epilog),
