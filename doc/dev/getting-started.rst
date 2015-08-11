@@ -367,3 +367,26 @@ contribution). Then we merge those changes into your local copy of the
 master branch.
 
 Now, you can go back to `Claiming an issue and starting to develop`_.
+
+Advanced merging with git-merge-changelog
+-----------------------------------------
+
+Often one can get a merge conflict due to updates in the ChangeLog. To teach
+Git how to handle these on its own you can install a special merge driver.
+
+On Debian & Ubuntu systems you'll need the `git-merge-changelog` package::
+
+        sudo apt-get install git-merge-changelog
+
+Ubuntu 14.04 LTS users will need to add an external repository that contains a
+backport of the package first before installing::
+
+        sudo apt-add-repository ppa:misterc/gedlab
+        sudo apt-get update
+        sudo apt-get install git-merge-changelog
+
+Everyone should then update their `~/.gitconfig` file with the following::
+
+        [merge "merge-changelog"]
+                  name = GNU-style ChangeLog merge driver
+                  driver = /usr/bin/git-merge-changelog %O %A %B
