@@ -9,3 +9,6 @@ https://github.com/dib-lab/khmer/issues/266
 
 BSD users will need to download khmer and install using `make CC="cc -fPIC"
 install`. https://github.com/dib-lab/khmer/issues/719
+
+Some very badly formatted FASTA/FASTQ files will silently be accepted without
+error. https://github.com/dib-lab/khmer/issues/884
