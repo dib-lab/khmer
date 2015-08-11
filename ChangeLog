@@ -1,3 +1,20 @@
+2015-08-11  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * CITATION, doc/{index,introduction,user/scripts}.rst: formatting fixes
+   * Makefile: PDF building hints, tweaked dependencies, update coverity URL
+   * doc/conf.py: don't generate a module index
+   * doc/contributors.rst: formatting, remove references to old lab
+   * doc/dev/coding-guidelines-and-review.rst: add C++ version standard
+   * doc/dev/getting-started.rst: ccache, git-merge-changelog, and advanced
+   commit squashing
+   * doc/user/biblio.rst: added links to khmer citation collections
+   * doc/user/examples.rst: linked to online version of example scripts
+   * doc/user/guide.rst: commented out empty section, added BSD note
+   * lib/counting.{cc},lib/*.hh: c++11 fixes: remove unneeded trailing
+   semicolons
+   * scripts/*.py: line-wrap & scrub output
+   * setup.py: turn optimizations back on and -pedantic
+
 2015-08-11  Kevin Murray  <spam@kdmurray.id.au>
 
    * lib/Makefile: Fix SONAME and ABI versioning to sync with Debian standard
