@@ -9,8 +9,8 @@
 """
 Count the median/avg k-mer abundance for each sequence in the input file.
 
-The abundance is based on the k-mer counts in the given k-mer counting
-table.  Can be used to estimate expression levels (mRNAseq) or coverage
+The abundance is based on the k-mer counts in the given k-mer countgraph.
+Can be used to estimate expression levels (mRNAseq) or coverage
 (genomic/metagenomic).
 
 % scripts/count-median.py <htname> <input seqs> <output counts>
@@ -36,7 +36,7 @@ from khmer.khmer_args import info, sanitize_epilog
 def get_parser():
     epilog = """
     Count the median/avg k-mer abundance for each sequence in the input file,
-    based on the k-mer counts in the given k-mer counting table.  Can be used
+    based on the k-mer counts in the given k-mer countgraph.  Can be used
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
 
     The output file contains sequence id, median, average, stddev, and
@@ -52,8 +52,8 @@ def get_parser():
         description='Count k-mers summary stats for sequences',
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('ctfile', metavar='input_counting_table_filename',
-                        help='input k-mer count table filename')
+    parser.add_argument('countgraph', metavar='input_count_graph_filename',
+                        help='input k-mer countgraph filename')
     parser.add_argument('input', metavar='input_sequence_filename',
                         help='input FAST[AQ] sequence filename')
     parser.add_argument('output', metavar='output_summary_filename',
@@ -70,7 +70,7 @@ def main():
     info('count-median.py', ['diginorm'])
     args = sanitize_epilog(get_parser()).parse_args()
 
-    htfile = args.ctfile
+    htfile = args.countgraph
     input_filename = args.input
     output = args.output
     output_filename = str(output)
@@ -81,9 +81,9 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading k-mer counting table from', htfile, file=sys.stderr)
-    htable = khmer.load_counting_hash(htfile)
-    ksize = htable.ksize()
+    print('loading k-mer countgraph from', htfile, file=sys.stderr)
+    countgraph = khmer.load_countgraph(htfile)
+    ksize = countgraph.ksize()
     print('writing to', output_filename, file=sys.stderr)
 
     output = csv.writer(output)
@@ -96,7 +96,7 @@ def main():
             seq = seq.replace('N', 'A')
 
         if ksize <= len(seq):
-            medn, ave, stdev = htable.get_median_count(seq)
+            medn, ave, stdev = countgraph.get_median_count(seq)
             ave, stdev = [round(x, 9) for x in (ave, stdev)]
             output.writerow([record.name, medn, ave, stdev, len(seq)])
 

@@ -50,7 +50,7 @@ def get_parser():
     Example::
 
              interleave-reads.py tests/test-data/paired.fq.1 \\
-                tests/test-data/paired.fq.2 -o paired.fq"""
+                     tests/test-data/paired.fq.2 -o paired.fq"""
     parser = argparse.ArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
         epilog=textwrap.dedent(epilog),
@@ -81,16 +81,6 @@ def main():
     s2_file = args.right
 
     fail = False
-    if not os.path.exists(s1_file):
-        print("Error! R1 file %s does not exist" % s1_file, file=sys.stderr)
-        fail = True
-
-    if not os.path.exists(s2_file):
-        print("Error! R2 file %s does not exist" % s2_file, file=sys.stderr)
-        fail = True
-
-    if fail and not args.force:
-        sys.exit(1)
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 

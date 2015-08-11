@@ -26,10 +26,25 @@ def test_normalize_by_median_indent():
     hashfile = utils.get_test_data('normC20k20.ct')
     outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = 'normalize-by-median.py'
-    args = ['--loadtable', hashfile, '-o', outfile, infile]
+    args = ['--loadgraph', hashfile, '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
     assert os.path.exists(outfile)
+
+
+def test_normalize_by_median_loadgraph_with_args():
+    infile = utils.get_test_data("test-abund-read-2.fa")
+    tablefile = utils.get_temp_filename("table")
+    in_dir = os.path.dirname(tablefile)
+
+    script = "load-into-countgraph.py"
+    args = [tablefile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    script = "normalize-by-median.py"
+    args = ["--ksize", "7", "--loadgraph", tablefile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert 'WARNING: You are loading a saved k-mer countgraph from' in err, err
 
 
 def test_normalize_by_median_empty_file():
@@ -78,7 +93,7 @@ def test_normalize_by_median_quiet():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '-k', '17', '--quiet', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--quiet', '-M', '2e6', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(out) == 0, out
@@ -117,7 +132,7 @@ def test_normalize_by_median_sanity_check_0():
     script = 'normalize-by-median.py'
     args = ['-U', '1024', '--max-mem', '60', infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status != 0
+    assert status != 0, status
     assert "recommended false positive ceiling of 0.1!" in err, err
 
 
@@ -144,8 +159,28 @@ def test_normalize_by_median_sanity_check_2():
     args = ['-U', '83', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert "*** INFO: set memory ceiling using auto optimization." in err, err
-    assert "*** Ceiling is: 399 bytes" in err, err
+    assert "*** INFO: set memory ceiling automatically." in err, err
+    assert "*** Ceiling is: 1e+06 bytes" in err, err
+
+
+def test_normalize_by_median_sanity_check_3():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    tablefile = utils.get_temp_filename('table', in_dir)
+
+    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-s', tablefile, '-U', '83', '--fp-rate', '0.7', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert "Overriding default fp 0.1 with new fp: 0.7" in err, err
+
+    args = ['--loadgraph', tablefile, '-U', '83', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert "WARNING: You have asked that the graph size be auto" in err, err
+    assert "NOT be set automatically" in err, err
+    assert "loading an existing graph" in err, err
 
 
 def test_normalize_by_median_unforced_badfile():
@@ -308,7 +343,7 @@ def test_normalize_by_median_unpaired_and_paired():
     args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of unique k-mers: 4030' in err, err
+    assert 'Total number of unique k-mers: 4061' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -514,14 +549,14 @@ def test_normalize_by_median_no_bigcount():
     counting_ht = _make_counting(infile, K=8)
 
     script = 'normalize-by-median.py'
-    args = ['-C', '1000', '-k 8', '--savetable', hashfile, infile]
+    args = ['-C', '1000', '-k 8', '--savegraph', hashfile, infile]
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
     print((out, err))
 
     assert os.path.exists(hashfile), hashfile
-    kh = khmer.load_counting_hash(hashfile)
+    kh = khmer.load_countgraph(hashfile)
 
     assert kh.get('GGTTGACG') == 255
 
@@ -542,7 +577,7 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
-def test_normalize_by_median_emptycountingtable():
+def test_normalize_by_median_emptycountgraph():
     CUTOFF = '1'
 
     infile = utils.get_temp_filename('test.fa')
@@ -551,7 +586,7 @@ def test_normalize_by_median_emptycountingtable():
     shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', CUTOFF, '--loadtable', infile, infile]
+    args = ['-C', CUTOFF, '--loadgraph', infile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
     assert 'ValueError' in err, (status, out, err)

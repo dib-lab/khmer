@@ -14,7 +14,7 @@ K = 32
 
 
 def main():
-    ht = khmer.Hashbits(K, 1, 1)
+    ht = khmer.Nodegraph(K, 1, 1)
 
     x = [0] * 255
     y = [0] * 255

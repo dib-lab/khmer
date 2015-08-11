@@ -6,6 +6,8 @@
 *.swp
 *.egg-info
 *.egg
+.tags*
+cscope*
 *~
 build
 dist

@@ -65,10 +65,14 @@ Good ideas to rewrite using newer tools/approaches:
 * assembly-diff.py - find sequences that differ between two assemblies
 * assembly-diff-2.py - find subsequences that differ between two assemblies
 * bloom-count.py - count # of unique k-mers; should be reimplemented with HyperLogLog, Renamed from bloom_count.py in commit 4788c31
-* bloom-count-intersection.py - look at unique and disjoint #s of k-mers, Renamed from bloom_count_intersection.py in commit 4788c31.
 * split-sequences-by-length.py - break up short reads by length
 
 ----
+
+Present in commit 19b0a09353cddc45070edcf1283cae2c83c13b0e but removed
+thereafter:
+
+* `bloom-count-intersection.py <https://github.com/dib-lab/khmer/blob/19b0a09353cddc45070edcf1283cae2c83c13b0e/sandbox/bloom-count-intersection.py>`__ - look at unique and disjoint #s of k-mers, renamed from bloom_count_intersection.py in commit 4788c31.
 
 Present in commit d295bc847 but removed thereafter:
 

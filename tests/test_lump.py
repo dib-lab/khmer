@@ -19,7 +19,7 @@ from nose.plugins.attrib import attr
 def test_fakelump_together():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
@@ -35,7 +35,7 @@ def test_fakelump_stop():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     for line in open(fakelump_stoptags_txt):
@@ -53,7 +53,7 @@ def test_fakelump_stop():
 def test_fakelump_stop2():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     ht.add_stop_tag('GGGGAGGGGTGCAGTTGTGACTTGCTCGAGAG')
@@ -71,7 +71,7 @@ def test_fakelump_repartitioning():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
@@ -88,7 +88,7 @@ def test_fakelump_repartitioning():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.CountingHash(32, 1e5, 4)
+    counting = khmer.Countgraph(32, 1e5, 4)
 
     ht.repartition_largest_partition(None, counting,
                                      EXCURSION_DISTANCE,
@@ -99,7 +99,7 @@ def test_fakelump_repartitioning():
 
     # ok, now re-do everything with these stop tags, specifically.
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
     ht.load_stop_tags(fakelump_fa_foo)
 
@@ -114,7 +114,7 @@ def test_fakelump_load_stop_tags_trunc():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
-    ht = khmer.Hashbits(32, 1e5, 4)
+    ht = khmer.Nodegraph(32, 1e5, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
@@ -131,7 +131,7 @@ def test_fakelump_load_stop_tags_trunc():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer._CountingHash(32, [5, 7, 11, 13])
+    counting = khmer._Countgraph(32, [5, 7, 11, 13])
 
     ht.repartition_largest_partition(None, counting,
                                      EXCURSION_DISTANCE,
@@ -146,7 +146,7 @@ def test_fakelump_load_stop_tags_trunc():
     fp.close()
 
     # ok, now try loading these stop tags; should fail.
-    ht = khmer._Hashbits(32, [5, 7, 11, 13])
+    ht = khmer._Nodegraph(32, [5, 7, 11, 13])
     ht.consume_fasta_and_tag(fakelump_fa)
 
     try:
@@ -160,7 +160,7 @@ def test_fakelump_load_stop_tags_notexist():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     # ok, now try loading these stop tags; should fail.
-    ht = khmer._Hashbits(32, [5, 7, 11, 13])
+    ht = khmer._Nodegraph(32, [5, 7, 11, 13])
 
     try:
         ht.load_stop_tags(fakelump_fa_foo)

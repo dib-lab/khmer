@@ -103,26 +103,27 @@ def test_get_primes_fal():
         assert "unable to find 5 prime numbers < 5" in str(err)
 
 
-def test_extract_countinghash_info_badfile():
+def test_extract_countgraph_info_badfile():
     try:
-        khmer.extract_countinghash_info(
+        khmer.extract_countgraph_info(
             utils.get_test_data('test-abund-read-2.fa'))
         assert 0, 'this should fail'
     except ValueError:
         pass
 
 
-def test_extract_countinghash_info():
+def test_extract_countgraph_info():
     fn = utils.get_temp_filename('test_extract_counting.ct')
     for size in [1e6, 2e6, 5e6, 1e7]:
-        ht = khmer.CountingHash(25, size, 4)
+        ht = khmer.Countgraph(25, size, 4)
         ht.save(fn)
 
         try:
-            info = khmer.extract_countinghash_info(fn)
+            info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
+            raise
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _ = info
+        ksize, table_size, n_tables, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
@@ -135,27 +136,27 @@ def test_extract_countinghash_info():
             assert 0, '...failed to remove ' + fn + str(err)
 
 
-def test_extract_hashbits_info_badfile():
+def test_extract_nodegraph_info_badfile():
     try:
-        khmer.extract_hashbits_info(
+        khmer.extract_nodegraph_info(
             utils.get_test_data('test-abund-read-2.fa'))
         assert 0, 'this should fail'
     except ValueError:
         pass
 
 
-def test_extract_hashbits_info():
-    fn = utils.get_temp_filename('test_extract_hashbits.pt')
+def test_extract_nodegraph_info():
+    fn = utils.get_temp_filename('test_extract_nodegraph.pt')
     for size in [1e6, 2e6, 5e6, 1e7]:
-        ht = khmer.Hashbits(25, size, 4)
+        ht = khmer.Nodegraph(25, size, 4)
         ht.save(fn)
 
-        info = khmer.extract_hashbits_info(fn)
-        ksize, table_size, n_tables, _, _ = info
+        info = khmer.extract_nodegraph_info(fn)
+        ksize, table_size, n_tables, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
-        assert table_size == size
+        assert table_size == size, table_size
         assert n_tables == 4
 
         try:

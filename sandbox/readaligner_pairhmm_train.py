@@ -40,7 +40,7 @@ def main():
 
     args = parser.parse_args()
 
-    ht = khmer.load_counting_hash(args.ht)
+    ht = khmer.load_countgraph(args.ht)
     samfile = pysam.Samfile(args.bam_file)
 
     k = ht.ksize()

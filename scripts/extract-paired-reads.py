@@ -47,13 +47,13 @@ def get_parser():
     contains orphan sequences.
 
     The directory into which the interleaved and orphaned reads are
-    output may be specified using :option:`-o`/:option:`--output-dir`.
+    output may be specified using :option:`-d`/:option:`--output-dir`.
     This directory will be created if it does not already exist.
 
     Alternatively, you can specify the filenames directly with
     :option:`-p`/:option:`--output-paired` and
     :option:`-s`/:option:`--output-single`, which will override the
-    :option:`-o`/:option:`--output-dir` option.
+    :option:`-d`/:option:`--output-dir` option.
 
     Example::
 
@@ -66,7 +66,7 @@ def get_parser():
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
 
-    parser.add_argument('-o', '--output-dir', default='', help='Output '
+    parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
 

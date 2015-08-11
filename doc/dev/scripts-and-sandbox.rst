@@ -38,7 +38,7 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a hash-bang line (``#! /usr/bin/env python2``) at the top
+* have a hash-bang line (``#! /usr/bin/env python``) at the top
 * be command-line executable (``chmod a+x``)
 * have a Copyright message (see below)
 * have lowercase names

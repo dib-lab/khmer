@@ -55,7 +55,7 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   
   # the next command will create a '50m.ct' and a '50m.tagset',
   # representing the de Bruijn graph
-  load-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz 
+  load-into-nodegraph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz 
   
   # this will then partition that graph. should take a while.
   # update threads to something higher if you have more cores.
@@ -81,7 +81,7 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   mv iowa-corn-50m.group0005.fa corn-50m.lump.fa
   
   # create graph,
-  load-graph.py -x 8e9 lump corn-50m.lump.fa
+  load-into-nodegraph.py -x 8e9 lump corn-50m.lump.fa
 
   # create an initial set of stoptags to help in knot-traversal; otherwise,
   # partitioning and knot-traversal (which is systematic) is really expensive.
@@ -102,7 +102,7 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   # fasta, therefore if your files are fastq formatted you need
   # to append 'fastq' to the name so that 'load-graph.py' 
   # will parse the file correctly
-  load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
+  load-into-nodegraph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
   partition-graph.py -T 4 lumpfilt
   merge-partitions.py lumpfilt
   annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt

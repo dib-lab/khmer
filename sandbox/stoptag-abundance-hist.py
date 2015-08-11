@@ -20,7 +20,7 @@ def main():
     filename = sys.argv[2]
     figure = sys.argv[3]
 
-    ht = khmer.load_counting_hash(hashfile)
+    ht = khmer.load_countgraph(hashfile)
 
     outabund = open(os.path.basename(filename) + '.counts', 'w')
 

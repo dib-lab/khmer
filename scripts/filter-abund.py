@@ -7,12 +7,12 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Sequence trimming by abundance using counting table.
+Sequence trimming by abundance using countgraph.
 
-Trim sequences at k-mers of the given abundance, based on the given counting
-hash table.  Output sequences will be placed in 'infile.abundfilt'.
+Trim sequences at k-mers of the given abundance, based on the given countgraph.
+Output sequences will be placed in 'infile.abundfilt'.
 
-% python scripts/filter-abund.py <counting.ct> <data1> [ <data2> <...> ]
+% python scripts/filter-abund.py <coungraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -41,15 +41,15 @@ def get_parser():
 
     Example::
 
-        load-into-countgraph.py -k 20 -x 5e7 table.ct data/100k-filtered.fa
-        filter-abund.py -C 2 table.ct data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
+        filter-abund.py -C 2 countgraph data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(
         description='Trim sequences at a minimum k-mer abundance.',
         epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
-    parser.add_argument('input_table', metavar='input_counting_table_filename',
-                        help='The input k-mer counting table filename')
+    parser.add_argument('input_graph', metavar='input_count_graph_filename',
+                        help='The input k-mer countgraph filename')
     parser.add_argument('input_filename', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
@@ -64,7 +64,7 @@ def get_parser():
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
-    parser.add_argument('-o', '--out', dest='single_output_file',
+    parser.add_argument('-o', '--output', dest='single_output_file',
                         type=argparse.FileType('wb'),
                         metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
@@ -82,7 +82,7 @@ def main():
     info('filter-abund.py', ['counting'])
     args = sanitize_epilog(get_parser()).parse_args()
 
-    check_input_files(args.input_table, args.force)
+    check_input_files(args.input_graph, args.force)
     infiles = args.input_filename
     if ('-' in infiles or '/dev/stdin' in infiles) and not \
        args.single_output_file:
@@ -95,10 +95,10 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading counting table:', args.input_table,
+    print('loading countgraph:', args.input_graph,
           file=sys.stderr)
-    htable = khmer.load_counting_hash(args.input_table)
-    ksize = htable.ksize()
+    countgraph = khmer.load_countgraph(args.input_graph)
+    ksize = countgraph.ksize()
 
     print("K:", ksize, file=sys.stderr)
 
@@ -109,11 +109,11 @@ def main():
         seqN = seq.replace('N', 'A')
 
         if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = htable.get_median_count(seqN)
+            med, _, _ = countgraph.get_median_count(seqN)
             if med < args.normalize_to:
                 return name, seq
 
-        _, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
+        _, trim_at = countgraph.trim_on_abundance(seqN, args.cutoff)
 
         if trim_at >= ksize:
             # be sure to not to change the 'N's in the trimmed sequence -

@@ -29,8 +29,7 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import argparse
 import khmer, oxli
-from khmer.khmer_args import info, sanitize_epilog
-from oxli.functions import optimal_size
+from khmer.khmer_args import info, optimal_size, sanitize_epilog
 import textwrap
 import sys
 

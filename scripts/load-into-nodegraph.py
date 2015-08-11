@@ -16,13 +16,13 @@ Use '-h' for parameter help.
 
 import sys
 
-from khmer.khmer_args import build_hashbits_args
+from khmer.khmer_args import build_nodegraph_args
 from oxli import build_graph
 
 
 def get_parser():
-    parser = build_hashbits_args(descr="Load sequences into the compressible "
-                                       "graph format plus optional tagset.")
+    parser = build_nodegraph_args(descr="Load sequences into the compressible "
+                                  "graph format plus optional tagset.")
 
     parser = build_graph.build_parser(parser)
     return parser
@@ -30,6 +30,5 @@ def get_parser():
 
 if __name__ == '__main__':
     build_graph.main(get_parser().parse_args())
-    sys.exit(0)
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

@@ -26,7 +26,7 @@ import khmer
 from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
                               _VersionStdErrAction, sanitize_epilog)
 from khmer.utils import write_record
-from oxli.functions import optimal_args_output_gen as output_gen
+from khmer.khmer_args import graphsize_args_report
 from khmer import __version__
 import screed
 
@@ -117,11 +117,7 @@ def main():
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        for record in screed.open(input_filename):
-            seq = record.sequence.upper().replace('N', 'A')
-            hllcpp.consume_string(seq)
-            if args.stream_out:
-                write_record(record, sys.stdout)
+        hllcpp.consume_fasta(input_filename, stream_out=args.stream_out)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(
@@ -138,7 +134,7 @@ def main():
           args.ksize, cardinality),
           file=sys.stderr)
 
-    to_print = output_gen(cardinality, args.error_rate)
+    to_print = graphsize_args_report(cardinality, args.error_rate)
     if args.diagnostics:
         print(to_print, file=sys.stderr)
 

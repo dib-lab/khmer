@@ -4,6 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
+SHELL=bash
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
@@ -73,7 +74,7 @@ clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc
+	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
@@ -127,10 +128,10 @@ diff_pep8_report: pep8_report.txt
 ## pep257      : check Python code style
 pep257: $(PYSOURCES) $(wildcard tests/*.py)
 	pep257 --ignore=D100,D101,D102,D103 \
-		setup.py khmer/ scripts/ tests/ || true
+		setup.py khmer/ scripts/ tests/ oxli/ || true
 
 pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 setup.py khmer/ scripts/ tests/ \
+	pep257 setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep257_report.txt 2>&1 || true
 
 diff_pep257_report: pep257_report.txt
@@ -224,9 +225,9 @@ libtest: FORCE
 	test -f install_target/include/oxli/khmer.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-static -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-static -I install_target/include \
 		lib/test-compile.cc install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-dynamic -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-dynamic -I install_target/include \
 		-L install_target/lib lib/test-compile.cc -loxli
 	rm -rf install_target
 
@@ -248,7 +249,7 @@ coverity-build:
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
-		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
+		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr ${TESTATTR} ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
@@ -281,6 +282,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+# may need to `sudo apt-get install bear`
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext

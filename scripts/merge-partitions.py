@@ -61,7 +61,7 @@ def main():
           (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
     ksize = args.ksize
-    htable = khmer.Hashbits(ksize, 1, 1)
+    nodegraph = khmer.Nodegraph(ksize, 1, 1)
 
     for _ in pmap_files:
         check_input_files(_, args.force)
@@ -70,10 +70,10 @@ def main():
 
     for pmap_file in pmap_files:
         print('merging', pmap_file, file=sys.stderr)
-        htable.merge_subset_from_disk(pmap_file)
+        nodegraph.merge_subset_from_disk(pmap_file)
 
     print('saving merged to', output_file, file=sys.stderr)
-    htable.save_partitionmap(output_file)
+    nodegraph.save_partitionmap(output_file)
 
     if args.remove_subsets:
         print('removing pmap files', file=sys.stderr)

@@ -23,7 +23,7 @@ import os.path
 import os
 import textwrap
 from khmer import khmer_args
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
                               add_threading_args, sanitize_epilog)
 import glob
 from khmer.kfile import check_input_files, check_space
@@ -40,21 +40,11 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
 
-# Debugging Support
-if "Linux" == platform.system():
-    def __debug_vm_usage(msg):
-        print("===> DEBUG: " + msg, file=sys.stderr)
-        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print(vmstat)
-else:
-    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
-        pass
-
 
 def worker(queue, basename, stop_big_traversals):
     while True:
         try:
-            (htable, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = queue.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return
@@ -68,11 +58,11 @@ def worker(queue, basename, stop_big_traversals):
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
-        subset = htable.do_subset_partition(start, stop, True,
-                                            stop_big_traversals)
+        subset = nodegraph.do_subset_partition(start, stop, True,
+                                               stop_big_traversals)
 
         print('saving:', basename, index, file=sys.stderr)
-        htable.save_subset_partitionmap(subset, outfile)
+        nodegraph.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
 
@@ -89,7 +79,7 @@ def get_parser():
     data sets, because :program:`do-partition.py` doesn't provide save/resume
     functionality.
     """
-    parser = build_hashbits_args(
+    parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
         epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
@@ -115,14 +105,14 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
     args = sanitize_epilog(get_parser()).parse_args()
 
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
 
     for infile in args.input_filenames:
         check_input_files(infile, args.force)
 
     check_space(args.input_filenames, args.force)
 
-    print('Saving k-mer presence table to %s' %
+    print('Saving k-mer nodegraph to %s' %
           args.graphbase, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(args.input_filenames), file=sys.stderr)
@@ -134,15 +124,16 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # load-into-nodegraph
 
     print('making nodegraph', file=sys.stderr)
-    htable = khmer_args.create_nodegraph(args)
+    nodegraph = khmer_args.create_nodegraph(args)
 
     for _, filename in enumerate(args.input_filenames):
         print('consuming input', filename, file=sys.stderr)
-        htable.consume_fasta_and_tag(filename)
+        nodegraph.consume_fasta_and_tag(filename)
 
     # 0.18 is ACTUAL MAX. Do not change.
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
+        khmer.calc_expected_collisions(
+            nodegraph, args.force, max_false_pos=.15)
     print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     # partition-graph
@@ -161,7 +152,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     #
 
     # divide the tags up into subsets
-    divvy = htable.divide_tags_into_subsets(int(args.subset_size))
+    divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -172,7 +163,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     for _ in range(0, n_subsets):
         start = divvy[_]
         end = divvy[_ + 1]
-        worker_q.put((htable, _, start, end))
+        worker_q.put((nodegraph, _, start, end))
 
     print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
     open('%s.info' % args.graphbase, 'w').write('%d subsets total\n'
@@ -212,11 +203,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     print('loading %d pmap files (first one: %s)' %
           (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
-    htable = khmer.Hashbits(args.ksize, 1, 1)
+    nodegraph = khmer.Nodegraph(args.ksize, 1, 1)
 
     for pmap_file in pmap_files:
         print('merging', pmap_file, file=sys.stderr)
-        htable.merge_subset_from_disk(pmap_file)
+        nodegraph.merge_subset_from_disk(pmap_file)
 
     if args.remove_subsets:
         print('removing pmap files', file=sys.stderr)
@@ -228,7 +219,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     for infile in args.input_filenames:
         print('outputting partitions for', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.part'
-        part_count = htable.output_partitions(infile, outfile)
+        part_count = nodegraph.output_partitions(infile, outfile)
         print('output %d partitions for %s' % (
             part_count, infile), file=sys.stderr)
         print('partitions are in', outfile, file=sys.stderr)
