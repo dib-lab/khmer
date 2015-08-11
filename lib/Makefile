@@ -124,7 +124,9 @@ LIB_VERSION = 1
 ifeq ($(shell uname), Darwin)
 SHARED_EXT   = dylib
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
-SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) -compatibility_version $(LIB_VERSION) -current_version $(LIB_VERSION)
+SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
+	       -compatibility_version $(LIB_VERSION) \
+	       -current_version $(LIB_VERSION)
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
