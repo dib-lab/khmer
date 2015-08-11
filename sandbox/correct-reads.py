@@ -26,7 +26,7 @@ import textwrap
 import argparse
 
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+                              report_on_config, sanitize_epilog)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -114,8 +114,7 @@ def get_parser():
 
 def main():
     info('correct-reads.py', ['streaming'])
-    parser = get_parser()
-    args = parser.parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     ###
 

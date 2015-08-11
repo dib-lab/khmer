@@ -29,7 +29,7 @@ import sys
 import khmer
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -82,7 +82,7 @@ def get_parser():
 
 def main():
     info('sample-reads-randomly.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     for _ in args.filenames:
         check_input_files(_, args.force)

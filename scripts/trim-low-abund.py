@@ -28,7 +28,8 @@ from screed import Record
 from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config, calculate_tablesize)
+                              report_on_config, calculate_tablesize,
+                              sanitize_epilog)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists, add_output_compression_type,
@@ -112,7 +113,7 @@ def get_parser():
 
 def main():
     info('trim-low-abund.py', ['streaming'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     ###

@@ -38,7 +38,8 @@ from collections import defaultdict
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
@@ -205,7 +206,7 @@ def get_parser():
 
 def main():
     info('sweep-reads-buffered.py', ['sweep'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     if args.max_tablesize < MAX_HSIZE:

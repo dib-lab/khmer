@@ -218,6 +218,13 @@ def add_threading_args(parser):
     parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
 
+
+def sanitize_epilog(parser):
+    parser.epilog = parser.epilog.replace(
+        '//', '/').replace(':option:', '').replace(
+            ':program:', '').replace('::', ':')
+    return parser
+
 _algorithms = {
     'software': 'MR Crusoe et al., '
     '2014. http://dx.doi.org/10.6084/m9.figshare.979190',

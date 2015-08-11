@@ -24,7 +24,8 @@ import threading
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config, info, calculate_tablesize)
+                              report_on_config, info, calculate_tablesize,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_space_for_hashtable)
 
 
@@ -68,7 +69,7 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('abundance-dist-single.py', ['counting', 'SeqAn'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)

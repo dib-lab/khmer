@@ -24,7 +24,7 @@ import os
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
-                              add_threading_args)
+                              add_threading_args, sanitize_epilog)
 import glob
 from khmer.kfile import check_input_files, check_space
 import re
@@ -113,7 +113,7 @@ def get_parser():
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     report_on_config(args, hashtype='nodegraph')
 

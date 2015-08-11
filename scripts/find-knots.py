@@ -24,7 +24,7 @@ import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+                              report_on_config, sanitize_epilog)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes

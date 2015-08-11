@@ -22,7 +22,7 @@ import textwrap
 import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config, info,
-                              calculate_tablesize)
+                              calculate_tablesize, sanitize_epilog)
 from khmer.kfile import check_input_files, check_space
 from khmer.kfile import check_space_for_hashtable
 import argparse
@@ -68,7 +68,7 @@ def get_parser():
 def main():
 
     info('collect-reads.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
     base = args.output_countingtable_filename

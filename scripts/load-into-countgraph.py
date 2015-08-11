@@ -21,8 +21,9 @@ import threading
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args, calculate_tablesize
+from khmer.khmer_args import (build_counting_args, report_on_config, info,
+                              add_threading_args, calculate_tablesize,
+                              sanitize_epilog)
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_hashtable
@@ -73,7 +74,7 @@ def main():
 
     info('load-into-countgraph.py', ['counting', 'SeqAn'])
 
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
     base = args.output_countingtable_filename

@@ -25,7 +25,8 @@ import khmer
 import textwrap
 from khmer import khmer_args
 from khmer.kfile import check_input_files
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+                              sanitize_epilog)
 
 
 def get_parser():
@@ -50,7 +51,7 @@ def get_parser():
 
 def main():
     info('count-overlap.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args, hashtype='nodegraph')
 
     for infile in [args.ptfile, args.fafile]:

@@ -25,7 +25,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space, is_block
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -71,7 +71,7 @@ def get_parser():
 
 def main():
     info('interleave-reads.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     check_input_files(args.left, args.force)
     check_input_files(args.right, args.force)

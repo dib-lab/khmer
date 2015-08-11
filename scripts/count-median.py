@@ -30,7 +30,7 @@ import textwrap
 
 import khmer
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 
 
 def get_parser():
@@ -68,7 +68,7 @@ def get_parser():
 
 def main():
     info('count-median.py', ['diginorm'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     htfile = args.ctfile
     input_filename = args.input

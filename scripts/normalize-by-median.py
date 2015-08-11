@@ -28,7 +28,8 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from oxli import functions as oxutils
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info, calculate_tablesize)
+                              report_on_config, info, calculate_tablesize,
+                              sanitize_epilog)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists, add_output_compression_type,
@@ -191,7 +192,7 @@ def get_parser():
     reads from a fragment, and helps with retention of repeats.)
     Unpaired reads are treated individually.
 
-    If :option:`-p`/`--paired` is set, then proper pairing is required
+    If :option:`-p`/:option:`--paired` is set, then proper pairing is required
     and the script will exit on unpaired reads, although
     :option:`--unpaired-reads` can be used to supply a file of orphan
     reads to be read after the paired reads.
@@ -278,10 +279,7 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
-    parser = get_parser()
-    parser.epilog = parser.epilog.replace(
-        '//', '/').replace(':option:', '').replace(
-            ':program:', '').replace('::', ':')
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
     configure_logging(args.quiet)
     info('normalize-by-median.py', ['diginorm'])

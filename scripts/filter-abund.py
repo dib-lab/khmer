@@ -23,7 +23,8 @@ import textwrap
 import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
+from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer import __version__
@@ -79,7 +80,7 @@ def get_parser():
 
 def main():
     info('filter-abund.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     check_input_files(args.input_table, args.force)
     infiles = args.input_filename

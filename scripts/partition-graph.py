@@ -23,7 +23,7 @@ import os.path
 import argparse
 import khmer
 import sys
-from khmer.khmer_args import (add_threading_args, info)
+from khmer.khmer_args import (add_threading_args, info, sanitize_epilog)
 from khmer.kfile import check_input_files
 
 # Debugging Support
@@ -104,7 +104,7 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     basename = args.basename
 
     filenames = [basename, basename + '.tagset']

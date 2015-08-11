@@ -36,7 +36,8 @@ from collections import defaultdict, deque
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+                              sanitize_epilog)
 
 DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
@@ -100,7 +101,7 @@ class IODeque(deque):
 
 def main():
     #info('sweep-files.py', ['sweep'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     if args.max_tablesize < MIN_HSIZE:

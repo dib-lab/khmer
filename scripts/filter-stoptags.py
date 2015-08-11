@@ -25,7 +25,7 @@ import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -55,7 +55,7 @@ def get_parser():
 
 def main():
     info('filter-stoptags.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 
