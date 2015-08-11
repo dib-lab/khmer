@@ -52,5 +52,5 @@ public:
     unsigned int degree(Kmer& node);
 };
 
-};
+}
 #endif
