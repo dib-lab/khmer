@@ -1,3 +1,8 @@
+2015-08-11  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Fix SONAME and ABI versioning to sync with Debian standard
+   practice.
+
 2015-08-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/traversal.{cc,hh}: Add new files with unified traversal machinery.

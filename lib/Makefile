@@ -118,24 +118,22 @@ else
 VERSION = $(shell ./get_version.py)
 endif
 
-MAJOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\1/')
-MINOR_VERSION = $(shell echo $(VERSION) | sed -e 's/^\([^-\.]*\)\.\([^-\.]*\).*/\2/')
-
-LIB_VERSION = $(MAJOR_VERSION).$(MINOR_VERSION)
+# The ABI version of liboxli
+LIB_VERSION = 1
 
 ifeq ($(shell uname), Darwin)
 SHARED_EXT   = dylib
-SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
-SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) -compatibility_version $(MAJOR_VERSION) -current_version $(LIB_VERSION)
+SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
+SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
+	       -compatibility_version $(LIB_VERSION) \
+	       -current_version $(LIB_VERSION)
 else
 SHARED_EXT   = so
-SONAME       = liboxli.$(SHARED_EXT).$(MAJOR_VERSION)
+SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -Wl,-soname=$(SONAME)
 endif
 
-# The ABI version of liboxli
-LIBVERSION = 1
-LIBKHMERSO=liboxli.$(SHARED_EXT).$(LIB_VERSION)
+LIBKHMERSO=$(SONAME)
 
 CXXFLAGS += -DVERSION=$(VERSION)
 
@@ -250,8 +248,7 @@ install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 		$(PREFIX)/include/oxli/
 	cp oxli.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib
-	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/$(SONAME)
-	ln -sf $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
+	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
 oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
@@ -271,7 +268,6 @@ murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 
 $(LIBKHMERSO): $(LIBKHMER_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
-	ln -sf $(LIBKHMERSO) $(SONAME)
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBKHMER_OBJS)
