@@ -49,12 +49,13 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 def get_parser():
     epilog = """
-    Load an k-mer presence table/tagset pair created by load-graph, and a set
-    of pmap files created by partition-graph. Go through each pmap file,
-    select the largest partition in each, and do the same kind of traversal as
-    in :program:`make-initial-stoptags.py` from each of the waypoints in that
-    partition; this should identify all of the HCKs in that partition. These
-    HCKs are output to <graphbase>.stoptags after each pmap file.
+    Load an k-mer presence table/tagset pair created by load-into-nodegraph,
+    and a set of pmap files created by partition-graph. Go through each pmap
+    file, select the largest partition in each, and do the same kind of
+    traversal as in :program:`make-initial-stoptags.py` from each of the
+    waypoints in that partition; this should identify all of the HCKs in that
+    partition. These HCKs are output to <graphbase>.stoptags after each pmap
+    file.
 
     Parameter choice is reasonably important. See the pipeline in
     :doc:`partitioning-big-data` for an example run.

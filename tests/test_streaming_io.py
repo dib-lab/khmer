@@ -260,7 +260,7 @@ def test_load_graph_1():
 
     cmd = """
        cat {in1} |
-       {scripts}/load-graph.py -x 1e3 -N 2 -k 20 {out1} - \
+       {scripts}/load-into-nodegraph.py -x 1e3 -N 2 -k 20 {out1} - \
        2> /dev/null
     """
 

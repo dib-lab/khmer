@@ -9,7 +9,7 @@
 """
 Build a graph from the given sequences, save in <ptname>.
 
-% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
+% python scripts/load-into-nodegraph.py <ptname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """

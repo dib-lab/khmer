@@ -42,12 +42,12 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 def get_parser():
     epilog = """
-    Loads a k-mer presence table/tagset pair created by load-graph.py, and does
-    a small set of traversals from graph waypoints; on these traversals, looks
-    for k-mers that are repeatedly traversed in high-density regions of the
-    graph, i.e. are highly connected. Outputs those k-mers as an initial set of
-    stoptags, which can be fed into partition-graph.py, find-knots.py, and
-    filter-stoptags.py.
+    Loads a k-mer presence table/tagset pair created by load-into-nodegraph.py,
+    and does a small set of traversals from graph waypoints; on these
+    traversals, looks for k-mers that are repeatedly traversed in high-density
+    regions of the graph, i.e. are highly connected. Outputs those k-mers as
+    an initial set of stoptags, which can be fed into partition-graph.py,
+    find-knots.py, and filter-stoptags.py.
 
     The k-mer counting table size options parameters are for a k-mer counting
     table to keep track of repeatedly-traversed k-mers. The subset size option

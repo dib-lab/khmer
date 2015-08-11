@@ -27,8 +27,7 @@ This should generally be set as high as possible; see
    output the same.  Some scripts may only recognize FASTQ if the file
    ending is '.fq' or '.fastq', at least for now.
 
-   Files ending with '.gz' will be treated as gzipped files, and
-   files ending with '.bz2' will be treated as bzip2'd files.
+   Gzip and bzip2 compressed files are detected using magic bits. 
 
 .. _scripts-counting:
 
