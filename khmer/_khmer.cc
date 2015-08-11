@@ -2566,6 +2566,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
     { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
 
+    // threading
+    { "n_table_locks", (PyCFunction)hashtable_n_table_locks, METH_VARARGS, "Number of blocks in the lock array" },
+    { "is_threadsafe", (PyCFunction)hashtable_is_threadsafe, METH_VARARGS, "Check if the table lock array is initialized" },
+
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -3134,6 +3138,8 @@ static PyMethodDef khmer_counting_methods[] = {
         METH_VARARGS, "Get a list of the raw tables as memoryview objects"
     },
     { "do_subset_partition_with_abundance", (PyCFunction)count_do_subset_partition_with_abundance, METH_VARARGS, "" },
+    { "init_threadsafe", (PyCFunction)count_init_threadsafe, METH_VARARGS, "Initialize the table lock array" },
+
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

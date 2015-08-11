@@ -83,6 +83,7 @@ protected:
         _init_bitstuff();
         partition = new SubsetPartition(this);
         _all_tags_spin_lock = 0;
+
     }
 
     virtual ~Hashtable( )
@@ -143,7 +144,7 @@ public:
 
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
-
+    
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;

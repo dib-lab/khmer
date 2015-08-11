@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+2015-04-08  Camille Scott  <camille.scott.w@gmail.com>
+
+    * lib/{hashtable.hh,counting.hh}: Add array of locks and a new
+    counting function for thread-safe writing to the counting table
+    * khmer/_khmermodule.cc: Expose new functionality to python
+    * tests/test_counting_hash.py: Tests for thread-safety
+=======
 2015-08-10  Camille Scott  <camille.scott.w@gmail.com>
 
    * lib/traversal.{cc,hh}: Add new files with unified traversal machinery.
@@ -978,6 +986,7 @@
    * khmer/file.py (check_file_writable): new function to check writability
    * scripts/load-into-counting.py (main): early check to see if output is
    writable
+>>>>>>> master
 
 2015-04-07  Michael R. Crusoe  <mcrusoe@msu.edu>
 

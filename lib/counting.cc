@@ -22,6 +22,17 @@ using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
+void CountingHash::init_threadsafe(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS) {
+    if(!_threadsafe) {
+        _n_table_locks = n_table_locks < 4 ? 4 : n_table_locks;
+        _table_spinlocks = new uint32_t[_n_table_locks];
+        for (unsigned int i=0; i<_n_table_locks; ++i) {
+            _table_spinlocks[i] = 0;
+        }
+        _threadsafe = true;
+    }
+}
+
 ///
 /// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
 ///

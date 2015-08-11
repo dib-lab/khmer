@@ -20,6 +20,8 @@
 #include "khmer.hh"
 #include "kmer_hash.hh"
 
+#define DEFAULT_TABLE_LOCKS 128
+
 namespace khmer
 {
 class Hashbits;
@@ -60,6 +62,10 @@ protected:
 
     Byte ** _counts;
 
+    uint32_t * _table_spinlocks;
+    HashIntoType _n_table_locks;
+    bool _threadsafe;
+
     virtual void _allocate_counters()
     {
         _n_tables = _tablesizes.size();
@@ -80,6 +86,7 @@ public:
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
+        _threadsafe = false;
     }
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
@@ -89,6 +96,7 @@ public:
     {
 
         _allocate_counters();
+        _threadsafe = false;
     }
 
     virtual ~CountingHash()
@@ -106,6 +114,11 @@ public:
 
             _n_tables = 0;
         }
+        if (_threadsafe) {
+          delete[] _table_spinlocks;
+          _table_spinlocks = NULL;
+          _threadsafe = false;
+        }
     }
 
     // Writing to the tables outside of defined methods has undefined behavior!
@@ -115,6 +128,10 @@ public:
         return _counts;
     }
 
+    void init_threadsafe(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS);
+    bool is_threadsafe() { return _threadsafe; };
+    const HashIntoType n_table_locks() const { return _n_table_locks; };
+    
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
     {
         BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
@@ -162,6 +179,7 @@ public:
         return _occupied_bins;
     }
 
+    /*
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
@@ -214,6 +232,54 @@ public:
         }
 
     } // count
+    */
+
+    virtual void count(const char * kmer)
+    {
+        HashIntoType hash = _hash(kmer, _ksize);
+        count_ts(hash);
+    }
+
+    // Thread-safe counting function
+    virtual void count(HashIntoType khash)
+    {
+        bool is_new_kmer = true;
+        unsigned int  n_full      = 0;
+        uint32_t lock_index = khash % _n_table_locks;
+
+        // Take the lock for the given region
+        while(!__sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 0, 1));
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            const HashIntoType bin = khash % _tablesizes[i];
+            Byte current_count = _counts[ i ][ bin ];
+            if (is_new_kmer && current_count != 0) {
+                is_new_kmer = false;
+            }
+            if ( _max_count > current_count ) {
+                __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+            } else {
+                n_full++;
+            }
+        } // for each table
+        __sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 1, 0);
+
+        if (n_full == _n_tables && _use_bigcount) {
+            while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
+            if (_bigcounts[khash] == 0) {
+                _bigcounts[khash] = _max_count + 1;
+            } else {
+                if (_bigcounts[khash] < _max_bigcount) {
+                    _bigcounts[khash] += 1;
+                }
+            }
+            __sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
+        }
+
+        if (is_new_kmer) {
+            __sync_add_and_fetch(&_n_unique_kmers, 1);
+        }
+
+    } // count_ts
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const
