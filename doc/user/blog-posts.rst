@@ -32,7 +32,7 @@ scripts can be used to generate the k-mer abundance profile data, after
 loading all the k-mer counts into a .ct file::
 
    # first, load all the k-mer counts:
-   load-into-counting.py -k 20 -x 1e7 25k.ct data/25k.fq.gz
+   load-into-countgraph.py -k 20 -x 1e7 25k.ct data/25k.fq.gz
 
    # then, build the '.freq' file that contains all of the counts by position
    python sandbox/fasta-to-abundance-hist.py 25k.ct data/25k.fq.gz
