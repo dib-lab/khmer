@@ -58,7 +58,10 @@ All scripts in scripts/ should have the following options, if they could apply:
 * ``--version`` - should always apply
 * ``--help`` - should always apply
 * ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadtable`` and ``--savetable`` - where appropriate (see khmer_args.py)
+* ``--loadgraph`` and ``--savesave`` - where appropriate (see khmer_args.py)
+
+If an option is of type ``type=argparse.FileType('w')`` then you need to also
+specify a ``metavar`` for the documentation and help formatting.
 
 Copyright message
 ~~~~~~~~~~~~~~~~~
