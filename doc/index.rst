@@ -4,10 +4,23 @@
 khmer -- k-mer counting & filtering FTW
 #######################################
 
-:Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe,
-          Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Humberto
-          Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott, Ramakrishnan
-          Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown
+:Authors: Michael R. Crusoe, ACharbonneau, James A. Stapleton, Sherine
+        Awad, Elmar Bucher, Adam Caldwell, Reed Cartwright, Bede Constantinides,
+        Peter Dave Hello, Kevin D. Murray, Greg Edvenson, Hussien F. Alameldin,
+        Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, Leonor 
+        Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, Iván González, Sarah 
+        Guermond, Jiarong Guo, Aditi Gupta, Andreas Härpfer, Adina Howe,
+        Alex Hyer, Luiz Irber, Alexander Johan Nederbragt, Rhys Kidd, David Lin,
+        Justin Lippi, Heather L. Wiencko, Tamer Mansour, Pamela McA'Nulty, Eric 
+        McDonald, Jessica Mizzi, Kevin Murray, Kaben Nanlohy, Humberto 
+        Ortiz-Zuazaga, Jeramia Ory, Jason Pell, Charles Pepe-Ranney, Rodney 
+        Picett, Ryan R. Boyce, Michael R. Crusoe, Joshua R. Herr, Joshua R. 
+        Nahum, Erich Schwarz, Camille Scott, Josiah Seaman, Scott Sievert, Jared
+        Simpson, James Spencer, Ramakrishnan Srinivasan, Daniel Standage, Joe 
+        Stein, Susan Steinman, Benjamin Taylor, C. Titus Brown, Will Trimble,
+        Connor T. Skennerton, Michael Wright, Brian Wyss, Qingpeng Zhang, en 
+        zyme, C. Titus Brown
+
 
 :Contact: khmer-project@idyll.org
 :GitHub: https://github.com/dib-lab/khmer
@@ -16,7 +29,7 @@ khmer -- k-mer counting & filtering FTW
 
 
 khmer is a library and suite of command line tools for working with
-DNA sequence.  It is primarily aimed at short-read sequencing data
+DNA sequences.  It is primarily aimed at short-read sequencing data
 such as that produced by the Illumina platform.  khmer takes a k-mer-centric
 approach to sequence analysis, hence the name.
 
@@ -32,7 +45,8 @@ the following URLs:
 
     * Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-The archives for the khmer list are available at: http://lists.idyll.org/pipermail/khmer/
+The archives for the khmer mailing list are available at: 
+http://lists.idyll.org/pipermail/khmer/
 
 khmer development has largely been supported by AFRI Competitive Grant
 no.  `2010-65205-20361
