@@ -1,70 +1,28 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
-#include "hashtable.hh"
-#include "read_parsers.hh"
-#include "counting.hh"
-
+#include <errno.h>
+#include <math.h>
 #include <algorithm>
-#include <sstream>
+#include <deque>
+#include <fstream>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <queue>
+#include <set>
+
+#include "counting.hh"
+#include "hashtable.hh"
+#include "khmer.hh"
+#include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
-
-#ifdef WITH_INTERNAL_METRICS
-HashTablePerformanceMetrics::
-HashTablePerformanceMetrics( )
-    : IPerformanceMetrics( ),
-      clock_nsecs_norm_read( 0 ),
-      cpu_nsecs_norm_read( 0 ),
-      clock_nsecs_hash_kmer( 0 ),
-      cpu_nsecs_hash_kmer( 0 ),
-      clock_nsecs_update_tallies( 0 ),
-      cpu_nsecs_update_tallies( 0 )
-{ }
-
-
-HashTablePerformanceMetrics::
-~HashTablePerformanceMetrics( )
-{ }
-
-
-void
-HashTablePerformanceMetrics::
-accumulate_timer_deltas( uint32_t metrics_key )
-{
-
-    switch (metrics_key) {
-    case MKEY_TIME_NORM_READ:
-        clock_nsecs_norm_read +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_norm_read   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    case MKEY_TIME_HASH_KMER:
-        clock_nsecs_hash_kmer +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_hash_kmer   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    case MKEY_TIME_UPDATE_TALLIES:
-        clock_nsecs_update_tallies +=
-            _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-        cpu_nsecs_update_tallies   +=
-            _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
-        break;
-    default:
-        throw InvalidPerformanceMetricsKey( );
-    }
-
-}
-#endif
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -145,18 +103,18 @@ consume_fasta(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-
+        bool is_valid;
         try {
-            bool is_valid;
             read = parser->get_next_read( );
-
-            unsigned int this_n_consumed =
-                check_and_process_read(read.sequence, is_valid);
-
-            __sync_add_and_fetch( &n_consumed, this_n_consumed );
-            __sync_add_and_fetch( &total_reads, 1 );
-        } catch (read_parsers::NoMoreReadsAvailable) {
+        } catch (NoMoreReadsAvailable) {
+            break;
         }
+
+        unsigned int this_n_consumed =
+            check_and_process_read(read.sequence, is_valid);
+
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &total_reads, 1 );
 
     } // while reads left for parser
 
@@ -171,7 +129,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    KMerIterator kmers(sp, _ksize);
+    KmerIterator kmers(sp, _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -192,24 +150,10 @@ void Hashtable::get_median_count(const std::string &s,
                                  float &stddev)
 {
     std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        BoundedCounterType count = this->get_count(kmer);
-        counts.push_back(count);
-    }
+    this->get_kmer_counts(s, counts);
 
     if (!counts.size()) {
-        throw khmer_exception();
-    }
-
-    if (!counts.size()) {
-        median = 0;
-        average = 0;
-        stddev = 0;
-
-        return;
+        throw khmer_exception("no k-mer counts for this string; too short?");
     }
 
     average = 0;
@@ -231,6 +175,42 @@ void Hashtable::get_median_count(const std::string &s,
     median = counts[counts.size() / 2]; // rounds down
 }
 
+//
+// Optimized filter function for normalize-by-median
+//
+bool Hashtable::median_at_least(const std::string &s,
+                                unsigned int cutoff)
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+    unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
+    unsigned int num_cutoff_kmers = 0;
+
+    // first loop:
+    // accumulate at least min_req worth of counts before checking to see
+    // if we have enough high-abundance k-mers to indicate success.
+    for (unsigned int i = 0; i < min_req; ++i) {
+        HashIntoType kmer = kmers.next();
+        if (this->get_count(kmer) >= cutoff) {
+            ++num_cutoff_kmers;
+        }
+    }
+
+    // second loop: now check to see if we pass the threshold for each k-mer.
+    if (num_cutoff_kmers >= min_req) {
+        return true;
+    }
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        if (this->get_count(kmer) >= cutoff) {
+            ++num_cutoff_kmers;
+            if (num_cutoff_kmers >= min_req) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void Hashtable::save_tagset(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
@@ -239,6 +219,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -256,6 +237,10 @@ void Hashtable::save_tagset(std::string outfilename)
     }
 
     outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+    if (outfile.fail()) {
+        delete[] buf;
+        throw khmer_file_exception(strerror(errno));
+    }
     outfile.close();
 
     delete[] buf;
@@ -278,7 +263,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -292,19 +277,30 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     HashIntoType * buf = NULL;
 
     try {
+        char signature[4];
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " while reading tagset from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading tagset from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -312,7 +308,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -332,7 +328,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
@@ -342,7 +338,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 {
     bool kmer_tagged;
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
     HashIntoType kmer;
 
     unsigned int since = _tag_density / 2 + 1;
@@ -449,7 +445,12 @@ consume_fasta_and_tag(
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
 
-        read = parser->get_next_read( );
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable &e) {
+            // Bail out if this error is raised
+            break;
+        }
 
         if (check_and_normalize_read( read.sequence )) {
             unsigned long long this_n_consumed = 0;
@@ -487,7 +488,11 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         read_tags.clear();
@@ -496,7 +501,7 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
         if (check_and_normalize_read(seq)) {	// process?
             bool is_new_kmer;
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             HashIntoType kmer, last_kmer;
             bool is_first_kmer = true;
@@ -608,7 +613,11 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
@@ -655,14 +664,18 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
     //
 
     while(!parser->is_complete())  {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {	// process?
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
-            HashIntoType kmer = 0;
             bool is_first_kmer = true;
+            Kmer kmer(0,0,0);
             while (!kmers.done()) {
                 kmer = kmers.next();
 
@@ -674,8 +687,7 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
             }
 
             if (!is_first_kmer) {	// traverse
-                SeenSet keeper;
-
+                KmerSet keeper;
                 unsigned int n = traverse_from_kmer(kmer, radius, keeper);
                 if (n >= big_threshold) {
 #if VERBOSE_REPARTITION
@@ -700,150 +712,69 @@ void Hashtable::consume_fasta_and_traverse(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(const HashIntoType kmer_f,
-        const HashIntoType kmer_r,
+void Hashtable::calc_connected_graph_size(Kmer start,
         unsigned long long& count,
-        SeenSet& keeper,
+        KmerSet& keeper,
         const unsigned long long threshold,
         bool break_on_circum)
 const
 {
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    const BoundedCounterType val = get_count(kmer);
+    const BoundedCounterType val = get_count(start);
 
     if (val == 0) {
         return;
     }
 
-    // have we already seen me? don't count; exit.
-    if (set_contains(keeper, kmer)) {
-        return;
+    Traverser traverser(this);
+    KmerQueue node_q;
+    node_q.push(start);
+
+    // Avoid high-circumference k-mers
+    auto filter = [&] (Kmer& n) { return !(break_on_circum &&
+                                  traverser.degree(n) > 4); };
+
+    while(!node_q.empty()) {
+      Kmer node = node_q.front();
+      node_q.pop();
+
+      // have we already seen me? don't count; exit.
+      if (set_contains(keeper, node)) {
+          continue;
+      }
+
+      // is this in stop_tags?
+      if (set_contains(stop_tags, node)) {
+          continue;
+      }
+
+      // keep track of both seen kmers, and counts.
+      keeper.insert(node);
+
+      count += 1;
+
+      // are we past the threshold? truncate search.
+      if (threshold && count >= threshold) {
+          return;
+      }
+
+      // otherwise, explore in all directions.
+      traverser.traverse_right(node, node_q, filter);
+      traverser.traverse_left(node, node_q, filter);
     }
-
-    // is this in stop_tags?
-    if (set_contains(stop_tags, kmer)) {
-        return;
-    }
-
-    // keep track of both seen kmers, and counts.
-    keeper.insert(kmer);
-
-    // is this a high-circumference k-mer? if so, don't count it; get outta here!
-    if (break_on_circum && \
-            kmer_degree(kmer_f, kmer_r) > 4) {
-        return;
-    }
-
-    count += 1;
-
-    // are we past the threshold? truncate search.
-    if (threshold && count >= threshold) {
-        return;
-    }
-
-    // otherwise, explore in all directions.
-
-    // NEXT.
-
-    HashIntoType f, r;
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    // PREVIOUS.
-
-
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 }
 
 unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
-const
 {
-    unsigned int neighbors = 0;
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_f, kmer_r);
+    return traverser.degree(node);
+}
 
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    HashIntoType f, r;
-
-    // NEXT.
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f, r))) {
-        neighbors++;
-    }
-
-    return neighbors;
+unsigned int Hashtable::kmer_degree(const char * kmer_s)
+{
+    Traverser traverser(this);
+    Kmer node = build_kmer(kmer_s);
+    return traverser.degree(node);
 }
 
 void Hashtable::filter_if_present(const std::string &infilename,
@@ -861,11 +792,15 @@ void Hashtable::filter_if_present(const std::string &infilename,
     HashIntoType kmer;
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
             bool keep = true;
 
             while (!kmers.done()) {
@@ -892,146 +827,13 @@ void Hashtable::filter_if_present(const std::string &infilename,
     return;
 }
 
-
-unsigned int Hashtable::count_kmers_within_radius(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        unsigned int radius,
-        unsigned int max_count,
-        const SeenSet * seen)
-const
-{
-    HashIntoType f, r;
-    NodeQueue node_q;
-    std::queue<unsigned int> breadth_q;
-    unsigned int cur_breadth = 0;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-    unsigned int total = 0;
-
-    SeenSet keeper;		// keep track of traversed kmers
-    if (seen) {
-        keeper = *seen;
-    }
-
-    // start breadth-first search.
-
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
-    breadth_q.push(0);
-
-    while(!node_q.empty()) {
-        kmer_f = node_q.front();
-        node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
-        unsigned int breadth = breadth_q.front();
-        breadth_q.pop();
-
-        if (breadth > radius) {
-            break;
-        }
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
-            continue;
-        }
-
-        // keep track of seen kmers
-        keeper.insert(kmer);
-        total++;
-
-        if (max_count && total > max_count) {
-            break;
-        }
-
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw khmer_exception();
-        }
-        if (breadth > cur_breadth) {
-            cur_breadth = breadth;
-        }
-
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-    }
-
-    return total;
-}
-
 size_t Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     size_t i = _ksize - 2;
     while (!kmers.done()) {
@@ -1053,7 +855,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     unsigned int i = 0;
     unsigned int n = 0;
     unsigned int n_big = 0;
-    SeenSet keeper;
+    KmerSet keeper;
 
 #if VERBOSE_REPARTITION
     std::cout << all_tags.size() << " tags...\n";
@@ -1061,13 +863,15 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 
     for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
             ++si, i++) {
+
         n++;
-        unsigned int count = traverse_from_kmer(*si, distance, keeper);
+        Kmer tag = build_kmer(*si);
+        unsigned int count = traverse_from_kmer(tag, distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
-            SeenSet::const_iterator ti;
+            KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
                     stop_tags.insert(*ti);
@@ -1091,35 +895,29 @@ void Hashtable::traverse_from_tags(unsigned int distance,
     }
 }
 
-unsigned int Hashtable::traverse_from_kmer(HashIntoType start,
+unsigned int Hashtable::traverse_from_kmer(Kmer start,
         unsigned int radius,
-        SeenSet &keeper)
+        KmerSet &keeper,
+        unsigned int max_count)
 const
 {
-    std::string kmer_s = _revhash(start, _ksize);
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
-    HashIntoType f, r;
-    NodeQueue node_q;
+    Traverser traverser(this);
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    bool is_first_kmer = true;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    // start breadth-first search.
+    auto filter = [&] (Kmer& n) { return !set_contains(keeper, n); };
 
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
@@ -1127,27 +925,21 @@ const
             break;
         }
 
-        if (total > MAX_KEEPER_SIZE) {
+        if (max_count && total > max_count) {
             break;
         }
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
+        if (set_contains(keeper, node)) {
             continue;
         }
 
-        if (set_contains(stop_tags, kmer)) {
+        if (set_contains(stop_tags, node)) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
-
-        // QUESTION: Huh? What's up with the following?
-        if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
-            continue;
-        }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
             throw khmer_exception();
@@ -1156,80 +948,11 @@ const
             cur_breadth = breadth;
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
+        nfound = traverser.traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
 
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        //r = next_r(kmer_r, 'A');
-
-        // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        is_first_kmer = false;
+        nfound = traverser.traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
     }
 
     return total;
@@ -1252,7 +975,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -1265,19 +988,30 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     size_t tagset_size = 0;
 
     try {
+        char signature[4];
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " while reading stoptags from " << infilename
+                << "; should be " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading stoptags from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -1285,7 +1019,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
+            throw khmer_file_exception(err.str());
         }
         infile.read((char *) &tagset_size, sizeof(tagset_size));
 
@@ -1299,7 +1033,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
-        throw khmer_file_exception(err.c_str());
+        throw khmer_file_exception(err);
     }
 }
 
@@ -1310,6 +1044,7 @@ void Hashtable::save_stop_tags(std::string outfilename)
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
+    outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
@@ -1360,13 +1095,13 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-unsigned int Hashtable::count_and_transfer_to_stoptags(SeenSet &keeper,
+unsigned int Hashtable::count_and_transfer_to_stoptags(KmerSet &keeper,
         unsigned int threshold,
         CountingHash &counting)
 {
     unsigned int n_inserted = 0;
 
-    SeenSet::const_iterator ti;
+    KmerSet::const_iterator ti;
     for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
         if (counting.get_count(*ti) >= threshold) {
             stop_tags.insert(*ti);
@@ -1387,7 +1122,7 @@ const
         return;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     unsigned int i = 0;
     while(!kmers.done()) {
@@ -1415,7 +1150,7 @@ void Hashtable::extract_unique_paths(std::string seq,
 
     min_length = min_length - _ksize + 1; // adjust for k-mer size.
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     std::deque<bool> seen_queue;
     unsigned int n_already_seen = 0;
@@ -1497,4 +1232,43 @@ void Hashtable::extract_unique_paths(std::string seq,
         }
     }
 }
+
+
+void Hashtable::get_kmers(const std::string &s,
+                          std::vector<std::string> &kmers_vec) const
+{
+    if (s.length() < _ksize) {
+        return;
+    }
+    for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+        std::string sub = s.substr(i, i + _ksize);
+        kmers_vec.push_back(sub);
+    }
+}
+
+
+void Hashtable::get_kmer_hashes(const std::string &s,
+                                std::vector<HashIntoType> &kmers_vec) const
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        kmers_vec.push_back(kmer);
+    }
+}
+
+
+void Hashtable::get_kmer_counts(const std::string &s,
+                                std::vector<BoundedCounterType> &counts) const
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        BoundedCounterType c = this->get_count(kmer);
+        counts.push_back(c);
+    }
+}
+
 // vim: set sts=2 sw=2:

@@ -29,8 +29,40 @@ indentation can be set with::
 For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
 standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
 
-Code, scripts, and documentation must have its spelling checked. Vim users can
-run::
+Code, scripts, and documentation must have their spelling checked. 
+
+Python-based `codespell` can be applied to multiple files easily. `codespell` 
+can be installed via the following::
+
+        mkdir ~/bin
+        git clone git@github.com:lucasdemarchi/codespell.git
+        cd codespell
+        make prefix=${HOME} install
+        export PATH=$PATH:~/bin/
+
+Note, if you want codespell to always be available you will need to add the
+`export` line to your `${HOME}\.bashrc` or equivalent.
+
+To run codespell over only what has been changed on the branch `my-branch`::
+
+        git diff master..my-branch > diff_file
+        codespell diff_file
+
+To run codespell over a single file::
+
+        codespell path/to/file
+
+To make codespell fix the issues it finds automatically::
+
+        codespell -w path/to/file
+        
+Please note that as `codespell` works off of a listing of possible
+misspellings it may not catch all errors. If you find a spelling error that
+is not caught by `codespell` feel free to open a pull request at the `project
+page <https://github.com/lucasdemarchi/codespell>`_ to add it to the 
+dictionary. 
+
+Vim users can run::
 
         :setlocal spell spelllang=en_us
 
@@ -72,6 +104,7 @@ ready for review::
      http://en.wikipedia.org/wiki/Changelog#Format
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
+   - [ ] Is the Copyright year up to date?
 
 **Note** that after you submit the comment you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y

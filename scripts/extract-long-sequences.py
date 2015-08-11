@@ -1,13 +1,15 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
 
 """
+Extract long sequences.
+
 Write out lines of FASTQ and FASTA files that exceed an argument-specified
 length.
 
@@ -16,10 +18,12 @@ length.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import argparse
 import screed
 import sys
 from khmer.utils import write_record
+from khmer.kfile import add_output_compression_type, get_file_writer
 
 
 def get_parser():
@@ -31,21 +35,23 @@ def get_parser():
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
     parser.add_argument('-o', '--output', help='The name of the output'
-                        ' sequence file.', default="/dev/stdout")
+                        ' sequence file.', default=sys.stdout,
+                        metavar='output', type=argparse.FileType('wb'))
     parser.add_argument('-l', '--length', help='The minimum length of'
                         ' the sequence file.',
                         type=int, default=200)
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    outfp = open(args.output, 'w')
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:
-        for record in screed.open(filename, parse_description=False):
+        for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
-    print >> sys.stderr, 'wrote to: ' + args.output
+    print('wrote to: ' + args.output.name, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

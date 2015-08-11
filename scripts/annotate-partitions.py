@@ -1,8 +1,8 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -15,13 +15,14 @@ Partition-annotated sequences will be in <fileN>.part.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import os
 import argparse
 import textwrap
 import khmer
 import sys
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import info
 
 DEFAULT_K = 32
@@ -66,26 +67,26 @@ def main():
 
     ksize = args.ksize
     filenames = args.input_filenames
-    htable = khmer.new_hashbits(ksize, 1, 1)
+    nodegraph = khmer.Nodegraph(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    check_file_status(partitionmap_file, args.force)
+    check_input_files(partitionmap_file, args.force)
     for _ in filenames:
-        check_file_status(_, args.force)
+        check_input_files(_, args.force)
 
     check_space(filenames, args.force)
 
-    print >>sys.stderr, 'loading partition map from:', partitionmap_file
-    htable.load_partitionmap(partitionmap_file)
+    print('loading partition map from:', partitionmap_file, file=sys.stderr)
+    nodegraph.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
-        print >>sys.stderr, 'outputting partitions for', infile
+        print('outputting partitions for', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.part'
-        part_count = htable.output_partitions(infile, outfile)
-        print >>sys.stderr, 'output %d partitions for %s' % (
-            part_count, infile)
-        print >>sys.stderr, 'partitions are in', outfile
+        part_count = nodegraph.output_partitions(infile, outfile)
+        print('output %d partitions for %s' % (
+            part_count, infile), file=sys.stderr)
+        print('partitions are in', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

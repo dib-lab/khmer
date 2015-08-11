@@ -1,25 +1,31 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
 import os
 import os.path
 import shutil
-from cStringIO import StringIO
+from io import StringIO
 import traceback
 import nose
+from nose.plugins.attrib import attr
 import glob
 import imp
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 import screed
+from .test_scripts import _make_counting
 
 
 def scriptpath(script):
@@ -54,7 +60,7 @@ class _checkImportSucceeds(object):
         try:
             mod = imp.load_source('__zzz', self.filename)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
             raise AssertionError("%s cannot be imported" % (self.filename,))
 
         #
@@ -72,9 +78,10 @@ class _checkImportSucceeds(object):
                 exec(
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
-            except (ImportError, SyntaxError):
-                print traceback.format_exc()
-                raise AssertionError("%s cannot be exec'd" % (self.filename,))
+            except (ImportError, SyntaxError) as err:
+                print("{0}".format(err))
+                raise AssertionError("%s cannot be exec'd" % (self.filename),
+                                     "{0}".format(traceback))
             except:
                 pass                        # other failures are expected :)
         finally:
@@ -96,7 +103,7 @@ def test_sweep_reads():
             contigfile, readfile, 'junkfile.fa']
 
     status, out, err = utils.runscript(
-        script, args, in_dir, fail_ok=True, sandbox=True)
+        script, args, in_dir, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -107,17 +114,21 @@ def test_sweep_reads():
     mout = os.path.join(in_dir, 'test_multi.fa')
     oout = os.path.join(in_dir, 'test_orphaned.fa')
 
-    print os.listdir(in_dir)
+    print(os.listdir(in_dir))
 
+    assert os.path.exists(out1)
+    assert os.path.exists(out2)
+    assert os.path.exists(mout)
+    assert os.path.exists(oout)
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
     seqso = set([r.name for r in screed.open(oout)])
 
-    print seqs1
-    print seqs2
-    print seqsm
-    print seqso
+    print(seqs1)
+    print(seqs2)
+    print(seqsm)
+    print(seqso)
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
     assert (seqsm == set(['read4_multi\t0\t1']) or
@@ -138,7 +149,7 @@ def test_sweep_reads_fq():
             contigfile, readfile, 'junkfile.fa']
 
     status, out, err = utils.runscript(
-        script, args, in_dir, fail_ok=True, sandbox=True)
+        script, args, in_dir, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -149,19 +160,23 @@ def test_sweep_reads_fq():
     mout = os.path.join(in_dir, 'test_multi.fq')
     oout = os.path.join(in_dir, 'test_orphaned.fq')
 
-    print open(out1).read()
+    assert os.path.exists(out1)
+    assert os.path.exists(out2)
+    assert os.path.exists(mout)
+    assert os.path.exists(oout)
+    print(open(out1).read())
 
-    print os.listdir(in_dir)
+    print(os.listdir(in_dir))
 
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
     seqso = set([r.name for r in screed.open(oout)])
 
-    print seqs1
-    print seqs2
-    print seqsm
-    print seqso
+    print(seqs1)
+    print(seqs2)
+    print(seqsm)
+    print(seqso)
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
     assert (seqsm == set(['read4_multi\t0\t1']) or
@@ -186,9 +201,9 @@ def test_sweep_reads_2():
             'test', '--label-by-seq', inref, infile]
     status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
-    for i in xrange(99):
+    for i in range(99):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
-        print p, err, out
+        print(p, err, out)
         assert os.path.exists(p)
         os.remove(p)
     assert os.path.exists(os.path.join(wdir, 'test.counts.csv'))
@@ -206,9 +221,9 @@ def test_sweep_reads_3():
             'test', '--label-by-group', '10', infile, infile]
     status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
-    for i in xrange(10):
+    for i in range(10):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
-        print p, err, out
+        print(p, err, out)
         assert os.path.exists(p)
         os.remove(p)
 
@@ -221,3 +236,66 @@ def test_sweep_reads_3():
     assert os.path.exists(counts_fn)
     assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_collect_reads():
+    outfile = utils.get_temp_filename('out.graph')
+    infile = utils.get_test_data('test-reads.fa')
+    script = 'collect-reads.py'
+    args = ['-M', '1e7', outfile, infile]
+
+    status, out, err = utils.runscript(script, args, sandbox=True)
+
+    assert status == 0
+    assert os.path.exists(outfile)
+
+
+def test_saturate_by_median():
+    infile = utils.get_test_data('test-reads.fa')
+    script = 'saturate-by-median.py'
+    args = ['-M', '1e7', infile]
+
+    status, out, err = utils.runscript(script, args, sandbox=True)
+
+    assert status == 0
+
+
+def test_count_kmers_1():
+    infile = utils.get_temp_filename('input.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    ctfile = _make_counting(infile)
+
+    script = scriptpath('count-kmers.py')
+    args = [ctfile, infile]
+
+    status, out, err = utils.runscript(script, args, os.path.dirname(infile),
+                                       sandbox=True)
+
+    out = out.splitlines()
+    assert 'TTGTAACCTGTGTGGGGTCG,1' in out
+
+
+def test_count_kmers_2_single():
+    infile = utils.get_temp_filename('input.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    script = scriptpath('count-kmers-single.py')
+    args = ['-x', '1e7', '-k', '20', '-N', '2', infile]
+
+    status, out, err = utils.runscript(script, args, os.path.dirname(infile),
+                                       sandbox=True)
+
+    out = out.splitlines()
+    assert 'TTGTAACCTGTGTGGGGTCG,1' in out
+
+
+def test_multirename_fasta():
+    infile1 = utils.get_temp_filename('test-multi.fa')
+    multioutfile = utils.get_temp_filename('out.fa')
+    infile2 = utils.get_temp_filename('out.fa')
+    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
+    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    args = ['assembly', infile1]
+    _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
+    r = open(infile2).read()
+    assert r in out

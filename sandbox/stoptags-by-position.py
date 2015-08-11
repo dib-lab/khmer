@@ -1,8 +1,9 @@
-#! /usr/bin/env python2
+from __future__ import print_function
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 import khmer
@@ -13,7 +14,7 @@ K = 32
 
 
 def main():
-    ht = khmer.new_hashbits(K, 1, 1)
+    ht = khmer.Nodegraph(K, 1, 1)
 
     x = [0] * 255
     y = [0] * 255
@@ -38,7 +39,7 @@ def main():
 
     for i, (n, m) in enumerate(zip(x, y)):
         if m:
-            print '%d,%d,%d' % (i, n, m)
+            print('%d,%d,%d' % (i, n, m))
 
 
 if __name__ == '__main__':

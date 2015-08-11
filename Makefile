@@ -4,26 +4,35 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
+SHELL=bash
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
-DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
-autopep8 pylint coverage gcovr nose screed
+DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
+	screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
-CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
+CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
+	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
+	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
+	 --file-list=- --platform=unix64 --std=c++11 --inline-suppr \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
-	 -Ithird-party/smhasher
+	 -Ithird-party/smhasher -I/usr/include/python3.4m -DHAVE_SSIZE_T \
+	 -D__linux__ -D__x86_64__ -D__LP64__ -I/usr/include \
+	 -I/usr/include/x86_64-linux-gnu/ -I/usr/include/linux \
+	 -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include/
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR='!known_failing,!jenkins'
+	TESTATTR ?= '!known_failing,!jenkins,!huge'
 else
-	TESTATTR='!known_failing,!jenkins,!linux'
+	TESTATTR ?= '!known_failing,!jenkins,!huge,!linux'
 endif
+
+
+MODEXT=$(shell python -c "import sysconfig;print(sysconfig.get_config_var('SO'))")
+EXTENSION_MODULE = khmer/_khmer$(MODEXT)
 
 ## all         : default task; compile C++ code, build shared object library
 all: sharedobj
@@ -36,12 +45,13 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
+	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: khmer/_khmermodule.so
+sharedobj: $(EXTENSION_MODULE)
 
-khmer/_khmermodule.so: $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -63,11 +73,12 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so || true
-	rm khmer/*.pyc lib/*.pyc || true
+	rm -f $(EXTENSION_MODULE)
+	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc
 	./setup.py clean --all || true
-	rm coverage-debug || true
-	rm -Rf .coverage || true
+	rm -f coverage-debug
+	rm -Rf .coverage
+	rm -f diff-cover.html
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
@@ -101,14 +112,26 @@ cppcheck: $(CPPSOURCES)
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
-		scripts/ tests/ || true
+		scripts/ tests/ oxli/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
+
+## pep257      : check Python code style
+pep257: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 --ignore=D100,D101,D102,D103 \
+		setup.py khmer/ scripts/ tests/ oxli/ || true
+
+pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
+	pep257 setup.py khmer/ scripts/ tests/ oxli/ \
+		> pep257_report.txt 2>&1 || true
+
+diff_pep257_report: pep257_report.txt
+	diff-quality --violations=pep8 pep257_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
@@ -117,7 +140,7 @@ astyle: $(CPPSOURCES)
 ## autopep8    : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
-		setup.py khmer/*.py scripts/*.py tests/*.py
+		setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
 ## format      : check/fix all code indentation and formatting (runs astyle and autopep8)
@@ -127,13 +150,14 @@ format: astyle autopep8
 ## pylint      : run static code analysis on Python code
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+                --extension-pkg-whitelist=khmer \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		|| true
+		oxli/*.py || true
 
 pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		sandbox/*.py > pylint_report.txt || true
+		sandbox/*.py oxli/*.py > pylint_report.txt || true
 
 diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
@@ -141,9 +165,9 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
-	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
-		-m nose --with-xunit --attr=\!known_failing --processes=0
+.coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
+	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
+		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
 
 coverage.xml: .coverage
 	coverage xml
@@ -159,7 +183,8 @@ coverage-report: .coverage
 
 coverage-gcovr.xml: coverage-debug .coverage
 	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
-          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*'
+          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*' \
+	  --exclude-unreachable-branches
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
@@ -180,7 +205,7 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 		Doxyfile
 	doxygen
 
-lib:
+lib: FORCE
 	cd lib && \
 	$(MAKE)
 
@@ -193,13 +218,13 @@ libtest: FORCE
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
-	test -f install_target/include/khmer.hh
+	test -f install_target/include/oxli/khmer.hh
 	test -d install_target/lib
-	test -f install_target/lib/libkhmer.a
-	$(CXX) -o install_target/test-prog-static -I install_target/include \
-		lib/test-compile.cc install_target/lib/libkhmer.a
-	$(CXX) -o install_target/test-prog-dynamic -I install_target/include \
-		-L install_target/lib lib/test-compile.cc -lkhmer
+	test -f install_target/lib/liboxli.a
+	$(CXX) -std=c++11 -o install_target/test-prog-static -I install_target/include \
+		lib/test-compile.cc install_target/lib/liboxli.a
+	$(CXX) -std=c++11 -o install_target/test-prog-dynamic -I install_target/include \
+		-L install_target/lib lib/test-compile.cc -loxli
 	rm -rf install_target
 
 ## test        : run the khmer test suite
@@ -220,7 +245,7 @@ coverity-build:
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
-		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
+		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr ${TESTATTR} ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
@@ -253,6 +278,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+# may need to `sudo apt-get install bear`
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext
@@ -261,5 +287,24 @@ convert-release-notes:
 	for file in doc/release-notes/*.md; do \
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
+
+list-authors:
+	@echo '\author[1]{Michael R. Crusoe}'
+	@git log --format='\author[]{%aN}' | sort -uk2 | \
+		grep -v 'root\|crusoe\|titus'
+	@echo '\author[]{C. Titus Brown}'
+	@echo '\affil[1]{mcrusoe@msu.edu}'
+	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
+		awk -F\\ '{print "\\"$$3}' | grep -v \
+		'root\|crusoe\|titus\|waffle\|boyce\|pickett.rodney'
+	# R. Boyce requested to be removed 2015/05/21
+	# via pers correspondence to MRC
+	# P Rodney requested to be removed 2015/06/22 via pers correspondence
+	# to MRC
+	@echo '\affil[]{titus@idyll.org}'
+
+list-author-emails:
+	@echo 'name, E-Mail Address'
+	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
 
 FORCE:

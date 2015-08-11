@@ -1,9 +1,9 @@
-#! /usr/bin/env python2
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
-""" Setup for khmer project. """
+"""Setup for khmer project."""
 
 import ez_setup
 
@@ -50,6 +50,7 @@ os.environ['OPT'] = " ".join(
 
 
 def check_for_openmp():
+    """Check for OpenMP support."""
     # Create a temporary directory
     tmpdir = tempfile.mkdtemp()
     curdir = os.getcwd()
@@ -101,23 +102,26 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
+    "traversal"])
 
-SOURCES = ["khmer/_khmermodule.cc"]
+SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
+    "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter"])
+    "hllcounter", "traversal"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
-EXTRA_COMPILE_ARGS = ['-O3', ]
+# Don't forget to update lib/Makefile with these flags!
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-O0']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
+                               '-stdlib=libc++'])
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -133,7 +137,7 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
+EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
                           ** EXTENSION_MOD_DICT)
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
@@ -149,8 +153,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
-    "Programming Language :: Python :: 2 :: Only",
     "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.3",
+    "Programming Language :: Python :: 3.4",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -173,16 +178,19 @@ SETUP_METADATA = \
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
-        "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        "url": 'https://khmer.readthedocs.org/',
+        "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.8'],
-        # testing screed download link
-
+        "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
+        "entry_points": {
+            'console_scripts': [
+                "oxli = oxli:main"
+            ]
+        },
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
@@ -203,6 +211,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
     """
 
     def run(self):
+        """Run extension builder."""
         if "%x" % sys.maxsize != '7fffffffffffffff':
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
@@ -233,13 +242,13 @@ _DISTUTILS_REINIT = Distribution.reinitialize_command
 
 
 def reinitialize_command(self, command, reinit_subcommands):
-    '''
-    Monkeypatch distutils.Distribution.reinitialize_command() to match behavior
-    of Distribution.get_command_obj()
+    """Monkeypatch the original version from distutils.
 
+    It's supposed to match the behavior of Distribution.get_command_obj()
     This fixes issues with 'pip install -e' and './setup.py nosetests' not
-    respecting the setup.cfg configuration directives for the build_ext command
-    '''
+    respecting the setup.cfg configuration directives for the build_ext
+    command.
+    """
     cmd_obj = _DISTUTILS_REINIT(self, command, reinit_subcommands)
     options = self.command_options.get(command)
     if options:

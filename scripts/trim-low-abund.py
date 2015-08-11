@@ -1,18 +1,20 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 """
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
+
 Output sequences will be placed in 'infile.abundtrim'.
 
 % python scripts/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
 
 Use -h for parameter help.
 """
+from __future__ import print_function
 import sys
 import screed
 import os
@@ -20,23 +22,24 @@ import khmer
 import tempfile
 import shutil
 import textwrap
+import argparse
 
-from screed.screedRecord import _screed_record_dict
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+from screed import Record
+from khmer import khmer_args
+
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
+                              report_on_config, calculate_graphsize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+from khmer.kfile import (check_space, check_space_for_graph,
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
-# see Zhang et al., http://arxiv.org/abs/1309.2975
-MAX_FALSE_POSITIVE_RATE = 0.8
-
 
 def trim_record(read, trim_at):
-    new_read = _screed_record_dict()
+    new_read = Record()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
     if hasattr(read, 'quality'):
@@ -81,20 +84,28 @@ def get_parser():
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
+    parser.add_argument('-o', '--output', metavar="output_filename",
+                        type=argparse.FileType('wb'),
+                        help='only output a single file with '
+                        'the specified filename; use a single dash "-" to '
+                        'specify that output should go to STDOUT (the '
+                        'terminal)')
+
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
-    add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    add_loadgraph_args(parser)
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true')
     parser.add_argument('--tempdir', '-T', type=str, default='./')
+    add_output_compression_type(parser)
 
     return parser
 
@@ -107,8 +118,8 @@ def main():
     ###
 
     if len(set(args.input_filenames)) != len(args.input_filenames):
-        print >>sys.stderr, \
-            "Error: Cannot input the same filename multiple times."
+        print("Error: Cannot input the same filename multiple times.",
+              file=sys.stderr)
         sys.exit(1)
 
     ###
@@ -116,25 +127,30 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
-    K = args.ksize
+    if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
+       and not args.output:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
 
+    if args.loadgraph:
+        print('loading countgraph from', args.loadgraph, file=sys.stderr)
+        ct = khmer.load_countgraph(args.loadgraph)
+    else:
+        print('making countgraph', file=sys.stderr)
+        ct = khmer_args.create_countgraph(args)
+
+    K = ct.ksize()
     CUTOFF = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    if args.loadtable:
-        print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
-        ct = khmer.load_counting_hash(args.loadtable)
-    else:
-        print >>sys.stderr, 'making k-mer counting table'
-        ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
-
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print >>sys.stderr, 'created temporary directory %s; ' \
-                        'use -T to change location' % tempdir
+    print('created temporary directory %s; '
+          'use -T to change location' % tempdir, file=sys.stderr)
 
     # ### FIRST PASS ###
 
@@ -150,13 +166,17 @@ def main():
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        trimfilename = os.path.basename(filename) + '.abundtrim'
+        if args.output is None:
+            trimfp = get_file_writer(open(os.path.basename(filename) +
+                                          '.abundtrim', 'wb'),
+                                     args.gzip, args.bzip)
+        else:
+            trimfp = get_file_writer(args.output, args.gzip, args.bzip)
 
-        pass2list.append((filename, pass2filename, trimfilename))
+        pass2list.append((filename, pass2filename, trimfp))
 
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
-        trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
         n = 0
@@ -165,8 +185,8 @@ def main():
                                            force_single=args.ignore_pairs)
         for n, is_pair, read1, read2 in paired_iter:
             if n % 10000 == 0:
-                print >>sys.stderr, '...', n, filename, save_pass2, \
-                    n_reads, n_bp, written_reads, written_bp
+                print('...', n, filename, save_pass2, n_reads, n_bp,
+                      written_reads, written_bp, file=sys.stderr)
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
@@ -231,31 +251,30 @@ def main():
                             trimmed_reads += 1
 
         pass2fp.close()
-        trimfp.close()
 
-        print '%s: kept aside %d of %d from first pass, in %s' % \
-              (filename, save_pass2, n, filename)
+        print('%s: kept aside %d of %d from first pass, in %s' %
+              (filename, save_pass2, n, filename),
+              file=sys.stderr)
         save_pass2_total += save_pass2
 
     # ### SECOND PASS. ###
 
     skipped_n = 0
     skipped_bp = 0
-    for _, pass2filename, trimfilename in pass2list:
-        print 'second pass: looking at sequences kept aside in %s' % \
-              pass2filename
+    for _, pass2filename, trimfp in pass2list:
+        print('second pass: looking at sequences kept aside in %s' %
+              pass2filename,
+              file=sys.stderr)
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.
 
-        trimfp = open(trimfilename, 'a')
-        for n, read in enumerate(screed.open(pass2filename,
-                                             parse_description=False)):
+        for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print >>sys.stderr, '... x 2', n, pass2filename, \
-                    written_reads, written_bp
+                print('... x 2', n, pass2filename,
+                      written_reads, written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ct.get_median_count(seq)
@@ -282,50 +301,50 @@ def main():
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
 
-        print >>sys.stderr, 'removing %s' % pass2filename
+        print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
 
-    print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
+    print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
 
     n_passes = 1.0 + (float(save_pass2_total) / n_reads)
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print 'read %d reads, %d bp' % (n_reads, n_bp,)
-    print 'wrote %d reads, %d bp' % (written_reads, written_bp,)
-    print 'looked at %d reads twice (%.2f passes)' % (save_pass2_total,
-                                                      n_passes)
-    print 'removed %d reads and trimmed %d reads (%.2f%%)' % \
-        (n_reads - written_reads, trimmed_reads, percent_reads_trimmed)
-    print 'trimmed or removed %.2f%% of bases (%d total)' % \
-        ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp)
+    print('read %d reads, %d bp' % (n_reads, n_bp,), file=sys.stderr)
+    print('wrote %d reads, %d bp' % (written_reads, written_bp,),
+          file=sys.stderr)
+    print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
+                                                      n_passes),
+          file=sys.stderr)
+    print('removed %d reads and trimmed %d reads (%.2f%%)' %
+          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed),
+          file=sys.stderr)
+    print('trimmed or removed %.2f%% of bases (%d total)' %
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp),
+          file=sys.stderr)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print '%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
-                                                         percent_reads_hicov)
-        print 'skipped %d reads/%d bases because of low coverage' % \
-              (skipped_n, skipped_bp)
+        print('%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
+                                                         percent_reads_hicov),
+              file=sys.stderr)
+        print('skipped %d reads/%d bases because of low coverage' %
+              (skipped_n, skipped_bp),
+              file=sys.stderr)
 
-    fp_rate = khmer.calc_expected_collisions(ct)
-    print >>sys.stderr, \
-        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    fp_rate = \
+        khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
+    # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
+          file=sys.stderr)
 
-    if fp_rate > MAX_FALSE_POSITIVE_RATE:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " for this data set. Increase tablesize/# "
-                              "tables.")
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** Do not use these results!!"
-        sys.exit(1)
+    print('output in *.abundtrim', file=sys.stderr)
 
-    print 'output in *.abundtrim'
-
-    if args.savetable:
-        print >>sys.stderr, "Saving k-mer counting table to", args.savetable
-        ct.save(args.savetable)
+    if args.savegraph:
+        print("Saving k-mer countgraph to",
+              args.savegraph, file=sys.stderr)
+        ct.save(args.savegraph)
 
 
 if __name__ == '__main__':

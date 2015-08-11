@@ -1,26 +1,27 @@
+from __future__ import division, print_function, unicode_literals
+from __future__ import absolute_import
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=missing-docstring,protected-access
 
 import math
-import string
 
 import khmer
 
 from screed.fasta import fasta_iter
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.tools import assert_raises
 
 
-TT = string.maketrans('ACGT', 'TGCA')
 K = 20  # size of kmer
 ERR_RATE = 0.01
 N_UNIQUE = 3960
+TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
 
 
 def teardown():
@@ -41,7 +42,7 @@ def test_hll_add_python():
         seq_len = len(sequence)
         for n in range(0, seq_len + 1 - K):
             kmer = sequence[n:n + K]
-            rc = kmer[::-1].translate(TT)
+            rc = "".join(TRANSLATE[c] for c in kmer[::-1])
 
             hllcpp.add(kmer)
 
@@ -61,16 +62,19 @@ def test_hll_consume_string():
 
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    for n, record in enumerate(fasta_iter(open(filename))):
-        hllcpp.consume_string(record['sequence'])
+    n_consumed = 0
+    for n, record in enumerate(fasta_iter(open(filename)), 1):
+        n_consumed += hllcpp.consume_string(record['sequence'])
 
+    assert n == 99
+    assert n_consumed == 3960
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_empty_fasta():
     filename = utils.get_test_data('test-empty.fa')
     hll = khmer.HLLCounter(ERR_RATE, K)
-    with assert_raises(IOError):
+    with assert_raises(OSError):
         hll.consume_fasta(filename)
 
 
@@ -79,8 +83,10 @@ def test_hll_consume_fasta():
 
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    hllcpp.consume_fasta(filename)
+    n, n_consumed = hllcpp.consume_fasta(filename)
 
+    assert n == 99
+    assert n_consumed == 3960
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
@@ -90,10 +96,12 @@ def test_hll_consume_fasta_ep():
 
     filename = utils.get_test_data('paired-mixed.fa')
     hll = khmer.HLLCounter(0.36, 32)
-    hll.consume_fasta(filename)
+    n, n_consumed = hll.consume_fasta(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 236
+    assert n == 11
+    assert n_consumed == 575
 
 
 def test_hll_consume_fasta_estimate_bias():
@@ -104,17 +112,21 @@ def test_hll_consume_fasta_estimate_bias():
 
     filename = utils.get_test_data("test-abund-read-3.fa")
     hll = khmer.HLLCounter(0.36, K)
-    hll.consume_fasta(filename)
+    n, n_consumed = hll.consume_fasta(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 79
+    assert n == 21
+    assert n_consumed == 1176
 
 
 def test_hll_len():
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    hllcpp.consume_fasta(filename)
+    n, n_consumed = hllcpp.consume_fasta(filename)
 
+    assert n == 99
+    assert n_consumed == 3960
     assert hllcpp.estimate_cardinality() == len(hllcpp)
 
 
@@ -225,7 +237,7 @@ def test_hll_change_ksize():
     hllcpp.ksize = 24
     assert hllcpp.ksize == 24
 
-    hllcpp.ksize = 12L
+    hllcpp.ksize = 12
     assert hllcpp.ksize == 12
 
     with assert_raises(ValueError):
@@ -248,3 +260,43 @@ def test_hll_get_counters():
     counters = hll.counters
     assert len(counters) == 2 ** 4
     assert all(c == 0 for c in counters)
+
+
+def test_hll_merge_1():
+    hll = khmer.HLLCounter(0.36, K)
+    hll2 = khmer.HLLCounter(0.36, K - 1)
+
+    try:
+        hll.merge(hll2)
+        assert 0, "previous statement should fail with a ValueError"
+    except ValueError as err:
+        print(str(err))
+
+
+def test_hll_merge_2():
+    hll = khmer.HLLCounter(0.10, K)
+    hll2 = khmer.HLLCounter(0.36, K)
+
+    try:
+        hll.merge(hll2)
+        assert 0, "previous statement should fail with a ValueError"
+    except ValueError as err:
+        print(str(err))
+
+
+def test_hll_merge_3():
+    hll = khmer.HLLCounter(0.36, 32)
+    hll2 = khmer.HLLCounter(0.36, 32)
+
+    filename = utils.get_test_data('paired-mixed.fa')
+    hll = khmer.HLLCounter(0.36, 32)
+    hll.consume_fasta(filename)
+
+    hll2 = khmer.HLLCounter(0.36, 32)
+    hll2.consume_fasta(filename)
+
+    assert len(hll) == 236
+    assert len(hll2) == 236
+
+    hll.merge(hll2)
+    assert len(hll) == 236

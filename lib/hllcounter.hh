@@ -1,17 +1,26 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2014-2015. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
 #ifndef HLLCOUNTER_HH
 #define HLLCOUNTER_HH
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer
+{
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 
 namespace khmer
@@ -26,9 +35,11 @@ public:
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
     void consume_fasta(std::string const &,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     void consume_fasta(read_parsers::IParser *,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     unsigned int check_and_process_read(std::string &,

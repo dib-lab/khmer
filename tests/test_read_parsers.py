@@ -1,7 +1,9 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 
@@ -10,7 +12,7 @@
 
 import khmer
 from khmer import ReadParser
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 from functools import reduce
 
@@ -68,7 +70,7 @@ def test_num_reads_threads():
     n_threads = 4
     threads = []
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for _ in xrange(n_threads):
+    for _ in range(n_threads):
         thr = threading.Thread(target=count_reads, args=[rparser, ])
         threads.append(thr)
         thr.start()
@@ -85,7 +87,7 @@ def test_num_reads_truncated():
     try:
         for read in rparser:
             n_reads += 1
-    except IOError as err:
+    except ValueError as err:
         assert "Sequence is empty" in str(err), str(err)
     assert rparser.num_reads == 1, "%d valid reads in file, got %d" % (
         n_reads, rparser.num_reads)
@@ -107,8 +109,8 @@ def test_gzip_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
 
 
 def test_gzip_decompression_truncated_pairiter():
@@ -118,8 +120,10 @@ def test_gzip_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_bzip2_decompression():
@@ -139,8 +143,10 @@ def test_bzip2_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_bzip2_decompression_truncated_pairiter():
@@ -150,8 +156,10 @@ def test_bzip2_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_badbzip2():
@@ -160,10 +168,10 @@ def test_badbzip2():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
 @attr('multithread')
@@ -184,7 +192,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
     threads = []
     reads_counts_per_thread = [0] * N_THREADS
     rparser = ReadParser(utils.get_test_data(testfile))
-    for tnum in xrange(N_THREADS):
+    for tnum in range(N_THREADS):
         t = \
             threading.Thread(
                 target=count_reads,
@@ -267,7 +275,7 @@ def test_read_truncated():
         for read in rparser:
             pass
         assert 0, "No exception raised on a truncated file"
-    except IOError as err:
+    except ValueError as err:
         assert "Sequence is empty" in str(err), str(err)
 
 
@@ -308,13 +316,14 @@ def test_read_pair_iterator_in_error_mode():
             in rparser.iter_read_pairs(ReadParser.PAIR_MODE_ERROR_ON_UNPAIRED):
         read_pairs_2.append([read_1, read_2])
     matches = \
-        map(
+        list(map(
             lambda rp1, rp2: rp1[0].name == rp2[0].name,
             read_pairs_1, read_pairs_2
-        )
+        ))
     assert all(matches)  # Assert ALL the matches. :-]
 
 
+@attr('linux')
 def test_read_pair_iterator_in_error_mode_xfail():
 
     rparser = \
@@ -325,7 +334,22 @@ def test_read_pair_iterator_in_error_mode_xfail():
         for rpair in rparser.iter_read_pairs():
             pass
         failed = False
-    except IOError as exc:
+    except ValueError as exc:
+        assert "Invalid read pair" in str(exc), str(exc)
+    assert failed
+
+
+def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
+
+    rparser = \
+        ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
+
+    failed = True
+    try:
+        for rpair in rparser.iter_read_pairs():
+            pass
+        failed = False
+    except ValueError as exc:
         pass
     assert failed
 
@@ -353,12 +377,14 @@ def test_constructor():
         assert 0, ("ReadParser's constructor shouldn't accept a character for "
                    "the number of threads")
     except TypeError as err:
-        print str(err)
+        print(str(err))
     try:
         rparser = ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
     except ValueError as err:
-        print str(err)
+        print(str(err))
+    except OSError as err:
+        print(str(err))
 
 
 def test_iternext():
@@ -368,8 +394,8 @@ def test_iternext():
         for read_1, read_2 in rparser.iter_read_pairs():
             read_pairs.append(read_1, read_2)
         assert 0, "Shouldn't be able to iterate over non FASTA file"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
     except ValueError as err:
-        print str(err)
+        print(str(err))
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

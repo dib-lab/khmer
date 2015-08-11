@@ -1,8 +1,3 @@
-@@ merge refactor => master
-@@ review site for paper?
-
-auto-memory setting.
-
 find-knot speedup:
    - too many redundant rounds of partitioning?
 
@@ -28,17 +23,14 @@ load-counting/bigcount loading is slooooow
 
 ----
 
-screed bzip
 screed slice
 screed fasta/fastq output
 
-screed streaming foo
 
 ---
 
 fix tests cleanup
 pyrex/cython stuff
-script testing
 docs!
 
 ---
@@ -53,8 +45,6 @@ put in logging.
 fix tests and test cases to properly isolate/remove temp files.
 
 fix dir(ht)
-
-rename new_hashtable to new_countinghash
 
 ###
 

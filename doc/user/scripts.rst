@@ -10,14 +10,10 @@ distribution.  Below is our documentation for these scripts.  Note
 that all scripts can be given :option:`-h` which will print out
 a list of arguments taken by that script.
 
-Many scripts take :option:`-x` and :option:`-N` parameters, which drive khmer's
-memory usage. These parameters depend on details of your data set; for more information
-on how to choose them, see :doc:`choosing-table-sizes`.
-
-You can also override the default values of :option:`--ksize`/:option:`-k`,
-:option:`--n_tables`/:option:`-N`, and :option:`--min-tablesize`/:option:`-x` with
-the environment variables `KHMER_KSIZE`, `KHMER_N_TABLES`, and
-`KHMER_MIN_TABLESIZE` respectively.
+Scripts that use k-mer counting tables or k-mer graphs take an
+:option:`-M` parameter, which sets the maximum memory usage in bytes.
+This should generally be set as high as possible; see
+:doc:`choosing-table-sizes` for more information.
 
 1. :ref:`scripts-counting`
 2. :ref:`scripts-partitioning`
@@ -59,8 +55,8 @@ k-mer counting and abundance filtering
 .. autoprogram:: count-median:get_parser()
         :prog: count-median.py
 
-.. autoprogram:: count-overlap:get_parser()
-        :prog: count-overlap.py
+.. autoprogram:: unique-kmers:get_parser()
+        :prog: unique-kmers.py
 
 .. _scripts-partitioning:
 

@@ -1,8 +1,8 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -12,8 +12,10 @@ Display summary statistics for one or more FASTA/FASTQ files.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
+import csv
 import screed
 import argparse
 import textwrap
@@ -25,7 +27,7 @@ def get_parser():
     Report number of bases, number of sequences, and average sequence length
     for one or more FASTA/FASTQ files; and report aggregate statistics at end.
 
-    With :option:`-o`/:options:`--output`, the output will be saved to the
+    With :option:`-o`/:option:`--output`, the output will be saved to the
     specified file.
 
     Example::
@@ -38,61 +40,145 @@ def get_parser():
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
-                        type=argparse.FileType('w'), default=None)
-
+                        type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Use the CSV format for the statistics, '
+                        'including column headers.')
     return parser
 
 
-def main():
-    "Main function - run when executed as a script."
+class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
 
+    """
+    Output statistics for several data files.
+
+    The format of the output is determined by the formatter used.
+    All statistics are aggregated and a summary is added to the data.
+    """
+
+    def __init__(self, formatter):
+        self.formatter = formatter
+
+    def __enter__(self):
+        self.formatter.write_header()
+        return self
+
+    def append(self, basepairs, seqs, filename):
+        """Append a new line for the given basepair num, sequences and file."""
+        self.formatter.append(
+            basepairs, seqs, basepairs / float(seqs), filename)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            self.formatter.finalize()
+
+
+class CsvFormatter(object):
+
+    """Format the statistis information as CSV."""
+
+    headers = ['bp', 'seqs', 'avg_len', 'filename']
+
+    def __init__(self, underlying_file):
+        self.file = csv.writer(underlying_file)
+
+    def write_header(self):
+        """Add headers for the csv columns."""
+        self.file.writerow(self.headers)
+
+    def append(self, basepairs, seqs, avg_len, filename):
+        """Append the data separated by comma."""
+        self.file.writerow([basepairs, seqs, "%.1f" % avg_len, filename])
+
+    def finalize(self):
+        """No statistics since the CSV data is to be processed further."""
+        pass
+
+
+class StdFormatter(object):
+
+    """Format the statistics in a human readable string."""
+
+    def __init__(self, underlying_file):
+        self.file = underlying_file
+        self.bp_total = 0
+        self.seqs_total = 0
+
+    def write_header(self):
+        """Write a header line."""
+        self.file.write('---------------\n')
+
+    def append(self, basepairs, seqs, avg_len, filename):
+        """Append the data human readable."""
+        self.bp_total += basepairs
+        self.seqs_total += seqs
+        self.file.write('%d bp / %d seqs; %.1f average length -- %s\n' %
+                        (basepairs,
+                         seqs,
+                         avg_len,
+                         filename))
+
+    def finalize(self):
+        """Add a summary with the accumulated data."""
+        self.file.write('---------------\n')
+        avg = self.bp_total / float(self.seqs_total)
+        self.file.write('%d bp / %d seqs; %.1f average length -- total\n' %
+                        (self.bp_total, self.seqs_total, avg))
+
+
+def analyze_file(filename):
+    """Run over the given file and count base pairs and sequences."""
+    bps = 0
+    seqs = 0
+    input_iter = screed.open(filename)
+    for record in input_iter:
+        if seqs % 100000 == 0:
+            print('...', filename, seqs, file=sys.stderr)
+        bps += len(record.sequence)
+        seqs += 1
+    return bps, seqs
+
+
+def main():
+    """Main function - run when executed as a script."""
     parser = get_parser()
     args = parser.parse_args()
 
     total_bp = 0
     total_seqs = 0
 
-    output = []
-    for filename in args.filenames:
-        bp = 0
-        seqs = 0
+    statistics = []
 
+    for filename in args.filenames:
         try:
-            input_iter = screed.open(filename, parse_description=False)
+            bps, seqs = analyze_file(filename)
         except (IOError, OSError, EOFError) as exc:
-            print >>sys.stderr, 'ERROR in opening %s:' % filename
-            print >>sys.stderr, '     ', str(exc)
+            print('ERROR in opening %s:' % filename, file=sys.stderr)
+            print('     ', str(exc), file=sys.stderr)
             continue
 
-        for record in input_iter:
-            if seqs % 100000 == 0:
-                print >>sys.stderr, '...', filename, seqs
-            bp += len(record.sequence)
-            seqs += 1
-
         if seqs:
-            avg_len = bp / float(seqs)
-            s = '%d bp / %d seqs; %.1f average length -- %s' % (bp,
-                                                                seqs,
-                                                                avg_len,
-                                                                filename)
-            print >>sys.stderr, '... found', s
-            output.append(s)
-
-            total_bp += bp
-            total_seqs += seqs
+            statistics.append((bps, seqs, filename))
+            avg = bps / float(seqs)
+            msg = '%d bps / %d seqs; %.1f average length -- %s' % (bps,
+                                                                   seqs,
+                                                                   avg,
+                                                                   filename)
+            print('... found', msg, file=sys.stderr)
         else:
-            print >>sys.stderr, 'No sequences found in %s' % filename
+            print('No sequences found in %s' % filename, file=sys.stderr)
 
-    if total_seqs:
-        print >>args.outfp, '---------------'
-        print >>args.outfp, "\n".join(output)
-        print >>args.outfp, '---------------'
-        print >>args.outfp, '%d bp / %d seqs; %.1f average length -- total' % \
-            (total_bp, total_seqs, total_bp / float(total_seqs))
+    if statistics:
+        if args.csv:
+            formatter = CsvFormatter(args.outfp)
+        else:
+            formatter = StdFormatter(args.outfp)
+        with StatisticsOutput(formatter) as out:
+            for stat in statistics:
+                out.append(*stat)
     else:
-        print >>args.outfp, \
-            'No sequences found in %d files' % len(args.filenames)
+        print('No sequences found in %d files' %
+              len(args.filenames), file=args.outfp)
 
 
 if __name__ == '__main__':

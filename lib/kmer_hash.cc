@@ -1,18 +1,20 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
-#include <math.h>
-#include <string>
-#include <iostream>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include <algorithm>
+#include <string>
 
-#include "khmer.hh"
-#include "kmer_hash.hh"
 #include "MurmurHash3.h"
+#include "khmer.hh"
+#include "khmer_exception.hh"
+#include "kmer_hash.hh"
 
 using namespace std;
 
@@ -154,6 +156,73 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
 
     khmer::_hash_murmur(kmer, h, r);
     return h;
+}
+
+KmerIterator::KmerIterator(const char * seq,
+                           unsigned char k) :
+                           KmerFactory(k), _seq(seq)
+{
+    bitmask = 0;
+    for (unsigned char i = 0; i < _ksize; i++) {
+        bitmask = (bitmask << 2) | 3;
+    }
+    _nbits_sub_1 = (_ksize*2 - 2);
+
+    index = _ksize - 1;
+    length = strlen(seq);
+    _kmer_f = 0;
+    _kmer_r = 0;
+
+    initialized = false;
+}
+
+Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
+{
+    HashIntoType x;
+    x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
+
+    f = _kmer_f;
+    r = _kmer_r;
+
+    index = _ksize;
+
+    return Kmer(_kmer_f, _kmer_r, x);
+}
+
+Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
+{
+    if (done()) {
+        throw khmer_exception();
+    }
+
+    if (!initialized) {
+        initialized = true;
+        return first(f, r);
+    }
+
+    unsigned char ch = _seq[index];
+    index++;
+    if (!(index <= length)) {
+        throw khmer_exception();
+    }
+
+    // left-shift the previous hash over
+    _kmer_f = _kmer_f << 2;
+
+    // 'or' in the current nt
+    _kmer_f |= twobit_repr(ch);
+
+    // mask off the 2 bits we shifted over.
+    _kmer_f &= bitmask;
+
+    // now handle reverse complement
+    _kmer_r = _kmer_r >> 2;
+    _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
+
+    f = _kmer_f;
+    r = _kmer_r;
+
+    return build_kmer(_kmer_f, _kmer_r);
 }
 
 };

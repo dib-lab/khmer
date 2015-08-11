@@ -1,8 +1,8 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -11,22 +11,22 @@ Count saturation curve for reads with a coverage of 1, but collect
 reads whether or not they have high coverage.  This is better for
 assessing saturation of (esp) low-coverage data sets.
 """
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
-from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
+                              report_on_config, info, create_countgraph)
 import argparse
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 1
 
-MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
-# http://arxiv.org/abs/1309.2975
 
 # Iterate a collection in arbitrary batches
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
@@ -34,7 +34,7 @@ MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 
 def batchwise(coll, size):
     iter_coll = iter(coll)
-    return izip(*[iter_coll] * size)
+    return zip(*[iter_coll] * size)
 
 # Returns true if the pair of records are properly pairs
 
@@ -63,14 +63,14 @@ def normalize_by_median(input_filename, htable, args, report_fp=None,
     for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if index > 0 and index % report_frequency == 0:
-            print '... kept {kept} of {total} or {perc:2}%'.format(
+            print('... kept {kept} of {total} or {perc:2}%'.format(
                 kept=total - discarded, total=total,
-                perc=int(100. - discarded / float(total) * 100.))
-            print '... in file', input_filename
+                perc=int(100. - discarded / float(total) * 100.)))
+            print('... in file', input_filename)
 
             if report_fp:
-                print >> report_fp, total, total - discarded, \
-                    1. - (discarded / float(total))
+                print(total, total - discarded, \
+                    1. - (discarded / float(total)), file=report_fp)
                 report_fp.flush()
 
         total += batch_size
@@ -105,8 +105,8 @@ def normalize_by_median(input_filename, htable, args, report_fp=None,
 
 
 def handle_error(error, input_name):
-    print >> sys.stderr, '** ERROR:', error
-    print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
+    print('** ERROR:', error, file=sys.stderr)
+    print('** Failed on {name}: '.format(name=input_name), file=sys.stderr)
 
 def get_parser():
     epilog = ("""
@@ -118,13 +118,13 @@ def get_parser():
     keeping (or discarding) each sequencing fragment. This helps with retention
     of repeats, especially.
 
-    With :option:`-s`/:option:`--savetable`, the k-mer counting table
+    With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
     will be saved to the specified file after all sequences have been
-    processed. With :option:`-d`, the k-mer counting table will be
+    processed. With :option:`-d`, the k-mer countgraph will be
     saved every d files for multifile runs; if :option:`-s` is set,
     the specified name will be used, and if not, the name `backup.ct`
-    will be used.  :option:`-l`/:option:`--loadtable` will load the
-    specified k-mer counting table before processing the specified
+    will be used.  :option:`-l`/:option:`--loadgraph` will load the
+    specified k-mer countgraph before processing the specified
     files.  Note that these tables are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
@@ -157,7 +157,7 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-s', '--savetable', metavar="filename", default='')
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
@@ -171,7 +171,7 @@ def get_parser():
                         ' file with the specified filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
     return parser
 
 
@@ -186,20 +186,19 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, False)
-    if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize, False)
+    if args.savegraph:
+        check_space_for_graph(args, 'countgraph', False)
 
     # list to save error files along with throwing exceptions
     if args.force:
         corrupt_files = []
 
-    if args.loadtable:
-        print 'loading k-mer counting table from', args.loadtable
-        htable = khmer.load_counting_hash(args.loadtable)
+    if args.loadgraph:
+        print('loading k-mer countgraph from', args.loadgraph)
+        htable = khmer.load_countgraph(args.loadgraph)
     else:
-        print 'making k-mer counting table'
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        print('making countgraph')
+        htable = create_countgraph(args)
 
     total = 0
     discarded = 0
@@ -216,43 +215,39 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         except IOError as err:
             handle_error(err, input_filename)
             if not args.force:
-                print >> sys.stderr, '** Exiting!'
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
+                print('** Exiting!', file=sys.stderr)
                 sys.exit(1)
             else:
-                print >> sys.stderr, '*** Skipping error file, moving on...'
+                print('*** Skipping error file, moving on...', file=sys.stderr)
                 corrupt_files.append(input_filename)
         else:
             if total_acc == 0 and discarded_acc == 0:
-                print 'SKIPPED empty file', input_filename
+                print('SKIPPED empty file', input_filename)
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
                     .format(inp=input_filename,
                             kept=total - discarded, total=total,
-                            perc=int(100. - discarded / float(total) * 100.))
+                            perc=int(100. - discarded / float(total) * 100.)))
 
-    if args.savetable:
-        print 'Saving k-mer counting table through', input_filename
-        print '...saving to', args.savetable
-        htable.save(args.savetable)
+    if args.savegraph:
+        print('Saving k-mer countgraph through', input_filename)
+        print('...saving to', args.savegraph)
+        htable.save(args.savegraph)
 
-    fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    # re: threshold, see Zhang et al.,
+    # http://arxiv.org/abs/1309.2975
+    fp_rate = khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate))
 
     if args.force and len(corrupt_files) > 0:
-        print >> sys.stderr, "** WARNING: Finished with errors!"
-        print >> sys.stderr, "** IOErrors occurred in the following files:"
-        print >> sys.stderr, "\t", " ".join(corrupt_files)
+        print("** WARNING: Finished with errors!", file=sys.stderr)
+        print("** I/O Errors occurred in the following files:", file=sys.stderr)
+        print("\t", " ".join(corrupt_files), file=sys.stderr)
 
-    if fp_rate > MAX_FALSE_POSITIVE_RATE:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " for this data set.  Increase tablesize/# "
-                              "tables.")
-        print >> sys.stderr, "**"
-        print >> sys.stderr, "** Do not use these results!!"
-        sys.exit(1)
 
 if __name__ == '__main__':
     main()

@@ -1,18 +1,17 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
-#include "read_parsers.hh"
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+#include <fstream>
 
-#include <cstring>
 #include "khmer_exception.hh"
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
+#include "read_parsers.hh"
 
 namespace khmer
 {
@@ -20,6 +19,21 @@ namespace khmer
 
 namespace read_parsers
 {
+
+void
+Read::write_to(std::ostream& output)
+{
+    if (quality.length() != 0) {
+        output << "@" << name << std::endl
+               << sequence << std::endl
+               << "+" << std::endl
+               << quality << std::endl;
+    } else {
+        output << ">" << name << std::endl
+               << sequence << std::endl;
+    }
+}
+
 
 struct SeqAnParser::Handle {
     seqan::SequenceStream stream;
@@ -33,11 +47,11 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
         message = message + filename + " for reading.";
-        throw InvalidStreamHandle(message.c_str());
+        throw InvalidStream(message);
     } else if (seqan::atEnd(_private->stream)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
-        throw InvalidStreamHandle(message.c_str());
+        throw InvalidStream(message);
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
@@ -122,7 +136,7 @@ IParser(
             REG_EXTENDED | REG_NOSUB
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R2 nosub regex");
     }
     regex_rc =
         regcomp(
@@ -130,7 +144,7 @@ IParser(
             "^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R1 regex");
     }
     regex_rc =
         regcomp(
@@ -138,7 +152,7 @@ IParser(
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception();
+        throw khmer_exception("Could not compile R2 regex");
     }
     _num_reads = 0;
     _have_qualities = false;
@@ -169,7 +183,9 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
         _imprint_next_read_pair_in_error_mode( the_read_pair );
         break;
     default:
-        throw UnknownPairReadingMode( );
+        std::ostringstream oss;
+        oss << "Unknown pair reading mode: " << mode;
+        throw UnknownPairReadingMode(oss.str());
     }
 }
 

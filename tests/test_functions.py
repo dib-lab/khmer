@@ -1,17 +1,23 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 import khmer
-from nose.plugins.attrib import attr
 import os
-import khmer_tst_utils as utils
+import sys
 import collections
+from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
-from khmer.kfile import check_file_status
+from khmer.kfile import check_input_files, get_file_writer
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 def test_forward_hash():
@@ -19,6 +25,19 @@ def test_forward_hash():
     assert khmer.forward_hash('TTTT', 4) == 0
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
+
+
+def test_get_file_writer_fail():
+    somefile = utils.get_temp_filename("potato")
+    somefile = open(somefile, "w")
+    stopped = True
+    try:
+        get_file_writer(somefile, True, True)
+        stopped = False
+    except Exception as err:
+        assert "Cannot specify both bzip and gzip" in str(err), str(err)
+
+    assert stopped, "Expected exception"
 
 
 def test_forward_hash_no_rc():
@@ -76,15 +95,36 @@ def test_get_primes():
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
 
-def test_extract_countinghash_info():
+def test_get_primes_fal():
+    try:
+        primes = khmer.get_n_primes_near_x(5, 5)
+        assert 0, "previous statement should fail"
+    except RuntimeError as err:
+        assert "unable to find 5 prime numbers < 5" in str(err)
+
+
+def test_extract_countgraph_info_badfile():
+    try:
+        khmer.extract_countgraph_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
+
+
+def test_extract_countgraph_info():
     fn = utils.get_temp_filename('test_extract_counting.ct')
     for size in [1e6, 2e6, 5e6, 1e7]:
-        ht = khmer.new_counting_hash(25, size, 4)
+        ht = khmer.Countgraph(25, size, 4)
         ht.save(fn)
 
-        info = khmer.extract_countinghash_info(fn)
-        ksize, table_size, n_tables, _, _, _ = info
-        print ksize, table_size, n_tables
+        try:
+            info = khmer.extract_countgraph_info(fn)
+        except ValueError as err:
+            raise
+            assert 0, 'Should not throw a ValueErorr: ' + str(err)
+        ksize, table_size, n_tables, _, _, _, _ = info
+        print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
         assert table_size == size
@@ -92,46 +132,69 @@ def test_extract_countinghash_info():
 
         try:
             os.remove(fn)
-        except OSError as e:
-            print >>sys.stder, '...failed to remove {fn}'.format(fn)
+        except OSError as err:
+            assert 0, '...failed to remove ' + fn + str(err)
 
 
-def test_extract_hashbits_info():
-    fn = utils.get_temp_filename('test_extract_hashbits.pt')
+def test_extract_nodegraph_info_badfile():
+    try:
+        khmer.extract_nodegraph_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
+
+
+def test_extract_nodegraph_info():
+    fn = utils.get_temp_filename('test_extract_nodegraph.pt')
     for size in [1e6, 2e6, 5e6, 1e7]:
-        ht = khmer.Hashbits(25, size, 4)
+        ht = khmer.Nodegraph(25, size, 4)
         ht.save(fn)
 
-        info = khmer.extract_hashbits_info(fn)
-        ksize, table_size, n_tables, _, _ = info
-        print ksize, table_size, n_tables
+        info = khmer.extract_nodegraph_info(fn)
+        ksize, table_size, n_tables, _, _, _ = info
+        print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
-        assert table_size == size
+        assert table_size == size, table_size
         assert n_tables == 4
 
         try:
             os.remove(fn)
-        except OSError as e:
-            print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+        except OSError as err:
+            print('...failed to remove {fn}'.format(fn) + str(err),
+                  file=sys.stderr)
 
 
 def test_check_file_status_kfile():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
     check_file_status_exited = False
+
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
-        check_file_status(fn, False)
+        check_input_files(fn, False)
     except SystemExit:
-        check_file_status_exited = True
-    assert check_file_status_exited
+        assert "does not exist" in capture.getvalue(), capture.getvalue()
+    finally:
+        sys.stderr = old_stderr
 
 
 def test_check_file_status_kfile_force():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
+
+    old_stderr = sys.stderr
+    sys.stderr = capture = StringIO()
+
     try:
-        check_file_status(fn, True)
-    except OSError as e:
+        check_input_files(fn, True)
+    except OSError:
         assert False
+    finally:
+        sys.stderr = old_stderr
+
+    assert "does not exist" in capture.getvalue(), capture.getvalue()
 
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])

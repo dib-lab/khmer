@@ -107,6 +107,26 @@ the digital normalization algorithm, described in:
       url = "http://arxiv.org/abs/1203.4802",
   }
 
+Efficient k-mer error trimming
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The script trim-low-abund.py is described in:
+
+   Crossing the streams: a framework for streaming analysis of short DNA
+   sequencing reads
+   Zhang Q, Awad S, Brown CT
+   https://dx.doi.org/10.7287/peerj.preprints.890v1
+
+.. code-block:: tex
+
+  @unpublished{semistream,
+      author = "Qingpeng Zhang and Sherine Awad and C. Titus Brown",
+      title = "Crossing the streams: a framework for streaming analysis of short DNA sequencing reads",
+      year = "2015",
+      eprint = "PeerJ Preprints 3:e1100",
+      url = "https://dx.doi.org/10.7287/peerj.preprints.890v1"
+  }
+
 K-mer counting
 ^^^^^^^^^^^^^^
 
@@ -153,7 +173,7 @@ implement the probabilistic k-mer counting described in:
   digital normalization of reads in the context of high khmer false positive
   rates. khmer is implemented in C++ wrapped in a Python interface, offers a
   tested and robust API, and is freely available under the BSD license at
-  github.com/ged-lab/khmer.</p>",
+  github.com/dib-lab/khmer.</p>",
       number = "7",
       doi = "10.1371/journal.pone.0101271"
   }

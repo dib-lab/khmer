@@ -1,19 +1,20 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2014-2015. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
-#include "hllcounter.hh"
-
 #include <math.h>
+#include <stdlib.h>
 #include <algorithm>
+#include <map>
 #include <numeric>
-#include <inttypes.h>
-#include <sstream>
+#include <utility>
 
+#include "hllcounter.hh"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 
@@ -321,10 +322,15 @@ void HLLCounter::add(const std::string &value)
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 
-unsigned int HLLCounter::consume_string(const std::string &s)
+unsigned int HLLCounter::consume_string(const std::string &inp)
 {
     unsigned int n_consumed = 0;
     std::string kmer = "";
+    std::string s = inp;
+
+    for (unsigned int i = 0; i < s.length(); i++)  {
+        s[i] &= 0xdf; // toupper - knock out the "lowercase bit"
+    }
 
     for(std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
         kmer.push_back(*it);
@@ -341,18 +347,20 @@ unsigned int HLLCounter::consume_string(const std::string &s)
 
 void HLLCounter::consume_fasta(
     std::string const &filename,
+    bool output_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(parser, total_reads, n_consumed);
+    consume_fasta(parser, output_records, total_reads, n_consumed);
 
     delete parser;
 }
 
 void HLLCounter::consume_fasta(
     read_parsers::IParser *parser,
+    bool output_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
 {
@@ -366,7 +374,7 @@ void HLLCounter::consume_fasta(
 
     #pragma omp parallel
     {
-        #pragma omp single
+        #pragma omp master
         {
             counters = (HLLCounter**)calloc(omp_get_num_threads(),
             sizeof(HLLCounter*));
@@ -386,27 +394,32 @@ void HLLCounter::consume_fasta(
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
-
-                    #pragma omp task default(none) firstprivate(read) \
-                    shared(counters, n_consumed_partial, total_reads_partial)
-                    {
-                        bool is_valid;
-                        int n, t = omp_get_thread_num();
-                        n = counters[t]->check_and_process_read(read.sequence,
-                        is_valid);
-                        n_consumed_partial[t] += n;
-                        if (is_valid) {
-                            total_reads_partial[t] += 1;
-                        }
-                    }
                 } catch (read_parsers::NoMoreReadsAvailable) {
+                    break;
+                }
+
+                if (output_records) {
+                    read.write_to(std::cout);
+                }
+
+                #pragma omp task default(none) firstprivate(read) \
+                shared(counters, n_consumed_partial, total_reads_partial)
+                {
+                    bool is_valid;
+                    int n, t = omp_get_thread_num();
+                    n = counters[t]->check_and_process_read(read.sequence,
+                                                            is_valid);
+                    n_consumed_partial[t] += n;
+                    if (is_valid) {
+                        total_reads_partial[t] += 1;
+                    }
                 }
 
             } // while reads left for parser
         }
         #pragma omp taskwait
 
-        #pragma omp single
+        #pragma omp master
         {
             for (int i=0; i < omp_get_num_threads(); ++i)
             {
@@ -443,8 +456,11 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
     }
 
     for (unsigned int i = 0; i < read.length(); i++) {
-        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
-        if (!is_valid_dna( read[ i ] )) {
+        read[i] &= 0xdf; // toupper - knock out the "lowercase bit"
+        if (read[i] == 'N') {
+            read[i] = 'A';
+        }
+        if (!is_valid_dna( read[i] )) {
             is_valid = false;
             break;
         }
@@ -455,6 +471,9 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 
 void HLLCounter::merge(HLLCounter &other)
 {
+    if (this->p != other.p || this->_ksize != other._ksize) {
+        throw khmer_exception("HLLCounters to be merged must be created with same parameters");
+    }
     for(unsigned int i=0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);
     }

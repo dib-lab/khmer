@@ -1,26 +1,47 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
-#include "hashtable.hh"
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <map>
+#include <string>
+#include <utility>
 #include <vector>
+
+#include "hashtable.hh"
+#include "khmer.hh"
+#include "kmer_hash.hh"
+
+#define DEFAULT_TABLE_LOCKS 128
+
+namespace khmer
+{
+class Hashbits;
+
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
-class CountingHashIntersect;
 class CountingHashFile;
 class CountingHashFileReader;
 class CountingHashFileWriter;
 class CountingHashGzFileReader;
 class CountingHashGzFileWriter;
+class CountingHashIntersect;
 
 class CountingHash : public khmer::Hashtable
 {
@@ -37,8 +58,13 @@ protected:
     std::vector<HashIntoType> _tablesizes;
     size_t _n_tables;
     HashIntoType _n_unique_kmers;
+    HashIntoType _occupied_bins;
 
     Byte ** _counts;
+
+    uint32_t * _table_spinlocks;
+    HashIntoType _n_table_locks;
+    bool _threadsafe;
 
     virtual void _allocate_counters()
     {
@@ -55,19 +81,22 @@ public:
 
     CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
+        _threadsafe = false;
     }
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
+        _bigcount_spin_lock(false), _tablesizes(tablesizes),
+        _n_unique_kmers(0), _occupied_bins(0)
     {
 
         _allocate_counters();
+        _threadsafe = false;
     }
 
     virtual ~CountingHash()
@@ -85,6 +114,11 @@ public:
 
             _n_tables = 0;
         }
+        if (_threadsafe) {
+          delete[] _table_spinlocks;
+          _table_spinlocks = NULL;
+          _threadsafe = false;
+        }
     }
 
     // Writing to the tables outside of defined methods has undefined behavior!
@@ -94,17 +128,10 @@ public:
         return _counts;
     }
 
-    virtual void init_threadstuff(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS) {
-        if(!_threadsafe) {
-            _n_table_locks = n_table_locks < 4 ? 4 : n_table_locks;
-            _table_spinlocks = new uint32_t[_n_table_locks];
-            for (unsigned int i=0; i<_n_table_locks; ++i) {
-                _table_spinlocks[i] = 0;
-            }
-            _threadsafe = true;
-        }
-    }
-
+    void init_threadsafe(unsigned int n_table_locks=DEFAULT_TABLE_LOCKS);
+    bool is_threadsafe() { return _threadsafe; };
+    const HashIntoType n_table_locks() const { return _n_table_locks; };
+    
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
     {
         BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
@@ -124,7 +151,10 @@ public:
         return _tablesizes;
     }
 
-    virtual const HashIntoType n_unique_kmers() const;
+    virtual const HashIntoType n_unique_kmers() const
+    { 
+        return _n_unique_kmers;
+    }
 
     void set_use_bigcount(bool b)
     {
@@ -138,33 +168,18 @@ public:
     virtual void save(std::string);
     virtual void load(std::string);
 
-    // accessors to get table info
-    const HashIntoType n_entries() const
-    {
-        return _tablesizes[0];
-    }
-
     const size_t n_tables() const
     {
         return _n_tables;
     }
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const
+    virtual const HashIntoType n_occupied() const
     {
-        HashIntoType n = 0;
-        if (stop == 0) {
-            stop = _tablesizes[0];
-        }
-        for (HashIntoType i = start; i < stop; i++) {
-            if (_counts[0][i % _tablesizes[0]]) {
-                n++;
-            }
-        }
-        return n;
+        return _occupied_bins;
     }
 
+    /*
     virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
@@ -173,14 +188,19 @@ public:
 
     virtual void count(HashIntoType khash)
     {
-        bool is_new_kmer = true;
+        bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
-            if (is_new_kmer && current_count != 0) {
-                is_new_kmer = false;
+            if (!is_new_kmer) {
+                if (current_count == 0) {
+                    is_new_kmer = true;
+                    if (i == 0) {
+                       __sync_add_and_fetch(&_occupied_bins, 1);
+                    }
+                }
             }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than
@@ -212,19 +232,22 @@ public:
         }
 
     } // count
+    */
 
-    virtual void count_ts(const char * kmer)
+    virtual void count(const char * kmer)
     {
         HashIntoType hash = _hash(kmer, _ksize);
         count_ts(hash);
     }
 
     // Thread-safe counting function
-    virtual void count_ts(HashIntoType khash)
+    virtual void count(HashIntoType khash)
     {
         bool is_new_kmer = true;
         unsigned int  n_full      = 0;
         uint32_t lock_index = khash % _n_table_locks;
+
+        // Take the lock for the given region
         while(!__sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 0, 1));
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
@@ -291,10 +314,6 @@ public:
     BoundedCounterType get_min_count(const std::string &s);
 
     BoundedCounterType get_max_count(const std::string &s);
-
-    void get_kadian_count(const std::string &s,
-                          BoundedCounterType &kadian,
-                          unsigned int nk = 1);
 
     HashIntoType * abundance_distribution(read_parsers::IParser * parser,
                                           Hashbits * tracking);

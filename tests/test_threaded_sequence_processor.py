@@ -1,10 +1,15 @@
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, SequenceGroup
-from cStringIO import StringIO
+from io import StringIO
 from screed.fasta import fasta_iter
 from screed.fastq import fastq_iter
-import Queue
 from nose.plugins.attrib import attr
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 
 def load_records(stringio_fp):
@@ -111,7 +116,7 @@ def test_paired_2thread():
             while not self.done or not inq.empty():
                 try:
                     g = inq.get(True, 1)
-                except Queue.Empty:
+                except queue.Empty:
                     continue
 
                 assert len(g.seqlist) == 2
@@ -160,7 +165,7 @@ def test_paired_2thread_more_seq():
             while not self.done or not inq.empty():
                 try:
                     g = inq.get(True, 1)
-                except Queue.Empty:
+                except queue.Empty:
                     continue
 
                 if len(g.seqlist) == 2:

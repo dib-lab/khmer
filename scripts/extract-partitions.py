@@ -1,8 +1,8 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
 # pylint: disable=invalid-name,missing-docstring
@@ -18,13 +18,16 @@ Use '-h' for parameter help.
 @CTB note that if threshold is != 1, those sequences will not be output
 by output_unassigned...
 """
+from __future__ import print_function
 
 import sys
 import screed
 import argparse
 import textwrap
 import khmer
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type,
+                         get_file_writer)
 from khmer.khmer_args import info
 from khmer.utils import write_record
 
@@ -33,8 +36,7 @@ DEFAULT_THRESHOLD = 5
 
 
 def read_partition_file(filename):
-    for record_index, record in enumerate(screed.open
-                                          (filename, parse_description=False)):
+    for record_index, record in enumerate(screed.open(filename)):
         _, partition_id = record.name.rsplit('\t', 1)
         yield record_index, record, int(partition_id)
 
@@ -77,6 +79,7 @@ def get_parser():
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
@@ -90,28 +93,28 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     n_unassigned = 0
 
     for infile in args.part_filenames:
-        check_file_status(infile, args.force)
+        check_input_files(infile, args.force)
 
     check_space(args.part_filenames, args.force)
 
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'reading partitioned files:', repr(args.part_filenames)
+    print('---', file=sys.stderr)
+    print('reading partitioned files:', repr(
+        args.part_filenames), file=sys.stderr)
     if args.output_groups:
-        print >>sys.stderr, 'outputting to files named "%s.groupN.fa"' % \
-            args.prefix
-        print >>sys.stderr, 'min reads to keep a partition:', \
-            args.min_part_size
-        print >>sys.stderr, 'max size of a group file:', args.max_size
+        print('outputting to files named "%s.groupN.fa"' %
+              args.prefix, file=sys.stderr)
+        print('min reads to keep a partition:',
+              args.min_part_size, file=sys.stderr)
+        print('max size of a group file:', args.max_size, file=sys.stderr)
     else:
-        print >>sys.stderr, 'NOT outputting groups! Beware!'
+        print('NOT outputting groups! Beware!', file=sys.stderr)
 
     if args.output_unassigned:
-        print >>sys.stderr, \
-            'outputting unassigned reads to "%s.unassigned.fa"' % \
-            args.prefix
-    print >>sys.stderr, 'partition size distribution will go to %s' \
-        % distfilename
-    print >>sys.stderr, '---'
+        print('outputting unassigned reads to "%s.unassigned.fa"' %
+              args.prefix, file=sys.stderr)
+    print('partition size distribution will go to %s'
+          % distfilename, file=sys.stderr)
+    print('---', file=sys.stderr)
 
     #
 
@@ -136,13 +139,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             break
 
     if args.output_unassigned:
-        unassigned_fp = open('%s.unassigned.%s' % (args.prefix, suffix), 'w')
-
+        ofile = open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
+        unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
     count = {}
     for filename in args.part_filenames:
         for index, read, pid in read_partition_file(filename):
             if index % 100000 == 0:
-                print >>sys.stderr, '...', index
+                print('...', index, file=sys.stderr)
 
             count[pid] = count.get(pid, 0) + 1
 
@@ -159,7 +162,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     # develop histogram of partition sizes
     dist = {}
-    for pid, size in count.items():
+    for pid, size in list(count.items()):
         dist[size] = dist.get(size, 0) + 1
 
     # output histogram
@@ -177,7 +180,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(0)
 
     # sort groups by size
-    divvy = sorted(count.items(), key=lambda y: y[1])
+    divvy = sorted(list(count.items()), key=lambda y: y[1])
     divvy = [y for y in divvy if y[1] > args.min_part_size]
 
     # divvy up into different groups, based on having max_size sequences
@@ -205,16 +208,18 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             # print 'group_d', partition_id, group_n
         group_n += 1
 
-    print >>sys.stderr, '%d groups' % group_n
+    print('%d groups' % group_n, file=sys.stderr)
     if group_n == 0:
-        print >>sys.stderr, 'nothing to output; exiting!'
+        print('nothing to output; exiting!', file=sys.stderr)
         return
 
     # open a bunch of output files for the different groups
     group_fps = {}
-    for _ in range(group_n):
-        group_fp = open('%s.group%04d.%s' % (args.prefix, _, suffix), 'w')
-        group_fps[_] = group_fp
+    for index in range(group_n):
+        fname = '%s.group%04d.%s' % (args.prefix, index, suffix)
+        group_fp = get_file_writer(open(fname, 'wb'), args.gzip,
+                                   args.bzip)
+        group_fps[index] = group_fp
 
     # write 'em all out!
 
@@ -225,7 +230,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         for index, read, partition_id in read_partition_file(filename):
             total_seqs += 1
             if index % 100000 == 0:
-                print >>sys.stderr, '...x2', index
+                print('...x2', index, file=sys.stderr)
 
             if partition_id == 0:
                 continue
@@ -242,20 +247,19 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             write_record(read, outfp)
             part_seqs += 1
 
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'Of %d total seqs,' % total_seqs
-    print >>sys.stderr, 'extracted %d partitioned seqs into group files,' % \
-        part_seqs
-    print >>sys.stderr, \
-        'discarded %d sequences from small partitions (see -m),' % \
-        toosmall_parts
-    print >>sys.stderr, 'and found %d unpartitioned sequences (see -U).' % \
-        n_unassigned
-    print >>sys.stderr, ''
-    print >>sys.stderr, 'Created %d group files named %s.groupXXXX.%s' % \
-        (len(group_fps),
-         args.prefix,
-         suffix)
+    print('---', file=sys.stderr)
+    print('Of %d total seqs,' % total_seqs, file=sys.stderr)
+    print('extracted %d partitioned seqs into group files,' %
+          part_seqs, file=sys.stderr)
+    print('discarded %d sequences from small partitions (see -m),' %
+          toosmall_parts, file=sys.stderr)
+    print('and found %d unpartitioned sequences (see -U).' %
+          n_unassigned, file=sys.stderr)
+    print('', file=sys.stderr)
+    print('Created %d group files named %s.groupXXXX.%s' %
+          (len(group_fps),
+           args.prefix,
+           suffix), file=sys.stderr)
 
 if __name__ == '__main__':
     main()

@@ -1,5 +1,13 @@
+.. This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   the three-clause BSD license; see doc/LICENSE.txt.
+   Contact: khmer-project@idyll.org
+
+
 Getting started with khmer development
 ======================================
+
+.. contents::
 
 This document is for people who would like to contribute to khmer.  It
 walks first-time contributors through making their own copy of khmer,
@@ -40,7 +48,7 @@ One-time Preparation
        On recent Debian and Ubuntu this can be done with::
 
            sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
-           g++
+           g++ git astyle gcovr cppcheck
 
        For RHEL6::
 
@@ -55,7 +63,7 @@ One-time Preparation
 
    (We use GitHub to manage khmer contributions.)
 
-#. Fork `github.com/ged-lab/khmer <http://github.com/ged-lab/khmer>`__.
+#. Fork `github.com/dib-lab/khmer <https://github.com/dib-lab/khmer>`__.
 
    Visit that page, and then click on the 'fork' button (upper right).
 
@@ -73,10 +81,10 @@ One-time Preparation
 
    (This makes a local copy of khmer on your development machine.)
 
-#. Add a git reference to the khmer ged-lab repository::
+#. Add a git reference to the khmer dib-lab repository::
 
        cd khmer
-       git remote add ged https://github.com/ged-lab/khmer.git
+       git remote add dib https://github.com/dib-lab/khmer.git
        cd ../
 
    (This makes it easy for you to pull down the latest changes in the
@@ -95,13 +103,19 @@ One-time Preparation
 	tar xzf virtualenv*
 	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
-   `Conda <https://github.com/conda/conda>`__ users on any platform can install
-   virtualenv this way::
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install pip by execution from the command line::
+     
+       sudo port install py27-pip
+     
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+   already installed
 
-       conda install pip
-       hash -r
-       pip install virtualenv
-       python2.7 -m virtualenv env 
+
+   `Conda <https://github.com/conda/conda>`__ users on any platform
+   should instead create a separate Conda environment::
+
+       conda create -n khmer anaconda
 
 #. Activate the virtualenv and install a few packages::
 
@@ -113,12 +127,42 @@ One-time Preparation
    <https://nose.readthedocs.org/en/latest/>`__, packages we use for
    building the documentation and running the tests.)
 
+   In Conda to activate the previously created environment and install
+   dependencies::
+
+       source activate khmer
+       cd khmer
+       make install-dependencies
+       
+#. Cppcheck installation:
+   
+   `Debian <https://www.debian.org/>`__ and
+   `Ubuntu <http://www.ubuntu.com/>`__ Linux distro users can
+   install cppcheck by executing from the command line::
+     
+       sudo apt-get install cppcheck
+
+   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo port install cppcheck
+
+   `Homebrew <http://brew.sh/>`__ users on the OS X platform can
+   install cppcheck by executing from the command line::
+     
+       sudo brew install cppcheck
+
+
 Building khmer and running the tests
 ------------------------------------
 
 #. Activate (or re-activate) the virtualenv::
 
       source ../env/bin/activate
+
+   ... or for Conda users::
+
+      source activate khmer
 
    You can run this many times without any ill effects.
 
@@ -129,7 +173,7 @@ Building khmer and running the tests
       make
 
    If this fails, we apologize -- please `go create a new issue
-   <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
+   <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
    paste in the failure message, and we'll try to help you work through it!
 
    (This takes the C++ source code and compiles it into something that Python
@@ -157,8 +201,8 @@ Claiming an issue and starting to develop
 #. Find an open issue and claim it.
 
    Go to `the list of open khmer issues
-   <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__
-   and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/ged-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
+   <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__
+   and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/dib-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
 
    Once you've found an issue you like, make sure that no one has been
    assigned to it (see "assignee", bottom right near "notifications").
@@ -171,17 +215,18 @@ Claiming an issue and starting to develop
    from the main khmer master branch::
 
       git checkout master
-      git pull ged master
+      git pull dib master
 
    (This pulls in all of the latest changes from whatever we've been
-   doing on ged-lab.)
+   doing on dib-lab.)
 
 #. Create a new branch and link it to your fork on GitHub::
 
-      git checkout -b fix/issue_number
-      git push -u origin fix/issue_number
+      git checkout -b fix/brief_issue_description
+      git push -u origin fix/brief_issue_description
 
-   where you replace "issue_number" with the number of the issue.
+   where you replace "brief_issue_description" with 2-3 words, separated
+   by underscores, describing the issue.
 
    (This is the set of changes you're going to ask to be merged into khmer.)
 
@@ -193,10 +238,10 @@ Claiming an issue and starting to develop
 
 #. Periodically update your branch from the main khmer master branch::
 
-      git pull ged master
+      git pull dib master
 
    (This pulls in all of the latest changes from whatever we've been
-   doing on ged-lab - important especially during periods of fast change
+   doing on dib-lab - important especially during periods of fast change
    or for long-running pull requests.
 
 #. Run the tests and/or build the docs *before* pushing to GitHub::
@@ -245,13 +290,13 @@ Claiming an issue and starting to develop
 
       git push origin
 
-#. When you are ready to have the pull request reviewed, please add a
-   comment "ready for review!".
+#. When you are ready to have the pull request reviewed, please mention 
+   @luizirber, @camillescott, @mr-c, or @ctb with a comment 'Ready for review!'
 
 #. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
-   'ping!' in the comments if you are looking for feedback -- this
-   will alert us that you are still on the line -- but we will
+   'ping!' and an @ in the comments if you are looking for feedback 
+   -- this will alert us that you are still on the line -- but we will
    automatically get notified of your pull request and any new
    comments, so use sparingly.
 
@@ -289,3 +334,26 @@ Here are a few suggestions:
 
 * You can also help other people out by watching for new issues or
   looking at pull requests.  Remember to be nice and polite!
+
+Your second contribution...
+---------------------------
+
+Here are a few pointers on getting started on your second (or third,
+or fourth, or nth contribution).
+
+So, assuming you've found an issue you'd like to work on there are a
+couple things to do to make sure your local copy of the repository is
+ready for a new issue--specifically, we need to make sure it's in sync
+with the remote repository so you aren't working on a old copy. So::
+
+        git checkout master
+        git fetch --all
+        git pull
+
+This puts you on the latest master branch and pulls down updates from
+GitHub with any changes that may have been made since your last
+contribution (usually including the merge of your last
+contribution). Then we merge those changes into your local copy of the
+master branch.
+
+Now, you can go back to `Claiming an issue and starting to develop`_.

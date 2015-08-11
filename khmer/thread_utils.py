@@ -1,26 +1,35 @@
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-"""
-Utilities for dealing with multithreaded processing of short reads.
-"""
+
+"""Utilities for dealing with multithreaded processing of short reads."""
+
+from __future__ import print_function, unicode_literals
+
 import threading
-import Queue
 import sys
 import screed
 from khmer import utils
+from khmer.utils import write_record
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
 DEFAULT_WORKER_THREADS = 8
 DEFAULT_GROUPSIZE = 100
 
 
 def verbose_loader(filename):
-    screed_iter = screed.open(filename, parse_description=False)
+    """Screed iterator that additionally prints progress info to stderr."""
+    screed_iter = screed.open(filename)
     for n, record in enumerate(screed_iter):
         if n % 100000 == 0:
-            print >>sys.stderr, '... filtering', n
+            print('... filtering', n, file=sys.stderr)
         yield record
 
 verbose_fasta_iter = verbose_loader
@@ -49,8 +58,8 @@ class ThreadedSequenceProcessor(object):
         self.n_workers = n_workers
         self.group_size = group_size
 
-        self.inqueue = Queue.Queue(self.QUEUESIZE)
-        self.outqueue = Queue.Queue(self.QUEUESIZE)
+        self.inqueue = queue.Queue(self.QUEUESIZE)
+        self.outqueue = queue.Queue(self.QUEUESIZE)
 
         self.worker_count = 0
         self.worker_count_lock = threading.Lock()
@@ -65,7 +74,7 @@ class ThreadedSequenceProcessor(object):
 
     def start(self, inputiter, outfp):
         if self.verbose:
-            print >>sys.stderr, 'starting threads'
+            print('starting threads', file=sys.stderr)
 
         try:
             for _ in range(self.n_workers):
@@ -74,18 +83,18 @@ class ThreadedSequenceProcessor(object):
                 t.start()
 
             if self.verbose:
-                print >>sys.stderr, 'starting writer'
+                print('starting writer', file=sys.stderr)
 
             w = threading.Thread(target=self.do_write, args=(outfp,))
             w.start()
 
             if self.verbose:
-                print >>sys.stderr, 'loading...'
+                print('loading...', file=sys.stderr)
 
             self.push_sequences(inputiter)
 
             if self.verbose:
-                print >>sys.stderr, 'done loading in sequences'
+                print('done loading in sequences', file=sys.stderr)
             self.done = True
 
             w.join()
@@ -129,7 +138,7 @@ class ThreadedSequenceProcessor(object):
         while not self.done or not inq.empty():
             try:
                 g = inq.get(True, 1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
             bp_processed = 0
@@ -157,17 +166,16 @@ class ThreadedSequenceProcessor(object):
                 self.bp_written += bp_written
 
                 if self.verbose and self.n_processed % 500000 == 0:
-                    print >>sys.stderr, \
-                        "processed %d / wrote %d / removed %d" % \
-                        (self.n_processed, self.n_written,
-                         self.n_processed - self.n_written)
-                    print >>sys.stderr, \
-                        "processed %d bp / wrote %d bp / removed %d bp" % \
-                        (self.bp_processed, self.bp_written,
-                         self.bp_processed - self.bp_written)
+                    print("processed %d / wrote %d / removed %d" %
+                          (self.n_processed, self.n_written,
+                           self.n_processed - self.n_written), file=sys.stderr)
+                    print("processed %d bp / wrote %d bp / removed %d bp" %
+                          (self.bp_processed, self.bp_written,
+                           self.bp_processed - self.bp_written),
+                          file=sys.stderr)
                     discarded = self.bp_processed - self.bp_written
                     f = float(discarded) / float(self.bp_processed) * 100
-                    print >>sys.stderr, "discarded %.1f%%" % f
+                    print("discarded %.1f%%" % f, file=sys.stderr)
 
         # end of thread; exit, decrement worker count.
         with self.worker_count_lock:
@@ -178,26 +186,26 @@ class ThreadedSequenceProcessor(object):
         while self.worker_count > 0 or not outq.empty():
             try:
                 g = outq.get(True, 1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
-            for name, seq, quality in g.seqlist:
-                if quality:  # write FASTQ; CTB hack.
-                    outfp.write('@%s\n%s\n+\n%s\n' % (name, seq, quality))
+            for name, seq, qual in g.seqlist:
+                if qual:
+                    record = screed.Record(name=name, sequence=seq,
+                                           quality=qual)
                 else:
-                    outfp.write('>%s\n%s\n' % (name, seq,))
+                    record = screed.Record(name=name, sequence=seq)
+                write_record(record, outfp)
 
         if self.verbose:
-            print >>sys.stderr, \
-                "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
-                (self.n_processed, self.n_written,
-                 self.n_processed - self.n_written)
-            print >>sys.stderr, \
-                "processed %d bp / wrote %d bp / removed %d bp" % \
-                (self.bp_processed, self.bp_written,
-                 self.bp_processed - self.bp_written)
+            print("DONE writing.\nprocessed %d / wrote %d / removed %d" %
+                  (self.n_processed, self.n_written,
+                   self.n_processed - self.n_written), file=sys.stderr)
+            print("processed %d bp / wrote %d bp / removed %d bp" %
+                  (self.bp_processed, self.bp_written,
+                   self.bp_processed - self.bp_written), file=sys.stderr)
             discarded = self.bp_processed - self.bp_written
             f = float(discarded) / float(self.bp_processed) * 100
-            print >>sys.stderr, "discarded %.1f%%" % f
+            print("discarded %.1f%%" % f, file=sys.stderr)
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

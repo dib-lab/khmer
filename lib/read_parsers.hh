@@ -1,7 +1,7 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE.
 // Contact: khmer-project@idyll.org
 //
 
@@ -9,9 +9,15 @@
 #define READ_PARSERS_HH
 
 #include <regex.h>
-#include <iostream>
+#include <stddef.h>
+#include <stdint.h>
 #include <cstdlib>
+#include <iostream>
+#include <string>
+#include <utility>
+
 #include "khmer.hh"
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -21,32 +27,32 @@ namespace khmer
 namespace read_parsers
 {
 
-struct NoMoreReadsAvailable : public  khmer_exception {
-    explicit NoMoreReadsAvailable(const char *msg) :
-        khmer_exception(msg) {}
+struct NoMoreReadsAvailable : public  khmer_file_exception {
+    explicit NoMoreReadsAvailable(const std::string& msg) :
+        khmer_file_exception(msg) {}
     NoMoreReadsAvailable() :
-        khmer_exception("No more reads available in this stream.") {}
+        khmer_file_exception("No more reads available in this stream.") {}
 };
 
-struct InvalidRead : public  khmer_exception {
-    explicit InvalidRead(const char *msg) :
-        khmer_exception(msg) {}
+struct InvalidRead : public  khmer_value_exception {
+    explicit InvalidRead(const std::string& msg) :
+        khmer_value_exception(msg) {}
     InvalidRead() :
-        khmer_exception("Invalid read") {}
+        khmer_value_exception("Invalid FASTA/Q read") {}
 };
 
-struct UnknownPairReadingMode : public  khmer_exception {
-    explicit UnknownPairReadingMode(const char *msg) :
-        khmer_exception(msg) {}
+struct UnknownPairReadingMode : public  khmer_value_exception {
+    explicit UnknownPairReadingMode(const std::string& msg) :
+        khmer_value_exception(msg) {}
     UnknownPairReadingMode() :
-        khmer_exception("Unknown pair reading mode supplied.") {}
+        khmer_value_exception("Unknown pair reading mode supplied.") {}
 };
 
-struct InvalidReadPair : public  khmer_exception {
-    explicit InvalidReadPair(const char *msg) :
-        khmer_exception(msg) {}
+struct InvalidReadPair : public  khmer_value_exception {
+    explicit InvalidReadPair(const std::string& msg) :
+        khmer_value_exception(msg) {}
     InvalidReadPair() :
-        khmer_exception("Invalid read pair detected.") {}
+        khmer_value_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
@@ -63,6 +69,8 @@ struct Read {
         sequence.clear( );
         quality.clear( );
     }
+
+    void write_to(std::ostream&);
 };
 
 typedef std:: pair< Read, Read >	ReadPair;
@@ -138,7 +146,7 @@ class SeqAnParser : public IParser
 {
 
 public:
-    SeqAnParser( const char * filename );
+    explicit SeqAnParser( const char * filename );
     ~SeqAnParser( );
 
     bool is_complete( );
@@ -146,6 +154,7 @@ public:
 
 private:
     struct Handle;
+
     Handle* _private;
 
 };

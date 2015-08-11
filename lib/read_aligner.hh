@@ -1,21 +1,25 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
+// the three-clause BSD license; see LICENSE. Contact: ctb@msu.edu
 //
 
 #ifndef READ_ALIGNER_HH
 #define READ_ALIGNER_HH
 
-#include "khmer.hh"
-#include "counting.hh"
-
-#include <limits>
+#include <math.h>
+#include <stddef.h>
 #include <algorithm>
-#include <set>
-#include <vector>
-#include <queue>
+#include <limits>
 #include <memory>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "counting.hh"
+#include "khmer.hh"
+#include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0
 
@@ -100,6 +104,7 @@ struct AlignmentNode {
     double f_score;
     double h_score;
     bool trusted;
+    BoundedCounterType cov;
 
     size_t num_indels;
 
@@ -111,7 +116,7 @@ struct AlignmentNode {
         :prev(_prev), base(_emission), seq_idx(_seq_idx),
          state(_state), trans(_trans), fwd_hash(_fwd_hash),
          rc_hash(_rc_hash), score(0), f_score(0), h_score(0), trusted(false),
-         num_indels(0), length(_length) {}
+         cov(0), num_indels(0), length(_length) {}
 
     bool operator== (const AlignmentNode& rhs) const
     {
@@ -164,6 +169,7 @@ struct Alignment {
     std::string graph_alignment;
     std::string read_alignment;
     std::string trusted;
+    std::vector<BoundedCounterType> covs;
     double score;
     bool truncated;
 };
@@ -203,9 +209,9 @@ private:
         }
         return ret;
     }
-
 public:
     Alignment* Align(const std::string&);
+    Alignment* AlignForward(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta)
@@ -227,7 +233,20 @@ public:
                   << std::endl;
 #endif
     }
+
+    ReadAligner(khmer::CountingHash* ch,
+                BoundedCounterType trusted_cutoff, double bits_theta,
+                double* scoring_matrix, double* transitions)
+        : bitmask(comp_bitmask(ch->ksize())),
+          rc_left_shift(ch->ksize() * 2 - 2),
+          m_ch(ch), m_sm(scoring_matrix[0], scoring_matrix[1],
+                         scoring_matrix[2], scoring_matrix[3],
+                         transitions),
+          m_trusted_cutoff(trusted_cutoff),
+          m_bits_theta(bits_theta) {};
+
+    ScoringMatrix getScoringMatrix();
+
 };
 }
-
 #endif // READ_ALIGNER_HH
