@@ -34,7 +34,7 @@ This should generally be set as high as possible; see
 k-mer counting and abundance filtering
 ======================================
 
-.. autoprogram:: load-into-counting:get_parser()
+.. autoprogram:: load-into-countgraph:get_parser()
         :prog: load-into-counting.py
 
 .. autoprogram:: abundance-dist:get_parser()
@@ -69,7 +69,7 @@ Partitioning
 .. autoprogram:: do-partition:get_parser()
         :prog: do-partition.py
 
-.. autoprogram:: load-graph:get_parser()
+.. autoprogram:: load-into-nodegraph:get_parser()
         :prog: load-graph.py
 
 See :program:`extract-partitions.py` for a complete workflow.
