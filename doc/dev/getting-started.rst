@@ -390,3 +390,21 @@ Everyone should then update their `~/.gitconfig` file with the following::
         [merge "merge-changelog"]
                   name = GNU-style ChangeLog merge driver
                   driver = /usr/bin/git-merge-changelog %O %A %B
+
+Pull request cleanup (commit squashing)
+---------------------------------------
+
+Submitters are invited to reduce the numbers of commits in their pull requests
+either via `git rebase -i dib/master` or this recipe::
+
+        git pull # make sure the local is up to date
+        git pull dib master # get up to date
+        # fix any merge conflicts
+        git status # sanity check
+        git diff dib/master # does the diff look correct? (no merge markers)
+        git reset --soft dib/master # un-commit the differences from dib/master
+        git status # sanity check
+        git commit --all # package all differences in one commit
+        git status # sanity check
+        git push # should fail
+        git push --force # override what's in GitHub's copy of the branch/pull request
