@@ -344,7 +344,7 @@ public:
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 };
-};
+}
 
 
 

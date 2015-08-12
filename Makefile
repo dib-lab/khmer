@@ -5,7 +5,7 @@
 # make coverage-report to check coverage of the python scripts by the tests
 
 SHELL=bash
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
@@ -81,22 +81,26 @@ clean: FORCE
 	rm -f diff-cover.html
 
 debug: FORCE
-	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
+	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
+		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug \
 		--inplace
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html
 
-build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
+build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
 ## pdf         : render documentation as a PDF file
+# packages needed include: texlive-latex-recommended,
+# texlive-fonts-recommended, texlive-latex-extra
 pdf: build/sphinx/latex/khmer.pdf
 
-build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
+build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
+	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst)
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''
@@ -255,11 +259,10 @@ coverity-upload: cov-int
 	if [[ -n "${COVERITY_TOKEN}" ]]; \
 	then \
 		tar czf khmer-cov.tgz cov-int; \
-		curl --form project=ged-lab/khmer \
-			--form token=${COVERITY_TOKEN} --form \
+		curl --form token=${COVERITY_TOKEN} --form \
 			email=mcrusoe@msu.edu --form file=@khmer-cov.tgz \
 			--form version=${VERSION} \
-			http://scan5.coverity.com/cgi-bin/upload.py; \
+			https://scan.coverity.com/builds?project=ged-lab%2Fkhmer ; \
 	else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
 		'skipping scan'; \
 	fi
@@ -306,5 +309,11 @@ list-authors:
 list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
+
+list-citation:
+	git log --format='%aN,%aE' | sort -u | grep -v \
+		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
+		> authors.csv
+	python sort-authors-list.py
 
 FORCE:

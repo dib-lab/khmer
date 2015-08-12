@@ -290,6 +290,6 @@ public:
     }
 }; // class KmerIterator
 
-};
+}
 
 #endif // KMER_HASH_HH

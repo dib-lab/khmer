@@ -225,4 +225,4 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
     return build_kmer(_kmer_f, _kmer_r);
 }
 
-};
+}

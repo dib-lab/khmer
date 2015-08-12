@@ -237,10 +237,10 @@ For a cleverer approach that we will someday implement, read `the
 Beachcomber's Dilemma
 <http://ivory.idyll.org/blog/beachcombers-dilemma.html>`__.
 
-Validating and comparing assemblies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. Validating and comparing assemblies
+.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-More here soon :).
+.. More here soon :).
 
 .. Check/validate assembly - look at high abundance kmers.
 .. @@error trimming
