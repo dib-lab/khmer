@@ -95,7 +95,6 @@ Copyright and license
 
 Portions of khmer are Copyright California Institute of Technology,
 where the exact counting code was first developed. All other code developed
-through 2014 is copyright Michigan State University. All developed code through
-2015 is copyright University of California Davis.  
-All the code is freely available for
-use and re-use under the BSD License.
+through 2014 is copyright Michigan State University. Portions are copyright
+Michigan State University and Regents of the University of California.  
+All the code is freely available for use and re-use under the BSD License.

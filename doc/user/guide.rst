@@ -11,7 +11,7 @@ about.  Moreover, our assembly strategies themselves are also under
 constant evolution as we do more research and find ever-wider
 applicability of our approaches.
 
-Note, this is nearly an exact copy of `Titus' blog post, here
+Note, this is modified from `Titus' blog post, here
 <http://ivory.idyll.org/blog/an-assembly-handbook-for-khmer.html>`__
 -- go check the bottom of that for comments.
 
