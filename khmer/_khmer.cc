@@ -4442,7 +4442,9 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
 {
     const char * filename;
     PyObject * output_records_o = NULL;
-    char * kwlist[] = {"filename", "stream_out", NULL};
+
+    static const char* const_kwlist[] = {"filename", "stream_out", NULL};
+    static char** kwlist = const_cast<char**>(const_kwlist);
 
     bool output_records = false;
 
