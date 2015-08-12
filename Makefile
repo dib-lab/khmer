@@ -259,11 +259,10 @@ coverity-upload: cov-int
 	if [[ -n "${COVERITY_TOKEN}" ]]; \
 	then \
 		tar czf khmer-cov.tgz cov-int; \
-		curl --form project=ged-lab/khmer \
-			--form token=${COVERITY_TOKEN} --form \
+		curl --form token=${COVERITY_TOKEN} --form \
 			email=mcrusoe@msu.edu --form file=@khmer-cov.tgz \
 			--form version=${VERSION} \
-			http://scan5.coverity.com/cgi-bin/upload.py; \
+			https://scan.coverity.com/builds?project=ged-lab%2Fkhmer ; \
 	else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
 		'skipping scan'; \
 	fi
