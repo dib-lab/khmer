@@ -310,4 +310,10 @@ list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
 
+list-citation:
+	git log --format='%aN,%aE' | sort -u | grep -v \
+		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
+		> authors.csv
+	python sort-authors-list.py
+
 FORCE:

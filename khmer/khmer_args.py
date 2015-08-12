@@ -400,7 +400,7 @@ def sanitize_epilog(parser):
 
 _algorithms = {
     'software': 'MR Crusoe et al., '
-    '2014. http://dx.doi.org/10.6084/m9.figshare.979190',
+    '2015. http://dx.doi.org/10.12688/f1000research.6924.1',
     'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
     'streaming': 'Q Zhang, S Awad, CT Brown, '
     'https://dx.doi.org/10.7287/peerj.preprints.890v1',

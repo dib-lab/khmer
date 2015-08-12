@@ -15,8 +15,11 @@
 
 2015-08-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
-   * CITATION, doc/{index,introduction,user/scripts}.rst: formatting fixes
-   * Makefile: PDF building hints, tweaked dependencies, update coverity URL
+   * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
+   formatting fixes and new citation for the software as a whole
+   * Makefile: PDF building hints, tweaked dependencies, update coverity URL,
+   new target to generate author list for the paper citation 
+   * sort-authors-list.py: helper script for the above
    * doc/conf.py: don't generate a module index
    * doc/contributors.rst: formatting, remove references to old lab
    * doc/dev/coding-guidelines-and-review.rst: add C++ version standard
@@ -29,6 +32,8 @@
    semicolons
    * scripts/*.py: line-wrap & scrub output
    * setup.py: turn optimizations back on and -pedantic
+   * .mailmap: additional tweaks to author list
+
 
 2015-08-11  Kevin Murray  <spam@kdmurray.id.au>
 
