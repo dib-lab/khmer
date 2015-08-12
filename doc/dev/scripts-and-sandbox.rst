@@ -78,6 +78,15 @@ Our current Copyright message is::
    # Contact: khmer-project@idyll.org
    #
 
+Some files are copyright University of California Regents::
+
+   #
+   # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   # Copyright (C) The Regents of the University of California, 2015. 
+   # It is licensed under the three-clause BSD license; see doc/LICENSE.txt.
+   # Contact: khmer-project@idyll.org
+   #
+
 The beginning year should be the first year that this file existed in
 the repo; the end year should be the last year a coding change was
 made in the file.

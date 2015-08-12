@@ -21,7 +21,8 @@ import khmer
 import textwrap
 
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
-                              report_on_config, info, create_countgraph)
+                              report_on_config, info, create_countgraph,
+                              sanitize_epilog)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists)
@@ -177,7 +178,8 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('saturate-by-median.py', ['diginorm'])
-    args = get_parser().parse_args()
+    parser = sanitize_epilog(get_parser())
+    args = parser.parse_args()
 
     report_on_config(args)
 

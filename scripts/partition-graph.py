@@ -23,7 +23,7 @@ import os.path
 import argparse
 import khmer
 import sys
-from khmer.khmer_args import (add_threading_args, info)
+from khmer.khmer_args import (add_threading_args, info, sanitize_epilog)
 from khmer.kfile import check_input_files
 
 # stdlib queue module was renamed on Python 3
@@ -64,7 +64,7 @@ def worker(queue, basename, stop_big_traversals):
 
 def get_parser():
     epilog = """
-    The resulting partition maps are saved as '${basename}.subset.#.pmap'
+    The resulting partition maps are saved as `${basename}.subset.#.pmap`
     files.
     """
     parser = argparse.ArgumentParser(
@@ -92,7 +92,7 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     basename = args.basename
 
     filenames = [basename, basename + '.tagset']

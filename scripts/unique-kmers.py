@@ -24,7 +24,7 @@ import textwrap
 
 import khmer
 from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
-                              _VersionStdErrAction)
+                              _VersionStdErrAction, sanitize_epilog)
 from khmer.utils import write_record
 from khmer.khmer_args import graphsize_args_report
 from khmer import __version__
@@ -109,7 +109,7 @@ def get_parser():
 
 def main():
     info('unique-kmers.py', ['SeqAn', 'hll'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     total_hll = khmer.HLLCounter(args.error_rate, args.ksize)
 

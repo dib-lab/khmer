@@ -11,7 +11,7 @@ khmer is a library and toolkit for doing k-mer-based dataset analysis and
 transformations.  Our focus in developing it has been on scaling assembly of 
 metagenomes and mRNA.
 
-khmer can be used for a number of transformations, include inexact 
+khmer can be used for a number of transformations, including inexact 
 transformations (abundance filtering and error trimming) and exact 
 transformations (graph-size filtering, to throw away disconnected reads; and 
 partitioning, to split reads into disjoint sets).  Of these, only partitioning 
@@ -34,16 +34,16 @@ will never incorrectly report a k-mer as being absent when it *is* present.
 This one-sided error makes the Bloom filter very useful for certain kinds of 
 operations.
 
-khmer is also independent of K, and currently works for K <= 32.  We will be 
-integrating code for up to K=64 soon.
+khmer is also independent of a specific k-size (K), and currently works for 
+K <= 32.  We will be integrating code for K<=64 soon.
 
 khmer is implemented in C++ with a Python wrapper, which is what all of the 
 scripts use.
 
-Some important documentation for khmer is provided on the Web sites for 
+Documentation for khmer is provided on the Web sites for 
 `khmer-protocols <http://khmer-protocols.readthedocs.org>`__ and `khmer-recipes 
 <http://khmer-recipes.readthedocs.org>`__. khmer-protocols provides detailed 
-protocols for using khmer to analyze either a transcriptome or a metagenome; 
+protocols for using khmer to analyze either a transcriptome or a metagenome. 
 khmer-recipes provides individual recipes for using khmer in a variety of 
 sequence-oriented tasks such as extracting reads by coverage, estimating a 
 genome or metagenome size from unassembled reads, and error-trimming reads via 
@@ -71,7 +71,7 @@ immediately useful for a few different operations, including:
 
  - optimizing assemblies on various parameters;
 
- - converting FASTA to FASTQ;
+ - converting FASTQ to FASTA;
 
 and a few other random functions.
 
@@ -94,6 +94,7 @@ Copyright and license
 =====================
 
 Portions of khmer are Copyright California Institute of Technology,
-where the exact counting code was first developed; the remainder is
-Copyright Michigan State University.  The code is freely available for
-use and re-use under the BSD License.
+where the exact counting code was first developed. All other code developed
+through 2014 is copyright Michigan State University. Portions are copyright
+Michigan State University and Regents of the University of California.  
+All the code is freely available for use and re-use under the BSD License.

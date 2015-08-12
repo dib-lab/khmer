@@ -27,7 +27,8 @@ import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
-                              report_on_config, info, calculate_graphsize)
+                              report_on_config, info, calculate_graphsize,
+                              sanitize_epilog)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -190,7 +191,7 @@ def get_parser():
     reads from a fragment, and helps with retention of repeats.)
     Unpaired reads are treated individually.
 
-    If :option:`-p`/`--paired` is set, then proper pairing is required
+    If :option:`-p`/:option:`--paired` is set, then proper pairing is required
     and the script will exit on unpaired reads, although
     :option:`--unpaired-reads` can be used to supply a file of orphan
     reads to be read after the paired reads.
@@ -203,7 +204,7 @@ def get_parser():
     processed. :option:`-l`/:option:`--loadgraph` will load the
     specified k-mer countgraph before processing the specified
     files.  Note that these graphs are are in the same format as those
-    produced by :program:`load-into-counting.py` and consumed by
+    produced by :program:`load-into-countgraph.py` and consumed by
     :program:`abundance-dist.py`.
 
     To append reads to an output file (rather than overwriting it), send output
@@ -277,10 +278,8 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
+    parser = sanitize_epilog(get_parser())
     parser = get_parser()
-    parser.epilog = parser.epilog.replace(
-        '//', '/').replace(':option:', '').replace(
-            ':program:', '').replace('::', ':')
     args = parser.parse_args()
     configure_logging(args.quiet)
     info('normalize-by-median.py', ['diginorm'])

@@ -29,7 +29,7 @@ import sys
 import khmer
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -47,7 +47,7 @@ def get_parser():
     but take :option:`-S`/:option:`--samples` samples if specified.
 
     The output is placed in :option:`-o`/:option:`--output` <file>
-    (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
+    (for a single sample) or in `<file>.subset.0` to `<file>.subset.S-1`
     (for more than one sample).
 
     This script uses the `reservoir sampling
@@ -66,7 +66,8 @@ def get_parser():
                         default=DEFAULT_MAX_READS)
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
-    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
+    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed',
+                        help='Provide a random seed for the generator')
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
@@ -82,7 +83,7 @@ def get_parser():
 
 def main():
     info('sample-reads-randomly.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     for _ in args.filenames:
         check_input_files(_, args.force)

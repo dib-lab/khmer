@@ -23,7 +23,7 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
@@ -92,7 +92,7 @@ def get_parser():
 
 def main():
     info('split-paired-reads.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     infile = args.infile
 

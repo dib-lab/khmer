@@ -18,7 +18,7 @@ details.)  This is what the :option:`-M` parameter does.
 If you set it too low, khmer will warn you to set it higher at the end.
 See below for some good choices for various kinds of data.
 
-**Note for khmer 1.x users:** as of khmer 2.0, the :option:`-M`
+**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M`
 parameter sets the :option:`-N`/:option:`--n_tables` and
 :option:`-x`/:option:`--max_tablesize` parameters automatically.
 You can still set these parameters directly if you wish.
@@ -57,7 +57,7 @@ memory, decrease the table size.
 
 Also see the rules of thumb, below.
 
-The real full version
+The long version
 =====================
 
 khmer's scripts, at their heart, represents k-mers in a very memory

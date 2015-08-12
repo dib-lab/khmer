@@ -40,7 +40,7 @@ release makers, following this checklist by MRC.
 #. Review the issue list for any new bugs that will not be fixed in this
    release. Add them to ``doc/known-issues.txt``
 
-#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
+#. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
 
 #. Submit a build to Coverity Scan if it hasn't been done
    recently. You can get the token from
@@ -221,7 +221,7 @@ cross-platform testing environment.
 Setuptools Bootstrap
 --------------------
 
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
+`ez_setup.py` is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
 
 Before major releases it should be examined to see if there are new
 versions available and if the change would be useful
