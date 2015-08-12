@@ -85,10 +85,10 @@ def main():
 
     if args.loadhash:
         print('loading hashtable from', args.loadhash)
-        ht = khmer.load_counting_hash(args.loadhash)
+        ht = khmer.load_countgraph(args.loadhash)
     else:
         print('making hashtable')
-        ht = khmer.CountingHash(K, HT_SIZE, N_HT)
+        ht = khmer.Countgraph(K, HT_SIZE, N_HT)
 
     total = 0
     discarded = 0

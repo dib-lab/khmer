@@ -38,7 +38,7 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a hash-bang line (``#! /usr/bin/env python2``) at the top
+* have a hash-bang line (``#! /usr/bin/env python``) at the top
 * be command-line executable (``chmod a+x``)
 * have a Copyright message (see below)
 * have lowercase names
@@ -58,7 +58,13 @@ All scripts in scripts/ should have the following options, if they could apply:
 * ``--version`` - should always apply
 * ``--help`` - should always apply
 * ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadtable`` and ``--savetable`` - where appropriate (see khmer_args.py)
+* ``--loadgraph`` and ``--savegraph`` - where appropriate (see khmer_args.py)
+
+If an option is of type ``type=argparse.FileType('w')`` then you need to also
+specify a ``metavar`` for the documentation and help formatting. Example::
+
+    parser.add_argument('-R', '--report', metavar='report_filename',
+        type=argparse.FileType('w'))
 
 Copyright message
 ~~~~~~~~~~~~~~~~~

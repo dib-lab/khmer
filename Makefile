@@ -4,7 +4,8 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc)
+SHELL=bash
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
@@ -73,29 +74,33 @@ clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc
+	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
 	rm -f diff-cover.html
 
 debug: FORCE
-	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
+	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
+		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug \
 		--inplace
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html
 
-build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
+build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
 ## pdf         : render documentation as a PDF file
+# packages needed include: texlive-latex-recommended,
+# texlive-fonts-recommended, texlive-latex-extra
 pdf: build/sphinx/latex/khmer.pdf
 
-build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
+build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
+	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst)
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''
@@ -123,10 +128,10 @@ diff_pep8_report: pep8_report.txt
 ## pep257      : check Python code style
 pep257: $(PYSOURCES) $(wildcard tests/*.py)
 	pep257 --ignore=D100,D101,D102,D103 \
-		setup.py khmer/ scripts/ tests/ || true
+		setup.py khmer/ scripts/ tests/ oxli/ || true
 
 pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 setup.py khmer/ scripts/ tests/ \
+	pep257 setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep257_report.txt 2>&1 || true
 
 diff_pep257_report: pep257_report.txt
@@ -220,9 +225,9 @@ libtest: FORCE
 	test -f install_target/include/oxli/khmer.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-static -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-static -I install_target/include \
 		lib/test-compile.cc install_target/lib/liboxli.a
-	$(CXX) -o install_target/test-prog-dynamic -I install_target/include \
+	$(CXX) -std=c++11 -o install_target/test-prog-dynamic -I install_target/include \
 		-L install_target/lib lib/test-compile.cc -loxli
 	rm -rf install_target
 
@@ -244,7 +249,7 @@ coverity-build:
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
-		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
+		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr ${TESTATTR} ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
@@ -254,11 +259,10 @@ coverity-upload: cov-int
 	if [[ -n "${COVERITY_TOKEN}" ]]; \
 	then \
 		tar czf khmer-cov.tgz cov-int; \
-		curl --form project=ged-lab/khmer \
-			--form token=${COVERITY_TOKEN} --form \
+		curl --form token=${COVERITY_TOKEN} --form \
 			email=mcrusoe@msu.edu --form file=@khmer-cov.tgz \
 			--form version=${VERSION} \
-			http://scan5.coverity.com/cgi-bin/upload.py; \
+			https://scan.coverity.com/builds?project=ged-lab%2Fkhmer ; \
 	else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
 		'skipping scan'; \
 	fi
@@ -277,6 +281,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+# may need to `sudo apt-get install bear`
 compile_commands.json: clean
 	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
 		bear -- ./setup.py build_ext
@@ -304,5 +309,11 @@ list-authors:
 list-author-emails:
 	@echo 'name, E-Mail Address'
 	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
+
+list-citation:
+	git log --format='%aN,%aE' | sort -u | grep -v \
+		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
+		> authors.csv
+	python sort-authors-list.py
 
 FORCE:

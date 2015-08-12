@@ -29,7 +29,7 @@ def main():
     print('--')
 
     print('making hashtable')
-    ht = khmer.load_counting_hash(counting_ht)
+    ht = khmer.load_countgraph(counting_ht)
     K = ht.ksize()
 
     for infile in infiles:

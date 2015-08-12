@@ -21,7 +21,7 @@ def teardown():
 class Test_RandomData(object):
 
     def test_3_merge_013(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
 
         filename = utils.get_test_data('test-graph2.fa')
 
@@ -43,7 +43,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_3_merge_023(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -64,7 +64,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_5_merge_046(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph5.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -83,7 +83,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_random_20_a_succ(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
@@ -102,7 +102,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_II(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
@@ -121,7 +121,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_III(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
@@ -144,7 +144,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_IV(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
@@ -164,7 +164,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_IV_save(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
 
         savefile_ht = utils.get_temp_filename('ht')
@@ -177,7 +177,7 @@ class Test_RandomData(object):
         ht.save_tagset(savefile_tags)
 
         del ht
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
 
         ht.load(savefile_ht)
         ht.load_tagset(savefile_tags)
@@ -200,7 +200,7 @@ class Test_RandomData(object):
 class Test_SaveLoadPmap(object):
 
     def test_save_load_merge(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -233,7 +233,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_load_merge_truncate(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -270,7 +270,7 @@ class Test_SaveLoadPmap(object):
                 print(str(err), i)
 
     def test_save_load_merge_2(self):
-        ht = khmer.Hashbits(20, 4 ** 8 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 8 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -302,7 +302,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_load_merge_nexist(self):
-        ht = khmer._Hashbits(20, [1])
+        ht = khmer._Nodegraph(20, [1])
         try:
             a = ht.load_subset_partitionmap('this does not exist')
             assert 0, "this should not succeed"
@@ -310,7 +310,7 @@ class Test_SaveLoadPmap(object):
             print(str(e))
 
     def test_save_merge_from_disk(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -339,7 +339,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_merge_from_disk_2(self):
-        ht = khmer.Hashbits(20, 4 ** 7 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -368,7 +368,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_merge_from_disk_file_not_exist(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -389,7 +389,7 @@ class Test_SaveLoadPmap(object):
             print(str(e))
 
     def test_merge_from_disk_file_bad_type(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         infile = utils.get_test_data('goodversion-k12.ht')
 
         try:
@@ -399,7 +399,7 @@ class Test_SaveLoadPmap(object):
             print(str(e))
 
     def test_merge_from_disk_file_version(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         infile = utils.get_test_data('badversion-k12.ht')
 
         try:
@@ -409,7 +409,7 @@ class Test_SaveLoadPmap(object):
             print(str(e))
 
     def test_save_merge_from_disk_ksize(self):
-        ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+        ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -424,7 +424,7 @@ class Test_SaveLoadPmap(object):
         ht.save_subset_partitionmap(x, outfile1)
         del x
 
-        ht = khmer._Hashbits(19, [1])
+        ht = khmer._Nodegraph(19, [1])
         try:
             ht.merge_subset_from_disk(outfile1)
             assert 0, "this should fail"
@@ -433,7 +433,7 @@ class Test_SaveLoadPmap(object):
 
 
 def test_save_load_merge_on_graph():
-    ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+    ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
     (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -466,7 +466,7 @@ def test_save_load_merge_on_graph():
 
 
 def test_save_load_on_graph_truncate():
-    ht = khmer.Hashbits(20, 4 ** 4 + 1, 2)
+    ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
     (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -506,7 +506,7 @@ def test_save_load_on_graph_truncate():
 def test_output_partitions():
     filename = utils.get_test_data('test-output-partitions.fa')
 
-    ht = khmer._Hashbits(10, [1])
+    ht = khmer._Nodegraph(10, [1])
     ht.set_partition_id('TTAGGACTGC', 2)
     ht.set_partition_id('TGCGTTTCAA', 3)
     ht.set_partition_id('ATACTGTAAA', 4)
@@ -531,7 +531,7 @@ test_output_partitions.runme = True
 def test_tiny_real_partitions():
     filename = utils.get_test_data('real-partition-tiny.fa')
 
-    ht = khmer.Hashbits(32, 8e2, 4)
+    ht = khmer.Nodegraph(32, 8e2, 4)
     ht.consume_fasta_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
@@ -558,7 +558,7 @@ def test_tiny_real_partitions():
 def test_small_real_partitions():
     filename = utils.get_test_data('real-partition-small.fa')
 
-    ht = khmer.Hashbits(32, 2e3, 4)
+    ht = khmer.Nodegraph(32, 2e3, 4)
     ht.consume_fasta_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
@@ -600,7 +600,7 @@ CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
 def test_partition_on_abundance_1():
     print((a,))
     print((b,))
-    kh = khmer.CountingHash(20, 1e3, 4)
+    kh = khmer.Countgraph(20, 1e3, 4)
     for i in range(10):
         print(kh.consume_and_tag(a))
 
@@ -614,7 +614,7 @@ def test_partition_on_abundance_1():
 
 
 def test_partition_on_abundance_2():
-    kh = khmer.CountingHash(20, 1e3, 4)
+    kh = khmer.Countgraph(20, 1e3, 4)
     for i in range(10):
         print(kh.consume_and_tag(a))
 
@@ -628,7 +628,7 @@ def test_partition_on_abundance_2():
 
 
 def test_partition_on_abundance_3():
-    kh = khmer.CountingHash(20, 1e4, 4)
+    kh = khmer.Countgraph(20, 1e4, 4)
     for i in range(10):
         print(kh.consume_and_tag(a))
 
@@ -647,7 +647,7 @@ def test_partition_on_abundance_3():
 
 
 def test_partition_overlap_1():
-    kh = khmer.CountingHash(20, 1e3, 4)
+    kh = khmer.Countgraph(20, 1e3, 4)
     for i in range(10):
         kh.consume_and_tag(a)
 
@@ -668,7 +668,7 @@ def test_partition_overlap_1():
 
 
 def test_partition_overlap_2():
-    kh = khmer.CountingHash(20, 1e4, 4)
+    kh = khmer.Countgraph(20, 1e4, 4)
     for i in range(10):
         kh.consume_and_tag(a)
 

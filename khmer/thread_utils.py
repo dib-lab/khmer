@@ -175,7 +175,7 @@ class ThreadedSequenceProcessor(object):
                           file=sys.stderr)
                     discarded = self.bp_processed - self.bp_written
                     f_discarded = float(discarded) / float(
-                                  self.bp_processed) * 100
+                        self.bp_processed) * 100
                     print("discarded %.1f%%" % f_discarded, file=sys.stderr)
 
         # end of thread; exit, decrement worker count.

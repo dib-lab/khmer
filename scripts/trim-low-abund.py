@@ -28,10 +28,10 @@ import argparse
 from screed import Record
 from khmer import khmer_args
 
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config, calculate_tablesize)
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
+                              report_on_config, calculate_graphsize)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
+from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 
@@ -85,7 +85,7 @@ def get_parser():
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
-    parser.add_argument('-o', '--out', metavar="filename",
+    parser.add_argument('-o', '--output', metavar="output_filename",
                         type=argparse.FileType('wb'),
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
@@ -97,9 +97,9 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
-    add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    add_loadgraph_args(parser)
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
 
     # expert options
@@ -128,24 +128,24 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        tablesize = calculate_tablesize(args, 'countgraph')
-        check_space_for_hashtable(args.savetable, tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
-       and not args.out:
+       and not args.output:
         print("Accepting input from stdin; output filename must "
               "be provided with -o.", file=sys.stderr)
         sys.exit(1)
 
-    if args.loadtable:
-        print('loading countgraph from', args.loadtable, file=sys.stderr)
-        counting_table = khmer.load_counting_hash(args.loadtable)
+    if args.loadgraph:
+        print('loading countgraph from', args.loadgraph, file=sys.stderr)
+        counting_graph = khmer.load_countgraph(args.loadgraph)
     else:
         print('making countgraph', file=sys.stderr)
-        counting_table = khmer_args.create_countgraph(args)
+        counting_graph = khmer_args.create_countgraph(args)
 
-    ksize = counting_table.ksize()
+    ksize = counting_graph.ksize()
     cutoff = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
@@ -167,12 +167,12 @@ def main():
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        if args.out is None:
-            trimfp = get_file_writer(open(os.path.basename(filename)
-                                     + '.abundtrim', 'wb'),
+        if args.output is None:
+            trimfp = get_file_writer(open(os.path.basename(filename) +
+                                          '.abundtrim', 'wb'),
                                      args.gzip, args.bzip)
         else:
-            trimfp = get_file_writer(args.out, args.gzip, args.bzip)
+            trimfp = get_file_writer(args.output, args.gzip, args.bzip)
 
         pass2list.append((filename, pass2filename, trimfp))
 
@@ -199,18 +199,18 @@ def main():
                 seq1 = read1.sequence.replace('N', 'A')
                 seq2 = read2.sequence.replace('N', 'A')
 
-                med1, _, _ = counting_table.get_median_count(seq1)
-                med2, _, _ = counting_table.get_median_count(seq2)
+                med1, _, _ = counting_graph.get_median_count(seq1)
+                med2, _, _ = counting_graph.get_median_count(seq2)
 
                 if med1 < NORMALIZE_LIMIT or med2 < NORMALIZE_LIMIT:
-                    counting_table.consume(seq1)
-                    counting_table.consume(seq2)
+                    counting_graph.consume(seq1)
+                    counting_graph.consume(seq2)
                     write_record_pair(read1, read2, pass2fp)
                     save_pass2 += 2
                 else:
-                    _, trim_at1 = counting_table.trim_on_abundance(seq1,
+                    _, trim_at1 = counting_graph.trim_on_abundance(seq1,
                                                                    cutoff)
-                    _, trim_at2 = counting_table.trim_on_abundance(seq2,
+                    _, trim_at2 = counting_graph.trim_on_abundance(seq2,
                                                                    cutoff)
 
                     if trim_at1 >= ksize:
@@ -233,16 +233,16 @@ def main():
 
                 seq = read1.sequence.replace('N', 'A')
 
-                med, _, _ = counting_table.get_median_count(seq)
+                med, _, _ = counting_graph.get_median_count(seq)
 
                 # has this portion of the graph saturated? if not,
                 # consume & save => pass2.
                 if med < NORMALIZE_LIMIT:
-                    counting_table.consume(seq)
+                    counting_graph.consume(seq)
                     write_record(read1, pass2fp)
                     save_pass2 += 1
                 else:                       # trim!!
-                    _, trim_at = counting_table.trim_on_abundance(seq, cutoff)
+                    _, trim_at = counting_graph.trim_on_abundance(seq, cutoff)
                     if trim_at >= ksize:
                         new_read = trim_record(read1, trim_at)
                         write_record(new_read, trimfp)
@@ -280,7 +280,7 @@ def main():
                       written_reads, written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
-            med, _, _ = counting_table.get_median_count(seq)
+            med, _, _ = counting_graph.get_median_count(seq)
 
             # do we retain low-abundance components unchanged?
             if med < NORMALIZE_LIMIT and args.variable_coverage:
@@ -293,7 +293,7 @@ def main():
 
             # otherwise, examine/trim/truncate.
             else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
-                _, trim_at = counting_table.trim_on_abundance(seq, cutoff)
+                _, trim_at = counting_graph.trim_on_abundance(seq, cutoff)
                 if trim_at >= ksize:
                     new_read = trim_record(read, trim_at)
                     write_record(new_read, trimfp)
@@ -337,7 +337,7 @@ def main():
               file=sys.stderr)
 
     fp_rate = \
-        khmer.calc_expected_collisions(counting_table, args.force,
+        khmer.calc_expected_collisions(counting_graph, args.force,
                                        max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
     print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
@@ -345,10 +345,10 @@ def main():
 
     print('output in *.abundtrim', file=sys.stderr)
 
-    if args.savetable:
-        print("Saving k-mer counting table to",
-              args.savetable, file=sys.stderr)
-        counting_table.save(args.savetable)
+    if args.savegraph:
+        print("Saving k-mer countgraph to",
+              args.savegraph, file=sys.stderr)
+        counting_graph.save(args.savegraph)
 
 
 if __name__ == '__main__':

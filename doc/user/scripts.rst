@@ -1,12 +1,13 @@
 .. vim: set filetype=rst
 
-==============================
+******************************
 khmer's command-line interface
-==============================
+******************************
 
 The simplest way to use khmer's functionality is through the command
-line scripts, located in the scripts/ directory of the khmer
-distribution.  Below is our documentation for these scripts.  Note
+line scripts, located in the `scripts/
+<https://github.com/dib-lab/khmer/tree/stable/scripts>`__ directory of the
+khmer distribution.  Below is our documentation for these scripts.  Note
 that all scripts can be given :option:`-h` which will print out
 a list of arguments taken by that script.
 
@@ -54,9 +55,6 @@ k-mer counting and abundance filtering
 
 .. autoprogram:: count-median:get_parser()
         :prog: count-median.py
-
-.. autoprogram:: count-overlap:get_parser()
-        :prog: count-overlap.py
 
 .. autoprogram:: unique-kmers:get_parser()
         :prog: unique-kmers.py
