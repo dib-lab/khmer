@@ -34,8 +34,8 @@ DEFAULT_K = 32
 def get_parser():
     epilog = """
     Load stoptags in from the given `.stoptags` file and use them to trim
-    or remove the sequences in `<file1-N>`.  Trimmed sequences will be placed in
-    `<fileN>.stopfilt`.
+    or remove the sequences in `<file1-N>`.  Trimmed sequences will be placed
+    in `<fileN>.stopfilt`.
     """
     parser = argparse.ArgumentParser(
         description="Trim sequences at stoptags.",

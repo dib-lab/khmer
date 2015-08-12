@@ -30,8 +30,9 @@ DEFAULT_K = 32
 
 def get_parser():
     epilog = """
-    Take the `${graphbase}.subset.#.pmap` files and merge them all into a single
-    ${graphbase}.pmap.merged file for :program:`annotate-partitions.py` to use.
+    Take the `${graphbase}.subset.#.pmap` files and merge them all into a
+    single ${graphbase}.pmap.merged file for :program:`annotate-partitions.py`
+    to use.
     """
     parser = argparse.ArgumentParser(
         description="Merge partition map '.pmap' files.",
