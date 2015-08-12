@@ -14,6 +14,7 @@
 #include "hashbits.hh"
 #include "hashtable.hh"
 #include "khmer_exception.hh"
+#include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "zlib.h"
 
@@ -62,7 +63,7 @@ void CountingHash::output_fasta_kmer_pos_freq(
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType min_count = MAX_KCOUNT;
 
@@ -80,7 +81,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 
 BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType max_count = 0;
 
@@ -128,7 +129,7 @@ CountingHash::abundance_distribution(
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -248,13 +249,14 @@ void CountingHash::fasta_dump_kmers_by_abundance(
             for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
                 string kmer = seq.substr(i, i + _ksize);
                 BoundedCounterType n = get_count(kmer.c_str());
-                char ss[_ksize + 1];
+                char * ss = new char[_ksize + 1];
                 strncpy(ss, kmer.c_str(), _ksize);
                 ss[_ksize] = 0;
 
                 if (n == limit_by_count) {
-                    cout << ss << endl;
+                    cout << *ss << endl;
                 }
+		delete[] ss;
             }
         }
 
@@ -296,7 +298,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -322,7 +324,6 @@ const
     return seq.length();
 }
 
-
 unsigned long CountingHash::trim_below_abundance(
     std::string     seq,
     BoundedCounterType  max_abund)
@@ -332,7 +333,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -368,7 +369,7 @@ const
         throw khmer_exception("invalid read");
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer = kmers.next();
     if (kmers.done()) {
@@ -941,7 +942,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -984,7 +985,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();

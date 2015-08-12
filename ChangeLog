@@ -3,6 +3,67 @@
    * tests/{khmer_tst_utils,test_normalize_by_median}.py: added new utility
    function and proof-of-concept
 
+2015-08-11  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
+   formatting fixes and new citation for the software as a whole
+   * Makefile: PDF building hints, tweaked dependencies, update coverity URL,
+   new target to generate author list for the paper citation 
+   * sort-authors-list.py: helper script for the above
+   * doc/conf.py: don't generate a module index
+   * doc/contributors.rst: formatting, remove references to old lab
+   * doc/dev/coding-guidelines-and-review.rst: add C++ version standard
+   * doc/dev/getting-started.rst: ccache, git-merge-changelog, and advanced
+   commit squashing
+   * doc/user/biblio.rst: added links to khmer citation collections
+   * doc/user/examples.rst: linked to online version of example scripts
+   * doc/user/guide.rst: commented out empty section, added BSD note
+   * lib/counting.{cc},lib/*.hh: c++11 fixes: remove unneeded trailing
+   semicolons
+   * scripts/*.py: line-wrap & scrub output
+   * setup.py: turn optimizations back on and -pedantic
+   * .mailmap: additional tweaks to author list
+
+
+2015-08-11  Kevin Murray  <spam@kdmurray.id.au>
+
+   * lib/Makefile: Fix SONAME and ABI versioning to sync with Debian standard
+   practice.
+
+2015-08-10  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/traversal.{cc,hh}: Add new files with unified traversal machinery.
+   Introduce Traverser class to handle finding neighbors and appropriate
+   bitmasking.
+   * khmer/_khmer.cc,lib/{counting,hashbits,hashtable,labelhash,subset}.{cc,hh}:
+   Updated relevant instances of HashIntoType and KMerIterator to use new Kmer
+   and KmerIterator, respectively.
+   * lib/Makefile: Add -std=c++11 flag.
+   * Makefile: Update -std=c++11 flag in libtest target.
+   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser. 
+   Change kmer_degree to use functions from traversal.cc. Remove redundant
+   count_kmers_with_radius in favor of calc_connected_graph_size. Update
+   traverse_from_kmer to use Traverser. Hashtable subclasses KmerFactory.
+   * lib/{hashtable.hh,kmer_hash.{cc,hh}}: Move KmerIterator from hashtable.hh
+   to kmer_hash.{cc,hh}. Add Kmer class to store forward, reverse, and
+   uniqified integer representations of k-mers, and to handle string
+   conversion. Update KmerIterator to emit objects of type Kmer and to subclass 
+   KmerFactory; add doxygen markup.
+   * lib/khmer.hh: Forward declare Kmer and typedef new Kmer data structures.
+   * lib/subset.{cc,hh}: Move constructor definition to .cc file. Remove
+   queue_neighbors in favor of new traversal machinery. Update find_all_tags, 
+   sweep_for_tags, and find_all_tags_truncate_on_abundance to use Traverser.
+   * setup.py: Add traversal.{cc,hh} to deps.
+
+2015-08-10  Luiz Irber  <khmer@luizirber.org>
+
+   * scripts/unique-kmers.py: use consume_fasta again.
+   * khmer/_khmer.cc: expose output_records option on HLLCounter consume_fasta.
+   * lib/hllcounter.{cc,hh}: implement output_records option in consume_fasta.
+   * lib/read_parsers.{cc,hh}: add Read method write_to, useful for outputting
+   the read to an output stream.
+   * doc/whats-new-2.0.rst: Add unique-kmers description.
+
 2015-08-09  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * khmer/khmer_args.py: pep8

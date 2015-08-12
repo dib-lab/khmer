@@ -176,7 +176,7 @@ public:
 
     void update_from(const Hashbits &other);
 };
-};
+}
 
 #include "counting.hh"
 #include "labelhash.hh"

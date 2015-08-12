@@ -13,6 +13,7 @@
 #include <string>
 
 #include "khmer.hh"
+#include "traversal.hh"
 
 namespace khmer
 {
@@ -44,10 +45,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    explicit SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
-    {
-        ;
-    };
+    explicit SubsetPartition(Hashtable * ht);
 
     ~SubsetPartition()
     {
@@ -77,14 +75,7 @@ public:
     void load_partitionmap(std::string infile);
     void _validate_pmap();
 
-    void queue_neighbors(HashIntoType kmer_f,
-                         HashIntoType kmer_r,
-                         unsigned int breadth,
-                         SeenSet& traversed_kmers,
-                         NodeQueue& node_q,
-                         std::queue<unsigned int>& breadth_q);
-
-    void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
+    void find_all_tags(Kmer start_kmer,
                        SeenSet& tagged_kmers,
                        const SeenSet& all_tags,
                        bool break_on_stop_tags=false,
@@ -97,8 +88,7 @@ public:
                                 bool break_on_stop_tags,
                                 bool stop_big_traversals);
 
-    void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
-            HashIntoType kmer_r,
+    void find_all_tags_truncate_on_abundance(Kmer start_kmer,
             SeenSet& tagged_kmers,
             const SeenSet& all_tags,
             BoundedCounterType min_count,
