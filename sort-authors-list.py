@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
+#
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) University of California Regents 2015. It is licensed under
+# the three-clause BSD license; see LICENSE.
+# Contact: khmer-project@idyll.org
 
 from __future__ import print_function
 from __future__ import unicode_literals
