@@ -42,8 +42,6 @@ Countgraph
 
 (a.k.a ``CountingHash``, a Count-min Sketch)
 
-:Preferred extension: '.ct' (count table)
-
 The header is in the format below, again in the order of file offset.
 
 ================== ===== ===== ==============================================
@@ -86,8 +84,6 @@ Nodegraph
 ---------
 
 (a.k.a ``HashBits``, a Bloom Filter)
-
-:Preferred extension: '.pt' (presence table)
 
 The header is in the format below, again in the order of file offset. Value
 macro definitions are given in parenthesis
