@@ -13,6 +13,10 @@
    load-into-countgraph, load-graph -> load-into-nodegraph, fixed tests to not
    bork
 
+2015-08-12  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/_khmer.cc: Fix a GCC string initialization warning.
+
 2015-08-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
