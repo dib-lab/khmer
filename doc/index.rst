@@ -4,23 +4,21 @@
 khmer -- k-mer counting & filtering FTW
 #######################################
 
-:Authors: Michael R. Crusoe, ACharbonneau, James A. Stapleton, Sherine
-        Awad, Elmar Bucher, Adam Caldwell, Reed Cartwright, Bede Constantinides,
-        Peter Dave Hello, Kevin D. Murray, Greg Edvenson, Hussien F. Alameldin,
-        Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, Leonor 
-        Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, Iván González, Sarah 
-        Guermond, Jiarong Guo, Aditi Gupta, Andreas Härpfer, Adina Howe,
-        Alex Hyer, Luiz Irber, Alexander Johan Nederbragt, Rhys Kidd, David Lin,
-        Justin Lippi, Heather L. Wiencko, Tamer Mansour, Pamela McA'Nulty, Eric 
-        McDonald, Jessica Mizzi, Kevin Murray, Kaben Nanlohy, Humberto 
-        Ortiz-Zuazaga, Jeramia Ory, Jason Pell, Charles Pepe-Ranney, Rodney 
-        Picett, Ryan R. Boyce, Michael R. Crusoe, Joshua R. Herr, Joshua R. 
-        Nahum, Erich Schwarz, Camille Scott, Josiah Seaman, Scott Sievert, Jared
-        Simpson, James Spencer, Ramakrishnan Srinivasan, Daniel Standage, Joe 
-        Stein, Susan Steinman, Benjamin Taylor, C. Titus Brown, Will Trimble,
-        Connor T. Skennerton, Michael Wright, Brian Wyss, Qingpeng Zhang, en 
-        zyme, C. Titus Brown
-
+:Authors: Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, Elmar
+        Bucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau, Bede
+        Constantinides, Greg Edvenson, Scott Fay, Jacob Fenton, Thomas Fenzl,
+        Jordan Fish, Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck,
+        IvÃ¡n GonzÃ¡lez, Sarah Guermond, Jiarong Guo, Aditi Gupta, Joshua R.
+        Herr, Adina Howe, Alex Hyer, Andreas HÃ¤rpfer, Luiz Irber, Rhys Kidd,
+        David Lin, Justin Lippi, Tamer Mansour, Pamela McA'Nulty, Eric
+        McDonald, Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, Kaben
+        Nanlohy, Alexander Johan Nederbragt, Humberto Ortiz-Zuazaga, Jeramia
+        Ory, Jason Pell, Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz,
+        Camille Scott, Josiah Seaman, Scott Sievert, Jared Simpson, Connor T.
+        Skennerton, James Spencer, Ramakrishnan Srinivasan, Daniel Standage,
+        James A. Stapleton, Joe Stein, Susan R Steinman, Benjamin Taylor, Will
+        Trimble, Heather L. Wiencko, Michael Wright, Brian Wyss, Qingpeng
+        Zhang, en zyme, C. Titus Brown
 
 :Contact: khmer-project@idyll.org
 :GitHub: https://github.com/dib-lab/khmer

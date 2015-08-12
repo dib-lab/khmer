@@ -46,3 +46,16 @@ print(
      publisher = "F1000",
      url = "http://dx.doi.org/10.12688/f1000research.6924.1"
   }''')
+
+doclist = u':Authors: '
+
+for tup in authors:
+    name = tup[0]
+    name.string_format = "{first} {middle} {last}"
+    doclist += unicode(name) + ", "
+
+doclist = doclist[:-2]
+
+for line in textwrap.wrap(unicode(doclist), 71):
+    print('        ' + line)
+
