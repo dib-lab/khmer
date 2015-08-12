@@ -54,7 +54,7 @@ Pipelines
 ---------
 
 All khmer scripts used by a published recommended analysis pipeline must be
-included in `scripts/` and meet the standards therein implied.
+included in ``scripts/`` and meet the standards therein implied.
 
 Command line scripts
 --------------------
@@ -83,8 +83,8 @@ Command line thoughts:
 
 ----
 
-All code in `scripts/` must have automated tests; see `tests/test_scripts.py`.
-Otherwise it belongs in `sandbox/`.
+All code in ``scripts/`` must have automated tests; see
+``tests/test_scripts.py``. Otherwise it belongs in ``sandbox/``.
 
 When files are overwritten, they should only be opened to be overwritten
 after the input files have been shown to exist.  That prevents stupid
@@ -108,7 +108,7 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-`khmer/_khmermodule.cc`
+``khmer/_khmermodule.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.

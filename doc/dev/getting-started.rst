@@ -231,7 +231,7 @@ Claiming an issue and starting to develop
    doing on dib-lab.)
 
    It is possible that when you do a `git pull` you will get a "merge
-   conflict"--This is what happens when something changed in the branch you're
+   conflict" -- This is what happens when something changed in the branch you're
    pulling in in the same place you made a change in your local copy. This
    frequently happens in the `Changelog` file.
 
@@ -281,19 +281,17 @@ Claiming an issue and starting to develop
       git add path/to/file
 
    If you have a large quanity of changes and you don't want to add each file
-   manually you can do `git add --all`--but be careful! This can sometimes add
-   changes you didn't intend to commit, such as extraneous test datia--You can
-   do a `git diff` to see the difference between the current state of your
-   branch and the last time you made a commit.
+   manually you can do ``git add --patch`` which will display each set of
+   changes to you before staging them for commit.
 
    Once you have staged your changes, it's time to make a commit::
 
       git commit
 
    Git will then open your default console text editor to write a commit
-   message--this is a short (typically 1-3 sentence) description of the
+   message -- this is a short (typically 1-3 sentence) description of the
    changes you've made. Please make your commit message informative but
-   concise--these messages become part of the 'official' history of the
+   concise -- these messages become part of the 'official' history of the
    project. 
 
    Once your changes have been committed, push them up to the remote branch::
@@ -301,7 +299,7 @@ Claiming an issue and starting to develop
       git push
 
    If this is your first commit on a new branch git will error out, telling
-   you the remote branch doesn't exist--This is fine, as it will also provide
+   you the remote branch doesn't exist -- This is fine, as it will also provide
    the command to create the branch. Copy/paste/run and you should be set.
 
    You should also visit and read :doc:`coding-guidelines-and-review`.

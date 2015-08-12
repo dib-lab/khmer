@@ -78,7 +78,7 @@ Our current Copyright message is::
    # Contact: khmer-project@idyll.org
    #
 
-Some files are copyright University of California Regents::
+Some files are copyright Regents of the University of California::
 
    #
    # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
