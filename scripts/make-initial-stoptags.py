@@ -42,12 +42,13 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 def get_parser():
     epilog = """
-    Loads a k-mer nodegraph/tagset pair created by load-into-nodegraph.py, and
+    Loads a k-mer nodegraph/tagset pair created by
+    :program:`load-into-nodegraph.py`, and
     does a small set of traversals from graph waypoints; on these traversals,
     looks for k-mers that are repeatedly traversed in high-density regions of
     the graph, i.e. are highly connected. Outputs those k-mers as an initial
-    set of stoptags, which can be fed into partition-graph.py, find-knots.py,
-    and filter-stoptags.py.
+    set of stoptags, which can be fed into :program:`partition-graph.py`,
+    :program:`find-knots.py`, and :program:`filter-stoptags.py`.
 
     The k-mer countgraph size options parameters are for a k-mer countgraph
     to keep track of repeatedly-traversed k-mers. The subset size option

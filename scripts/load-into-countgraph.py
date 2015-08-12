@@ -64,7 +64,8 @@ def get_parser():
     parser.add_argument('--summary-info', '-s', type=str, default=None,
                         metavar="FORMAT", choices=[str('json'), str('tsv')],
                         help="What format should the machine readable run "
-                        "summary be in? (json or tsv, disabled by default)")
+                        "summary be in? (`json` or `tsv`, disabled by"
+                        " default)")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

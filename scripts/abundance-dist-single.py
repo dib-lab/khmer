@@ -52,7 +52,7 @@ def get_parser():
                         '(4) fraction of total distinct k-mers.')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
-                        help='Do not output 0-count bins')
+                        help='Do not output zero-count bins')
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')

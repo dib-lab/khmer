@@ -35,7 +35,7 @@ DEFAULT_CUTOFF = 2
 
 def get_parser():
     epilog = """
-    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt
+    Trimmed sequences will be placed in `${input_sequence_filename}.abundfilt`
     for each input sequence file. If the input sequences are from RNAseq or
     metagenome sequencing then :option:`--variable-coverage` should be used.
 

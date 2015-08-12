@@ -41,8 +41,8 @@ def get_parser():
     normalization in non-paired mode, or partitioning) and separates
     the interleaved reads from the orphaned reads.
 
-    The default output is two files, <input file>.pe and <input
-    file>.se, placed in the current directory. The .pe file contains
+    The default output is two files, `<input file>.pe` and `<input
+    file>.se`, placed in the current directory. The .pe file contains
     interleaved and properly paired sequences, while the .se file
     contains orphan sequences.
 

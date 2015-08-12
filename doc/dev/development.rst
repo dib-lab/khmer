@@ -15,7 +15,7 @@ tag.
 Build framework
 ---------------
 
-'make' should build everything, including tests and "development" code.
+`make` should build everything, including tests and "development" code.
 
 git and GitHub strategies
 -------------------------
@@ -54,13 +54,13 @@ Pipelines
 ---------
 
 All khmer scripts used by a published recommended analysis pipeline must be
-included in scripts/ and meet the standards therein implied.
+included in `scripts/` and meet the standards therein implied.
 
 Command line scripts
 --------------------
 
 Python command-line scripts should use '-' instead of '_' in the name.
-(Only filenames containing code for import imported should use _.)
+(Only filenames containing code for import should use _.)
 
 Please follow the command-line conventions used under scripts/.  This
 includes most especially standardization of '-x' to be hash table size,
@@ -83,19 +83,12 @@ Command line thoughts:
 
 ----
 
-All code in scripts/ must have automated tests; see tests/test_scripts.py.
-Otherwise it belongs in sandbox/.
+All code in `scripts/` must have automated tests; see `tests/test_scripts.py`.
+Otherwise it belongs in `sandbox/`.
 
 When files are overwritten, they should only be opened to be overwritten
 after the input files have been shown to exist.  That prevents stupid
-command like mistakes from trashing important files.
-
-It would be nice to allow piping from one command to another where possible.
-But this seems complicated.
-
-CTB: should we squash output files (overwrite them if they exist), or not?
-So far, leaning towards 'not', as that way no one is surprised and loses
-their data.
+command line mistakes from trashing important files.
 
 A general error should be signaled by exit code `1` and success by `0`. Linux
 supports exit codes from `0` to `255` where the value `1` means a general
@@ -115,7 +108,7 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-khmer/_khmermodule.CC
+`khmer/_khmermodule.cc`
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.

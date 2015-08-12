@@ -64,7 +64,7 @@ def worker(queue, basename, stop_big_traversals):
 
 def get_parser():
     epilog = """
-    The resulting partition maps are saved as '${basename}.subset.#.pmap'
+    The resulting partition maps are saved as `${basename}.subset.#.pmap`
     files.
     """
     parser = argparse.ArgumentParser(

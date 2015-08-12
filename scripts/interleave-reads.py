@@ -45,7 +45,7 @@ def get_parser():
 
     As a "bonus", this file ensures that if read names are not already
     formatted properly, they are reformatted consistently, such that
-    they look like the pre-1.8 Casava format (@name/1, @name/2).
+    they look like the pre-1.8 Casava format (`@name/1`, `@name/2`).
 
     Example::
 

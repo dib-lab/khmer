@@ -39,7 +39,7 @@ def get_parser():
                         'count, (4) fraction of total distinct k-mers.')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
-                        help='Do not output 0-count bins')
+                        help='Do not output zero-count bins')
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite existing output_histogram_filename')
