@@ -8,8 +8,8 @@ khmer -- k-mer counting & filtering FTW
         Bucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau, Bede
         Constantinides, Greg Edvenson, Scott Fay, Jacob Fenton, Thomas Fenzl,
         Jordan Fish, Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck,
-        IvÃ¡n GonzÃ¡lez, Sarah Guermond, Jiarong Guo, Aditi Gupta, Joshua R.
-        Herr, Adina Howe, Alex Hyer, Andreas HÃ¤rpfer, Luiz Irber, Rhys Kidd,
+        Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, Joshua R.
+        Herr, Adina Howe, Alex Hyer, Andreas Härpfer, Luiz Irber, Rhys Kidd,
         David Lin, Justin Lippi, Tamer Mansour, Pamela McA'Nulty, Eric
         McDonald, Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, Kaben
         Nanlohy, Alexander Johan Nederbragt, Humberto Ortiz-Zuazaga, Jeramia

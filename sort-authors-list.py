@@ -12,6 +12,10 @@ from nameparser import HumanName
 import codecs
 import textwrap
 
+import sys
+import codecs
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+
 authors = []
 
 with codecs.open('authors.csv', 'r', encoding='utf-8') as namefile:
