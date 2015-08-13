@@ -295,7 +295,6 @@ def main():
 
     extractor.refresh_reader()
 
-
     extractor.output_histogram(distfilename)
 
     if not args.output_groups:
