@@ -24,10 +24,9 @@ This should generally be set as high as possible; see
 .. note::
  
    Almost all scripts take in either FASTA and FASTQ format, and
-   output the same.  Some scripts may only recognize FASTQ if the file
-   ending is '.fq' or '.fastq', at least for now.
+   output the same.
 
-   Gzip and bzip2 compressed files are detected using magic bits. 
+   Gzip and bzip2 compressed files are detected automatically. 
 
 .. _scripts-counting:
 
