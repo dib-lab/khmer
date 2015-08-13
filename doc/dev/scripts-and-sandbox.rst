@@ -69,27 +69,20 @@ specify a ``metavar`` for the documentation and help formatting. Example::
 Copyright message
 ~~~~~~~~~~~~~~~~~
 
-Our current Copyright message is::
+The copyright message should be of the form::
 
    #
    # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-   # Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   # Copyright (C) ___WHO___, ___YEAR(s)___. It is licensed under
    # the three-clause BSD license; see doc/LICENSE.txt.
    # Contact: khmer-project@idyll.org
    #
 
-Some files are copyright Regents of the University of California::
-
-   #
-   # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-   # Copyright (C) The Regents of the University of California, 2015. 
-   # It is licensed under the three-clause BSD license; see doc/LICENSE.txt.
-   # Contact: khmer-project@idyll.org
-   #
-
-The beginning year should be the first year that this file existed in
-the repo; the end year should be the last year a coding change was
-made in the file.
+Where ___WHO___ is replaced with one or more of "Michigan State University" or
+"The Regents of the University of California" and ___YEAR(s)___ is replaced
+with the year or years the file was created or modified. The copyright
+statement for new files should only refer to "The Regents of the University of
+California".
 
 Upgrading a script from 'sandbox' to 'scripts'
 ----------------------------------------------
