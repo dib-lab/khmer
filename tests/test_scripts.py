@@ -822,7 +822,7 @@ def test_oxli_build_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-graph worked :)
+    # roundabout way of checking that load-into-nodegraph worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -1973,10 +1973,10 @@ def test_make_initial_stoptags():
 
 
 def test_make_initial_stoptags_load_stoptags():
-    # gen input files using load-graph.py -t
+    # gen input files using load-into-nodegraph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-graph works properly
+    # this assumes (obv.) load-into-nodegraph works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
@@ -1985,7 +1985,7 @@ def test_make_initial_stoptags_load_stoptags():
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-graphs
+    # test input file gen'd by load-into-nodegraphs
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 

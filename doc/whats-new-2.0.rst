@@ -43,6 +43,18 @@ and so can be used in conjunction with other scripts (like
 Incompatible changes
 ====================
 
+New datastructure and script names
+----------------------------------
+
+For clarity the Count-Min Sketch based data structure previously known as
+"counting_hash" or "counting_table" and variations of these is now known as
+``countgraph``. Likewise with the Bloom Filter based data structure previously
+known at "hashtable", "presence_table" and variations of these is now known as
+``nodegraph``. Many options relating to 'table' have been changes to 'graph'.
+Some scripts have been renamed: ``load-into-counting.py`` is now
+:program:`load-into-countgraph.py`; ``load-graph.py`` is now
+:program:`load-into-nodegraph.py`.
+
 New parameter for tablesize/number of table parameters.
 -------------------------------------------------------
 
@@ -65,6 +77,10 @@ this project.
 Files of the above types made in previous versions of khmer are not compatible
 with v2.0; the reverse is also true.
 
+In addition to the ``OXLI`` string, the Nodegraph and Countgraph file format
+now includes the number of occupied bins. See :doc:`dev/binary-file-formats`
+for details.
+
 Scripts now output columnar data in CSV format by default
 ---------------------------------------------------------
 
@@ -83,3 +99,8 @@ specified output filename and partition-graph appended a `.pt` to the
 given input filename.  Now, `load-graph.py` writes to the specified
 output filename and `partition-graph.py` does not append a `.pt` to
 the given input filename.
+
+Removed script
+--------------
+
+``count-overlap.py`` has been removed.

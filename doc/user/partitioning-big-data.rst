@@ -97,10 +97,10 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   filter-stoptags.py *.stoptags corn-50m.lump.fa
 
   # now, reload the filtered data set in and partition again.
-  # NOTE: 'load-graph.py' uses the file extension to determine
+  # NOTE: 'load-into-nodegraph.py' uses the file extension to determine
   # if the file is formatted as FASTA or FASTQ. The default is
   # fasta, therefore if your files are fastq formatted you need
-  # to append 'fastq' to the name so that 'load-graph.py' 
+  # to append 'fastq' to the name so that 'load-into-nodegraph.py' 
   # will parse the file correctly
   load-into-nodegraph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
   partition-graph.py -T 4 lumpfilt

@@ -98,7 +98,7 @@ Metagenome assembly
 2. Run filter-below-abund with C=50 (if you diginormed to C=10) or
    C=100 (if you diginormed to C=20);
 
-3. Partition reads with load-graph, etc. etc.
+3. Partition reads with load-into-nodegraph, etc. etc.
 
 4. Assemble groups as normal, extracting paired-end reads and lumping
    remaining orphan reads into singletons using

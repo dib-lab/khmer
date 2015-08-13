@@ -51,7 +51,7 @@ you of the total memory usage, and (at the end) will complain if it's
 too small.
 
 Life is a bit more complicated than this, however, because some scripts --
-load-into-counting and load-graph -- keep ancillary information that will
+load-into-countgraph and load-into-nodegraph -- keep ancillary information that will
 consume memory beyond this table data structure.  So if you run out of
 memory, decrease the table size.
 
@@ -72,7 +72,7 @@ they are not, in fact, present.
 Digital normalization (normalize-by-median and filter-abund) uses
 the Count-Min Sketch data structure.
 
-Graph partitioning (load-graph etc.) uses the Bloom filter data structure.
+Graph partitioning (load-into-nodegraph etc.) uses the Bloom filter data structure.
 
 The practical ramifications of this are pretty cool.  For example,
 your digital normalization is guaranteed not to increase in memory

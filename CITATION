@@ -54,9 +54,8 @@ any command line arguments.
 Graph partitioning and/or compressible graph representation
 ===========================================================
 
-The :program:`load-graph.py`, :program:`partition-graph.py`,
-:program:`find-knots.py`, :program:`load-graph.py`, and
-:program:`partition-graph.py` scripts are part of the compressible graph
+The :program:`load-into-nodegraph.py`, :program:`partition-graph.py`,
+and :program:`find-knots.py` scripts are part of the compressible graph
 representation and partitioning algorithms described in:
 
    Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
@@ -147,7 +146,7 @@ K-mer counting
 ==============
 
 The :program:`abundance-dist.py`, :program:`filter-abund.py`, and
-:program:`load-into-counting.py` scripts implement the probabilistic k-mer
+:program:`load-into-countgraph.py` scripts implement the probabilistic k-mer
 counting described in:
 
    These Are Not the K-mers You Are Looking For: Efficient Online K-mer

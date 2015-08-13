@@ -35,7 +35,7 @@ k-mer counting and abundance filtering
 ======================================
 
 .. autoprogram:: load-into-countgraph:get_parser()
-        :prog: load-into-counting.py
+        :prog: load-into-countgraph.py
 
 .. autoprogram:: abundance-dist:get_parser()
         :prog: abundance-dist.py
@@ -67,7 +67,7 @@ Partitioning
         :prog: do-partition.py
 
 .. autoprogram:: load-into-nodegraph:get_parser()
-        :prog: load-graph.py
+        :prog: load-into-nodegraph.py
 
 See :program:`extract-partitions.py` for a complete workflow.
 
