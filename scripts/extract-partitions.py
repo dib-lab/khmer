@@ -83,6 +83,58 @@ def get_parser():
     return parser
 
 
+class PartitonedReadIterator(object):
+    """
+    Generatior/context manager to do boilerplate output of statistics
+
+    Uses a list of input files and verbosity
+    Returns reads and partition IDs
+    """
+
+    def __init__(self, filename_list):
+        self.filename_list = filename_list
+
+    def __call__(self, quiet=False, single=False):
+        """
+        Iterate though the filename list, iterate though reads in the files
+        """
+        for filename in self.filename_list:
+            for index, read, pid in read_partition_file(filename):
+                if not quiet:
+                    if index % 100000 == 0:
+                        print('...x2', index, file=sys.stderr)
+                yield read, pid
+                if single:
+                    break  # only yield a single read from each file
+
+
+class PartitionExtractor(object):
+
+    def __init__(self, file_list):
+        # We'll make our own generator! With files! And...
+        self.file_list = file_list
+        self.reader = PartitonedReadIterator(file_list)
+        self.n_unassigned = 0
+        self.count = {}
+
+    def refresh_reader(self):
+        """
+        Function to recreate the reader since generators die
+
+        Alternative: tee(reader), but that's memory intensive
+        """
+        self.reader = PartitonedReadIterator(self.file_list)
+
+    def process_unassigned(self, outfp=None):
+        for read, pid in self.reader():
+            self.count[pid] = self.count.get(pid, 0) + 1
+
+            if pid == 0:
+                self.n_unassigned += 1
+                if outfp:
+                    write_record(read, outfp)
+
+
 # pylint: disable=too-many-statements
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('extract-partitions.py', ['graph'])
@@ -118,44 +170,36 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     #
 
-    suffix = 'fa'
-    is_fastq = False
+    suffix = None
+    is_fastq = None
 
-    for index, read, pid in read_partition_file(args.part_filenames[0]):
-        if hasattr(read, 'quality'):
-            suffix = 'fq'
-            is_fastq = True
-        break
+    reader = PartitonedReadIterator(args.part_filenames)
 
-    for filename in args.part_filenames:
-        for index, read, pid in read_partition_file(filename):
-            if is_fastq:
-                assert hasattr(read, 'quality'), \
-                    "all input files must be FASTQ if the first one is"
-            else:
-                assert not hasattr(read, 'quality'), \
-                    "all input files must be FASTA if the first one is"
+    for read, _ in reader(True, True):
+        if is_fastq is None:
+            is_fastq = hasattr(read, 'quality')
+        else:
+            assert hasattr(read, 'quality') == is_fastq,\
+                "Input files must have consistent format."
 
-            break
+    if is_fastq:
+        suffix = "fq"
+    else:
+        suffix = "fa"
+
+    # remember folks, generators exhaust themseleves
+    extractor = PartitionExtractor(file_list=args.part_filenames)
 
     if args.output_unassigned:
         ofile = open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
         unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
-    count = {}
-    for filename in args.part_filenames:
-        for index, read, pid in read_partition_file(filename):
-            if index % 100000 == 0:
-                print('...', index, file=sys.stderr)
-
-            count[pid] = count.get(pid, 0) + 1
-
-            if pid == 0:
-                n_unassigned += 1
-                if args.output_unassigned:
-                    write_record(read, unassigned_fp)
-
-    if args.output_unassigned:
+        extractor.process_unassigned(unassigned_fp)
         unassigned_fp.close()
+    else:
+        extractor.process_unassigned()
+
+    extractor.refresh_reader()
+    count = extractor.count
 
     if 0 in count:                          # eliminate unpartitioned sequences
         del count[0]
@@ -226,26 +270,24 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     total_seqs = 0
     part_seqs = 0
     toosmall_parts = 0
-    for filename in args.part_filenames:
-        for index, read, partition_id in read_partition_file(filename):
-            total_seqs += 1
-            if index % 100000 == 0:
-                print('...x2', index, file=sys.stderr)
+    # refresh the generator
+    reader = PartitonedReadIterator(args.part_filenames)
+    for read, partition_id in reader():
+        total_seqs += 1
+        if partition_id == 0:
+            continue
 
-            if partition_id == 0:
-                continue
+        try:
+            group_n = group_d[partition_id]
+        except KeyError:
+            assert count[partition_id] <= args.min_part_size
+            toosmall_parts += 1
+            continue
 
-            try:
-                group_n = group_d[partition_id]
-            except KeyError:
-                assert count[partition_id] <= args.min_part_size
-                toosmall_parts += 1
-                continue
+        outfp = group_fps[group_n]
 
-            outfp = group_fps[group_n]
-
-            write_record(read, outfp)
-            part_seqs += 1
+        write_record(read, outfp)
+        part_seqs += 1
 
     print('---', file=sys.stderr)
     print('Of %d total seqs,' % total_seqs, file=sys.stderr)
