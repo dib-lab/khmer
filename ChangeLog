@@ -2,6 +2,7 @@
 
    * scripts/extract-partitions.py: refactored much of the processing into
    generators
+   * tests/test_scripts.py: added test
 
 2015-08-12  Luiz Irber  <khmer@luizirber.org>
 
