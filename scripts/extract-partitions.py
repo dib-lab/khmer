@@ -5,7 +5,6 @@
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
 """
 Extract partitioned sequences into files grouped by partition size.
 
@@ -36,12 +35,14 @@ DEFAULT_THRESHOLD = 5
 
 
 def read_partition_file(filename):
+    """Utility function to get partitioned reads from file."""
     for record_index, record in enumerate(screed.open(filename)):
         _, partition_id = record.name.rsplit('\t', 1)
         yield record_index, record, int(partition_id)
 
 
 def get_parser():
+    """Create parser for extract-partitions.py."""
     epilog = """
     Example (results will be in ``example.group0000.fa``)::
 
@@ -109,13 +110,24 @@ class PartitonedReadIterator(object):
 
 
 class PartitionExtractor(object):
+    """
+    Does extraction, processing and accounting of partitioned reads.
 
-    def __init__(self, file_list):
+    Contains methods for self_maintenance  and output production
+    """
+
+    def __init__(self, file_list, min_size, max_size):
         # We'll make our own generator! With files! And...
         self.file_list = file_list
         self.reader = PartitonedReadIterator(file_list)
         self.n_unassigned = 0
         self.count = {}
+
+        self.divvy = None
+        self.group_n = 0
+        self.group_d = {}
+        self.min_size = min_size
+        self.max_size = max_size
 
     def refresh_reader(self):
         """
@@ -126,6 +138,12 @@ class PartitionExtractor(object):
         self.reader = PartitonedReadIterator(self.file_list)
 
     def process_unassigned(self, outfp=None):
+        """
+        Process unassigned reads
+
+        Can optionally output said reads if outfp is given
+        Also develops counts of partition IDs--necessary for further processing
+        """
         for read, pid in self.reader():
             self.count[pid] = self.count.get(pid, 0) + 1
 
@@ -134,15 +152,90 @@ class PartitionExtractor(object):
                 if outfp:
                     write_record(read, outfp)
 
+    def output_histogram(self, dist_filename):
+        """OUtputs histogram of partition counts to the given filename"""
+        # develop histogram of partition sizes
+        dist = {}
+        for _, size in list(self.count.items()):
+            dist[size] = dist.get(size, 0) + 1
 
-# pylint: disable=too-many-statements
-def main():  # pylint: disable=too-many-locals,too-many-branches
+        # output histogram
+        distfp = open(dist_filename, 'w')
+
+        total = 0
+        wtotal = 0
+        for counter, index in sorted(dist.items()):
+            total += index
+            wtotal += counter * index
+            distfp.write('%d %d %d %d\n' % (counter, index, total, wtotal))
+        distfp.close()
+
+    def develop_groups(self):
+        """Processing method that divides up the partitions into groups"""
+        if 0 in self.count:            # eliminate unpartitioned sequences
+            del self.count[0]
+
+        # sort groups by size
+        self.divvy = sorted(list(self.count.items()), key=lambda y: y[1])
+        self.divvy = [y for y in self.divvy if y[1] > self.min_size]
+
+        # divvy up into different groups, based on having max_size sequences
+        # in each group.
+        total = 0
+        group = set()
+        for partition_id, n_reads in self.divvy:
+            group.add(partition_id)
+            total += n_reads
+
+            if total > self.max_size:
+                for partition_id in group:
+                    self.group_d[partition_id] = self.group_n
+
+                self.group_n += 1
+                group = set()
+                total = 0
+
+        if group:
+            for partition_id in group:
+                self.group_d[partition_id] = self.group_n
+            self.group_n += 1
+
+    class ReadGroupGenerator(object):
+        """
+        Generator that yields partitioned reads and their group
+
+        Takes PartitionExtractor and PartitonedReadIterator objects
+        """
+        def __init__(self, extractor):
+            self.extractor = extractor
+
+            self.total_seqs = 0
+            self.part_seqs = 0
+            self.toosmall_parts = 0
+
+        def __call__(self, reader):
+            for read, partition_id in reader():
+                self.total_seqs += 1
+                if partition_id == 0:
+                    continue
+
+                try:
+                    group_n = self.extractor.group_d[partition_id]
+                except KeyError:
+                    assert self.extractor.count[partition_id] <=\
+                        self.extractor.min_size
+                    self.toosmall_parts += 1
+                    continue
+
+                yield read, group_n
+                self.part_seqs += 1
+
+
+def main():
     info('extract-partitions.py', ['graph'])
     args = get_parser().parse_args()
 
     distfilename = args.prefix + '.dist'
-
-    n_unassigned = 0
 
     for infile in args.part_filenames:
         check_input_files(infile, args.force)
@@ -188,7 +281,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         suffix = "fa"
 
     # remember folks, generators exhaust themseleves
-    extractor = PartitionExtractor(file_list=args.part_filenames)
+    extractor = PartitionExtractor(args.part_filenames,
+                                   args.min_part_size,
+                                   args.max_size)
 
     if args.output_unassigned:
         ofile = open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
@@ -199,104 +294,45 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         extractor.process_unassigned()
 
     extractor.refresh_reader()
-    count = extractor.count
 
-    if 0 in count:                          # eliminate unpartitioned sequences
-        del count[0]
 
-    # develop histogram of partition sizes
-    dist = {}
-    for pid, size in list(count.items()):
-        dist[size] = dist.get(size, 0) + 1
-
-    # output histogram
-    distfp = open(distfilename, 'w')
-
-    total = 0
-    wtotal = 0
-    for counter, index in sorted(dist.items()):
-        total += index
-        wtotal += counter * index
-        distfp.write('%d %d %d %d\n' % (counter, index, total, wtotal))
-    distfp.close()
+    extractor.output_histogram(distfilename)
 
     if not args.output_groups:
         sys.exit(0)
 
-    # sort groups by size
-    divvy = sorted(list(count.items()), key=lambda y: y[1])
-    divvy = [y for y in divvy if y[1] > args.min_part_size]
+    extractor.develop_groups()
 
-    # divvy up into different groups, based on having max_size sequences
-    # in each group.
-    total = 0
-    group = set()
-    group_n = 0
-    group_d = {}
-    for partition_id, n_reads in divvy:
-        group.add(partition_id)
-        total += n_reads
-
-        if total > args.max_size:
-            for partition_id in group:
-                group_d[partition_id] = group_n
-                # print 'group_d', partition_id, group_n
-
-            group_n += 1
-            group = set()
-            total = 0
-
-    if group:
-        for partition_id in group:
-            group_d[partition_id] = group_n
-            # print 'group_d', partition_id, group_n
-        group_n += 1
-
-    print('%d groups' % group_n, file=sys.stderr)
-    if group_n == 0:
+    print('%d groups' % extractor.group_n, file=sys.stderr)
+    if extractor.group_n == 0:
         print('nothing to output; exiting!', file=sys.stderr)
         return
 
     # open a bunch of output files for the different groups
     group_fps = {}
-    for index in range(group_n):
+    for index in range(extractor.group_n):
         fname = '%s.group%04d.%s' % (args.prefix, index, suffix)
         group_fp = get_file_writer(open(fname, 'wb'), args.gzip,
                                    args.bzip)
         group_fps[index] = group_fp
 
     # write 'em all out!
-
-    total_seqs = 0
-    part_seqs = 0
-    toosmall_parts = 0
     # refresh the generator
     reader = PartitonedReadIterator(args.part_filenames)
-    for read, partition_id in reader():
-        total_seqs += 1
-        if partition_id == 0:
-            continue
+    read_generator = PartitionExtractor.ReadGroupGenerator(extractor)
 
-        try:
-            group_n = group_d[partition_id]
-        except KeyError:
-            assert count[partition_id] <= args.min_part_size
-            toosmall_parts += 1
-            continue
-
+    for read, group_n in read_generator(reader):
         outfp = group_fps[group_n]
-
         write_record(read, outfp)
-        part_seqs += 1
 
     print('---', file=sys.stderr)
-    print('Of %d total seqs,' % total_seqs, file=sys.stderr)
+    print('Of %d total seqs,' % read_generator.total_seqs, file=sys.stderr)
     print('extracted %d partitioned seqs into group files,' %
-          part_seqs, file=sys.stderr)
+          read_generator.part_seqs, file=sys.stderr)
     print('discarded %d sequences from small partitions (see -m),' %
-          toosmall_parts, file=sys.stderr)
+          read_generator.toosmall_parts, file=sys.stderr)
     print('and found %d unpartitioned sequences (see -U).' %
-          n_unassigned, file=sys.stderr)
+          extractor.n_unassigned, file=sys.stderr)
     print('', file=sys.stderr)
     print('Created %d group files named %s.groupXXXX.%s' %
           (len(group_fps),
