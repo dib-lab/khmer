@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import sys
-sys.path.insert(0, '../')
+import os
+sys.path.insert(
+    0, os.path.abspath(os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        os.pardir)))
 import versioneer
+
 versioneer.VCS = 'git'
 versioneer.versionfile_source = '../khmer/_version.py'
 versioneer.versionfile_build = '../khmer/_version.py'

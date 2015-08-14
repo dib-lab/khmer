@@ -139,7 +139,7 @@ public:
 };
 
 /**
- * \Class KmerFactory
+ * \class KmerFactory
  *
  * \brief Build complete Kmer objects.
  *
@@ -218,7 +218,7 @@ public:
 };
 
 /**
- * \Class KmerIterator
+ * \class KmerIterator
  *
  * \brief Emit Kmer objects generated from the given sequence.
  *
