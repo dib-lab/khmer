@@ -24,7 +24,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
@@ -41,8 +41,8 @@ def get_parser():
     normalization in non-paired mode, or partitioning) and separates
     the interleaved reads from the orphaned reads.
 
-    The default output is two files, <input file>.pe and <input
-    file>.se, placed in the current directory. The .pe file contains
+    The default output is two files, `<input file>.pe` and `<input
+    file>.se`, placed in the current directory. The .pe file contains
     interleaved and properly paired sequences, while the .se file
     contains orphan sequences.
 
@@ -85,7 +85,7 @@ def get_parser():
 
 def main():
     info('extract-paired-reads.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     infile = args.infile
     check_input_files(infile, args.force)

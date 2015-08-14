@@ -18,7 +18,7 @@ details.)  This is what the :option:`-M` parameter does.
 If you set it too low, khmer will warn you to set it higher at the end.
 See below for some good choices for various kinds of data.
 
-**Note for khmer 1.x users:** as of khmer 2.0, the :option:`-M`
+**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M`
 parameter sets the :option:`-N`/:option:`--n_tables` and
 :option:`-x`/:option:`--max_tablesize` parameters automatically.
 You can still set these parameters directly if you wish.
@@ -51,13 +51,13 @@ you of the total memory usage, and (at the end) will complain if it's
 too small.
 
 Life is a bit more complicated than this, however, because some scripts --
-load-into-counting and load-graph -- keep ancillary information that will
+load-into-countgraph and load-into-nodegraph -- keep ancillary information that will
 consume memory beyond this table data structure.  So if you run out of
 memory, decrease the table size.
 
 Also see the rules of thumb, below.
 
-The real full version
+The long version
 =====================
 
 khmer's scripts, at their heart, represents k-mers in a very memory
@@ -72,7 +72,7 @@ they are not, in fact, present.
 Digital normalization (normalize-by-median and filter-abund) uses
 the Count-Min Sketch data structure.
 
-Graph partitioning (load-graph etc.) uses the Bloom filter data structure.
+Graph partitioning (load-into-nodegraph etc.) uses the Bloom filter data structure.
 
 The practical ramifications of this are pretty cool.  For example,
 your digital normalization is guaranteed not to increase in memory

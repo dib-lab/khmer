@@ -195,7 +195,7 @@ Building khmer and running the tests
 
    You should see lots of output, with something like::
 
-      Ran 360 tests in 10.403s
+      Ran 633 tests in 47.446s
 
       OK
 
@@ -230,6 +230,33 @@ Claiming an issue and starting to develop
    (This pulls in all of the latest changes from whatever we've been
    doing on dib-lab.)
 
+   It is possible that when you do a `git pull` you will get a "merge
+   conflict" -- This is what happens when something changed in the branch you're
+   pulling in in the same place you made a change in your local copy. This
+   frequently happens in the `Changelog` file.
+
+   Git will complain loudly about merges and tell you specifically in which
+   files they occurred. If you open the file, you'll see something vaugely
+   like this in the place where the merge occurred::
+
+      <<<<<<< HEAD
+      Changes made on the branch that is being merged into. In most cases,
+      this is the branch that you have currently checked out
+      =======
+      Changes made on the branch that is being merged in, almost certianly
+      master.
+      >>>>>>> abcde1234
+
+   Though there are a variety of tools to assist with resolving merge
+   conflicts they can be quite complicated at first glance and it is usually
+   easy enough to manually resolve the conflict.
+
+   To resolve the conflict you simply have to manually 'meld' the changes
+   together and remove the merge markers.
+
+   After this you'll have to add and commit the merge just like any other set
+   of changes. It's also recommended that you run tests.
+
 #. Create a new branch and link it to your fork on GitHub::
 
       git checkout -b fix/brief_issue_description
@@ -242,9 +269,40 @@ Claiming an issue and starting to develop
 
 #. Make some changes and commit them.
 
-   This will be issue dependent ;).
+   Though this will largely be issue-dependent the basics of committing are
+   simple. After you've made a cohesive set of changes, run the command `git
+   status`. This will display a list of all the files git has noticed you
+   changed. A file in the 'untracked' section are files that haven't existed
+   previously in the repository but git has noticed.
 
-   (You should visit and read :doc:`coding-guidelines-and-review`.)
+   To commit changes you have to 'stage' them--this is done by issuing the
+   following command::
+
+      git add path/to/file
+
+   If you have a large quanity of changes and you don't want to add each file
+   manually you can do ``git add --patch`` which will display each set of
+   changes to you before staging them for commit.
+
+   Once you have staged your changes, it's time to make a commit::
+
+      git commit
+
+   Git will then open your default console text editor to write a commit
+   message -- this is a short (typically 1-3 sentence) description of the
+   changes you've made. Please make your commit message informative but
+   concise -- these messages become part of the 'official' history of the
+   project. 
+
+   Once your changes have been committed, push them up to the remote branch::
+
+      git push
+
+   If this is your first commit on a new branch git will error out, telling
+   you the remote branch doesn't exist -- This is fine, as it will also provide
+   the command to create the branch. Copy/paste/run and you should be set.
+
+   You should also visit and read :doc:`coding-guidelines-and-review`.
 
 #. Periodically update your branch from the main khmer master branch::
 
@@ -256,7 +314,7 @@ Claiming an issue and starting to develop
 
 #. Run the tests and/or build the docs *before* pushing to GitHub::
 
-      make doc test pep8
+      make doc test pep8 diff-cover
 
    Make sure they all pass!
 

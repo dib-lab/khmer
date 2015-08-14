@@ -20,6 +20,8 @@ import screed
 import argparse
 import textwrap
 
+from khmer.khmer_args import sanitize_epilog
+
 
 def get_parser():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
@@ -141,7 +143,7 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     total_bp = 0

@@ -28,7 +28,8 @@ from screed import Record
 from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config, calculate_graphsize)
+                              report_on_config, calculate_graphsize,
+                              sanitize_epilog)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -61,7 +62,7 @@ def get_parser():
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use ``load-into-counting.py`` and ``filter-abund.py``.  However, read
+    use ``load-into-countgraph.py`` and ``filter-abund.py``.  However, read
     pairs will be kept together, in "broken-paired" format; you can use
     ``extract-paired-reads.py`` to extract read pairs and orphans.
 
@@ -112,7 +113,7 @@ def get_parser():
 
 def main():
     info('trim-low-abund.py', ['streaming'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     ###

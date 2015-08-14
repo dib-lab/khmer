@@ -29,7 +29,7 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import argparse
 import khmer, oxli
-from khmer.khmer_args import info, optimal_size
+from khmer.khmer_args import info, optimal_size, sanitize_epilog
 import textwrap
 import sys
 
@@ -70,7 +70,7 @@ def get_parser():
 
 def main():
     info('estimate_optimal_hash.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     N = args.N
     if args.M:
         M = args.M

@@ -8,7 +8,7 @@
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 
-% load-into-counting.py <htname> <data1> [ <data2> <...> ]
+% load-into-countgraph.py <htname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -21,8 +21,9 @@ import threading
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args, calculate_graphsize
+from khmer.khmer_args import (build_counting_args, report_on_config, info,
+                              add_threading_args, calculate_graphsize,
+                              sanitize_epilog)
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
@@ -38,14 +39,14 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"
@@ -63,7 +64,8 @@ def get_parser():
     parser.add_argument('--summary-info', '-s', type=str, default=None,
                         metavar="FORMAT", choices=[str('json'), str('tsv')],
                         help="What format should the machine readable run "
-                        "summary be in? (json or tsv, disabled by default)")
+                        "summary be in? (`json` or `tsv`, disabled by"
+                        " default)")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -71,9 +73,9 @@ def get_parser():
 
 def main():
 
-    info('load-into-counting.py', ['counting', 'SeqAn'])
+    info('load-into-countgraph.py', ['counting', 'SeqAn'])
 
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
     base = args.output_countgraph_filename

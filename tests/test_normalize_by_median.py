@@ -37,7 +37,7 @@ def test_normalize_by_median_loadgraph_with_args():
     tablefile = utils.get_temp_filename("table")
     in_dir = os.path.dirname(tablefile)
 
-    script = "load-into-counting.py"
+    script = "load-into-countgraph.py"
     args = [tablefile, infile]
     (status, out, err) = utils.runscript(script, args)
 

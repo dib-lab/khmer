@@ -109,6 +109,8 @@ ready for review::
      http://en.wikipedia.org/wiki/Changelog#Format
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
+   - [ ] Do the changes respect streaming IO? (Are they
+     tested for streaming IO?)
    - [ ] Is the Copyright year up to date?
 
 **Note** that after you submit the comment you can check and uncheck
