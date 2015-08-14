@@ -23,6 +23,7 @@ import sys
 import screed
 import argparse
 import textwrap
+from contextlib import contextmanager
 import khmer
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
@@ -84,22 +85,17 @@ def get_parser():
     return parser
 
 
-class PartitonedReadIterator(object):
+@contextmanager
+def PartitionedReadIterator(filename_list, quiet=False, single=False):
     """
-    Generatior/context manager to do boilerplate output of statistics
+    Context manager to do boilerplate output of statistics
 
     Uses a list of input files and verbosity
     Returns reads and partition IDs
     """
 
-    def __init__(self, filename_list):
-        self.filename_list = filename_list
-
-    def __call__(self, quiet=False, single=False):
-        """
-        Iterate though the filename list, iterate though reads in the files
-        """
-        for filename in self.filename_list:
+    def iterate():
+        for filename in filename_list:
             for index, read, pid in read_partition_file(filename):
                 if not quiet:
                     if index % 100000 == 0:
@@ -107,6 +103,8 @@ class PartitonedReadIterator(object):
                 yield read, pid
                 if single:
                     break  # only yield a single read from each file
+
+    yield iterate()
 
 
 class PartitionExtractor(object):
@@ -119,7 +117,6 @@ class PartitionExtractor(object):
     def __init__(self, file_list, min_size, max_size):
         # We'll make our own generator! With files! And...
         self.file_list = file_list
-        self.reader = PartitonedReadIterator(file_list)
         self.n_unassigned = 0
         self.count = {}
 
@@ -129,14 +126,6 @@ class PartitionExtractor(object):
         self.min_size = min_size
         self.max_size = max_size
 
-    def refresh_reader(self):
-        """
-        Function to recreate the reader since generators die
-
-        Alternative: tee(reader), but that's memory intensive
-        """
-        self.reader = PartitonedReadIterator(self.file_list)
-
     def process_unassigned(self, outfp=None):
         """
         Process unassigned reads
@@ -144,13 +133,14 @@ class PartitionExtractor(object):
         Can optionally output said reads if outfp is given
         Also develops counts of partition IDs--necessary for further processing
         """
-        for read, pid in self.reader():
-            self.count[pid] = self.count.get(pid, 0) + 1
+        with PartitionedReadIterator(self.file_list) as reader:
+            for read, pid in reader:
+                self.count[pid] = self.count.get(pid, 0) + 1
 
-            if pid == 0:
-                self.n_unassigned += 1
-                if outfp:
-                    write_record(read, outfp)
+                if pid == 0:
+                    self.n_unassigned += 1
+                    if outfp:
+                        write_record(read, outfp)
 
     def output_histogram(self, dist_filename):
         """OUtputs histogram of partition counts to the given filename"""
@@ -214,7 +204,7 @@ class PartitionExtractor(object):
             self.toosmall_parts = 0
 
         def __call__(self, reader):
-            for read, partition_id in reader():
+            for read, partition_id in reader:
                 self.total_seqs += 1
                 if partition_id == 0:
                     continue
@@ -266,14 +256,13 @@ def main():
     suffix = None
     is_fastq = None
 
-    reader = PartitonedReadIterator(args.part_filenames)
-
-    for read, _ in reader(True, True):
-        if is_fastq is None:
-            is_fastq = hasattr(read, 'quality')
-        else:
-            assert hasattr(read, 'quality') == is_fastq,\
-                "Input files must have consistent format."
+    with PartitionedReadIterator(args.part_filenames, True, True) as reader:
+        for read, _ in reader:
+            if is_fastq is None:
+                is_fastq = hasattr(read, 'quality')
+            else:
+                assert hasattr(read, 'quality') == is_fastq,\
+                    "Input files must have consistent format."
 
     if is_fastq:
         suffix = "fq"
@@ -292,8 +281,6 @@ def main():
         unassigned_fp.close()
     else:
         extractor.process_unassigned()
-
-    extractor.refresh_reader()
 
     extractor.output_histogram(distfilename)
 
@@ -317,12 +304,12 @@ def main():
 
     # write 'em all out!
     # refresh the generator
-    reader = PartitonedReadIterator(args.part_filenames)
     read_generator = PartitionExtractor.ReadGroupGenerator(extractor)
 
-    for read, group_n in read_generator(reader):
-        outfp = group_fps[group_n]
-        write_record(read, outfp)
+    with PartitionedReadIterator(args.part_filenames) as reader:
+        for read, group_n in read_generator(reader):
+            outfp = group_fps[group_n]
+            write_record(read, outfp)
 
     print('---', file=sys.stderr)
     print('Of %d total seqs,' % read_generator.total_seqs, file=sys.stderr)
