@@ -86,25 +86,26 @@ def get_parser():
 
 
 @contextmanager
+def PartitionedReader(filename_list, quiet=False, single=False):
+    yield PartitionedReadIterator(filename_list, quiet, single)
+
+
 def PartitionedReadIterator(filename_list, quiet=False, single=False):
     """
-    Context manager to do boilerplate output of statistics
+    Generator to do boilerplate output of statistics
 
     Uses a list of input files and verbosity
     Returns reads and partition IDs
     """
 
-    def iterate():
-        for filename in filename_list:
-            for index, read, pid in read_partition_file(filename):
-                if not quiet:
-                    if index % 100000 == 0:
-                        print('...x2', index, file=sys.stderr)
-                yield read, pid
-                if single:
-                    break  # only yield a single read from each file
-
-    yield iterate()
+    for filename in filename_list:
+        for index, read, pid in read_partition_file(filename):
+            if not quiet:
+                if index % 100000 == 0:
+                    print('...x2', index, file=sys.stderr)
+            yield read, pid
+            if single:
+                break  # only yield a single read from each file
 
 
 class PartitionExtractor(object):
@@ -133,7 +134,7 @@ class PartitionExtractor(object):
         Can optionally output said reads if outfp is given
         Also develops counts of partition IDs--necessary for further processing
         """
-        with PartitionedReadIterator(self.file_list) as reader:
+        with PartitionedReader(self.file_list) as reader:
             for read, pid in reader:
                 self.count[pid] = self.count.get(pid, 0) + 1
 
@@ -256,7 +257,7 @@ def main():
     suffix = None
     is_fastq = None
 
-    with PartitionedReadIterator(args.part_filenames, True, True) as reader:
+    with PartitionedReader(args.part_filenames, True, True) as reader:
         for read, _ in reader:
             if is_fastq is None:
                 is_fastq = hasattr(read, 'quality')
@@ -306,7 +307,7 @@ def main():
     # refresh the generator
     read_generator = PartitionExtractor.ReadGroupGenerator(extractor)
 
-    with PartitionedReadIterator(args.part_filenames) as reader:
+    with PartitionedReader(args.part_filenames) as reader:
         for read, group_n in read_generator(reader):
             outfp = group_fps[group_n]
             write_record(read, outfp)
