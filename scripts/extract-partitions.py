@@ -195,7 +195,7 @@ class PartitionExtractor(object):
         """
         Generator that yields partitioned reads and their group
 
-        Takes PartitionExtractor and PartitonedReadIterator objects
+        Takes PartitionExtractor and PartitionedReadIterator objects
         """
         def __init__(self, extractor):
             self.extractor = extractor
