@@ -4,11 +4,26 @@
    generators
    * tests/test_scripts.py: added test
 
+2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
+
+   * doc/dev/{codebase-guide,coding-guidelines-and-review,development,
+   for-khmer-developers,getting-started,release,scripts-and-sandbox,
+   binary-file-formats}.rst,doc/{index,introduction,whats-new-2.0,
+   contributors}.rst,doc/user/{blog-posts,choosing-table-sizes,galaxy,
+   getting-help,guide,install,known-issues,partitioning-big-data,
+   scripts}.rst,CITATION: Cleaned up documentation
+   * scripts/*.py, khmer/khmer_args.py: added epilog sanitation
+   * scripts/{load-into-counting,load-graph,load-into-countgraph,
+   load-into-nodegraph}.py, tests/{test_scripts,test_normalize_by_median,
+   test_streaming_io,test_countgraph}: renamed load-into-counting -> 
+   load-into-countgraph, load-graph -> load-into-nodegraph, fixed tests to not
+   bork
+
 2015-08-12  Luiz Irber  <khmer@luizirber.org>
 
    * khmer/_khmer.cc: Fix a GCC string initialization warning.
 
-2015-08-11  Michael R. Crusoe  <crusoe@ucdavis.edu>
+2015-08-12  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
    formatting fixes and new citation for the software as a whole

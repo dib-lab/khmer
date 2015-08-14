@@ -27,7 +27,8 @@ Mailing List
 ------------
 
 The primary way to get help is through the khmer discussion list:
-http://lists.idyll.org/listinfo/khmer
+http://lists.idyll.org/listinfo/khmer, though we are also available for
+closer-to-realtime support via `Gitter <https://gitter.im/dib-lab/khmer>`_. 
 
 Asking a question
 -----------------
@@ -50,5 +51,5 @@ Asking a question
 GitHub
 ------
 
-You are also welcome to report an issue you are having using GitHub::
+You are also welcome to report an issue you are having using GitHub:
 https://github.com/dib-lab/khmer/issues/new

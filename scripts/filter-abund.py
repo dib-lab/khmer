@@ -23,7 +23,8 @@ import textwrap
 import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
+from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer import __version__
@@ -34,13 +35,13 @@ DEFAULT_CUTOFF = 2
 
 def get_parser():
     epilog = """
-    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt
+    Trimmed sequences will be placed in `${input_sequence_filename}.abundfilt`
     for each input sequence file. If the input sequences are from RNAseq or
     metagenome sequencing then :option:`--variable-coverage` should be used.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
         filter-abund.py -C 2 countgraph data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(
@@ -79,7 +80,7 @@ def get_parser():
 
 def main():
     info('filter-abund.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     check_input_files(args.input_graph, args.force)
     infiles = args.input_filename

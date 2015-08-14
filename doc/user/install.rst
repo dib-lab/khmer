@@ -62,9 +62,11 @@ Installing khmer inside the virtualenv
 Run the tests
 ^^^^^^^^^^^^^
 
-After installing you can run the embedded test suite::
+After installing you can run the embedded test suite. If you are running an
+OSX system you should also add `!linux` to prevent linux-specific tests from
+failing.::
 
-      nosetests khmer --attr '!known_failing'
+      nosetests khmer --attr '!known_failing,!huge'
 
 If the nosetests binary isn't installed then::
 

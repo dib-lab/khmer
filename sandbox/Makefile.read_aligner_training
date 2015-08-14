@@ -14,7 +14,7 @@ mockRefG.fa:
 	wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR172/SRR172902/SRR172902.fastq.gz
 
 combined_reads.ht: SRR172902.fastq.gz SRR172903.fastq.gz
-	python $(KHMER)/scripts/load-into-counting.py --ksize $(KSIZE) -x $(HASH_SIZE) -N $(N_HASHES) $@ $^
+	python $(KHMER)/scripts/load-into-countgraph.py --ksize $(KSIZE) -x $(HASH_SIZE) -N $(N_HASHES) $@ $^
 
 mockRefG.1.bt1: mockRefG.fa
 	bowtie2-build mockRefG.fa

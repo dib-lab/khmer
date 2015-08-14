@@ -687,7 +687,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
             if (to_read_ll > INT_MAX) {
                 to_read_int = INT_MAX;
             } else {
-                to_read_int = to_read_ll;
+                to_read_int = (unsigned int) to_read_ll;
             }
             read_b = gzread(infile, (char *) ht._counts[i], to_read_int);
 
@@ -863,7 +863,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
             if (to_write_ll > INT_MAX) {
                 to_write_int = INT_MAX;
             } else {
-                to_write_int = to_write_ll;
+                to_write_int = (unsigned int) to_write_ll;
             }
             gz_result = gzwrite(outfile, (const char *) ht._counts[i],
                                 to_write_int);

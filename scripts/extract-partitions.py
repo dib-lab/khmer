@@ -28,7 +28,7 @@ import khmer
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -47,7 +47,7 @@ def get_parser():
     epilog = """
     Example (results will be in ``example.group0000.fa``)::
 
-        load-graph.py -k 20 example tests/test-data/random-20-a.fa
+        load-into-nodegraph.py -k 20 example tests/test-data/random-20-a.fa
         partition-graph.py example
         merge-partitions.py -k 20 example
         annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
@@ -224,7 +224,7 @@ class PartitionExtractor(object):
 
 def main():
     info('extract-partitions.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     distfilename = args.prefix + '.dist'
 

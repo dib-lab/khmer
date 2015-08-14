@@ -24,7 +24,7 @@ import os
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
-                              add_threading_args)
+                              add_threading_args, sanitize_epilog)
 import glob
 from khmer.kfile import check_input_files, check_space
 import re
@@ -72,11 +72,12 @@ def get_parser():
     Load in a set of sequences, partition them, merge the partitions, and
     annotate the original sequences files with the partition information.
 
-    This script combines the functionality of :program:`load-graph.py`,
-    :program:`partition-graph.py`, :program:`merge-partitions.py`, and
-    :program:`annotate-partitions.py` into one script. This is convenient
-    but should probably not be used for large data sets, because
-    :program:`do-partition.py` doesn't provide save/resume functionality.
+    This script combines the functionality of
+    :program:`load-into-nodegraph.py`, :program:`partition-graph.py`,
+    :program:`merge-partitions.py`, and :program:`annotate-partitions.py` into
+    one script. This is convenient but should probably not be used for large
+    data sets, because :program:`do-partition.py` doesn't provide save/resume
+    functionality.
     """
     parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
@@ -102,7 +103,7 @@ def get_parser():
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     report_on_config(args, graphtype='nodegraph')
 
@@ -120,7 +121,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     print('N THREADS', args.threads, file=sys.stderr)
     print('--', file=sys.stderr)
 
-    # load-graph
+    # load-into-nodegraph
 
     print('making nodegraph', file=sys.stderr)
     nodegraph = khmer_args.create_nodegraph(args)

@@ -26,7 +26,8 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
-                              add_threading_args, info, calculate_graphsize)
+                              add_threading_args, info, calculate_graphsize,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
@@ -42,7 +43,7 @@ def get_parser():
     This script is constant memory.
 
     To trim reads based on k-mer abundance across multiple files, use
-    :program:`load-into-counting.py` and :program:`filter-abund.py`.
+    :program:`load-into-countgraph.py` and :program:`filter-abund.py`.
 
     Example::
 
@@ -68,7 +69,7 @@ def get_parser():
 
 def main():
     info('filter-abund-single.py', ['counting', 'SeqAn'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)

@@ -28,7 +28,7 @@ def get_parser():
 
     subparsers = parser.add_subparsers()
 
-    # build-graph (formerly load-graph) parsers here
+    # build-graph (formerly load-into-nodegraph) parsers here
     parser_build_graph = \
         subparsers.add_parser('build-graph',
                               help="Load sequences into the compressible graph"

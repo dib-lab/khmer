@@ -95,8 +95,8 @@ build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 	@echo ''
 
 ## pdf         : render documentation as a PDF file
-# packages needed include: texlive-latex-recommended,
-# texlive-fonts-recommended, texlive-latex-extra
+# packages needed include: texlive-latex-base texlive-latex-recommended
+# texlive-fonts-recommended texlive-latex-extra
 pdf: build/sphinx/latex/khmer.pdf
 
 build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
@@ -201,12 +201,15 @@ nosetests.xml: FORCE
 	./setup.py nosetests --with-xunit --attr ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code
+# helpful packages: doxygen graphviz
+# ignore warning re: _formulas.aux
 doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 	mkdir -p doc/doxygen
-	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > \
-		Doxyfile
+	sed "s/\$${VERSION}/$$(python ./lib/get_version.py)/" Doxyfile.in | \
+	 sed "s@\$${INCLUDES}@$$($$(gcc -print-prog-name=cc1plus) -v /dev/null \
+	 2>&1 >/dev/null | grep '^ '|tr '\n' ' ')@" > Doxyfile
 	doxygen
 
 lib: FORCE

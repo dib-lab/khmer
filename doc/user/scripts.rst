@@ -24,19 +24,17 @@ This should generally be set as high as possible; see
 .. note::
  
    Almost all scripts take in either FASTA and FASTQ format, and
-   output the same.  Some scripts may only recognize FASTQ if the file
-   ending is '.fq' or '.fastq', at least for now.
+   output the same.
 
-   Files ending with '.gz' will be treated as gzipped files, and
-   files ending with '.bz2' will be treated as bzip2'd files.
+   Gzip and bzip2 compressed files are detected automatically. 
 
 .. _scripts-counting:
 
 k-mer counting and abundance filtering
 ======================================
 
-.. autoprogram:: load-into-counting:get_parser()
-        :prog: load-into-counting.py
+.. autoprogram:: load-into-countgraph:get_parser()
+        :prog: load-into-countgraph.py
 
 .. autoprogram:: abundance-dist:get_parser()
         :prog: abundance-dist.py
@@ -67,8 +65,8 @@ Partitioning
 .. autoprogram:: do-partition:get_parser()
         :prog: do-partition.py
 
-.. autoprogram:: load-graph:get_parser()
-        :prog: load-graph.py
+.. autoprogram:: load-into-nodegraph:get_parser()
+        :prog: load-into-nodegraph.py
 
 See :program:`extract-partitions.py` for a complete workflow.
 
