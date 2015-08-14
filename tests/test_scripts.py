@@ -1349,7 +1349,7 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
-def test_extract_paired_inconsitent_formats():
+def test_extract_paired_inconsistent_formats():
     fa_seqfile = utils.get_test_data('random-20-a.fa')
     fq_seqfile = utils.get_test_data('random-20-a.fq')
     graphbase = _make_graph(
