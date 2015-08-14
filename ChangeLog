@@ -1,3 +1,9 @@
+2015-08-14  Luiz Irber  <khmer@luizirber.org>
+
+   * scripts/unique-kmers.py: Rename option --stream-out to --stream-records.
+   * tests/test_streaming_io.py: Fix unique-kmers tests, use new option.
+   * khmer/_khmer.cc, lib/hllcounter.cc: Rename some variables for consistency.
+
 2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/{codebase-guide,coding-guidelines-and-review,development,

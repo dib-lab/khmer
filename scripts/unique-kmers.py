@@ -45,7 +45,7 @@ def get_parser():
     Informational output is sent to STDERR, but a report file can be generated
     with :option:`-R`/:option:`--report`.
 
-    :option:`--stream-out` will write the sequences taken in to STDOUT.
+    :option:`--stream-records` will write the sequences taken in to STDOUT.
     This is useful for workflows: count unique kmers in a stream, then do
     digital normalization.
 
@@ -63,7 +63,7 @@ def get_parser():
 
     Example::
 
-        unique-kmers.py --stream-out -k 17 tests/test-data/test-reads.fa | \\
+        unique-kmers.py --stream-records -k 17 tests/test-data/test-reads.fa | \\
         normalize-by-median.py -k 17 -o normalized /dev/stdin
 
     Example::
@@ -93,7 +93,7 @@ def get_parser():
                         help='generate informational report and write to'
                         ' filename')
 
-    parser.add_argument('--stream-out', '-S', default=False,
+    parser.add_argument('--stream-records', '-S', default=False,
                         action='store_true',
                         help='write input sequences to STDOUT')
 
@@ -117,7 +117,8 @@ def main():
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        hllcpp.consume_fasta(input_filename, stream_out=args.stream_out)
+        hllcpp.consume_fasta(input_filename,
+                             stream_records=args.stream_records)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(

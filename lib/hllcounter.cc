@@ -347,20 +347,20 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
 
 void HLLCounter::consume_fasta(
     std::string const &filename,
-    bool output_records,
+    bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(parser, output_records, total_reads, n_consumed);
+    consume_fasta(parser, stream_records, total_reads, n_consumed);
 
     delete parser;
 }
 
 void HLLCounter::consume_fasta(
     read_parsers::IParser *parser,
-    bool output_records,
+    bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
 {
@@ -398,7 +398,7 @@ void HLLCounter::consume_fasta(
                     break;
                 }
 
-                if (output_records) {
+                if (stream_records) {
                     read.write_to(std::cout);
                 }
 

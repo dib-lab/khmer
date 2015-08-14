@@ -486,7 +486,7 @@ def test_readstats_1():
 def test_unique_kmers_stream_out_fasta():
     infile = utils.get_test_data('random-20-a.fa')
 
-    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-out {infile}"
+    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-records {infile}"
     cmd = cmd.format(scripts=scriptpath(), infile=infile)
 
     (status, out, err) = run_shell_cmd(cmd)
@@ -503,7 +503,7 @@ def test_unique_kmers_stream_out_fasta():
 def test_unique_kmers_stream_out_fastq_with_N():
     infile = utils.get_test_data('test-filter-abund-Ns.fq')
 
-    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-out {infile}"
+    cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-records {infile}"
     cmd = cmd.format(scripts=scriptpath(), infile=infile)
 
     (status, out, err) = run_shell_cmd(cmd)
