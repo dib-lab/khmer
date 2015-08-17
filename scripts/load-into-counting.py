@@ -126,7 +126,7 @@ def main():
           repr(filenames), file=sys.stderr)
 
     # clobber the '.info' file now, as we always open in append mode below
-    with open(info_filename, 'w') as info_fh:
+    with open(info_filename, 'w') as info_fp:
         print('khmer version:', khmer.__version__, file=info_fh)
 
     print('making countgraph', file=sys.stderr)
