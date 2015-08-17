@@ -5,14 +5,13 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "read_parsers.hh"
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+#include <fstream>
 
-#include <cstring>
 #include "khmer_exception.hh"
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <pthread.h>
+#include "read_parsers.hh"
 
 namespace khmer
 {
@@ -20,6 +19,21 @@ namespace khmer
 
 namespace read_parsers
 {
+
+void
+Read::write_to(std::ostream& output)
+{
+    if (quality.length() != 0) {
+        output << "@" << name << std::endl
+               << sequence << std::endl
+               << "+" << std::endl
+               << quality << std::endl;
+    } else {
+        output << ">" << name << std::endl
+               << sequence << std::endl;
+    }
+}
+
 
 struct SeqAnParser::Handle {
     seqan::SequenceStream stream;
@@ -33,11 +47,11 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
         message = message + filename + " for reading.";
-        throw InvalidStream(message.c_str());
+        throw InvalidStream(message);
     } else if (seqan::atEnd(_private->stream)) {
         std::string message = "File ";
         message = message + filename + " does not contain any sequences!";
-        throw InvalidStream(message.c_str());
+        throw InvalidStream(message);
     }
     __asm__ __volatile__ ("" ::: "memory");
     _private->seqan_spin_lock = 0;
@@ -171,7 +185,7 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
     default:
         std::ostringstream oss;
         oss << "Unknown pair reading mode: " << mode;
-        throw UnknownPairReadingMode(oss.str().c_str());
+        throw UnknownPairReadingMode(oss.str());
     }
 }
 

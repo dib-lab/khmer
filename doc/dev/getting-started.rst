@@ -7,6 +7,8 @@
 Getting started with khmer development
 ======================================
 
+.. contents::
+
 This document is for people who would like to contribute to khmer.  It
 walks first-time contributors through making their own copy of khmer,
 building it, and submitting changes for review and merge into the master
@@ -151,6 +153,16 @@ One-time Preparation
        sudo brew install cppcheck
 
 
+#. ccache installation:
+
+   Debian and Ubuntu Linux distro users can install ``ccache`` to speed up
+   their compile times::
+
+       sudo apt-get install ccache
+       echo 'export PATH="/usr/lib/ccache:$PATH" # enable ccache' >> ~/.bashrc
+       export PATH="/usr/lib/ccache:$PATH"
+
+
 Building khmer and running the tests
 ------------------------------------
 
@@ -183,7 +195,7 @@ Building khmer and running the tests
 
    You should see lots of output, with something like::
 
-      Ran 360 tests in 10.403s
+      Ran 633 tests in 47.446s
 
       OK
 
@@ -218,6 +230,33 @@ Claiming an issue and starting to develop
    (This pulls in all of the latest changes from whatever we've been
    doing on dib-lab.)
 
+   It is possible that when you do a `git pull` you will get a "merge
+   conflict" -- This is what happens when something changed in the branch you're
+   pulling in in the same place you made a change in your local copy. This
+   frequently happens in the `Changelog` file.
+
+   Git will complain loudly about merges and tell you specifically in which
+   files they occurred. If you open the file, you'll see something vaugely
+   like this in the place where the merge occurred::
+
+      <<<<<<< HEAD
+      Changes made on the branch that is being merged into. In most cases,
+      this is the branch that you have currently checked out
+      =======
+      Changes made on the branch that is being merged in, almost certianly
+      master.
+      >>>>>>> abcde1234
+
+   Though there are a variety of tools to assist with resolving merge
+   conflicts they can be quite complicated at first glance and it is usually
+   easy enough to manually resolve the conflict.
+
+   To resolve the conflict you simply have to manually 'meld' the changes
+   together and remove the merge markers.
+
+   After this you'll have to add and commit the merge just like any other set
+   of changes. It's also recommended that you run tests.
+
 #. Create a new branch and link it to your fork on GitHub::
 
       git checkout -b fix/brief_issue_description
@@ -230,9 +269,40 @@ Claiming an issue and starting to develop
 
 #. Make some changes and commit them.
 
-   This will be issue dependent ;).
+   Though this will largely be issue-dependent the basics of committing are
+   simple. After you've made a cohesive set of changes, run the command `git
+   status`. This will display a list of all the files git has noticed you
+   changed. A file in the 'untracked' section are files that haven't existed
+   previously in the repository but git has noticed.
 
-   (You should visit and read :doc:`coding-guidelines-and-review`.)
+   To commit changes you have to 'stage' them--this is done by issuing the
+   following command::
+
+      git add path/to/file
+
+   If you have a large quanity of changes and you don't want to add each file
+   manually you can do ``git add --patch`` which will display each set of
+   changes to you before staging them for commit.
+
+   Once you have staged your changes, it's time to make a commit::
+
+      git commit
+
+   Git will then open your default console text editor to write a commit
+   message -- this is a short (typically 1-3 sentence) description of the
+   changes you've made. Please make your commit message informative but
+   concise -- these messages become part of the 'official' history of the
+   project. 
+
+   Once your changes have been committed, push them up to the remote branch::
+
+      git push
+
+   If this is your first commit on a new branch git will error out, telling
+   you the remote branch doesn't exist -- This is fine, as it will also provide
+   the command to create the branch. Copy/paste/run and you should be set.
+
+   You should also visit and read :doc:`coding-guidelines-and-review`.
 
 #. Periodically update your branch from the main khmer master branch::
 
@@ -244,7 +314,7 @@ Claiming an issue and starting to develop
 
 #. Run the tests and/or build the docs *before* pushing to GitHub::
 
-      make doc test pep8
+      make doc test pep8 diff-cover
 
    Make sure they all pass!
 
@@ -332,3 +402,67 @@ Here are a few suggestions:
 
 * You can also help other people out by watching for new issues or
   looking at pull requests.  Remember to be nice and polite!
+
+Your second contribution...
+---------------------------
+
+Here are a few pointers on getting started on your second (or third,
+or fourth, or nth contribution).
+
+So, assuming you've found an issue you'd like to work on there are a
+couple things to do to make sure your local copy of the repository is
+ready for a new issue--specifically, we need to make sure it's in sync
+with the remote repository so you aren't working on a old copy. So::
+
+        git checkout master
+        git fetch --all
+        git pull
+
+This puts you on the latest master branch and pulls down updates from
+GitHub with any changes that may have been made since your last
+contribution (usually including the merge of your last
+contribution). Then we merge those changes into your local copy of the
+master branch.
+
+Now, you can go back to `Claiming an issue and starting to develop`_.
+
+Advanced merging with git-merge-changelog
+-----------------------------------------
+
+Often one can get a merge conflict due to updates in the ChangeLog. To teach
+Git how to handle these on its own you can install a special merge driver.
+
+On Debian & Ubuntu systems you'll need the `git-merge-changelog` package::
+
+        sudo apt-get install git-merge-changelog
+
+Ubuntu 14.04 LTS users will need to add an external repository that contains a
+backport of the package first before installing::
+
+        sudo apt-add-repository ppa:misterc/gedlab
+        sudo apt-get update
+        sudo apt-get install git-merge-changelog
+
+Everyone should then update their `~/.gitconfig` file with the following::
+
+        [merge "merge-changelog"]
+                  name = GNU-style ChangeLog merge driver
+                  driver = /usr/bin/git-merge-changelog %O %A %B
+
+Pull request cleanup (commit squashing)
+---------------------------------------
+
+Submitters are invited to reduce the numbers of commits in their pull requests
+either via `git rebase -i dib/master` or this recipe::
+
+        git pull # make sure the local is up to date
+        git pull dib master # get up to date
+        # fix any merge conflicts
+        git status # sanity check
+        git diff dib/master # does the diff look correct? (no merge markers)
+        git reset --soft dib/master # un-commit the differences from dib/master
+        git status # sanity check
+        git commit --all # package all differences in one commit
+        git status # sanity check
+        git push # should fail
+        git push --force # override what's in GitHub's copy of the branch/pull request

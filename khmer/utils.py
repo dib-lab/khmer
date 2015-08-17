@@ -34,6 +34,9 @@ def check_is_pair(record1, record2):
 
     Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
     and 'seq::... 2::...'.
+
+    Also handles the default format of the SRA toolkit's fastq-dump:
+    'Accession seq/1'
     """
     if hasattr(record1, 'quality') or hasattr(record2, 'quality'):
         if not (hasattr(record1, 'quality') and hasattr(record2, 'quality')):
@@ -47,8 +50,7 @@ def check_is_pair(record1, record2):
         subpart1 = lhs1.split('/', 1)[0]
         subpart2 = lhs2.split('/', 1)[0]
 
-        assert subpart1
-        if subpart1 == subpart2:
+        if subpart1 and subpart1 == subpart2:
             return True
 
     # handle '@name 1:rst'
@@ -57,7 +59,11 @@ def check_is_pair(record1, record2):
 
     # handle @name seq/1
     elif lhs1 == lhs2 and rhs1.endswith('/1') and rhs2.endswith('/2'):
-        return True
+        subpart1 = rhs1.split('/', 1)[0]
+        subpart2 = rhs2.split('/', 1)[0]
+
+        if subpart1 and subpart1 == subpart2:
+            return True
 
     return False
 
@@ -98,6 +104,13 @@ def check_is_right(name):
         return True
 
     return False
+
+
+class UnpairedReadsError(ValueError):
+    def __init__(self, msg, r1, r2):
+        super(ValueError, self).__init__(msg)
+        self.r1 = r1
+        self.r2 = r2
 
 
 def broken_paired_reader(screed_iter, min_length=None,
@@ -146,8 +159,9 @@ def broken_paired_reader(screed_iter, min_length=None,
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    raise ValueError("Unpaired reads when require_paired"
-                                     " is set!")
+                    e = UnpairedReadsError("Unpaired reads when require_paired"
+                                           " is set!", prev_record, record)
+                    raise e
                 yield n, False, prev_record, None
                 n += 1
 
@@ -157,7 +171,8 @@ def broken_paired_reader(screed_iter, min_length=None,
     # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
         if require_paired:
-            raise ValueError("Unpaired reads when require_paired is set!")
+            raise UnpairedReadsError("Unpaired reads when require_paired "
+                                     "is set!", prev_record, None)
         yield n, False, prev_record, None
 
 

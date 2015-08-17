@@ -11,7 +11,7 @@ Produce the k-mer abundance distribution for the given file.
 
 % python scripts/abundance-dist-single.py <data> <histout>
 
-The script does not load a prebuilt k-mer counting table.
+The script does not load a prebuilt k-mer countgraph.
 
 Use '-h' for parameter help.
 """
@@ -24,9 +24,9 @@ import threading
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config, info)
-from khmer.kfile import (check_input_files, check_space,
-                         check_space_for_hashtable)
+                              report_on_config, info, calculate_graphsize,
+                              sanitize_epilog)
+from khmer.kfile import (check_input_files, check_space_for_graph)
 
 
 def get_parser():
@@ -52,21 +52,16 @@ def get_parser():
                         '(4) fraction of total distinct k-mers.')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
-                        help='Do not output 0-count bins')
+                        help='Do not output zero-count bins')
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--csv', default=False, action='store_true',
-                        help='Use the CSV format for the histogram. '
-                        'Includes column headers.')
-    parser.add_argument('--savetable', default='', metavar="filename",
-                        help="Save the k-mer counting table to the specified "
+    parser.add_argument('--savegraph', default='', metavar="filename",
+                        help="Save the k-mer countgraph to the specified "
                         "filename.")
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers to stderr")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -74,14 +69,13 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('abundance-dist-single.py', ['counting', 'SeqAn'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)
-    check_space([args.input_sequence_filename], args.force)
-    if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
-
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
         print('ERROR: %s exists; not squashing.' %
@@ -89,22 +83,21 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
-        if args.csv:
-            hist_fp_csv = csv.writer(hist_fp)
-            # write headers:
-            hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                                  'cumulative_fraction'])
+        hist_fp_csv = csv.writer(hist_fp)
+        # write headers:
+        hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                              'cumulative_fraction'])
 
     print('making countgraph', file=sys.stderr)
-    counting_hash = khmer_args.create_countgraph(args, multiplier=1.1)
-    counting_hash.set_use_bigcount(args.bigcount)
+    countgraph = khmer_args.create_countgraph(args, multiplier=1.1)
+    countgraph.set_use_bigcount(args.bigcount)
 
-    print('building k-mer tracking table', file=sys.stderr)
+    print('building k-mer tracking graph', file=sys.stderr)
     tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
-    print('kmer_size:', counting_hash.ksize(), file=sys.stderr)
-    print('k-mer counting table sizes:',
-          counting_hash.hashsizes(), file=sys.stderr)
+    print('kmer_size:', countgraph.ksize(), file=sys.stderr)
+    print('k-mer countgraph sizes:',
+          countgraph.hashsizes(), file=sys.stderr)
     print('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     # start loading
@@ -115,7 +108,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=counting_hash.consume_fasta_with_reads_parser,
+                target=countgraph.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -124,14 +117,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for thread in threads:
         thread.join()
 
-    if args.report_total_kmers:
-        print('Total number of unique k-mers: {0}'.format(
-            counting_hash.n_unique_kmers()), file=sys.stderr)
+    print('Total number of unique k-mers: {0}'.format(
+        countgraph.n_unique_kmers()), file=sys.stderr)
 
     abundance_lists = []
 
     def __do_abundance_dist__(read_parser):
-        abundances = counting_hash.abundance_distribution_with_reads_parser(
+        abundances = countgraph.abundance_distribution_with_reads_parser(
             read_parser, tracking)
         abundance_lists.append(abundances)
 
@@ -176,18 +168,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sofar += i
         frac = sofar / float(total)
 
-        if args.csv:
-            hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
-        else:
-            print(_, i, sofar, round(frac, 3), file=hist_fp)
+        hist_fp_csv.writerow([_, i, sofar, round(frac, 3)])
 
         if sofar == total:
             break
 
-    if args.savetable:
-        print('Saving k-mer counting table ', args.savetable, file=sys.stderr)
-        print('...saving to', args.savetable, file=sys.stderr)
-        counting_hash.save(args.savetable)
+    if args.savegraph:
+        print('Saving k-mer countgraph ', args.savegraph, file=sys.stderr)
+        print('...saving to', args.savegraph, file=sys.stderr)
+        countgraph.save(args.savegraph)
 
     print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
 

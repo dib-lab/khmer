@@ -24,7 +24,9 @@ import textwrap
 import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
+from khmer.kfile import add_output_compression_type
+from khmer.kfile import get_file_writer
 
 from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
@@ -39,19 +41,19 @@ def get_parser():
     normalization in non-paired mode, or partitioning) and separates
     the interleaved reads from the orphaned reads.
 
-    The default output is two files, <input file>.pe and <input
-    file>.se, placed in the current directory. The .pe file contains
+    The default output is two files, `<input file>.pe` and `<input
+    file>.se`, placed in the current directory. The .pe file contains
     interleaved and properly paired sequences, while the .se file
     contains orphan sequences.
 
     The directory into which the interleaved and orphaned reads are
-    output may be specified using :option:`-o`/:option:`--output-dir`.
+    output may be specified using :option:`-d`/:option:`--output-dir`.
     This directory will be created if it does not already exist.
 
     Alternatively, you can specify the filenames directly with
     :option:`-p`/:option:`--output-paired` and
     :option:`-s`/:option:`--output-single`, which will override the
-    :option:`-o`/:option:`--output-dir` option.
+    :option:`-d`/:option:`--output-dir` option.
 
     Example::
 
@@ -64,32 +66,33 @@ def get_parser():
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
 
-    parser.add_argument('-o', '--output-dir', default='', help='Output '
+    parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
 
-    parser.add_argument('-p', '--output-paired', metavar='output_paired',
+    parser.add_argument('--output-paired', '-p', metavar="filename",
+                        type=argparse.FileType('wb'),
                         default=None, help='Output paired reads to this '
-                        'file', type=argparse.FileType('w'))
-    parser.add_argument('-s', '--output-single', metavar='output_single',
-                        default=None, help='Output orphaned reads to this '
-                        'file', type=argparse.FileType('w'))
-
+                        'file')
+    parser.add_argument('--output-single', '-s', metavar="filename",
+                        type=argparse.FileType('wb'), default=None,
+                        help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     info('extract-paired-reads.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     infile = args.infile
     check_input_files(infile, args.force)
     check_space([infile], args.force)
 
     # decide where to put output files - specific directory? or just default?
-    if infile == '/dev/stdin' or infile == '-':
+    if infile in ('/dev/stdin', '-'):
         if not (args.output_paired and args.output_single):
             print("Accepting input from stdin; output filenames must be "
                   "provided.", file=sys.stderr)
@@ -105,17 +108,17 @@ def main():
 
     # OVERRIDE default output file locations with -p, -s
     if args.output_paired:
-        paired_fp = args.output_paired
+        paired_fp = get_file_writer(args.output_paired, args.gzip, args.bzip)
         out2 = paired_fp.name
     else:
         # Don't override, just open the default filename from above
-        paired_fp = open(out2, 'w')
+        paired_fp = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
     if args.output_single:
-        single_fp = args.output_single
-        out1 = single_fp.name
+        single_fp = get_file_writer(args.output_single, args.gzip, args.bzip)
+        out1 = args.output_single.name
     else:
         # Don't override, just open the default filename from above
-        single_fp = open(out1, 'w')
+        single_fp = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
 
     print('reading file "%s"' % infile, file=sys.stderr)
     print('outputting interleaved pairs to "%s"' % out2, file=sys.stderr)
@@ -124,7 +127,7 @@ def main():
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(infile, parse_description=False)
+    screed_iter = screed.open(infile)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)

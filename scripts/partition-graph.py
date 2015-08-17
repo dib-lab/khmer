@@ -23,20 +23,8 @@ import os.path
 import argparse
 import khmer
 import sys
-from khmer.khmer_args import (add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
-
-# Debugging Support
-import re
-import platform
-if "Linux" == platform.system():
-    def __debug_vm_usage(msg):
-        print("===> DEBUG: " + msg, file=sys.stderr)
-        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print(vmstat, file=sys.stderr)
-else:
-    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
-        pass
+from khmer.khmer_args import (add_threading_args, info, sanitize_epilog)
+from khmer.kfile import check_input_files
 
 # stdlib queue module was renamed on Python 3
 try:
@@ -51,7 +39,7 @@ DEFAULT_N_THREADS = 4
 def worker(queue, basename, stop_big_traversals):
     while True:
         try:
-            (htable, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = queue.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return
@@ -65,18 +53,18 @@ def worker(queue, basename, stop_big_traversals):
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
-        subset = htable.do_subset_partition(start, stop, True,
-                                            stop_big_traversals)
+        subset = nodegraph.do_subset_partition(start, stop, True,
+                                               stop_big_traversals)
 
         print('saving:', basename, index, file=sys.stderr)
-        htable.save_subset_partitionmap(subset, outfile)
+        nodegraph.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
 
 
 def get_parser():
     epilog = """
-    The resulting partition maps are saved as '${basename}.subset.#.pmap'
+    The resulting partition maps are saved as `${basename}.subset.#.pmap`
     files.
     """
     parser = argparse.ArgumentParser(
@@ -84,8 +72,8 @@ def get_parser():
         "connectivity", epilog=epilog,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('basename', help="basename of the input k-mer presence"
-                        " table + tagset files")
+    parser.add_argument('basename', help="basename of the input k-mer"
+                        "nodegraph  + tagset files")
     parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
@@ -104,14 +92,12 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     basename = args.basename
 
-    filenames = [basename + '.pt', basename + '.tagset']
+    filenames = [basename, basename + '.tagset']
     for _ in filenames:
         check_input_files(_, args.force)
-
-    check_space(filenames, args.force)
 
     print('--', file=sys.stderr)
     print('SUBSET SIZE', args.subset_size, file=sys.stderr)
@@ -120,14 +106,14 @@ def main():
         print('stoptag file:', args.stoptags, file=sys.stderr)
     print('--', file=sys.stderr)
 
-    print('loading ht %s.pt' % basename, file=sys.stderr)
-    htable = khmer.load_hashbits(basename + '.pt')
-    htable.load_tagset(basename + '.tagset')
+    print('loading nodegraph %s' % basename, file=sys.stderr)
+    nodegraph = khmer.load_nodegraph(basename)
+    nodegraph.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print('loading stoptags from', args.stoptags, file=sys.stderr)
-        htable.load_stop_tags(args.stoptags)
+        nodegraph.load_stop_tags(args.stoptags)
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
@@ -143,7 +129,7 @@ def main():
     #
 
     # divide the tags up into subsets
-    divvy = htable.divide_tags_into_subsets(int(args.subset_size))
+    divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -154,7 +140,7 @@ def main():
     for _ in range(0, n_subsets):
         start = divvy[_]
         end = divvy[_ + 1]
-        worker_q.put((htable, _, start, end))
+        worker_q.put((nodegraph, _, start, end))
 
     print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))

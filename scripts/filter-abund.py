@@ -7,12 +7,12 @@
 #
 # pylint: disable=missing-docstring,invalid-name
 """
-Sequence trimming by abundance using counting table.
+Sequence trimming by abundance using countgraph.
 
-Trim sequences at k-mers of the given abundance, based on the given counting
-hash table.  Output sequences will be placed in 'infile.abundfilt'.
+Trim sequences at k-mers of the given abundance, based on the given countgraph.
+Output sequences will be placed in 'infile.abundfilt'.
 
-% python scripts/filter-abund.py <counting.ct> <data1> [ <data2> <...> ]
+% python scripts/filter-abund.py <coungraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -23,10 +23,11 @@ import textwrap
 import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
+                              sanitize_epilog)
+from khmer.kfile import (check_input_files, check_space,
+                         add_output_compression_type, get_file_writer)
 from khmer import __version__
-#
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -34,21 +35,21 @@ DEFAULT_CUTOFF = 2
 
 def get_parser():
     epilog = """
-    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt
+    Trimmed sequences will be placed in `${input_sequence_filename}.abundfilt`
     for each input sequence file. If the input sequences are from RNAseq or
     metagenome sequencing then :option:`--variable-coverage` should be used.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 table.ct data/100k-filtered.fa
-        filter-abund.py -C 2 table.ct data/100k-filtered.fa
+        load-into-countgraph.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
+        filter-abund.py -C 2 countgraph data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(
         description='Trim sequences at a minimum k-mer abundance.',
         epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
-    parser.add_argument('input_table', metavar='input_counting_table_filename',
-                        help='The input k-mer counting table filename')
+    parser.add_argument('input_graph', metavar='input_count_graph_filename',
+                        help='The input k-mer countgraph filename')
     parser.add_argument('input_filename', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
@@ -63,8 +64,9 @@ def get_parser():
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
-    parser.add_argument('-o', '--out', dest='single_output_filename',
-                        default='', metavar="optional_output_filename",
+    parser.add_argument('-o', '--output', dest='single_output_file',
+                        type=argparse.FileType('wb'),
+                        metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
@@ -72,24 +74,31 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     info('filter-abund.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
-    check_input_files(args.input_table, args.force)
+    check_input_files(args.input_graph, args.force)
     infiles = args.input_filename
+    if ('-' in infiles or '/dev/stdin' in infiles) and not \
+       args.single_output_file:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
+
     for filename in infiles:
         check_input_files(filename, args.force)
 
     check_space(infiles, args.force)
 
-    print('loading counting table:', args.input_table,
+    print('loading countgraph:', args.input_graph,
           file=sys.stderr)
-    htable = khmer.load_counting_hash(args.input_table)
-    ksize = htable.ksize()
+    countgraph = khmer.load_countgraph(args.input_graph)
+    ksize = countgraph.ksize()
 
     print("K:", ksize, file=sys.stderr)
 
@@ -100,11 +109,11 @@ def main():
         seqN = seq.replace('N', 'A')
 
         if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = htable.get_median_count(seqN)
+            med, _, _ = countgraph.get_median_count(seqN)
             if med < args.normalize_to:
                 return name, seq
 
-        _, trim_at = htable.trim_on_abundance(seqN, args.cutoff)
+        _, trim_at = countgraph.trim_on_abundance(seqN, args.cutoff)
 
         if trim_at >= ksize:
             # be sure to not to change the 'N's in the trimmed sequence -
@@ -113,20 +122,27 @@ def main():
 
         return None, None
 
+    if args.single_output_file:
+        outfile = args.single_output_file.name
+        outfp = get_file_writer(outfile, args.gzip, args.bzip)
+
     # the filtering loop
     for infile in infiles:
         print('filtering', infile, file=sys.stderr)
-        if args.single_output_filename != '':
-            outfile = args.single_output_filename
-            outfp = open(outfile, 'a')
+        if args.single_output_file:
+            outfile = args.single_output_file.name
+            outfp = get_file_writer(args.single_output_file, args.gzip,
+                                    args.bzip)
         else:
             outfile = os.path.basename(infile) + '.abundfilt'
-            outfp = open(outfile, 'w')
+            outfp = open(outfile, 'wb')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
         tsp.start(verbose_loader(infile), outfp)
 
         print('output in', outfile, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

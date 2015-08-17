@@ -27,11 +27,13 @@ import argparse
 from screed import Record
 from khmer import khmer_args
 
-from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
-                              report_on_config)
+from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
+                              report_on_config, calculate_graphsize,
+                              sanitize_epilog)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
-from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
+from khmer.kfile import (check_space, check_space_for_graph,
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -60,7 +62,7 @@ def get_parser():
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use ``load-into-counting.py`` and ``filter-abund.py``.  However, read
+    use ``load-into-countgraph.py`` and ``filter-abund.py``.  However, read
     pairs will be kept together, in "broken-paired" format; you can use
     ``extract-paired-reads.py`` to extract read pairs and orphans.
 
@@ -83,9 +85,9 @@ def get_parser():
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
-    parser.add_argument('-o', '--out', metavar="filename",
-                        type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+    parser.add_argument('-o', '--output', metavar="output_filename",
+                        type=argparse.FileType('wb'),
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
@@ -95,15 +97,16 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
-    add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+    add_loadgraph_args(parser)
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true')
     parser.add_argument('--tempdir', '-T', type=str, default='./')
+    add_output_compression_type(parser)
 
     return parser
 
@@ -188,7 +191,7 @@ class Trimmer(object):
 
 def main():
     info('trim-low-abund.py', ['streaming'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     ###
@@ -203,12 +206,19 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        check_space_for_hashtable(args, 'countgraph', args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
-    if args.loadtable:
-        print('loading countgraph from', args.loadtable, file=sys.stderr)
-        ct = khmer.load_counting_hash(args.loadtable)
+    if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
+       and not args.output:
+        print("Accepting input from stdin; output filename must "
+              "be provided with -o.", file=sys.stderr)
+        sys.exit(1)
+
+    if args.loadgraph:
+        print('loading countgraph from', args.loadgraph, file=sys.stderr)
+        ct = khmer.load_countgraph(args.loadgraph)
     else:
         print('making countgraph', file=sys.stderr)
         ct = khmer_args.create_countgraph(args)
@@ -235,14 +245,16 @@ def main():
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        if args.out is None:
-            trimfp = open(os.path.basename(filename) + '.abundtrim', 'w')
+        if args.output is None:
+            trimfp = get_file_writer(open(os.path.basename(filename) +
+                                          '.abundtrim', 'wb'),
+                                     args.gzip, args.bzip)
         else:
-            trimfp = args.out
+            trimfp = get_file_writer(args.output, args.gzip, args.bzip)
 
         pass2list.append((filename, pass2filename, trimfp))
 
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
 
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
@@ -318,14 +330,18 @@ def main():
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print('read %d reads, %d bp' % (n_reads, n_bp,))
-    print('wrote %d reads, %d bp' % (written_reads, written_bp,))
+    print('read %d reads, %d bp' % (n_reads, n_bp,), file=sys.stderr)
+    print('wrote %d reads, %d bp' % (written_reads, written_bp,),
+          file=sys.stderr)
     print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
-                                                      n_passes))
+                                                      n_passes),
+          file=sys.stderr)
     print('removed %d reads and trimmed %d reads (%.2f%%)' %
-          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed))
+          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed),
+          file=sys.stderr)
     print('trimmed or removed %.2f%% of bases (%d total)' %
-          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp))
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp),
+          file=sys.stderr)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - n_skipped) / n_reads
@@ -344,10 +360,10 @@ def main():
 
     print('output in *.abundtrim', file=sys.stderr)
 
-    if args.savetable:
-        print("Saving k-mer counting table to",
-              args.savetable, file=sys.stderr)
-        ct.save(args.savetable)
+    if args.savegraph:
+        print("Saving k-mer countgraph to",
+              args.savegraph, file=sys.stderr)
+        ct.save(args.savegraph)
 
 
 if __name__ == '__main__':

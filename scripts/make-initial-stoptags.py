@@ -17,8 +17,8 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info)
-from khmer.kfile import check_input_files, check_space
+from khmer.khmer_args import (build_counting_args, info, sanitize_epilog)
+from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -42,15 +42,16 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 def get_parser():
     epilog = """
-    Loads a k-mer presence table/tagset pair created by load-graph.py, and does
-    a small set of traversals from graph waypoints; on these traversals, looks
-    for k-mers that are repeatedly traversed in high-density regions of the
-    graph, i.e. are highly connected. Outputs those k-mers as an initial set of
-    stoptags, which can be fed into partition-graph.py, find-knots.py, and
-    filter-stoptags.py.
+    Loads a k-mer nodegraph/tagset pair created by
+    :program:`load-into-nodegraph.py`, and
+    does a small set of traversals from graph waypoints; on these traversals,
+    looks for k-mers that are repeatedly traversed in high-density regions of
+    the graph, i.e. are highly connected. Outputs those k-mers as an initial
+    set of stoptags, which can be fed into :program:`partition-graph.py`,
+    :program:`find-knots.py`, and :program:`filter-stoptags.py`.
 
-    The k-mer counting table size options parameters are for a k-mer counting
-    table to keep track of repeatedly-traversed k-mers. The subset size option
+    The k-mer countgraph size options parameters are for a k-mer countgraph
+    to keep track of repeatedly-traversed k-mers. The subset size option
     specifies the number of waypoints from which to traverse; for highly
     connected data sets, the default (1000) is probably ok.
     """
@@ -72,35 +73,32 @@ def get_parser():
 def main():
 
     info('make-initial-stoptags.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     graphbase = args.graphbase
 
     # @RamRS: This might need some more work
-    infiles = [graphbase + '.pt', graphbase + '.tagset']
+    infiles = [graphbase, graphbase + '.tagset']
     if args.stoptags:
         infiles.append(args.stoptags)
     for _ in infiles:
         check_input_files(_, args.force)
 
-    check_space(infiles, args.force)
-
-    print('loading htable %s.pt' % graphbase, file=sys.stderr)
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    print('loading nodegraph %s.pt' % graphbase, file=sys.stderr)
+    nodegraph = khmer.load_nodegraph(graphbase)
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print('loading stoptags from', args.stoptags, file=sys.stderr)
-        htable.load_stop_tags(args.stoptags)
+        nodegraph.load_stop_tags(args.stoptags)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
-    htable.load_tagset(graphbase + '.tagset')
+    nodegraph.load_tagset(graphbase + '.tagset')
 
-    ksize = htable.ksize()
     counting = khmer_args.create_countgraph(args)
 
     # divide up into SUBSET_SIZE fragments
-    divvy = htable.divide_tags_into_subsets(args.subset_size)
+    divvy = nodegraph.divide_tags_into_subsets(args.subset_size)
 
     # pick off the first one
     if len(divvy) == 1:
@@ -110,17 +108,17 @@ def main():
 
     # partition!
     print('doing pre-partitioning from', start, 'to', end, file=sys.stderr)
-    subset = htable.do_subset_partition(start, end)
+    subset = nodegraph.do_subset_partition(start, end)
 
     # now, repartition...
     print('repartitioning to find HCKs.', file=sys.stderr)
-    htable.repartition_largest_partition(subset, counting,
-                                         EXCURSION_DISTANCE,
-                                         EXCURSION_KMER_THRESHOLD,
-                                         EXCURSION_KMER_COUNT_THRESHOLD)
+    nodegraph.repartition_largest_partition(subset, counting,
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
     print('saving stop tags', file=sys.stderr)
-    htable.save_stop_tags(graphbase + '.stoptags')
+    nodegraph.save_stop_tags(graphbase + '.stoptags')
     print('wrote to:', graphbase + '.stoptags', file=sys.stderr)
 
 if __name__ == '__main__':

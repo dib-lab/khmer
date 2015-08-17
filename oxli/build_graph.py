@@ -5,11 +5,11 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=missing-docstring
 """
 Build a graph from the given sequences, save in <ptname>.
 
-% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
+% python scripts/load-into-nodegraph.py <ptname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -20,10 +20,11 @@ import sys
 
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (report_on_config, info, add_threading_args)
+from khmer.khmer_args import (report_on_config, info, add_threading_args,
+                              calculate_graphsize)
 from khmer.kfile import check_input_files, check_space
-from khmer.kfile import check_space_for_hashtable
-from oxli import functions
+from khmer.kfile import check_space_for_graph
+from oxli import functions as oxfuncs
 
 
 def build_parser(parser):
@@ -32,8 +33,8 @@ def build_parser(parser):
                         action='store_true', dest='no_build_tagset',
                         help='Do NOT construct tagset while loading sequences')
     parser.add_argument('output_filename',
-                        metavar='output_presence_table_filename', help='output'
-                        ' k-mer presence table filename.')
+                        metavar='output_nodegraph_filename', help='output'
+                        ' k-mer nodegraph filename.')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filename')
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -44,17 +45,17 @@ def build_parser(parser):
 def main(args):
     info('build-graph.py', ['graph', 'SeqAn'])
 
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
     base = args.output_filename
     filenames = args.input_filenames
 
     for fname in args.input_filenames:
         check_input_files(fname, args.force)
 
-    check_space(args.input_filenames, args.force)
-    check_space_for_hashtable(args, 'nodegraph', args.force)
+    graphsize = calculate_graphsize(args, 'nodegraph')
+    check_space_for_graph(args.output_filename, graphsize, args.force)
 
-    print('Saving k-mer presence table to %s' % base, file=sys.stderr)
+    print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(filenames), file=sys.stderr)
     if args.no_build_tagset:
@@ -64,26 +65,27 @@ def main(args):
               file=sys.stderr)
 
     print('making nodegraph', file=sys.stderr)
-    htable = khmer_args.create_nodegraph(args)
+    nodegraph = khmer_args.create_nodegraph(args)
 
-    functions.build_graph(filenames, htable, args.threads,
-                          not args.no_build_tagset)
+    oxfuncs.build_graph(filenames, nodegraph, args.threads,
+                        not args.no_build_tagset)
 
-    print('Total number of unique k-mers: {0}'.format(htable.n_unique_kmers()),
-          file=sys.stderr)
+    print('Total number of unique k-mers: {0}'.format(
+        nodegraph.n_unique_kmers()), file=sys.stderr)
 
-    print('saving k-mer presence table in', base + '.pt', file=sys.stderr)
-    htable.save(base + '.pt')
+    print('saving k-mer nodegraph in', base, file=sys.stderr)
+    nodegraph.save(base)
 
     if not args.no_build_tagset:
         print('saving tagset in', base + '.tagset', file=sys.stderr)
-        htable.save_tagset(base + '.tagset')
+        nodegraph.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
-    info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
+    info_fp.write('%d unique k-mers' % nodegraph.n_unique_kmers())
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.15)
+        khmer.calc_expected_collisions(
+            nodegraph, args.force, max_false_pos=.15)
     # 0.18 is ACTUAL MAX. Do not change.
 
     print('false positive rate estimated to be %1.3f' % fp_rate,
@@ -91,7 +93,7 @@ def main(args):
     print('\nfalse positive rate estimated to be %1.3f' % fp_rate,
           file=info_fp)
 
-    print('wrote to', base + '.info and', base + '.pt', file=sys.stderr)
+    print('wrote to ' + base + '.info and ' + base, file=sys.stderr)
     if not args.no_build_tagset:
         print('and ' + base + '.tagset', file=sys.stderr)
 

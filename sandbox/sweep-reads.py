@@ -38,7 +38,8 @@ from collections import defaultdict
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
+                              sanitize_epilog)
 from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
@@ -161,7 +162,7 @@ class ReadBufferManager(object):
 
 
 def get_parser():
-    parser = build_hashbits_args('Takes a partitioned reference file \
+    parser = build_nodegraph_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = EPILOG
@@ -205,7 +206,7 @@ def get_parser():
 
 def main():
     info('sweep-reads-buffered.py', ['sweep'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     if args.max_tablesize < MAX_HSIZE:
@@ -213,7 +214,7 @@ def main():
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
 
     K = args.ksize
     HT_SIZE = args.max_tablesize
@@ -253,7 +254,7 @@ def main():
         max_buffers, max_reads, buf_size, output_pref, outdir, extension)
 
     # consume the partitioned fasta with which to label the graph
-    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
+    ht = khmer.GraphLabels(K, HT_SIZE, N_HT)
     try:
         print('consuming input sequences...', file=sys.stderr)
         if args.label_by_pid:

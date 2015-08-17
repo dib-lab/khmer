@@ -19,7 +19,7 @@ SCRIPTPATH=$KHMER_PATH/scripts
 
 # the next command will create a '50m.ht' and a '50m.tagset',
 # representing the de Bruijn graph
-${SCRIPTPATH}/load-graph.py -k 32 -N 4 -x 12e9 50m iowa-corn-50m.fa.gz 
+${SCRIPTPATH}/load-into-nodegraph.py -k 32 -N 4 -x 12e9 50m iowa-corn-50m.fa.gz 
 
 # this will then partition that graph. should take a while.
 # update threads to something higher if you have more cores.
@@ -45,7 +45,7 @@ ${SCRIPTPATH}/extract-partitions.py iowa-corn-50m iowa-corn-50m.fa.gz.part
 mv iowa-corn-50m.group0007.fa corn-50m.lump.fa
 
 # create graph,
-${SCRIPTPATH}/load-graph.py -x 8e9 lump corn-50m.lump.fa
+${SCRIPTPATH}/load-into-nodegraph.py -x 8e9 lump corn-50m.lump.fa
 
 # create an initial set of stoptags to help in knot-traversal; otherwise,
 # partitioning and knot-traversal (which is systematic) is really expensive.
@@ -61,7 +61,7 @@ ${SCRIPTPATH}/find-knots.py -x 2e8 -N 4 lump
 ${SCRIPTPATH}/filter-stoptags.py *.stoptags corn-50m.lump.fa
 
 # now, reload the filtered data set in and partition again.
-${SCRIPTPATH}/load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
+${SCRIPTPATH}/load-into-nodegraph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
 ${SCRIPTPATH}/partition-graph.py -T 4 lumpfilt
 ${SCRIPTPATH}/merge-partitions.py lumpfilt
 ${SCRIPTPATH}/annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt

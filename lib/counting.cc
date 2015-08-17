@@ -5,16 +5,18 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "hashtable.hh"
+#include <errno.h>
+#include <algorithm>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+
 #include "counting.hh"
 #include "hashbits.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "kmer_hash.hh"
 #include "read_parsers.hh"
-
 #include "zlib.h"
-#include <math.h>
-#include <algorithm>
-#include <sstream>
-#include <errno.h>
 
 using namespace std;
 using namespace khmer;
@@ -59,14 +61,9 @@ void CountingHash::output_fasta_kmer_pos_freq(
     outfile.close();
 }
 
-const HashIntoType CountingHash::n_unique_kmers() const
-{
-    return _n_unique_kmers;
-}
-
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType min_count = MAX_KCOUNT;
 
@@ -84,7 +81,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 
 BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
-    KMerIterator kmers(s.c_str(), _ksize);
+    KmerIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType max_count = 0;
 
@@ -132,7 +129,7 @@ CountingHash::abundance_distribution(
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KMerIterator kmers(seq.c_str(), _ksize);
+            KmerIterator kmers(seq.c_str(), _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -252,13 +249,14 @@ void CountingHash::fasta_dump_kmers_by_abundance(
             for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
                 string kmer = seq.substr(i, i + _ksize);
                 BoundedCounterType n = get_count(kmer.c_str());
-                char ss[_ksize + 1];
+                char * ss = new char[_ksize + 1];
                 strncpy(ss, kmer.c_str(), _ksize);
                 ss[_ksize] = 0;
 
                 if (n == limit_by_count) {
-                    cout << ss << endl;
+                    cout << *ss << endl;
                 }
+		delete[] ss;
             }
         }
 
@@ -291,43 +289,6 @@ void CountingHash::load(std::string infilename)
     CountingHashFile::load(infilename, *this);
 }
 
-void CountingHash::get_kadian_count(
-    const std::string   &s,
-    BoundedCounterType  &kadian,
-    unsigned int    nk)
-{
-    std::vector<BoundedCounterType> counts;
-    KMerIterator kmers(s.c_str(), _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        BoundedCounterType count = this->get_count(kmer);
-        counts.push_back(count);
-    }
-
-    if (!counts.size()) {
-        throw khmer_exception();
-    }
-    unsigned int kpos = nk * _ksize;
-
-    if (counts.size() < kpos) {
-        kadian = 0;
-
-        return;
-    }
-
-    sort(counts.begin(), counts.end());
-    kadian = counts[kpos - 1];
-
-#if 0
-    std::cout << "k " << kpos << ": ";
-    for (unsigned int i = 0; i < counts.size(); i++) {
-        std::cout << i << "-" << counts[i] << " ";
-    }
-    std::cout << "\n";
-#endif // 0
-}
-
 unsigned long CountingHash::trim_on_abundance(
     std::string     seq,
     BoundedCounterType  min_abund)
@@ -337,7 +298,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -363,7 +324,6 @@ const
     return seq.length();
 }
 
-
 unsigned long CountingHash::trim_below_abundance(
     std::string     seq,
     BoundedCounterType  max_abund)
@@ -373,7 +333,7 @@ const
         return 0;
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -409,7 +369,7 @@ const
         throw khmer_exception("invalid read");
     }
 
-    KMerIterator kmers(seq.c_str(), _ksize);
+    KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer = kmers.next();
     if (kmers.done()) {
@@ -523,6 +483,7 @@ CountingHashFileReader::CountingHashFileReader(
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
         char signature [4];
         unsigned char version = 0, ht_type = 0, use_bigcount = 0;
 
@@ -531,9 +492,11 @@ CountingHashFileReader::CountingHashFileReader(
         infile.read((char *) &ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
-            err << "Does not start with signature for a khmer " <<
-                "file: " << signature << " Should be: " <<
-                SAVED_SIGNATURE;
+            err << "Does not start with signature for a khmer file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
@@ -551,9 +514,11 @@ CountingHashFileReader::CountingHashFileReader(
         infile.read((char *) &use_bigcount, 1);
         infile.read((char *) &save_ksize, sizeof(save_ksize));
         infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+        infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
 
         ht._ksize = (WordLength) save_ksize;
         ht._n_tables = (unsigned int) save_n_tables;
+        ht._occupied_bins = save_occupied_bins;
         ht._init_bitstuff();
 
         ht._use_bigcount = use_bigcount;
@@ -632,6 +597,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;
+    unsigned long long save_occupied_bins = 0;
     char signature [4];
     unsigned char version, ht_type, use_bigcount;
 
@@ -671,8 +637,10 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     int read_k = gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
     int read_nt = gzread(infile, (char *) &save_n_tables,
                          sizeof(save_n_tables));
+    int read_ob = gzread(infile, (char *) &save_occupied_bins,
+                         sizeof(save_occupied_bins));
 
-    if (read_b <= 0 || read_k <= 0 || read_nt <= 0) {
+    if (read_b <= 0 || read_k <= 0 || read_nt <= 0 || read_ob <= 0) {
         std::string err = "K-mer count file header read error: " + infilename
                           + " " + strerror(errno);
         gzclose(infile);
@@ -680,6 +648,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     }
 
     ht._ksize = (WordLength) save_ksize;
+    ht._occupied_bins = save_occupied_bins;
     ht._n_tables = (unsigned int) save_n_tables;
     ht._init_bitstuff();
 
@@ -718,7 +687,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
             if (to_read_ll > INT_MAX) {
                 to_read_int = INT_MAX;
             } else {
-                to_read_int = to_read_ll;
+                to_read_int = (unsigned int) to_read_ll;
             }
             read_b = gzread(infile, (char *) ht._counts[i], to_read_int);
 
@@ -792,6 +761,7 @@ CountingHashFileWriter::CountingHashFileWriter(
     unsigned int save_ksize = ht._ksize;
     unsigned char save_n_tables = ht._n_tables;
     unsigned long long save_tablesize;
+    unsigned long long save_occupied_bins = ht._occupied_bins;
 
     ofstream outfile(outfilename.c_str(), ios::binary);
 
@@ -810,6 +780,8 @@ CountingHashFileWriter::CountingHashFileWriter(
 
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
     outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
+    outfile.write((const char *) &save_occupied_bins,
+                  sizeof(save_occupied_bins));
 
     for (unsigned int i = 0; i < save_n_tables; i++) {
         save_tablesize = ht._tablesizes[i];
@@ -847,6 +819,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     unsigned int save_ksize = ht._ksize;
     unsigned char save_n_tables = ht._n_tables;
     unsigned long long save_tablesize;
+    unsigned long long save_occupied_bins = ht._occupied_bins;
 
     gzFile outfile = gzopen(outfilename.c_str(), "wb");
     if (outfile == NULL) {
@@ -873,6 +846,8 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
 
     gzwrite(outfile, (const char *) &save_ksize, sizeof(save_ksize));
     gzwrite(outfile, (const char *) &save_n_tables, sizeof(save_n_tables));
+    gzwrite(outfile, (const char *) &save_occupied_bins,
+            sizeof(save_occupied_bins));
 
     for (unsigned int i = 0; i < save_n_tables; i++) {
         save_tablesize = ht._tablesizes[i];
@@ -888,7 +863,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
             if (to_write_ll > INT_MAX) {
                 to_write_int = INT_MAX;
             } else {
-                to_write_int = to_write_ll;
+                to_write_int = (unsigned int) to_write_ll;
             }
             gz_result = gzwrite(outfile, (const char *) ht._counts[i],
                                 to_write_int);
@@ -910,7 +885,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
                     msg << strerror(errno);
                 }
                 gzclose(outfile);
-                throw khmer_file_exception(msg.str().c_str());
+                throw khmer_file_exception(msg.str());
             }
             written += gz_result;
         }
@@ -967,7 +942,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -1010,7 +985,7 @@ void CountingHash::collect_high_abundance_kmers(
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
-            KMerIterator kmers(sp, _ksize);
+            KmerIterator kmers(sp, _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();

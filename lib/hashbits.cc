@@ -5,13 +5,13 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include <iostream>
-#include "hashtable.hh"
-#include "hashbits.hh"
-#include "read_parsers.hh"
-
-#include <sstream>
 #include <errno.h>
+#include <sstream> // IWYU pragma: keep
+
+#include "hashbits.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;
@@ -26,6 +26,7 @@ void Hashbits::save(std::string outfilename)
     unsigned int save_ksize = _ksize;
     unsigned char save_n_tables = _n_tables;
     unsigned long long save_tablesize;
+    unsigned long long save_occupied_bins = _occupied_bins;
 
     ofstream outfile(outfilename.c_str(), ios::binary);
 
@@ -38,6 +39,8 @@ void Hashbits::save(std::string outfilename)
 
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
     outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
+    outfile.write((const char *) &save_occupied_bins,
+                  sizeof(save_occupied_bins));
 
     for (unsigned int i = 0; i < _n_tables; i++) {
         save_tablesize = _tablesizes[i];
@@ -91,6 +94,7 @@ void Hashbits::load(std::string infilename)
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
         char signature[4];
         unsigned char version, ht_type;
 
@@ -99,9 +103,11 @@ void Hashbits::load(std::string infilename)
         infile.read((char *) &ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
-            err << "Does not start with signature for a khmer " <<
-                "file: " << signature << " Should be: " <<
-                SAVED_SIGNATURE;
+            err << "Does not start with signature for a khmer file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
@@ -118,9 +124,11 @@ void Hashbits::load(std::string infilename)
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
         infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+        infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
 
         _ksize = (WordLength) save_ksize;
         _n_tables = (unsigned int) save_n_tables;
+        _occupied_bins = save_occupied_bins;
         _init_bitstuff();
 
         _counts = new Byte*[_n_tables];
@@ -152,122 +160,6 @@ void Hashbits::load(std::string infilename)
         }
         throw khmer_file_exception(err);
     }
-}
-
-/**
- * Checks for non-ACGT characters before consuming read.
- * This is specifically for counting overlap k-mers.
- */
-unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
-        bool &is_valid,
-        Hashbits &ht2)
-{
-    is_valid = check_and_normalize_read(read);
-
-    if (!is_valid) {
-        return 0;
-    }
-
-    return consume_string_overlap(read, ht2);
-}
-
-/**
- * Consume a FASTA file of reads.
- */
-void Hashbits::consume_fasta_overlap(const std::string &filename,
-                                     HashIntoType curve[2][100],Hashbits &ht2,
-                                     unsigned int &total_reads,
-                                     unsigned long long &n_consumed)
-{
-    total_reads = 0;
-    n_consumed = 0;
-    Read read;
-
-//get total number of reads in dataset
-
-    IParser* parser = IParser::get_parser(filename.c_str());
-    while(!parser->is_complete())  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        total_reads++;
-    }
-//block size for curve
-    int block_size = total_reads/100;
-
-// reads number <100, block size =1
-    if (block_size == 0) {
-        block_size = 1;
-    }
-// set the remaining as 0
-    for (int n=total_reads; n<100; n++) {
-        curve[0][n] = 0;
-        curve[1][n] = 0;
-    }
-
-    total_reads = 0;
-
-    delete parser;
-    parser = IParser::get_parser(filename.c_str());
-
-
-
-    string currSeq = "";
-
-    //
-    // iterate through the FASTA file & consume the reads.
-    //
-
-    while(!parser->is_complete())  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        currSeq = read.sequence;
-
-        unsigned int this_n_consumed;
-        bool is_valid;
-
-        this_n_consumed = check_and_process_read_overlap(currSeq,
-                          is_valid, ht2);
-
-        n_consumed += this_n_consumed;
-
-        // reset the sequence info, increment read number
-
-        total_reads++;
-
-        if (total_reads%block_size == 0) {
-            curve[0][total_reads/block_size-1] = n_overlap_kmers();
-            curve[1][total_reads/block_size-1] = n_unique_kmers();
-        }
-    } // while
-
-    delete parser;
-}
-
-/**
- * Run through every k-mer in the given string, & hash it.
- */
-unsigned int Hashbits::consume_string_overlap(const std::string &s,
-        Hashbits &ht2)
-{
-    const char * sp = s.c_str();
-    unsigned int n_consumed = 0;
-
-    KMerIterator kmers(sp, _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        count_overlap(kmer,ht2);
-        n_consumed++;
-    }
-
-    return n_consumed;
 }
 
 void Hashbits::update_from(const Hashbits &other)

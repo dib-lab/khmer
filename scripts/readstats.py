@@ -20,6 +20,8 @@ import screed
 import argparse
 import textwrap
 
+from khmer.khmer_args import sanitize_epilog
+
 
 def get_parser():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
@@ -47,9 +49,10 @@ def get_parser():
     return parser
 
 
-class StatisticsOutput(object):
-    #  pylint: disable=too-few-public-methods
-    """Output statistics for several data files.
+class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
+
+    """
+    Output statistics for several data files.
 
     The format of the output is determined by the formatter used.
     All statistics are aggregated and a summary is added to the data.
@@ -63,8 +66,7 @@ class StatisticsOutput(object):
         return self
 
     def append(self, basepairs, seqs, filename):
-        """Append a new line for the given basepair number, sequences and file.
-        """
+        """Append a new line for the given basepair num, sequences and file."""
         self.formatter.append(
             basepairs, seqs, basepairs / float(seqs), filename)
 
@@ -74,7 +76,9 @@ class StatisticsOutput(object):
 
 
 class CsvFormatter(object):
+
     """Format the statistis information as CSV."""
+
     headers = ['bp', 'seqs', 'avg_len', 'filename']
 
     def __init__(self, underlying_file):
@@ -89,12 +93,12 @@ class CsvFormatter(object):
         self.file.writerow([basepairs, seqs, "%.1f" % avg_len, filename])
 
     def finalize(self):
-        """No statistics since the CSV data is supposed to be processed further.
-        """
+        """No statistics since the CSV data is to be processed further."""
         pass
 
 
 class StdFormatter(object):
+
     """Format the statistics in a human readable string."""
 
     def __init__(self, underlying_file):
@@ -128,7 +132,7 @@ def analyze_file(filename):
     """Run over the given file and count base pairs and sequences."""
     bps = 0
     seqs = 0
-    input_iter = screed.open(filename, parse_description=False)
+    input_iter = screed.open(filename)
     for record in input_iter:
         if seqs % 100000 == 0:
             print('...', filename, seqs, file=sys.stderr)
@@ -139,7 +143,7 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     total_bp = 0

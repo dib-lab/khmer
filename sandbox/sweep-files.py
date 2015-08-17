@@ -36,7 +36,8 @@ from collections import defaultdict, deque
 import os
 import time
 import khmer
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
+                              sanitize_epilog)
 
 DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
@@ -46,7 +47,7 @@ MIN_KSIZE = 21
 
 
 def get_parser():
-    parser = build_hashbits_args('Takes a partitioned reference file \
+    parser = build_nodegraph_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = EPILOG
@@ -100,7 +101,7 @@ class IODeque(deque):
 
 def main():
     #info('sweep-files.py', ['sweep'])
-    parser = get_parser()
+    parser = sanitize_epilog(get_parser())
     args = parser.parse_args()
 
     if args.max_tablesize < MIN_HSIZE:
@@ -108,7 +109,7 @@ def main():
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
-    report_on_config(args, hashtype='nodegraph')
+    report_on_config(args, graphtype='nodegraph')
 
     K = args.ksize
     HT_SIZE = args.max_tablesize
@@ -120,7 +121,7 @@ def main():
 
     # Consume the database files and assign each a unique label in the
     # de Bruin graph; open a file and output queue for each file as well.
-    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
+    ht = khmer.GraphLabels(K, HT_SIZE, N_HT)
     try:
         print('consuming and labeling input sequences...', file=sys.stderr)
 

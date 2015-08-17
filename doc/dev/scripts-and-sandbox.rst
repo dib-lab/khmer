@@ -38,7 +38,7 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a hash-bang line (``#! /usr/bin/env python2``) at the top
+* have a hash-bang line (``#! /usr/bin/env python``) at the top
 * be command-line executable (``chmod a+x``)
 * have a Copyright message (see below)
 * have lowercase names
@@ -58,23 +58,31 @@ All scripts in scripts/ should have the following options, if they could apply:
 * ``--version`` - should always apply
 * ``--help`` - should always apply
 * ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadtable`` and ``--savetable`` - where appropriate (see khmer_args.py)
+* ``--loadgraph`` and ``--savegraph`` - where appropriate (see khmer_args.py)
+
+If an option is of type ``type=argparse.FileType('w')`` then you need to also
+specify a ``metavar`` for the documentation and help formatting. Example::
+
+    parser.add_argument('-R', '--report', metavar='report_filename',
+        type=argparse.FileType('w'))
 
 Copyright message
 ~~~~~~~~~~~~~~~~~
 
-Our current Copyright message is::
+The copyright message should be of the form::
 
    #
    # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-   # Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   # Copyright (C) ___WHO___, ___YEAR(s)___. It is licensed under
    # the three-clause BSD license; see doc/LICENSE.txt.
    # Contact: khmer-project@idyll.org
    #
 
-The beginning year should be the first year that this file existed in
-the repo; the end year should be the last year a coding change was
-made in the file.
+Where ___WHO___ is replaced with one or more of "Michigan State University" or
+"The Regents of the University of California" and ___YEAR(s)___ is replaced
+with the year or years the file was created or modified. The copyright
+statement for new files should only refer to "The Regents of the University of
+California".
 
 Upgrading a script from 'sandbox' to 'scripts'
 ----------------------------------------------
@@ -116,5 +124,6 @@ development/PR checklist::
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
    - [ ] support '-' (STDIN) as an input file, if appropriate
    - [ ] support designation of an output file (including STDOUT), if appropriate
+   - [ ] script reads and writes sequences in compressed format
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
    - [ ] script has been removed from sandbox/README.rst

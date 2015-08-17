@@ -12,7 +12,9 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import errno
-from stat import S_ISBLK, S_ISFIFO
+from stat import S_ISBLK, S_ISFIFO, S_ISCHR
+import gzip
+import bz2file
 from khmer import khmer_args
 
 
@@ -27,6 +29,7 @@ def check_input_files(file_path, force):
 
     if file_path == '-':
         return
+
     try:
         mode = os.stat(file_path).st_mode
     except OSError:
@@ -34,25 +37,31 @@ def check_input_files(file_path, force):
               file_path, file=sys.stderr)
 
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             print("Exiting", file=sys.stderr)
             sys.exit(1)
         else:
             return
 
-    # block devices will be nonzero
-    if S_ISBLK(mode) or S_ISFIFO(mode):
+    # block devices/stdin will be nonzero
+    if S_ISBLK(mode) or S_ISFIFO(mode) or S_ISCHR(mode):
         return
 
     if not os.path.exists(file_path):
         print("ERROR: Input file %s does not exist; exiting" %
               file_path, file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
             print("ERROR: Input file %s is empty; exiting." %
                   file_path, file=sys.stderr)
             if not force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
 
 
@@ -109,17 +118,17 @@ def check_space(in_files, force, _testhook_free_space=None):
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
-def check_space_for_hashtable(args, hashtype, force,
-                              _testhook_free_space=None):
-    """Check we have enough size to write a hash table."""
-    hash_size = khmer_args._calculate_tablesize(args, hashtype)
-
-    cwd = os.getcwd()
-    dir_path = os.path.dirname(os.path.realpath(cwd))
+def check_space_for_graph(outfile_name, hash_size, force,
+                          _testhook_free_space=None):
+    """Check that we have enough size to write the specified graph."""
+    dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
+
     if _testhook_free_space is None:
         free_space = target.f_frsize * target.f_bavail
     else:
@@ -128,14 +137,16 @@ def check_space_for_hashtable(args, hashtype, force,
     size_diff = hash_size - free_space
     if size_diff > 0:
         print("ERROR: Not enough free space on disk "
-              "for saved table files;"
-              "       Need at least %s GB more."
+              "for saved graph files;"
+              "       Need at least %.1f GB more."
               % (float(size_diff) / 1e9,), file=sys.stderr)
         print("       Table size: %.1f GB"
               % (float(hash_size) / 1e9,), file=sys.stderr)
         print("       Free space: %.1f GB"
               % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
@@ -148,8 +159,11 @@ def check_valid_file_exists(in_files):
     or non-existent.
     """
     for in_file in in_files:
-        if os.path.exists(in_file):
-            if os.stat(in_file).st_size > 0:
+        if in_file == '-':
+            pass
+        elif os.path.exists(in_file):
+            mode = os.stat(in_file).st_mode
+            if os.stat(in_file).st_size > 0 or S_ISBLK(mode) or S_ISFIFO(mode):
                 return
             else:
                 print('WARNING: Input file %s is empty' %
@@ -157,3 +171,45 @@ def check_valid_file_exists(in_files):
         else:
             print('WARNING: Input file %s not found' %
                   in_file, file=sys.stderr)
+
+
+def is_block(fthing):
+    """Take in a file object and checks to see if it's a block or fifo."""
+    if fthing is sys.stdout or fthing is sys.stdin:
+        return True
+    else:
+        mode = os.stat(fthing.name).st_mode
+        return S_ISBLK(mode) or S_ISCHR(mode)
+
+
+def describe_file_handle(fthing):
+    if is_block(fthing):
+        return "block device"
+    else:
+        return fthing.name
+
+
+def add_output_compression_type(parser):
+    """Add compression arguments to a parser object."""
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--gzip', default=False, action='store_true',
+                       help='Compress output using gzip')
+    group.add_argument('--bzip', default=False, action='store_true',
+                       help='Compress output using bzip2')
+
+
+def get_file_writer(file_handle, do_gzip, do_bzip):
+    """Generate and return a file object with specified compression."""
+    ofile = None
+
+    if do_gzip and do_bzip:
+        raise Exception("Cannot specify both bzip and gzip compression!")
+
+    if do_gzip:
+        ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
+    elif do_bzip:
+        ofile = bz2file.open(file_handle, mode='w')
+    else:
+        ofile = file_handle
+
+    return ofile

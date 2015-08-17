@@ -4,9 +4,8 @@
 Installing and running khmer
 ============================
 
-You'll need a 64-bit operating system, Python 2.7.x and internet access.
-
-The khmer project currently works with Python 2.6 but we target Python 2.7.x.
+You'll need a 64-bit operating system, internet access, and Python
+2.7.x OR Python 3.3 or greater.
 
 Build requirements
 ------------------
@@ -63,9 +62,11 @@ Installing khmer inside the virtualenv
 Run the tests
 ^^^^^^^^^^^^^
 
-After installing you can run the embedded test suite::
+After installing you can run the embedded test suite. If you are running an
+OSX system you should also add `!linux` to prevent linux-specific tests from
+failing.::
 
-      nosetests khmer --attr '!known_failing'
+      nosetests khmer --attr '!known_failing,!huge'
 
 If the nosetests binary isn't installed then::
 

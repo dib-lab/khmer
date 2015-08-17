@@ -25,7 +25,7 @@ import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -33,9 +33,9 @@ DEFAULT_K = 32
 
 def get_parser():
     epilog = """
-    Load stoptags in from the given .stoptags file and use them to trim
-    or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
-    <fileN>.stopfilt.
+    Load stoptags in from the given `.stoptags` file and use them to trim
+    or remove the sequences in `<file1-N>`.  Trimmed sequences will be placed
+    in `<fileN>.stopfilt`.
     """
     parser = argparse.ArgumentParser(
         description="Trim sequences at stoptags.",
@@ -55,7 +55,7 @@ def get_parser():
 
 def main():
     info('filter-stoptags.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 
@@ -65,8 +65,8 @@ def main():
     check_space(infiles, args.force)
 
     print('loading stop tags, with K', args.ksize, file=sys.stderr)
-    htable = khmer.Hashbits(args.ksize, 1, 1)
-    htable.load_stop_tags(stoptags)
+    nodegraph = khmer.Nodegraph(args.ksize, 1, 1)
+    nodegraph.load_stop_tags(stoptags)
 
     def process_fn(record):
         name = record['name']
@@ -74,7 +74,7 @@ def main():
         if 'N' in seq:
             return None, None
 
-        trim_seq, trim_at = htable.trim_on_stoptags(seq)
+        trim_seq, trim_at = nodegraph.trim_on_stoptags(seq)
 
         if trim_at >= args.ksize:
             return name, trim_seq

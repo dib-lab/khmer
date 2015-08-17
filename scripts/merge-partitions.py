@@ -23,15 +23,16 @@ import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_epilog
 
 DEFAULT_K = 32
 
 
 def get_parser():
     epilog = """
-    Take the ${graphbase}.subset.#.pmap files and merge them all into a single
-    ${graphbase}.pmap.merged file for :program:`annotate-partitions.py` to use.
+    Take the `${graphbase}.subset.#.pmap` files and merge them all into a
+    single ${graphbase}.pmap.merged file for :program:`annotate-partitions.py`
+    to use.
     """
     parser = argparse.ArgumentParser(
         description="Merge partition map '.pmap' files.",
@@ -52,7 +53,7 @@ def get_parser():
 
 def main():
     info('merge-partitions.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     output_file = args.graphbase + '.pmap.merged'
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
@@ -61,7 +62,7 @@ def main():
           (len(pmap_files), pmap_files[0]), file=sys.stderr)
 
     ksize = args.ksize
-    htable = khmer.Hashbits(ksize, 1, 1)
+    nodegraph = khmer.Nodegraph(ksize, 1, 1)
 
     for _ in pmap_files:
         check_input_files(_, args.force)
@@ -70,10 +71,10 @@ def main():
 
     for pmap_file in pmap_files:
         print('merging', pmap_file, file=sys.stderr)
-        htable.merge_subset_from_disk(pmap_file)
+        nodegraph.merge_subset_from_disk(pmap_file)
 
     print('saving merged to', output_file, file=sys.stderr)
-    htable.save_partitionmap(output_file)
+    nodegraph.save_partitionmap(output_file)
 
     if args.remove_subsets:
         print('removing pmap files', file=sys.stderr)

@@ -8,12 +8,26 @@
 #ifndef LABELHASH_HH
 #define LABELHASH_HH
 
+#include <stddef.h>
+#include <stdint.h>
+#include <map>
 #include <string>
+#include <utility>
 
-#include "khmer.hh"
 #include "hashbits.hh"
 #include "hashtable.hh"
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer
+{
+class Hashtable;
+
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 namespace khmer
 {
@@ -155,7 +169,7 @@ public:
     void load_labels_and_tags(std::string);
 
 };
-};
+}
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));

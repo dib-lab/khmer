@@ -1,12 +1,13 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
 #
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
@@ -18,9 +19,9 @@ import shutil
 from io import StringIO
 import traceback
 from nose.plugins.attrib import attr
-import subprocess
 import threading
 import bz2
+import gzip
 import io
 
 from . import khmer_tst_utils as utils
@@ -41,8 +42,8 @@ def test_check_space():
 
 
 def test_load_into_counting():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -50,13 +51,43 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
 
-def test_load_into_counting_tablesize_warning():
-    script = 'load-into-counting.py'
-    args = ['-k', '20', '-t']
+def test_load_into_counting_autoargs_0():
+    script = 'load-into-countgraph.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--fp-rate', '0.08', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert 'INFO: Overriding default fp 0.1 with new fp: 0.08' in err, err
+    assert ' tablesize is too small!' in err, err
+    assert 'Estimated FP rate with current config is: 0.9999546' in err, err
+    assert 'Recommended tablesize is: 1.77407e+07 bytes' in err, err
+
+
+def test_load_into_counting_autoargs_1():
+    script = 'load-into-countgraph.py'
+
+    outfile = utils.get_temp_filename('table')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = ['-U', '1e7', '--max-tablesize', '3e7', outfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+
+    assert os.path.exists(outfile)
+    assert "Ceiling is: 4.80833e+07 bytes" in err, err
+    assert "set memory ceiling automatically." in err, err
+
+
+def test_load_into_count_graphsize_warning():
+    script = 'load-into-countgraph.py'
+    args = ['-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -69,8 +100,8 @@ def test_load_into_counting_tablesize_warning():
 
 
 def test_load_into_counting_max_memory_usage_parameter():
-    script = 'load-into-counting.py'
-    args = ['-M', '2e3', '-k', '20', '-t']
+    script = 'load-into-countgraph.py'
+    args = ['-M', '2e3', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -81,13 +112,13 @@ def test_load_into_counting_max_memory_usage_parameter():
     assert os.path.exists(outfile)
     assert "WARNING: tablesize is default!" not in err
 
-    kh = khmer.load_counting_hash(outfile)
+    kh = khmer.load_countgraph(outfile)
     assert sum(kh.hashsizes()) < 3e8
 
 
 def test_load_into_counting_abundance_dist_nobig():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t', '-b']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-b']
 
     outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -95,7 +126,7 @@ def test_load_into_counting_abundance_dist_nobig():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 83' in err, err
+    assert 'Total number of unique k-mers: 94' in err, err
     assert os.path.exists(outfile)
 
     htfile = outfile
@@ -107,9 +138,46 @@ def test_load_into_counting_abundance_dist_nobig():
     assert 'bigcount' in err, err
 
 
+def test_load_into_counting_abundance_dist_squashing():
+    graphfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args = [graphfile, infile]
+    script = 'load-into-countgraph.py'
+    utils.runscript(script, args)
+
+    histogram = utils.get_temp_filename('histogram')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+    args = [graphfile, infile, histogram]
+
+    script = 'abundance-dist.py'
+    # make histogram
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(histogram)
+    # attempt to overwrite histogram; fail
+    failed = True
+    try:
+        (status, out, err) = utils.runscript(script, args)
+        failed = False
+    except AssertionError as error:
+        assert "exists; not squashing" in str(error), str(error)
+
+    assert failed, "Expected to fail"
+    # attempt to overwrite with squashing; should work
+    args = ['-s', graphfile, infile, histogram]
+    (status, out, err) = utils.runscript(script, args)
+    assert "squashing existing file" in err, err
+
+    histfile = open(histogram, 'r')
+    lines = histfile.readlines()
+    # stripping because boo whitespace
+    assert lines[1].strip() == "0,0,0,0.0", lines[1]
+    assert lines[2].strip() == "1,83,83,1.0", lines[2]
+
+
 def test_load_into_counting_nonwritable():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('test-nonwritable')
     with open(outfile, 'w') as fout:
@@ -127,8 +195,8 @@ def test_load_into_counting_nonwritable():
 
 @attr('huge')
 def test_load_into_counting_toobig():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -141,7 +209,7 @@ def test_load_into_counting_toobig():
 
 
 def test_load_into_counting_fail():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out.ct')
@@ -156,8 +224,8 @@ def test_load_into_counting_fail():
 
 
 def test_load_into_counting_multifile():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -171,8 +239,8 @@ def test_load_into_counting_multifile():
 
 
 def test_load_into_counting_tsv():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.ct')
     tabfile = outfile + '.info.tsv'
@@ -194,8 +262,8 @@ def test_load_into_counting_tsv():
 
 
 def test_load_into_counting_json():
-    script = 'load-into-counting.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
+    script = 'load-into-countgraph.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.ct')
     jsonfile = outfile + '.info.json'
@@ -225,7 +293,7 @@ def test_load_into_counting_json():
 
 
 def test_load_into_counting_bad_summary_fmt():
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -239,7 +307,7 @@ def test_load_into_counting_bad_summary_fmt():
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
-    script = 'load-into-counting.py'
+    script = 'load-into-countgraph.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
     if not BIGCOUNT:
@@ -313,6 +381,21 @@ def test_filter_abund_2():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
+
+def test_filter_abund_2_stdin():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = 'filter-abund.py'
+    args = ['-C', '1', counting_ht, '-']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
+
 # make sure that FASTQ records are retained.
 
 
@@ -358,7 +441,7 @@ def test_filter_abund_4_fq_casava_18():
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     assert 'pair:foo 1::N' in seqs, seqs
 
 
@@ -369,7 +452,7 @@ def test_filter_abund_1_singlefile():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', infile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -385,12 +468,12 @@ def test_filter_abund_1_singlefile():
 def test_filter_abund_2_singlefile():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-    tabfile = utils.get_temp_filename('test-savetable.ct')
+    tabfile = utils.get_temp_filename('test-savegraph.ct')
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '--savegraph',
             tabfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
@@ -418,7 +501,7 @@ def test_filter_abund_2_singlefile_fq_casava_18():
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     assert 'pair:foo 1::N' in seqs, seqs
 
 
@@ -496,7 +579,7 @@ def test_filter_abund_7_retain_Ns():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
-    # copy test file over to test.fq & load into counting table
+    # copy test file over to test.fq & load into countgraph
     shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
     counting_ht = _make_counting(infile, K=17)
 
@@ -508,7 +591,7 @@ def test_filter_abund_7_retain_Ns():
     assert os.path.exists(outfile), outfile
 
     # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    names = set([r.name for r in screed.open(outfile)])
     assert '895:1:37:17593:9954 1::FOO_withN' in names, names
 
     # check to see if that 'N' was properly changed to an 'A'
@@ -530,7 +613,7 @@ def test_filter_abund_single_8_retain_Ns():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
-    # copy test file over to test.fq & load into counting table
+    # copy test file over to test.fq & load into countgraph
     shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
 
     script = 'filter-abund-single.py'
@@ -541,7 +624,7 @@ def test_filter_abund_single_8_retain_Ns():
     assert os.path.exists(outfile), outfile
 
     # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile, parse_description=0)])
+    names = set([r.name for r in screed.open(outfile)])
     assert '895:1:37:17593:9954 1::FOO_withN' in names, names
 
     # check to see if that 'N' was properly changed to an 'A'
@@ -566,7 +649,7 @@ def test_filter_stoptags():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer._Hashbits(K, [1])
+    kh = khmer._Nodegraph(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -597,7 +680,7 @@ def test_filter_stoptags_fq():
 
     # now, create a file with some stop tags in it --
     K = 18
-    kh = khmer._Hashbits(K, [1])
+    kh = khmer._Nodegraph(K, [1])
     kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
     kh.save_stop_tags(stopfile)
     del kh
@@ -618,7 +701,7 @@ def test_filter_stoptags_fq():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
     # make sure that record names are carried through unparsed
-    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    names = [r.name for r in screed.open(outfile)]
     names = set(names)
     assert 'seq 1::BAR' in names
 
@@ -636,15 +719,15 @@ def test_count_median():
 
     assert os.path.exists(outfile), outfile
 
-    data = [x.strip() for x in open(outfile)]
+    data = [x.strip() for x in open(outfile).readlines()[1:]]
     data = set(data)
     assert len(data) == 2, data
-    assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
+    assert 'seq,1001,1001.0,0.0,18' in data, data
+    assert '895:1:37:17593:9954/1,1,103.803741455,303.702941895,114' in data
 
 
-def test_count_median_fq():
-    infile = utils.get_temp_filename('test.fa')
+def test_count_median_fq_csv():
+    infile = utils.get_temp_filename('test.fq')
     outfile = infile + '.counts'
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
@@ -658,37 +741,32 @@ def test_count_median_fq():
 
     data = [x.strip() for x in open(outfile)]
     data = set(data)
-    assert len(data) == 2, data
-    assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
+    assert len(data) == 4, data
+    assert 'name,median,average,stddev,seqlen' in data
+    assert 'seq,1001,1001.0,0.0,18' in data
+
+    # verify that sequence names remain unparsed
+    names = set([line.split(',')[0] for line in data])
+    assert '895:1:37:17593:9954 1::FOO' in names, names
 
 
-def test_count_median_fq_csv():
-    infile = utils.get_temp_filename('test.fa')
-    outfile = infile + '.counts'
+def test_count_median_fq_csv_stdout():
+    infile = utils.get_temp_filename('test.fq')
+    outfile = '-'
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
     counting_ht = _make_counting(infile, K=8)
 
     script = 'count-median.py'
-    args = ['--csv', counting_ht, infile, outfile]
-    utils.runscript(script, args)
+    args = [counting_ht, infile, outfile]
+    (status, out, err) = utils.runscript(script, args)
 
-    assert os.path.exists(outfile), outfile
-
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
-    assert len(data) == 4, data
-    assert 'name,median,average,stddev,seqlen' in data
-    assert 'seq,1001,1001.0,0.0,18' in data
-
-    # verify that sequence names remain unparsed with '--csv'
-    names = set([line.split(',')[0] for line in data])
-    assert '895:1:37:17593:9954 1::FOO' in names, names
+    assert 'name,median,average,stddev,seqlen' in out
+    assert 'seq,1001,1001.0,0.0,18' in out
 
 
 def test_load_graph():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
@@ -700,21 +778,21 @@ def test_load_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
 
     try:
-        ht = khmer.load_hashbits(ht_file)
+        ht = khmer.load_nodegraph(ht_file)
     except OSError as err:
         assert 0, str(err)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-graph worked :)
+    # roundabout way of checking that load-into-nodegraph worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -733,25 +811,64 @@ def test_oxli_build_graph():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
 
-    ht = khmer.load_hashbits(ht_file)
+    ht = khmer.load_nodegraph(ht_file)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-graph worked :)
+    # roundabout way of checking that load-into-nodegraph worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
 
+def test_oxli_build_graph_unique_kmers_arg():
+    script = 'oxli'
+    args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+    assert 'INFO: set memory ceiling automatically' in err, err
+    assert 'Ceiling is: 1e+06 bytes' in err, err
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_nodegraph(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-into-nodegraph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+
+def test_oxli_nocommand():
+    script = 'oxli'
+
+    (status, out, err) = utils.runscript(script, [])
+    assert status == 0
+
+
 def test_load_graph_no_tags():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -761,13 +878,13 @@ def test_load_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
     assert not os.path.exists(tagset_file), tagset_file
 
-    assert khmer.load_hashbits(ht_file)
+    assert khmer.load_nodegraph(ht_file)
 
     # can't think of a good way to make sure this worked, beyond just
     # loading the ht file...
@@ -784,20 +901,20 @@ def test_oxli_build_graph_no_tags():
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
     assert not os.path.exists(tagset_file), tagset_file
 
-    assert khmer.load_hashbits(ht_file)
+    assert khmer.load_nodegraph(ht_file)
 
     # can't think of a good way to make sure this worked, beyond just
     # loading the ht file...
 
 
 def test_load_graph_fail():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -825,7 +942,7 @@ def test_oxli_build_graph_fail():
 
 
 def test_load_graph_write_fp():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -835,7 +952,7 @@ def test_load_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -858,7 +975,7 @@ def test_oxli_build_graph_write_fp():
 
     (status, out, err) = utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     info_file = outfile + '.info'
@@ -870,7 +987,7 @@ def test_oxli_build_graph_write_fp():
 
 
 def test_load_graph_multithread():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
 
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
@@ -892,7 +1009,7 @@ def test_oxli_build_graph_multithread():
 
 
 def test_load_graph_max_memory_usage_parameter():
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-M', '2e7', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -904,11 +1021,11 @@ def test_load_graph_max_memory_usage_parameter():
 
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     try:
-        ht = khmer.load_hashbits(ht_file)
+        ht = khmer.load_nodegraph(ht_file)
     except OSError as err:
         assert 0, str(err)
 
@@ -919,7 +1036,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -929,7 +1046,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     utils.runscript(script, args)
 
-    ht_file = outfile + '.pt'
+    ht_file = outfile
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -966,7 +1083,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                       do_partition=False,
                       annotate_partitions=False,
                       stop_big_traverse=False):
-    script = 'load-graph.py'
+    script = 'load-into-nodegraph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1027,7 +1144,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1051,7 +1168,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1064,7 +1181,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -1083,7 +1200,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1098,7 +1215,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1114,7 +1231,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.pt')
+    ht = khmer.load_nodegraph(graphbase)
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1136,6 +1253,27 @@ def test_partition_find_knots_execute():
 
     stoptags_file = graphbase + '.stoptags'
     assert os.path.exists(stoptags_file)
+
+
+def test_partition_find_knots_existing_stoptags():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    script = 'partition-graph.py'
+    args = [graphbase]
+    utils.runscript(script, args)
+
+    script = 'make-initial-stoptags.py'
+    args = [graphbase]
+    utils.runscript(script, args)
+
+    script = 'find-knots.py'
+    args = [graphbase]
+    (status, out, err) = utils.runscript(script, args)
+
+    stoptags_file = graphbase + '.stoptags'
+    assert os.path.exists(stoptags_file)
+    assert "loading stoptags" in err, err
+    assert "these output stoptags will include the already" in err, err
 
 
 def test_annotate_partitions():
@@ -1235,7 +1373,7 @@ def test_extract_partitions_header_whitespace():
     assert dist.strip() == '1 11960 11960 11960', dist.strip()
 
     parts = [r.name.split('\t')[1]
-             for r in screed.open(partfile, parse_description=False)]
+             for r in screed.open(partfile)]
     assert len(parts) == 13538, len(parts)
     parts = set(parts)
     assert len(parts) == 12602, len(parts)
@@ -1264,12 +1402,12 @@ def test_extract_partitions_fq():
     dist = open(distfile).readline()
     assert dist.strip() == '99 1 1 99'
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     parts = [r.name.split('\t')[1] for r in screed_iter]
 
     assert len(parts) == 99, len(parts)
@@ -1326,7 +1464,7 @@ def test_extract_partitions_no_output_groups():
     args = ['-n', 'extracted', partfile]
 
     # We expect a sys.exit -> we need the test to be tolerant
-    _, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir)
     assert "NOT outputting groups! Beware!" in err
     # Group files are created after output_groups is
     # checked. They should not exist in this scenario
@@ -1391,8 +1529,9 @@ def test_extract_partitions_no_groups():
     script = 'extract-partitions.py'
     args = ['extracted', empty_file]
 
-    _, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    status, _, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert "ERROR: Input file", "is empty; Exiting." in err
+    assert status != 0
     # No group files should be created
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
 
@@ -1414,21 +1553,27 @@ def test_abundance_dist():
 
     with open(outfile) as fp:
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
-        line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
-
-    os.remove(outfile)
-    args = ['-z', '--csv', htfile, infile, outfile]
-    utils.runscript(script, args, in_dir)
-
-    with open(outfile) as fp:
-        line = fp.readline().strip()
         assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
         line = fp.readline().strip()
         assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
         assert line == '1001,2,98,1.0', line
+
+
+def test_abundance_dist_stdout():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = 'abundance-dist.py'
+    args = ['-z', htfile, infile, "-"]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert '1,96,96,0.98' in out, out
+    assert '1001,2,98,1.0' in out, out
 
 
 def test_abundance_dist_nobigcount():
@@ -1445,31 +1590,11 @@ def test_abundance_dist_nobigcount():
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '255 2 98 1.0', line
-
-
-def test_abundance_dist_single():
-    infile = utils.get_temp_filename('test.fa')
-    outfile = utils.get_temp_filename('test.dist')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile,
-            outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    assert 'Total number of unique k-mers: 98' in err, err
-
-    with open(outfile) as fp:
-        line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
-        line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '255,2,98,1.0', line
 
 
 def test_abundance_dist_threaded():
@@ -1480,17 +1605,18 @@ def test_abundance_dist_threaded():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--threads', '18',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--threads', '18',
             infile, outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
 def test_abundance_dist_single_csv():
@@ -1501,7 +1627,7 @@ def test_abundance_dist_single_csv():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--csv', infile,
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile,
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
@@ -1526,10 +1652,11 @@ def test_abundance_dist_single_nobigcount():
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '255 2 98 1.0', line
+        assert line == '255,2,98,1.0', line
 
 
 def test_abundance_dist_single_nosquash():
@@ -1540,34 +1667,36 @@ def test_abundance_dist_single_nosquash():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
-def test_abundance_dist_single_savetable():
+def test_abundance_dist_single_savegraph():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
-    tabfile = utils.get_temp_filename('test-savetable.ct')
+    tabfile = utils.get_temp_filename('test-savegraph.ct')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--savegraph',
             tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
         line = fp.readline().strip()
-        assert line == '1 96 96 0.98', line
+        assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
-        assert line == '1001 2 98 1.0', line
+        assert line == '1001,2,98,1.0', line
 
 
 def test_do_partition():
@@ -1620,10 +1749,37 @@ def test_do_partition_2_fq():
 
     partfile = os.path.join(in_dir, 'random-20-a.fq.part')
 
-    screed_iter = screed.open(partfile, parse_description=False)
+    screed_iter = screed.open(partfile)
     names = [r.name.split('\t')[0] for r in screed_iter]
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
+
+
+def test_interleave_read_stdout():
+    # create input files
+    infile1 = utils.get_test_data('paired-slash1.fq.1')
+    infile2 = utils.get_test_data('paired-slash1.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2]
+
+    (stats, out, err) = utils.runscript(script, args)
+
+    with open(outfile, 'w') as ofile:
+        ofile.write(out)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
 
 
 def test_interleave_read_seq1_fq():
@@ -1633,6 +1789,30 @@ def test_interleave_read_seq1_fq():
 
     # correct output
     ex_outfile = utils.get_test_data('paired-slash1.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '-o', outfile]
+
+    utils.runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+
+def test_interleave_read_badleft_badright():
+    # create input files
+    infile1 = utils.get_test_data('paired-broken.fq.badleft')
+    infile2 = utils.get_test_data('paired-broken.fq.badright')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired-broken.fq.paired_bad')
 
     # actual output file
     outfile = utils.get_temp_filename('out.fq')
@@ -1720,19 +1900,20 @@ def test_interleave_reads_broken_fq_3():
     assert "ERROR: This doesn't look like paired data!" in err
 
 
-def test_interleave_reads_broken_fq_4():
+def test_interleave_reads_broken_fq_5():
     # test input files
-    infile1 = utils.get_test_data('paired-mixed-broken.fq')
+    infile1 = utils.get_test_data('paired-broken4.fq.1')
+    infile2 = utils.get_test_data('paired-broken4.fq.2')
 
     # actual output file
     outfile = utils.get_temp_filename('out.fq')
 
     script = 'interleave-reads.py'
-    args = [infile1, '-o', outfile]
+    args = [infile1, infile2, '-o', outfile]
 
     status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
-    assert "ERROR: given only one filename, that doesn't contain _R1_" in err
+    assert "ERROR: This doesn't look like paired data!" in err
 
 
 def test_interleave_reads_2_fa():
@@ -1760,19 +1941,19 @@ def test_interleave_reads_2_fa():
 
 
 def test_make_initial_stoptags():
-    # gen input files using load-graph.py -t
+    # gen input files using load-into-nodegraph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-graph works properly
+    # this assumes (obv.) load-into-nodegraph works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-graph.py'
+    genscript = 'load-into-nodegraph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-graphs
+    # test input file gen'd by load-into-nodegraphs
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -1787,6 +1968,40 @@ def test_make_initial_stoptags():
     # read the code before modifying
     args = ['test-reads']
 
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile1), outfile1
+
+
+def test_make_initial_stoptags_load_stoptags():
+    # gen input files using load-into-nodegraph.py -t
+    # should keep test_data directory size down
+    # or something like that
+    # this assumes (obv.) load-into-nodegraph works properly
+    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
+    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    in_dir = os.path.dirname(bzinfile)
+
+    genscript = 'load-into-nodegraph.py'
+    genscriptargs = ['test-reads', 'test-reads.fq.bz2']
+    utils.runscript(genscript, genscriptargs, in_dir)
+
+    # test input file gen'd by load-into-nodegraphs
+    infile = utils.get_temp_filename('test-reads.pt')
+    infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
+
+    # get file to compare against
+    ex_outfile = utils.get_test_data('test-reads.stoptags')
+
+    # actual output file
+    outfile1 = utils.get_temp_filename('test-reads.stoptags', in_dir)
+
+    script = 'make-initial-stoptags.py'
+    # make-initial-stoptags has weird file argument syntax
+    # read the code before modifying
+    args = ['test-reads']
+
+    utils.runscript(script, args, in_dir)
+    args = ['test-reads', '--stoptags', 'test-reads.stoptags']
     utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile1), outfile1
 
@@ -1847,8 +2062,8 @@ def test_extract_paired_reads_2_fq():
     assert os.path.exists(outfile2), outfile2
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile1, parse_description=False),
-                    screed.open(outfile1, parse_description=False)):
+    for r, q in zip(screed.open(ex_outfile1),
+                    screed.open(outfile1)):
         n += 1
         assert r.name == q.name, (r.name, q.name, n)
         assert r.sequence == q.sequence
@@ -1856,8 +2071,8 @@ def test_extract_paired_reads_2_fq():
     assert n > 0
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile2, parse_description=False),
-                    screed.open(outfile2, parse_description=False)):
+    for r, q in zip(screed.open(ex_outfile2),
+                    screed.open(outfile2)):
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
@@ -1876,7 +2091,7 @@ def test_extract_paired_reads_3_output_dir():
     out_dir = utils.get_temp_filename('output')
 
     script = 'extract-paired-reads.py'
-    args = [infile, '-o', out_dir]
+    args = [infile, '-d', out_dir]
 
     utils.runscript(script, args)
 
@@ -2083,11 +2298,20 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = ['-p', infile]
+    args = [infile]
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1, status
+    assert "Unpaired reads found" in err
+
+
+def test_split_paired_reads_2_stdin_no_out():
+    script = 'split-paired-reads.py'
+    args = ['-']
+
+    status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
-    assert "is not part of a pair" in err
+    assert "Accepting input from stdin; output filenames must " in err
 
 
 def test_split_paired_reads_2_mixed_fq():
@@ -2097,11 +2321,67 @@ def test_split_paired_reads_2_mixed_fq():
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
-    args = [infile]
+    args = ['-0', '/dev/null', infile]
 
     status, out, err = utils.runscript(script, args, in_dir)
     assert status == 0
-    assert "split 11 sequences (7 left, 4 right)" in err, err
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+
+def test_split_paired_reads_2_mixed_fq_orphans_to_file():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        try:
+            fp.read()
+        except IOError as e:
+            assert "Not a gzipped file" in str(e), str(e)
+        fp.close()
+
+
+def test_split_paired_reads_2_mixed_fq_gzfile():
+    # test input file
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'split-paired-reads.py'
+    args = ['-0', outfile, '--gzip', infile]
+
+    status, out, err = utils.runscript(script, args, in_dir)
+    assert status == 0
+    assert "split 6 sequences (3 left, 3 right, 5 orphans)" in err, err
+
+    n_orphans = len([1 for record in screed.open(outfile)])
+    assert n_orphans == 5
+    n_left = len([1 for record in screed.open(infile + '.1')])
+    assert n_left == 3
+    n_right = len([1 for record in screed.open(infile + '.2')])
+    assert n_right == 3
+
+    for filename in [outfile, infile + '.1', infile + '.2']:
+        fp = gzip.open(filename)
+        fp.read()                       # this will fail if not gzip file.
+        fp.close()
 
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
@@ -2115,7 +2395,7 @@ def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
 
     status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status == 1
-    assert "Unrecognized format" in err
+    assert "Unpaired reads found starting at 895:1:37:17593:9954" in err, err
 
 
 def test_split_paired_reads_3_output_dir():
@@ -2205,7 +2485,7 @@ def test_split_paired_reads_3_output_files_left():
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-o', output_dir, '-1', outfile1, infile]
+    args = ['-d', output_dir, '-1', outfile1, infile]
 
     utils.runscript(script, args)
 
@@ -2242,7 +2522,7 @@ def test_split_paired_reads_3_output_files_right():
     outfile2 = utils.get_temp_filename('yyy', output_dir)
 
     script = 'split-paired-reads.py'
-    args = ['-2', outfile2, '-o', output_dir, infile]
+    args = ['-2', outfile2, '-d', output_dir, infile]
 
     utils.runscript(script, args)
 
@@ -2354,6 +2634,52 @@ def test_sample_reads_randomly_force_single():
     assert seqs == answer
 
 
+def test_sample_reads_randomly_force_single_outfile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    script = 'sample-reads-randomly.py'
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single', '-o',
+            in_dir + '/randreads.out']
+
+    args.append(infile)
+    utils.runscript(script, args, in_dir)
+
+    outfile = in_dir + '/randreads.out'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print(list(sorted(seqs)))
+
+    if sys.version_info.major == 2:
+        answer = {'850:2:1:2399:20086/2',
+                  '850:2:1:2273:13309/1',
+                  '850:2:1:2065:16816/1',
+                  '850:2:1:1984:7162/2',
+                  '850:2:1:2691:14602/1',
+                  '850:2:1:1762:5439/1',
+                  '850:2:1:2503:4494/2',
+                  '850:2:1:2263:11143/2',
+                  '850:2:1:1792:15774/2',
+                  '850:2:1:2084:17145/1'}
+    else:
+        answer = {'850:2:1:1199:4197/1',
+                  '850:2:1:1251:16575/2',
+                  '850:2:1:1267:6790/2',
+                  '850:2:1:1601:4443/1',
+                  '850:2:1:1625:19325/1',
+                  '850:2:1:1832:14607/2',
+                  '850:2:1:1946:20852/2',
+                  '850:2:1:2401:4896/2',
+                  '850:2:1:2562:1308/1',
+                  '850:2:1:3123:15968/2'}
+
+    assert seqs == answer
+
+
 def test_sample_reads_randomly_fq():
     infile = utils.get_temp_filename('test.fq.gz')
     in_dir = os.path.dirname(infile)
@@ -2392,10 +2718,18 @@ def test_sample_reads_randomly_fq():
                   '850:2:1:2562:1308/1',
                   '850:2:1:3123:15968/2'}
 
-    seqs = set([r.name for r in screed.open(outfile,
-                                            parse_description=False)])
+    seqs = set([r.name for r in screed.open(outfile)])
     print(list(sorted(seqs)))
     assert seqs == answer
+
+
+def test_sample_reads_randomly_stdin_no_out():
+    script = 'sample-reads-randomly.py'
+    args = ['-']
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0
+    assert "Accepting input from stdin; output filename" in err, err
 
 
 def test_fastq_to_fasta():
@@ -2415,37 +2749,138 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2, len(out.splitlines())
+    assert len(out.splitlines()) == 0, len(out.splitlines())
     assert "No lines dropped" in err
 
-    names = [r.name for r in screed.open(clean_outfile,
-                                         parse_description=False)]
+    names = [r.name for r in screed.open(clean_outfile)]
     assert '895:1:1:1246:14654 1:N:0:NNNNN' in names, names
 
     args = [n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "No lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 0
     assert "0 lines dropped" in err
 
     args = [n_infile, '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) == 2, out
+    assert len(out.splitlines()) == 0, out
     assert "4 lines dropped" in err, err
 
     args = [clean_infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "0 lines dropped" in err
 
     args = [n_infile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
-    assert len(out.splitlines()) > 2
+    assert len(out.splitlines()) > 0
     assert "4 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--gzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 0
+    assert "0 lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile, '--bzip']
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 0
+    assert "0 lines dropped" in err
+
+
+def test_fastq_to_fasta_streaming_compressed_gzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.gz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--gzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    gzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x1f\x8b\x08"  # gzip magic signature
+    file_start = gzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
+
+
+def test_fastq_to_fasta_streaming_compressed_bzip():
+
+    script = 'fastq-to-fasta.py'
+    infile = utils.get_temp_filename('test-clean.fq')
+    in_dir = os.path.dirname(infile)
+    fifo = utils.get_temp_filename('fifo')
+    copyfilepath = utils.get_temp_filename('copied.fa.bz', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+    args = ['--bzip', '-o', fifo, infile]
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    copyfile = io.open(copyfilepath, 'wb')
+    fifofile = io.open(fifo, 'rb')
+
+    # read binary to handle compressed files
+    chunk = fifofile.read(8192)
+    while len(chunk) > 0:
+        copyfile.write(chunk)
+        chunk = fifofile.read(8192)
+
+    fifofile.close()
+    thread.join()
+    copyfile.close()
+
+    # verify that the seqs are there and not broken
+    f = screed.open(copyfilepath)
+    count = 0
+    for _ in f:
+        count += 1
+
+    assert count == 25000, count
+    f.close()
+
+    # verify we're looking at a gzipped file
+    bzfile = io.open(file=copyfilepath, mode='rb', buffering=8192)
+    magic = b"\x42\x5a\x68"  # bzip magic signature
+    file_start = bzfile.peek(len(magic))
+    assert file_start[:3] == magic, file_start[:3]
 
 
 def test_extract_long_sequences_fa():
@@ -2465,7 +2900,7 @@ def test_extract_long_sequences_fa():
     countlines = sum(1 for line in open(fa_outfile))
     assert countlines == 22, countlines
 
-    names = [r.name for r in screed.open(fa_outfile, parse_description=False)]
+    names = [r.name for r in screed.open(fa_outfile)]
     assert "895:1:37:17593:9954/1" in names
     assert "895:1:37:17593:9954/2" in names
 
@@ -2487,7 +2922,7 @@ def test_extract_long_sequences_fq():
     countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
 
-    names = [r.name for r in screed.open(fq_outfile, parse_description=False)]
+    names = [r.name for r in screed.open(fq_outfile)]
     assert "895:1:37:17593:9954 1::foo" in names
     assert "895:1:37:17593:9954 2::foo" in names
 
@@ -2575,73 +3010,6 @@ def test_sample_reads_randomly_S():
     assert seqs == answer
 
 
-def test_count_overlap_invalid_datafile():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    htfile = _make_graph(seqfile1, ksize=20)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', htfile + '.pt', outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert "OSError" in err
-
-
-def test_count_overlap():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, ksize=20)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize', '10000000',
-            htfile + '.pt', seqfile2, outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
-    assert '# of unique k-mers in dataset2: 759020' in data, data
-    assert '# of overlap unique k-mers: 245547' in data
-    assert os.path.exists(curvefile), curvefile
-    data = [x.strip() for x in open(curvefile)]
-    data = set(data)
-    assert '178630 1134' in data, data
-    assert '496280 2904' in data
-    assert '752031 238558' in data
-
-
-def test_count_overlap_csv():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, ksize=20)
-    script = 'count-overlap.py'
-    args = ['--ksize', '20', '--n_tables', '2', '--max-tablesize',
-            '10000000', '--csv', htfile + '.pt', seqfile2, outfile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [x.strip() for x in open(outfile)]
-    data = set(data)
-    assert '# of unique k-mers in dataset2: 759020' in data
-    assert '# of overlap unique k-mers: 245547' in data
-    assert os.path.exists(curvefile), curvefile
-    data = [x.strip() for x in open(curvefile)]
-    data = set(data)
-    assert '178630,1134' in data, data
-    assert '496280,2904' in data
-    assert '752031,238558' in data
-
-
 def execute_streaming_diginorm(ifilename):
     '''Helper function for the matrix of streaming tests for read_parser
     using diginorm, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
@@ -2677,43 +3045,44 @@ def execute_streaming_diginorm(ifilename):
     return in_dir + '/outfile'
 
 
-def execute_load_graph_streaming(filename):
+def _execute_load_graph_streaming(filename):
     '''Helper function for the matrix of streaming tests using screed via
     filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
 
-    script = 'load-graph.py'
-    args = '-x 1e7 -N 2 -k 20 out -'
-
+    scripts = utils.scriptpath()
     infile = utils.get_temp_filename('temp')
     in_dir = os.path.dirname(infile)
     shutil.copyfile(utils.get_test_data(filename), infile)
-    (status, out, err) = utils.runscriptredirect(script, args, infile, in_dir)
+
+    args = '-x 1e7 -N 2 -k 20 out -'
+
+    cmd = 'cat {infile} | {scripts}/load-into-nodegraph.py {args}'.format(
+        infile=infile, scripts=scripts, args=args)
+
+    (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
 
     if status != 0:
-        for line in out:
-            print(out)
-        for line in err:
-            print(err)
+        print(out)
+        print(err)
         assert status == 0, status
-    err.seek(0)
-    err = err.read()
+
     assert 'Total number of unique k-mers: 3960' in err, err
 
-    ht_file = os.path.join(in_dir, 'out.pt')
+    ht_file = os.path.join(in_dir, 'out')
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = os.path.join(in_dir, 'out.tagset')
     assert os.path.exists(tagset_file), tagset_file
 
-    ht = khmer.load_hashbits(ht_file)
+    ht = khmer.load_nodegraph(ht_file)
     ht.load_tagset(tagset_file)
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-graph worked :)
+    # roundabout way of checking that load-into-nodegraph worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -2775,34 +3144,34 @@ def test_screed_streaming_gzipfa():
 
 def test_read_parser_streaming_ufa():
     # uncompressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
 
 
 def test_read_parser_streaming_ufq():
     # uncompressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
 def test_read_parser_streaming_gzfq():
     # gzip compressed FASTQ
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
-    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
+    _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
 
 
 def test_readstats():
@@ -2888,12 +3257,20 @@ def test_trim_low_abund_1_duplicate_filename_err():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
-    try:
-        utils.runscript('trim-low-abund.py', args, in_dir)
-        raise Exception("should not reach this")
-    except AssertionError:
-        # an error should be raised by passing 'infile' twice.
-        pass
+    (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Error: Cannot input the same filename multiple times." in str(err)
+
+
+def test_trim_low_abund_1_stdin_err():
+    args = ["-"]
+
+    (status, out, err) = utils.runscript('trim-low-abund.py', args,
+                                         fail_ok=True)
+    assert status == 1
+    assert "Accepting input from stdin; output filename must be provided" \
+           in str(err)
 
 
 def test_trim_low_abund_2():
@@ -3034,7 +3411,7 @@ def test_trim_low_abund_keep_paired_casava18():
     outfile = infile + '.abundtrim'
     assert os.path.exists(outfile), outfile
 
-    seqs = [r.name for r in screed.open(outfile, parse_description=False)]
+    seqs = [r.name for r in screed.open(outfile)]
     assert seqs[-2:] == ['pair:foo 1::N', 'pair:foo 2::N'], seqs
 
 
@@ -3089,9 +3466,9 @@ def test_trim_low_abund_trimtest_after_load():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
-    utils.runscript('load-into-counting.py', args, in_dir)
+    utils.runscript('load-into-countgraph.py', args, in_dir)
 
-    args = ["-Z", "2", "-C", "2", "-V", '--loadtable', saved_table, infile]
+    args = ["-Z", "2", "-C", "2", "-V", '--loadgraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'
@@ -3112,7 +3489,7 @@ def test_trim_low_abund_trimtest_after_load():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-def test_trim_low_abund_trimtest_savetable():
+def test_trim_low_abund_trimtest_savegraph():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -3121,7 +3498,7 @@ def test_trim_low_abund_trimtest_savetable():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2",
-            "-Z", "2", "-C", "2", "-V", '--savetable', saved_table, infile]
+            "-Z", "2", "-C", "2", "-V", '--savegraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'
@@ -3230,3 +3607,74 @@ def test_roundtrip_commented_format():
     r = open(infile).read()
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
+
+
+def test_unique_kmers_defaults():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+
+def test_unique_kmers_report_fp():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    outfile = utils.get_temp_filename('report.unique')
+
+    args = ['-k', '20', '-e', '0.01', '-R', outfile, infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'.format(infile)
+            in err)
+    assert 'Total estimated number of unique 20-mers: 3950' in err
+
+    with open(outfile, 'r') as report_fp:
+        outf = report_fp.read().splitlines()
+        assert '3950 20 (total)' in outf
+        assert '3950 20 total' in outf
+
+
+def test_unique_kmers_diagnostics():
+    infile = utils.get_temp_filename('random-20-a.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    args = ['-k', '20', '-e', '0.01', '--diagnostics', infile]
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    out = out.splitlines()
+    assert ('expected_fp\tnumber_hashtable(Z)\t'
+            'size_hashtable(H)\texpected_memory_usage' in err)
+
+
+def test_unique_kmers_multiple_inputs():
+    infiles = []
+    for fname in ('random-20-a.fa', 'paired-mixed.fa'):
+        infile = utils.get_temp_filename(fname)
+        shutil.copyfile(utils.get_test_data(fname), infile)
+        infiles.append(infile)
+
+    args = ['-k', '20', '-e', '0.01']
+    args += infiles
+
+    _, out, err = utils.runscript('unique-kmers.py', args,
+                                  os.path.dirname(infile))
+
+    err = err.splitlines()
+    assert ('Estimated number of unique 20-mers in {0}: 3950'
+            .format(infiles[0]) in err)
+    assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
+            in err)
+    assert 'Total estimated number of unique 20-mers: 4170' in err

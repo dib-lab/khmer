@@ -8,10 +8,19 @@
 #ifndef HLLCOUNTER_HH
 #define HLLCOUNTER_HH
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "khmer.hh"
 #include "read_parsers.hh"
+
+namespace khmer
+{
+namespace read_parsers
+{
+struct IParser;
+}  // namespace read_parsers
+}  // namespace khmer
 
 
 namespace khmer
@@ -26,9 +35,11 @@ public:
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
     void consume_fasta(std::string const &,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     void consume_fasta(read_parsers::IParser *,
+                       bool,
                        unsigned int &,
                        unsigned long long &);
     unsigned int check_and_process_read(std::string &,
@@ -72,7 +83,7 @@ private:
     void init(int p, WordLength ksize);
 };
 
-};
+}
 
 #ifdef __cplusplus
 extern "C" {

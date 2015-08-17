@@ -11,6 +11,7 @@ Single entry point script for khmer
 """
 
 import argparse
+import sys
 import textwrap
 from khmer import khmer_args
 from oxli import build_graph
@@ -27,7 +28,7 @@ def get_parser():
 
     subparsers = parser.add_subparsers()
 
-    # build-graph (formerly load-graph) parsers here
+    # build-graph (formerly load-into-nodegraph) parsers here
     parser_build_graph = \
         subparsers.add_parser('build-graph',
                               help="Load sequences into the compressible graph"
@@ -35,9 +36,9 @@ def get_parser():
                               description="Load sequences into the "
                               "compressible graph format plus optional tagset")
 
-    khmer_args.build_hashbits_args("Load sequences into the compressible"
-                                   "graph format plus optional tagset.",
-                                   None, parser=parser_build_graph)
+    khmer_args.build_nodegraph_args("Load sequences into the compressible"
+                                    "graph format plus optional tagset.",
+                                    None, parser=parser_build_graph)
     build_graph.build_parser(parser_build_graph)
     parser_build_graph.set_defaults(func=build_graph.main)
 
@@ -48,7 +49,10 @@ def main():
     """
     main function; does the parsing and kicks off the subcommand
     """
-    args = get_parser().parse_args()
+    if (len(sys.argv) < 2):
+        args = get_parser().parse_args(['--help'])
+    else:
+        args = get_parser().parse_args()
     args.func(args)
 
 if __name__ == '__main__':

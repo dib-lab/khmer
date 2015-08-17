@@ -29,9 +29,7 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import argparse
 import khmer, oxli
-from khmer.khmer_args import info
-from oxli.functions import estimate_optimal_with_N_and_M
-from oxli.functions import estimate_optimal_with_N_and_f
+from khmer.khmer_args import info, optimal_size, sanitize_epilog
 import textwrap
 import sys
 
@@ -69,14 +67,14 @@ def get_parser():
                         + khmer.__version__)
     return parser
 
-    
+
 def main():
     info('estimate_optimal_hash.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     N = args.N
     if args.M:
         M = args.M
-        result = estimate_optimal_with_N_and_M(N,M)
+        result = optimal_size(N, M=M)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
         print("size of memory available to use:      ", M, file=sys.stderr)
         print("optimal number of hash tables:        ", result.num_htables,
@@ -87,10 +85,10 @@ def main():
               file=sys.stderr)
         print("estimated usage of memory:            ", result.mem_use,
               file=sys.stderr)
-        
+
     elif args.f:
         f = args.f
-        result = estimate_optimal_with_N_and_f(N,f)
+        result = optimal_size(N, f=f)
         print("number of estimated distinct k-mers:  ", N, file=sys.stderr)
         print("desired maximum false positive rate:  ", f, file=sys.stderr)
         print("optimal number of hash tables:        ", result.num_htables,

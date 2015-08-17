@@ -27,8 +27,9 @@ import textwrap
 import sys
 
 import khmer
-from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.kfile import (check_input_files, add_output_compression_type,
+                         get_file_writer)
+from khmer.khmer_args import info, sanitize_epilog
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -46,7 +47,7 @@ def get_parser():
     but take :option:`-S`/:option:`--samples` samples if specified.
 
     The output is placed in :option:`-o`/:option:`--output` <file>
-    (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
+    (for a single sample) or in `<file>.subset.0` to `<file>.subset.S-1`
     (for more than one sample).
 
     This script uses the `reservoir sampling
@@ -65,27 +66,27 @@ def get_parser():
                         default=DEFAULT_MAX_READS)
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
-    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
+    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed',
+                        help='Provide a random seed for the generator')
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
-                        metavar='output_file',
-                        type=argparse.FileType('w'), default=None)
+                        type=argparse.FileType('wb'),
+                        metavar="filename", default=None)
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
     info('sample-reads-randomly.py')
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
 
     for _ in args.filenames:
         check_input_files(_, args.force)
-
-    check_space(args.filenames, args.force)
 
     # seed the random number generator?
     if args.random_seed:
@@ -96,18 +97,22 @@ def main():
 
     #
     # Figure out what the output filename is going to be
-    #
 
-    output_file = args.output_file
-    if output_file:
+    if args.output_file:
+        output_filename = args.output_file.name
         if num_samples > 1:
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             if not args.force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
-        output_filename = output_file.name
     else:
         filename = args.filenames[0]
+        if filename in ('/dev/stdin', '-'):
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
@@ -131,7 +136,7 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename, parse_description=False)
+        screed_iter = screed.open(filename)
 
         for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
                 screed_iter,
@@ -162,8 +167,12 @@ def main():
     if len(reads) == 1:
         print('Writing %d sequences to %s' %
               (len(reads[0]), output_filename), file=sys.stderr)
+
+        output_file = args.output_file
         if not output_file:
-            output_file = open(output_filename, 'w')
+            output_file = open(output_filename, 'wb')
+
+        output_file = get_file_writer(output_file, args.gzip, args.bzip)
 
         for records in reads[0]:
             write_record(records[0], output_file)
@@ -174,7 +183,8 @@ def main():
             n_filename = output_filename + '.%d' % n
             print('Writing %d sequences to %s' %
                   (len(reads[n]), n_filename), file=sys.stderr)
-            output_file = open(n_filename, 'w')
+            output_file = get_file_writer(open(n_filename, 'wb'), args.gzip,
+                                          args.bzip)
             for records in reads[n]:
                 write_record(records[0], output_file)
                 if records[1] is not None:

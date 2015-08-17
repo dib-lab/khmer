@@ -21,9 +21,10 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import build_counting_args, report_on_config, info
+from khmer.khmer_args import (build_counting_args, report_on_config, info,
+                              calculate_graphsize, sanitize_epilog)
 from khmer.kfile import check_input_files, check_space
-from khmer.kfile import check_space_for_hashtable
+from khmer.kfile import check_space_for_graph
 import argparse
 import screed
 
@@ -47,14 +48,14 @@ def get_parser():
 
     parser = build_counting_args("Collect reads until a given avg coverage.",
                                  epilog=textwrap.dedent(epilog))
-    parser.add_argument('output_countingtable_filename', help="The name of the"
-                        " file to write the k-mer counting table to.")
+    parser.add_argument('output_countgraph_filename', help="The name of the"
+                        " file to write the k-mer countgraph to.")
     parser.add_argument('input_sequence_filename', nargs='+',
                         help="The names of one or more FAST[AQ] input "
                         "sequence files.")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
-    parser.add_argument('-C', '--coverage', type=int,
+    parser.add_argument('-C', '--coverage', type=int, default=50,
                         help='Collect reads until this coverage, then exit.')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'),
                         help='Write collect reads into this file.')
@@ -67,19 +68,21 @@ def get_parser():
 def main():
 
     info('collect-reads.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)
 
-    base = args.output_countingtable_filename
+    base = args.output_countgraph_filename
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
         check_input_files(name, False)
 
     check_space(args.input_sequence_filename, False)
-    check_space_for_hashtable(args, 'countgraph', False)
+    tablesize = calculate_graphsize(args, 'countgraph')
+    check_space_for_graph(args.output_countgraph_filename, tablesize,
+                              False)
 
-    print('Saving k-mer counting table to %s' % base)
+    print('Saving k-mer countgraph to %s' % base)
     print('Loading sequences from %s' % repr(filenames))
     if args.output:
         print('Outputting sequences to', args.output)

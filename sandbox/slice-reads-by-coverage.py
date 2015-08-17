@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--min-coverage', type=int, default=None)
     parser.add_argument('-M', '--max-coverage', type=int, default=None)
-    parser.add_argument('input_counting_table')
+    parser.add_argument('input_count_graph')
     parser.add_argument('input_readfile')
     parser.add_argument('output_readfile')
     args = parser.parse_args()
@@ -39,7 +39,7 @@ def main():
         print("min_coverage > max_coverage!? exiting!", file=sys.stderr)
         sys.exit(1)
 
-    htable = khmer.load_counting_hash(args.input_counting_table)
+    htable = khmer.load_countgraph(args.input_count_graph)
     output_file = args.output_readfile
     output_fp = open(output_file, 'w')
 
