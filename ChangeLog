@@ -2,6 +2,7 @@
 
    * doc/index.rst: update introductory text.
    * doc/user/biblio.rst: update bibliography link descriptions and text.
+   * doc/_static/labibi.css: reference new location of base CSS
 
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
