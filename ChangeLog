@@ -2,6 +2,8 @@
 
 2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
    reflows the text of ArgParse descriptions and epilog while preserving the
    formatting. Enhanced removal of Sphinx directives by replacing double
@@ -24,6 +26,8 @@
    functionality.
    * scripts/{do-partition,abundance-dist,abundance-dist-single,
    extract-long-sequences}.py: Added an example command to the epilog.
+   * tests/khmer_tst_utils.py: Added 'name' attribute to make the fake
+   sys.stdout more like a read stdout object.
 
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 

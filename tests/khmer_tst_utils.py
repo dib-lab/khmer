@@ -121,6 +121,7 @@ def runscript(scriptname, args, in_directory=None,
 
         oldout, olderr = sys.stdout, sys.stderr
         sys.stdout = StringIO()
+        sys.stdout.name = "StringIO"
         sys.stderr = StringIO()
 
         if in_directory:
