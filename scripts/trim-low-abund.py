@@ -108,6 +108,9 @@ def get_parser():
     parser.add_argument('--tempdir', '-T', type=str, default='./')
     add_output_compression_type(parser)
 
+    parser.add_argument('--diginorm', default=False, action='store_true')
+    parser.add_argument('--single-pass', default=False, action='store_true')
+
     return parser
 
 
@@ -291,6 +294,9 @@ def main():
     # nothing should have been skipped yet!
     assert trimmer.n_skipped == 0
     assert trimmer.bp_skipped == 0
+
+    if args.single_pass:
+        pass2list = []
 
     # go back through all the files again.
     for _, pass2filename, trimfp in pass2list:
