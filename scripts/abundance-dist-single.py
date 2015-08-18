@@ -38,6 +38,11 @@ def get_parser():
 
     To count k-mers in multiple files use :program:`load_into_counting.py` and
     :program:`abundance_dist.py`.
+
+    Example::
+
+        abundance-dist-single.py -x 1e7 -N 2 -k 17 \\
+                tests/test-data/test-abund-read-2.fa test-dist
     '''
     parser = build_counting_args(
         descr="Calculate the abundance distribution of k-mers from a "

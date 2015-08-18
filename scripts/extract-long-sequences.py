@@ -21,6 +21,7 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import argparse
 import screed
+import textwrap
 import sys
 from khmer.utils import write_record
 from khmer.kfile import add_output_compression_type, get_file_writer
@@ -28,10 +29,15 @@ from khmer.khmer_args import ComboFormatter, sanitize_help
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        extract-long-sequences.py --length 10 tests/test-data/paired-mixed.fa
+    """
     parser = argparse.ArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
         ' specified length (default: 200 bp).',
-        formatter_class=ComboFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')

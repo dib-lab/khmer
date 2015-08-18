@@ -1,5 +1,7 @@
 2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
    reflows the text of ArgParse descriptions and epilog while preserving the
    formatting. Enhanced removal of Sphinx directives by replacing double
@@ -20,7 +22,8 @@
    * scripts/{partition-graph.py,do-partition.py}: Fixed erasure of the queue
    module name in the worker functions, which is necessary for basic
    functionality.
-   * scripts/do-partition.py: added an example command to the epilog
+   * scripts/{do-partition,abundance-dist,abundance-dist-single,
+   extract-long-sequences}.py: Added an example command to the epilog.
 
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 

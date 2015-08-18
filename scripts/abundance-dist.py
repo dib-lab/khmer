@@ -19,16 +19,24 @@ import sys
 import csv
 import khmer
 import argparse
+import textwrap
 import os
 from khmer.kfile import check_input_files
 from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        load-into-countgraph.py -x 1e7 -N 2 -k 17 counts \\
+                tests/test-data/test-abund-read-2.fa 
+        abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
+    """
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
         "the sequence file using a pre-made k-mer countgraph.",
-        formatter_class=ComboFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
                         ' input k-mer countgraph file.')
