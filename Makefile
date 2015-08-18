@@ -4,7 +4,6 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-SHELL=bash
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
