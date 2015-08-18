@@ -55,7 +55,7 @@ def get_parser():
 
     Example::
 
-        split-paired-reads.py -o reads-output-file tests/test-data/paired.fq
+        split-paired-reads.py -0 reads-output-file tests/test-data/paired.fq
 
     Example::
 

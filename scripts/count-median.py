@@ -44,7 +44,8 @@ def get_parser():
 
     Example::
 
-       count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
+        load-into-countgraph.py counts tests/test-data/test-reads.fq.gz
+        count-median.py counts tests/test-data/test-reads.fq.gz medians.txt
 
     NOTE: All 'N's in the input sequences are converted to 'A's.
     """
@@ -73,7 +74,6 @@ def main():
     htfile = args.countgraph
     input_filename = args.input
     output = args.output
-    output_filename = str(output)
 
     infiles = [htfile, input_filename]
     for infile in infiles:
@@ -84,7 +84,7 @@ def main():
     print('loading k-mer countgraph from', htfile, file=sys.stderr)
     countgraph = khmer.load_countgraph(htfile)
     ksize = countgraph.ksize()
-    print('writing to', output_filename, file=sys.stderr)
+    print('writing to', output.name, file=sys.stderr)
 
     output = csv.writer(output)
     # write headers:

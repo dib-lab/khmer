@@ -39,10 +39,10 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
 
-def worker(queue, basename, stop_big_traversals):
+def worker(que, basename, stop_big_traversals):
     while True:
         try:
-            (nodegraph, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = que.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return

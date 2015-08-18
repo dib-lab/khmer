@@ -39,14 +39,14 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"

@@ -232,9 +232,9 @@ def get_parser():
 
     Example::
 
-        normalize-by-median.py -k 17 -d 2 -s test.ct \\
+        normalize-by-median.py -k 17 -s test.ct \\
         tests/test-data/test-abund-read-2.fa \\
-        tests/test-data/test-fastq-reads"""
+        tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
@@ -252,7 +252,7 @@ def get_parser():
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
     parser.add_argument('-s', '--savegraph', metavar="filename", default='',
-                        help='save the k-mer countgraph to disk after all'
+                        help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='report_filename', type=argparse.FileType('w'))

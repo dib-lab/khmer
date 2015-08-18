@@ -132,14 +132,12 @@ def main():
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print('output in', outfile, file=sys.stderr)
+    print('output in', outfile.name, file=sys.stderr)
 
     if args.savegraph:
         print('Saving k-mer countgraph filename',
               args.savegraph, file=sys.stderr)
-        print('...saving to', args.savegraph, file=sys.stderr)
         graph.save(args.savegraph)
-    print('wrote to: ', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

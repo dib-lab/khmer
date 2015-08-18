@@ -41,10 +41,10 @@ DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
 
 
-def worker(queue, basename, stop_big_traversals):
+def worker(que, basename, stop_big_traversals):
     while True:
         try:
-            (nodegraph, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = que.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return
@@ -78,6 +78,10 @@ def get_parser():
     one script. This is convenient but should probably not be used for large
     data sets, because :program:`do-partition.py` doesn't provide save/resume
     functionality.
+
+    Example::
+
+        do-partition.py -k 20 example tests/test-data/random-20-a.fa
     """
     parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
