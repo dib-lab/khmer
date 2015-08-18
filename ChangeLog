@@ -1,3 +1,8 @@
+2015-08-18  Titus Brown  <titus@idyll.org>
+
+   * doc/index.rst: update introductory text.
+   * doc/user/biblio.rst: update bibliography link descriptions and text.
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * scripts/unique-kmers.py: Rename option --stream-out to --stream-records.
