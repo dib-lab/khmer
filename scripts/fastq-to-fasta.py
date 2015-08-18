@@ -21,12 +21,13 @@ import screed
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          is_block, describe_file_handle)
 from khmer.utils import write_record
+from khmer.khmer_args import sanitize_help, ComboFormatter
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
         description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
 
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
@@ -43,7 +44,7 @@ def get_parser():
 
 
 def main():
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     print(('fastq from ', args.input_sequence), file=sys.stderr)
     outfp = get_file_writer(args.output, args.gzip, args.bzip)

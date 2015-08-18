@@ -25,7 +25,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space, is_block
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -38,7 +38,7 @@ except ImportError:
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     The output is an interleaved set of reads, with each read in <R1> paired
     with a read in <R2>. By default, the output goes to stdout unless
     :option:`-o`/:option:`--output` is specified.
@@ -53,8 +53,7 @@ def get_parser():
                      tests/test-data/paired.fq.2 -o paired.fq"""
     parser = argparse.ArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
 
     parser.add_argument('left')
     parser.add_argument('right')
@@ -71,7 +70,7 @@ def get_parser():
 
 def main():
     info('interleave-reads.py')
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     check_input_files(args.left, args.force)
     check_input_files(args.right, args.force)

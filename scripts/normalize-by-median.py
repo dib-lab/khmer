@@ -28,7 +28,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -182,7 +182,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
@@ -278,8 +278,7 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
 
-    parser = sanitize_epilog(get_parser())
-    parser = get_parser()
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
     configure_logging(args.quiet)
     info('normalize-by-median.py', ['diginorm'])

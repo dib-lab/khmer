@@ -1,3 +1,15 @@
+2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/khmer_args.py: replaced sanitize_epilog() with santize_help() that
+   reflows the text of ArgParse descriptions and epilog while preserving the
+   formatting. Enhanced removal of Sphinx directives by replacing double
+   backticks with the double quote character.
+   * scripts/*.py: use of sanitize_epilog was renamed to sanitize_help;
+   leading newlines from triple-quoted epilogs removed; formatting made
+   consistent; sanitize_help and ComboFormatter added where it was missing; a
+   couple script specific epilog reformatting (for use of `:doc:` and a
+   hyperlinkg).
+
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * Makefile: remove BASH shell designation that appears to be incompatible

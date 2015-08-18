@@ -23,20 +23,20 @@ import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 DEFAULT_K = 32
 
 
 def get_parser():
-    epilog = """
-    Take the `${graphbase}.subset.#.pmap` files and merge them all into a
-    single ${graphbase}.pmap.merged file for :program:`annotate-partitions.py`
-    to use.
+    epilog = """\
+    Take the ``${graphbase}.subset.#.pmap`` files and merge them all into a
+    single ``${graphbase}.pmap.merged`` file for
+    :program:`annotate-partitions.py` to use.
     """
     parser = argparse.ArgumentParser(
         description="Merge partition map '.pmap' files.",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',
@@ -53,7 +53,7 @@ def get_parser():
 
 def main():
     info('merge-partitions.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     output_file = args.graphbase + '.pmap.merged'
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')

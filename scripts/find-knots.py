@@ -24,7 +24,8 @@ import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config, sanitize_epilog)
+                              report_on_config, sanitize_help,
+                              ComboFormatter)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -48,14 +49,15 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Load an k-mer nodegraph/tagset pair created by
     :program:`load-into-graph.py`, and a set of pmap files created by
     :program:`partition-graph.py`. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that
-    partition; this should identify all of the HCKs in that partition. These
-    HCKs are output to <graphbase>.stoptags after each pmap file.
+    partition; this should identify all of the Highly Connected Kmers in that
+    partition. These HCKs are output to ``<graphbase>.stoptags`` after each
+    pmap file.
 
     Parameter choice is reasonably important. See the pipeline in
     :doc:`partitioning-big-data` for an example run.
@@ -78,7 +80,12 @@ def get_parser():
 
 def main():
     info('find-knots.py', ['graph'])
-    args = get_parser().parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        ":doc:`partitioning-big-data`",
+        "http://khmer.readthedocs.org/en/stable/user/partitioning-big-data.html"
+    )
+    args = sanitize_help(parser).parse_args()
 
     graphbase = args.graphbase
 

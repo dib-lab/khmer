@@ -24,13 +24,14 @@ import screed
 import sys
 from khmer.utils import write_record
 from khmer.kfile import add_output_compression_type, get_file_writer
+from khmer.khmer_args import ComboFormatter, sanitize_help
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
         ' specified length (default: 200 bp).',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
@@ -45,7 +46,7 @@ def get_parser():
 
 
 def main():
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:
         for record in screed.open(filename):

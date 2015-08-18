@@ -13,6 +13,7 @@ import sys
 import os
 import argparse
 import math
+import textwrap
 from argparse import _VersionAction
 from collections import namedtuple
 
@@ -392,10 +393,24 @@ def add_threading_args(parser):
                         help='Number of simultaneous threads to execute')
 
 
-def sanitize_epilog(parser):
-    parser.epilog = parser.epilog.replace(
-        '//', '/').replace(':option:', '').replace(
-            ':program:', '').replace('::', ':')
+def sanitize_help(parser):
+    """Remove Sphinx directives & reflow text to width of 79 characters."""
+    wrapper = textwrap.TextWrapper(width=79)
+    parser.description = wrapper.fill(parser.description)
+    if not parser.epilog:
+        return parser
+    cleanlog = parser.epilog.replace(':option:', '').replace(
+        ':program:', '').replace('::', ':').replace('``', '"')
+    newlog = prev_section = ""
+    for section in cleanlog.split('\n\n'):
+        if section.startswith('    '):
+            newlog += section + '\n'
+        else:
+            if prev_section.startswith('    '):
+                newlog += '\n'
+            newlog += wrapper.fill(section) + '\n\n'
+        prev_section = section
+    parser.epilog = newlog
     return parser
 
 _algorithms = {

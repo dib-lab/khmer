@@ -23,19 +23,19 @@ import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config, info,
                               add_threading_args, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
 
 
 def get_parser():
-    epilog = """
-    Note: with :option:`-b` the output will be the exact size of the
-    k-mer countgraph and this script will use a constant amount of memory.
-    In exchange k-mer counts will stop at 255. The memory usage of this script
-    with :option:`-b` will be about 1.15x the product of the :option:`-x` and
-    :option:`-N` numbers.
+    epilog = """\
+    Note: with :option:`-b`/:option:`--no-bigcount` the output will be the
+    exact size of the k-mer countgraph and this script will use a constant
+    amount of memory. In exchange k-mer counts will stop at 255. The memory
+    usage of this script with :option:`-b` will be about 1.15x the product of
+    the :option:`-x` and :option:`-N` numbers.
 
     Example::
 
@@ -75,7 +75,7 @@ def main():
 
     info('load-into-counting.py', ['counting', 'SeqAn'])
 
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     report_on_config(args)
 
     base = args.output_countgraph_filename

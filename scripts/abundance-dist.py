@@ -21,14 +21,14 @@ import khmer
 import argparse
 import os
 from khmer.kfile import check_input_files
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
         "the sequence file using a pre-made k-mer countgraph.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
                         ' input k-mer countgraph file.')
@@ -56,7 +56,7 @@ def get_parser():
 
 def main():
     info('abundance-dist.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]

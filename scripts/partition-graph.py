@@ -21,9 +21,12 @@ import threading
 import gc
 import os.path
 import argparse
-import khmer
+import textwrap
 import sys
-from khmer.khmer_args import (add_threading_args, info, sanitize_epilog)
+
+import khmer
+from khmer.khmer_args import (add_threading_args, info, sanitize_help,
+                              ComboFormatter)
 from khmer.kfile import check_input_files
 
 # stdlib queue module was renamed on Python 3
@@ -63,14 +66,14 @@ def worker(queue, basename, stop_big_traversals):
 
 
 def get_parser():
-    epilog = """
-    The resulting partition maps are saved as `${basename}.subset.#.pmap`
+    epilog = """\
+    The resulting partition maps are saved as ``${basename}.subset.#.pmap``
     files.
     """
     parser = argparse.ArgumentParser(
         description="Partition a sequence graph based upon waypoint "
-        "connectivity", epilog=epilog,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        "connectivity", epilog=textwrap.dedent(epilog), 
+        formatter_class=ComboFormatter)
 
     parser.add_argument('basename', help="basename of the input k-mer"
                         "nodegraph  + tagset files")
@@ -92,7 +95,7 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     basename = args.basename
 
     filenames = [basename, basename + '.tagset']

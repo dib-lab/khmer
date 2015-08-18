@@ -23,17 +23,17 @@ import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 DEFAULT_K = 32
 
 
 def get_parser():
-    epilog = """
-    Load in a partitionmap (generally produced by partition-graph.py or
-    merge-partitions.py) and annotate the sequences in the given files with
-    their partition IDs. Use :program:`extract-partitions.py` to extract
-    sequences into separate group files.
+    epilog = """\
+    Load in a partitionmap (generally produced by :program:`partition-graph.py`
+    or :program:`merge-partitions.py`) and annotate the sequences in the given
+    files with their partition IDs. Use :program:`extract-partitions.py` to
+    extract sequences into separate group files.
 
     Example (results will be in ``random-20-a.fa.part``)::
 
@@ -44,8 +44,7 @@ def get_parser():
     """
     parser = argparse.ArgumentParser(
         description="Annotate sequences with partition IDs.",
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
@@ -63,7 +62,7 @@ def get_parser():
 
 def main():
     info('annotate-partitions.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     ksize = args.ksize
     filenames = args.input_filenames

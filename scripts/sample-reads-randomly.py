@@ -29,7 +29,7 @@ import sys
 import khmer
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -38,8 +38,7 @@ DEBUG = True
 
 
 def get_parser():
-    epilog = ("""
-
+    epilog = """\
     Take a list of files containing sequences, and subsample 100,000
     sequences (:option:`-N`/:option:`--num_reads`) uniformly, using
     reservoir sampling.  Stop after first 100m sequences
@@ -47,17 +46,16 @@ def get_parser():
     but take :option:`-S`/:option:`--samples` samples if specified.
 
     The output is placed in :option:`-o`/:option:`--output` <file>
-    (for a single sample) or in `<file>.subset.0` to `<file>.subset.S-1`
+    (for a single sample) or in ``<file>.subset.0`` to ``<file>.subset.S-1``
     (for more than one sample).
 
     This script uses the `reservoir sampling
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
-    """)   # noqa
+    """
 
     parser = argparse.ArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        epilog=textwrap.dedent(epilog))
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
@@ -83,7 +81,13 @@ def get_parser():
 
 def main():
     info('sample-reads-randomly.py')
-    args = sanitize_epilog(get_parser()).parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        "`reservoir sampling\n"
+        "<http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.",
+        "reservoir sampling algorithm. "
+        "http://en.wikipedia.org/wiki/Reservoir_sampling")
+    args = sanitize_help(parser).parse_args()
 
     for _ in args.filenames:
         check_input_files(_, args.force)

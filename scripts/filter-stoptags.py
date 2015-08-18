@@ -25,22 +25,21 @@ import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Load stoptags in from the given `.stoptags` file and use them to trim
     or remove the sequences in `<file1-N>`.  Trimmed sequences will be placed
     in `<fileN>.stopfilt`.
     """
     parser = argparse.ArgumentParser(
         description="Trim sequences at stoptags.",
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
     parser.add_argument('--ksize', '-k', default=DEFAULT_K, type=int,
                         help='k-mer size')
     parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
@@ -55,7 +54,7 @@ def get_parser():
 
 def main():
     info('filter-stoptags.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 

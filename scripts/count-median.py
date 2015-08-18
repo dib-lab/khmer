@@ -30,11 +30,11 @@ import textwrap
 
 import khmer
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Count the median/avg k-mer abundance for each sequence in the input file,
     based on the k-mer counts in the given k-mer countgraph.  Can be used
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
@@ -50,7 +50,7 @@ def get_parser():
     """
     parser = argparse.ArgumentParser(
         description='Count k-mers summary stats for sequences',
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
 
     parser.add_argument('countgraph', metavar='input_count_graph_filename',
                         help='input k-mer countgraph filename')
@@ -68,7 +68,7 @@ def get_parser():
 
 def main():
     info('count-median.py', ['diginorm'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     htfile = args.countgraph
     input_filename = args.input

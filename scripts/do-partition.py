@@ -24,7 +24,7 @@ import os
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
-                              add_threading_args, sanitize_epilog)
+                              add_threading_args, sanitize_help)
 import glob
 from khmer.kfile import check_input_files, check_space
 import re
@@ -68,7 +68,7 @@ def worker(queue, basename, stop_big_traversals):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Load in a set of sequences, partition them, merge the partitions, and
     annotate the original sequences files with the partition information.
 
@@ -103,7 +103,7 @@ def get_parser():
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     report_on_config(args, graphtype='nodegraph')
 

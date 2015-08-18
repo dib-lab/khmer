@@ -24,7 +24,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import info, sanitize_help, ComboFormatter
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
@@ -32,7 +32,7 @@ from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Many read-handling programs (assemblers, mappers, etc.) require
     that you give them either perfectly interleaved files, or files
     containing only single reads. This script takes files that were
@@ -61,7 +61,8 @@ def get_parser():
     """
     parser = argparse.ArgumentParser(
         description='Take a mixture of reads and split into pairs and '
-        'orphans.', epilog=textwrap.dedent(epilog))
+        'orphans.', epilog=textwrap.dedent(epilog),
+        formatter_class=ComboFormatter)
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
     parser.add_argument('--version', action='version', version='%(prog)s ' +
                         khmer.__version__)
@@ -85,7 +86,7 @@ def get_parser():
 
 def main():
     info('extract-paired-reads.py')
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile
     check_input_files(infile, args.force)
