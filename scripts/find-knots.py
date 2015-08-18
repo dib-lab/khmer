@@ -83,7 +83,8 @@ def main():
     parser = get_parser()
     parser.epilog = parser.epilog.replace(
         ":doc:`partitioning-big-data`",
-        "http://khmer.readthedocs.org/en/stable/user/partitioning-big-data.html"
+        "http://khmer.readthedocs.org/en/stable/user/"
+        "partitioning-big-data.html"
     )
     args = sanitize_help(parser).parse_args()
 

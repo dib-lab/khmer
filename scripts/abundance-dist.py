@@ -30,7 +30,7 @@ def get_parser():
     Example::
 
         load-into-countgraph.py -x 1e7 -N 2 -k 17 counts \\
-                tests/test-data/test-abund-read-2.fa 
+                tests/test-data/test-abund-read-2.fa
         abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
     """
     parser = argparse.ArgumentParser(

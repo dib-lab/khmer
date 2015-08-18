@@ -72,7 +72,7 @@ def get_parser():
     """
     parser = argparse.ArgumentParser(
         description="Partition a sequence graph based upon waypoint "
-        "connectivity", epilog=textwrap.dedent(epilog), 
+        "connectivity", epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
 
     parser.add_argument('basename', help="basename of the input k-mer"

@@ -34,8 +34,8 @@ import screed
 def get_parser():
     descr = "Estimate number of unique k-mers, with precision <= ERROR_RATE."
     epilog = """\
-    A HyperLogLog counter is used to do cardinality estimation. Since this counter
-    is based on a tradeoff between precision and memory consumption,
+    A HyperLogLog counter is used to do cardinality estimation. Since this
+    counter is based on a tradeoff between precision and memory consumption,
     the :option:`-e`/:option:`--error-rate` can be used to control how much
     memory will be used. In practice the memory footprint is small even
     at low error rates (< 0.01).
@@ -69,7 +69,7 @@ def get_parser():
     Example::
 
         unique-kmers.py -R unique_count -k 30 \\
-        tests/test-data/test-abund-read-paired.fa"""
+        tests/test-data/test-abund-read-paired.fa"""  # noqa
     parser = argparse.ArgumentParser(
         description=descr, epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
