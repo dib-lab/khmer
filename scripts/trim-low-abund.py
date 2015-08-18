@@ -128,6 +128,8 @@ class Trimmer(object):
         self.n_skipped = 0
         self.bp_skipped = 0
 
+        self.do_normalize = False
+
     def __call__(self, reader, saver):
         graph = self.graph
         NORMALIZE_LIMIT = self.normalize_limit
@@ -176,6 +178,10 @@ class Trimmer(object):
             # otherwise, trim them if they should be trimmed, THEN write 'em
             else:
                 assert (not is_low_coverage or self.do_trim_low_abund)
+                
+                if self.do_normalize:
+                    continue
+    
                 for read, seq in zip(reads, examine):
                     _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
 
@@ -243,6 +249,8 @@ def main():
 
     trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
                       args.normalize_to)
+    if args.diginorm:
+        trimmer.do_normalize = True
 
     pass2list = []
     for filename in args.input_filenames:
