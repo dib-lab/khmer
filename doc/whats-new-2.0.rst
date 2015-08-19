@@ -31,14 +31,14 @@ New scripts
 Estimate number of unique kmers
 -------------------------------
 
-`unique-kmers.py` estimates the k-mer cardinality of a dataset using the
+:program:`unique-kmers.py` estimates the k-mer cardinality of a dataset using the
 HyperLogLog probabilistic data structure. This allows very low memory
 consumption, which can be configured through an expected error rate.
 Even with low error rate (and higher memory consumption), it is still much
 more efficient than exact counting and alternative methods.
 It supports multicore processing (using OpenMP) and streaming,
 and so can be used in conjunction with other scripts (like
-`normalize-by-median.py` and `filter-abund.py`).
+:program:`normalize-by-median.py` and :program:`filter-abund.py`).
 
 Incompatible changes
 ====================
@@ -63,7 +63,7 @@ that sets the number of tables (:option:`-N`/:option:`--num_tables`)
 and tablesize (:option:`-x`/:option:`--max-tablesize`) parameters
 automatically to match the desired memory usage.
 
-(:option:`--min-tablesize` was also renamed to
+(``--min-tablesize`` was also renamed to
 :option:`--max-tablesize` to reflect this more desirable behavior.)
 
 Binary file formats have changed
@@ -85,7 +85,7 @@ Scripts now output columnar data in CSV format by default
 ---------------------------------------------------------
 
 All scripts that output any kind of columnar data now do so in CSV format,
-with headers.  Previously this had to be enabled with :option:`--csv`.
+with headers.  Previously this had to be enabled with ``--csv``.
 (Affects :program:`abundance-dist-single.py`, :program:`abundance-dist.py`,
 :program:`count-median.py`, and :program:`count-overlap.py`.)
 :program:`normalize-by-median.py` also now outputs CSV when :option:`-R` is
@@ -94,11 +94,43 @@ used.
 load-graph.py no longer appends .pt to the specified filename
 -------------------------------------------------------------
 
-Previously, `load-graph.py` appended a `.pt` extension to the
+Previously, ``load-graph.py`` appended a `.pt` extension to the
 specified output filename and partition-graph appended a `.pt` to the
-given input filename.  Now, `load-graph.py` writes to the specified
-output filename and `partition-graph.py` does not append a `.pt` to
-the given input filename.
+given input filename.  Now, :program:`load-into-nodegraph.py` writes to the
+specified output filename and :program:`partition-graph.py` does not append a
+``.pt`` to the given input filename.
+
+Some reporting options have been turned always on
+-------------------------------------------------
+
+The total number of unique k-mers will always be reported every time a new
+countgraph is made. The ``--report-total-kmers`` option has been removed from
+:program:`abundance-dist-single.py`, :program:`filter-abund-single.py`, and
+:program:`normalize-by-median.py` to reflect this. Likewise with
+``write-fp-rate`` for :program:`load-into-countgraph.py` and
+:program:`load-into-nodegraph.py`; the false positive rate will always be
+written to the ``.info`` files.
+
+An uncommon error recovery routine was removed
+----------------------------------------------
+
+To simplify the codebase the ``--save-on-failure`` and it's helper option
+``--dump-frequency`` have been removed from :program:`normalize-by-median.py`.
+
+Single file output option names have been normalized
+----------------------------------------------------
+
+``--out`` is now :option:`--output` for both :program:`normalize-by-median.py`
+and :program:`trim-low-abund.py`.
+
+Mixed-pair sequence file format support
+---------------------------------------
+
+A final change related to the wide support in khmer for files that contain a
+mixture of single and paired sequence reads is the elimination of the
+``--force-paired``/``-p`` option from :program:`split-paired-reads.py` and the
+addition of :option:`--output-orphaned`/:option:`-0` to allow for orphaned
+reads and give them a file to be sorted into.
 
 Removed script
 --------------
