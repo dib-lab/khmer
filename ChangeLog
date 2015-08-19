@@ -1,9 +1,13 @@
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * Makefile: remove BASH shell designation that appears to be incompatible
-   with OS X Mavericks & virtualenv; refactored out BASH-isms for those who's
+   with OS X Mavericks & virtualenv; refactored out BASH-isms for those whose
    default shell isn't BASH (Debian, and others).
-   * lib/test-read-alinger.cc,read_aligner_test.sh: removed unused test files
+   * lib/test-read-aligner.cc,read_aligner_test.sh: removed unused test files
    found during search for other shell scripts with BASHisms.
 
 2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
