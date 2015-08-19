@@ -204,7 +204,7 @@ def get_parser():
     processed. :option:`-l`/:option:`--loadgraph` will load the
     specified k-mer countgraph before processing the specified
     files.  Note that these graphs are are in the same format as those
-    produced by :program:`load-into-countgraph.py` and consumed by
+    produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
 
     To append reads to an output file (rather than overwriting it), send output

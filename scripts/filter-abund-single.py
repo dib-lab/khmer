@@ -43,7 +43,7 @@ def get_parser():
     This script is constant memory.
 
     To trim reads based on k-mer abundance across multiple files, use
-    :program:`load-into-countgraph.py` and :program:`filter-abund.py`.
+    :program:`load-into-counting.py` and :program:`filter-abund.py`.
 
     Example::
 

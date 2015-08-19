@@ -1,3 +1,8 @@
+2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * *: reverted load-into-counting.py -> load-into-countgraph.py and
+   load-graph.py -> load-into nodegraph.py rename.
+
 2015-08-18  Titus Brown  <titus@idyll.org>
 
    * doc/index.rst: update introductory text.

@@ -127,7 +127,7 @@ def get_parser():
     will be used.  :option:`-l`/:option:`--loadgraph` will load the
     specified k-mer countgraph before processing the specified
     files.  Note that these tables are are in the same format as those
-    produced by :program:`load-into-countgraph.py` and consumed by
+    produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
 
     :option:`-f`/:option:`--fault-tolerant` will force the program to continue
