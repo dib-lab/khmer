@@ -166,7 +166,7 @@ counting described in:
       year = "2014",
       month = "07",
       volume = "9",
-      url = "http://dx.doi.org/10.1371%2Fjournal.pone.0101271",
+      url = "http://dx.doi.org/10.1371/journal.pone.0101271",
       pages = "e101271",
       abstract = "<p>K-mer abundance analysis is widely used for many purposes in
   nucleotide sequence analysis, including data preprocessing for de novo
