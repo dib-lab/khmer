@@ -81,7 +81,7 @@ mRNAseq assembly
    Run :program:`normalize-by-median.py` to C=20.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
-   reads into singletons using :progam:`extract-paired-reads.py`
+   reads into singletons using :program:`extract-paired-reads.py`
 
 3. Then assemble as normal, with appropriate insert size specs
    etc. for the paired end reads.
