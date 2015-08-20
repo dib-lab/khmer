@@ -51,9 +51,6 @@ For clarity the Count-Min Sketch based data structure previously known as
 ``countgraph``. Likewise with the Bloom Filter based data structure previously
 known at "hashtable", "presence_table" and variations of these is now known as
 ``nodegraph``. Many options relating to 'table' have been changes to 'graph'.
-Some scripts have been renamed: ``load-into-counting.py`` is now
-:program:`load-into-counting.py`; ``load-graph.py`` is now
-:program:`load-into-graph.py`.
 
 New parameter for tablesize/number of table parameters.
 -------------------------------------------------------
@@ -94,9 +91,9 @@ used.
 load-graph.py no longer appends .pt to the specified filename
 -------------------------------------------------------------
 
-Previously, ``load-graph.py`` appended a `.pt` extension to the
-specified output filename and partition-graph appended a `.pt` to the
-given input filename.  Now, :program:`load-into-nodegraph.py` writes to the
+Previously, :program:`load-graph.py`` appended a ``.pt`` extension to the
+specified output filename and :program:`partition-graph.py` appended a ``.pt``
+to the given input filename.  Now, :program:`load-graph.py` writes to the
 specified output filename and :program:`partition-graph.py` does not append a
 ``.pt`` to the given input filename.
 
@@ -107,8 +104,8 @@ The total number of unique k-mers will always be reported every time a new
 countgraph is made. The ``--report-total-kmers`` option has been removed from
 :program:`abundance-dist-single.py`, :program:`filter-abund-single.py`, and
 :program:`normalize-by-median.py` to reflect this. Likewise with
-``write-fp-rate`` for :program:`load-into-countgraph.py` and
-:program:`load-into-nodegraph.py`; the false positive rate will always be
+``write-fp-rate`` for :program:`load-into-counting.py` and
+:program:`load-graph.py`; the false positive rate will always be
 written to the ``.info`` files.
 
 An uncommon error recovery routine was removed
