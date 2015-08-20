@@ -1,7 +1,5 @@
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
-2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
-
    * Makefile: remove BASH shell designation that appears to be incompatible
    with OS X Mavericks & virtualenv; refactored out BASH-isms for those whose
    default shell isn't BASH (Debian, and others).
