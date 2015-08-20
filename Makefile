@@ -4,7 +4,8 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-SHELL=bash
+# `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
+# `[[` conditional expressions.
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
@@ -248,7 +249,7 @@ sloccount:
 	sloccount lib khmer scripts tests setup.py Makefile
 
 coverity-build:
-	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
+	if [ -x "${cov_analysis_dir}/bin/cov-build" ]; \
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
@@ -259,7 +260,7 @@ coverity-build:
 	fi
 
 coverity-upload: cov-int
-	if [[ -n "${COVERITY_TOKEN}" ]]; \
+	if [ -n "${COVERITY_TOKEN}" ]; \
 	then \
 		tar czf khmer-cov.tgz cov-int; \
 		curl --form token=${COVERITY_TOKEN} --form \
