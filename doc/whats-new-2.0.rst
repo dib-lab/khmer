@@ -50,7 +50,8 @@ For clarity the Count-Min Sketch based data structure previously known as
 "counting_hash" or "counting_table" and variations of these is now known as
 ``countgraph``. Likewise with the Bloom Filter based data structure previously
 known at "hashtable", "presence_table" and variations of these is now known as
-``nodegraph``. Many options relating to 'table' have been changes to 'graph'.
+``nodegraph``. Many options relating to ``table`` have been changed to
+``graph``.
 
 New parameter for tablesize/number of table parameters.
 -------------------------------------------------------
@@ -111,7 +112,7 @@ written to the ``.info`` files.
 An uncommon error recovery routine was removed
 ----------------------------------------------
 
-To simplify the codebase the ``--save-on-failure`` and it's helper option
+To simplify the codebase ``--save-on-failure`` and it's helper option
 ``--dump-frequency`` have been removed from :program:`normalize-by-median.py`.
 
 Single file output option names have been normalized
