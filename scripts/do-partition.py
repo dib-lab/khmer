@@ -73,7 +73,7 @@ def get_parser():
     annotate the original sequences files with the partition information.
 
     This script combines the functionality of
-    :program:`load-into-nodegraph.py`, :program:`partition-graph.py`,
+    :program:`load-into-graph.py`, :program:`partition-graph.py`,
     :program:`merge-partitions.py`, and :program:`annotate-partitions.py` into
     one script. This is convenient but should probably not be used for large
     data sets, because :program:`do-partition.py` doesn't provide save/resume
@@ -121,7 +121,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     print('N THREADS', args.threads, file=sys.stderr)
     print('--', file=sys.stderr)
 
-    # load-into-nodegraph
+    # load-graph.py
 
     print('making nodegraph', file=sys.stderr)
     nodegraph = khmer_args.create_nodegraph(args)

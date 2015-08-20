@@ -52,8 +52,8 @@ For clarity the Count-Min Sketch based data structure previously known as
 known at "hashtable", "presence_table" and variations of these is now known as
 ``nodegraph``. Many options relating to 'table' have been changes to 'graph'.
 Some scripts have been renamed: ``load-into-counting.py`` is now
-:program:`load-into-countgraph.py`; ``load-graph.py`` is now
-:program:`load-into-nodegraph.py`.
+:program:`load-into-counting.py`; ``load-graph.py`` is now
+:program:`load-into-graph.py`.
 
 New parameter for tablesize/number of table parameters.
 -------------------------------------------------------

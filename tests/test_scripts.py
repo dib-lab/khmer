@@ -42,7 +42,7 @@ def test_check_space():
 
 
 def test_load_into_counting():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -56,7 +56,7 @@ def test_load_into_counting():
 
 
 def test_load_into_counting_autoargs_0():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
 
     outfile = utils.get_temp_filename('table')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -72,7 +72,7 @@ def test_load_into_counting_autoargs_0():
 
 
 def test_load_into_counting_autoargs_1():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
 
     outfile = utils.get_temp_filename('table')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -86,7 +86,7 @@ def test_load_into_counting_autoargs_1():
 
 
 def test_load_into_count_graphsize_warning():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -100,7 +100,7 @@ def test_load_into_count_graphsize_warning():
 
 
 def test_load_into_counting_max_memory_usage_parameter():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-M', '2e3', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -117,7 +117,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
 
 def test_load_into_counting_abundance_dist_nobig():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-b']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -143,7 +143,7 @@ def test_load_into_counting_abundance_dist_squashing():
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args = [graphfile, infile]
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     utils.runscript(script, args)
 
     histogram = utils.get_temp_filename('histogram')
@@ -176,7 +176,7 @@ def test_load_into_counting_abundance_dist_squashing():
 
 
 def test_load_into_counting_nonwritable():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('test-nonwritable')
@@ -195,7 +195,7 @@ def test_load_into_counting_nonwritable():
 
 @attr('huge')
 def test_load_into_counting_toobig():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -209,7 +209,7 @@ def test_load_into_counting_toobig():
 
 
 def test_load_into_counting_fail():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out.ct')
@@ -224,7 +224,7 @@ def test_load_into_counting_fail():
 
 
 def test_load_into_counting_multifile():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -239,7 +239,7 @@ def test_load_into_counting_multifile():
 
 
 def test_load_into_counting_tsv():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -262,7 +262,7 @@ def test_load_into_counting_tsv():
 
 
 def test_load_into_counting_json():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -293,7 +293,7 @@ def test_load_into_counting_json():
 
 
 def test_load_into_counting_bad_summary_fmt():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -307,7 +307,7 @@ def test_load_into_counting_bad_summary_fmt():
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
     if not BIGCOUNT:
@@ -766,7 +766,7 @@ def test_count_median_fq_csv_stdout():
 
 
 def test_load_graph():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
@@ -792,7 +792,7 @@ def test_load_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-into-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -822,7 +822,7 @@ def test_oxli_build_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-into-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -854,7 +854,7 @@ def test_oxli_build_graph_unique_kmers_arg():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-into-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -868,7 +868,7 @@ def test_oxli_nocommand():
 
 
 def test_load_graph_no_tags():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -914,7 +914,7 @@ def test_oxli_build_graph_no_tags():
 
 
 def test_load_graph_fail():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -942,7 +942,7 @@ def test_oxli_build_graph_fail():
 
 
 def test_load_graph_write_fp():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -987,7 +987,7 @@ def test_oxli_build_graph_write_fp():
 
 
 def test_load_graph_multithread():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
 
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
@@ -1009,7 +1009,7 @@ def test_oxli_build_graph_multithread():
 
 
 def test_load_graph_max_memory_usage_parameter():
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-M', '2e7', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -1036,7 +1036,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1083,7 +1083,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                       do_partition=False,
                       annotate_partitions=False,
                       stop_big_traverse=False):
-    script = 'load-into-nodegraph.py'
+    script = 'load-into-graph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1941,19 +1941,19 @@ def test_interleave_reads_2_fa():
 
 
 def test_make_initial_stoptags():
-    # gen input files using load-into-nodegraph.py -t
+    # gen input files using load-into-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-nodegraph works properly
+    # this assumes (obv.) load-into-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-nodegraph.py'
+    genscript = 'load-into-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-nodegraphs
+    # test input file gen'd by load-into-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -1973,19 +1973,19 @@ def test_make_initial_stoptags():
 
 
 def test_make_initial_stoptags_load_stoptags():
-    # gen input files using load-into-nodegraph.py -t
+    # gen input files using load-into-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-nodegraph works properly
+    # this assumes (obv.) load-into-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-nodegraph.py'
+    genscript = 'load-into-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-nodegraphs
+    # test input file gen'd by load-into-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -3059,7 +3059,7 @@ def _execute_load_graph_streaming(filename):
 
     args = '-x 1e7 -N 2 -k 20 out -'
 
-    cmd = 'cat {infile} | {scripts}/load-into-nodegraph.py {args}'.format(
+    cmd = 'cat {infile} | {scripts}/load-into-graph.py {args}'.format(
         infile=infile, scripts=scripts, args=args)
 
     (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
@@ -3082,7 +3082,7 @@ def _execute_load_graph_streaming(filename):
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-into-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -3466,7 +3466,7 @@ def test_trim_low_abund_trimtest_after_load():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
-    utils.runscript('load-into-countgraph.py', args, in_dir)
+    utils.runscript('load-into-counting.py', args, in_dir)
 
     args = ["-Z", "2", "-C", "2", "-V", '--loadgraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)

@@ -41,7 +41,7 @@ def get_parser():
 
     Example::
 
-        load-into-countgraph.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 countgraph data/100k-filtered.fa
         filter-abund.py -C 2 countgraph data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(

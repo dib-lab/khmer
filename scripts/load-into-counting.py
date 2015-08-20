@@ -8,7 +8,7 @@
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 
-% load-into-countgraph.py <htname> <data1> [ <data2> <...> ]
+% load-into-counting.py <htname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -39,14 +39,14 @@ def get_parser():
 
     Example::
 
-        load-into-countgraph.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-countgraph.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"
@@ -73,7 +73,7 @@ def get_parser():
 
 def main():
 
-    info('load-into-countgraph.py', ['counting', 'SeqAn'])
+    info('load-into-counting.py', ['counting', 'SeqAn'])
 
     args = sanitize_epilog(get_parser()).parse_args()
     report_on_config(args)

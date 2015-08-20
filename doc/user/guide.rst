@@ -57,16 +57,16 @@ Broadly, normalize each insert library separately, in the following way:
 
 For high-coverage libraries (> ~50x), do three-pass digital
 normalization: run normalize-by-median to C=20 and then run
-filter-abund with C=1.  Now split out the remaining
+:program:`filter-abund.py` with C=1.  Now split out the remaining
 paired-end/interleaved and single-end reads using
-strip-and-split-for-assembly, and normalize-by-median the paired-end and
-single-end files to C=5 (in that order).
+:program:`extract-paired-reads.py`, and :program:`normalize-by-median.py` the
+paired-end and single-end files (using :option:`--unpaired-reads`) to C=5.
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
-run normalize-by-median to C=10.
+run :program:`normalize-by-median.py` to C=10.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
-   reads into singletons using strip-and-split-for-assembly
+   reads into singletons using :program:`extract-paired-reads.py`
 
 3. Then assemble as normal, with appropriate insert size specs
    etc. for the paired end reads.
@@ -78,10 +78,10 @@ mRNAseq assembly
 ~~~~~~~~~~~~~~~~
 
 1. Apply single-pass digital normalization.
-   Run normalize-by-median to C=20.
+   Run :program:`normalize-by-median.py` to C=20.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
-   reads into singletons using strip-and-split-for-assembly
+   reads into singletons using :program:`extract-paired-reads.py`
 
 3. Then assemble as normal, with appropriate insert size specs
    etc. for the paired end reads.
@@ -93,16 +93,17 @@ Metagenome assembly
 ~~~~~~~~~~~~~~~~~~~
 
 1. Apply single-pass digital normalization.
-   Run normalize-by-median to C=20 (we've also found C=10 works fine).
+   Run :program:`normalize-by-median.py` to C=20 (we've also found C=10 works
+   fine).
 
-2. Run filter-below-abund with C=50 (if you diginormed to C=10) or
-   C=100 (if you diginormed to C=20);
+2. Run ``sandbox/filter-below-abund.py`` with C=50 (if you diginormed to C=10)
+   or C=100 (if you diginormed to C=20);
 
-3. Partition reads with load-into-nodegraph, etc. etc.
+3. Partition reads with :program:`load-graph.py`, etc. etc.
 
 4. Assemble groups as normal, extracting paired-end reads and lumping
    remaining orphan reads into singletons using
-   strip-and-split-for-assembly.
+   :program:`extract-paired-reads.py`.
 
 (We actually use Velvet at this point, but there should be no harm in
 using a metagenome assembler such as MetaVelvet or MetaIDBA or
@@ -123,7 +124,7 @@ Metatranscriptome assembly
 Run normalize-by-median to C=20.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
-reads into singletons using strip-and-split-for-assembly
+reads into singletons using :program:`extract-paired-reads.py`.
 
 3. Then assemble with a genome or metagenome assembler, *not* an
 mRNAseq assembler. Use appropriate insert size specs etc. for the

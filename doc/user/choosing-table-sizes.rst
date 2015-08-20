@@ -51,9 +51,9 @@ you of the total memory usage, and (at the end) will complain if it's
 too small.
 
 Life is a bit more complicated than this, however, because some scripts --
-load-into-countgraph and load-into-nodegraph -- keep ancillary information that will
-consume memory beyond this table data structure.  So if you run out of
-memory, decrease the table size.
+:program:`load-into-counting.py` and :program:`load-into-graph.py` -- keep
+ancillary information that will consume memory beyond this table data
+structure.  So if you run out of memory, decrease the table size.
 
 Also see the rules of thumb, below.
 
@@ -69,10 +69,11 @@ means that there are false positives: the less memory you use, the
 more likely it is that khmer will think that k-mers are present when
 they are not, in fact, present.
 
-Digital normalization (normalize-by-median and filter-abund) uses
-the Count-Min Sketch data structure.
+Digital normalization (:program:`normalize-by-median.py` and
+:program:`filter-abund.py`) uses the Count-Min Sketch data structure.
 
-Graph partitioning (load-into-nodegraph etc.) uses the Bloom filter data structure.
+Graph partitioning (:program:`load-graph.py` etc.) uses the Bloom filter data
+structure.
 
 The practical ramifications of this are pretty cool.  For example,
 your digital normalization is guaranteed not to increase in memory

@@ -309,7 +309,7 @@ def test_load_into_counting_1():
 
     cmd = """
        cat {in1} |
-       {scripts}/load-into-countgraph.py -x 1e3 -N 2 -k 20 {out1} - \
+       {scripts}/load-into-counting.py -x 1e3 -N 2 -k 20 {out1} - \
        2> /dev/null
     """
 
@@ -327,7 +327,7 @@ def test_load_graph_1():
 
     cmd = """
        cat {in1} |
-       {scripts}/load-into-nodegraph.py -x 1e3 -N 2 -k 20 {out1} - \
+       {scripts}/load-into-graph.py -x 1e3 -N 2 -k 20 {out1} - \
        2> /dev/null
     """
 
