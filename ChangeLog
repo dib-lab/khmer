@@ -33,7 +33,9 @@
    and the citation header consistent across the scripts.
    * tests/test_scripts.py: added tests for the "--version" and citation
    header behavior.
-   * setup.py: turned off the "oxli" script for v2.0.
+   * tests/test_normalize_by_median.py: updated test for 'quiet' mode as
+   citation header still prints to STDERR.
+   * setup.py,tests/test_scripts.py: turned off the "oxli" script for v2.0.
 
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
