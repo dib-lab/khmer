@@ -97,7 +97,7 @@ def test_normalize_by_median_quiet():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(out) == 0, out
-    assert len(err) == 455, len(err)
+    assert len(err) < 460, len(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
