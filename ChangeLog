@@ -25,9 +25,14 @@
    * tests/khmer_tst_utils.py: Added 'name' attribute to make the fake
    sys.stdout more like a read stdout object.
    * oxli/__init__.py: removed redundant and unused help text
-   * scripts/{extract-long-sequences,fastq-to-fasta,load-into-graph,
-   normalize-by-median,readstats}.py: made "--version" and the citation header
-   consistent across the scripts.
+   * scripts/{abundance-dist,annotate-partitions,count-median,
+   extract-long-sequences,extract-paired-reads,extract-partitions,
+   fastq-to-fasta,filter-abund,filter-stopgaps,interleave-reads,
+   load-into-graph,merge-partitions,normalize-by-median,partition-graph,
+   readstats,sample-reads-randomly,split-paired-reads}.py: made "--version"
+   and the citation header consistent across the scripts.
+   * tests/test_scripts.py: added tests for the "--version" and citation
+   header behavior.
    * setup.py: turned off the "oxli" script for v2.0.
 
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
