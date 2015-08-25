@@ -708,11 +708,11 @@ def test_save_load_tagset_trunc():
 # khmer.hh in order to create "bad" versions, of course. -CTB
 
 
-def _build_testfiles():
+def test_build_testfiles():
     # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer.Nodegraph(12, 2)
+    hi = khmer.Nodegraph(12, 12, 2)
     hi.consume_fasta(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
@@ -728,7 +728,7 @@ def _build_testfiles():
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    nodegraph = khmer.Nodegraph(32, 4, 4)
+    nodegraph = khmer.Nodegraph(32, 12, 4)
     nodegraph.consume_fasta_and_tag(fakelump_fa)
 
     subset = nodegraph.do_subset_partition(0, 0)
