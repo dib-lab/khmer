@@ -12,8 +12,10 @@
 #      https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
 #
 
+set -e
+set -x
+
 KHMER_PATH=$1
-export PYTHONPATH=$KHMER_PATH/python
 
 SCRIPTPATH=$KHMER_PATH/scripts
 
