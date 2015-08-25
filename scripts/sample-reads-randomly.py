@@ -26,10 +26,11 @@ import random
 import textwrap
 import sys
 
-import khmer
+from khmer import __version__
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -71,8 +72,8 @@ def get_parser():
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)

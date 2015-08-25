@@ -24,9 +24,9 @@ import argparse
 import textwrap
 import sys
 
-import khmer
+from khmer import __version__, load_nodegraph
 from khmer.khmer_args import (add_threading_args, info, sanitize_help,
-                              ComboFormatter)
+                              ComboFormatter, _VersionStdErrAction)
 from khmer.kfile import check_input_files
 
 # stdlib queue module was renamed on Python 3
@@ -85,8 +85,8 @@ def get_parser():
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -110,7 +110,7 @@ def main():
     print('--', file=sys.stderr)
 
     print('loading nodegraph %s' % basename, file=sys.stderr)
-    nodegraph = khmer.load_nodegraph(basename)
+    nodegraph = load_nodegraph(basename)
     nodegraph.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?

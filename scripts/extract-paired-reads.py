@@ -22,9 +22,11 @@ import sys
 import os.path
 import textwrap
 import argparse
-import khmer
+
+from khmer import __version__
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
@@ -64,13 +66,11 @@ def get_parser():
         'orphans.', epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
-
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
-
     parser.add_argument('--output-paired', '-p', metavar="filename",
                         type=argparse.FileType('wb'),
                         default=None, help='Output paired reads to this '

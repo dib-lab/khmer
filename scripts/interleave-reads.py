@@ -23,9 +23,10 @@ import sys
 import os
 import textwrap
 import argparse
-import khmer
+from khmer import __version__
 from khmer.kfile import check_input_files, check_space, is_block
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -60,8 +61,8 @@ def get_parser():
     parser.add_argument('-o', '--output', metavar="filename",
                         type=argparse.FileType('wb'),
                         default=sys.stdout)
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)

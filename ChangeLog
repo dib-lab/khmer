@@ -1,8 +1,4 @@
-2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
-
-2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
-
-2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+2015-08-24  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
    reflows the text of ArgParse descriptions and epilog while preserving the
@@ -28,6 +24,11 @@
    extract-long-sequences}.py: Added an example command to the epilog.
    * tests/khmer_tst_utils.py: Added 'name' attribute to make the fake
    sys.stdout more like a read stdout object.
+   * oxli/__init__.py: removed redundant and unused help text
+   * scripts/{extract-long-sequences,fastq-to-fasta,load-into-graph,
+   normalize-by-median,readstats}.py: made "--version" and the citation header
+   consistent across the scripts.
+   * setup.py: turned off the "oxli" script for v2.0.
 
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 

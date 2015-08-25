@@ -18,10 +18,12 @@ from __future__ import print_function, unicode_literals
 import sys
 import argparse
 import screed
+from khmer import __version__
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          is_block, describe_file_handle)
 from khmer.utils import write_record
-from khmer.khmer_args import sanitize_help, ComboFormatter
+from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
+                              _VersionStdErrAction)
 
 
 def get_parser():
@@ -39,11 +41,14 @@ def get_parser():
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to keep reads containing \'N\'s in '
                              'input_sequence file. Default is to drop reads')
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     add_output_compression_type(parser)
     return parser
 
 
 def main():
+    info('fastq-to-fasta.py')
     args = sanitize_help(get_parser()).parse_args()
 
     print(('fastq from ', args.input_sequence), file=sys.stderr)

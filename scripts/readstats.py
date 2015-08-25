@@ -20,7 +20,9 @@ import screed
 import argparse
 import textwrap
 
-from khmer.khmer_args import sanitize_help, ComboFormatter
+from khmer import __version__
+from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
+                              _VersionStdErrAction)
 
 
 def get_parser():
@@ -47,6 +49,8 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the statistics, '
                         'including column headers.')
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     return parser
 
 
@@ -144,6 +148,7 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
+    info('readstats.py')
     args = sanitize_help(get_parser()).parse_args()
 
     total_bp = 0

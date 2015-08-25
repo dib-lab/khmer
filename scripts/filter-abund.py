@@ -24,7 +24,7 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
-                              sanitize_help)
+                              sanitize_help, _VersionStdErrAction)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer import __version__
@@ -71,7 +71,7 @@ def get_parser():
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
-    parser.add_argument('--version', action='version',
+    parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')

@@ -23,6 +23,7 @@ import threading
 import bz2
 import gzip
 import io
+import re
 
 from . import khmer_tst_utils as utils
 import khmer
@@ -3678,3 +3679,18 @@ def test_unique_kmers_multiple_inputs():
     assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
             in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
+
+
+def check_version(scriptname):
+    version = re.compile("^khmer .*$", re.MULTILINE)
+    status, out, err = utils.runscript(scriptname, ["--version"])
+    assert status == 0, status
+    assert out is "", out
+    assert "publication" in err, err
+    assert version.search(err) is not None, err
+
+
+def test_version():
+    for entry in os.listdir(utils.scriptpath()):
+        if entry.endswith(".py"):
+            yield check_version, entry

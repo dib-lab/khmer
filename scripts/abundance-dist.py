@@ -21,8 +21,10 @@ import khmer
 import argparse
 import textwrap
 import os
+from khmer import __version__
 from khmer.kfile import check_input_files
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 
 def get_parser():
@@ -54,8 +56,8 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')

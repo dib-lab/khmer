@@ -20,10 +20,11 @@ from __future__ import print_function
 import os
 import argparse
 import textwrap
-import khmer
 import sys
+from khmer import __version__, Nodegraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 DEFAULT_K = 32
 
@@ -53,8 +54,8 @@ def get_parser():
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequences to '
                         'annotate.')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -66,7 +67,7 @@ def main():
 
     ksize = args.ksize
     filenames = args.input_filenames
-    nodegraph = khmer.Nodegraph(ksize, 1, 1)
+    nodegraph = Nodegraph(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 

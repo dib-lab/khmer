@@ -19,13 +19,14 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import os
-import khmer
 import argparse
 import textwrap
 import sys
+from khmer import __version__, Nodegraph
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -45,8 +46,8 @@ def get_parser():
     parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -64,7 +65,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading stop tags, with K', args.ksize, file=sys.stderr)
-    nodegraph = khmer.Nodegraph(args.ksize, 1, 1)
+    nodegraph = Nodegraph(args.ksize, 1, 1)
     nodegraph.load_stop_tags(stoptags)
 
     def process_fn(record):

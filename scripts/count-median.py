@@ -28,9 +28,10 @@ import sys
 import csv
 import textwrap
 
-import khmer
+from khmer import __version__, load_countgraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_help, ComboFormatter
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 
 def get_parser():
@@ -60,8 +61,8 @@ def get_parser():
     parser.add_argument('output', metavar='output_summary_filename',
                         help='output summary filename',
                         type=argparse.FileType('w'))
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -82,7 +83,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer countgraph from', htfile, file=sys.stderr)
-    countgraph = khmer.load_countgraph(htfile)
+    countgraph = load_countgraph(htfile)
     ksize = countgraph.ksize()
     print('writing to', output.name, file=sys.stderr)
 
