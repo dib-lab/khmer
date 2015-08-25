@@ -3692,7 +3692,6 @@ def check_version(scriptname):
     version = re.compile("^khmer .*$", re.MULTILINE)
     status, out, err = utils.runscript(scriptname, ["--version"])
     assert status == 0, status
-    assert out is "", out
     assert "publication" in err, err
     assert version.search(err) is not None, err
 
