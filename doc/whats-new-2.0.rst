@@ -13,7 +13,7 @@ Digital normalization script now supports mixed paired and unpaired read input
 :program:`normalize-by-median.py` now supports mixed paired and unpaired (or
 "broken-paired") input. Behavior can be forced to either treat all
 reads as singletons or to require all reads be properly paired using
-:option:`--force-single` or :option:`--paired`, respectively. If
+:option:`--force_single` or :option:`--paired`, respectively. If
 :option:`--paired` is set, :option:`--unpaired-reads` can be used to
 include a file of unpaired reads. The unpaired reads will be examined
 after all of the other sequence files.
@@ -24,6 +24,40 @@ Reservoir sampling script extracts paired reads by default
 :program:`sample-reads-randomly.py` now retains pairs in the output, by
 default.  This can be overridden to match previous behavior
 with :option:`--force_single`.
+
+Mixed-pair sequence file format support
+---------------------------------------
+
+:option:`--output-orphaned`/:option:`-0` has been added to
+:`program:`split-paired-reads.py` to allow for orphaned reads and give them a
+file to be sorted into.
+
+Streaming I/O from Unix Pipes
+-----------------------------
+
+All scripts now accept input from named (like ``/dev/stdin``, or that created
+using ``<( list )`` process substituion) and unamed pipes (like output piped in
+from another program with ``|``). The STDIN stream can also be specified using
+a single dash: ``-``.
+
+New parameter for tablesize/number of table parameters.
+-------------------------------------------------------
+
+There is now a :option:`-M`/:option:`--max-memory-usage` parameter
+that sets the number of tables (:option:`-N`/:option:`--num_tables`)
+and tablesize (:option:`-x`/:option:`--max-tablesize`) parameters
+automatically to match the desired memory usage.
+
+Scripts now output columnar data in CSV format by default
+---------------------------------------------------------
+
+All scripts that output any kind of columnar data now do so in CSV format,
+with headers.  Previously this had to be enabled with ``--csv``.
+(Affects :program:`abundance-dist-single.py`, :program:`abundance-dist.py`,
+:program:`count-median.py`, and :program:`count-overlap.py`.)
+:program:`normalize-by-median.py` also now outputs CSV when :option:`-R` is
+used.
+
 
 New scripts
 ===========
@@ -53,16 +87,6 @@ known at "hashtable", "presence_table" and variations of these is now known as
 ``nodegraph``. Many options relating to ``table`` have been changed to
 ``graph``.
 
-New parameter for tablesize/number of table parameters.
--------------------------------------------------------
-
-There is now a :option:`-M`/:option:`--max-memory-usage` parameter
-that sets the number of tables (:option:`-N`/:option:`--num_tables`)
-and tablesize (:option:`-x`/:option:`--max-tablesize`) parameters
-automatically to match the desired memory usage.
-
-(``--min-tablesize`` was also renamed to
-:option:`--max-tablesize` to reflect this more desirable behavior.)
 
 Binary file formats have changed
 --------------------------------
@@ -78,16 +102,6 @@ with v2.0; the reverse is also true.
 In addition to the ``OXLI`` string, the Nodegraph and Countgraph file format
 now includes the number of occupied bins. See :doc:`dev/binary-file-formats`
 for details.
-
-Scripts now output columnar data in CSV format by default
----------------------------------------------------------
-
-All scripts that output any kind of columnar data now do so in CSV format,
-with headers.  Previously this had to be enabled with ``--csv``.
-(Affects :program:`abundance-dist-single.py`, :program:`abundance-dist.py`,
-:program:`count-median.py`, and :program:`count-overlap.py`.)
-:program:`normalize-by-median.py` also now outputs CSV when :option:`-R` is
-used.
 
 load-graph.py no longer appends .pt to the specified filename
 -------------------------------------------------------------
@@ -112,7 +126,7 @@ written to the ``.info`` files.
 An uncommon error recovery routine was removed
 ----------------------------------------------
 
-To simplify the codebase ``--save-on-failure`` and it's helper option
+To simplify the codebase ``--save-on-failure`` and its helper option
 ``--dump-frequency`` have been removed from :program:`normalize-by-median.py`.
 
 Single file output option names have been normalized
@@ -121,14 +135,16 @@ Single file output option names have been normalized
 ``--out`` is now :option:`--output` for both :program:`normalize-by-median.py`
 and :program:`trim-low-abund.py`.
 
-Mixed-pair sequence file format support
----------------------------------------
+Miscellaneous changes
+---------------------
+The common option ``--min-tablesize`` was renamed to
+:option:`--max-tablesize` to reflect this more desirable behavior.)
 
-A final change related to the wide support in khmer for files that contain a
-mixture of single and paired sequence reads is the elimination of the
-``--force-paired``/``-p`` option from :program:`split-paired-reads.py` and the
-addition of :option:`--output-orphaned`/:option:`-0` to allow for orphaned
-reads and give them a file to be sorted into.
+In conjuction with the new :option:`--output-orphaned` option for
+:program:`split-paired-reads.py`, the option ``--force-paired``/``-p`` has been
+eliminated.
+
+As CSV format is now the default the ``--csv`` option has been removed.
 
 Removed script
 --------------

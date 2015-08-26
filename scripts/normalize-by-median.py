@@ -196,7 +196,7 @@ def get_parser():
     :option:`--unpaired-reads` can be used to supply a file of orphan
     reads to be read after the paired reads.
 
-    :option:`--force-single` will ignore all pairing information and treat
+    :option:`--force_single` will ignore all pairing information and treat
     reads individually.
 
     With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
@@ -244,7 +244,7 @@ def get_parser():
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')
-    parser.add_argument('--force-single', dest='force_single',
+    parser.add_argument('--force_single', dest='force_single',
                         action='store_true',
                         help='treat all sequences as single-ended/unpaired')
     parser.add_argument('-u', '--unpaired-reads',

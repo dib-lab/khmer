@@ -1,4 +1,4 @@
-2015-08-19  Michael R. Crusoe  <crusoe@ucdavis.edu>
+2015-08-25  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * doc/whats-new-2.0.rst: Many updates from `diff`ing the `--help` output of
    version 1.4.1 vs now.
