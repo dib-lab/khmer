@@ -1,3 +1,9 @@
+2015-08-26  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/test_scripts.py: removed the unused `_DEBUG_make_graph` function in
+   favor of other debugging methods like `ipdb`. Added
+   test_do_partition_no_big_traverse and test_extract_paired_reads_unpaired.
+
 2015-08-24  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
