@@ -179,7 +179,7 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'https://khmer.readthedocs.org/',
-        "packages": ['khmer', 'khmer.tests'],
+        "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
