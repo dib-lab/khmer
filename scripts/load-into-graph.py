@@ -16,7 +16,7 @@ Use '-h' for parameter help.
 
 import sys
 
-from khmer.khmer_args import build_nodegraph_args
+from khmer.khmer_args import build_nodegraph_args, info
 from oxli import build_graph
 
 
@@ -29,6 +29,7 @@ def get_parser():
 
 
 if __name__ == '__main__':
+    info('load-into-graph.py', ['graph', 'SeqAn'])
     build_graph.main(get_parser().parse_args())
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

@@ -21,9 +21,12 @@ import threading
 import gc
 import os.path
 import argparse
-import khmer
+import textwrap
 import sys
-from khmer.khmer_args import (add_threading_args, info, sanitize_epilog)
+
+from khmer import __version__, load_nodegraph
+from khmer.khmer_args import (add_threading_args, info, sanitize_help,
+                              ComboFormatter, _VersionStdErrAction)
 from khmer.kfile import check_input_files
 
 # stdlib queue module was renamed on Python 3
@@ -36,10 +39,10 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
 
-def worker(queue, basename, stop_big_traversals):
+def worker(tasks, basename, stop_big_traversals):
     while True:
         try:
-            (nodegraph, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = tasks.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return
@@ -63,14 +66,14 @@ def worker(queue, basename, stop_big_traversals):
 
 
 def get_parser():
-    epilog = """
-    The resulting partition maps are saved as `${basename}.subset.#.pmap`
+    epilog = """\
+    The resulting partition maps are saved as ``${basename}.subset.#.pmap``
     files.
     """
     parser = argparse.ArgumentParser(
         description="Partition a sequence graph based upon waypoint "
-        "connectivity", epilog=epilog,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        "connectivity", epilog=textwrap.dedent(epilog),
+        formatter_class=ComboFormatter)
 
     parser.add_argument('basename', help="basename of the input k-mer"
                         "nodegraph  + tagset files")
@@ -82,8 +85,8 @@ def get_parser():
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -92,7 +95,7 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     basename = args.basename
 
     filenames = [basename, basename + '.tagset']
@@ -107,7 +110,7 @@ def main():
     print('--', file=sys.stderr)
 
     print('loading nodegraph %s' % basename, file=sys.stderr)
-    nodegraph = khmer.load_nodegraph(basename)
+    nodegraph = load_nodegraph(basename)
     nodegraph.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?

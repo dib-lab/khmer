@@ -23,6 +23,7 @@ import threading
 import bz2
 import gzip
 import io
+import re
 
 from . import khmer_tst_utils as utils
 import khmer
@@ -798,6 +799,7 @@ def test_load_graph():
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_build_graph():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
@@ -828,6 +830,7 @@ def test_oxli_build_graph():
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_build_graph_unique_kmers_arg():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
@@ -860,6 +863,7 @@ def test_oxli_build_graph_unique_kmers_arg():
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_nocommand():
     script = 'oxli'
 
@@ -890,6 +894,7 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
+@attr('known_failing')
 def test_oxli_build_graph_no_tags():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
@@ -927,6 +932,7 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+@attr('known_failing')
 def test_oxli_build_graph_fail():
     script = 'oxli'
     args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -963,6 +969,7 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
+@attr('known_failing')
 def test_oxli_build_graph_write_fp():
     script = 'oxli'
     # use small HT
@@ -997,6 +1004,7 @@ def test_load_graph_multithread():
     (status, out, err) = utils.runscript(script, args)
 
 
+@attr('known_failing')
 def test_oxli_build_graph_multithread():
     script = 'oxli'
 
@@ -3678,3 +3686,17 @@ def test_unique_kmers_multiple_inputs():
     assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
             in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
+
+
+def check_version(scriptname):
+    version = re.compile("^khmer .*$", re.MULTILINE)
+    status, out, err = utils.runscript(scriptname, ["--version"])
+    assert status == 0, status
+    assert "publication" in err, err
+    assert version.search(err) is not None, err
+
+
+def test_version():
+    for entry in os.listdir(utils.scriptpath()):
+        if entry.endswith(".py"):
+            yield check_version, entry

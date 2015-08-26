@@ -27,7 +27,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
@@ -37,8 +37,9 @@ DEFAULT_CUTOFF = 2
 
 
 def get_parser():
-    epilog = """
-    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt.
+    epilog = """\
+    Trimmed sequences will be placed in
+    ``${input_sequence_filename}.abundfilt``.
 
     This script is constant memory.
 
@@ -69,7 +70,7 @@ def get_parser():
 
 def main():
     info('filter-abund-single.py', ['counting', 'SeqAn'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
@@ -131,14 +132,12 @@ def main():
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print('output in', outfile, file=sys.stderr)
+    print('output in', outfile.name, file=sys.stderr)
 
     if args.savegraph:
         print('Saving k-mer countgraph filename',
               args.savegraph, file=sys.stderr)
-        print('...saving to', args.savegraph, file=sys.stderr)
         graph.save(args.savegraph)
-    print('wrote to: ', outfile, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

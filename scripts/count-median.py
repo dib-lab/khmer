@@ -28,13 +28,14 @@ import sys
 import csv
 import textwrap
 
-import khmer
+from khmer import __version__, load_countgraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Count the median/avg k-mer abundance for each sequence in the input file,
     based on the k-mer counts in the given k-mer countgraph.  Can be used
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
@@ -44,13 +45,14 @@ def get_parser():
 
     Example::
 
-       count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
+        load-into-countgraph.py counts tests/test-data/test-reads.fq.gz
+        count-median.py counts tests/test-data/test-reads.fq.gz medians.txt
 
     NOTE: All 'N's in the input sequences are converted to 'A's.
     """
     parser = argparse.ArgumentParser(
         description='Count k-mers summary stats for sequences',
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
 
     parser.add_argument('countgraph', metavar='input_count_graph_filename',
                         help='input k-mer countgraph filename')
@@ -59,8 +61,8 @@ def get_parser():
     parser.add_argument('output', metavar='output_summary_filename',
                         help='output summary filename',
                         type=argparse.FileType('w'))
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -68,12 +70,11 @@ def get_parser():
 
 def main():
     info('count-median.py', ['diginorm'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     htfile = args.countgraph
     input_filename = args.input
     output = args.output
-    output_filename = str(output)
 
     infiles = [htfile, input_filename]
     for infile in infiles:
@@ -82,9 +83,9 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer countgraph from', htfile, file=sys.stderr)
-    countgraph = khmer.load_countgraph(htfile)
+    countgraph = load_countgraph(htfile)
     ksize = countgraph.ksize()
-    print('writing to', output_filename, file=sys.stderr)
+    print('writing to', output.name, file=sys.stderr)
 
     output = csv.writer(output)
     # write headers:

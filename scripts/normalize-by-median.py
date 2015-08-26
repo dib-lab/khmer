@@ -28,7 +28,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -182,7 +182,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
@@ -232,9 +232,9 @@ def get_parser():
 
     Example::
 
-        normalize-by-median.py -k 17 -d 2 -s test.ct \\
+        normalize-by-median.py -k 17 -s test.ct \\
         tests/test-data/test-abund-read-2.fa \\
-        tests/test-data/test-fastq-reads"""
+        tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
@@ -252,7 +252,7 @@ def get_parser():
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
     parser.add_argument('-s', '--savegraph', metavar="filename", default='',
-                        help='save the k-mer countgraph to disk after all'
+                        help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='report_filename', type=argparse.FileType('w'))
@@ -277,12 +277,10 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-
-    parser = sanitize_epilog(get_parser())
-    parser = get_parser()
+    info('normalize-by-median.py', ['diginorm'])
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
     configure_logging(args.quiet)
-    info('normalize-by-median.py', ['diginorm'])
     report_on_config(args)
 
     report_fp = args.report

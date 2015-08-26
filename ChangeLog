@@ -1,3 +1,42 @@
+2015-08-24  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
+   reflows the text of ArgParse descriptions and epilog while preserving the
+   formatting. Enhanced removal of Sphinx directives by replacing double
+   backticks with the double quote character.
+   * scripts/*.py: Renamed sanitize_epilog to sanitize_help; leading newlines
+   from triple-quoted epilogs removed; formatting made consistent;
+   sanitize_help and ComboFormatter added where it was missing; a couple
+   script specific epilog reformatting (for use of `:doc:` and a
+   hyperlink).
+   * scripts/{count-median,filter-abund-single}.py: Fixed printing of output
+   file name to do so instead of printing information about the file handle.
+   * scripts/count-median.py: Added missing command so that example given
+   actually works.
+   * scripts/filter-abund-single.py: Removed redundant printing of output file
+   names.
+   * scripts/normalize-by-median.py: Removed unused option "-d" from an example
+   command (left over from the "--dump-frequency" era).
+   * scripts/{partition-graph.py,do-partition.py}: Fixed erasure of the queue
+   module name in the worker functions, which is necessary for basic
+   functionality.
+   * scripts/{do-partition,abundance-dist,abundance-dist-single,
+   extract-long-sequences}.py: Added an example command to the epilog.
+   * tests/khmer_tst_utils.py: Added 'name' attribute to make the fake
+   sys.stdout more like a read stdout object.
+   * oxli/__init__.py: removed redundant and unused help text
+   * scripts/{abundance-dist,annotate-partitions,count-median,
+   extract-long-sequences,extract-paired-reads,extract-partitions,
+   fastq-to-fasta,filter-abund,filter-stopgaps,interleave-reads,
+   load-into-graph,merge-partitions,normalize-by-median,partition-graph,
+   readstats,sample-reads-randomly,split-paired-reads}.py: made "--version"
+   and the citation header consistent across the scripts.
+   * tests/test_scripts.py: added tests for the "--version" and citation
+   header behavior.
+   * tests/test_normalize_by_median.py: updated test for 'quiet' mode as
+   citation header still prints to STDERR.
+   * setup.py,tests/test_scripts.py: turned off the "oxli" script for v2.0.
+
 2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * Makefile: remove BASH shell designation that appears to be incompatible

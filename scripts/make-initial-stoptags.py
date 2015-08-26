@@ -17,7 +17,7 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, sanitize_epilog)
+from khmer.khmer_args import (build_counting_args, info, sanitize_help)
 from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -41,7 +41,7 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Loads a k-mer nodegraph/tagset pair created by
     :program:`load-into-graph.py`, and
     does a small set of traversals from graph waypoints; on these traversals,
@@ -73,7 +73,7 @@ def get_parser():
 def main():
 
     info('make-initial-stoptags.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     graphbase = args.graphbase
 

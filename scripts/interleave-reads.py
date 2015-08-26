@@ -23,9 +23,10 @@ import sys
 import os
 import textwrap
 import argparse
-import khmer
+from khmer import __version__
 from khmer.kfile import check_input_files, check_space, is_block
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -38,7 +39,7 @@ except ImportError:
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     The output is an interleaved set of reads, with each read in <R1> paired
     with a read in <R2>. By default, the output goes to stdout unless
     :option:`-o`/:option:`--output` is specified.
@@ -49,20 +50,19 @@ def get_parser():
 
     Example::
 
-             interleave-reads.py tests/test-data/paired.fq.1 \\
-                     tests/test-data/paired.fq.2 -o paired.fq"""
+        interleave-reads.py tests/test-data/paired.fq.1 \\
+                tests/test-data/paired.fq.2 -o paired.fq"""
     parser = argparse.ArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
 
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
                         type=argparse.FileType('wb'),
                         default=sys.stdout)
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -71,7 +71,7 @@ def get_parser():
 
 def main():
     info('interleave-reads.py')
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     check_input_files(args.left, args.force)
     check_input_files(args.right, args.force)

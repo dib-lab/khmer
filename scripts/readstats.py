@@ -20,12 +20,14 @@ import screed
 import argparse
 import textwrap
 
-from khmer.khmer_args import sanitize_epilog
+from khmer import __version__
+from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
+                              _VersionStdErrAction)
 
 
 def get_parser():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
-    epilog = ("""
+    epilog = """\
     Report number of bases, number of sequences, and average sequence length
     for one or more FASTA/FASTQ files; and report aggregate statistics at end.
 
@@ -35,10 +37,11 @@ def get_parser():
     Example::
 
         readstats.py tests/test-data/test-abund-read-2.fa
-    """)
+    """
 
-    parser = argparse.ArgumentParser(description=descr,
-                                     epilog=textwrap.dedent(epilog))
+    parser = argparse.ArgumentParser(
+        description=descr, formatter_class=ComboFormatter,
+        epilog=textwrap.dedent(epilog),)
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
@@ -46,6 +49,8 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the statistics, '
                         'including column headers.')
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     return parser
 
 
@@ -143,8 +148,8 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
-    parser = sanitize_epilog(get_parser())
-    args = parser.parse_args()
+    info('readstats.py')
+    args = sanitize_help(get_parser()).parse_args()
 
     total_bp = 0
     total_seqs = 0

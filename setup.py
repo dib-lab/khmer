@@ -179,18 +179,18 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'https://khmer.readthedocs.org/',
-        "packages": ['khmer', 'khmer.tests', 'oxli'],
+        "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
-        "entry_points": {
-            'console_scripts': [
-                "oxli = oxli:main"
-            ]
-        },
+        # "entry_points": { # Not ready for distribution yet.
+        #    'console_scripts': [
+        #        "oxli = oxli:main"
+        #    ]
+        # },
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below

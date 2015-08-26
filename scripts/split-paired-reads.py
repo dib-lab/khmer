@@ -22,8 +22,9 @@ import sys
 import os
 import textwrap
 import argparse
-import khmer
-from khmer.khmer_args import info, sanitize_epilog
+from khmer import __version__
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
@@ -32,7 +33,7 @@ from khmer.kfile import (check_input_files, check_space,
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Some programs want paired-end read input in the One True Format, which is
     interleaved; other programs want input in the Insanely Bad Format, with
     left- and right- reads separated. This reformats the former to the latter.
@@ -55,7 +56,7 @@ def get_parser():
 
     Example::
 
-        split-paired-reads.py -o ~/reads-go-here tests/test-data/paired.fq
+        split-paired-reads.py -0 reads-output-file tests/test-data/paired.fq
 
     Example::
 
@@ -64,7 +65,7 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
         epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
 
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
@@ -82,8 +83,8 @@ def get_parser():
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
                         'file', type=argparse.FileType('wb'))
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -92,7 +93,7 @@ def get_parser():
 
 def main():
     info('split-paired-reads.py')
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile
 

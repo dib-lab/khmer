@@ -29,7 +29,7 @@ from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -50,21 +50,22 @@ def trim_record(read, trim_at):
 
 
 def get_parser():
-    epilog = """
-    The output is one file for each input file, <input file>.abundtrim, placed
-    in the current directory.  This output contains the input sequences
+    epilog = """\
+    The output is one file for each input file, ``<input file>.abundtrim``,
+    placed in the current directory.  This output contains the input sequences
     trimmed at low-abundance k-mers.
 
-    The ``-V/--variable-coverage`` parameter will, if specified,
-    prevent elimination of low-abundance reads by only trimming
+    The :option:`-V`/:option:`--variable-coverage` parameter will, if
+    specified, prevent elimination of low-abundance reads by only trimming
     low-abundance k-mers from high-abundance reads; use this for
     non-genomic data sets that may have variable coverage.
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use ``load-into-counting.py`` and ``filter-abund.py``.  However, read
-    pairs will be kept together, in "broken-paired" format; you can use
-    ``extract-paired-reads.py`` to extract read pairs and orphans.
+    use :program:`load-into-countgraph.py` and :program:`filter-abund.py`.
+    However, read pairs will be kept together, in "broken-paired" format; you
+    can use :program:`extract-paired-reads.py` to extract read pairs and
+    orphans.
 
     Example::
 
@@ -113,7 +114,7 @@ def get_parser():
 
 def main():
     info('trim-low-abund.py', ['streaming'])
-    parser = sanitize_epilog(get_parser())
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
 
     ###

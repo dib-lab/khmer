@@ -21,16 +21,25 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import argparse
 import screed
+import textwrap
 import sys
+from khmer import __version__
 from khmer.utils import write_record
 from khmer.kfile import add_output_compression_type, get_file_writer
+from khmer.khmer_args import (ComboFormatter, sanitize_help, info,
+                              _VersionStdErrAction)
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        extract-long-sequences.py --length 10 tests/test-data/paired-mixed.fa
+    """
     parser = argparse.ArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
         ' specified length (default: 200 bp).',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
@@ -40,12 +49,15 @@ def get_parser():
     parser.add_argument('-l', '--length', help='The minimum length of'
                         ' the sequence file.',
                         type=int, default=200)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    args = get_parser().parse_args()
+    info('extract-long-sequences.py')
+    args = sanitize_help(get_parser()).parse_args()
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:
         for record in screed.open(filename):

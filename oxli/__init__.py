@@ -13,7 +13,7 @@ Single entry point script for khmer
 import argparse
 import sys
 import textwrap
-from khmer import khmer_args
+from khmer.khmer_args import build_nodegraph_args
 from oxli import build_graph
 
 
@@ -30,15 +30,12 @@ def get_parser():
 
     # build-graph (formerly load-graph.py) parsers here
     parser_build_graph = \
-        subparsers.add_parser('build-graph',
-                              help="Load sequences into the compressible graph"
-                              "format plus optional tagset",
-                              description="Load sequences into the "
-                              "compressible graph format plus optional tagset")
+        subparsers.add_parser(
+            name='build-graph',
+            help="Load sequences into the compressible graph format "
+            "plus optional tagset")
 
-    khmer_args.build_nodegraph_args("Load sequences into the compressible"
-                                    "graph format plus optional tagset.",
-                                    None, parser=parser_build_graph)
+    parser_build_graph = build_nodegraph_args(parser=parser_build_graph)
     build_graph.build_parser(parser_build_graph)
     parser_build_graph.set_defaults(func=build_graph.main)
 

@@ -25,19 +25,24 @@ import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
 
 
 def get_parser():
-    epilog = '''
-    Note that with :option:`-b` this script is constant memory; in exchange,
-    k-mer counts will stop at 255. The memory usage of this script with
-    :option:`-b` will be about 1.15x the product of the :option:`-x` and
-    :option:`-N` numbers.
+    epilog = '''\
+    Note that with :option:`-b`/:option:`--no-bigcount` this script is constant
+    memory; in exchange, k-mer counts will stop at 255. The memory usage of
+    this script with :option:`-b` will be about 1.15x the product of the
+    :option:`-x` and :option:`-N` numbers.
 
     To count k-mers in multiple files use :program:`load_into_counting.py` and
     :program:`abundance_dist.py`.
+
+    Example::
+
+        abundance-dist-single.py -x 1e7 -N 2 -k 17 \\
+                tests/test-data/test-abund-read-2.fa test-dist
     '''
     parser = build_counting_args(
         descr="Calculate the abundance distribution of k-mers from a "
@@ -69,7 +74,7 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('abundance-dist-single.py', ['counting', 'SeqAn'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)

@@ -24,11 +24,12 @@ import sys
 import screed
 import argparse
 import textwrap
-import khmer
+from khmer import __version__
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -42,7 +43,7 @@ def read_partition_file(filename):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Example (results will be in ``example.group0000.fa``)::
 
         load-into-graph.py -k 20 example tests/test-data/random-20-a.fa
@@ -51,15 +52,15 @@ def get_parser():
         annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
         extract-partitions.py example random-20-a.fa.part
 
-        (extract-partitions.py will produce a partition size distribution
-        in <base>.dist. The columns are: (1) number of reads, (2) count
-        of partitions with n reads, (3) cumulative sum of partitions,
-        (4) cumulative sum of reads.)
+    (:program:`extract-partitions.py` will produce a partition size
+    distribution in <base>.dist. The columns are: (1) number of reads,
+    (2) count of partitions with n reads, (3) cumulative sum of partitions,
+    (4) cumulative sum of reads.)
     """
     parser = argparse.ArgumentParser(
         description="Separate sequences that are annotated with partitions "
         "into grouped files.", epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
     parser.add_argument('prefix', metavar='output_filename_prefix')
     parser.add_argument('part_filenames', metavar='input_partition_filename',
                         nargs='+')
@@ -75,8 +76,8 @@ def get_parser():
     parser.add_argument('--output-unassigned', '-U', default=False,
                         action='store_true',
                         help='Output unassigned sequences, too')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -86,7 +87,7 @@ def get_parser():
 # pylint: disable=too-many-statements
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('extract-partitions.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     distfilename = args.prefix + '.dist'
 

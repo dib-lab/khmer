@@ -39,7 +39,7 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.kfile import (check_input_files, check_valid_file_exists,
                          check_space)
 
@@ -206,7 +206,7 @@ def get_parser():
 
 def main():
     info('sweep-reads-buffered.py', ['sweep'])
-    parser = sanitize_epilog(get_parser())
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
 
     if args.max_tablesize < MAX_HSIZE:

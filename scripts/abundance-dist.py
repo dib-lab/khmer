@@ -19,16 +19,26 @@ import sys
 import csv
 import khmer
 import argparse
+import textwrap
 import os
+from khmer import __version__
 from khmer.kfile import check_input_files
-from khmer.khmer_args import info
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        load-into-countgraph.py -x 1e7 -N 2 -k 17 counts \\
+                tests/test-data/test-abund-read-2.fa
+        abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
+    """
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
         "the sequence file using a pre-made k-mer countgraph.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
                         ' input k-mer countgraph file.')
@@ -46,8 +56,8 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')
@@ -56,7 +66,7 @@ def get_parser():
 
 def main():
     info('abundance-dist.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]

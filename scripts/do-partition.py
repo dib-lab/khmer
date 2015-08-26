@@ -24,7 +24,7 @@ import os
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
-                              add_threading_args, sanitize_epilog)
+                              add_threading_args, sanitize_help)
 import glob
 from khmer.kfile import check_input_files, check_space
 import re
@@ -41,10 +41,10 @@ DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
 
 
-def worker(queue, basename, stop_big_traversals):
+def worker(tasks, basename, stop_big_traversals):
     while True:
         try:
-            (nodegraph, index, start, stop) = queue.get(False)
+            (nodegraph, index, start, stop) = tasks.get(False)
         except queue.Empty:
             print('exiting', file=sys.stderr)
             return
@@ -68,7 +68,7 @@ def worker(queue, basename, stop_big_traversals):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Load in a set of sequences, partition them, merge the partitions, and
     annotate the original sequences files with the partition information.
 
@@ -78,6 +78,10 @@ def get_parser():
     one script. This is convenient but should probably not be used for large
     data sets, because :program:`do-partition.py` doesn't provide save/resume
     functionality.
+
+    Example::
+
+        do-partition.py -k 20 example tests/test-data/random-20-a.fa
     """
     parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
@@ -103,7 +107,7 @@ def get_parser():
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
     info('do-partition.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     report_on_config(args, graphtype='nodegraph')
 
