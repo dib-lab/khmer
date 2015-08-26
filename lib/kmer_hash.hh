@@ -200,7 +200,7 @@ protected:
 
 public:
 
-    KmerFactory(WordLength K): _ksize(K) {}
+    explicit KmerFactory(WordLength K): _ksize(K) {}
 
     /** @param[in]  kmer_u Uniqified hash value.
      *  @return A complete Kmer object.

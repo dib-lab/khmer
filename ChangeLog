@@ -5,6 +5,35 @@
 
 2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
 
+   * .dictionary, pylintrc:  added `pylint` configuration that checks spelling
+   in Python files. Added dictionary of project specific words.
+   * khmer/__init__.py, scripts/readstats.py, setup.py: Fixed typos.
+   * Makefile: line-wrapped; bumped up `pep8` version; beefed up `cppcheck`
+   target to correctly list the defines and includes for the current platform
+   which eliminates false positives; `*.pyc` files are now cleaned from the
+   `sandbox` as well as the `dist` directory. Added `cppcheck-long` target to
+   also examine the seqan headers. Fed the dynamically constucted list of
+   includes to Doxygen. Added simultaneous OS X, Debian, and Ubuntu
+   compatibility to many targets. Added helper target to print the value of
+   any variable via `make print-VARNAME`. Fixed the `make coverage-report`
+   target!
+   * third-party/seqan/core/include/seqan/basic/debug_test_system.h,
+   third-party/seqan/ChangeLog: silenced bogus import
+   * doc/dev/coding-guidelines-and-review.rst: reformulated checklist to list
+   action followed by a motivating question.
+   * doc/dev/release.rst: added author management to release checklist
+   * lib/counting.{cc,hh},sandbox/find-high-abund-kmers.py,
+   sandbox/README.rsr: removed the unused function
+   CountingHash::collect_high_abundance_kmers and the nonfunctional sandbox
+   script that called it.
+   * lib/kmer_hash.hh: make KmerFactory's default contrustor explicit to avoid
+   auto-casting optimizations.
+   * setup.py: updated authors list. Set file encoding to `utf-8`.
+   * */*.py: a multitude of pylint inspired cleanups and bug fixes. Some
+   checks silenced in place.
+
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
    * README.rst: add depsy badge
 
 2016-05-08 Michael R. Crusoe  <michael.crusoe@gmail.com>

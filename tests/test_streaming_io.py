@@ -31,6 +31,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,invalid-name
 
 # important note -- these tests do not contribute to code coverage, because
 # of the use of subprocess to execute.  Most script tests should go into
@@ -102,7 +103,7 @@ def test_interleave_split_2_fail():
                      in1=in1, in2=in2,
                      out1=out1, out2=out2)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    (status, _, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filenames must be provided." \
            in err, err
@@ -211,7 +212,6 @@ def test_extract_paired_se():
 
 def test_extract_paired_se_fail():
     in1 = utils.get_test_data('paired-mixed.fq')
-    out_test = utils.get_test_data('paired-mixed.fq.se')
     out1 = utils.get_temp_filename('a.fq')
 
     cmd = """
@@ -221,7 +221,7 @@ def test_extract_paired_se_fail():
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    (status, _, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filenames must be provided." \
            in err, err
@@ -247,7 +247,6 @@ def test_norm_by_median_1():
 
 def test_norm_by_median_2_fail():
     in1 = utils.get_test_data('paired-mixed.fq')
-    out_test = utils.get_test_data('paired-mixed.fq.pe')
     out1 = utils.get_temp_filename('a.fq')
 
     cmd = """
@@ -258,7 +257,7 @@ def test_norm_by_median_2_fail():
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    (status, _, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err, err
@@ -291,7 +290,7 @@ def test_sample_reads_randomly_2_fail():
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    (status, _, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err, err
@@ -343,7 +342,7 @@ def test_load_into_counting_1():
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
     print(cmd)
 
-    (status, out, err) = run_shell_cmd(cmd)
+    run_shell_cmd(cmd)
     assert os.path.exists(out1)
     khmer.load_countgraph(out1)
 
@@ -361,7 +360,7 @@ def test_load_graph_1():
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
     print(cmd)
 
-    (status, out, err) = run_shell_cmd(cmd)
+    run_shell_cmd(cmd)
     assert os.path.exists(out1)
     khmer.load_nodegraph(out1)
 
@@ -403,7 +402,7 @@ def test_filter_abund_2_fail():
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1,
                      countgraph=countgraph)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    status, _, err = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err, err
@@ -427,11 +426,11 @@ def test_abundance_dist_1():
     run_shell_cmd(cmd)
 
     assert os.path.exists(out1)
-    with open(out1) as fp:
-        line = fp.readline().strip()
-        line = fp.readline().strip()
+    with open(out1) as fpout1:
+        line = fpout1.readline().strip()
+        line = fpout1.readline().strip()
         assert line == '1,96,96,0.98', line
-        line = fp.readline().strip()
+        line = fpout1.readline().strip()
         assert line == '1001,2,98,1.0', line
 
 
@@ -466,7 +465,7 @@ def test_trim_low_abund_2_fail():
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
 
-    (status, out, err) = run_shell_cmd(cmd, fail_ok=True)
+    (status, _, err) = run_shell_cmd(cmd, fail_ok=True)
     assert status != 0
     assert "Accepting input from stdin; output filename must be provided with"\
            in err, err
@@ -516,7 +515,7 @@ def test_unique_kmers_stream_out_fasta():
     cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-records {infile}"
     cmd = cmd.format(scripts=scriptpath(), infile=infile)
 
-    (status, out, err) = run_shell_cmd(cmd)
+    (_, out, err) = run_shell_cmd(cmd)
 
     expected = ('Estimated number of unique 20-mers in {infile}: 3950'
                 .format(infile=infile))
@@ -533,7 +532,7 @@ def test_unique_kmers_stream_out_fastq_with_N():
     cmd = "{scripts}/unique-kmers.py -k 20 -e 0.01 --stream-records {infile}"
     cmd = cmd.format(scripts=scriptpath(), infile=infile)
 
-    (status, out, err) = run_shell_cmd(cmd)
+    (_, out, err) = run_shell_cmd(cmd)
 
     expected = ('Estimated number of unique 20-mers in {infile}: 94'
                 .format(infile=infile))

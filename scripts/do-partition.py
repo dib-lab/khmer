@@ -46,7 +46,6 @@ from __future__ import print_function
 import khmer
 import sys
 import threading
-import gc
 import os.path
 import os
 import textwrap
@@ -232,4 +231,5 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

@@ -33,12 +33,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+"""Common argparse constructs."""
 
 from __future__ import unicode_literals
 from __future__ import print_function
 
 import sys
-import os
 import argparse
 import math
 import textwrap
@@ -47,7 +47,7 @@ from collections import namedtuple
 
 import screed
 import khmer
-from khmer import extract_countgraph_info, extract_nodegraph_info
+from khmer import extract_countgraph_info
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
@@ -58,8 +58,24 @@ DEFAULT_N_TABLES = 4
 DEFAULT_MAX_TABLESIZE = 1e6
 DEFAULT_N_THREADS = 1
 
+ALGORITHMS = {
+    'software': 'MR Crusoe et al., '
+                '2015. http://dx.doi.org/10.12688/f1000research.6924.1',
+    'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
+    'streaming': 'Q Zhang, S Awad, CT Brown, '
+                 'https://dx.doi.org/10.7287/peerj.preprints.890v1',
+    'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
+    'counting': 'Q Zhang et al., '
+                'http://dx.doi.org/10.1371/journal.pone.0101271',
+    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
+    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
+    'hll': 'Irber and Brown, unpublished'
+}
+
 
 class _VersionStdErrAction(_VersionAction):
+    # pylint: disable=too-few-public-methods, protected-access
+    """Force output to StdErr."""
 
     def __call__(self, parser, namespace, values, option_string=None):
         version = self.version
@@ -73,6 +89,7 @@ class _VersionStdErrAction(_VersionAction):
 
 class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
                      argparse.RawDescriptionHelpFormatter):
+    """Both ArgumentDefaults and RawDescription formatters."""
     pass
 
 
@@ -140,6 +157,7 @@ def check_conflicting_args(args, hashtype):
             args.max_tablesize = max_tablesize
 
 
+# pylint: disable=invalid-name
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
     Utility function for estimating optimal countgraph args where num_kmers
@@ -158,6 +176,7 @@ def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     return res(int_n_tables, ht_size, mem_cap, fp_rate)
 
 
+# pylint: disable=invalid-name
 def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     """
     Utility function for estimating optimal memory where num_kmers  is the
@@ -323,15 +342,15 @@ def build_nodegraph_args(descr=None, epilog=None, parser=None):
 
     return parser
 
-# add an argument for loadgraph with warning about parameters
-
 
 def add_loadgraph_args(parser):
+    """Common loadgraph argument."""
     parser.add_argument('-l', '--loadgraph', metavar="filename", default=None,
                         help='load a precomputed k-mer graph from disk')
 
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
+    """Transform the table parameters into a size."""
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
@@ -441,24 +460,9 @@ def sanitize_help(parser):
     parser.epilog = newlog
     return parser
 
-_algorithms = {
-    'software': 'MR Crusoe et al., '
-    '2015. http://dx.doi.org/10.12688/f1000research.6924.1',
-    'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
-    'streaming': 'Q Zhang, S Awad, CT Brown, '
-    'https://dx.doi.org/10.7287/peerj.preprints.890v1',
-    'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
-    'counting': 'Q Zhang et al., '
-    'http://dx.doi.org/10.1371/journal.pone.0101271',
-    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
-    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
-    'hll': 'Irber and Brown, unpublished'
-}
-
 
 def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
-    import khmer
 
     log_info("\n|| This is the script {name} in khmer.\n"
              "|| You are running khmer version {version}",
@@ -475,7 +479,7 @@ def info(scriptname, algorithm_list=None):
     algorithm_list.insert(0, 'software')
 
     for alg in algorithm_list:
-        algstr = "||   * " + _algorithms[alg].encode(
+        algstr = "||   * " + ALGORITHMS[alg].encode(
             'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
             log_info(algstr)
@@ -485,4 +489,5 @@ def info(scriptname, algorithm_list=None):
     log_info("||\n|| Please see http://khmer.readthedocs.org/en/"
              "latest/citations.html for details.\n")
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

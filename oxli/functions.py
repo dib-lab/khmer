@@ -38,11 +38,8 @@ A collection of functions for use throughout khmer/oxli
 """
 
 from __future__ import print_function
-from collections import namedtuple
 import threading
-import math
 import khmer.utils
-import sys
 
 
 def build_graph(ifilenames, graph, num_threads=1, tags=False):

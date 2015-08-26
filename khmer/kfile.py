@@ -42,7 +42,6 @@ import errno
 from stat import S_ISBLK, S_ISFIFO, S_ISCHR
 import gzip
 import bz2file
-from khmer import khmer_args
 
 
 def check_input_files(file_path, force):
@@ -210,6 +209,7 @@ def is_block(fthing):
 
 
 def describe_file_handle(fthing):
+    """Returns name of file or a description."""
     if is_block(fthing):
         return "block device"
     else:
@@ -230,7 +230,7 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
     ofile = None
 
     if do_gzip and do_bzip:
-        raise Exception("Cannot specify both bzip and gzip compression!")
+        raise ValueError("Cannot specify both bzip and gzip compression!")
 
     if do_gzip:
         ofile = gzip.GzipFile(fileobj=file_handle, mode='w')

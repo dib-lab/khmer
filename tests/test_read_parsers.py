@@ -32,15 +32,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,invalid-name
 
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
-import khmer
 from khmer import ReadParser
 from . import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
-from functools import reduce
+from functools import reduce  # pylint: disable=redefined-builtin
 
 
 def test_read_properties():
@@ -111,7 +111,7 @@ def test_num_reads_truncated():
     n_reads = 0
     rparser = ReadParser(utils.get_test_data("truncated.fq"))
     try:
-        for read in rparser:
+        for _ in rparser:
             n_reads += 1
     except ValueError as err:
         assert "Sequence is empty" in str(err), str(err)
@@ -122,7 +122,7 @@ def test_num_reads_truncated():
 def test_gzip_decompression():
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for read in rparser:
+    for _ in rparser:
         reads_count += 1
 
     assert 100 == reads_count
@@ -132,7 +132,7 @@ def test_gzip_decompression_truncated():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
     except OSError as err:
@@ -143,7 +143,7 @@ def test_gzip_decompression_truncated_pairiter():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
-        for read in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
     except OSError as err:
@@ -156,7 +156,7 @@ def test_bzip2_decompression():
 
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.bz2"))
-    for read in rparser:
+    for _ in rparser:
         reads_count += 1
 
     assert 100 == reads_count
@@ -166,7 +166,7 @@ def test_bzip2_decompression_truncated():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
     except OSError as err:
@@ -179,7 +179,7 @@ def test_bzip2_decompression_truncated_pairiter():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
-        for read in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
     except OSError as err:
@@ -191,7 +191,7 @@ def test_bzip2_decompression_truncated_pairiter():
 def test_badbzip2():
     try:
         rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
     except OSError as err:
@@ -208,7 +208,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     reads_count_1thr = 0
     rparser = ReadParser(utils.get_test_data(testfile))
-    for read in rparser:
+    for _ in rparser:
         reads_count_1thr += 1
 
     def count_reads(rparser, counters, tnum):
@@ -246,11 +246,11 @@ def test_old_illumina_pair_mating():
     rparser = ReadParser(utils.get_test_data("test-reads.fa"))
 
     def thread_1_runtime(rparser):
-        for read in rparser:
+        for _ in rparser:
             pass
 
     def thread_2_runtime(rparser):
-        for readnum, read in enumerate(rparser):
+        for readnum, _ in enumerate(rparser):
             if 0 == readnum:
                 pass
 
@@ -275,11 +275,11 @@ def test_casava_1_8_pair_mating():
     rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"))
 
     def thread_1_runtime(rparser):
-        for read in rparser:
+        for _ in rparser:
             pass
 
     def thread_2_runtime(rparser):
-        for readnum, read in enumerate(rparser):
+        for readnum, _ in enumerate(rparser):
             if 0 == readnum:
                 pass
             # assert "895:1:1:1761:13189 2:N:0:NNNNN" == read.name, read.name
@@ -298,7 +298,7 @@ def test_read_truncated():
 
     rparser = ReadParser(utils.get_test_data("truncated.fq"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "No exception raised on a truncated file"
     except ValueError as err:
@@ -341,11 +341,8 @@ def test_read_pair_iterator_in_error_mode():
     for read_1, read_2 \
             in rparser.iter_read_pairs(ReadParser.PAIR_MODE_ERROR_ON_UNPAIRED):
         read_pairs_2.append([read_1, read_2])
-    matches = \
-        list(map(
-            lambda rp1, rp2: rp1[0].name == rp2[0].name,
-            read_pairs_1, read_pairs_2
-        ))
+    matches = [(rp1, rp2) for rp1, rp2 in read_pairs_1, read_pairs_2
+               if rp1[0].name == rp2[0].name]
     assert all(matches)  # Assert ALL the matches. :-]
 
 
@@ -357,7 +354,7 @@ def test_read_pair_iterator_in_error_mode_xfail():
 
     failed = True
     try:
-        for rpair in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         failed = False
     except ValueError as exc:
@@ -372,10 +369,10 @@ def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
 
     failed = True
     try:
-        for rpair in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         failed = False
-    except ValueError as exc:
+    except ValueError:
         pass
     assert failed
 
@@ -399,13 +396,13 @@ def test_constructor():
 
     # Note: Using a data file with only one read.
     try:
-        rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
+        ReadParser(utils.get_test_data("single-read.fq"), "a")
         assert 0, ("ReadParser's constructor shouldn't accept a character for "
                    "the number of threads")
     except TypeError as err:
         print(str(err))
     try:
-        rparser = ReadParser("non-existent-file-name")
+        ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
     except ValueError as err:
         print(str(err))
@@ -424,4 +421,5 @@ def test_iternext():
         print(str(err))
     except ValueError as err:
         print(str(err))
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

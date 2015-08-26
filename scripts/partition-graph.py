@@ -46,8 +46,6 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import gc
-import os.path
 import argparse
 import textwrap
 import sys

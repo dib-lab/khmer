@@ -74,7 +74,7 @@ def main():
     """
     main function; does the parsing and kicks off the subcommand
     """
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         args = get_parser().parse_args(['--help'])
     else:
         args = get_parser().parse_args()

@@ -1,4 +1,3 @@
-# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
@@ -32,9 +31,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-'''Convenience functions for performing common argument-checking tasks in
-scripts.'''
-
+"""
+Convenience methods for performing common argument-checking tasks in scripts.
+"""
 from __future__ import print_function, unicode_literals
 
 
@@ -136,10 +135,11 @@ def check_is_right(name):
 
 
 class UnpairedReadsError(ValueError):
+    """ValueError with refs to the read pair in question. """
     def __init__(self, msg, r1, r2):
-        super(ValueError, self).__init__(msg)
-        self.r1 = r1
-        self.r2 = r2
+        ValueError.__init__(self, msg)
+        self.read1 = r1
+        self.read2 = r2
 
 
 def broken_paired_reader(screed_iter, min_length=None,
@@ -169,7 +169,7 @@ def broken_paired_reader(screed_iter, min_length=None,
     """
     record = None
     prev_record = None
-    n = 0
+    num = 0
 
     if force_single and require_paired:
         raise ValueError("force_single and require_paired cannot both be set!")
@@ -183,16 +183,17 @@ def broken_paired_reader(screed_iter, min_length=None,
 
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
-                yield n, True, prev_record, record  # it's a pair!
-                n += 2
+                yield num, True, prev_record, record  # it's a pair!
+                num += 2
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    e = UnpairedReadsError("Unpaired reads when require_paired"
-                                           " is set!", prev_record, record)
-                    raise e
-                yield n, False, prev_record, None
-                n += 1
+                    err = UnpairedReadsError(
+                        "Unpaired reads when require_paired is set!",
+                        prev_record, record)
+                    raise err
+                yield num, False, prev_record, None
+                num += 1
 
         prev_record = record
         record = None
@@ -202,7 +203,7 @@ def broken_paired_reader(screed_iter, min_length=None,
         if require_paired:
             raise UnpairedReadsError("Unpaired reads when require_paired "
                                      "is set!", prev_record, None)
-        yield n, False, prev_record, None
+        yield num, False, prev_record, None
 
 
 def write_record(record, fileobj):
@@ -231,4 +232,5 @@ def write_record_pair(read1, read2, fileobj):
     write_record(read2, fileobj)
 
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

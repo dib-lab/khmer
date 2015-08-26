@@ -48,11 +48,10 @@ from __future__ import print_function
 
 import screed
 import sys
-import os
 import textwrap
 import argparse
 from khmer import __version__
-from khmer.kfile import check_input_files, check_space, is_block
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
                               _VersionStdErrAction)
 from khmer.kfile import (add_output_compression_type, get_file_writer,
@@ -112,8 +111,6 @@ def main():
 
     s1_file = args.left
     s2_file = args.right
-
-    fail = False
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 

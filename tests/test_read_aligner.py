@@ -1,4 +1,3 @@
-# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
@@ -32,11 +31,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,no-member,invalid-name,unused-variable
 from __future__ import print_function
 from __future__ import absolute_import
+
 import khmer
 from . import khmer_tst_utils as utils
-# from nose.tools import assert_almost_equals
+from nose.tools import assert_almost_equals
 
 
 def pretty_compare(a, b):
@@ -84,7 +85,7 @@ def test_align_nothing():
     read = "ACCAAGGCTCGAGATTTACC"
 
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc = aligner.align(read)
 
@@ -99,10 +100,10 @@ def test_alignnocov():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume("ACCTAGGTTCGACATGTACC")
-    score, graphAlign, readAlign, trunc = aligner.align(read)
+    _, graphAlign, readAlign, trunc = aligner.align(read)
 
     # should be the same
     eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
@@ -114,10 +115,10 @@ def test_align_middle():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume(read)
-    score, graphAlign, readAlign, trunc = aligner.align(read)
+    _, graphAlign, readAlign, trunc = aligner.align(read)
 
     # should be the same
     eq_(readAlign, read)
@@ -131,12 +132,12 @@ def test_align_middle_trunc():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
 
     # omit suffix from graph
     ch.consume(read[:-5])
-    score, graphAlign, readAlign, trunc = aligner.align(read)
+    _, graphAlign, readAlign, trunc = aligner.align(read)
 
     # should not be the same...
     neq_(readAlign, read)
@@ -155,12 +156,12 @@ def test_align_middle_trunc_2():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
 
     # omit prefix from graph
     ch.consume(read[12:])
-    score, graphAlign, readAlign, trunc = aligner.align(read)
+    _, graphAlign, readAlign, trunc = aligner.align(read)
 
     # here, the alignment must start not at the beginning
     print(readAlign)
@@ -178,7 +179,7 @@ def test_align_fwd_nothing():
     read = "ACCAAGGCTCGAGATTTACC"
 
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
@@ -193,10 +194,10 @@ def test_align_fwd_nocov():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume("ACCTAGGTTCGACATGTACC")
-    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+    _, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # should be the same
     eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
@@ -208,7 +209,7 @@ def test_align_fwd_middle():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
     ch.consume(read)
     score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
@@ -246,12 +247,12 @@ def test_align_fwd_middle_trunc_2():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
-    for i in range(20):
+    for _ in range(20):
         ch.consume("AAAAAAAAAAAATCGACAAGTCCTTGACAGAT")
 
     # omit prefix from graph
     ch.consume(read[12:])
-    score, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
+    _, graphAlign, readAlign, trunc, _ = aligner.align_forward(read)
 
     # this will fail, because align_forward chooses the first kmer as the
     # seed.
@@ -414,7 +415,7 @@ def test_readalign():
 
     ch.consume("GCTTTTAAAAAGGTTCGACAAAGGCCCGGG")
 
-    score, graphAlign, readAlign, trunc = aligner.align(read)
+    score, graphAlign, readAlign, _ = aligner.align(read)
 
     eq_(readAlign, 'ACCTAGGTTCGACATGTACC')
     eq_(graphAlign, 'AGCTAGGTTCGACAAGTCCT')
@@ -436,54 +437,54 @@ ht_seqs = ["TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
 queries = [
     {
         "seq": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAA"
-        "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAA"
-        "CCTCTTTAC",
+               "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATC"
+               "TTAACAACCTCTTTAC",
         "score": 274.76338282696173,
         "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCG"
-        "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCT"
-        "TAACAACCTCTTTAC",
+                     "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCC"
+                     "TGTGTTGCAATCTTAACAACCTCTTTAC",
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGC"
-        "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTT"
-        "AACAACCTCTTTAC",
+                    "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTG"
+                    "TGTTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {
         "seq": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAA"
-        "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAA"
-        "CCTCTTTAC",
+               "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATC"
+               "TAACAACCTCTTTAC",
         "score": 274.76338282696173,
         "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCG"
-        "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCT"
-        "TAACAACCTCTTTAC",
+                     "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCC"
+                     "TGTATTGCAATCTTAACAACCTCTTTAC",
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGC"
-        "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTT"
-        "AACAACCTCTTTAC",
+                    "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTG"
+                    "TATTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {
         "seq": "TAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAAC"
-        "TGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAAC"
-        "CTCTTTAC",
+               "TGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCT"
+               "TAACAACCTCTTTAC",
         "score": 272.841515695261,
         "graph_aln": "TAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGC"
-        "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTT"
-        "AACAACCTCTTTAC",
+                     "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCT"
+                     "GTGTTGCAATCTTAACAACCTCTTTAC",
         "read_aln": "TAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCT"
-        "TTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTA"
-        "ACAACCTCTTTAC",
+                    "TTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGT"
+                    "GTTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {
         "seq": "TAAATGCGCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAAC"
-        "TGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAAC"
-        "CTCTTTAC",
+               "TGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCT"
+               "TAACAACCTCTTTAC",
         "score": 268.2640868672253,
         "graph_aln": "TAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGC"
-        "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTT"
-        "AACAACCTCTTTAC",
+                     "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCT"
+                     "GTGTTGCAATCTTAACAACCTCTTTAC",
         "read_aln": "TAAATGCGCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCT"
-        "TTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTA"
-        "ACAACCTCTTTAC",
+                    "TTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGT"
+                    "GTTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {
@@ -530,40 +531,38 @@ queries = [
     },
     {
         "seq": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATAATTTTGCCGCTTTAAC"
-        "TGGGTCTAGTTTCTACTGCAAACTTTCCACCAACTAGTTTTTCTGCATCCTTTGTTGCAATCTTAACAA"
-        "CCTCTTTAC",
+               "TGGGTCTAGTTTCTACTGCAAACTTTCCACCAACTAGTTTTTCTGCATCCTTTGTTGCAATC"
+               "TTAACAACCTCTTTAC",
         "score": 237.81111469018322,
-        "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATcAATTTTGCC"
-        "GCTTTAACTGGGTCT-GTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAAT"
-        "CTTAACAACCTCTTTAC",
-        "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTAT-AATTTTGCCG"
-        "CTTTAACTGGGTCTaGTTTCTACTGCAAACTTTCCACCAACTAGTTTTTCTGCATCCTTTGTTGCAATC"
-        "TTAACAACCTCTTTAC",
+        "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATcAATTTTGCCG"
+                     "CTTTAACTGGGTCT-GTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATC"
+                     "CTGTGTTGCAATCTTAACAACCTCTTTAC",
+        "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTAT-AATTTTGCCGC"
+                    "TTTAACTGGGTCTaGTTTCTACTGCAAACTTTCCACCAACTAGTTTTTCTGCATCCT"
+                    "TTGTTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {
         "seq": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGAAAATAATTAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAA",
+               "AAAAAAAAAAAAAAAAAAAAAAAAAA",
         "score": 5.331560863368736,
-        "graph_aln":
-        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTC"
-        "TGTTTCTACTGCAAACTTT",
-        "read_aln":
-        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGAAAATAATTAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAA",
+        "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCG"
+                     "CTTTAACTGGGTCTGTTTCTACTGCAAACTTT",
+        "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGAAAATAATTAAAAAAAA"
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         "truncated": False
     },
     {
         "seq": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAA"
-        "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTGTATTGCAATCTTAACAA"
-        "CCTCTTTAC",
+               "CTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTGTATTGCAATC"
+               "TTAACAACCTCTTTAC",
         "score": 274.76338282696173,
         "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCG"
-        "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTGTATTGCAATC"
-        "TTAACAACCTCTTTAC",
+                     "CTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCC"
+                     "TGTATTGCAATCTTAACAACCTCTTTAC",
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGC"
-        "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTGTATTGCAATCT"
-        "TAACAACCTCTTTAC",
+                    "TTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTG"
+                    "TATTGCAATCTTAACAACCTCTTTAC",
         "truncated": False
     },
     {  # the motif of 32 bases are identical match to HT seqs, the rest are
