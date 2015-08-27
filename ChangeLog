@@ -1,3 +1,7 @@
+2015-08-27  Titus Brown  <titus@idyll.org>
+
+  * doc/dev/getting-started.rst: fixed a few misspellings.
+
 2015-08-26  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * tests/test_scripts.py: removed the unused `_DEBUG_make_graph` function in
