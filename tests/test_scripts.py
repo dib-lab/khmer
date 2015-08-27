@@ -1087,67 +1087,11 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     return outfile
 
 
-def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
-                      do_partition=False,
-                      annotate_partitions=False,
-                      stop_big_traverse=False):
-    script = 'load-into-graph.py'
-    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
-
-    outfile = utils.get_temp_filename('out')
-    infile = utils.get_test_data(infilename)
-
-    args.extend([outfile, infile])
-
-    utils.runscript(script, args)
-
-    ht_file = outfile + '.ct'
-    assert os.path.exists(ht_file), ht_file
-
-    tagset_file = outfile + '.tagset'
-    assert os.path.exists(tagset_file), tagset_file
-
-    if do_partition:
-        print(">>>> DEBUG: Partitioning <<<")
-        script = 'partition-graph.py'
-        args = [outfile]
-        if stop_big_traverse:
-            args.insert(0, '--no-big-traverse')
-        utils.runscript(script, args)
-
-        print(">>>> DEBUG: Merging Partitions <<<")
-        script = 'merge-partitions.py'
-        args = [outfile, '-k', str(ksize)]
-        utils.runscript(script, args)
-
-        final_pmap_file = outfile + '.pmap.merged'
-        assert os.path.exists(final_pmap_file)
-
-        if annotate_partitions:
-            print(">>>> DEBUG: Annotating Partitions <<<")
-            script = 'annotate-partitions.py'
-            args = ["-k", str(ksize), outfile, infilename]
-
-            in_dir = os.path.dirname(outfile)
-            utils.runscript(script, args, in_dir)
-
-            baseinfile = os.path.basename(infilename)
-            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
-
-    return outfile
-
-
 def test_partition_graph_1():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
-    script = 'partition-graph.py'
-    args = [graphbase]
-
-    utils.runscript(script, args)
-
-    script = 'merge-partitions.py'
-    args = [graphbase, '-k', str(20)]
-    utils.runscript(script, args)
+    utils.runscript('partition-graph.py', [graphbase])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
 
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
@@ -1282,6 +1226,23 @@ def test_partition_find_knots_existing_stoptags():
     assert os.path.exists(stoptags_file)
     assert "loading stoptags" in err, err
     assert "these output stoptags will include the already" in err, err
+
+
+def test_partition_graph_too_many_threads():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    utils.runscript('partition-graph.py', [graphbase, '--threads', '100'])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_nodegraph(graphbase)
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
 
 
 def test_annotate_partitions():
@@ -1725,6 +1686,25 @@ def test_do_partition():
     assert len(parts) == 1
 
 
+def test_do_partition_no_big_traverse():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = 'do-partition.py'
+    args = ["-k", "20", "--no-big-traverse", "--threads=100", graphbase,
+            seqfile]
+
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+
 def test_do_partition_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -2012,6 +1992,22 @@ def test_make_initial_stoptags_load_stoptags():
     args = ['test-reads', '--stoptags', 'test-reads.stoptags']
     utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile1), outfile1
+
+
+def test_extract_paired_reads_unpaired():
+    # test input file
+    infile = utils.get_test_data('random-20-a.fa')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('unpaired.pe.fa')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('unpaired.se.fa', in_dir)
+
+    script = 'extract-paired-reads.py'
+    args = [infile]
+
+    (_, _, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert 'no paired reads!? check file formats...' in err, err
 
 
 def test_extract_paired_reads_1_fa():
@@ -2414,8 +2410,9 @@ def test_split_paired_reads_3_output_dir():
     ex_outfile2 = utils.get_test_data('paired.fq.2')
 
     # actual output files...
-    outfile1 = utils.get_temp_filename('paired.fq.1')
-    output_dir = os.path.dirname(outfile1)
+    testdir = utils.get_temp_filename('test')
+    output_dir = os.path.join(os.path.dirname(testdir), "out")
+    outfile1 = utils.get_temp_filename('paired.fq.1', output_dir)
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = 'split-paired-reads.py'
