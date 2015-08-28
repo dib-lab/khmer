@@ -17,27 +17,27 @@ shotgun data.  You can read more about khmer in `our software paper
 khmer is free and open source software.
 
 **To install khmer**, you will need a Linux or Mac computer, together with
-Python 2.7 or Python 3.x.   See `our installation docs <user/install.html>`__
+Python 2.7 or Python 3.x.   See :doc:`our installation docs <user/install>`
 for detailed instructions.
 
 **To use khmer**, you will generally need to work at the UNIX command
-line.  See `our command line documentation <user/scripts.html>`__.
+line.  See :doc:`our command line documentation <user/scripts>`.
 
 We have **additional documentation** in several places, including
 `protocols for metagenome and mRNAseq assembly
 <https://khmer-protocols.readthedocs.org/>`__ and `recipes for several
 common research tasks <https://khmer-recipes.readthedocs.org/>`__.
-You might also be interested in `papers using or citing khmer
-<user/biblio.html>`__.
+You might also be interested in :doc:`papers using or citing khmer
+<user/biblio>`.
 
 **To get help**, please ask questions on `the khmer mailing list
 <http://lists.idyll.org/listinfo/khmer>`__ or `post an issue on
 GitHub <https://github.com/dib-lab/khmer/issues/new>`__.
 
 We welcome contributions to the khmer project!  We are friendly and
-supportive of new contributors, and have a `code of conduct
-<dev/CODE_OF_CONDUCT.html>`__.  Please see our `docs on getting
-started on khmer development <dev/getting-started.html>`__.
+supportive of new contributors, and have a :doc:`code of conduct
+<dev/CODE_OF_CONDUCT>`.  Please see our :doc:`docs on getting
+started on khmer development <dev/getting-started>`.
 
 Details
 =======

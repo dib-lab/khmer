@@ -101,7 +101,7 @@ build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 pdf: build/sphinx/latex/khmer.pdf
 
 build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
-	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst)
+	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst) sharedobj
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''

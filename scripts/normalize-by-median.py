@@ -240,7 +240,9 @@ def get_parser():
         epilog=textwrap.dedent(epilog))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('-C', '--cutoff', type=int,
+    parser.add_argument('-C', '--cutoff', type=int, help="when the median "
+                        "k-mer coverage level above is above this numer the "
+                        "read is not kept.",
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')

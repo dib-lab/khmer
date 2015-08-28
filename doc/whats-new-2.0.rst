@@ -1,4 +1,4 @@
-.. vim: set filetype=rst
+.. vim: set filetype=sphinx
 
 ************************
 What's New In khmer 2.0?
@@ -13,9 +13,11 @@ Digital normalization script now supports mixed paired and unpaired read input
 :program:`normalize-by-median.py` now supports mixed paired and unpaired (or
 "broken-paired") input. Behavior can be forced to either treat all
 reads as singletons or to require all reads be properly paired using
-:option:`--force_single` or :option:`--paired`, respectively. If
-:option:`--paired` is set, :option:`--unpaired-reads` can be used to
-include a file of unpaired reads. The unpaired reads will be examined
+:option:`--force_single <normalize-by-median.py --force_single>` or
+:option:`--paired <normalize-by-median.py --paired>`, respectively. If
+:option:`--paired <normalize-by-median.py --paired>` is set,
+:option:`--unpaired-reads <normalize-by-median.py --unpaired-reads>` can be
+used to include a file of unpaired reads. The unpaired reads will be examined
 after all of the other sequence files.
 
 Reservoir sampling script extracts paired reads by default
@@ -23,14 +25,14 @@ Reservoir sampling script extracts paired reads by default
 
 :program:`sample-reads-randomly.py` now retains pairs in the output, by
 default.  This can be overridden to match previous behavior
-with :option:`--force_single`.
+with :option:`--force_single <sample-reads-randomly.py --force_single>`.
 
 Mixed-pair sequence file format support
 ---------------------------------------
 
-:option:`--output-orphaned`/:option:`-0` has been added to
-:`program:`split-paired-reads.py` to allow for orphaned reads and give them a
-file to be sorted into.
+:option:`split-paired-reads.py --output-orphaned`/:option:`-0
+<split-paired-reads.py -0>` has been added to allow for orphaned reads and give
+them a file to be sorted into.
 
 Streaming I/O from Unix Pipes
 -----------------------------
@@ -43,10 +45,14 @@ a single dash: ``-``.
 New parameter for tablesize/number of table parameters.
 -------------------------------------------------------
 
-There is now a :option:`-M`/:option:`--max-memory-usage` parameter
-that sets the number of tables (:option:`-N`/:option:`--num_tables`)
-and tablesize (:option:`-x`/:option:`--max-tablesize`) parameters
-automatically to match the desired memory usage.
+There is now a :option:`-M <load-into-counting.py -M>`/
+:option:`--max-memory-usage <load-into-counting.py --max-memory-usage>`
+parameter that sets the number of tables (
+:option:`-N <load-into-counting.py -N>`/
+:option:`--n_tables <load-into-counting.py --n_tables>`) and tablesize
+(:option:`-x <load-into-counting.py -x>`/:option:`--max-tablesize
+<load-into-counting.py --max-tablesize>`) parameters automatically to match the
+desired memory usage.
 
 Scripts now output columnar data in CSV format by default
 ---------------------------------------------------------
@@ -55,8 +61,7 @@ All scripts that output any kind of columnar data now do so in CSV format,
 with headers.  Previously this had to be enabled with ``--csv``.
 (Affects :program:`abundance-dist-single.py`, :program:`abundance-dist.py`,
 :program:`count-median.py`, and :program:`count-overlap.py`.)
-:program:`normalize-by-median.py` also now outputs CSV when :option:`-R` is
-used.
+:option:`normalize-by-median.py --report` also now outputs in CSV format.
 
 
 New scripts
@@ -65,8 +70,8 @@ New scripts
 Estimate number of unique kmers
 -------------------------------
 
-:program:`unique-kmers.py` estimates the k-mer cardinality of a dataset using the
-HyperLogLog probabilistic data structure. This allows very low memory
+:program:`unique-kmers.py` estimates the k-mer cardinality of a dataset using
+the HyperLogLog probabilistic data structure. This allows very low memory
 consumption, which can be configured through an expected error rate.
 Even with low error rate (and higher memory consumption), it is still much
 more efficient than exact counting and alternative methods.
@@ -132,21 +137,24 @@ To simplify the codebase ``--save-on-failure`` and its helper option
 Single file output option names have been normalized
 ----------------------------------------------------
 
-``--out`` is now :option:`--output` for both :program:`normalize-by-median.py`
-and :program:`trim-low-abund.py`.
+``--out`` is now ``--output`` for both :option:`normalize-by-median.py
+<normalize-by-median.py --output>` and :program:`trim-low-abund.py
+<trim-low-abund.py --output>`.
 
 Miscellaneous changes
 ---------------------
 The common option ``--min-tablesize`` was renamed to
-:option:`--max-tablesize` to reflect this more desirable behavior.)
+:option:`--max-tablesize <load-into-counting.py --max-tablesize>` to reflect
+this more desirable behavior.
 
-In conjuction with the new :option:`--output-orphaned` option for
-:program:`split-paired-reads.py`, the option ``--force-paired``/``-p`` has been
-eliminated.
+In conjuction with the new :option:`split-paired-reads.py --output-orphaned`
+option, the option ``--force-paired``/``-p`` has been eliminated.
 
-As CSV format is now the default the ``--csv`` option has been removed.
+As CSV format is now the default, the ``--csv`` option has been removed.
 
 Removed script
 --------------
 
-``count-overlap.py`` has been removed.
+`count-overlap.py
+<http://khmer.readthedocs.org/en/v1.4.1/user/scripts.html#count-overlap-py>`__
+has been removed.
