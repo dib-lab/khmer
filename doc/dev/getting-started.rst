@@ -233,17 +233,17 @@ Claiming an issue and starting to develop
    It is possible that when you do a `git pull` you will get a "merge
    conflict" -- This is what happens when something changed in the branch you're
    pulling in in the same place you made a change in your local copy. This
-   frequently happens in the `Changelog` file.
+   frequently happens in the `ChangeLog` file.
 
    Git will complain loudly about merges and tell you specifically in which
-   files they occurred. If you open the file, you'll see something vaugely
+   files they occurred. If you open the file, you'll see something vaguely
    like this in the place where the merge occurred::
 
       <<<<<<< HEAD
       Changes made on the branch that is being merged into. In most cases,
       this is the branch that you have currently checked out
       =======
-      Changes made on the branch that is being merged in, almost certianly
+      Changes made on the branch that is being merged in, almost certainly
       master.
       >>>>>>> abcde1234
 
@@ -280,7 +280,7 @@ Claiming an issue and starting to develop
 
       git add path/to/file
 
-   If you have a large quanity of changes and you don't want to add each file
+   If you have a large quantity of changes and you don't want to add each file
    manually you can do ``git add --patch`` which will display each set of
    changes to you before staging them for commit.
 
