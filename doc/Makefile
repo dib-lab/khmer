@@ -88,13 +88,3 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) _build/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in _build/doctest/output.txt."
-xml:
-	$(SPHINXBUILD) -b xml $(ALLSPHINXOPTS) _build/xml
-	@echo
-	@echo "Build finished. The XML files are in _build/xml."
-
-pseudoxml:
-	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) _build/pseudoxml
-	@echo
-	@echo "Build finished. The pseudo-XML files are in _build/pseudoxml."
-

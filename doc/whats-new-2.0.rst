@@ -1,4 +1,4 @@
-.. vim: set filetype=sphinx
+.. vim: set filetype=rst
 
 ************************
 What's New In khmer 2.0?
