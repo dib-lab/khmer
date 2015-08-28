@@ -172,7 +172,7 @@ diff_pylint_report: pylint_report.txt
 # statement). So we run nose inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
-		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
+		-m nose --with-xunit --attr $(TESTATTR) --processes=0
 
 coverage.xml: .coverage
 	coverage xml

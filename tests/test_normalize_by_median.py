@@ -207,7 +207,7 @@ def test_normalize_by_median_contradictory_args():
     shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', '1', '-k', '17', '--force-single', '-p', '-R',
+    args = ['-C', '1', '-k', '17', '--force_single', '-p', '-R',
             outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
@@ -359,7 +359,7 @@ def test_normalize_by_median_count_kmers_PE():
     shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = 'normalize-by-median.py'
 
-    args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--force_single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'kept 1 of 2 or 50.0%' in err, err
@@ -707,7 +707,7 @@ def test_diginorm_basic_functionality_2():
     # single', only random seqs should be kept, together with one copy
     # of the multicopy sequence.
     CUTOFF = ['-C', '1']
-    PAIRING = ['--force-single']
+    PAIRING = ['--force_single']
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
