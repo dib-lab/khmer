@@ -7,6 +7,26 @@ What's New In khmer 2.0?
 New behavior
 ============
 
+Streaming I/O from Unix Pipes
+-----------------------------
+
+All scripts now accept input from named (like ``/dev/stdin``, or that created
+using ``<( list )`` process substituion) and unamed pipes (like output piped in
+from another program with ``|``). The STDIN stream can also be specified using
+a single dash: ``-``.
+
+New parameter for memory usage, and/or tablesize/number of table parameters.
+----------------------------------------------------------------------------
+
+There is now a :option:`-M <load-into-counting.py -M>`/
+:option:`--max-memory-usage <load-into-counting.py --max-memory-usage>`
+parameter that sets the number of tables (
+:option:`-N <load-into-counting.py -N>`/
+:option:`--n_tables <load-into-counting.py --n_tables>`) and tablesize
+(:option:`-x <load-into-counting.py -x>`/:option:`--max-tablesize
+<load-into-counting.py --max-tablesize>`) parameters automatically to match the
+desired memory usage.
+
 Digital normalization script now supports mixed paired and unpaired read input
 ------------------------------------------------------------------------------
 
@@ -20,39 +40,12 @@ reads as singletons or to require all reads be properly paired using
 used to include a file of unpaired reads. The unpaired reads will be examined
 after all of the other sequence files.
 
-Reservoir sampling script extracts paired reads by default
-----------------------------------------------------------
-
-:program:`sample-reads-randomly.py` now retains pairs in the output, by
-default.  This can be overridden to match previous behavior
-with :option:`--force_single <sample-reads-randomly.py --force_single>`.
-
 Mixed-pair sequence file format support
 ---------------------------------------
 
 :option:`split-paired-reads.py --output-orphaned`/:option:`-0
 <split-paired-reads.py -0>` has been added to allow for orphaned reads and give
 them a file to be sorted into.
-
-Streaming I/O from Unix Pipes
------------------------------
-
-All scripts now accept input from named (like ``/dev/stdin``, or that created
-using ``<( list )`` process substituion) and unamed pipes (like output piped in
-from another program with ``|``). The STDIN stream can also be specified using
-a single dash: ``-``.
-
-New parameter for tablesize/number of table parameters.
--------------------------------------------------------
-
-There is now a :option:`-M <load-into-counting.py -M>`/
-:option:`--max-memory-usage <load-into-counting.py --max-memory-usage>`
-parameter that sets the number of tables (
-:option:`-N <load-into-counting.py -N>`/
-:option:`--n_tables <load-into-counting.py --n_tables>`) and tablesize
-(:option:`-x <load-into-counting.py -x>`/:option:`--max-tablesize
-<load-into-counting.py --max-tablesize>`) parameters automatically to match the
-desired memory usage.
 
 Scripts now output columnar data in CSV format by default
 ---------------------------------------------------------
@@ -63,6 +56,12 @@ with headers.  Previously this had to be enabled with ``--csv``.
 :program:`count-median.py`, and :program:`count-overlap.py`.)
 :option:`normalize-by-median.py --report` also now outputs in CSV format.
 
+Reservoir sampling script extracts paired reads by default
+----------------------------------------------------------
+
+:program:`sample-reads-randomly.py` now retains pairs in the output, by
+default.  This can be overridden to match previous behavior
+with :option:`--force_single <sample-reads-randomly.py --force_single>`.
 
 New scripts
 ===========
@@ -88,7 +87,7 @@ New datastructure and script names
 For clarity the Count-Min Sketch based data structure previously known as
 "counting_hash" or "counting_table" and variations of these is now known as
 ``countgraph``. Likewise with the Bloom Filter based data structure previously
-known at "hashtable", "presence_table" and variations of these is now known as
+known at "hashbits", "presence_table" and variations of these is now known as
 ``nodegraph``. Many options relating to ``table`` have been changed to
 ``graph``.
 
@@ -138,7 +137,7 @@ Single file output option names have been normalized
 ----------------------------------------------------
 
 ``--out`` is now ``--output`` for both :option:`normalize-by-median.py
-<normalize-by-median.py --output>` and :program:`trim-low-abund.py
+<normalize-by-median.py --output>` and :option:`trim-low-abund.py
 <trim-low-abund.py --output>`.
 
 Miscellaneous changes
