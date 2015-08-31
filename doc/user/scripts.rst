@@ -8,12 +8,12 @@ The simplest way to use khmer's functionality is through the command
 line scripts, located in the `scripts/
 <https://github.com/dib-lab/khmer/tree/stable/scripts>`__ directory of the
 khmer distribution.  Below is our documentation for these scripts.  Note
-that all scripts can be given :option:`-h` which will print out
+that all scripts can be given ``-h``/``--help`` which will print out
 a list of arguments taken by that script.
 
 Scripts that use k-mer counting tables or k-mer graphs take an
-:option:`-M` parameter, which sets the maximum memory usage in bytes.
-This should generally be set as high as possible; see
+:option:`-M <load-into-counting.py -M>` parameter, which sets the maximum
+memory usage in bytes. This should generally be set as high as possible; see
 :doc:`choosing-table-sizes` for more information.
 
 1. :ref:`scripts-counting`

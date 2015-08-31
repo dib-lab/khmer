@@ -101,7 +101,7 @@ build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.rst) doc/conf.py all
 pdf: build/sphinx/latex/khmer.pdf
 
 build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
-	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst)
+	$(wildcard doc/user/*.rst) $(wildcard doc/dev/*.rst) sharedobj
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''
@@ -172,7 +172,7 @@ diff_pylint_report: pylint_report.txt
 # statement). So we run nose inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	coverage run --branch --source=scripts,khmer,oxli --omit=khmer/_version.py \
-		-m nose --with-xunit --attr $(TEST_ATTR) --processes=0
+		-m nose --with-xunit --attr $(TESTATTR) --processes=0
 
 coverage.xml: .coverage
 	coverage xml

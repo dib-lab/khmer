@@ -14,7 +14,7 @@ described in this blog post:
 
 A test data set (soil metagenomics, 88m reads, 10gb) is here:
 
-   http://angus.ged.msu.edu.s3.amazonaws.com/88m-reads.fa.gz
+   http://ci.oxli.org/userContent/88m-reads.fa.gz
 
 Illumina read abundance profiles
 ================================

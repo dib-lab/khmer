@@ -1,3 +1,17 @@
+2015-08-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/whats-new-2.0.rst: Many updates from `diff`ing the `--help` output of
+   version 1.4.1 vs now.
+   * Makefile: build the project if needed when making a PDF
+   * doc/index.rst: fixed inter-doc links to be relative
+   * doc/user/blog-posts.rst: replaced link to 88m-reads.fa.gz with a working
+   URL
+   * doc/user/{choosing-table-sizes,guide}.rst: disambiguated :option:
+   references so that they link properly.
+   * scripts/README.txt: removed unhelpful file
+   * scripts/normalize-by-median.py: replace `--force-single` with
+   `--force_single`. Added help text for `--cutoff`.
+
 2015-08-27  Titus Brown  <titus@idyll.org>
 
   * doc/dev/getting-started.rst: fixed a few misspellings.

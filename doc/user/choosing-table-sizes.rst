@@ -5,23 +5,27 @@ Setting khmer memory usage
 ==========================
 
 If you look at the documentation for the scripts (:doc:`scripts`) you'll
-see a :option:`-M` parameter that sets the maximum memory usage for
-any script that uses k-mer counting tables or k-mer graphs.  What is this?
+see a :option:`-M <load-into-counting.py -M>` parameter that sets the maximum
+memory usage for any script that uses k-mer counting tables or k-mer graphs. 
+What is this?
 
 khmer uses a special data structure that lets it store counting tables
 and k-mer graphs in very low memory; the trick is that you must fix
 the amount of memory khmer can use before running it. (See `Pell et
 al., 2012 <http://www.ncbi.nlm.nih.gov/pubmed/22847406>`__ and `Zhang
 et al., 2014 <http://www.ncbi.nlm.nih.gov/pubmed/25062443>`__ for the
-details.)  This is what the :option:`-M` parameter does.
+details.)  This is what the :option:`-M <load-into-counting.py -M>` parameter
+does.
 
 If you set it too low, khmer will warn you to set it higher at the end.
 See below for some good choices for various kinds of data.
 
-**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M`
-parameter sets the :option:`-N`/:option:`--n_tables` and
-:option:`-x`/:option:`--max_tablesize` parameters automatically.
-You can still set these parameters directly if you wish.
+**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M
+<load-into-counting.py -M>` parameter sets the
+:option:`-N <load-into-counting.py -N>`/:option:`--n_tables
+<load-into-counting.py --n_tables>` and :option:`-x <load-into-counting.py -x>`
+/:option:`--max-tablesize <load-into-counting.py --max-tablesize>` parameters
+automatically. You can still set these parameters directly if you wish.
 
 The really short version
 ========================
@@ -41,7 +45,7 @@ This parameter specifies the maximum memory usage of the primary data
 structure in khmer, which is basically N big hash tables of size x.
 The **product** of the number of hash tables and the size of the hash
 tables specifies the total amount of memory used, which is what the
-:option:`-M` parameter sets.
+:option:`-M <load-into-counting.py -M>` parameter sets.
 
 These tables are used to track k-mers.  If they are too small, khmer
 will fail in various ways (and will complain), but there is no harm
