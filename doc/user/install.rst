@@ -107,4 +107,4 @@ failing.::
 If the nosetests binary isn't installed then::
 
       pip2 install khmer[tests]
-      nosetests khmer --attr '!known_failing'
+      nosetests khmer --attr '!known_failing,!huge'

@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# vim: set fileencoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
@@ -199,15 +200,31 @@ SETUP_METADATA = \
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
-        ' Adina Howe, Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
-        ' Humberto Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott,'
-        ' Ramakrishnan Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown',
+        "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
+                  "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
+                  "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
+                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
+                  "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
+                  "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
+                  "Joshua R. Herr, Adina Howe, Alex Hyer, Andreas Härpfer, "
+                  "Luiz Irber, Rhys Kidd, David Lin, Justin Lippi, "
+                  "Tamer Mansour, Pamela McA'Nulty, Eric McDonald, "
+                  "Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, "
+                  "Kaben Nanlohy, Alexander Johan Nederbragt, "
+                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
+                  "Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz, "
+                  "Camille Scott, Josiah Seaman, Scott Sievert, "
+                  "Jared Simpson, Connor T. Skennerton, James Spencer, "
+                  "Ramakrishnan Srinivasan, Daniel Standage, "
+                  "James A. Stapleton, Joe Stein, Susan R Steinman, "
+                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
+                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
+                  "C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Michael R. Crusoe', # this overrides the author field
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
-        # additiona-meta-data note #3
+        # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.org/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
