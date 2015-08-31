@@ -1,3 +1,10 @@
+2015-08-31  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/thread_utils.py: Use the robust test for paired reads from
+   khmer.utils; drop `is_pair()`
+   * tests/test_threaded_sequence_processor.py: Update to use Screed Record
+   objects.
+
 2015-08-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * doc/whats-new-2.0.rst: Many updates from `diff`ing the `--help` output of

@@ -4,6 +4,7 @@ from io import StringIO
 from screed.fasta import fasta_iter
 from screed.fastq import fastq_iter
 from nose.plugins.attrib import attr
+import screed
 
 # stdlib queue module was renamed on Python 3
 try:
@@ -23,7 +24,7 @@ def load_records_fastq(stringio_fp):
 
 
 def load_records_d(stringio_fp):
-    return dict([(r['name'], r['sequence'])
+    return dict([(r.name, r.sequence)
                  for r in load_records(stringio_fp)])
 
 # simple processing function: keep all sequences.
@@ -50,8 +51,8 @@ def every_other(record):
 def test_basic():
     tsp = ThreadedSequenceProcessor(idem, 1, 1, verbose=False)
 
-    input = [dict(name='a', sequence='AAA'),
-             dict(name='b', sequence='TTT'), ]
+    input = [screed.Record(name='a', sequence='AAA'),
+             screed.Record(name='b', sequence='TTT'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
@@ -65,8 +66,8 @@ def test_basic():
 def test_basic_fastq_like():
     tsp = ThreadedSequenceProcessor(idem, 1, 1, verbose=False)
 
-    input = [dict(name='a', sequence='AAA', quality='###'),
-             dict(name='b', sequence='TTT', quality='###'), ]
+    input = [screed.Record(name='a', sequence='AAA', quality='###'),
+             screed.Record(name='b', sequence='TTT', quality='###'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
@@ -79,8 +80,8 @@ def test_basic_fastq_like():
 def test_odd():
     tsp = ThreadedSequenceProcessor(every_other, 1, 1, verbose=False)
 
-    input = [dict(name='a', sequence='AAA'),
-             dict(name='b', sequence='TTT'), ]
+    input = [screed.Record(name='a', sequence='AAA'),
+             screed.Record(name='b', sequence='TTT'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
@@ -93,8 +94,8 @@ def test_odd():
 def test_basic_2thread():
     tsp = ThreadedSequenceProcessor(idem, 2, 1, verbose=False)
 
-    input = [dict(name='a', sequence='AAA'),
-             dict(name='b', sequence='TTT'), ]
+    input = [screed.Record(name='a', sequence='AAA'),
+             screed.Record(name='b', sequence='TTT'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
@@ -142,8 +143,8 @@ def test_paired_2thread():
 
     tsp = TSP_TestPairedProcess(idem, 1, 1, verbose=False)
 
-    input = [dict(name='a/1', sequence='AAA'),
-             dict(name='a/2', sequence='TTT'), ]
+    input = [screed.Record(name='a/1', sequence='AAA'),
+             screed.Record(name='a/2', sequence='TTT'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
@@ -191,10 +192,10 @@ def test_paired_2thread_more_seq():
 
     tsp = TSP_TestPairedProcess(idem, 1, 1, verbose=False)
 
-    input = [dict(name='b/1', sequence='AAA'),
-             dict(name='a/1', sequence='AAA'),
-             dict(name='a/2', sequence='TTT'),
-             dict(name='c/2', sequence='AAA'), ]
+    input = [screed.Record(name='b/1', sequence='AAA'),
+             screed.Record(name='a/1', sequence='AAA'),
+             screed.Record(name='a/2', sequence='TTT'),
+             screed.Record(name='c/2', sequence='AAA'), ]
     outfp = StringIO()
 
     tsp.start(input, outfp)
