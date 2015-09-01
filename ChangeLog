@@ -1,9 +1,12 @@
 2015-09-01  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+2015-09-01  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * doc/release-notes/release-2.0.md: release notes for 2.0
    * doc/user/install.txt: correct second invocation of nosetests to match the
    first.
    * setup.py: update the authors list for PyPI.
+   * doc/user/known-issues.rst: remove two fixed issues
 
 2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
 

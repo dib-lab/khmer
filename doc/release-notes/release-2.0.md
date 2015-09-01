@@ -314,6 +314,10 @@ everyone with a commit in git. #1023 @mr-c
 \#1284 @mr-c
 
 ## Known issues:
+
+Some users have reported that normalize-by-median.py will utilize more
+memory than it was configured for. This is being investigated in #266
+
 ## Contributors
 
 @ctb, @bocajnotnef, @mr-c, @luizirber, @kdmurray91, @SherineAwad,
