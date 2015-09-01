@@ -12,8 +12,7 @@ from __future__ import print_function, unicode_literals
 import threading
 import sys
 import screed
-from khmer import utils
-from khmer.utils import write_record
+from khmer.utils import write_record, check_is_pair
 # stdlib queue module was renamed on Python 3
 try:
     import queue
@@ -40,13 +39,6 @@ class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
-
-
-def is_pair(r1, r2):
-    a = r1['name'].split('/')[0]
-    b = r2['name'].split('/')[0]
-
-    return (a == b)
 
 
 class ThreadedSequenceProcessor(object):
@@ -109,7 +101,7 @@ class ThreadedSequenceProcessor(object):
         for record in inputiter:
             if i >= self.group_size:
                 # keep pairs together in batches, to retain the interleaving.
-                if is_pair(record, last_record):
+                if check_is_pair(last_record, record):
                     batch.append(record)
                     g = SequenceGroup(0, batch)
                     self.inqueue.put(g)
