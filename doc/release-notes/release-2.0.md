@@ -1,8 +1,9 @@
 # khmer v2.0 release notes
 
-This is the v2.0 release of khmer featuring Python 3 compatibility, streaming
-I/O from Unix Pipes, mixed-pair sequence file format support, and a new
-parameter to simplify memory usage. We also have a software paper in-press
+This is the v2.0 release of khmer featuring and the first from our new lab at
+the University of California, Davis. It features Python 3 compatibility,
+streaming I/O from Unix Pipes, mixed-pair sequence file format support, and a
+new parameter to simplify memory usage. We also have a software paper in-press
 describing the project and the citation reminders have been updated to reflect
 that.
 
@@ -312,6 +313,9 @@ everyone with a commit in git. #1023 @mr-c
 
 `thread_utils.is_pair()` has been dropped in favor of `utils.check_is_pair()`
 \#1284 @mr-c
+
+The Doxygen produced documentation is improving. The location of included
+headers is now autodetected for Doxygen and cppcheck.
 
 ## Known issues:
 
