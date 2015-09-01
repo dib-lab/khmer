@@ -73,7 +73,7 @@ def get_parser():
     annotate the original sequences files with the partition information.
 
     This script combines the functionality of
-    :program:`load-into-graph.py`, :program:`partition-graph.py`,
+    :program:`load-graph.py`, :program:`partition-graph.py`,
     :program:`merge-partitions.py`, and :program:`annotate-partitions.py` into
     one script. This is convenient but should probably not be used for large
     data sets, because :program:`do-partition.py` doesn't provide save/resume

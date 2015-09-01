@@ -55,7 +55,7 @@ you of the total memory usage, and (at the end) will complain if it's
 too small.
 
 Life is a bit more complicated than this, however, because some scripts --
-:program:`load-into-counting.py` and :program:`load-into-graph.py` -- keep
+:program:`load-into-counting.py` and :program:`load-graph.py` -- keep
 ancillary information that will consume memory beyond this table data
 structure.  So if you run out of memory, decrease the table size.
 

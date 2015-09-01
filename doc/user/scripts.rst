@@ -65,8 +65,8 @@ Partitioning
 .. autoprogram:: do-partition:get_parser()
         :prog: do-partition.py
 
-.. autoprogram:: load-into-graph:get_parser()
-        :prog: load-into-graph.py
+.. autoprogram:: load-graph:get_parser()
+        :prog: load-graph.py
 
 See :program:`extract-partitions.py` for a complete workflow.
 

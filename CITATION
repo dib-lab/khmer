@@ -54,7 +54,7 @@ any command line arguments.
 Graph partitioning and/or compressible graph representation
 ===========================================================
 
-The :program:`load-into-graph.py`, :program:`partition-graph.py`,
+The :program:`load-graph.py`, :program:`partition-graph.py`,
 and :program:`find-knots.py` scripts are part of the compressible graph
 representation and partitioning algorithms described in:
 

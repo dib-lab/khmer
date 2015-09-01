@@ -51,7 +51,7 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 def get_parser():
     epilog = """\
     Load an k-mer nodegraph/tagset pair created by
-    :program:`load-into-graph.py`, and a set of pmap files created by
+    :program:`load-graph.py`, and a set of pmap files created by
     :program:`partition-graph.py`. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that

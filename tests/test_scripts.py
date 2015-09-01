@@ -767,7 +767,7 @@ def test_count_median_fq_csv_stdout():
 
 
 def test_load_graph():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
@@ -793,7 +793,7 @@ def test_load_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-graph.py worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -824,7 +824,7 @@ def test_oxli_build_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-graph.py worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -857,7 +857,7 @@ def test_oxli_build_graph_unique_kmers_arg():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-graph.py worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -872,7 +872,7 @@ def test_oxli_nocommand():
 
 
 def test_load_graph_no_tags():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -919,7 +919,7 @@ def test_oxli_build_graph_no_tags():
 
 
 def test_load_graph_fail():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -948,7 +948,7 @@ def test_oxli_build_graph_fail():
 
 
 def test_load_graph_write_fp():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -994,7 +994,7 @@ def test_oxli_build_graph_write_fp():
 
 
 def test_load_graph_multithread():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
 
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
@@ -1017,7 +1017,7 @@ def test_oxli_build_graph_multithread():
 
 
 def test_load_graph_max_memory_usage_parameter():
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-M', '2e7', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -1044,7 +1044,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
-    script = 'load-into-graph.py'
+    script = 'load-graph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1929,19 +1929,19 @@ def test_interleave_reads_2_fa():
 
 
 def test_make_initial_stoptags():
-    # gen input files using load-into-graph.py -t
+    # gen input files using load-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-graph.py works properly
+    # this assumes (obv.) load-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-graph.py'
+    genscript = 'load-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-graph.pys
+    # test input file gen'd by load-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -1961,19 +1961,19 @@ def test_make_initial_stoptags():
 
 
 def test_make_initial_stoptags_load_stoptags():
-    # gen input files using load-into-graph.py -t
+    # gen input files using load-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-graph.py works properly
+    # this assumes (obv.) load-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-graph.py'
+    genscript = 'load-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-graph.pys
+    # test input file gen'd by load-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -3064,7 +3064,7 @@ def _execute_load_graph_streaming(filename):
 
     args = '-x 1e7 -N 2 -k 20 out -'
 
-    cmd = 'cat {infile} | {scripts}/load-into-graph.py {args}'.format(
+    cmd = 'cat {infile} | {scripts}/load-graph.py {args}'.format(
         infile=infile, scripts=scripts, args=args)
 
     (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
@@ -3087,7 +3087,7 @@ def _execute_load_graph_streaming(filename):
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-graph.py worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
