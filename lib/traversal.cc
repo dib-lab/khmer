@@ -68,8 +68,8 @@ Kmer Traverser::get_right(Kmer& node, const char ch)
 }
 
 unsigned int Traverser::traverse_left(Kmer& node,
-                                       KmerQueue & node_q,
-                                       std::function<bool (Kmer&)> filter)
+                                      KmerQueue & node_q,
+                                      std::function<bool (Kmer&)> filter)
 {
     unsigned int found = 0;
 

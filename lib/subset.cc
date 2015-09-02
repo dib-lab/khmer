@@ -83,7 +83,7 @@ static void print_tag_set(SeenSet& p)
 #endif //0
 
 SubsetPartition::SubsetPartition(Hashtable * ht) :
-                                 next_partition_id(2), _ht(ht)
+    next_partition_id(2), _ht(ht)
 {
 }
 
@@ -442,10 +442,14 @@ void SubsetPartition::find_all_tags(
         }
 
         nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
         nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
 
         first = false;
@@ -534,10 +538,14 @@ unsigned int SubsetPartition::sweep_for_tags(
         }
 
         nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
         nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
     }
 
     return total;
@@ -633,10 +641,14 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         }
 
         nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
         nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
         first = false;
     }

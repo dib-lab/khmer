@@ -190,7 +190,7 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
 
 KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
-                           KmerFactory(k), _seq(seq)
+    KmerFactory(k), _seq(seq)
 {
     bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {

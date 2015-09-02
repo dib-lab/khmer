@@ -150,19 +150,24 @@ public:
     }
 
     /// @warning The default constructor builds an invalid k-mer.
-	Kmer()
-	{
-		kmer_f = kmer_r = kmer_u = 0;
-	}
+    Kmer()
+    {
+        kmer_f = kmer_r = kmer_u = 0;
+    }
 
     /// Allows complete backwards compatibility
-    operator HashIntoType() const { return kmer_u; }
+    operator HashIntoType() const
+    {
+        return kmer_u;
+    }
 
-    bool operator< (const Kmer &other) const {
+    bool operator< (const Kmer &other) const
+    {
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K) {
+    std::string get_string_rep(WordLength K)
+    {
         return _revhash(kmer_u, K);
     }
 
@@ -180,7 +185,7 @@ public:
  * between the (kmer_u, K) and (kmer_f, kmer_r) cases. This
  * implementation also allows a logical architecture wherein
  * KmerIterator and Hashtable inherit directly from KmerFactory,
- * extending the latter's purpose of "create k-mers" to 
+ * extending the latter's purpose of "create k-mers" to
  * "emit k-mers from a sequence" and "create and store k-mers".
  *
  * \author Camille Scott
@@ -203,7 +208,7 @@ public:
     Kmer build_kmer(HashIntoType kmer_u)
     {
         HashIntoType kmer_f, kmer_r;
-		std:: string kmer_s = _revhash(kmer_u, _ksize);
+        std:: string kmer_s = _revhash(kmer_u, _ksize);
         _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
@@ -238,7 +243,7 @@ public:
      *
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
-     */ 
+     */
     Kmer build_kmer(const char * kmer_c)
     {
         HashIntoType kmer_f, kmer_r, kmer_u;

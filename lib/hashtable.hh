@@ -85,7 +85,8 @@ struct IParser;
 namespace khmer
 {
 
-class Hashtable: public KmerFactory  		// Base class implementation of a Bloom ht.
+class Hashtable: public
+    KmerFactory  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
@@ -330,7 +331,7 @@ public:
                                     unsigned int radius,
                                     KmerSet &keeper,
                                     unsigned int max_count = MAX_KEEPER_SIZE)
-                                    const;
+    const;
 
     unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
             unsigned int threshold,

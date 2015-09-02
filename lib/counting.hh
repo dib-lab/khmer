@@ -165,7 +165,7 @@ public:
     }
 
     virtual const HashIntoType n_unique_kmers() const
-    { 
+    {
         return _n_unique_kmers;
     }
 
@@ -210,7 +210,7 @@ public:
                 if (current_count == 0) {
                     is_new_kmer = true;
                     if (i == 0) {
-                       __sync_add_and_fetch(&_occupied_bins, 1);
+                        __sync_add_and_fetch(&_occupied_bins, 1);
                     }
                 }
             }

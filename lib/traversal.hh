@@ -47,7 +47,8 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "hashtable.hh"
 
-namespace khmer {
+namespace khmer
+{
 
 class Hashtable;
 

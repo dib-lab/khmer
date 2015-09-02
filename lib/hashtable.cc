@@ -760,36 +760,38 @@ const
     node_q.push(start);
 
     // Avoid high-circumference k-mers
-    auto filter = [&] (Kmer& n) { return !(break_on_circum &&
-                                  traverser.degree(n) > 4); };
+    auto filter = [&] (Kmer& n) {
+        return !(break_on_circum &&
+                 traverser.degree(n) > 4);
+    };
 
     while(!node_q.empty()) {
-      Kmer node = node_q.front();
-      node_q.pop();
+        Kmer node = node_q.front();
+        node_q.pop();
 
-      // have we already seen me? don't count; exit.
-      if (set_contains(keeper, node)) {
-          continue;
-      }
+        // have we already seen me? don't count; exit.
+        if (set_contains(keeper, node)) {
+            continue;
+        }
 
-      // is this in stop_tags?
-      if (set_contains(stop_tags, node)) {
-          continue;
-      }
+        // is this in stop_tags?
+        if (set_contains(stop_tags, node)) {
+            continue;
+        }
 
-      // keep track of both seen kmers, and counts.
-      keeper.insert(node);
+        // keep track of both seen kmers, and counts.
+        keeper.insert(node);
 
-      count += 1;
+        count += 1;
 
-      // are we past the threshold? truncate search.
-      if (threshold && count >= threshold) {
-          return;
-      }
+        // are we past the threshold? truncate search.
+        if (threshold && count >= threshold) {
+            return;
+        }
 
-      // otherwise, explore in all directions.
-      traverser.traverse_right(node, node_q, filter);
-      traverser.traverse_left(node, node_q, filter);
+        // otherwise, explore in all directions.
+        traverser.traverse_right(node, node_q, filter);
+        traverser.traverse_left(node, node_q, filter);
     }
 }
 
@@ -939,7 +941,9 @@ const
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) { return !set_contains(keeper, n); };
+    auto filter = [&] (Kmer& n) {
+        return !set_contains(keeper, n);
+    };
 
     node_q.push(start);
     breadth_q.push(0);
@@ -979,10 +983,14 @@ const
         }
 
         nfound = traverser.traverse_right(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
 
         nfound = traverser.traverse_left(node, node_q, filter);
-        for (unsigned int i = 0; i<nfound; ++i) breadth_q.push(breadth + 1);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
     }
 
     return total;

@@ -157,7 +157,7 @@ public:
             unsigned char bits_orig = __sync_fetch_and_or( *(_counts + i) + byte, bit );
             if (!(bits_orig & bit)) {
                 if (i == 0) {
-                  __sync_add_and_fetch( &_occupied_bins, 1 );
+                    __sync_add_and_fetch( &_occupied_bins, 1 );
                 }
                 is_new_kmer = true;
             }
