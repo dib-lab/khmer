@@ -1,3 +1,7 @@
+2015-09-02  Micheal R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/requirements.txt: Update URL to sphinxcontrib-autoprogram tarball
+
 2015-08-31  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * khmer/thread_utils.py: Use the robust test for paired reads from
