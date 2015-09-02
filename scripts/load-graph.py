@@ -9,7 +9,7 @@
 """
 Build a graph from the given sequences, save in <ptname>.
 
-% python scripts/load-into-graph.py <ptname> <data1> [ <data2> <...> ]
+% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -29,7 +29,7 @@ def get_parser():
 
 
 if __name__ == '__main__':
-    info('load-into-graph.py', ['graph', 'SeqAn'])
+    info('load-graph.py', ['graph', 'SeqAn'])
     build_graph.main(get_parser().parse_args())
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

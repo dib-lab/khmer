@@ -1,3 +1,7 @@
+2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * *: finish undoing the `load-graph.py` rename
+
 2015-09-02  Micheal R. Crusoe  <crusoe@ucdavis.edu>
 
    * doc/requirements.txt: Update URL to sphinxcontrib-autoprogram tarball

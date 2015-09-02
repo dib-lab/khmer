@@ -43,7 +43,7 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 def get_parser():
     epilog = """\
     Loads a k-mer nodegraph/tagset pair created by
-    :program:`load-into-graph.py`, and
+    :program:`load-graph.py`, and
     does a small set of traversals from graph waypoints; on these traversals,
     looks for k-mers that are repeatedly traversed in high-density regions of
     the graph, i.e. are highly connected. Outputs those k-mers as an initial
