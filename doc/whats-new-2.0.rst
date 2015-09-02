@@ -35,6 +35,7 @@
    
    Contact: khmer-project@idyll.org
 
+************************
 What's New In khmer 2.0?
 ************************
 

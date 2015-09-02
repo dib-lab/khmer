@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
@@ -33,7 +34,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-
 #
 load-into-counting.py -x 1e8 -k 20 stamps-reads.ct \
 	../../data/stamps-reads.fa.gz

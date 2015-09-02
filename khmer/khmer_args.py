@@ -1,4 +1,5 @@
 # vim: set encoding=utf-8
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
