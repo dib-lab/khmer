@@ -30,7 +30,8 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# LICENSE (END)
+#
+# Contact: khmer-project@idyll.org
 
 # make pep8 to check for basic Python code compliance
 # make autopep8 to fix most pep8 errors

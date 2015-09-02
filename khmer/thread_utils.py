@@ -30,7 +30,8 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# LICENSE (END)
+#
+# Contact: khmer-project@idyll.org
 """Utilities for dealing with multithreaded processing of short reads."""
 
 from __future__ import print_function, unicode_literals
