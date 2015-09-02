@@ -2,7 +2,8 @@
 
    * *: complete audit of license headers
    * LICENSE: listings of some of the third-party licenses
-   * bink.ipynb: deleted unused file
+   * bink.ipynb,lib/graphtest.cc,lib/primes.hh: deleted unused files
+   * sandbox/assemstats.py: updated screed install instructions
 
 2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
