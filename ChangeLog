@@ -435,7 +435,13 @@
 
 2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * tests/test_read_parsers.py: added workaround for bug in OSX Python
+   * khmer/thread_utils.py,scripts/trim-low-abund.py: pylint cleanup
+   * tests/{test_counting_hash,tests/test_graph}.py: disabled noisy warnings
+   that shouldn't be happening anyway
+
+2015-07-22  Jacob Fenton  <bocajnotnef@gmail.com>
+
+* tests/test_read_parsers.py: added workaround for bug in OSX Python
    * Makefile: respect that workaround when running the tests
 
 2015-07-21  Jacob Fenton  <bocajnotnef@gmail.com>

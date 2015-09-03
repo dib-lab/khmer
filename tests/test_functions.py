@@ -6,6 +6,7 @@ from __future__ import absolute_import
 # the three-clause BSD license; see LICENSE.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring
 import khmer
 import os
 import sys
