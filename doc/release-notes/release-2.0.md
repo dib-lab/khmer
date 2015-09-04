@@ -40,7 +40,7 @@ automatically to match the desired memory usage. #1106 #621 #1126 #390 #1117
 as singletons or to require all reads be properly paired
 using `--force\_single` or `--paired`, respectively. If `--paired` is
 set, `--unpaired-reads` can be used to include a file of unpaired reads. The
-`unpaired reads will be examined after all of the other sequence files.
+unpaired reads will be examined after all of the other sequence files.
 `normalize-by-median.py` now has a `--quiet` option to reduce the amount of
 output. #1200 @bocajnotnef
 
@@ -176,7 +176,7 @@ All scripts that create nodegraphs or countgraphs report the total number of
 unique k-mers. #491 #609 #429 @mr-c
 
 Read pairs from SRA are fully supported. Reported by @macmanes in #1027, fixed
-by @kdmurray91 @Sherine Awad in #1173 #1088
+by @kdmurray91 @SherineAwad in #1173 #1088
 
 ### Of interest to users:
 
@@ -211,7 +211,7 @@ supplied. #657 #814 #1208 @ACharbonneau @bocajnotnef
 
 We've updated the URL to the '88m-reads.fa.gz' file. #1242 #1269 @mr-c
 
-@camillecodon designed and implemented an optimization for
+@camillescott designed and implemented an optimization for
 `normalize-by-median.py` #862
 
 `abundance-dist.py` can now be used without counts over 255 with
@@ -254,7 +254,8 @@ Developer docs have been expanded #737 #1184 @bocajnotnef #1083 #1282 @ctb
 
 A lot of code was deleted: TRACE related code in #274 #1180 @ctb 
 `hashtable_collect_high_abundance_kmers` in #1142 #1044 @ctb `lib/ht-diff.cc`,
-`lib/test-HashTables.cc`, `lib/test-Parser.cc` #1144, @mr-c
+`lib/test-HashTables.cc`, `lib/test-Parser.cc` #1144, @mr-c `bink.ipynb`,
+`lib/graphtest.cc`, `lib/primes.hh` #1289 @mr-c
 
 @bocajnotnef deleted more unused code and added new tests elsewhere to increase
 testing coverage in #1236. @mr-c had his own go in #1279

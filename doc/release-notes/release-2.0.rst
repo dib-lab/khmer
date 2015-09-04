@@ -1,12 +1,12 @@
 khmer v2.0 release notes
 ========================
 
-This is the v2.0 release of khmer featuring and the first from our new
-lab at the University of California, Davis. It features Python 3
-compatibility, streaming I/O from Unix Pipes, mixed-pair sequence file
-format support, and a new parameter to simplify memory usage. We also
-have a software paper in-press describing the project and the citation
-reminders have been updated to reflect that.
+This is the v2.0 release of khmer and the first from our new lab at the
+University of California, Davis. It features Python 3 compatibility,
+streaming I/O from Unix Pipes, mixed-pair sequence file format support,
+and a new parameter to simplify memory usage. We also have a software
+paper in-press describing the project and the citation reminders have
+been updated to reflect that.
 
 Overall there are an additional 2,380 lines of Python code (mostly
 tests) and 283 less lines of C++ (despite adding features). This release
@@ -24,7 +24,7 @@ Streaming I/O from Unix Pipes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All scripts now accept input from named (like ``/dev/stdin``, or that
-created using ``<( list )`` process substituion) and unamed pipes (like
+created using ``<( list )`` process substituion) and unnamed pipes (like
 output piped in from another program with ``|``). The STDIN stream can
 also be specified using a single dash: ``-``. #1186 @mr-c #1042 #763
 @SherineAwad #1085 @ctb
@@ -46,9 +46,9 @@ Digital normalization script now supports mixed paired and unpaired read input
 as singletons or to require all reads be properly paired using
 ``--force\_single`` or ``--paired``, respectively. If ``--paired`` is
 set, ``--unpaired-reads`` can be used to include a file of unpaired
-reads. The
-``unpaired reads will be examined after all of the other sequence files.``\ normalize-by-median.py\ ``now has a``--quiet\`
-option to reduce the amount of output. #1200 @bocajnotnef
+reads. The unpaired reads will be examined after all of the other
+sequence files. ``normalize-by-median.py`` now has a ``--quiet`` option
+to reduce the amount of output. #1200 @bocajnotnef
 
 Mixed-pair sequence file format support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,7 +204,7 @@ All scripts that create nodegraphs or countgraphs report the total
 number of unique k-mers. #491 #609 #429 @mr-c
 
 Read pairs from SRA are fully supported. Reported by @macmanes in #1027,
-fixed by @kdmurray91 @Sherine Awad in #1173 #1088
+fixed by @kdmurray91 @SherineAwad in #1173 #1088
 
 Of interest to users:
 ~~~~~~~~~~~~~~~~~~~~~
@@ -244,7 +244,7 @@ this option is supplied. #657 #814 #1208 @ACharbonneau @bocajnotnef
 
 We've updated the URL to the '88m-reads.fa.gz' file. #1242 #1269 @mr-c
 
-@camillecodon designed and implemented an optimization for
+@camillescott designed and implemented an optimization for
 ``normalize-by-median.py`` #862
 
 ``abundance-dist.py`` can now be used without counts over 255 with
@@ -292,7 +292,8 @@ Developer docs have been expanded #737 #1184 @bocajnotnef #1083 #1282
 A lot of code was deleted: TRACE related code in #274 #1180 @ctb
 ``hashtable_collect_high_abundance_kmers`` in #1142 #1044 @ctb
 ``lib/ht-diff.cc``, ``lib/test-HashTables.cc``, ``lib/test-Parser.cc``
-#1144, @mr-c
+#1144, @mr-c ``bink.ipynb``, ``lib/graphtest.cc``, ``lib/primes.hh``
+#1289 @mr-c
 
 @bocajnotnef deleted more unused code and added new tests elsewhere to
 increase testing coverage in #1236. @mr-c had his own go in #1279
