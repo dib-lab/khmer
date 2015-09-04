@@ -112,7 +112,7 @@ The example script for the STAMPS database has been fixed to run correctly #781
 `split-paired-reads.py`: added `-o` option to allow specification of an output
 directory #752 @bede 
 
-Fixed a string formatting and a boundry error in `sample-reads-randomly.py`
+Fixed a string formatting and a boundary error in `sample-reads-randomly.py`
 \#773 @qingpeng #995 @ctb 
 
 CSV output added to `abundance-dist.py`, `abundance-dist-single.py`, and
