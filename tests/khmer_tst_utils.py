@@ -88,7 +88,10 @@ def scriptpath(scriptname='interleave-reads.py'):
     # it's some khmer script present in this version of khmer.
 
     path = os.path.join(os.path.dirname(__file__), "../scripts")
+    if os.path.exists(os.path.join(path, scriptname)):
+        return path
 
+    path = os.path.join(os.path.dirname(__file__), "../../EGG-INFO/scripts")
     if os.path.exists(os.path.join(path, scriptname)):
         return path
 
