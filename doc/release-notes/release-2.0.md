@@ -191,7 +191,7 @@ FIFOs are no longer seen as empty. #1147 #1163 @bocajnotnef
 When the k-size is requested to be larger than 32 (which is unsupported) a
 helpful error message is reported. #1094 #1050 @ctb
 
-We try to report more helpfuly during errors, such as suggesting the `--force`
+We try to report more helpfully during errors, such as suggesting the `--force`
 option when outputs files already exist. #1162 #1170 @bocajnotnef
 
 There is a paper related to `trim-low-abund.py`: "Crossing the streams: a
@@ -216,7 +216,7 @@ We've updated the URL to the '88m-reads.fa.gz' file. #1242 #1269 @mr-c
 
 `abundance-dist.py` can now be used without counts over 255 with
 `--no-bigcount`. #1067 #909 @drtamermansour @bocajnotnef Its input file
-requirement can no longer be overriden #1201 #1202 @bocajnotnef
+requirement can no longer be overridden #1201 #1202 @bocajnotnef
 
 khmer v2.0 will be released as a package for the Debian GNU/Linux operating
 system. Big thanks to @kdmurray91 for his assistance. #1148 #1240 The C++
