@@ -1,9 +1,9 @@
 # khmer v2.0 release notes
 
-This is the v2.0 release of khmer featuring and the first from our new lab at
-the University of California, Davis. It features Python 3 compatibility,
-streaming I/O from Unix Pipes, mixed-pair sequence file format support, and a
-new parameter to simplify memory usage. We also have a software paper in-press
+This is the v2.0 release of khmer and the first from our new lab at the
+University of California, Davis. It features Python 3 compatibility, streaming
+I/O from Unix Pipes, mixed-pair sequence file format support, and a new
+parameter to simplify memory usage. We also have a software paper in-press
 describing the project and the citation reminders have been updated to reflect
 that.
 
@@ -21,7 +21,7 @@ New behavior
 ### Streaming I/O from Unix Pipes
 
 All scripts now accept input from named (like `/dev/stdin`, or that
-created using `<( list )` process substituion) and unamed pipes (like
+created using `<( list )` process substituion) and unnamed pipes (like
 output piped in from another program with `|`). The STDIN stream can
 also be specified using a single dash: `-`. #1186 @mr-c #1042 #763 @SherineAwad
 \#1085 @ctb
