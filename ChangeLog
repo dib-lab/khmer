@@ -1,5 +1,10 @@
 2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
+   * tests/khmer_tst_utils.py: look in "EGG-INFO" for scripts before checking
+   the PATH
+
+2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
    * doc/release-notes/release-2.0.md: release notes for 2.0
    * doc/user/install.txt: correct second invocation of nosetests to match the
    first.
