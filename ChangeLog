@@ -1,3 +1,13 @@
+2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/release-notes/release-2.0.md: release notes for 2.0
+   * doc/user/install.txt: correct second invocation of nosetests to match the
+   first.
+   * setup.py: update the authors list for PyPI.
+   * doc/user/known-issues.rst: remove three fixed issues; add a new one
+   * doc/whats-new-2.0.rst: update to match the release notes
+   * doc/release-notes/*.rst: refresh using `make convert-release-notes'
+
 2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * *: complete audit of license headers

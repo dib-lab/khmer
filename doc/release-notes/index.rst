@@ -47,4 +47,5 @@ Contents:
    :titlesonly:
 
    release-1.*
+   release-2.*
 

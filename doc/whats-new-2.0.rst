@@ -74,6 +74,8 @@ reads as singletons or to require all reads be properly paired using
 :option:`--unpaired-reads <normalize-by-median.py --unpaired-reads>` can be
 used to include a file of unpaired reads. The unpaired reads will be examined
 after all of the other sequence files.
+:option:`normalize-by-median.py --quiet` can be used to reduce the amount of
+diagnostic output.
 
 Mixed-pair sequence file format support
 ---------------------------------------
@@ -111,7 +113,8 @@ Even with low error rate (and higher memory consumption), it is still much
 more efficient than exact counting and alternative methods.
 It supports multicore processing (using OpenMP) and streaming,
 and so can be used in conjunction with other scripts (like
-:program:`normalize-by-median.py` and :program:`filter-abund.py`).
+:program:`normalize-by-median.py` and :program:`filter-abund.py`). This is the
+work of Luiz Irber and it is the subject of a paper in draft.
 
 Incompatible changes
 ====================
