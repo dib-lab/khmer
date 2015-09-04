@@ -7,6 +7,10 @@ new parameter to simplify memory usage. We also have a software paper in-press
 describing the project and the citation reminders have been updated to reflect
 that.
 
+Overall there are an additional 2,380 lines of Python code (mostly tests) and
+283 less lines of C++ (despite adding features). This release is the product of
+over 1,000 commits to the codebase since v1.4.
+
 Documentation is at https://khmer.readthedocs.org/en/v2.0/
 
 ## New items of note:
@@ -207,7 +211,8 @@ supplied. #657 #814 #1208 @ACharbonneau @bocajnotnef
 
 We've updated the URL to the '88m-reads.fa.gz' file. #1242 #1269 @mr-c
 
-@camillecodon contributed an optimization for `normalize-by-median.py` #862
+@camillecodon designed and implemented an optimization for
+`normalize-by-median.py` #862
 
 `abundance-dist.py` can now be used without counts over 255 with
 `--no-bigcount`. #1067 #909 @drtamermansour @bocajnotnef Its input file
@@ -215,7 +220,7 @@ requirement can no longer be overriden #1201 #1202 @bocajnotnef
 
 khmer v2.0 will be released as a package for the Debian GNU/Linux operating
 system. Big thanks to @kdmurray91 for his assistance. #1148 #1240 The C++
-library, now named liboxli, will have its own package.
+library, now named liboxli, will have its own package as well.
 
 `sandbox/multi-rename.py` now wraps long FASTA sequences at 80 columns. #450
 \#1136 @SherineAwad
@@ -231,7 +236,7 @@ Python 2.7. Huge credit to @luizirber #978 #922 #1045 #1066 #1089 #1157 #1191
 removed a considerable amount of redundant code and will be very useful for
 future work. #1231 #1080
 
-We now use and allow all C++11 features in the codebase. #598 #1122 @mr-c 
+We now use some and allow all C++11 features in the codebase. #598 #1122 @mr-c 
 
 `normalize-by-median.py` was extensively refactored. #1006 #1010 #1057 #1039
 \#1135 #1182 @bocajnotnef @ctb @camillescott
@@ -319,13 +324,13 @@ headers is now autodetected for Doxygen and cppcheck.
 
 ## Known issues:
 
-Some users have reported that normalize-by-median.py will utilize more
-memory than it was configured for. This is being investigated in #266
+``load-graph.py`` in multithreaded mode will find slightly different number of
+unique kmers. This is being investigated in #1248
 
 ## Contributors
 
 @ctb, @bocajnotnef, @mr-c, @luizirber, @kdmurray91, @SherineAwad,
-@camillescott, @ACharbonneau
+@camillescott, \*@ACharbonneau
 
 \* Indicates new contributors
 

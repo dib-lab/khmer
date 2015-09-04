@@ -39,6 +39,6 @@
 Known Issues
 ============
 
-Some users have reported that normalize-by-median.py will utilize more
-memory than it was configured for. This is being investigated in
-https://github.com/dib-lab/khmer/issues/266
+``load-graph.py`` in multithreaded mode will find slightly different number of
+unique kmers. This is being investigated in
+https://github.com/dib-lab/khmer/issues/1248
