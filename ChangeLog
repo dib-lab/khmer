@@ -1,3 +1,9 @@
+2015-09-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/test_scripts.py: make the script version test more specific; double
+   check that script in question is from the 'khmer' project based upon the
+   second line of the file.
+
 2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * tests/khmer_tst_utils.py: look in "EGG-INFO" for scripts before checking

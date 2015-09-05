@@ -3722,4 +3722,8 @@ def check_version(scriptname):
 def test_version():
     for entry in os.listdir(utils.scriptpath()):
         if entry.endswith(".py"):
-            yield check_version, entry
+            with open(os.path.join(utils.scriptpath(), entry)) as script:
+                line = script.readline()
+                line = script.readline()
+                if 'khmer' in line:
+                    yield check_version, entry
