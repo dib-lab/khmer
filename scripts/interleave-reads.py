@@ -134,7 +134,7 @@ def main():
         name1 = read1.name
         name2 = read2.name
 
-        if not args.no_format:
+        if not args.no_reformat:
             if not check_is_left(name1):
                 name1 += '/1'
             if not check_is_right(name2):
