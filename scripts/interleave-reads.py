@@ -76,7 +76,7 @@ def get_parser():
     formatted properly, they are reformatted consistently, such that
     they look like the pre-1.8 Casava format (`@name/1`, `@name/2`).
     This reformatting can be switched off with the 
-    :option:`--ignore-name-format` flag.
+    :option:`--no-reformat` flag.
 
     Example::
 
@@ -93,8 +93,8 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--ignore-name-format', default=False, action='store_true',
-                        help='Ignore read name format when checking pair consistency')
+    parser.add_argument('--no-reformat', default=False, action='store_true',
+                        help='Do not reformat read names or enforce constistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -134,7 +134,7 @@ def main():
         name1 = read1.name
         name2 = read2.name
 
-        if not args.ignore_name_format:
+        if not args.no_format:
             if not check_is_left(name1):
                 name1 += '/1'
             if not check_is_right(name2):
