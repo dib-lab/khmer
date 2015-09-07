@@ -1,3 +1,9 @@
+2015-09-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/roadmap.rst: Updated for 2.0 release.
+   * README.rst: drop unstable badges; fix links
+   * doc/index.rst: point at getting help guide
+
 2015-09-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * tests/test_scripts.py: make the script version test more specific; double
