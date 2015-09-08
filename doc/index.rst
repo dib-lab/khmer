@@ -66,9 +66,7 @@ common research tasks <https://khmer-recipes.readthedocs.org/>`__.
 You might also be interested in :doc:`papers using or citing khmer
 <user/biblio>`.
 
-**To get help**, please ask questions on `the khmer mailing list
-<http://lists.idyll.org/listinfo/khmer>`__ or `post an issue on
-GitHub <https://github.com/dib-lab/khmer/issues/new>`__.
+**To get help**, :doc:`please follow this guide <user/getting-help>`.
 
 We welcome contributions to the khmer project!  We are friendly and
 supportive of new contributors, and have a :doc:`code of conduct
