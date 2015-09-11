@@ -106,6 +106,7 @@ def test_update_from():
     assert other_nodegraph.get('GCGCG') == 0
     assert other_nodegraph.n_occupied() == 1
 
+
 def test_update_from_2():
 
     ng1 = khmer.Nodegraph(20, 1000, 4)
