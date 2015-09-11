@@ -200,6 +200,9 @@ void Hashbits::update_from(const Hashbits &other)
     if (_tablesizes != other._tablesizes) {
         throw khmer_exception("both nodegraphs must have same table sizes");
     }
+
+    Byte tmp = 0;
+
     for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
         Byte * me = _counts[table_num];
         Byte * ot = other._counts[table_num];
@@ -207,7 +210,11 @@ void Hashbits::update_from(const Hashbits &other)
         HashIntoType tablebytes = tablesize / 8 + 1;
 
         for (HashIntoType index = 0; index < tablebytes; index++) {
-            me[index] |= ot[index];     // bitwise or
+            tmp = me[index] | ot[index];
+            if (table_num == 0) {
+              _occupied_bins += __builtin_popcountll(me[index] ^ tmp);
+            }
+            me[index] = tmp;   
         }
     }
 }
