@@ -200,6 +200,7 @@ void Hashbits::update_from(const Hashbits &other)
     if (_tablesizes != other._tablesizes) {
         throw khmer_exception("both nodegraphs must have same table sizes");
     }
+    Byte tmp = 0;
     for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
         Byte * me = _counts[table_num];
         Byte * ot = other._counts[table_num];
@@ -207,7 +208,20 @@ void Hashbits::update_from(const Hashbits &other)
         HashIntoType tablebytes = tablesize / 8 + 1;
 
         for (HashIntoType index = 0; index < tablebytes; index++) {
-            me[index] |= ot[index];     // bitwise or
+            // Bloom filters can be unioned with bitwise OR.
+            // First, get the new value
+            tmp = me[index] | ot[index];
+            if (table_num == 0) {
+                // We'd like for the merged filter to have an accurate count of occupied bins.
+                // First, observe that HammingDistance(x,y) is equivalent to HammingWeight(x^y).
+                // Then, observe that the number of additional occupied bins from the update
+                // is the hamming distance between the original bin and the OR'd bin. Thus,
+                // we can use the builtin popcountll function, which calls a hardware instruction
+                // for hamming weight, with the original and merged bin, to find the number of
+                // additional occupied bins.
+                _occupied_bins += __builtin_popcountll(me[index] ^ tmp);
+            }
+            me[index] = tmp;
         }
     }
 }

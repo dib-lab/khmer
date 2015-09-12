@@ -74,29 +74,52 @@ def test_update_from():
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 0
+    assert nodegraph.n_occupied() == 0
     assert other_nodegraph.get('AAAAA') == 0
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 0
 
     other_nodegraph.count('AAAAA')
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 0
+    assert nodegraph.n_occupied() == 0
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
 
     nodegraph.count('GCGCG')
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 1
+    assert nodegraph.n_occupied() == 1
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
 
     nodegraph.update(other_nodegraph)
 
     assert nodegraph.get('AAAAA') == 1
     assert nodegraph.get('GCGCG') == 1
+    assert nodegraph.n_occupied() == 2
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
+
+
+def test_update_from_2():
+
+    ng1 = khmer.Nodegraph(20, 1000, 4)
+    ng2 = khmer.Nodegraph(20, 1000, 4)
+
+    filename = utils.get_test_data('random-20-a.fa')
+    ng1.consume_fasta(filename)
+    ng2.consume_fasta(filename)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
+    ng1.update(ng2)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
 
 
 def test_update_from_diff_ksize_2():

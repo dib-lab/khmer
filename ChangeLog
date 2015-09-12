@@ -1,3 +1,9 @@
+2015-09-11  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashbits.cc: Make hasbits::update_from() correctly update
+   _occupied_bins.
+   * lib/test_nodegraph.py: Test Nodegraph.n_occupied() after update.
+
 2015-09-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * doc/roadmap.rst: Updated for 2.0 release.
