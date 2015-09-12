@@ -1,13 +1,40 @@
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2015, The Regents of the University of California.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,invalid-name,unused-variable
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-#
-# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,invalid-name,unused-variable
-
 import os
 import shutil
 import threading
@@ -37,7 +64,7 @@ def test_normalize_by_median_loadgraph_with_args():
     tablefile = utils.get_temp_filename("table")
     in_dir = os.path.dirname(tablefile)
 
-    script = "load-into-countgraph.py"
+    script = "load-into-counting.py"
     args = [tablefile, infile]
     (status, out, err) = utils.runscript(script, args)
 
@@ -97,7 +124,7 @@ def test_normalize_by_median_quiet():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(out) == 0, out
-    assert len(err) == 0, err
+    assert len(err) < 460, len(err)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -207,7 +234,7 @@ def test_normalize_by_median_contradictory_args():
     shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', '1', '-k', '17', '--force-single', '-p', '-R',
+    args = ['-C', '1', '-k', '17', '--force_single', '-p', '-R',
             outfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
@@ -359,7 +386,7 @@ def test_normalize_by_median_count_kmers_PE():
     shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = 'normalize-by-median.py'
 
-    args = ['-C', CUTOFF, '-k', '17', '--force-single', infile]
+    args = ['-C', CUTOFF, '-k', '17', '--force_single', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert 'Total number of unique k-mers: 98' in err, err
     assert 'kept 1 of 2 or 50.0%' in err, err
@@ -707,7 +734,7 @@ def test_diginorm_basic_functionality_2():
     # single', only random seqs should be kept, together with one copy
     # of the multicopy sequence.
     CUTOFF = ['-C', '1']
-    PAIRING = ['--force-single']
+    PAIRING = ['--force_single']
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)

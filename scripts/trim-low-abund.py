@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2012-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 """
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
 
@@ -29,7 +57,7 @@ from khmer import khmer_args
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -50,21 +78,22 @@ def trim_record(read, trim_at):
 
 
 def get_parser():
-    epilog = """
-    The output is one file for each input file, <input file>.abundtrim, placed
-    in the current directory.  This output contains the input sequences
+    epilog = """\
+    The output is one file for each input file, ``<input file>.abundtrim``,
+    placed in the current directory.  This output contains the input sequences
     trimmed at low-abundance k-mers.
 
-    The ``-V/--variable-coverage`` parameter will, if specified,
-    prevent elimination of low-abundance reads by only trimming
+    The :option:`-V`/:option:`--variable-coverage` parameter will, if
+    specified, prevent elimination of low-abundance reads by only trimming
     low-abundance k-mers from high-abundance reads; use this for
     non-genomic data sets that may have variable coverage.
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use ``load-into-countgraph.py`` and ``filter-abund.py``.  However, read
-    pairs will be kept together, in "broken-paired" format; you can use
-    ``extract-paired-reads.py`` to extract read pairs and orphans.
+    use :program:`load-into-countgraph.py` and :program:`filter-abund.py`.
+    However, read pairs will be kept together, in "broken-paired" format; you
+    can use :program:`extract-paired-reads.py` to extract read pairs and
+    orphans.
 
     Example::
 
@@ -200,7 +229,7 @@ class Trimmer(object):
 
 def main():
     info('trim-low-abund.py', ['streaming'])
-    parser = sanitize_epilog(get_parser())
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
 
     ###

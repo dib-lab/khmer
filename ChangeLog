@@ -1,3 +1,150 @@
+2015-09-11  Russell Y. Neches <ryneches@ucdavis.edu>
+   * lib/hashbits.hh: added get_raw_tables to Hashbits
+   * khmer/_khmer.cc: added get_raw_tables to Hashbits
+   * tests/test_nodegraph.py: added test for Nodegraph.get_raw_tables
+
+2015-09-11  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashbits.cc: Make hasbits::update_from() correctly update
+   _occupied_bins.
+   * lib/test_nodegraph.py: Test Nodegraph.n_occupied() after update.
+
+2015-09-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/roadmap.rst: Updated for 2.0 release.
+   * README.rst: drop unstable badges; fix links
+   * doc/index.rst: point at getting help guide
+
+2015-09-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/test_scripts.py: make the script version test more specific; double
+   check that script in question is from the 'khmer' project based upon the
+   second line of the file.
+
+2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/khmer_tst_utils.py: look in "EGG-INFO" for scripts before checking
+   the PATH
+
+2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/release-notes/release-2.0.md: release notes for 2.0
+   * doc/user/install.txt: correct second invocation of nosetests to match the
+   first.
+   * setup.py: update the authors list for PyPI.
+   * doc/user/known-issues.rst: remove three fixed issues; add a new one
+   * doc/whats-new-2.0.rst: update to match the release notes
+   * doc/release-notes/*.rst: refresh using `make convert-release-notes'
+
+2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * *: complete audit of license headers
+   * LICENSE: listings of some of the third-party licenses
+   * bink.ipynb,lib/graphtest.cc,lib/primes.hh: deleted unused files
+   * sandbox/assemstats.py: updated screed install instructions
+
+2015-09-02  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * *: finish undoing the `load-graph.py` rename
+
+2015-09-02  Micheal R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/requirements.txt: Update URL to sphinxcontrib-autoprogram tarball
+
+2015-08-31  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/thread_utils.py: Use the robust test for paired reads from
+   khmer.utils; drop `is_pair()`
+   * tests/test_threaded_sequence_processor.py: Update to use Screed Record
+   objects.
+
+2015-08-28  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/whats-new-2.0.rst: Many updates from `diff`ing the `--help` output of
+   version 1.4.1 vs now.
+   * Makefile: build the project if needed when making a PDF
+   * doc/index.rst: fixed inter-doc links to be relative
+   * doc/user/blog-posts.rst: replaced link to 88m-reads.fa.gz with a working
+   URL
+   * doc/user/{choosing-table-sizes,guide}.rst: disambiguated :option:
+   references so that they link properly.
+   * scripts/README.txt: removed unhelpful file
+   * scripts/normalize-by-median.py: replace `--force-single` with
+   `--force_single`. Added help text for `--cutoff`.
+
+2015-08-27  Titus Brown  <titus@idyll.org>
+
+  * doc/dev/getting-started.rst: fixed a few misspellings.
+
+2015-08-26  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/test_scripts.py: removed the unused `_DEBUG_make_graph` function in
+   favor of other debugging methods like `ipdb`. Added
+   test_do_partition_no_big_traverse and test_extract_paired_reads_unpaired.
+
+2015-08-24  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * khmer/khmer_args.py: Replaced sanitize_epilog() with santize_help() that
+   reflows the text of ArgParse descriptions and epilog while preserving the
+   formatting. Enhanced removal of Sphinx directives by replacing double
+   backticks with the double quote character.
+   * scripts/*.py: Renamed sanitize_epilog to sanitize_help; leading newlines
+   from triple-quoted epilogs removed; formatting made consistent;
+   sanitize_help and ComboFormatter added where it was missing; a couple
+   script specific epilog reformatting (for use of `:doc:` and a
+   hyperlink).
+   * scripts/{count-median,filter-abund-single}.py: Fixed printing of output
+   file name to do so instead of printing information about the file handle.
+   * scripts/count-median.py: Added missing command so that example given
+   actually works.
+   * scripts/filter-abund-single.py: Removed redundant printing of output file
+   names.
+   * scripts/normalize-by-median.py: Removed unused option "-d" from an example
+   command (left over from the "--dump-frequency" era).
+   * scripts/{partition-graph.py,do-partition.py}: Fixed erasure of the queue
+   module name in the worker functions, which is necessary for basic
+   functionality.
+   * scripts/{do-partition,abundance-dist,abundance-dist-single,
+   extract-long-sequences}.py: Added an example command to the epilog.
+   * tests/khmer_tst_utils.py: Added 'name' attribute to make the fake
+   sys.stdout more like a read stdout object.
+   * oxli/__init__.py: removed redundant and unused help text
+   * scripts/{abundance-dist,annotate-partitions,count-median,
+   extract-long-sequences,extract-paired-reads,extract-partitions,
+   fastq-to-fasta,filter-abund,filter-stopgaps,interleave-reads,
+   load-into-graph,merge-partitions,normalize-by-median,partition-graph,
+   readstats,sample-reads-randomly,split-paired-reads}.py: made "--version"
+   and the citation header consistent across the scripts.
+   * tests/test_scripts.py: added tests for the "--version" and citation
+   header behavior.
+   * tests/test_normalize_by_median.py: updated test for 'quiet' mode as
+   citation header still prints to STDERR.
+   * setup.py,tests/test_scripts.py: turned off the "oxli" script for v2.0.
+
+2015-08-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * Makefile: remove BASH shell designation that appears to be incompatible
+   with OS X Mavericks & virtualenv; refactored out BASH-isms for those whose
+   default shell isn't BASH (Debian, and others).
+   * lib/test-read-aligner.cc,read_aligner_test.sh: removed unused test files
+   found during search for other shell scripts with BASHisms.
+
+2015-08-18  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * *: reverted load-into-counting.py -> load-into-countgraph.py and
+   load-graph.py -> load-into nodegraph.py rename.
+   * CITATION: unescaped URL
+   * doc/user/guide.rst: added `:program:` and `:option:` directives as
+   needed; replaced references to `strip-and-split-for-assembly` with
+   `extract-paired-reads`. Updated instructions to use `--unpaired-reads` with
+   `normalize-by-median.py` instead of second round of diginorm.
+
+2015-08-18  Titus Brown  <titus@idyll.org>
+
+   * doc/index.rst: update introductory text.
+   * doc/user/biblio.rst: update bibliography link descriptions and text.
+   * doc/_static/labibi.css: reference new location of base CSS
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * scripts/unique-kmers.py: Rename option --stream-out to --stream-records.

@@ -1,16 +1,42 @@
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2014-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+# pylint: disable=C0111,C0103,E1103,W0612
 
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-
-# pylint: disable=C0111,C0103,E1103,W0612
-
 import json
 import sys
 import os
@@ -23,6 +49,7 @@ import threading
 import bz2
 import gzip
 import io
+import re
 
 from . import khmer_tst_utils as utils
 import khmer
@@ -42,7 +69,7 @@ def test_check_space():
 
 
 def test_load_into_counting():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -56,7 +83,7 @@ def test_load_into_counting():
 
 
 def test_load_into_counting_autoargs_0():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
 
     outfile = utils.get_temp_filename('table')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -72,7 +99,7 @@ def test_load_into_counting_autoargs_0():
 
 
 def test_load_into_counting_autoargs_1():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
 
     outfile = utils.get_temp_filename('table')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -86,7 +113,7 @@ def test_load_into_counting_autoargs_1():
 
 
 def test_load_into_count_graphsize_warning():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -100,7 +127,7 @@ def test_load_into_count_graphsize_warning():
 
 
 def test_load_into_counting_max_memory_usage_parameter():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-M', '2e3', '-k', '20']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -117,7 +144,7 @@ def test_load_into_counting_max_memory_usage_parameter():
 
 
 def test_load_into_counting_abundance_dist_nobig():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-b']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -143,7 +170,7 @@ def test_load_into_counting_abundance_dist_squashing():
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args = [graphfile, infile]
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     utils.runscript(script, args)
 
     histogram = utils.get_temp_filename('histogram')
@@ -176,7 +203,7 @@ def test_load_into_counting_abundance_dist_squashing():
 
 
 def test_load_into_counting_nonwritable():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('test-nonwritable')
@@ -195,7 +222,7 @@ def test_load_into_counting_nonwritable():
 
 @attr('huge')
 def test_load_into_counting_toobig():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -209,7 +236,7 @@ def test_load_into_counting_toobig():
 
 
 def test_load_into_counting_fail():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out.ct')
@@ -224,7 +251,7 @@ def test_load_into_counting_fail():
 
 
 def test_load_into_counting_multifile():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out.kh')
@@ -239,7 +266,7 @@ def test_load_into_counting_multifile():
 
 
 def test_load_into_counting_tsv():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -262,7 +289,7 @@ def test_load_into_counting_tsv():
 
 
 def test_load_into_counting_json():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -293,7 +320,7 @@ def test_load_into_counting_json():
 
 
 def test_load_into_counting_bad_summary_fmt():
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
     outfile = utils.get_temp_filename('out.ct')
@@ -307,7 +334,7 @@ def test_load_into_counting_bad_summary_fmt():
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
-    script = 'load-into-countgraph.py'
+    script = 'load-into-counting.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
     if not BIGCOUNT:
@@ -766,7 +793,7 @@ def test_count_median_fq_csv_stdout():
 
 
 def test_load_graph():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20']
 
     outfile = utils.get_temp_filename('out')
@@ -792,12 +819,13 @@ def test_load_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_build_graph():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
@@ -822,12 +850,13 @@ def test_oxli_build_graph():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_build_graph_unique_kmers_arg():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
@@ -854,12 +883,13 @@ def test_oxli_build_graph_unique_kmers_arg():
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
 
+@attr('known_failing')
 def test_oxli_nocommand():
     script = 'oxli'
 
@@ -868,7 +898,7 @@ def test_oxli_nocommand():
 
 
 def test_load_graph_no_tags():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -890,6 +920,7 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
+@attr('known_failing')
 def test_oxli_build_graph_no_tags():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
@@ -914,7 +945,7 @@ def test_oxli_build_graph_no_tags():
 
 
 def test_load_graph_fail():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -927,6 +958,7 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+@attr('known_failing')
 def test_oxli_build_graph_fail():
     script = 'oxli'
     args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -942,7 +974,7 @@ def test_oxli_build_graph_fail():
 
 
 def test_load_graph_write_fp():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
 
     outfile = utils.get_temp_filename('out')
@@ -963,6 +995,7 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
+@attr('known_failing')
 def test_oxli_build_graph_write_fp():
     script = 'oxli'
     # use small HT
@@ -987,7 +1020,7 @@ def test_oxli_build_graph_write_fp():
 
 
 def test_load_graph_multithread():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
 
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
@@ -997,6 +1030,7 @@ def test_load_graph_multithread():
     (status, out, err) = utils.runscript(script, args)
 
 
+@attr('known_failing')
 def test_oxli_build_graph_multithread():
     script = 'oxli'
 
@@ -1009,7 +1043,7 @@ def test_oxli_build_graph_multithread():
 
 
 def test_load_graph_max_memory_usage_parameter():
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-M', '2e7', '-k', '20', '-n']
 
     outfile = utils.get_temp_filename('out')
@@ -1036,7 +1070,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
-    script = 'load-into-nodegraph.py'
+    script = 'load-graph.py'
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
@@ -1079,67 +1113,11 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     return outfile
 
 
-def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
-                      do_partition=False,
-                      annotate_partitions=False,
-                      stop_big_traverse=False):
-    script = 'load-into-nodegraph.py'
-    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
-
-    outfile = utils.get_temp_filename('out')
-    infile = utils.get_test_data(infilename)
-
-    args.extend([outfile, infile])
-
-    utils.runscript(script, args)
-
-    ht_file = outfile + '.ct'
-    assert os.path.exists(ht_file), ht_file
-
-    tagset_file = outfile + '.tagset'
-    assert os.path.exists(tagset_file), tagset_file
-
-    if do_partition:
-        print(">>>> DEBUG: Partitioning <<<")
-        script = 'partition-graph.py'
-        args = [outfile]
-        if stop_big_traverse:
-            args.insert(0, '--no-big-traverse')
-        utils.runscript(script, args)
-
-        print(">>>> DEBUG: Merging Partitions <<<")
-        script = 'merge-partitions.py'
-        args = [outfile, '-k', str(ksize)]
-        utils.runscript(script, args)
-
-        final_pmap_file = outfile + '.pmap.merged'
-        assert os.path.exists(final_pmap_file)
-
-        if annotate_partitions:
-            print(">>>> DEBUG: Annotating Partitions <<<")
-            script = 'annotate-partitions.py'
-            args = ["-k", str(ksize), outfile, infilename]
-
-            in_dir = os.path.dirname(outfile)
-            utils.runscript(script, args, in_dir)
-
-            baseinfile = os.path.basename(infilename)
-            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
-
-    return outfile
-
-
 def test_partition_graph_1():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
-    script = 'partition-graph.py'
-    args = [graphbase]
-
-    utils.runscript(script, args)
-
-    script = 'merge-partitions.py'
-    args = [graphbase, '-k', str(20)]
-    utils.runscript(script, args)
+    utils.runscript('partition-graph.py', [graphbase])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
 
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
@@ -1274,6 +1252,23 @@ def test_partition_find_knots_existing_stoptags():
     assert os.path.exists(stoptags_file)
     assert "loading stoptags" in err, err
     assert "these output stoptags will include the already" in err, err
+
+
+def test_partition_graph_too_many_threads():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    utils.runscript('partition-graph.py', [graphbase, '--threads', '100'])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_nodegraph(graphbase)
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
 
 
 def test_annotate_partitions():
@@ -1717,6 +1712,25 @@ def test_do_partition():
     assert len(parts) == 1
 
 
+def test_do_partition_no_big_traverse():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = 'do-partition.py'
+    args = ["-k", "20", "--no-big-traverse", "--threads=100", graphbase,
+            seqfile]
+
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+
 def test_do_partition_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -1941,19 +1955,19 @@ def test_interleave_reads_2_fa():
 
 
 def test_make_initial_stoptags():
-    # gen input files using load-into-nodegraph.py -t
+    # gen input files using load-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-nodegraph works properly
+    # this assumes (obv.) load-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-nodegraph.py'
+    genscript = 'load-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-nodegraphs
+    # test input file gen'd by load-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -1973,19 +1987,19 @@ def test_make_initial_stoptags():
 
 
 def test_make_initial_stoptags_load_stoptags():
-    # gen input files using load-into-nodegraph.py -t
+    # gen input files using load-graph.py -t
     # should keep test_data directory size down
     # or something like that
-    # this assumes (obv.) load-into-nodegraph works properly
+    # this assumes (obv.) load-graph.py works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
     shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
 
-    genscript = 'load-into-nodegraph.py'
+    genscript = 'load-graph.py'
     genscriptargs = ['test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
 
-    # test input file gen'd by load-into-nodegraphs
+    # test input file gen'd by load-graph.pys
     infile = utils.get_temp_filename('test-reads.pt')
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
 
@@ -2004,6 +2018,22 @@ def test_make_initial_stoptags_load_stoptags():
     args = ['test-reads', '--stoptags', 'test-reads.stoptags']
     utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile1), outfile1
+
+
+def test_extract_paired_reads_unpaired():
+    # test input file
+    infile = utils.get_test_data('random-20-a.fa')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('unpaired.pe.fa')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('unpaired.se.fa', in_dir)
+
+    script = 'extract-paired-reads.py'
+    args = [infile]
+
+    (_, _, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert 'no paired reads!? check file formats...' in err, err
 
 
 def test_extract_paired_reads_1_fa():
@@ -2406,8 +2436,9 @@ def test_split_paired_reads_3_output_dir():
     ex_outfile2 = utils.get_test_data('paired.fq.2')
 
     # actual output files...
-    outfile1 = utils.get_temp_filename('paired.fq.1')
-    output_dir = os.path.dirname(outfile1)
+    testdir = utils.get_temp_filename('test')
+    output_dir = os.path.join(os.path.dirname(testdir), "out")
+    outfile1 = utils.get_temp_filename('paired.fq.1', output_dir)
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = 'split-paired-reads.py'
@@ -3059,7 +3090,7 @@ def _execute_load_graph_streaming(filename):
 
     args = '-x 1e7 -N 2 -k 20 out -'
 
-    cmd = 'cat {infile} | {scripts}/load-into-nodegraph.py {args}'.format(
+    cmd = 'cat {infile} | {scripts}/load-graph.py {args}'.format(
         infile=infile, scripts=scripts, args=args)
 
     (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
@@ -3082,7 +3113,7 @@ def _execute_load_graph_streaming(filename):
 
     # check to make sure we get the expected result for this data set
     # upon partitioning (all in one partition).  This is kind of a
-    # roundabout way of checking that load-into-nodegraph worked :)
+    # roundabout way of checking that load-graph.py worked :)
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
@@ -3466,7 +3497,7 @@ def test_trim_low_abund_trimtest_after_load():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
-    utils.runscript('load-into-countgraph.py', args, in_dir)
+    utils.runscript('load-into-counting.py', args, in_dir)
 
     args = ["-Z", "2", "-C", "2", "-V", '--loadgraph', saved_table, infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -3678,3 +3709,22 @@ def test_unique_kmers_multiple_inputs():
     assert ('Estimated number of unique 20-mers in {0}: 232'.format(infiles[1])
             in err)
     assert 'Total estimated number of unique 20-mers: 4170' in err
+
+
+def check_version_and_basic_citation(scriptname):
+    version = re.compile("^khmer .*$", re.MULTILINE)
+    status, out, err = utils.runscript(scriptname, ["--version"])
+    assert status == 0, status
+    assert "publication" in err, err
+    assert version.search(err) is not None, err
+
+
+def test_version():
+    for entry in os.listdir(utils.scriptpath()):
+        if entry.endswith(".py"):
+            with open(os.path.join(utils.scriptpath(), entry)) as script:
+                line = script.readline()
+                line = script.readline()
+                if 'khmer' in line:  # simple check of copyright line.
+                    yield check_version_and_basic_citation, entry
+                    # emit test for each script

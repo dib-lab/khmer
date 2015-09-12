@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
 Produce the k-mer abundance distribution for the given file.
@@ -25,19 +53,24 @@ import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
 
 
 def get_parser():
-    epilog = '''
-    Note that with :option:`-b` this script is constant memory; in exchange,
-    k-mer counts will stop at 255. The memory usage of this script with
-    :option:`-b` will be about 1.15x the product of the :option:`-x` and
-    :option:`-N` numbers.
+    epilog = '''\
+    Note that with :option:`-b`/:option:`--no-bigcount` this script is constant
+    memory; in exchange, k-mer counts will stop at 255. The memory usage of
+    this script with :option:`-b` will be about 1.15x the product of the
+    :option:`-x` and :option:`-N` numbers.
 
     To count k-mers in multiple files use :program:`load_into_counting.py` and
     :program:`abundance_dist.py`.
+
+    Example::
+
+        abundance-dist-single.py -x 1e7 -N 2 -k 17 \\
+                tests/test-data/test-abund-read-2.fa test-dist
     '''
     parser = build_counting_args(
         descr="Calculate the abundance distribution of k-mers from a "
@@ -69,7 +102,7 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     info('abundance-dist-single.py', ['counting', 'SeqAn'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)

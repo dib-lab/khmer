@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring
 """
 Eliminate surplus reads.
@@ -28,7 +56,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_epilog)
+                              sanitize_help)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -182,7 +210,7 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
@@ -196,7 +224,7 @@ def get_parser():
     :option:`--unpaired-reads` can be used to supply a file of orphan
     reads to be read after the paired reads.
 
-    :option:`--force-single` will ignore all pairing information and treat
+    :option:`--force_single` will ignore all pairing information and treat
     reads individually.
 
     With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
@@ -204,7 +232,7 @@ def get_parser():
     processed. :option:`-l`/:option:`--loadgraph` will load the
     specified k-mer countgraph before processing the specified
     files.  Note that these graphs are are in the same format as those
-    produced by :program:`load-into-countgraph.py` and consumed by
+    produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
 
     To append reads to an output file (rather than overwriting it), send output
@@ -232,19 +260,21 @@ def get_parser():
 
     Example::
 
-        normalize-by-median.py -k 17 -d 2 -s test.ct \\
+        normalize-by-median.py -k 17 -s test.ct \\
         tests/test-data/test-abund-read-2.fa \\
-        tests/test-data/test-fastq-reads"""
+        tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('-C', '--cutoff', type=int,
+    parser.add_argument('-C', '--cutoff', type=int, help="when the median "
+                        "k-mer coverage level above is above this numer the "
+                        "read is not kept.",
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')
-    parser.add_argument('--force-single', dest='force_single',
+    parser.add_argument('--force_single', dest='force_single',
                         action='store_true',
                         help='treat all sequences as single-ended/unpaired')
     parser.add_argument('-u', '--unpaired-reads',
@@ -252,7 +282,7 @@ def get_parser():
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
     parser.add_argument('-s', '--savegraph', metavar="filename", default='',
-                        help='save the k-mer countgraph to disk after all'
+                        help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='report_filename', type=argparse.FileType('w'))
@@ -277,12 +307,10 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-
-    parser = sanitize_epilog(get_parser())
-    parser = get_parser()
+    info('normalize-by-median.py', ['diginorm'])
+    parser = sanitize_help(get_parser())
     args = parser.parse_args()
     configure_logging(args.quiet)
-    info('normalize-by-median.py', ['diginorm'])
     report_on_config(args)
 
     report_fp = args.report

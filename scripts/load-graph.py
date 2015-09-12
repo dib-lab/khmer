@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2011-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,34 +33,31 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-from __future__ import print_function
-import khmer
+# pylint disable=missing-docstring
+"""
+Build a graph from the given sequences, save in <ptname>.
+
+% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
+
+Use '-h' for parameter help.
+"""
+
 import sys
-import gc
-import glob
 
-K = 32
+from khmer.khmer_args import build_nodegraph_args, info
+from oxli import build_graph
 
 
-def main():
-    subset_filenames = sys.argv[1:]
+def get_parser():
+    parser = build_nodegraph_args(descr="Load sequences into the compressible "
+                                  "graph format plus optional tagset.")
 
-    ht = khmer.Nodegraph(K, 1, 1)
-    for filename in subset_filenames:
-        print('--')
-        print('partition map:', filename)
-        subset = ht.load_subset_partitionmap(filename)
-        n_part, n_orphan = ht.subset_count_partitions(subset)
-        print('num partitions:', n_part)
-        print('num orphans:', n_orphan)
-
-        (dist, n_unassigned) = ht.subset_partition_size_distribution(subset)
-        for (size, count) in dist:
-            print(size, count)
-        print('%d unassigned tags' % n_unassigned)
-
-        print('--')
+    parser = build_graph.build_parser(parser)
+    return parser
 
 
 if __name__ == '__main__':
-    main()
+    info('load-graph.py', ['graph', 'SeqAn'])
+    build_graph.main(get_parser().parse_args())
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

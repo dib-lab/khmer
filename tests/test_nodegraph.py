@@ -1,9 +1,37 @@
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,
 
 from __future__ import print_function
@@ -46,29 +74,52 @@ def test_update_from():
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 0
+    assert nodegraph.n_occupied() == 0
     assert other_nodegraph.get('AAAAA') == 0
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 0
 
     other_nodegraph.count('AAAAA')
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 0
+    assert nodegraph.n_occupied() == 0
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
 
     nodegraph.count('GCGCG')
 
     assert nodegraph.get('AAAAA') == 0
     assert nodegraph.get('GCGCG') == 1
+    assert nodegraph.n_occupied() == 1
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
 
     nodegraph.update(other_nodegraph)
 
     assert nodegraph.get('AAAAA') == 1
     assert nodegraph.get('GCGCG') == 1
+    assert nodegraph.n_occupied() == 2
     assert other_nodegraph.get('AAAAA') == 1
     assert other_nodegraph.get('GCGCG') == 0
+    assert other_nodegraph.n_occupied() == 1
+
+
+def test_update_from_2():
+
+    ng1 = khmer.Nodegraph(20, 1000, 4)
+    ng2 = khmer.Nodegraph(20, 1000, 4)
+
+    filename = utils.get_test_data('random-20-a.fa')
+    ng1.consume_fasta(filename)
+    ng2.consume_fasta(filename)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
+    ng1.update(ng2)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
 
 
 def test_update_from_diff_ksize_2():
@@ -511,6 +562,18 @@ def test_extract_unique_paths_4():
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     print(x)
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
+
+
+def test_get_raw_tables():
+    kh = khmer.Nodegraph(10, 1e6, 4)
+    kh.consume('ATGGAGAGAC')
+    kh.consume('AGTGGCGATG')
+    kh.consume('ATAGACAGGA')
+    tables = kh.get_raw_tables()
+
+    for size, table in zip(kh.hashsizes(), tables):
+        assert isinstance(table, memoryview)
+        assert size == len(table)
 
 
 def test_find_unpart():
