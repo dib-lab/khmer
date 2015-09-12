@@ -564,6 +564,18 @@ def test_extract_unique_paths_4():
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
+def test_get_raw_tables():
+    kh = khmer.Nodegraph(10, 1e6, 4)
+    kh.consume('ATGGAGAGAC')
+    kh.consume('AGTGGCGATG')
+    kh.consume('ATAGACAGGA')
+    tables = kh.get_raw_tables()
+
+    for size, table in zip(kh.hashsizes(), tables):
+        assert isinstance(table, memoryview)
+        assert size == len(table)
+
+
 def test_find_unpart():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
