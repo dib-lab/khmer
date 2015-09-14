@@ -570,7 +570,7 @@ def test_readstats_1():
 
 def test_unique_kmers_empty_stream():
     cmd = "cat < /dev/null | {scripts}/unique-kmers.py -k 20 -".format(
-            scripts=scriptpath())
+        scripts=scriptpath())
 
     (status, out, err) = run_shell_cmd(cmd)
 
