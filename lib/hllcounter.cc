@@ -424,6 +424,8 @@ void HLLCounter::consume_fasta(
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
+                } catch (khmer::StreamReadError) {
+                    break;
                 } catch (read_parsers::NoMoreReadsAvailable) {
                     break;
                 }

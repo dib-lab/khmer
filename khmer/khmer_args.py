@@ -294,11 +294,15 @@ def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
      - num_kmers: number of unique kmer
      - mem_cap: the allotted amount of memory
     """
+    if num_kmers == 0:
+        num_kmers = 1
     n_tables = math.log(2) * (mem_cap / float(num_kmers))
     int_n_tables = int(n_tables)
     if int_n_tables == 0:
         int_n_tables = 1
     ht_size = int(mem_cap / int_n_tables)
+    if ht_size == 0:
+        ht_size = 1
     mem_cap = ht_size * int_n_tables
     fp_rate = (1 - math.exp(-num_kmers / float(ht_size))) ** int_n_tables
     res = namedtuple("result", ["num_htables", "htable_size", "mem_use",
@@ -321,6 +325,8 @@ def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
 
     ht_size = int(-num_kmers / (
         math.log(1 - des_fp_rate ** (1 / float(int_n_tables)))))
+    if ht_size == 0:
+        ht_size = 1
     mem_cap = ht_size * int_n_tables
     fp_rate = (1 - math.exp(-num_kmers / float(ht_size))) ** int_n_tables
 

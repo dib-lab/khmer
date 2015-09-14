@@ -568,6 +568,16 @@ def test_readstats_1():
     assert '18114,1001,18.1,-' in open(out1).read(), open(out1).read()
 
 
+def test_unique_kmers_empty_stream():
+    cmd = "cat < /dev/null | {scripts}/unique-kmers.py -k 20 -".format(
+            scripts=scriptpath())
+
+    (status, out, err) = run_shell_cmd(cmd)
+
+    assert 'Estimated number of unique 20-mers in -: 0' in err
+    assert 'Total estimated number of unique 20-mers: 0' in err
+
+
 def test_unique_kmers_stream_out_fasta():
     infile = utils.get_test_data('random-20-a.fa')
 
