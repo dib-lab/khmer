@@ -75,7 +75,7 @@ def get_parser():
     As a "bonus", this file ensures that if read names are not already
     formatted properly, they are reformatted consistently, such that
     they look like the pre-1.8 Casava format (`@name/1`, `@name/2`).
-    This reformatting can be switched off with the 
+    This reformatting can be switched off with the
     :option:`--no-reformat` flag.
 
     Example::
@@ -94,7 +94,8 @@ def get_parser():
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('--no-reformat', default=False, action='store_true',
-                        help='Do not reformat read names or enforce constistency')
+                        help='Do not reformat read names or enforce\
+                              constistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
