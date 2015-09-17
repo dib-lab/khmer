@@ -1866,6 +1866,24 @@ def test_interleave_reads_1_fq():
     assert r == q, (r, q)
 
 
+def test_interleave_reads_no_reformat():
+    infile1 = utils.get_test_data('paired.fq.1')
+    infile2 = utils.get_test_data('paired.malformat.fq.2')
+
+    ex_outfile = utils.get_test_data('paired.malformat.fq')
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = 'interleave-reads.py'
+    args = [infile1, infile2, '--no-reformat', '-o', outfile]
+
+    utils.runscript(script, args)
+
+    r = open(ex_outfile).read()
+    q = open(outfile).read()
+
+    assert r == q, (r, q)
+
+
 def test_interleave_reads_broken_fq():
     # test input files
     infile1 = utils.get_test_data('paired-broken.fq.1')
