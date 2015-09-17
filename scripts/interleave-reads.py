@@ -95,7 +95,7 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('--no-reformat', default=False, action='store_true',
                         help='Do not reformat read names or enforce\
-                              constistency')
+                              consistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
