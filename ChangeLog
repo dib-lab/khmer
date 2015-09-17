@@ -1,3 +1,26 @@
+2015-09-11  Russell Y. Neches <ryneches@ucdavis.edu>
+   * lib/hashbits.hh: added get_raw_tables to Hashbits
+   * khmer/_khmer.cc: added get_raw_tables to Hashbits
+   * tests/test_nodegraph.py: added test for Nodegraph.get_raw_tables
+
+2015-09-11  Camille Scott  <camille.scott.w@gmail.com>
+
+   * lib/hashbits.cc: Make hasbits::update_from() correctly update
+   _occupied_bins.
+   * lib/test_nodegraph.py: Test Nodegraph.n_occupied() after update.
+
+2015-09-07  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * doc/roadmap.rst: Updated for 2.0 release.
+   * README.rst: drop unstable badges; fix links
+   * doc/index.rst: point at getting help guide
+
+2015-09-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * tests/test_scripts.py: make the script version test more specific; double
+   check that script in question is from the 'khmer' project based upon the
+   second line of the file.
+
 2015-09-04  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * tests/khmer_tst_utils.py: look in "EGG-INFO" for scripts before checking
