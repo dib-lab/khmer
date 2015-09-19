@@ -423,6 +423,7 @@ def test_filter_abund_2_stdin():
     assert "Accepting input from stdin; output filename must be provided" \
            in str(err)
 
+
 def test_filter_abund_2_stdin_gzip_out():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
