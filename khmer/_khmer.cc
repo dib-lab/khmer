@@ -4505,14 +4505,18 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
 {
     const char * filename;
     PyObject * stream_records_o = NULL;
+    PyObject * response_curve_o = NULL;
 
-    static const char* const_kwlist[] = {"filename", "stream_records", NULL};
+    static const char* const_kwlist[] = {"filename", "stream_records",
+                                         "response_curve", NULL};
     static char** kwlist = const_cast<char**>(const_kwlist);
 
     bool stream_records = false;
+    std::vector<std::pair<unsigned long long, unsigned long long> > rc(0);
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist,
-                                     &filename, &stream_records_o)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist,
+                                     &filename, &stream_records_o,
+                                     &response_curve_o)) {
         return NULL;
     }
 
@@ -4520,12 +4524,17 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         stream_records = true;
     }
 
+    if (response_curve_o != NULL && PyObject_IsTrue(response_curve_o)) {
+        rc.resize(200);
+    }
+
     // call the C++ function, and trap signals => Python
-    unsigned long long  n_consumed    = 0;
-    unsigned int        total_reads   = 0;
+    unsigned long long n_consumed    = 0;
+    unsigned long long total_reads   = 0;
+
     try {
-        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
-                                      n_consumed);
+        me->hllcounter->consume_fasta(filename, total_reads, n_consumed,
+                                      stream_records, rc);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -4534,7 +4543,11 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         return NULL;
     }
 
-    return Py_BuildValue("IK", total_reads, n_consumed);
+    PyObject * x = PyList_New(rc.size());
+    for (size_t i = 0; i < rc.size(); i++) {
+        PyList_SET_ITEM(x, i, Py_BuildValue("KK", rc[i].first, rc[i].second));
+    }
+    return Py_BuildValue("IKO", total_reads, n_consumed, x);
 }
 
 static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,

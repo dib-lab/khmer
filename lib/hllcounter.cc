@@ -41,6 +41,7 @@ Contact: khmer-project@idyll.org
 #include <map>
 #include <numeric>
 #include <utility>
+#include <random>
 
 #include "hllcounter.hh"
 #include "khmer.hh"
@@ -377,30 +378,58 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
 
 void HLLCounter::consume_fasta(
     std::string const &filename,
+    unsigned long long &total_reads,
+    unsigned long long &n_consumed,
+    bool stream_records=false)
+{
+    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
+    std::vector<std::pair<unsigned long long, unsigned long long> > rc(0);
+
+    consume_fasta(parser, total_reads, n_consumed, stream_records, rc);
+
+    delete parser;
+}
+
+void HLLCounter::consume_fasta(
+    std::string const &filename,
+    unsigned long long &total_reads,
+    unsigned long long &n_consumed,
     bool stream_records,
-    unsigned int &total_reads,
-    unsigned long long &n_consumed)
+    std::vector<std::pair<unsigned long long, unsigned long long> >& rc)
 {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(parser, stream_records, total_reads, n_consumed);
+    consume_fasta(parser, total_reads, n_consumed, stream_records, rc);
 
     delete parser;
 }
 
 void HLLCounter::consume_fasta(
     read_parsers::IParser *parser,
-    bool stream_records,
-    unsigned int &      total_reads,
-    unsigned long long &    n_consumed)
+    unsigned long long &      total_reads,
+    unsigned long long &    n_consumed,
+    bool stream_records=false)
 {
+    std::vector<std::pair<unsigned long long, unsigned long long> > rc(0);
+    consume_fasta(parser, total_reads, n_consumed, stream_records, rc);
+}
 
+void HLLCounter::consume_fasta(
+    read_parsers::IParser *parser,
+    unsigned long long &      total_reads,
+    unsigned long long &    n_consumed,
+    bool stream_records,
+    std::vector<std::pair<unsigned long long, unsigned long long> >& rc)
+{
     read_parsers::Read read;
     HLLCounter** counters;
-    unsigned int *n_consumed_partial;
-    unsigned int *total_reads_partial;
+    unsigned long long replaced = 0;
 
     n_consumed = 0;
+
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    auto rc_size = rc.size();
 
     #pragma omp parallel
     {
@@ -408,10 +437,6 @@ void HLLCounter::consume_fasta(
         {
             counters = (HLLCounter**)calloc(omp_get_num_threads(),
             sizeof(HLLCounter*));
-            n_consumed_partial = (unsigned int*)calloc(omp_get_num_threads(),
-            sizeof(unsigned int));
-            total_reads_partial = (unsigned int*)calloc(omp_get_num_threads(),
-            sizeof(unsigned int));
 
             for (int i=0; i < omp_get_num_threads(); i++)
             {
@@ -433,18 +458,41 @@ void HLLCounter::consume_fasta(
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
-                shared(counters, n_consumed_partial, total_reads_partial)
+                shared(counters, n_consumed, total_reads)
                 {
                     bool is_valid;
                     int n, t = omp_get_thread_num();
                     n = counters[t]->check_and_process_read(read.sequence,
                                                             is_valid);
-                    n_consumed_partial[t] += n;
                     if (is_valid) {
-                        total_reads_partial[t] += 1;
+                        #pragma omp atomic
+                        total_reads += 1;
+
+                        #pragma omp atomic
+                        n_consumed += n;
                     }
                 }
 
+                if (rc_size != 0) {
+                    std::uniform_int_distribution<unsigned long long> uni(0, n_consumed);
+                    auto new_pos = uni(rng);
+
+                    if (replaced < rc_size) {
+                        new_pos = replaced;
+                        replaced += 1;
+                    }
+
+                    if (new_pos < rc_size) {
+                        #pragma omp taskwait
+
+                        for (int i=0; i < omp_get_num_threads(); ++i)
+                        {
+                            this->merge(*counters[i]);
+                        }
+
+                        rc[new_pos] = std::make_pair(n_consumed, this->estimate_cardinality());
+                    }
+                }
             } // while reads left for parser
         }
         #pragma omp taskwait
@@ -455,12 +503,9 @@ void HLLCounter::consume_fasta(
             {
                 this->merge(*counters[i]);
                 delete counters[i];
-                n_consumed += n_consumed_partial[i];
-                total_reads += total_reads_partial[i];;
             }
             free(counters);
-            free(n_consumed_partial);
-            free(total_reads_partial);
+            sort(rc.begin(), rc.end());
         }
     }
 }

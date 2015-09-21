@@ -125,6 +125,10 @@ def get_parser():
                         action='store_true',
                         help='write input sequences to STDOUT')
 
+    parser.add_argument('--response-curve', '-C', default=False,
+                        action='store_true',
+                        help='write input sequences to STDOUT')
+
     parser.add_argument('--diagnostics', default=False, action='store_true',
                         help='print out recommended tablesize arguments and '
                              'restrictions')
@@ -145,8 +149,19 @@ def main():
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        hllcpp.consume_fasta(input_filename,
-                             stream_records=args.stream_records)
+        try:
+            total_reads, n_consumed, rc = hllcpp.consume_fasta(input_filename,
+                                stream_records=args.stream_records,
+                                response_curve=args.response_curve)
+        except OSError:
+            continue
+
+        dirname = "response_curves/"
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+        with open(os.path.join(dirname, os.path.basename(input_filename)), 'w') as f:
+            f.write(str(rc))
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(

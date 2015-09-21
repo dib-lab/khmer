@@ -111,7 +111,7 @@ def test_hll_consume_fasta():
 
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    n, n_consumed = hllcpp.consume_fasta(filename)
+    n, n_consumed, _ = hllcpp.consume_fasta(filename)
 
     assert n == 99
     assert n_consumed == 3960
@@ -124,7 +124,7 @@ def test_hll_consume_fasta_ep():
 
     filename = utils.get_test_data('paired-mixed.fa')
     hll = khmer.HLLCounter(0.36, 32)
-    n, n_consumed = hll.consume_fasta(filename)
+    n, n_consumed, _ = hll.consume_fasta(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 236
@@ -140,7 +140,7 @@ def test_hll_consume_fasta_estimate_bias():
 
     filename = utils.get_test_data("test-abund-read-3.fa")
     hll = khmer.HLLCounter(0.36, K)
-    n, n_consumed = hll.consume_fasta(filename)
+    n, n_consumed, _ = hll.consume_fasta(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 79
@@ -151,7 +151,7 @@ def test_hll_consume_fasta_estimate_bias():
 def test_hll_len():
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    n, n_consumed = hllcpp.consume_fasta(filename)
+    n, n_consumed, _ = hllcpp.consume_fasta(filename)
 
     assert n == 99
     assert n_consumed == 3960

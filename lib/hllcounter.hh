@@ -65,13 +65,23 @@ public:
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
     void consume_fasta(std::string const &,
+                       unsigned long long &,
+                       unsigned long long &,
+                       bool);
+    void consume_fasta(std::string const &,
+                       unsigned long long &,
+                       unsigned long long &,
                        bool,
-                       unsigned int &,
-                       unsigned long long &);
+                       std::vector<std::pair<unsigned long long, unsigned long long> >&);
     void consume_fasta(read_parsers::IParser *,
+                       unsigned long long &,
+                       unsigned long long &,
+                       bool);
+    void consume_fasta(read_parsers::IParser *,
+                       unsigned long long &,
+                       unsigned long long &,
                        bool,
-                       unsigned int &,
-                       unsigned long long &);
+                       std::vector<std::pair<unsigned long long, unsigned long long> >&);
     unsigned int check_and_process_read(std::string &,
                                         bool &);
     bool check_and_normalize_read(std::string &) const;
