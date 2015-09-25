@@ -1,10 +1,18 @@
+2015-09-19  Titus Brown  <titus@idyll.org>
+
+   * scripts/filter-abund.py: fixed bug with -o and --gzip used together.
+   * tests/test_scripts.py: added test for fixed bug.
+   * sandbox/count-kmers.py: added executable bit.
+
 2015-09-17  Camille Scott  <camille.scott.w@gmail.com>
+
    * scripts/interleave-reads.py: Added --no-reformat flag
    to disable format checking and renaming of headers
    * tests/{test_scripts.py, test-data/paired.malformat*}: Tests
    and test data for --no-reformat flag.
 
 2015-09-11  Russell Y. Neches <ryneches@ucdavis.edu>
+
    * lib/hashbits.hh: added get_raw_tables to Hashbits
    * khmer/_khmer.cc: added get_raw_tables to Hashbits
    * tests/test_nodegraph.py: added test for Nodegraph.get_raw_tables

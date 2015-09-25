@@ -423,6 +423,22 @@ def test_filter_abund_2_stdin():
     assert "Accepting input from stdin; output filename must be provided" \
            in str(err)
 
+
+def test_filter_abund_2_stdin_gzip_out():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    outfile = utils.get_temp_filename('out.fa.gz')
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = 'filter-abund.py'
+    args = ['-C', '1', counting_ht, infile, '-o', outfile, '--gzip']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    print(out)
+    print(err)
+    assert status == 0
+
 # make sure that FASTQ records are retained.
 
 
