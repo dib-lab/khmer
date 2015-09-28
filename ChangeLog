@@ -1,3 +1,9 @@
+2015-09-28  Lisa Cohen  <ljcohen@ucdavis.edu>
+
+   * tests/test_read_handling.py: created new file with interleave-reads,
+   split-paired-reads, and extract-paired-reads functions
+   * tests/test_scripts.py: removed functions mentioned above
+
 2015-09-19  Titus Brown  <titus@idyll.org>
 
    * scripts/filter-abund.py: fixed bug with -o and --gzip used together.
@@ -11,7 +17,7 @@
    * tests/{test_scripts.py, test-data/paired.malformat*}: Tests
    and test data for --no-reformat flag.
 
-2015-09-11  Russell Y. Neches <ryneches@ucdavis.edu>
+2015-09-11  Russell Y. Neches  <ryneches@ucdavis.edu>
 
    * lib/hashbits.hh: added get_raw_tables to Hashbits
    * khmer/_khmer.cc: added get_raw_tables to Hashbits
