@@ -1784,6 +1784,7 @@ def test_do_partition_2_fq():
     assert '35 1::FOO' in names
     assert '46 1::FIZ' in names
 
+
 def test_make_initial_stoptags():
     # gen input files using load-graph.py -t
     # should keep test_data directory size down
@@ -1849,6 +1850,7 @@ def test_make_initial_stoptags_load_stoptags():
     utils.runscript(script, args, in_dir)
     assert os.path.exists(outfile1), outfile1
 
+
 def execute_extract_paired_streaming(ifilename):
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
@@ -1878,6 +1880,7 @@ def execute_extract_paired_streaming(ifilename):
 def test_extract_paired_streaming():
     testinput = utils.get_test_data('paired-mixed.fa')
     o = execute_extract_paired_streaming(testinput)
+
 
 def test_sample_reads_randomly():
     infile = utils.get_temp_filename('test.fa')

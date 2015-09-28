@@ -56,6 +56,7 @@ import khmer
 import khmer.kfile
 import screed
 
+
 def test_interleave_read_stdout():
     # create input files
     infile1 = utils.get_test_data('paired-slash1.fq.1')
@@ -257,6 +258,7 @@ def test_interleave_reads_2_fa():
         assert r.name == q.name
         assert r.sequence == q.sequence
     assert n > 0
+
 
 def execute_split_paired_streaming(ifilename):
     fifo = utils.get_temp_filename('fifo')
