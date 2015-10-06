@@ -130,7 +130,7 @@ def extract_nodegraph_info(filename):
             raise ValueError("Node graph '{}' is missing file type "
                              "signature".format(filename) + str(signature))
     except:
-        raise ValueError("Presence table '{}' is corrupt ".format(filename))
+        raise ValueError("Node graph '{}' is corrupt ".format(filename))
 
     return ksize, round(table_size, -2), n_tables, version, ht_type, occupied
 
