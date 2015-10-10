@@ -200,17 +200,23 @@ class Trimmer(object):
                                                     NORMALIZE_LIMIT)
 
             # if either read is low coverage & we have a 'saver',
-            # keep both for 2nd pass
-            if is_low_coverage and saver:
+            # keep both reads for 2nd pass
+            if is_low_coverage:
                 for read, seq in zip(reads, examine):
                     graph.consume(seq)
                     write_record(read, saver)
                     self.n_saved += 1
+
+            # if both reads are high coverage & we're normalizing, ignore.
+            elif (not is_low_coverage) and self.do_normalize:
+                pass
+
             # otherwise, trim them if they should be trimmed, THEN write 'em
             else:
                 assert (not is_low_coverage or self.do_trim_low_abund)
 
-                if self.do_normalize:
+                # don't write them out if high coverage & normalizing
+                if (not is_low_coverage) and self.do_normalize:
                     continue
 
                 for read, seq in zip(reads, examine):
@@ -260,9 +266,6 @@ class Trimmer(object):
             # otherwise, trim them if they should be trimmed, THEN write 'em
             else:
                 assert (not is_low_coverage or self.do_trim_low_abund)
-
-                if self.do_normalize:
-                    continue
 
                 for read, seq in zip(reads, examine):
                     _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
