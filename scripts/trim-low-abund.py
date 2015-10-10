@@ -162,6 +162,28 @@ def clean_up_reads(reads):
 
     return cleaned_reads, n_reads, n_bp
 
+
+def do_trim_reads(graph, reads, examine, CUTOFF):
+    K = graph.ksize()
+
+    for read, seq in zip(reads, examine):
+        # trim the 'N'-cleaned read
+        _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
+
+        # too short after trimming? eliminate read.
+        if trim_at < K:
+            continue
+
+        # will trim? do so.
+        did_trim = False
+        if trim_at != len(seq):
+            did_trim = True
+            read = trim_record(read, trim_at)
+
+        # return for processing
+        yield read, did_trim
+
+
 class Trimmer(object):
     def __init__(self, graph, do_trim_low_abund, cutoff, normalize_limit):
         self.graph = graph
@@ -208,31 +230,20 @@ class Trimmer(object):
                     self.n_saved += 1
 
             # if both reads are high coverage & we're normalizing, ignore.
-            elif (not is_low_coverage) and self.do_normalize:
+            elif self.do_normalize:
                 pass
 
-            # otherwise, trim them if they should be trimmed, THEN write 'em
+            # otherwise, trim them and write 'em
             else:
-                assert (not is_low_coverage or self.do_trim_low_abund)
+                assert (not is_low_coverage or \
+                        self.do_trim_low_abund or \
+                        self.do_normalize)
 
-                # don't write them out if high coverage & normalizing
-                if (not is_low_coverage) and self.do_normalize:
-                    continue
-
-                for read, seq in zip(reads, examine):
-                    _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
-
-                    # too short after trimming? eliminate read.
-                    if trim_at < K:
-                        continue
-
-                    # will trim? do so.
-                    if trim_at != len(seq):
+                for record, did_trim in do_trim_reads(graph, reads, examine,
+                                                      CUTOFF):
+                    if did_trim:
                         self.trimmed_reads += 1
-                        read = trim_record(read, trim_at)
-
-                    # save
-                    yield read
+                    yield record
 
 
     def pass2(self, reader):
@@ -267,20 +278,11 @@ class Trimmer(object):
             else:
                 assert (not is_low_coverage or self.do_trim_low_abund)
 
-                for read, seq in zip(reads, examine):
-                    _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
-
-                    # too short after trimming? eliminate read.
-                    if trim_at < K:
-                        continue
-
-                    # will trim? do so.
-                    if trim_at != len(seq):
+                for record, did_trim in do_trim_reads(graph, reads, examine,
+                                                      CUTOFF):
+                    if did_trim:
                         self.trimmed_reads += 1
-                        read = trim_record(read, trim_at)
-
-                    # save
-                    yield read
+                    yield record
 
 
 def main():
