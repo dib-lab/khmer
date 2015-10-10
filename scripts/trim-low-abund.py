@@ -143,6 +143,25 @@ def get_parser():
     return parser
 
 
+def check_is_low_coverage(graph, reads, limit):
+    for r in reads:
+        med, _, _ = graph.get_median_count(r)
+        if med < limit:
+            return True
+
+
+def clean_up_reads(reads):
+    n_reads = 0
+    n_bp = 0
+    cleaned_reads = []
+    for read in reads:
+        r = read.sequence.replace('N', 'A')
+        cleaned_reads.append(r)
+        n_reads += 1
+        n_bp += len(r)
+
+    return cleaned_reads, n_reads, n_bp
+
 class Trimmer(object):
     def __init__(self, graph, do_trim_low_abund, cutoff, normalize_limit):
         self.graph = graph
@@ -159,25 +178,7 @@ class Trimmer(object):
 
         self.do_normalize = False
 
-    def __call__(self, reader, saver):
-        def check_is_low_coverage(graph, reads, limit):
-            for r in reads:
-                med, _, _ = graph.get_median_count(r)
-                if med < limit:
-                    return True
-
-        def clean_up_reads(reads):
-            n_reads = 0
-            n_bp = 0
-            cleaned_reads = []
-            for read in reads:
-                r = read.sequence.replace('N', 'A')
-                cleaned_reads.append(r)
-                n_reads += 1
-                n_bp += len(r)
-
-            return cleaned_reads, n_reads, n_bp
-
+    def pass1(self, reader, saver):
         graph = self.graph
         NORMALIZE_LIMIT = self.normalize_limit
         CUTOFF = self.cutoff
@@ -205,10 +206,53 @@ class Trimmer(object):
                     graph.consume(seq)
                     write_record(read, saver)
                     self.n_saved += 1
+            # otherwise, trim them if they should be trimmed, THEN write 'em
+            else:
+                assert (not is_low_coverage or self.do_trim_low_abund)
+
+                if self.do_normalize:
+                    continue
+
+                for read, seq in zip(reads, examine):
+                    _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
+
+                    # too short after trimming? eliminate read.
+                    if trim_at < K:
+                        continue
+
+                    # will trim? do so.
+                    if trim_at != len(seq):
+                        self.trimmed_reads += 1
+                        read = trim_record(read, trim_at)
+
+                    # save
+                    yield read
+
+
+    def pass2(self, reader):
+        graph = self.graph
+        NORMALIZE_LIMIT = self.normalize_limit
+        CUTOFF = self.cutoff
+        K = graph.ksize()
+
+        for n, is_pair, read1, read2 in reader:
+            if is_pair:
+                reads = (read1, read2)
+            else:
+                reads = (read1,)
+
+            # clean up the sequences for examination.
+            examine, add_n_reads, add_n_bp = clean_up_reads(reads)
+            self.n_reads += add_n_reads
+            self.n_bp += add_n_bp
+
+            # find out if they are estimated to have low coverage
+            is_low_coverage = check_is_low_coverage(graph, examine,
+                                                    NORMALIZE_LIMIT)
 
             # if they're low coverage, and we don't want to trim low coverage,
             # write them out as is.
-            elif is_low_coverage and not self.do_trim_low_abund:
+            if is_low_coverage and not self.do_trim_low_abund:
                 for read in reads:
                     self.n_skipped += 1
                     self.bp_skipped += len(read)
@@ -216,10 +260,10 @@ class Trimmer(object):
             # otherwise, trim them if they should be trimmed, THEN write 'em
             else:
                 assert (not is_low_coverage or self.do_trim_low_abund)
-                
+
                 if self.do_normalize:
                     continue
-    
+
                 for read, seq in zip(reads, examine):
                     _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
 
@@ -311,7 +355,7 @@ def main():
 
         n_start = trimmer.n_reads
         save_start = trimmer.n_saved
-        for read in trimmer(paired_iter, pass2fp):
+        for read in trimmer.pass1(paired_iter, pass2fp):
             if (trimmer.n_reads - n_start) % 10000 == 0:
                 print('...', n, filename, trimmer.n_saved,
                       trimmer.n_reads, trimmer.n_bp,
@@ -359,7 +403,7 @@ def main():
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=True)
 
-        for read in trimmer(paired_iter, None):
+        for read in trimmer.pass2(paired_iter):
             if (trimmer.n_reads - n_start) % 10000 == 0:
                 print('... x 2', trimmer.n_reads - n_start,
                       pass2filename, trimmer.n_saved,
