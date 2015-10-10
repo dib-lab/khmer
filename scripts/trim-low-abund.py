@@ -137,7 +137,7 @@ def get_parser():
     parser.add_argument('--tempdir', '-T', type=str, default='./')
     add_output_compression_type(parser)
 
-    parser.add_argument('--diginorm', type=int)
+    parser.add_argument('--diginorm', default=False, action='store_true')
     parser.add_argument('--single-pass', default=False, action='store_true')
 
     return parser
@@ -235,9 +235,8 @@ class Trimmer(object):
 
             # otherwise, trim them and write 'em
             else:
-                assert (not is_low_coverage or \
-                        self.do_trim_low_abund or \
-                        self.do_normalize)
+                assert (not is_low_coverage and \
+                        not self.do_normalize)
 
                 for record, did_trim in do_trim_reads(graph, reads, examine,
                                                       CUTOFF):
