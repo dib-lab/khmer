@@ -137,7 +137,7 @@ def get_parser():
     parser.add_argument('--tempdir', '-T', type=str, default='./')
     add_output_compression_type(parser)
 
-    parser.add_argument('--diginorm', default=False, action='store_true')
+    parser.add_argument('--diginorm', type=int)
     parser.add_argument('--single-pass', default=False, action='store_true')
 
     return parser
@@ -160,36 +160,45 @@ class Trimmer(object):
         self.do_normalize = False
 
     def __call__(self, reader, saver):
+        def check_is_low_coverage(graph, reads, limit):
+            for r in reads:
+                med, _, _ = graph.get_median_count(r)
+                if med < limit:
+                    return True
+
+        def clean_up_reads(reads):
+            n_reads = 0
+            n_bp = 0
+            cleaned_reads = []
+            for read in reads:
+                r = read.sequence.replace('N', 'A')
+                cleaned_reads.append(r)
+                n_reads += 1
+                n_bp += len(r)
+
+            return cleaned_reads, n_reads, n_bp
+
         graph = self.graph
         NORMALIZE_LIMIT = self.normalize_limit
         CUTOFF = self.cutoff
         K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
-            examine = []
-
             if is_pair:
                 reads = (read1, read2)
             else:
                 reads = (read1,)
 
             # clean up the sequences for examination.
-            for read in reads:
-                r = read.sequence.replace('N', 'A')
-                examine.append(r)
-
-                self.n_reads += 1
-                self.n_bp += len(r)
+            examine, add_n_reads, add_n_bp = clean_up_reads(reads)
+            self.n_reads += add_n_reads
+            self.n_bp += add_n_bp
 
             # find out if they are estimated to have low coverage
-            is_low_coverage = False
-            for r in examine:
-                med, _, _ = graph.get_median_count(r)
-                if med < NORMALIZE_LIMIT:
-                    is_low_coverage = True
-                    break
+            is_low_coverage = check_is_low_coverage(graph, examine,
+                                                    NORMALIZE_LIMIT)
 
-            # if either of the sequences are low coverage & we have a 'saver',
+            # if either read is low coverage & we have a 'saver',
             # keep both for 2nd pass
             if is_low_coverage and saver:
                 for read, seq in zip(reads, examine):
