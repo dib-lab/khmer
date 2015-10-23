@@ -63,8 +63,9 @@ from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 
-DEFAULT_NORMALIZE_LIMIT = 20
+DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
+DEFAULT_DIGINORM_COVERAGE = 20
 
 
 def trim_record(read, trim_at):
@@ -110,9 +111,9 @@ def get_parser():
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
-    parser.add_argument('--normalize-to', '-Z', type=int,
-                        help='base cutoff on this median k-mer abundance',
-                        default=DEFAULT_NORMALIZE_LIMIT)
+    parser.add_argument('--trim-at-coverage', '-Z', type=int,
+                        help='trim reads when entire read above this coverage',
+                        default=DEFAULT_TRIM_AT_COVERAGE)
 
     parser.add_argument('-o', '--output', metavar="output_filename",
                         type=argparse.FileType('wb'),
@@ -138,6 +139,8 @@ def get_parser():
     add_output_compression_type(parser)
 
     parser.add_argument('--diginorm', default=False, action='store_true')
+    parser.add_argument('--diginorm-coverage', type=int,
+                        default=DEFAULT_DIGINORM_COVERAGE)
     parser.add_argument('--single-pass', default=False, action='store_true')
 
     return parser
@@ -185,11 +188,11 @@ def do_trim_reads(graph, reads, examine, CUTOFF):
 
 
 class Trimmer(object):
-    def __init__(self, graph, do_trim_low_abund, cutoff, normalize_limit):
+    def __init__(self, graph, do_trim_low_abund, cutoff, trim_at_coverage):
         self.graph = graph
         self.do_trim_low_abund = do_trim_low_abund
         self.cutoff = cutoff
-        self.normalize_limit = normalize_limit
+        self.trim_at_coverage = trim_at_coverage
 
         self.n_reads = 0
         self.n_bp = 0
@@ -199,11 +202,13 @@ class Trimmer(object):
         self.bp_skipped = 0
 
         self.do_normalize = False
+        self.diginorm_coverage = None
 
     def pass1(self, reader, saver):
         graph = self.graph
-        NORMALIZE_LIMIT = self.normalize_limit
+        TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
+        DIGINORM_COVERAGE = self.diginorm_coverage
         K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
@@ -218,26 +223,27 @@ class Trimmer(object):
             self.n_bp += add_n_bp
 
             # find out if they are estimated to have low coverage
-            is_low_coverage = check_is_low_coverage(graph, examine,
-                                                    NORMALIZE_LIMIT)
+            is_below_trim_coverage = check_is_low_coverage(graph, examine,
+                                                           TRIM_AT_COVERAGE)
+            is_above_diginorm_cov = not check_is_low_coverage(graph,
+                                                              examine,
+                                                              DIGINORM_COVERAGE)
+            
 
             # if either read is low coverage & we have a 'saver',
             # keep both reads for 2nd pass
-            if is_low_coverage:
+            if is_below_trim_coverage:
                 for read, seq in zip(reads, examine):
                     graph.consume(seq)
                     write_record(read, saver)
                     self.n_saved += 1
 
             # if both reads are high coverage & we're normalizing, ignore.
-            elif self.do_normalize:
+            elif self.do_normalize and is_above_diginorm_cov:
                 pass
 
             # otherwise, trim them and write 'em
             else:
-                assert (not is_low_coverage and \
-                        not self.do_normalize)
-
                 for record, did_trim in do_trim_reads(graph, reads, examine,
                                                       CUTOFF):
                     if did_trim:
@@ -247,7 +253,7 @@ class Trimmer(object):
 
     def pass2(self, reader):
         graph = self.graph
-        NORMALIZE_LIMIT = self.normalize_limit
+        TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
         K = graph.ksize()
 
@@ -264,7 +270,7 @@ class Trimmer(object):
 
             # find out if they are estimated to have low coverage
             is_low_coverage = check_is_low_coverage(graph, examine,
-                                                    NORMALIZE_LIMIT)
+                                                    TRIM_AT_COVERAGE)
 
             # if they're low coverage, and we don't want to trim low coverage,
             # write them out as is.
@@ -296,6 +302,20 @@ def main():
               file=sys.stderr)
         sys.exit(1)
 
+    if args.trim_at_coverage != DEFAULT_TRIM_AT_COVERAGE and \
+       not args.variable_coverage:
+        print("Error: --trim-at-coverage/-Z given, but",
+              "--variable-coverage/-V not specified.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    if args.diginorm_coverage != DEFAULT_DIGINORM_COVERAGE and \
+       not args.diginorm:
+        print("Error: --diginorm-coverage given, but",
+              "--diginorm not specified.",
+              file=sys.stderr)
+        sys.exit(1)
+
     ###
 
     report_on_config(args)
@@ -319,9 +339,6 @@ def main():
         ct = khmer_args.create_countgraph(args)
 
     K = ct.ksize()
-    CUTOFF = args.cutoff
-    NORMALIZE_LIMIT = args.normalize_to
-
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print('created temporary directory %s; '
           'use -T to change location' % tempdir, file=sys.stderr)
@@ -334,9 +351,10 @@ def main():
     written_reads = 0
 
     trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
-                      args.normalize_to)
+                      args.trim_at_coverage)
     if args.diginorm:
         trimmer.do_normalize = True
+        trimmer.diginorm_coverage = int(args.diginorm_coverage)
 
     pass2list = []
     for filename in args.input_filenames:
