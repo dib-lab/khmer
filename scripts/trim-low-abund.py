@@ -146,6 +146,21 @@ def get_parser():
     return parser
 
 
+class ReadBundle(object):
+    def __init__(self, *raw_records):
+        self.reads = raw_records
+        self.cleaned_reads, self.n_reads, self.n_bp = \
+                            clean_up_reads(raw_records)
+
+    def coverages(self, graph):
+        return [ graph.get_median_count(r)[0] for r in self.cleaned_reads ]
+
+    def trim(self, graph, cutoff):
+        for read, did_trim in do_trim_reads(graph, self.reads,
+                                            self.cleaned_reads, cutoff):
+            yield read, did_trim
+
+
 def check_is_low_coverage(graph, reads, limit):
     for r in reads:
         med, _, _ = graph.get_median_count(r)
@@ -213,42 +228,31 @@ class Trimmer(object):
 
         for n, is_pair, read1, read2 in reader:
             if is_pair:
-                reads = (read1, read2)
+                bundle = ReadBundle(read1, read2)
             else:
-                reads = (read1,)
+                bundle = ReadBundle(read1)
 
             # clean up the sequences for examination.
-            examine, add_n_reads, add_n_bp = clean_up_reads(reads)
-            self.n_reads += add_n_reads
-            self.n_bp += add_n_bp
+            self.n_reads += bundle.n_reads
+            self.n_bp += bundle.n_bp
 
-            # find out if they are estimated to have low coverage
-            is_below_trim_coverage = check_is_low_coverage(graph, examine,
-                                                           TRIM_AT_COVERAGE)
-            is_above_diginorm_cov = not check_is_low_coverage(graph,
-                                                              examine,
-                                                              DIGINORM_COVERAGE)
-            
+            min_coverage = min(bundle.coverages(graph))
 
-            # if either read is low coverage & we have a 'saver',
-            # keep both reads for 2nd pass
-            if is_below_trim_coverage:
-                for read, seq in zip(reads, examine):
-                    graph.consume(seq)
+            if self.do_normalize and min_coverage >= DIGINORM_COVERAGE:
+                # skip reads if normalizing
+                continue
+
+            # trim?
+            if min_coverage >= TRIM_AT_COVERAGE:
+                for record, did_trim in bundle.trim(graph, CUTOFF):
+                    yield record
+
+            else:
+                for read, cleaned_read in zip(bundle.reads,
+                                              bundle.cleaned_reads):
+                    graph.consume(cleaned_read)
                     write_record(read, saver)
                     self.n_saved += 1
-
-            # if both reads are high coverage & we're normalizing, ignore.
-            elif self.do_normalize and is_above_diginorm_cov:
-                pass
-
-            # otherwise, trim them and write 'em
-            else:
-                for record, did_trim in do_trim_reads(graph, reads, examine,
-                                                      CUTOFF):
-                    if did_trim:
-                        self.trimmed_reads += 1
-                    yield record
 
 
     def pass2(self, reader):
@@ -259,35 +263,28 @@ class Trimmer(object):
 
         for n, is_pair, read1, read2 in reader:
             if is_pair:
-                reads = (read1, read2)
+                bundle = ReadBundle(read1, read2)
             else:
-                reads = (read1,)
+                bundle = ReadBundle(read1)
 
             # clean up the sequences for examination.
-            examine, add_n_reads, add_n_bp = clean_up_reads(reads)
-            self.n_reads += add_n_reads
-            self.n_bp += add_n_bp
+            self.n_reads += bundle.n_reads
+            self.n_bp += bundle.n_bp
 
-            # find out if they are estimated to have low coverage
-            is_low_coverage = check_is_low_coverage(graph, examine,
-                                                    TRIM_AT_COVERAGE)
-
-            # if they're low coverage, and we don't want to trim low coverage,
-            # write them out as is.
-            if is_low_coverage and not self.do_trim_low_abund:
-                for read in reads:
+            for read, cleaned_read, coverage in zip(\
+                bundle.reads, bundle.cleaned_reads, bundle.coverages(graph)):
+                if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
+                    for record, did_trim in do_trim_reads(graph,
+                                                          (read,),
+                                                          (cleaned_read,),
+                                                          CUTOFF):
+                        if did_trim:
+                            self.trimmed_reads += 1
+                        yield record
+                else:
                     self.n_skipped += 1
-                    self.bp_skipped += len(read)
+                    self.bp_skipped += 1
                     yield read
-            # otherwise, trim them if they should be trimmed, THEN write 'em
-            else:
-                assert (not is_low_coverage or self.do_trim_low_abund)
-
-                for record, did_trim in do_trim_reads(graph, reads, examine,
-                                                      CUTOFF):
-                    if did_trim:
-                        self.trimmed_reads += 1
-                    yield record
 
 
 def main():
