@@ -159,12 +159,15 @@ def get_parser():
 
 class ReadBundle(object):
     def __init__(self, *raw_records):
-        self.reads = raw_records
+        self.reads = [ i for i in raw_records if i ]
         self.cleaned_reads, self.n_reads, self.n_bp = \
-                            clean_up_reads(raw_records)
+                            clean_up_reads(self.reads)
 
     def coverages(self, graph):
         return [ graph.get_median_count(r)[0] for r in self.cleaned_reads ]
+
+    def both(self):
+        return zip(self.reads, self.cleaned_reads)
 
 
 def clean_up_reads(reads):
@@ -218,6 +221,20 @@ class Trimmer(object):
         self.diginorm_coverage = None
 
     def pass1(self, reader, saver):
+        """
+        The first pass across the read data does the following:
+
+        1. If do_normalize is set, discard all read pairs with coverage
+        above DIGINORM_COVERAGE.
+
+        2. For each remaining read pair, check if the read pair is above
+        the coverage necessary for trimming (TRIM_AT_COVERAGE).  If so,
+        k-mer trim the reads at CUTOFF, and yield them.
+
+        3. If the read pair is not at the coverage necessary for trimming,
+        consume the read pair with the graph and save the read pair for the
+        second pass.
+        """
         graph = self.graph
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
@@ -225,10 +242,7 @@ class Trimmer(object):
         K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
-            if is_pair:
-                bundle = ReadBundle(read1, read2)
-            else:
-                bundle = ReadBundle(read1)
+            bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
             self.n_reads += bundle.n_reads
@@ -242,39 +256,45 @@ class Trimmer(object):
 
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
-                for read, cleaned_read in zip(self.reads, self.cleaned_reads):
+                for read, cleaned_read in bundle.both():
                     record, did_trim = do_trim_read(graph, read,
                                                     cleaned_read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
                         yield record
+            # no, too low coverage to trim; consume & set aside for 2nd pass.
             else:
-                for read, cleaned_read in zip(bundle.reads,
-                                              bundle.cleaned_reads):
+                for read, cleaned_read in bundle.both():
                     graph.consume(cleaned_read)
                     write_record(read, saver)
                     self.n_saved += 1
 
 
     def pass2(self, reader):
+        """
+        The second pass across the data does the following.
+
+        1. For each read, evaluate the coverage. If the coverage is
+        sufficient to trim, OR we are trimming low-abundance reads (-V not
+        set), do trimming.
+
+        2. Otherwise, return the untrimmed read pair.
+        """
         graph = self.graph
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
         K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
-            if is_pair:
-                bundle = ReadBundle(read1, read2)
-            else:
-                bundle = ReadBundle(read1)
+            bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
             self.n_reads += bundle.n_reads
             self.n_bp += bundle.n_bp
 
-            for read, cleaned_read, coverage in zip(\
-                bundle.reads, bundle.cleaned_reads, bundle.coverages(graph)):
+            for (read, cleaned_read), coverage in zip(bundle.both(),
+                                                      bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
                     record, did_trim = do_trim_read(graph, read, cleaned_read,
                                                      CUTOFF)
