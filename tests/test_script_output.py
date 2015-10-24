@@ -51,6 +51,7 @@ import hashlib
 # b939a34b565ce973224abdd0eeb53d6b52833c01 (for trim-low-abund updates).
 #
 
+
 def _calc_md5(fp):
     m = hashlib.md5()
     m.update(fp.read())

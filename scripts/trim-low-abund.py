@@ -68,27 +68,6 @@ DEFAULT_CUTOFF = 2
 DEFAULT_DIGINORM_COVERAGE = 20
 
 
-### For testing purposes:
-###
-### (1)
-###
-###    scripts/normalize-by-median.py -C 2 -k 20 -M 1e8 data/100k-filtered.fa
-###    scripts/trim-low-abund.py -Z 0 -C 0 -k 20 -M 1e8 data/100k-filtered.fa
-###        --diginorm-coverage=2 --diginorm
-###
-### should yield identical output files.
-
-
-def trim_record(read, trim_at):
-    new_read = Record()
-    new_read.name = read.name
-    new_read.sequence = read.sequence[:trim_at]
-    if hasattr(read, 'quality'):
-        new_read.quality = read.quality[:trim_at]
-
-    return new_read
-
-
 def get_parser():
     epilog = """\
     The output is one file for each input file, ``<input file>.abundtrim``,
@@ -159,12 +138,12 @@ def get_parser():
 
 class ReadBundle(object):
     def __init__(self, *raw_records):
-        self.reads = [ i for i in raw_records if i ]
+        self.reads = [i for i in raw_records if i]
         self.cleaned_reads, self.n_reads, self.n_bp = \
-                            clean_up_reads(self.reads)
+            clean_up_reads(self.reads)
 
     def coverages(self, graph):
-        return [ graph.get_median_count(r)[0] for r in self.cleaned_reads ]
+        return [graph.get_median_count(r)[0] for r in self.cleaned_reads]
 
     def both(self):
         return zip(self.reads, self.cleaned_reads)
@@ -183,7 +162,19 @@ def clean_up_reads(reads):
     return cleaned_reads, n_reads, n_bp
 
 
+def trim_record(read, trim_at):
+    "Utility function: create a new record, trimmed at given location."
+    new_read = Record()
+    new_read.name = read.name
+    new_read.sequence = read.sequence[:trim_at]
+    if hasattr(read, 'quality'):
+        new_read.quality = read.quality[:trim_at]
+
+    return new_read
+
+
 def do_trim_read(graph, read, cleaned_read, CUTOFF):
+    "Utility function: trim a read on abundance."
     K = graph.ksize()
 
     # trim the 'N'-cleaned read
@@ -204,6 +195,10 @@ def do_trim_read(graph, read, cleaned_read, CUTOFF):
 
 
 class Trimmer(object):
+    """
+    Core trimming object; the two utility functions are 'pass1' and 'pass2',
+    which execute the first and second pass across the data, respectively.
+    """
     def __init__(self, graph, do_trim_low_abund, cutoff, trim_at_coverage):
         self.graph = graph
         self.do_trim_low_abund = do_trim_low_abund
@@ -270,7 +265,6 @@ class Trimmer(object):
                     write_record(read, saver)
                     self.n_saved += 1
 
-
     def pass2(self, reader):
         """
         The second pass across the data does the following.
@@ -297,7 +291,7 @@ class Trimmer(object):
                                                       bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
                     record, did_trim = do_trim_read(graph, read, cleaned_read,
-                                                     CUTOFF)
+                                                    CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
@@ -334,6 +328,12 @@ def main():
               file=sys.stderr)
         sys.exit(1)
 
+    if args.diginorm and args.single_pass:
+        print("Error: --diginorm and --single-pass are incompatible!\n"
+              "You probably want to use normalize-by-median.py instead.",
+              file=sys.stderr)
+        sys.exit(1)
+
     ###
 
     report_on_config(args)
@@ -361,6 +361,12 @@ def main():
     print('created temporary directory %s; '
           'use -T to change location' % tempdir, file=sys.stderr)
 
+    trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
+                      args.trim_at_coverage)
+    if args.diginorm:
+        trimmer.do_normalize = True
+        trimmer.diginorm_coverage = int(args.diginorm_coverage)
+
     # ### FIRST PASS ###
 
     save_pass2_total = 0
@@ -368,31 +374,30 @@ def main():
     written_bp = 0
     written_reads = 0
 
-    trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
-                      args.trim_at_coverage)
-    if args.diginorm:
-        trimmer.do_normalize = True
-        trimmer.diginorm_coverage = int(args.diginorm_coverage)
-
     pass2list = []
     for filename in args.input_filenames:
+        # figure out temporary filename for 2nd pass
         pass2filename = os.path.basename(filename) + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
-        if args.output is None:
-            trimfp = get_file_writer(open(os.path.basename(filename) +
-                                          '.abundtrim', 'wb'),
-                                     args.gzip, args.bzip)
-        else:
-            trimfp = get_file_writer(args.output, args.gzip, args.bzip)
-
-        pass2list.append((filename, pass2filename, trimfp))
-
-        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
 
+        # construct output filenames
+        outfp = args.output
+        if outfp is None:
+            outfp = open(os.path.basename(filename) + '.abundtrim', 'wb')
+
+        # get file handle w/gzip, bzip
+        trimfp = get_file_writer(outfp, args.gzip, args.bzip)
+
+        # record all this info
+        pass2list.append((filename, pass2filename, trimfp))
+
+        # input file stuff: get a broken_paired reader.
+        screed_iter = screed.open(filename)
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=args.ignore_pairs)
 
+        # main loop through the file.
         n_start = trimmer.n_reads
         save_start = trimmer.n_saved
         for read in trimmer.pass1(paired_iter, pass2fp):
@@ -401,6 +406,8 @@ def main():
                       trimmer.n_reads, trimmer.n_bp,
                       written_reads, written_bp, file=sys.stderr)
 
+            # write out the trimmed/etc sequences that AREN'T going to be
+            # revisited in a 2nd pass.
             write_record(read, trimfp)
             written_bp += len(read)
             written_reads += 1
@@ -413,7 +420,7 @@ def main():
               file=sys.stderr)
 
     # first pass goes across all the data, so record relevant stats...
-    n_reads = trimmer.n_reads           
+    n_reads = trimmer.n_reads
     n_bp = trimmer.n_bp
     n_skipped = trimmer.n_skipped
     bp_skipped = trimmer.bp_skipped
