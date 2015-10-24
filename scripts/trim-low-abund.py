@@ -125,13 +125,20 @@ def get_parser():
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true')
-    parser.add_argument('--tempdir', '-T', type=str, default='./')
+    parser.add_argument('--tempdir', '-T', type=str, default='./',
+                        help="Set location of temporary directory for "
+                        "second pass")
     add_output_compression_type(parser)
 
-    parser.add_argument('--diginorm', default=False, action='store_true')
+    parser.add_argument('--diginorm', default=False, action='store_true',
+                        help="Eliminate high-coverage reads altogether "
+                        "(digital normalization).")
     parser.add_argument('--diginorm-coverage', type=int,
-                        default=DEFAULT_DIGINORM_COVERAGE)
-    parser.add_argument('--single-pass', default=False, action='store_true')
+                        default=DEFAULT_DIGINORM_COVERAGE,
+                        help="Coverage threshold for --diginorm")
+    parser.add_argument('--single-pass', default=False, action='store_true',
+                        help="Do not do a second pass across the low coverage "
+                        "data")
 
     return parser
 
