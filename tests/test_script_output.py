@@ -45,6 +45,11 @@ from . import khmer_tst_utils as utils
 
 import hashlib
 
+#
+# hashes recorded as of git commit 799039ffcf15d2a3ac6902ae62ae2da81030e8d2
+# (for trim-low-abund without --diginorm behavior) and
+# b939a34b565ce973224abdd0eeb53d6b52833c01 (for trim-low-abund updates).
+#
 
 def _calc_md5(fp):
     m = hashlib.md5()
