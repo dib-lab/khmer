@@ -1,3 +1,17 @@
+2015-10-24  Titus Brown  <titus@idyll.org>
+
+   * scripts/trim-low-abund.py: refactor to use generators; add --diginorm
+   option to include digital normalization in trim-low-abund functionality.
+   * tests/test_script_output.py: added mD5sum hashing tests to pin down
+   functionality in trim-low-abund.py and normalize-by-median.py; verified
+   that refactoring does not alter existing functionality.
+   * tests/test-data/simple-genome-reads.fa: supporting file for md5sum
+   tests.
+   * tests/test-data/README.rst: a new README for describing test files,
+   how to generate them, and their uses.
+   * tests/test_scripts.py: added additional tests for trim-low-abund.py
+   functionality and error cases.
+
 2015-09-28  Lisa Cohen  <ljcohen@ucdavis.edu>
 
    * tests/test_read_handling.py: created new file with interleave-reads,

@@ -2870,6 +2870,62 @@ def test_trim_low_abund_stdout():
     assert 'GGTTGACGGGGCTCAGGG' in out
 
 
+def test_trim_low_abund_diginorm_coverage_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "--diginorm-coverage", "21"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert 'Error: --diginorm-coverage given, but --diginorm not specified.' \
+           in err, err
+
+
+def test_trim_low_abund_diginorm_single_pass():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "--diginorm", "--single-pass"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert "Error: --diginorm and --single-pass are incompatible!" \
+           in err, err
+
+
+def test_trim_low_abund_varcov_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-Z", "21"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert 'Error: --trim-at-coverage/-Z given' in err, err
+
+
+def test_trim_low_abund_single_pass():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-V", '--single-pass']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+
+
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
@@ -2909,7 +2965,7 @@ def test_roundtrip_casava_format_2():
     assert r == r2, (r, r2)
 
 
-def test_existance_failure():
+def test_existence_failure():
     expected_output = 'ERROR: Input file'
 
     args = [utils.get_temp_filename('thisfiledoesnotexistatall')]
