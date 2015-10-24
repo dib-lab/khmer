@@ -68,6 +68,17 @@ DEFAULT_CUTOFF = 2
 DEFAULT_DIGINORM_COVERAGE = 20
 
 
+### For testing purposes:
+###
+### (1)
+###
+###    scripts/normalize-by-median.py -C 2 -k 20 -M 1e8 data/100k-filtered.fa
+###    scripts/trim-low-abund.py -Z 0 -C 0 -k 20 -M 1e8 data/100k-filtered.fa
+###        --diginorm-coverage=2 --diginorm
+###
+### should yield identical output files.
+
+
 def trim_record(read, trim_at):
     new_read = Record()
     new_read.name = read.name
@@ -155,18 +166,6 @@ class ReadBundle(object):
     def coverages(self, graph):
         return [ graph.get_median_count(r)[0] for r in self.cleaned_reads ]
 
-    def trim(self, graph, cutoff):
-        for read, did_trim in do_trim_reads(graph, self.reads,
-                                            self.cleaned_reads, cutoff):
-            yield read, did_trim
-
-
-def check_is_low_coverage(graph, reads, limit):
-    for r in reads:
-        med, _, _ = graph.get_median_count(r)
-        if med < limit:
-            return True
-
 
 def clean_up_reads(reads):
     n_reads = 0
@@ -181,25 +180,24 @@ def clean_up_reads(reads):
     return cleaned_reads, n_reads, n_bp
 
 
-def do_trim_reads(graph, reads, examine, CUTOFF):
+def do_trim_read(graph, read, cleaned_read, CUTOFF):
     K = graph.ksize()
 
-    for read, seq in zip(reads, examine):
-        # trim the 'N'-cleaned read
-        _, trim_at = graph.trim_on_abundance(seq, CUTOFF)
+    # trim the 'N'-cleaned read
+    _, trim_at = graph.trim_on_abundance(cleaned_read, CUTOFF)
 
-        # too short after trimming? eliminate read.
-        if trim_at < K:
-            continue
+    # too short after trimming? eliminate read.
+    if trim_at < K:
+        return None, False
 
-        # will trim? do so.
-        did_trim = False
-        if trim_at != len(seq):
-            did_trim = True
-            read = trim_record(read, trim_at)
+    # will trim? do so.
+    did_trim = False
+    if trim_at != len(cleaned_read):
+        did_trim = True
+        read = trim_record(read, trim_at)
 
-        # return for processing
-        yield read, did_trim
+    # return for processing
+    return read, did_trim
 
 
 class Trimmer(object):
@@ -244,9 +242,13 @@ class Trimmer(object):
 
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
-                for record, did_trim in bundle.trim(graph, CUTOFF):
-                    yield record
-
+                for read, cleaned_read in zip(self.reads, self.cleaned_reads):
+                    record, did_trim = do_trim_read(graph, read,
+                                                    cleaned_read, CUTOFF)
+                    if did_trim:
+                        self.trimmed_reads += 1
+                    if record:
+                        yield record
             else:
                 for read, cleaned_read in zip(bundle.reads,
                                               bundle.cleaned_reads):
@@ -274,12 +276,11 @@ class Trimmer(object):
             for read, cleaned_read, coverage in zip(\
                 bundle.reads, bundle.cleaned_reads, bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
-                    for record, did_trim in do_trim_reads(graph,
-                                                          (read,),
-                                                          (cleaned_read,),
-                                                          CUTOFF):
-                        if did_trim:
-                            self.trimmed_reads += 1
+                    record, did_trim = do_trim_read(graph, read, cleaned_read,
+                                                     CUTOFF)
+                    if did_trim:
+                        self.trimmed_reads += 1
+                    if record:
                         yield record
                 else:
                     self.n_skipped += 1
