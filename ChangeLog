@@ -1,3 +1,8 @@
+2015-10-25  Titus Brown  <titus@idyll.org>
+
+   * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
+   and fix for close of --output file after first input file.
+
 2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * lib/magic: add file extensions, one media type, and a better comment

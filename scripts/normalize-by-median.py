@@ -400,7 +400,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     write_record(record, outfp)
 
             log_info('output in {name}', name=describe_file_handle(outfp))
-            if not is_block(outfp):
+            if not args.single_output_file:
                 outfp.close()
 
     # finished - print out some diagnostics.
