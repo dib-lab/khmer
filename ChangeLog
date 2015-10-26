@@ -1,3 +1,8 @@
+2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * lib/magic: add file extensions, one media type, and a better comment
+   * khmer/__init__.py: Replace an errant 'Presence table' with 'node graph'
+
 2015-09-28  Lisa Cohen  <ljcohen@ucdavis.edu>
 
    * tests/test_read_handling.py: created new file with interleave-reads,
