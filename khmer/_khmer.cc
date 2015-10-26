@@ -310,8 +310,8 @@ _ReadParser_iternext( PyObject * self )
     IParser *       parser  = myself->parser;
 
     bool        stop_iteration  = false;
-    const char *value_exception = NULL;
-    const char *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
     Read       *the_read_PTR    = NULL;
     try {
         the_read_PTR = new Read( );
@@ -327,9 +327,9 @@ _ReadParser_iternext( PyObject * self )
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            file_exception = std::string(exc.what());
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            value_exception = std::string(exc.what());
         }
     }
     Py_END_ALLOW_THREADS
@@ -341,14 +341,14 @@ _ReadParser_iternext( PyObject * self )
         return NULL;
     }
 
-    if (file_exception != NULL) {
+    if (file_exception != "") {
         delete the_read_PTR;
-        PyErr_SetString(PyExc_OSError, file_exception);
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
+    if (value_exception != "") {
         delete the_read_PTR;
-        PyErr_SetString(PyExc_ValueError, value_exception);
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         return NULL;
     }
 
@@ -368,8 +368,8 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 
     ReadPair    the_read_pair;
     bool        stop_iteration  = false;
-    const char *value_exception = NULL;
-    const char *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
@@ -379,9 +379,9 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            file_exception = std::string(exc.what());
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            value_exception = std::string(exc.what());
         }
     }
     Py_END_ALLOW_THREADS
@@ -390,12 +390,12 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     if (stop_iteration) {
         return NULL;
     }
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         return NULL;
     }
 
@@ -868,25 +868,25 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
 
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        value_exception = std::string(exc.what());
     }
     Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         return NULL;
     }
 
@@ -1546,8 +1546,8 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
     read_parsers:: IParser * rparser = rparser_obj-> parser;
 
     // call the C++ function, and trap signals => Python
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
 
@@ -1555,18 +1555,18 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
     try {
         hashtable->consume_fasta_and_tag(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        value_exception = std::string(exc.what());
     }
     Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
     }
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -2124,18 +2124,18 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
         return PyErr_NoMemory();
     }
 
-    const char         *file_exception  = NULL;
+    std::string file_exception  = "";
 
     Py_BEGIN_ALLOW_THREADS
     try {
         subset_p->load_partitionmap(filename);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     }
     Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         delete subset_p;
         return NULL;
     }
@@ -2997,25 +2997,25 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
     read_parsers::IParser *rparser      = rparser_obj->parser;
     Hashbits           *hashbits        = tracking_obj->hashbits;
     HashIntoType       *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
 
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(rparser, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        value_exception = std::string(exc.what());
     }
     Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         return NULL;
     }
 
@@ -3047,27 +3047,27 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
 
     Hashbits           *hashbits        = tracking_obj->hashbits;
     HashIntoType       *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        value_exception = std::string(exc.what());
     }
     Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         if (dist != NULL) {
             delete []dist;
         }
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         if (dist != NULL) {
             delete []dist;
         }
@@ -3700,8 +3700,8 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
+    std::string value_exception = "";
+    std::string file_exception  = "";
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
     //Py_BEGIN_ALLOW_THREADS
@@ -3709,18 +3709,18 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
                                               n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        file_exception = std::string(exc.what());
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        value_exception = std::string(exc.what());
     }
     //Py_END_ALLOW_THREADS
 
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
+    if (file_exception != "") {
+        PyErr_SetString(PyExc_OSError, file_exception.c_str());
         return NULL;
     }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
+    if (value_exception != "") {
+        PyErr_SetString(PyExc_ValueError, value_exception.c_str());
         return NULL;
     }
 

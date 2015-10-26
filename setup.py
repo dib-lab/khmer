@@ -40,6 +40,7 @@ import ez_setup
 
 import os
 import sys
+import platform
 from os import listdir as os_listdir
 from os.path import join as path_join
 import shutil
@@ -168,6 +169,22 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
+if os.environ.get('KHMER_INSTRUMENT_BUILD') == 'true':
+    EXTENSION_MOD_DICT['extra_compile_args'].append('-fsanitize=address')
+    EXTENSION_MOD_DICT['libraries'] = ['asan']
+    if platform.dist()[1] >= '15.04' or 'sid' in platform.dist()[1]:
+        EXTENSION_MOD_DICT['extra_compile_args'].extend([
+            '-fsanitize=undefined',
+            '-fsanitize=shift',
+            '-fsanitize=integer-divide-by-zero',
+            '-fsanitize=unreachable',
+            '-fsanitize=vla-bound',
+            '-fsanitize=null',
+            '-fsanitize=return',
+            '-fsanitize=signed-integer-overflow',
+        ])
+        EXTENSION_MOD_DICT['libraries'].append('ubsan')
+
 EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
                           ** EXTENSION_MOD_DICT)
 SCRIPTS = []
@@ -193,6 +210,7 @@ if "-rc" in versioneer.get_version():
     CLASSIFIERS.append("Development Status :: 4 - Beta")
 else:
     CLASSIFIERS.append("Development Status :: 5 - Production/Stable")
+
 
 SETUP_METADATA = \
     {
