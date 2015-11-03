@@ -1,5 +1,5 @@
 from hypothesis import given, assume
-from hypothesis.specifiers import strings
+from hypothesis.strategies import text
 from nose.plugins.attrib import attr
 
 from khmer import reverse_hash, forward_hash, forward_hash_no_rc
@@ -10,7 +10,7 @@ TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
 
 
 @attr('hypothesis')
-@given(strings("ACGT"))
+@given(text("ACGT"))
 def test_forward_hash(kmer):
     ksize = len(kmer)
     assume(ksize > 0)
@@ -21,7 +21,7 @@ def test_forward_hash(kmer):
 
 
 @attr('hypothesis')
-@given(strings("ACGT"))
+@given(text("ACGT"))
 def test_forward_hash_no_rc(kmer):
     ksize = len(kmer)
     assume(ksize > 0)
