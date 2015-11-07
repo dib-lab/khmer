@@ -160,4 +160,5 @@ def test_hll_cardinality(kmers):
         # but every hash function has some bias, even if small.
         # We set the error rate previously to 1%,
         # but we check for 2% here.
-        assert abs(len(hll) - len(oracle)) / len(oracle) <= 0.02
+        error = round(abs(len(hll) - len(oracle)) / len(oracle), 2)
+        assert error <= 0.02
