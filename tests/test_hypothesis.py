@@ -2,6 +2,8 @@
 
 from __future__ import division, unicode_literals
 
+from collections import Counter
+
 from hypothesis import given, assume, strategies as st
 from nose.plugins.attrib import attr
 
@@ -35,3 +37,17 @@ def test_forward_hash_no_rc(kmer):
 
     rh = reverse_hash(forward_hash_no_rc(kmer, ksize), ksize)
     assert rh == kmer
+
+
+@attr('hypothesis')
+@given(st.lists(st_kmer, min_size=1))
+def test_countgraph_undercounting(kmers):
+    oracle = Counter()
+    countgraph = khmer.Countgraph(KSIZE, 4 ** 4, 4)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        countgraph.count(kmer)
+
+    for kmer in oracle:
+        assert countgraph.get(kmer) >= min(oracle[kmer], 255)
