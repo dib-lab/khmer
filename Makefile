@@ -275,6 +275,11 @@ test: FORCE
 	./setup.py develop
 	./setup.py nosetests --attr ${TESTATTR}
 
+hypothesis: FORCE
+	./setup.py develop
+	./setup.py nosetests --attr hypothesis
+
+
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
 		setup.py Makefile > sloccount.sc
