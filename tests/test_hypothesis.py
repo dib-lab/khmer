@@ -65,3 +65,19 @@ def test_nodegraph_presence(kmers):
 
     for kmer in oracle:
         assert nodegraph.get(kmer) == 1
+
+
+@attr('hypothesis')
+@given(st.lists(st_kmer, min_size=10, unique_by=lex_rc))
+def test_hll_cardinality(kmers):
+    oracle = set()
+    hll = khmer.HLLCounter(0.01, KSIZE)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        hll.consume_string(kmer)
+
+    if len(oracle) < 100:
+        assert abs(len(oracle) - len(hll)) <= 2
+    else:
+        assert abs(len(hll) - len(oracle)) / len(oracle) <= 0.02
