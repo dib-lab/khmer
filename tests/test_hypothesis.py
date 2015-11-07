@@ -51,3 +51,17 @@ def test_countgraph_undercounting(kmers):
 
     for kmer in oracle:
         assert countgraph.get(kmer) >= min(oracle[kmer], 255)
+
+
+@attr('hypothesis')
+@given(st.sets(st_kmer, min_size=1))
+def test_nodegraph_presence(kmers):
+    oracle = set()
+    nodegraph = khmer.Nodegraph(KSIZE, 4 ** 4, 4)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        nodegraph.count(kmer)
+
+    for kmer in oracle:
+        assert nodegraph.get(kmer) == 1
