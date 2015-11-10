@@ -1,3 +1,7 @@
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * README.rst: add depsy badge
+
 2016-04-29  Luiz Irber  <khmer@luizirber.org>
 
    * jenkins-build.sh: add codecov coverage upload tool.
