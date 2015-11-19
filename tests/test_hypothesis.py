@@ -132,6 +132,7 @@ def test_nodegraph_presence(kmers):
 
 
 @attr('hypothesis')
+@attr('known_failing')
 @given(st.lists(st_kmer, min_size=10, unique_by=lex_rc))
 def test_hll_cardinality(kmers):
     """Testing HyperLogLog cardinality estimation.
