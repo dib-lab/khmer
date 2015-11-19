@@ -1,4 +1,13 @@
 language: python
+addons:
+    apt:
+        sources:
+            - llvm-toolchain-precise
+            - ubuntu-toolchain-r-test
+        packages:
+            - clang-3.7
+            - g++-5
+            - gcc-5
 python:
     - 2.7
     - 3.5
