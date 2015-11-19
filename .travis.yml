@@ -9,10 +9,9 @@ addons:
 python:
     - 2.7
     - 3.5
-before_install:
-  - make install-dep
 install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - make install-dep
 script:
   - TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
 after_success:
