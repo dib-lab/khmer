@@ -6,13 +6,17 @@ addons:
         packages:
             - g++-4.9
             - gcc-4.9
+env:
+    global:
+        - CXX=g++-4.9
+        - CC=gcc-4.9
 python:
     - 2.7
     - 3.5
 install:
-  - CXX=g++-4.9 CC=gcc-4.9 make install-dep
+  - make install-dep
 script:
-  - CXX=g++-4.9 CC=gcc-4.9 TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
+  - TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
 after_success:
   - coveralls --exclude third-party --gcov-options '\-lp'
 after_failure:
