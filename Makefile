@@ -45,7 +45,7 @@ CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=pep8==1.5.7 diff_cover autopep8 pylint coverage gcovr nose pep257 \
-	screed hypothesis
+	screed hypothesis cpp-coveralls
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
@@ -274,10 +274,6 @@ libtest: FORCE
 test: FORCE
 	./setup.py develop
 	./setup.py nosetests --attr ${TESTATTR}
-
-hypothesis: FORCE
-	./setup.py develop
-	./setup.py nosetests --attr hypothesis
 
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile

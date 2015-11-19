@@ -1,0 +1,12 @@
+language: python
+python:
+    - 2.7
+    - 3.5
+before_install:
+  - make install-dep
+script:
+  - TESTATTR=hypothesis make coverage-gcovr.xml
+after_success:
+  - coveralls --exclude tests --gcov-options '\-lp'
+after_failure:
+  - coveralls --exclude tests --gcov-options '\-lp'
