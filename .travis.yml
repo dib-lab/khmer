@@ -18,6 +18,6 @@ install:
 script:
   - TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
 after_success:
-  - coveralls --exclude third-party --gcov-options '\-lp'
+  - coveralls -n --exclude third-party --gcov-options '\-lp'
 after_failure:
-  - coveralls --exclude third-party --gcov-options '\-lp'
+  - coveralls -n --exclude third-party --gcov-options '\-lp'
