@@ -10,7 +10,7 @@ python:
     - 2.7
     - 3.5
 install:
-  - make install-dep
+  - CXX=g++-4.9 CC=gcc-4.9 make install-dep
 script:
   - CXX=g++-4.9 CC=gcc-4.9 TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
 after_success:
