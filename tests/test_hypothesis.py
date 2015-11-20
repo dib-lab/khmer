@@ -132,6 +132,28 @@ def test_countgraph_undercounting_bigcounts(kmers):
 
 
 @attr('hypothesis')
+@given(st.lists(st_kmer, min_size=1))
+def test_countgraph_undercounting_bigcounts_consume(kmers):
+    """Testing countgraph undercounting, using the bigcount feature and using consume.
+
+    A collections.Counter serves as an oracle for Count-Min sketches,
+    since both implement a frequency counter interface."""
+
+    oracle = Counter()
+    countgraph = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
+    countgraph.set_use_bigcount(True)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        countgraph.consume(kmer)
+
+    for kmer in oracle:
+        # The bigcount implementation counts to 65535,
+        # so we need to check for this at most in the comparison.
+        assert countgraph.get(kmer) >= min(oracle[kmer], 65535)
+
+
+@attr('hypothesis')
 @given(st.sets(st_kmer, min_size=1))
 def test_nodegraph_presence(kmers):
     """Testing nodegraph for presence checking.
