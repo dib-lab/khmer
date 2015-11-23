@@ -39,9 +39,12 @@ Contact: khmer-project@idyll.org
 #include <seqan/sequence.h> // IWYU pragma: keep
 #include <seqan/stream.h> // IWYU pragma: keep
 #include <fstream>
+#include <kseq.h>
 
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
+
+KSEQ_INIT(gzFile, gzread)
 
 namespace khmer
 {
@@ -143,6 +146,66 @@ SeqAnParser::~SeqAnParser()
     delete _private;
 }
 
+struct KSeqParser::Handle {
+    kseq_t *seq = 0;
+    gzFile fd = 0;
+};
+
+KSeqParser::KSeqParser( char const * filename ) : IParser( )
+{
+    _private = new KSeqParser::Handle();
+    _private->fd = gzopen(filename, "r");
+    _private->seq = kseq_init(_private->fd);
+}
+
+bool KSeqParser::is_complete()
+{
+    return (ks_eof(_private->seq->f));
+}
+
+void KSeqParser::imprint_next_read(Read &the_read)
+{
+    the_read.reset();
+    const char *invalid_read_exc = NULL;
+
+    size_t l = kseq_read(_private->seq);
+
+    switch (l) {
+    case 0:
+        invalid_read_exc = "Sequence is empty";
+        break;
+    case -1:
+        throw NoMoreReadsAvailable();
+        break;
+    case -2:
+        invalid_read_exc = "Sequence and quality lengths differ";
+        break;
+    default:
+        _num_reads++;
+        the_read.name = _private->seq->name.s;  /* TODO: merge name and comment here */
+        the_read.sequence = _private->seq->seq.s;
+        if (_private->seq->qual.l != 0) {
+            the_read.quality = _private->seq->qual.s;
+        }
+        break;
+    }
+
+    // Throw any error in the read, even if we're at the end
+    if (invalid_read_exc != NULL) {
+        throw InvalidRead(invalid_read_exc);
+    }
+}
+
+KSeqParser::~KSeqParser()
+{
+    kseq_destroy(_private->seq);
+    gzclose(_private->fd);
+    _private->fd = 0;
+    delete _private;
+}
+
+
+
 IParser * const
 IParser::
 get_parser(
@@ -150,7 +213,8 @@ get_parser(
 )
 {
 
-    return new SeqAnParser(ifile_name.c_str());
+    //return new SeqAnParser(ifile_name.c_str());
+    return new KSeqParser(ifile_name.c_str());
 }
 
 

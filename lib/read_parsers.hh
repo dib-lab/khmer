@@ -186,7 +186,22 @@ private:
     struct Handle;
 
     Handle* _private;
+};
 
+class KSeqParser : public IParser
+{
+
+public:
+    explicit KSeqParser( const char * filename );
+    ~KSeqParser( );
+
+    bool is_complete( );
+    void imprint_next_read(Read &the_read);
+
+private:
+    struct Handle;
+
+    Handle* _private;
 };
 
 inline PartitionID _parse_partition_id(std::string name)
