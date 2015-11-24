@@ -8,6 +8,7 @@ recursive-include third-party ChangeLog FAQ INDEX configure *.xsl
 recursive-include third-party/bzip2 bzip.css entities.xml libbz2.def LICENSE
 include third-party/zlib/zconf.h.in third-party/zlib/zlib.pc.in
 exclude third-party/zlib/Makefile third-party/zlib/zconf.h
+include third-party/kseq/kseq.h
 recursive-include scripts README.txt
 graft tests
 include scripts/oxli
