@@ -154,8 +154,20 @@ struct KSeqParser::Handle {
 KSeqParser::KSeqParser( char const * filename ) : IParser( )
 {
     _private = new KSeqParser::Handle();
+
     _private->fd = gzopen(filename, "r");
+	if (_private->fd == NULL) {
+        std::string message = "Could not open ";
+        message = message + filename + " for reading.";
+        throw InvalidStream(message);
+	}
+
     _private->seq = kseq_init(_private->fd);
+	if (ks_eof(_private->seq->f)) {
+        std::string message = "File ";
+        message = message + filename + " does not contain any sequences!";
+        throw InvalidStream(message);
+    }
 }
 
 bool KSeqParser::is_complete()
