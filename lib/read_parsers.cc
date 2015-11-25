@@ -221,12 +221,16 @@ KSeqParser::~KSeqParser()
 IParser * const
 IParser::
 get_parser(
-    std:: string const	    &ifile_name
+    std:: string const	    &ifile_name,
+    std:: string const      &parser_type
 )
 {
 
-    //return new SeqAnParser(ifile_name.c_str());
-    return new KSeqParser(ifile_name.c_str());
+	if (parser_type == "kseq") {
+        return new KSeqParser(ifile_name.c_str());
+	} else {
+        return new SeqAnParser(ifile_name.c_str());
+	}
 }
 
 

@@ -114,7 +114,8 @@ struct IParser {
     };
 
     static IParser * const  get_parser(
-        std:: string const 	&ifile_name
+        std:: string const 	&ifile_name,
+        std:: string const 	&parser_type = "seqan"
     );
 
     IParser( );

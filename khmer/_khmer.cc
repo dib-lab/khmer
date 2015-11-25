@@ -278,11 +278,13 @@ PyObject *
 _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 {
     const char *      ifile_name_CSTR;
+    const char *      parser_type_CSTR = "seqan";
 
-    if (!PyArg_ParseTuple(args, "s", &ifile_name_CSTR )) {
+    if (!PyArg_ParseTuple(args, "s|s", &ifile_name_CSTR, &parser_type_CSTR )) {
         return NULL;
     }
     std:: string    ifile_name( ifile_name_CSTR );
+    std:: string    parser_type( parser_type_CSTR );
 
     PyObject * self     = subtype->tp_alloc( subtype, 1 );
     if (self == NULL) {
@@ -293,7 +295,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     // Wrap the low-level parser object.
     try {
         myself->parser =
-            IParser:: get_parser( ifile_name );
+            IParser:: get_parser( ifile_name, parser_type );
     } catch (khmer_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -4503,16 +4505,18 @@ hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
 static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         PyObject * args, PyObject * kwds)
 {
-    const char * filename;
+    PyObject * rparser_obj = NULL;
+    std::string filename;
+    read_parsers:: IParser * rparser;
     PyObject * stream_records_o = NULL;
 
-    static const char* const_kwlist[] = {"filename", "stream_records", NULL};
+    static const char* const_kwlist[] = {"input", "stream_records", NULL};
     static char** kwlist = const_cast<char**>(const_kwlist);
 
     bool stream_records = false;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist,
-                                     &filename, &stream_records_o)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
+                                     &rparser_obj, &stream_records_o)) {
         return NULL;
     }
 

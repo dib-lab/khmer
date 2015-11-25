@@ -399,9 +399,9 @@ def test_constructor():
 
     # Note: Using a data file with only one read.
     try:
-        rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
-        assert 0, ("ReadParser's constructor shouldn't accept a character for "
-                   "the number of threads")
+        rparser = ReadParser(utils.get_test_data("single-read.fq"), 1)
+        assert 0, ("ReadParser's constructor shouldn't accept a number for "
+                   "parser type")
     except TypeError as err:
         print(str(err))
     try:
