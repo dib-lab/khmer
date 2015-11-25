@@ -4524,12 +4524,26 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         stream_records = true;
     }
 
+    if (PyUnicode_Check(rparser_obj)) {
+        filename = PyBytes_AsString(PyUnicode_AsEncodedString(
+                                             rparser_obj, "utf-8", "strict"));
+    } else if (PyBytes_Check(rparser_obj)) {
+        filename = PyBytes_AsString(rparser_obj);
+    } else {
+        rparser = _PyObject_to_khmer_ReadParser( rparser_obj );
+    }
+
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
-                                      n_consumed);
+        if (filename.empty()) {
+            me->hllcounter->consume_fasta(rparser, stream_records, total_reads,
+                                          n_consumed);
+        } else {
+            me->hllcounter->consume_fasta(filename, stream_records, total_reads,
+                                          n_consumed);
+        }
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

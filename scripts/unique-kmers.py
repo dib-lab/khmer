@@ -129,6 +129,10 @@ def get_parser():
                         help='print out recommended tablesize arguments and '
                              'restrictions')
 
+    parser.add_argument('--rparser', '-r', type=str, default=str('seqan'),
+                        metavar="rparser", choices=[str('seqan'), str('kseq')],
+                        help="ReadParser to use for sequence loading.")
+
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename(s).', nargs='+')
 
@@ -145,8 +149,8 @@ def main():
     input_filename = None
     for index, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        hllcpp.consume_fasta(input_filename,
-                             stream_records=args.stream_records)
+        rparser = khmer.ReadParser(input_filename, args.rparser)
+        hllcpp.consume_fasta(rparser, stream_records=args.stream_records)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(
