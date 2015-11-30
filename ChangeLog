@@ -1,4 +1,8 @@
-2015-08-14  Luiz Irber  <khmer@luizirber.org>
+2015-11-30  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/Makefile: add missing hllcounter.hh header to KHMER_HEADERS.
+
+2015-11-14  Luiz Irber  <khmer@luizirber.org>
 
    * lib/subset.cc: check iterator before decrementing in
    repartition_largest_partition
