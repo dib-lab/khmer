@@ -4507,7 +4507,7 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
 {
     PyObject * rparser_obj = NULL;
     std::string filename;
-    read_parsers:: IParser * rparser;
+    read_parsers:: IParser * rparser = NULL;
     PyObject * stream_records_o = NULL;
 
     static const char* const_kwlist[] = {"input", "stream_records", NULL};
@@ -4552,6 +4552,9 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         return NULL;
     }
 
+    if (rparser != NULL) {
+        delete rparser;
+    }
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
