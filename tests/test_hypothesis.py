@@ -13,7 +13,7 @@ from __future__ import division, unicode_literals
 
 from collections import Counter
 
-from hypothesis import given, assume, strategies as st
+from hypothesis import given, strategies as st
 from nose.plugins.attrib import attr
 
 import khmer
@@ -23,7 +23,7 @@ from khmer import reverse_hash, forward_hash, forward_hash_no_rc
 # TODO: we are only testing with fixed k, table size and number of tables for now.
 KSIZE = 13
 N_TABLES = 4
-TABLE_SIZE = 4 ** 4
+TABLE_SIZE = 1e6
 
 # strategy for creating kmers. Alphabet is derived from nucleotides.
 st_kmer = st.text("ACGT", min_size=KSIZE, max_size=KSIZE)
@@ -92,17 +92,17 @@ def test_countgraph_undercounting(kmers):
 @given(st.lists(st_kmer, min_size=1))
 def test_countgraph_undercounting_consume(kmers):
     """Testing countgraph undercounting, using consume instead of count.
-        
+
         A collections.Counter serves as an oracle for Count-Min sketches,
         since both implement a frequency counter interface."""
-    
+
     oracle = Counter()
     countgraph = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
-    
+
     for kmer in kmers:
         oracle.update([kmer])
         countgraph.consume(kmer)
-    
+
     for kmer in oracle:
         # Our implementation only counts to 255 by default,
         # so we need to check for at most 255 in the comparison.
@@ -204,5 +204,62 @@ def test_hll_cardinality(kmers):
         # but every hash function has some bias, even if small.
         # We set the error rate previously to 1%,
         # but we check for 2% here.
-        error = round(abs(len(hll) - len(oracle)) / len(oracle), 2)
+        error = round(abs(len(hll) - len(oracle)) / len(oracle), 3)
         assert error <= 0.02
+
+
+@attr('hypothesis')
+@given(st.sets(st_kmer, min_size=1))
+def test_nodegraph_update(kmers):
+    """
+
+    Modeled after test_nodegraph:test_update_from_2
+    """
+    ng1 = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+    ng2 = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    for kmer in kmers:
+        ng1.count(kmer)
+        ng2.count(kmer)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
+
+    ng1.update(ng2)
+    assert ng1.n_occupied() == ng2.n_occupied()
+
+
+@attr('hypothesis')
+@given(st.sets(st_kmer, min_size=1), st.sets(st_kmer, min_size=1))
+def test_nodegraph_update_commutativity(kmers_1, kmers_2):
+    """
+    """
+    ng1 = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+    ng2 = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    for kmer in kmers_1:
+        ng1.count(kmer)
+
+    for kmer in kmers_2:
+        ng2.count(kmer)
+
+    ng2.update(ng1)
+    ng1.update(ng2)
+    assert ng1.n_occupied() == ng2.n_occupied()
+
+
+@attr('hypothesis')
+@given(st.lists(st_kmer, min_size=10, unique_by=lex_rc))
+def test_n_unique(kmers):
+    oracle = set()
+    ng = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+    cg = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        ng.consume(kmer)
+        cg.consume(kmer)
+
+    assert len(oracle) == ng.n_unique_kmers(), (len(oracle), ng.n_unique_kmers())
+    assert len(oracle) == cg.n_unique_kmers(), (len(oracle), cg.n_unique_kmers())
+
+    assert ng.n_occupied() == cg.n_occupied(), (ng.n_occupied(), cg.n_occupied())
