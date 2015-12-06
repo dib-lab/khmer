@@ -226,6 +226,13 @@ coverage-gcovr.xml: coverage-debug .coverage
           --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*' \
 	  --exclude-unreachable-branches
 
+coverage-lcov.info: coverage-debug .coverage
+	lcov --capture --directory . --no-external --output-file coverage.info
+	lcov --remove coverage.info 'third-party/*' -o coverage-lcov.info
+
+lcov-report/index.html: coverage-lcov.info
+	genhtml coverage-lcov.info --output-directory lcov-report
+
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
 

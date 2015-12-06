@@ -6,6 +6,7 @@ addons:
         packages:
             - g++-4.9
             - gcc-4.9
+            - lcov
 env:
     global:
         - CXX=g++-4.9
@@ -16,7 +17,7 @@ python:
 install:
   - make install-dep
 script:
-  - TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml
+  - TESTATTR='hypothesis,!known_failing' make coverage-gcovr.xml lcov-report/index.html
 after_success:
   - coveralls -b . -r . --exclude third-party --gcov-options '\-lp' --gcov 'gcov-4.9'
 after_failure:
