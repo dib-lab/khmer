@@ -12,6 +12,7 @@ Hypothesis takes these strategies and tries to find inputs to falsify the tests.
 from __future__ import division, unicode_literals
 
 from collections import Counter
+from tempfile import NamedTemporaryFile
 
 from hypothesis import given, strategies as st
 from nose.plugins.attrib import attr
@@ -27,6 +28,18 @@ TABLE_SIZE = 1e6
 
 # strategy for creating kmers. Alphabet is derived from nucleotides.
 st_kmer = st.text("ACGT", min_size=KSIZE, max_size=KSIZE)
+
+st_sequence = st.text("ACGT", min_size=KSIZE, max_size=1000)
+
+def fasta_entry(name, seq):
+    return "".join([">", name, '\n', seq, '\n'])
+
+# strategy for creating valid FASTA files
+st_entry = st.builds(fasta_entry,
+                        st.characters(min_codepoint=32, max_codepoint=126),
+                        st_sequence)
+st_records= st.lists(st_entry)
+st_fasta = st.builds(lambda s: "".join(s), st_records)
 
 # Reverse complement utilities.
 TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
@@ -154,24 +167,29 @@ def test_countgraph_undercounting_bigcounts_consume(kmers):
 
 
 @attr('hypothesis')
-@given(st.sets(st_kmer, min_size=1))
-def test_nodegraph_presence(kmers):
-    """Testing nodegraph for presence checking.
+@given(st_records)
+def test_countgraph_consume_fasta(records):
+    """
+    """
+    cg_fasta = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
+    cg_string = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
 
-    A set serves as an oracle for Bloom Filters,
-    since both implement set membership operations."""
+    fasta = "".join(records)
+    with NamedTemporaryFile() as temp:
+        temp.write(fasta.encode('utf-8'))
+        temp.flush()
 
-    oracle = set()
-    nodegraph = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+        try:
+            cg_fasta.consume_fasta(temp.name)
+        except OSError:
+            assert fasta == ''
 
-    for kmer in kmers:
-        oracle.update([kmer])
-        nodegraph.count(kmer)
+    for record in records:
+        cg_string.consume(record.split('\n')[1])
 
-    for kmer in oracle:
-        # Nodegraph and Countgraph have similar API,
-        # but Nodegraph.get returns only {0,1}
-        assert nodegraph.get(kmer) == 1
+    assert cg_fasta.n_unique_kmers() == cg_string.n_unique_kmers()
+    assert cg_fasta.n_occupied() == cg_string.n_occupied()
+    assert cg_fasta.hashsizes() == cg_string.hashsizes()
 
 
 @attr('hypothesis')
@@ -206,6 +224,74 @@ def test_hll_cardinality(kmers):
         # but we check for 2% here.
         error = round(abs(len(hll) - len(oracle)) / len(oracle), 3)
         assert error <= 0.02
+
+
+@attr('hypothesis')
+@given(st.lists(st_kmer, min_size=1), st.lists(st_kmer, min_size=1))
+def test_hll_merge_commutativity(kmers_1, kmers_2):
+    """
+    """
+    hll1 = khmer.HLLCounter(0.01, KSIZE)
+    hll2 = khmer.HLLCounter(0.01, KSIZE)
+
+    for kmer in kmers_1:
+        hll1.consume_string(kmer)
+
+    for kmer in kmers_2:
+        hll2.consume_string(kmer)
+
+    hll2.merge(hll1)
+    hll1.merge(hll2)
+
+    assert hll1.counters == hll2.counters
+    assert len(hll1) == len(hll2)
+    assert hll1.error_rate == hll2.error_rate
+    assert hll1.ksize == hll2.ksize
+
+
+@attr('hypothesis')
+@given(st_records)
+def test_hll_consume_fasta(records):
+    """
+    """
+    hll_fasta = khmer.HLLCounter(0.01, KSIZE)
+    hll_string = khmer.HLLCounter(0.01, KSIZE)
+
+    fasta = "".join(records)
+    with NamedTemporaryFile() as temp:
+        temp.write(fasta.encode('utf-8'))
+        temp.flush()
+
+        try:
+            hll_fasta.consume_fasta(temp.name)
+        except OSError:
+            assert fasta == ''
+
+    for record in records:
+        hll_string.consume_string(record.split('\n')[1])
+
+    assert len(hll_fasta) == len(hll_string)
+
+
+@attr('hypothesis')
+@given(st.sets(st_kmer, min_size=1))
+def test_nodegraph_presence(kmers):
+    """Testing nodegraph for presence checking.
+
+    A set serves as an oracle for Bloom Filters,
+    since both implement set membership operations."""
+
+    oracle = set()
+    nodegraph = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    for kmer in kmers:
+        oracle.update([kmer])
+        nodegraph.count(kmer)
+
+    for kmer in oracle:
+        # Nodegraph and Countgraph have similar API,
+        # but Nodegraph.get returns only {0,1}
+        assert nodegraph.get(kmer) == 1
 
 
 @attr('hypothesis')
@@ -248,11 +334,38 @@ def test_nodegraph_update_commutativity(kmers_1, kmers_2):
 
 
 @attr('hypothesis')
-@given(st.lists(st_kmer, min_size=10, unique_by=lex_rc))
-def test_n_unique(kmers):
+@given(st_records)
+def test_nodegraph_consume_fasta(records):
+    """
+    """
+    ng_fasta = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+    ng_string = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    fasta = "".join(records)
+    with NamedTemporaryFile() as temp:
+        temp.write(fasta.encode('utf-8'))
+        temp.flush()
+
+        try:
+            ng_fasta.consume_fasta(temp.name)
+        except OSError:
+            assert fasta == ''
+
+    for record in records:
+        ng_string.consume(record.split('\n')[1])
+
+    assert ng_fasta.n_unique_kmers() == ng_string.n_unique_kmers()
+    assert ng_fasta.n_occupied() == ng_string.n_occupied()
+    assert ng_fasta.hashsizes() == ng_string.hashsizes()
+
+
+@attr('hypothesis')
+@given(st.lists(st_kmer, min_size=10, unique_by=lex_rc),
+       st.integers(min_value=int(TABLE_SIZE)))
+def test_n_unique(kmers, table_size):
     oracle = set()
-    ng = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
-    cg = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
+    ng = khmer.Nodegraph(KSIZE, table_size, N_TABLES)
+    cg = khmer.Countgraph(KSIZE, table_size, N_TABLES)
 
     for kmer in kmers:
         oracle.update([kmer])
@@ -263,3 +376,5 @@ def test_n_unique(kmers):
     assert len(oracle) == cg.n_unique_kmers(), (len(oracle), cg.n_unique_kmers())
 
     assert ng.n_occupied() == cg.n_occupied(), (ng.n_occupied(), cg.n_occupied())
+
+    assert ng.hashsizes() == cg.hashsizes(), (ng.hashsizes(), cg.hashsizes())
