@@ -378,3 +378,97 @@ def test_n_unique(kmers, table_size):
     assert ng.n_occupied() == cg.n_occupied(), (ng.n_occupied(), cg.n_occupied())
 
     assert ng.hashsizes() == cg.hashsizes(), (ng.hashsizes(), cg.hashsizes())
+
+#def test_nodegraph_filter_if_present(kmers):
+
+#def test_nodegraph_combine_pe(kmers):
+#  - count_partitions()
+#  - get_partition_od
+#  - join_partitions
+
+#def test_nodegraph_count_within_radius
+#  - count_kmers_within_radius
+
+#@attr('hypothesis')
+#@given(st_fasta)
+#def test_nodegraph_count_kmer_degree(fasta):
+#    nodegraph = khmer._Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+#
+#    for (kmer, degree) in kmers.items():
+#        assert nodegraph.kmer_degree(kmer) == degree
+
+#def test_nodegraph_save_load_tagset
+#  - add_tag
+#  - save_tagset
+#  - load_tagset (clear_tags=False)
+
+#def test_nodegraph_stop_traverse
+#  - add_stop_tag
+#  - consume_fasta_and_tag
+#  - do_subset_partition
+#  - merge_subset
+
+#def test_nodegraph_find_unpart
+#  - consume_fasta_and_tag
+#  - do_subset_partition
+#  - merge_subset
+#  - count_partitions
+#  - find_unpart
+
+#def test_nodegraph_find_stoptags
+#  - identify_stoptags_by_position
+
+#def test_nodegraph_ksize
+#  - ksize
+
+#def test_nodegraph_get_hashsizes
+#  - get_hashsizes
+
+#def test_nodegraph_extract_unique_paths
+#  - extract_unique_paths
+
+#def test_nodegraph_get_raw_tables
+#  - get_raw_tables
+
+#def test_nodegraph_get_median_count
+#  - get_median_count
+
+#def test_countgraph_median_at_least
+#  - median_at_least
+
+#def test_countgraph_get_kmer_counts
+#  - get_kmer_counts
+
+#def test_countgraph_get_kmer_hashes
+#  - get_kmer_hashes
+
+#def test_countgraph_get_kmer
+#  - get_kmers
+
+#def test_countgraph_abundance_distribution
+#  - abundance_distribution
+
+#def test_countgraph_trim_on_abundance
+#  - trim_on_abundance
+
+#def test_countgraph_find_spectral_error_positions
+#  - find_spectral_error_positions
+
+#def test_countgraph_get_min_count
+#  - get_min_count
+
+#def test_countgraph_get_max_count
+#  - get_max_count
+
+#def test_countgraph_get_median_count
+#  - get_median_count
+
+#def test_countgraph_get_tags_and_positions
+#  - consume_and_tag
+#  - get_tags_and_positions
+#  - find_all_tags_list
+
+#def test_countgraph_consume_and_retrieve_tags_empty
+#  - consume
+#  - get_tags_and_positions
+#  - find_all_tags_list
