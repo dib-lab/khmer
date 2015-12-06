@@ -1,7 +1,7 @@
 FROM ubuntu:15.10
 MAINTAINER ecs260@luizirber.org
 
-ENV PACKAGES python-dev zlib1g git python-setuptools g++ make ca-certificates wget
+ENV PACKAGES python-dev zlib1g git python-setuptools g++ make ca-certificates wget lcov
 ENV KHMER_VERSION pull/1324/head:feature/hypothesis
 ENV TESTATTR=hypothesis
 
