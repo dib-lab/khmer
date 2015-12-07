@@ -14,7 +14,7 @@ from __future__ import division, unicode_literals
 from collections import Counter
 from tempfile import NamedTemporaryFile
 
-from hypothesis import given, strategies as st
+from hypothesis import given, example, strategies as st
 from nose.plugins.attrib import attr
 
 import screed
@@ -383,6 +383,10 @@ def test_n_unique(kmers, table_size):
 
 @attr('hypothesis')
 @given(st_records, st_records)
+@example([">a\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"],
+         [">1\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
+          ">2\nGAGATCAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
+          ">3\nAGAGATACACAAGATAGAGAGACCCAGGAGGGGG\n"])
 def test_nodegraph_filter_if_present(mask, records):
     """Testing nodegraph.filter_if_present
 
@@ -417,7 +421,8 @@ def test_nodegraph_filter_if_present(mask, records):
             filtered_records = [r for r in filtered]
 
     for r in filtered_records:
-        assert all(r['sequence'].find(m.split('\n')[1]) < 0 for m in mask)
+        assert all(m.split('\n')[1] not in r['sequence']
+                   for m in mask)
 
 
 #def test_nodegraph_combine_pe(kmers):
