@@ -17,6 +17,7 @@ from tempfile import NamedTemporaryFile
 from hypothesis import given, strategies as st
 from nose.plugins.attrib import attr
 
+import screed
 import khmer
 from khmer import reverse_hash, forward_hash, forward_hash_no_rc
 
@@ -38,7 +39,7 @@ def fasta_entry(name, seq):
 st_entry = st.builds(fasta_entry,
                         st.characters(min_codepoint=32, max_codepoint=126),
                         st_sequence)
-st_records= st.lists(st_entry)
+st_records = st.lists(st_entry)
 st_fasta = st.builds(lambda s: "".join(s), st_records)
 
 # Reverse complement utilities.
@@ -379,7 +380,45 @@ def test_n_unique(kmers, table_size):
 
     assert ng.hashsizes() == cg.hashsizes(), (ng.hashsizes(), cg.hashsizes())
 
-#def test_nodegraph_filter_if_present(kmers):
+
+@attr('hypothesis')
+@given(st_records, st_records)
+def test_nodegraph_filter_if_present(mask, records):
+    """Testing nodegraph.filter_if_present
+
+    filter_if_present removes all reads from an input file already covered by
+    any kmer in the countgraph.
+    """
+    ng = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
+
+    mask_fasta = "".join(mask)
+    with NamedTemporaryFile() as maskfile:
+        maskfile.write(mask_fasta.encode('utf-8'))
+        maskfile.flush()
+
+        try:
+            ng.consume_fasta(maskfile.name)
+        except OSError:
+            assert mask_fasta == ''
+
+    input_fasta = "".join(records)
+    with NamedTemporaryFile() as outfile:
+        with NamedTemporaryFile() as inputfile:
+            inputfile.write(mask_fasta.encode('utf-8'))
+            inputfile.write(input_fasta.encode('utf-8'))
+            inputfile.flush()
+
+            try:
+                ng.filter_if_present(inputfile.name, outfile.name)
+            except OSError:
+                assert input_fasta == ''
+
+        with screed.open(outfile.name) as filtered:
+            filtered_records = [r for r in filtered]
+
+    for r in filtered_records:
+        assert all(r['sequence'].find(m.split('\n')[1]) < 0 for m in mask)
+
 
 #def test_nodegraph_combine_pe(kmers):
 #  - count_partitions()
