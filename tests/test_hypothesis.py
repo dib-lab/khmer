@@ -435,13 +435,8 @@ def test_nodegraph_filter_if_present(mask, records):
 #def test_nodegraph_count_within_radius
 #  - count_kmers_within_radius
 
-#@attr('hypothesis')
-#@given(st_fasta)
-#def test_nodegraph_count_kmer_degree(fasta):
-#    nodegraph = khmer._Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
-#
-#    for (kmer, degree) in kmers.items():
-#        assert nodegraph.kmer_degree(kmer) == degree
+#def test_nodegraph_count_kmer_degree
+#  - kmer_degree
 
 #def test_nodegraph_save_load_tagset
 #  - add_tag
