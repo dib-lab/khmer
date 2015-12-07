@@ -32,15 +32,12 @@ st_kmer = st.text("ACGT", min_size=KSIZE, max_size=KSIZE)
 
 st_sequence = st.text("ACGT", min_size=KSIZE, max_size=1000)
 
-def fasta_entry(name, seq):
-    return "".join([">", name, '\n', seq, '\n'])
-
-# strategy for creating valid FASTA files
-st_entry = st.builds(fasta_entry,
-                        st.characters(min_codepoint=32, max_codepoint=126),
-                        st_sequence)
-st_records = st.lists(st_entry)
-st_fasta = st.builds(lambda s: "".join(s), st_records)
+# strategy for creating valid FASTA records
+st_record = st.fixed_dictionaries({
+             'name': st.characters(min_codepoint=32, max_codepoint=126),
+             'sequence': st_sequence}
+            )
+st_records = st.lists(st_record)
 
 # Reverse complement utilities.
 TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
@@ -54,6 +51,11 @@ def lex_rc(kmer):
     # We abuse one property from reverse_hash here,
     # since its implementation always return the smaller between kmer and rc.
     return reverse_hash(forward_hash(kmer, len(kmer)), len(kmer))
+
+
+# FASTA utilities
+def fasta_build(records):
+    return "".join(">{name}\n{sequence}\n".format(**r) for r in records)
 
 
 @attr('hypothesis')
@@ -175,7 +177,7 @@ def test_countgraph_consume_fasta(records):
     cg_fasta = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
     cg_string = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
 
-    fasta = "".join(records)
+    fasta = fasta_build(records)
     with NamedTemporaryFile() as temp:
         temp.write(fasta.encode('utf-8'))
         temp.flush()
@@ -186,7 +188,7 @@ def test_countgraph_consume_fasta(records):
             assert fasta == ''
 
     for record in records:
-        cg_string.consume(record.split('\n')[1])
+        cg_string.consume(record['sequence'])
 
     assert cg_fasta.n_unique_kmers() == cg_string.n_unique_kmers()
     assert cg_fasta.n_occupied() == cg_string.n_occupied()
@@ -223,7 +225,7 @@ def test_hll_cardinality(kmers):
         # but every hash function has some bias, even if small.
         # We set the error rate previously to 1%,
         # but we check for 2% here.
-        error = round(abs(len(hll) - len(oracle)) / len(oracle), 3)
+        error = round(abs(len(hll) - len(oracle)) / len(oracle), 2)
         assert error <= 0.02
 
 
@@ -258,7 +260,7 @@ def test_hll_consume_fasta(records):
     hll_fasta = khmer.HLLCounter(0.01, KSIZE)
     hll_string = khmer.HLLCounter(0.01, KSIZE)
 
-    fasta = "".join(records)
+    fasta = fasta_build(records)
     with NamedTemporaryFile() as temp:
         temp.write(fasta.encode('utf-8'))
         temp.flush()
@@ -269,7 +271,7 @@ def test_hll_consume_fasta(records):
             assert fasta == ''
 
     for record in records:
-        hll_string.consume_string(record.split('\n')[1])
+        hll_string.consume_string(record['sequence'])
 
     assert len(hll_fasta) == len(hll_string)
 
@@ -342,7 +344,7 @@ def test_nodegraph_consume_fasta(records):
     ng_fasta = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
     ng_string = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
 
-    fasta = "".join(records)
+    fasta = fasta_build(records)
     with NamedTemporaryFile() as temp:
         temp.write(fasta.encode('utf-8'))
         temp.flush()
@@ -353,7 +355,7 @@ def test_nodegraph_consume_fasta(records):
             assert fasta == ''
 
     for record in records:
-        ng_string.consume(record.split('\n')[1])
+        ng_string.consume(record['sequence'])
 
     assert ng_fasta.n_unique_kmers() == ng_string.n_unique_kmers()
     assert ng_fasta.n_occupied() == ng_string.n_occupied()
@@ -383,10 +385,10 @@ def test_n_unique(kmers, table_size):
 
 @attr('hypothesis')
 @given(st_records, st_records)
-@example([">a\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"],
-         [">1\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
-          ">2\nGAGATCAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
-          ">3\nAGAGATACACAAGATAGAGAGACCCAGGAGGGGG\n"])
+@example([{"name": "a", "sequence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}],
+         [{"name": "1", "sequence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+          {"name": "2", "sequence": "GAGATCAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+          {"name": "3", "sequence": "AGAGATACACAAGATAGAGAGACCCAGGAGGGGG"}])
 def test_nodegraph_filter_if_present(mask, records):
     """Testing nodegraph.filter_if_present
 
@@ -395,7 +397,7 @@ def test_nodegraph_filter_if_present(mask, records):
     """
     ng = khmer.Nodegraph(KSIZE, TABLE_SIZE, N_TABLES)
 
-    mask_fasta = "".join(mask)
+    mask_fasta = fasta_build(mask)
     with NamedTemporaryFile() as maskfile:
         maskfile.write(mask_fasta.encode('utf-8'))
         maskfile.flush()
@@ -405,7 +407,7 @@ def test_nodegraph_filter_if_present(mask, records):
         except OSError:
             assert mask_fasta == ''
 
-    input_fasta = "".join(records)
+    input_fasta = fasta_build(records)
     with NamedTemporaryFile() as outfile:
         with NamedTemporaryFile() as inputfile:
             inputfile.write(mask_fasta.encode('utf-8'))
@@ -420,9 +422,9 @@ def test_nodegraph_filter_if_present(mask, records):
         with screed.open(outfile.name) as filtered:
             filtered_records = [r for r in filtered]
 
-    for r in filtered_records:
-        assert all(m.split('\n')[1] not in r['sequence']
-                   for m in mask)
+    assert all(m['sequence'] not in r['sequence']
+               for m in mask
+               for r in filtered_records)
 
 
 #def test_nodegraph_combine_pe(kmers):
