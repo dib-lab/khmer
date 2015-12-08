@@ -284,7 +284,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     "compress", "decompress", "bzlib"])
         if "jemalloc" not in self.libraries:
             cmd = ['bash', '-c', 'cd ' + JEMALLOCDIR + ' && ( test Makefile -nt'
-                    ' configure || bash ./configure ) && make']
+                    ' configure || bash ./configure --enable-prof ) && make']
             spawn(cmd=cmd, dry_run=self.dry_run)
             self.extensions[0].extra_objects.extend(
                 path_join("third-party", "jemalloc", "src", bn + ".pic.o") for bn in [
