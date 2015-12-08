@@ -4552,9 +4552,6 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
         return NULL;
     }
 
-    if (rparser != NULL) {
-        delete rparser;
-    }
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
