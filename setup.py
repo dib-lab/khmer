@@ -129,6 +129,7 @@ def check_for_openmp():
 
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
+JEMALLOCDIR = 'third-party/jemalloc'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
@@ -281,6 +282,16 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                 path_join("third-party", "bzip2", bn + ".o") for bn in [
                     "blocksort", "huffman", "crctable", "randtable",
                     "compress", "decompress", "bzlib"])
+        if "jemalloc" not in self.libraries:
+            cmd = ['bash', '-c', 'cd ' + JEMALLOCDIR + ' && ( test Makefile -nt'
+                    ' configure || bash ./configure ) && make']
+            spawn(cmd=cmd, dry_run=self.dry_run)
+            self.extensions[0].extra_objects.extend(
+                path_join("third-party", "jemalloc", "src", bn + ".pic.o") for bn in [
+                    "jemalloc", "arena", "atomic", "base", "bitmap", "chunk",
+                    "chunk_dss", "chunk_mmap", "ckh", "ctl", "extent", "hash",
+                    "huge", "mb", "mutex", "pages", "prof", "quarantine",
+                    "rtree", "stats", "tcache", "util", "tsd", "valgrind"])
         _build_ext.run(self)
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})
