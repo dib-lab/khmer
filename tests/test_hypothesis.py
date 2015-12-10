@@ -37,7 +37,11 @@ st_record = st.fixed_dictionaries({
              'name': st.characters(min_codepoint=32, max_codepoint=126),
              'sequence': st_sequence}
             )
-st_records = st.lists(st_record)
+
+st_invalid_record = st.fixed_dictionaries({
+             'name': st.characters(),
+             'sequence': st.characters()}
+            )
 
 # Reverse complement utilities.
 TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
@@ -170,7 +174,8 @@ def test_countgraph_undercounting_bigcounts_consume(kmers):
 
 
 @attr('hypothesis')
-@given(st_records)
+@given(st.one_of(st.lists(st_record),
+                 st.lists(st_invalid_record)))
 def test_countgraph_consume_fasta(records):
     """
     """
@@ -253,7 +258,7 @@ def test_hll_merge_commutativity(kmers_1, kmers_2):
 
 
 @attr('hypothesis')
-@given(st_records)
+@given(st.lists(st_record))
 def test_hll_consume_fasta(records):
     """
     """
@@ -337,7 +342,7 @@ def test_nodegraph_update_commutativity(kmers_1, kmers_2):
 
 
 @attr('hypothesis')
-@given(st_records)
+@given(st.lists(st_record))
 def test_nodegraph_consume_fasta(records):
     """
     """
@@ -384,7 +389,7 @@ def test_n_unique(kmers, table_size):
 
 
 @attr('hypothesis')
-@given(st_records, st_records)
+@given(st.lists(st_record), st.lists(st_record))
 @example([{"name": "a", "sequence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}],
          [{"name": "1", "sequence": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
           {"name": "2", "sequence": "GAGATCAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
