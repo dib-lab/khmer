@@ -182,6 +182,8 @@ def test_countgraph_consume_fasta(records):
     cg_fasta = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
     cg_string = khmer.Countgraph(KSIZE, TABLE_SIZE, N_TABLES)
 
+    fasta_error = None
+
     fasta = fasta_build(records)
     with NamedTemporaryFile() as temp:
         temp.write(fasta.encode('utf-8'))
@@ -191,9 +193,14 @@ def test_countgraph_consume_fasta(records):
             cg_fasta.consume_fasta(temp.name)
         except OSError:
             assert fasta == ''
+        except Exception as e:
+            fasta_error = e
 
     for record in records:
-        cg_string.consume(record['sequence'])
+        try:
+            cg_string.consume(record['sequence'])
+        except ValueError:
+            assert fasta_error is not None
 
     assert cg_fasta.n_unique_kmers() == cg_string.n_unique_kmers()
     assert cg_fasta.n_occupied() == cg_string.n_occupied()
