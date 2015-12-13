@@ -31,10 +31,11 @@ from khmer.kfile import check_input_files, check_space
 
 
 def get_parser():
-    epilog="""
+    epilog = """
     Example:
 
-    load-graph.py --unique-kmers 200000 --no-build-tagset 16s.oxling data/16s.fa
+    load-graph.py --unique-kmers 200000 --no-build-tagset 16s.oxling \
+            data/16s.fa
     filter-contamination.py 16s.oxling data/16s.fa
 
     """
