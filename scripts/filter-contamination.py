@@ -115,7 +115,7 @@ def main():
 
         for r in rparser:
             read_kmers = len(r.sequence) - ksize + 1
-            if read_kmers == 0 or not is_valid_dna(r.sequence):
+            if read_kmers < 1 or not is_valid_dna(r.sequence):
                 continue
             contaminant_read_matches = 0
 
@@ -124,6 +124,11 @@ def main():
 
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
+
+        if total_query_kmers == 0 :
+            print('No valid reads to test in {sample}'.format(sample=filename),
+                    file=sys.stderr)
+            break
 
         contam = contaminant_total_matches / total_query_kmers
 
