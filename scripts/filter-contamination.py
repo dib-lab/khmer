@@ -54,6 +54,7 @@ import sys
 from collections import defaultdict
 import argparse
 
+from khmer import __version__
 from khmer.khmer_args import info, _VersionStdErrAction
 from khmer.kfile import check_input_files, check_space
 
