@@ -1,3 +1,6 @@
+2015-12-13  Michael R. Crusoe <crusoe@ucdavis.edu> and Roman Valls Guimera <brainstorm@nopcode.org>
+  * scripts/filter-contamination.py: initial bloom filter (de)contamination checker.
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * lib/subset.cc: check iterator before decrementing in
