@@ -125,9 +125,9 @@ def main():
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
 
-        if total_query_kmers == 0 :
+        if total_query_kmers == 0:
             print('No valid reads to test in {sample}'.format(sample=filename),
-                    file=sys.stderr)
+                  file=sys.stderr)
             break
 
         contam = contaminant_total_matches / total_query_kmers
