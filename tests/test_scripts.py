@@ -3025,21 +3025,15 @@ def check_version_and_basic_citation(scriptname):
 
 
 def test_filter_contamination():
-    # load-graph.py --unique-kmers 200000 --fp-rate 0.05 --no-build-tagset \
-    #        test-reads.oxling tests/test-data/test-reads.fa
-    # filter-contamination.py test-reads.oxling tests/test-data/100-reads.fq.gz
 
     load_graph = 'load-graph.py'
     script = 'filter-contamination.py'
 
-    oxfile = 'test-reads.oxling'
-    infile = 'test-reads.fa'
-    queryfile = '100-reads.fq.bz2'
+    oxfile = utils.get_temp_filename('test-reads.oxling')
     in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('test-reads.fa')
 
-    oxfile = utils.get_temp_filename(oxfile)
-    infile = utils.get_test_data(infile)
-    queryfile = utils.get_test_data(queryfile)
+    queryfile = utils.get_test_data('100-reads.fq.bz2')
 
     args_load_graph = ['-U', '200000', '--fp-rate',
                        '0.05', '--no-build-tagset', oxfile, infile]
@@ -3047,13 +3041,35 @@ def test_filter_contamination():
 
     utils.runscript(load_graph, args_load_graph, in_dir)
 
-    # query node graph
     status, out, err = utils.runscript(
         script, args_contam, in_dir)
 
+    assert status == 0
     assert '-0.0' not in out
     assert '0.017702448210' in out
 
+
+def test_filter_contamination2():
+    load_graph = 'load-graph.py'
+    script = 'filter-contamination.py'
+
+    oxfile = utils.get_temp_filename('test-reads.oxling')
+    in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('test-reads.fa')
+
+    queryfile = utils.get_test_data('all-A.fa')  # very short read
+
+    args_load_graph = ['-U', '200000', '--fp-rate', '0.05',
+                       '--no-build-tagset', oxfile, infile]
+    args_contam = [oxfile, queryfile]
+
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    status, out, err = utils.runscript(
+        script, args_contam, in_dir)
+
+    assert status == 0
+    assert '-0.0' in out
 
 def test_version():
     for entry in os.listdir(utils.scriptpath()):

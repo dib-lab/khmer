@@ -23,6 +23,7 @@ from __future__ import print_function
 
 import khmer
 import json
+import sys
 from collections import defaultdict
 import argparse
 
@@ -100,13 +101,13 @@ def main():
     # anything?
     check_space(filenames, False)
 
-    print('loading nodegraph %s' % graph)
+    print('loading nodegraph %s' % graph, file=sys.stderr)
     htable = khmer.load_nodegraph(graph)
     ksize = htable.ksize()
 
     for _, filename in enumerate(filenames):
         print(('querying sample {sample} against filter {filt}').format(
-            sample=filename, filt=graph))
+            sample=filename, filt=graph), file=sys.stderr)
         total_query_kmers = 0
         contaminant_total_matches = 0
 
