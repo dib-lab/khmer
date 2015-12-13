@@ -3024,6 +3024,77 @@ def check_version_and_basic_citation(scriptname):
     assert version.search(err) is not None, err
 
 
+def test_filter_contamination():
+
+    load_graph = 'load-graph.py'
+    script = 'filter-contamination.py'
+
+    oxfile = utils.get_temp_filename('test-reads.oxling')
+    in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('test-reads.fa')
+
+    queryfile = utils.get_test_data('100-reads.fq.bz2')
+
+    args_load_graph = ['-U', '200000', '--fp-rate',
+                       '0.05', '--no-build-tagset', oxfile, infile]
+    args_contam = [oxfile, queryfile]
+
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    status, out, err = utils.runscript(
+        script, args_contam, in_dir)
+
+    assert status == 0, status
+    assert '-0.0' not in out
+    assert '0.017702448210' in out
+
+
+def test_filter_contamination2():
+    load_graph = 'load-graph.py'
+    script = 'filter-contamination.py'
+
+    oxfile = utils.get_temp_filename('test-reads.oxling')
+    in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('test-reads.fa')
+
+    queryfile = utils.get_test_data('all-A.fa')  # very short read
+
+    args_load_graph = ['-U', '200000', '--fp-rate', '0.05',
+                       '--no-build-tagset', oxfile, infile]
+    args_contam = [oxfile, queryfile]
+
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    status, out, err = utils.runscript(
+        script, args_contam, in_dir)
+
+    assert status == 0, status
+    assert 'No valid reads to test' in err, err
+
+
+def test_filter_contamination_nonACTG():
+    load_graph = 'load-graph.py'
+    script = 'filter-contamination.py'
+
+    oxfile = utils.get_temp_filename('16s.oxling')
+    in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('16s.fa')
+
+    queryfile = utils.get_test_data('16s.fa')  # contains non-ACTG
+
+    args_load_graph = ['-U', '200000', '--fp-rate', '0.05',
+                       '--no-build-tagset', oxfile, infile]
+    args_contam = [oxfile, queryfile]
+
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    status, out, err = utils.runscript(
+        script, args_contam, in_dir)
+
+    assert status == 0, status
+    assert '1.0' in out, out
+
+
 def test_version():
     for entry in os.listdir(utils.scriptpath()):
         if entry.endswith(".py"):

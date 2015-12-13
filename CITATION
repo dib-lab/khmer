@@ -280,4 +280,16 @@ in:
     algorithms.},
   }
 
+Decontamination filtering
+-------------------------
+
+The :program:`filter-contamination.py` script implements the classification of
+sequences described in:
+
+   Classification of DNA sequences using Bloom filters
+   Stranneheim H, Käer M, Allander T, Andersson B, Arvestad L, Lundeberg J
+   doi: 10.1093/bioinformatics/btq230
+   PMID: 20472541
+
 .. vim: set filetype=rst:
+

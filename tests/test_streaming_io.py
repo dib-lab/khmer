@@ -543,3 +543,20 @@ def test_unique_kmers_stream_out_fastq_with_N():
     assert '@895:1:37:17593:9954 1::FOO_withN' in out
     assert "GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGNGACAGCAGCCGCAGCTGTCGTCA" in out
     assert "##########################################################" in out
+
+
+def test_filter_contamination_streamIN():
+    load_graph = 'load-graph.py'
+    oxfile = utils.get_temp_filename('16s.oxling')
+    in_dir = os.path.dirname(oxfile)
+    infile = utils.get_test_data('16s.fa')
+    args_load_graph = ['-U', '200000', '--fp-rate', '0.05',
+                       '--no-build-tagset', oxfile, infile]
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    cmd = "cat {infile} | {scripts}/filter-contamination.py {oxling} /dev/stdin"
+    cmd = cmd.format(scripts=scriptpath(), oxling=oxfile, infile=infile)
+
+    (status, out, err) = run_shell_cmd(cmd)
+
+    assert '1.0' in out

@@ -1,3 +1,11 @@
+2015-12-13  Roman Valls Guimera  <brainstorm@nopcode.org> and
+            Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/filter-contamination.py: initial contamination checker.
+   * tests/test_scripts.py: Add tests for contamination.
+   * tests/test-data/16s.fa: Symlink 16s.fa data to test-data.
+   * khmer/khmer_args.py,CITATION: Add FACS citation.
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * lib/subset.cc: check iterator before decrementing in
@@ -197,7 +205,7 @@
    * scripts/*.py, khmer/khmer_args.py: added epilog sanitation
    * scripts/{load-into-counting,load-graph,load-into-countgraph,
    load-into-nodegraph}.py, tests/{test_scripts,test_normalize_by_median,
-   test_streaming_io,test_countgraph}: renamed load-into-counting -> 
+   test_streaming_io,test_countgraph}: renamed load-into-counting ->
    load-into-countgraph, load-graph -> load-into-nodegraph, fixed tests to not
    bork
 
@@ -210,7 +218,7 @@
    * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
    formatting fixes and new citation for the software as a whole
    * Makefile: PDF building hints, tweaked dependencies, update coverity URL,
-   new target to generate author list for the paper citation 
+   new target to generate author list for the paper citation
    * sort-authors-list.py: helper script for the above
    * doc/conf.py: don't generate a module index
    * doc/contributors.rst: formatting, remove references to old lab
@@ -242,18 +250,18 @@
    and KmerIterator, respectively.
    * lib/Makefile: Add -std=c++11 flag.
    * Makefile: Update -std=c++11 flag in libtest target.
-   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser. 
+   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser.
    Change kmer_degree to use functions from traversal.cc. Remove redundant
    count_kmers_with_radius in favor of calc_connected_graph_size. Update
    traverse_from_kmer to use Traverser. Hashtable subclasses KmerFactory.
    * lib/{hashtable.hh,kmer_hash.{cc,hh}}: Move KmerIterator from hashtable.hh
    to kmer_hash.{cc,hh}. Add Kmer class to store forward, reverse, and
    uniqified integer representations of k-mers, and to handle string
-   conversion. Update KmerIterator to emit objects of type Kmer and to subclass 
+   conversion. Update KmerIterator to emit objects of type Kmer and to subclass
    KmerFactory; add doxygen markup.
    * lib/khmer.hh: Forward declare Kmer and typedef new Kmer data structures.
    * lib/subset.{cc,hh}: Move constructor definition to .cc file. Remove
-   queue_neighbors in favor of new traversal machinery. Update find_all_tags, 
+   queue_neighbors in favor of new traversal machinery. Update find_all_tags,
    sweep_for_tags, and find_all_tags_truncate_on_abundance to use Traverser.
    * setup.py: Add traversal.{cc,hh} to deps.
 
@@ -319,9 +327,9 @@
 
 2015-08-04  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out 
+   * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out
    oxli and into khmer_args
-   * oxli/build_graph.py, tests/test_oxli_functions.py, 
+   * oxli/build_graph.py, tests/test_oxli_functions.py,
    sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py,
    scripts/{normalize-by-median,unique-kmers}.py: changed to not break on
    location change
@@ -546,7 +554,7 @@
    abundance-dist}.py,tests/test_{normalize_by_median,subset_graph,hashbits,
    oxli_function}.py: pylint cleanup.
 
-2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>  
+2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * Makefile, tests/test_read_aligner.py: import khmer when pylinting.
 
@@ -598,7 +606,7 @@
 
 2015-07-05  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 
+   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired
    updates.
 
 2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
@@ -675,7 +683,7 @@
 
 2015-06-28  Qingpeng Zhang  <qingpeng@msu.edu>
 
-   * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox 
+   * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox
    methods for estimating memory usage based on desired fp rate, etc.
 
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
@@ -1013,7 +1021,7 @@
 
 2015-04-17  Jessica Mizzi  <mizzijes@msu.edu>
 
-   * tests/test_scripts.py: split test_extract_long_sequences 
+   * tests/test_scripts.py: split test_extract_long_sequences
    into test_extract_long_sequences_fa and test_extract_long_sequences_fq
 
 2015-04-15  Elmar Bucher <buchere@ohsu.edu>
@@ -1049,7 +1057,7 @@
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * scripts/trim-low-abund.py: implemented STDOUT output, redirected
-   existing print statements to STDERR, fixed existing & new PEP 8 issues 
+   existing print statements to STDERR, fixed existing & new PEP 8 issues
    * tests/test_scripts.py: added test for above changes
 
 2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
@@ -1063,25 +1071,25 @@
 
 2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
 
-   * khmer/scripts/normalize-by-median.py: pass individual arg values to 
+   * khmer/scripts/normalize-by-median.py: pass individual arg values to
       functions instead of ArgParse object
 
 2015-04-15  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
-   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py:
    added a --csv option to readstats
    updated documentation for count-overlap
-   * khmer/_khmermodule.cc: fixed missing error handling 
+   * khmer/_khmermodule.cc: fixed missing error handling
    for hashbits_count_overlap
 
 2015-04-15  en zyme  <en_zyme@outlook.com>
 
    * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
-   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py
      khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
-     count-median, count-overlap, do-partition, extract-paired-reads, 
+     count-median, count-overlap, do-partition, extract-paired-reads,
      extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
-     find-knots, interleave-reads, load-graph, load-into-counting, 
+     find-knots, interleave-reads, load-graph, load-into-counting,
      make-initial-stoptags, merge-partitions, partition-graph,
      sample-reads-randomly, split-paired-reads}.py:
        check_file_status() -> check_input_files()
@@ -1157,7 +1165,7 @@
 
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
-   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
+   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed
    khmer_exception to use std::string to fix memory management.
 
 2015-04-13  Elmar Bucher  <buchere@ohsu.edu>
@@ -1184,7 +1192,7 @@
 
 2015-04-13  David Lin
 
-   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   * scripts/abundance-dist.py: disambiguate documentation for force and
    squash options
 
 2015-04-13  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -1204,7 +1212,7 @@
 
 2015-04-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * scripts/test-{scripts.py}: added test for check_file_writable using 
+   * scripts/test-{scripts.py}: added test for check_file_writable using
    load_into_counting
 
 2015-04-10  Phillip Garland  <pgarland@gmail.com>
@@ -1370,7 +1378,7 @@
    * scripts/abundance-dist-single.py: Use CSV format for the histogram.
    * scripts/count-overlap.py: Use CSV format for the curve file output.
    Includes column headers.
-   * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
+   * scripts/abundance-dist-single.py: Use CSV format for the histogram.
    Includes column headers.
    * tests/test_scripts.py: add test functions for the --csv option in
    abundance-dist-single.py and count-overlap.py
@@ -1382,9 +1390,9 @@
 
 2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
-   * sandbox/{collect-reads.py, correct-errors.py, 
-   normalize-by-median-pct.py, slice-reads-by-coverage.py, 
-   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}: 
+   * sandbox/{collect-reads.py, correct-errors.py,
+   normalize-by-median-pct.py, slice-reads-by-coverage.py,
+   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}:
    Replaced 'accuracy' with 'quality'. Fixes #787.
 
 2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
@@ -1614,7 +1622,7 @@
 
     * khmer/utils.py: Added single write_record fuction to write FASTA/Q
     * scripts/{abundance-dist,extract-long-sequences,extract-partitions,
-    interleave-reads,normalize-by-median,sample-reads-randomly}.py: 
+    interleave-reads,normalize-by-median,sample-reads-randomly}.py:
     Replaced FASTA/Q writing method with write_record
 
 2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -1682,13 +1690,13 @@
 2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
 
     * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
-    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
-    modifications to Hashtable that might exposure potential memory corruption 
+    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future
+    modifications to Hashtable that might exposure potential memory corruption
     with default copy constructor
 
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
-    * tests/test_scripts.py: Attained complete testing coverage for 
+    * tests/test_scripts.py: Attained complete testing coverage for
     scripts/filter_abund.py
 
 2014-12-30  Brian Wyss  <wyssbria@msu.edu>
@@ -1750,8 +1758,8 @@
     filter-stoptags,interleave-reads,load-graph,load-into-counting,
     make-initial-stoptags,merge-partitions,normalize-by-median,partition-graph,
     sample-reads-randomly,split-paired-reads}.py,setup.cfg,
-    tests/{test_script_arguments,test_scripts}.py: Added force option to all 
-    scripts to script IO sanity checks and updated tests to match. 
+    tests/{test_script_arguments,test_scripts}.py: Added force option to all
+    scripts to script IO sanity checks and updated tests to match.
 
 2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -1880,7 +1888,7 @@
 
 2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
 
-    * do-partition.py: replaced threading args in scripts with things from 
+    * do-partition.py: replaced threading args in scripts with things from
     khmer_args
     * khmer/theading_args.py: removed as it has been deprecated
 
@@ -1908,7 +1916,7 @@
     annotate-partitions, count-median, count-overlap, do-partition,
     extract-paired-reads, extract-partitions, filter-abund, filter-abund-single,
     filter-stoptags, find-knots, load-graph, load-into-counting,
-    make-initial-stoptags, merge-partitions, normalize-by-median, 
+    make-initial-stoptags, merge-partitions, normalize-by-median,
     partition-graph, sample-reads-randomly}.py:
     changed stdout output in scripts to go to stderr.
 
@@ -1939,11 +1947,11 @@
     * scripts/{abundance-dist-single, abundance-dist, count-median,
     count-overlap, extract-paired-reads, filter-abund-single,
     load-graph, load-into-counting, make-initial-stoptags,
-    partition-graph, split-paired-reads}.py: 
+    partition-graph, split-paired-reads}.py:
     added output file listing at end of file
     * scripts/extract-long-sequences.py: refactored to set write_out to
     sys.stdout by default; added output location listing.
-    * scripts/{fastq-to-fasta, interleave-reads}.py: 
+    * scripts/{fastq-to-fasta, interleave-reads}.py:
     added output file listing sensitive to optional -o argument
     * tests/test_scripts.py: added test for scripts/make-initial-stoptags.py
 
@@ -1959,7 +1967,7 @@
     .empty() instead of .size()
 
 2014-09-19  Ben Taylor  <taylo886@msu.edu>
-		
+
     * Makefile: Add astyle, format targets
     * doc/dev/coding-guidelines-and-review.txt: Add reference to `make format`
 		target
@@ -1972,7 +1980,7 @@
 	average cutoff.
     * sandbox/slice-reads-by-coverage.py: added script to extract reads with
 	a specific coverage slice (based on median k-mer abundance).
-	
+
 2014-09-09  Titus Brown  <titus@idyll.org>
 
     * Added sandbox/README.rst to describe/reference removed files,
@@ -2104,7 +2112,7 @@
     * khmer/thread_utils.py, sandbox/filter-below-abund.py,
 	scripts/{extract-long-sequences,load-graph,load-into-counting,
 	normalize-by-median,split-paired-reads}.py,
-	scripts/galaxy/gedlab.py: fix minor PyLint issues 
+	scripts/galaxy/gedlab.py: fix minor PyLint issues
 
 2014-08-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2112,7 +2120,7 @@
 
 2014-08-20  Rhys Kidd  <rhyskidd@gmail.com>
 
-    * setup.py,README.rst,doc/user/install.txt: Test requirement for a 
+    * setup.py,README.rst,doc/user/install.txt: Test requirement for a
     64-bit operating system, documentation changes. Fixes #529
 
 2014-08-19  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2199,7 +2207,7 @@
 
 2014-07-23  Qingpeng Zhang  <qingpeng@gmail.com>
 
-    * scripts/load-graph.py: write fp rate into *.info file with option 
+    * scripts/load-graph.py: write fp rate into *.info file with option
     to switch on
     * tests/test_scripts.py: add test_load_graph_write_fp
 
@@ -2209,16 +2217,16 @@
 
 2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
-    * tests/test_hashbits.py, tests/test_graph.py, 
+    * tests/test_hashbits.py, tests/test_graph.py,
     tests/test_lump.py: reduced memory requirement
-    
+
 2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
 
     * khmer_tst_utils.py: added import traceback
     * test_scripts.py: added test for normalize_by_median.py for fpr rate
 
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
- 
+
     * khmer/_khmermodule.cc: removed unused assignment
     * lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
     in the same compiler options that the only invocations are in to avoid
@@ -2241,7 +2249,7 @@
      * scripts/filter-abund.py: no longer asks for parameters that are unused,
      issue #524
 
-2014-07-22  Justin Lippi  <jlippi@gmail.com> 
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
 
     * tests/khmer_tst_utils.py: put runscript here
     * tests/test_sandbox_scripts.py: remove 'runsandbox', renamed to runscript
@@ -2255,11 +2263,11 @@
 2014-07-22  Rodney Picett  <pickett.rodney@gmail.com>
 
     * lib/scoringmatrix.{cc,hh}: removed assign function, issue #502
- 
+
 2014-07-22  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
     * tests/test_counting_single.py: reduced memory requirements
-    
+
 2014-07-21  Titus Brown  <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
@@ -2280,7 +2288,7 @@
 
 2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
-    * scripts/extract-partitions.py: added epilog documentation for 
+    * scripts/extract-partitions.py: added epilog documentation for
 	<base>.dist columns.
 
 2014-06-20  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2369,7 +2377,7 @@
 
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
-    * scripts/load-into-counting: Fixed docstring misnomer to 
+    * scripts/load-into-counting: Fixed docstring misnomer to
 	load-into-counting.py
 
 2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2393,7 +2401,7 @@
 
 2014-06-10  Michael Wright <wrigh517@msu.edu>
 
-    * scripts/extract-long-sequences: Moved from sandbox, added argparse and 
+    * scripts/extract-long-sequences: Moved from sandbox, added argparse and
     FASTQ support.
     * scripts/fastq-to-fasta: Fixed outdated argparse oversight.
     * tests/test_scripts.py: Added tests for extract-long-sequences.py
@@ -2411,7 +2419,7 @@
 
 2014-06-03 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
 
-    * scripts/abundance-dist.py: removed call to check_space on infiles.  
+    * scripts/abundance-dist.py: removed call to check_space on infiles.
 
 2014-05-31  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2444,10 +2452,10 @@
 
 2014-05-22  Michael Wright  <wrigh517@msu.edu>
 
-    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
+    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts
     from sandbox
     * tests/test_scripts.py: Added tests for fastq-to-fasta.py
-    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
+    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in
     sequence for testing
 
 2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2497,7 +2505,7 @@
 
     * sandbox/calc-best-assembly.py: added script to calculate best
     assembly from a list of contig/scaffold files
-	
+
 2014-04-23  Titus Brown  <titus@idyll.org>
 
     * scripts/abundance-dist-single.py: fixed problem where ReadParser was
@@ -2637,7 +2645,7 @@
     * test_scripts.py: add test code for count-overlap.py
     * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
     by min_hashsize)
-    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    * count-overlap.py: needs hashbits table generated by load-graph.py.
     This information is added to the "usage:" line.
     * count-overlap.py: fix minor PyLint issues
 
@@ -2720,7 +2728,7 @@
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
-    scalar field (UNINIT_CTOR) 
+    scalar field (UNINIT_CTOR)
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
     * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
@@ -2750,7 +2758,7 @@ users without root access to install virtualenv instead of pip.
 
 * Added support for sparse graph labeling
 
-* Added script to reinflate partitions from read files using the 
+* Added script to reinflate partitions from read files using the
   labeling system, called sweep-reads-by-partition-buffered.py
 
 * Implemented __new__ methods for Hashbits, enforced inheritance
@@ -2818,14 +2826,14 @@ clarified and simplified.
 * khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
 were eliminated and the error checking has improved.
 
-* Several fixes motivated by the results of a Coverity C/C++ scan. 
+* Several fixes motivated by the results of a Coverity C/C++ scan.
 
 * Tests that require greater than 0.5 gigabytes of memory are now annotated as
 being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and camillescott. 
+* contributors to this release are: ctb, mr-c and camillescott.
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2948,7 +2956,7 @@ project to conform to the standard layout
     * test_scripts.py: add test code for count-overlap.py
     * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
     by min_hashsize)
-    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    * count-overlap.py: needs hashbits table generated by load-graph.py.
     This information is added to the "usage:" line.
     * count-overlap.py: fix minor PyLint issues
 
@@ -3031,7 +3039,7 @@ project to conform to the standard layout
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
-    scalar field (UNINIT_CTOR) 
+    scalar field (UNINIT_CTOR)
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
     * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
@@ -3061,7 +3069,7 @@ users without root access to install virtualenv instead of pip.
 
 * Added support for sparse graph labeling
 
-* Added script to reinflate partitions from read files using the 
+* Added script to reinflate partitions from read files using the
   labeling system, called sweep-reads-by-partition-buffered.py
 
 * Implemented __new__ methods for Hashbits, enforced inheritance
@@ -3129,14 +3137,14 @@ clarified and simplified.
 * khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
 were eliminated and the error checking has improved.
 
-* Several fixes motivated by the results of a Coverity C/C++ scan. 
+* Several fixes motivated by the results of a Coverity C/C++ scan.
 
 * Tests that require greater than 0.5 gigabytes of memory are now annotated as
 being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and camillescott. 
+* contributors to this release are: ctb, mr-c and camillescott.
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
