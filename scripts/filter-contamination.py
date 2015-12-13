@@ -54,7 +54,7 @@ import sys
 from collections import defaultdict
 import argparse
 
-from khmer.khmer_args import info
+from khmer.khmer_args import info, _VersionStdErrAction
 from khmer.kfile import check_input_files, check_space
 
 
@@ -76,8 +76,8 @@ def get_parser():
     parser.add_argument(
         'graph', help="path of the input k-mer nodegraph")
     parser.add_argument('data', help="files to be decontaminated")
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     return parser
 
 # http://scipher.wordpress.com/2010/12/02/simple-sliding-window-iterator-in-python/
