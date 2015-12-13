@@ -3044,7 +3044,7 @@ def test_filter_contamination():
     status, out, err = utils.runscript(
         script, args_contam, in_dir)
 
-    assert status == 0
+    assert status == 0, status
     assert '-0.0' not in out
     assert '0.017702448210' in out
 
@@ -3068,8 +3068,8 @@ def test_filter_contamination2():
     status, out, err = utils.runscript(
         script, args_contam, in_dir)
 
-    assert status == 0
-    assert '-0.0' in out
+    assert status == 0, status
+    assert 'No valid reads to test' in err, err
 
 def test_version():
     for entry in os.listdir(utils.scriptpath()):
