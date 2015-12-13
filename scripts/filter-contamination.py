@@ -53,27 +53,32 @@ def get_parser():
 # http://scipher.wordpress.com/2010/12/02/simple-sliding-window-iterator-in-python/
 
 
-def sliding_window_it(sequence, winSize, step=1):
+def sliding_window_it(sequence, winSize):
     """Returns a generator that will iterate through
     the defined chunks of input sequence.  Input sequence
     must be iterable."""
 
-    # Verify the inputs
-    try:
-        iter(sequence)
-    except TypeError:
-        raise Exception("**ERROR** sequence must be iterable.")
-    if step > winSize:
-        raise Exception("**ERROR** step must not be larger than winSize.")
-    if winSize > len(sequence):
-        yield None
-
     # Pre-compute number of chunks to emit
-    numOfChunks = ((len(sequence) - winSize) / step) + 1
+    numOfChunks = len(sequence) - winSize + 1
 
     # Do the work
-    for i in range(0, int(numOfChunks * step), step):
+    for i in range(0, numOfChunks):
         yield sequence[i:i + winSize]
+
+
+def is_valid_dna(sequence):
+    a_count = c_count = t_count = g_count = 0
+    a_count = sequence.count('A') + sequence.count('a')
+    c_count = sequence.count('C') + sequence.count('c')
+    t_count = sequence.count('T') + sequence.count('t')
+    g_count = sequence.count('G') + sequence.count('g')
+
+    total_count = a_count + c_count + t_count + g_count
+
+    if total_count != len(sequence):
+        return False
+    else:
+        return True
 
 
 def main():
@@ -107,7 +112,7 @@ def main():
 
         for r in rparser:
             read_kmers = len(r.sequence) - ksize + 1
-            if read_kmers == 0:
+            if read_kmers == 0 or not is_valid_dna(r.sequence):
                 continue
             contaminant_read_matches = 0
 
