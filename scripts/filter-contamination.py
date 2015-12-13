@@ -34,9 +34,10 @@ def get_parser():
     epilog = """
     Example:
 
-    load-graph.py --unique-kmers 200000 --no-build-tagset 16s.oxling \
-            data/16s.fa
-    filter-contamination.py 16s.oxling data/16s.fa
+
+    load-graph.py --unique-kmers 200000 --fp-rate 0.05 --no-build-tagset \
+            test-reads.oxling tests/test-data/test-reads.fa
+    filter-contamination.py test-reads.oxling tests/test-reads/100-reads.fq.gz
 
     """
     parser = argparse.ArgumentParser(
