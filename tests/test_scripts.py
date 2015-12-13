@@ -3024,6 +3024,36 @@ def check_version_and_basic_citation(scriptname):
     assert version.search(err) is not None, err
 
 
+def test_filter_contamination():
+    # load-graph.py --unique-kmers 200000 --fp-rate 0.05 --no-build-tagset \
+    #        test-reads.oxling tests/test-data/test-reads.fa
+    # filter-contamination.py test-reads.oxling tests/test-data/100-reads.fq.gz
+
+    load_graph = 'load-graph.py'
+    script = 'filter-contamination.py'
+
+    oxfile = 'test-reads.oxling'
+    infile = 'test-reads.fa'
+    queryfile = '100-reads.fa'
+    in_dir = os.path.dirname(oxfile)
+
+    oxfile = utils.get_temp_filename(oxfile)
+    infile = utils.get_test_data(infile)
+    queryfile = utils.get_test_data(queryfile)
+
+    args_load_graph = ['-U', '200000', '--fp-rate',
+                       '0.05', '--no-build-tagset', oxfile, infile]
+    args_contam = [oxfile, queryfile]
+
+    utils.runscript(load_graph, args_load_graph, in_dir)
+
+    # query node graph
+    status, out, err = utils.runscript(
+        script, args_contam, in_dir)
+
+    # assert '0.017702448210' in out
+
+
 def test_version():
     for entry in os.listdir(utils.scriptpath()):
         if entry.endswith(".py"):
