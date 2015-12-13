@@ -168,3 +168,6 @@ Read handling: interleaving, splitting, etc.
 
 .. autoprogram:: split-paired-reads:get_parser()
         :prog: split-paired-reads.py
+
+.. autoprogram:: filter-contamination:get_parser()
+        :prog: filter-contamination.py
