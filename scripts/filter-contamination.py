@@ -19,7 +19,7 @@ Usage:
 Use '-h' for parameter help.
 """
 from __future__ import division
-
+from __future__ import print_function
 
 import khmer
 import json
@@ -100,13 +100,13 @@ def main():
     # anything?
     check_space(filenames, False)
 
-    print 'loading nodegraph %s' % graph
+    print('loading nodegraph %s' % graph)
     htable = khmer.load_nodegraph(graph)
     ksize = htable.ksize()
 
     for _, filename in enumerate(filenames):
-        print('querying sample {sample} against filter {filt}').format(
-            sample=filename, filt=graph)
+        print(('querying sample {sample} against filter {filt}').format(
+            sample=filename, filt=graph))
         total_query_kmers = 0
         contaminant_total_matches = 0
 
@@ -130,7 +130,7 @@ def main():
         results['filter'] = graph
         results['contamination'] = contam
 
-        print json.dumps(results)
+        print(json.dumps(results))
 
 if __name__ == '__main__':
     main()

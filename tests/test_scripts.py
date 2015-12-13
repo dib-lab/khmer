@@ -3034,7 +3034,7 @@ def test_filter_contamination():
 
     oxfile = 'test-reads.oxling'
     infile = 'test-reads.fa'
-    queryfile = '100-reads.fa'
+    queryfile = '100-reads.fq.bz2'
     in_dir = os.path.dirname(oxfile)
 
     oxfile = utils.get_temp_filename(oxfile)
