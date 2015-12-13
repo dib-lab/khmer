@@ -54,6 +54,7 @@ import sys
 from collections import defaultdict
 import argparse
 
+import screed
 from khmer import __version__
 from khmer.khmer_args import info, _VersionStdErrAction
 from khmer.kfile import check_input_files, check_space
@@ -130,8 +131,8 @@ def main():
     check_space(filenames, False)
 
     print('loading nodegraph %s' % graph, file=sys.stderr)
-    htable = khmer.load_nodegraph(graph)
-    ksize = htable.ksize()
+    nodegraph = khmer.load_nodegraph(graph)
+    ksize = nodegraph.ksize()
 
     for _, filename in enumerate(filenames):
         print(('querying sample {sample} against filter {filt}').format(
@@ -139,7 +140,7 @@ def main():
         total_query_kmers = 0
         contaminant_total_matches = 0
 
-        rparser = khmer.ReadParser(filename)
+        rparser = screed.open(filename)
 
         for r in rparser:
             read_kmers = len(r.sequence) - ksize + 1
@@ -148,7 +149,7 @@ def main():
             contaminant_read_matches = 0
 
             for kmer in sliding_window_it(r.sequence, ksize):
-                contaminant_read_matches += htable.get(kmer)
+                contaminant_read_matches += nodegraph.get(kmer)
 
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
