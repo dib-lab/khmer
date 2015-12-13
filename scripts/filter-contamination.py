@@ -14,14 +14,12 @@ party programs and pipelines, ie:
 {"sample": ["sample.fastq"], "filter": "eschColi_K12.pt", "contamination": 0.3}
 
 Usage:
-% python scripts/filter-contamination.py <htname> <data1> [ <data2> <...> ]
+% python scripts/filter-contamination.py <nodegraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
 from __future__ import division
 
-# Built the test graph using:
-# scripts/load-graph.py -x 4e9 -N 4 --no-build-tagset foo.khmer ../data/16s.fa
 
 import khmer
 import json
@@ -29,16 +27,24 @@ from collections import defaultdict
 import argparse
 
 from khmer.khmer_args import info
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_input_files, check_space
 
 
 def get_parser():
+    epilog="""
+    Example:
+
+    load-graph.py --unique-kmers 200000 --no-build-tagset 16s.oxling data/16s.fa
+    filter-contamination.py 16s.oxling data/16s.fa
+
+    """
     parser = argparse.ArgumentParser(
         description="Determine which organisms are present in a given file ",
+        epilog=epilog,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
-        'graph', help="basename of the input k-mer presence table")
+        'graph', help="path of the input k-mer nodegraph")
     parser.add_argument('data', help="files to be decontaminated")
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
@@ -57,13 +63,10 @@ def sliding_window_it(sequence, winSize, step=1):
         iter(sequence)
     except TypeError:
         raise Exception("**ERROR** sequence must be iterable.")
-    if not ((type(0) == type(winSize)) and (type(step) == type(0))):
-        raise Exception("**ERROR** type(winSize) and type(step) must be int.")
     if step > winSize:
         raise Exception("**ERROR** step must not be larger than winSize.")
     if winSize > len(sequence):
-        raise Exception(
-            "**ERROR** winSize must not be larger than sequence length.")
+        yield None
 
     # Pre-compute number of chunks to emit
     numOfChunks = ((len(sequence) - winSize) / step) + 1
@@ -84,14 +87,14 @@ def main():
     # Get samples to be analyzed against the graph file
     filenames = [data]
     for _ in filenames:
-        check_file_status(_)
+        check_input_files(_, False)
 
     # Is there enough disk space available for input/output files before doing
     # anything?
-    check_space(filenames)
+    check_space(filenames, False)
 
-    print 'loading presence table graph %s' % graph
-    htable = khmer.load_hashbits(graph)
+    print 'loading nodegraph %s' % graph
+    htable = khmer.load_nodegraph(graph)
     ksize = htable.ksize()
 
     for _, filename in enumerate(filenames):
@@ -100,10 +103,12 @@ def main():
         total_query_kmers = 0
         contaminant_total_matches = 0
 
-        rparser = khmer.ReadParser(filename, 1)
+        rparser = khmer.ReadParser(filename)
 
         for r in rparser:
             read_kmers = len(r.sequence) - ksize + 1
+            if read_kmers == 0:
+                continue
             contaminant_read_matches = 0
 
             for kmer in sliding_window_it(r.sequence, ksize):
