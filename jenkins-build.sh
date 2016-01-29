@@ -113,3 +113,7 @@ unset CXXFLAGS
 
 # Don't do lib too, as we already compile as part of libtest
 make libtest
+
+# Upload code coverage to codecov.io
+pip install codecov
+codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml
