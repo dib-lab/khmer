@@ -116,4 +116,4 @@ make libtest
 
 # Upload code coverage to codecov.io
 pip install codecov
-codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml
+codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml &> /dev/null
