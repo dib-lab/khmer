@@ -60,7 +60,7 @@ def get_parser():
         filter-if-present.py counts tests/test-data/test-abund-read-2.fa output.fa
     """
     parser = argparse.ArgumentParser(
-        description="Filter out reads if they contain any kmer in the countgraph"
+        description="Filter out reads if they contain any kmer in the countgraph",
         formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
