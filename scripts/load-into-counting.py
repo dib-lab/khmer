@@ -127,7 +127,7 @@ def main():
 
     # clobber the '.info' file now, as we always open in append mode below
     with open(info_filename, 'w') as info_fp:
-        print('khmer version:', khmer.__version__, file=info_fh)
+        print('khmer version:', khmer.__version__, file=info_fp)
 
     print('making countgraph', file=sys.stderr)
     countgraph = khmer_args.create_countgraph(args)
