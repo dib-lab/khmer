@@ -360,7 +360,7 @@ public:
                              const CountingHash &ht);
 };
 
-};
+}
 #endif // COUNTING_HH
 
 // vim: set sts=2 sw=2:
