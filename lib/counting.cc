@@ -956,7 +956,8 @@ CountingHashZstdFileWriter::CountingHashZstdFileWriter(
         char *z_buffer = new char[save_tablesize];
 
         zip_res = ZSTD_compress((void *) z_buffer, save_tablesize,
-                                (void *) ht._counts[i], save_tablesize);
+                                (void *) ht._counts[i], save_tablesize,
+                                -1);
         if (ZSTD_isError(zip_res)) {
             std::string msg = "Couldn't compress counting hash: ";
             msg += ZSTD_getErrorName(zip_res);
