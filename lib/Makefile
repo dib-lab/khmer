@@ -301,12 +301,15 @@ install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
+$(ZLIB_OBJS): CFLAGS += -fPIC
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
 
+$(BZIP2_OBJS): CFLAGS += -fPIC
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
+$(ZSTD_OBJS): CFLAGS += -fPIC
 $(ZSTD_OBJS): $(ZSTD_DIR)/zstd.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
