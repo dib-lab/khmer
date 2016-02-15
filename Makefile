@@ -107,9 +107,9 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 
 ## clean       : clean up all temporary / machine-generated files
 clean: FORCE
-	make -C third-party/zstd/ clean
-	test -f third-party/zlib/Makefile && make -C third-party/zlib/ distclean
-	make -C third-party/bzip2/ clean
+	make -C third-party/zstd/ clean || true
+	(cd third-party/zlib && test Makefile -nt configure && make distclean) || true
+	make -C third-party/bzip2/ clean || true
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
