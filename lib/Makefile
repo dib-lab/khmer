@@ -227,7 +227,7 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 # ZSTD
 ZSTD_DIR=../third-party/zstd
-ZSTD_OBJS=zstd.o
+ZSTD_OBJS=$(ZSTD_DIR)/libzstd.a
 
 #### oxli proper below here ####
 
@@ -256,6 +256,7 @@ endif
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
 LIBKHMER_OBJS  += $(ZSTD_OBJS)
 PRECOMILE_OBJS += $(ZSTD_OBJS)
+PRECLEAN_TARGS += zstdclean
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
@@ -281,6 +282,9 @@ KHMER_HEADERS= \
 
 # The all rule comes first!
 all: $(LIBKHMERSO) liboxli.a oxli.pc
+
+zstdclean:
+	(cd $(ZSTD_DIR) && make clean) || true
 
 zlibclean:
 	(cd $(ZLIB_DIR) && test Makefile -nt configure && make distclean) || true
@@ -312,8 +316,8 @@ $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
 $(ZSTD_OBJS): CFLAGS += -fPIC
-$(ZSTD_OBJS): $(ZSTD_DIR)/zstd.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(ZSTD_OBJS):
+	$(MAKE) -X $(ZSTD_DIR) libzstd
 
 # MurMur3
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc

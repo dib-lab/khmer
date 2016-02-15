@@ -267,10 +267,10 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
         if "zstd" not in self.libraries:
             zcmd = ['bash', '-c',
-                    'cd ' + ZSTDDIR + ' && ( make zstd.o CFLAGS=-fPIC )']
+                    'cd ' + ZSTDDIR + ' && ( make libzstd CFLAGS=-fPIC )']
             spawn(cmd=zcmd, dry_run=self.dry_run)
             self.extensions[0].extra_objects.extend(
-                [os.path.join(ZSTDDIR, 'zstd.o')],
+                [os.path.join(ZSTDDIR, 'libzstd.a')],
                 )
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
