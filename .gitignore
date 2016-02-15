@@ -50,3 +50,6 @@ compile_commands.json
 pylint_report.txt
 pep8_report.txt
 pep257_report.txt
+
+third-party/zstd/libzstd.a
+third-party/zstd/libzstd.so*

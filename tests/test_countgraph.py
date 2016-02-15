@@ -635,31 +635,135 @@ def test_load_gz():
     assert x == y, (x, y)
 
 
-def test_save_load_gz():
+def test_countgraph_consume_save_load_abund():
+    """Test cycle of consume, save, load, abundance-dist with (un)zipped HT"""
+
+    def _do_cg_consume_save_load_abund(outfile, infile='random-20-a.fa',
+                                       expected_sum=3966):
+        inpath = utils.get_test_data(infile)
+        savepath = utils.get_temp_filename(outfile)
+
+        orig_ht = khmer._Countgraph(12, PRIMES_1m)
+        orig_ht.consume_fasta(inpath)
+        orig_ht.save(savepath)
+
+        loaded_ht = khmer.load_countgraph(savepath)
+        tracking = khmer._Nodegraph(12, PRIMES_1m)
+        orig = orig_ht.abundance_distribution(inpath, tracking)
+
+        tracking = khmer._Nodegraph(12, PRIMES_1m)
+        loaded = loaded_ht.abundance_distribution(inpath, tracking)
+
+        assert sum(orig) == expected_sum, sum(orig)
+        assert orig == loaded, (orig, loaded)
+
+    for ext in ['', '.gz', '.zstd']:
+        _do_cg_consume_save_load_abund('temp_countgraph.ct' + ext)
+
+
+def test_save_load_bigcount():
+    """Test a save, load cycle of Countgraph with bigcounts & all zip
+    formats"""
+
+    def _do_cg_save_load_bigcount(outfile):
+        savepath = utils.get_temp_filename(outfile)
+
+        kmer = 'ATATATATATAT'
+
+        orig_ht = khmer.Countgraph(12, 10000, 1)
+        orig_ht.set_use_bigcount(True)
+        for _ in range(257):
+            orig_ht.count(kmer)
+        orig_ht.save(savepath)
+        del orig_ht
+
+        loaded_ht = khmer.load_countgraph(savepath)
+
+        assert loaded_ht.ksize() == 12
+        assert loaded_ht.get(kmer) == 257
+        assert loaded_ht.get_use_bigcount() is True
+
+    for ext in ['', '.gz', '.zstd']:
+        _do_cg_save_load_bigcount('temp_ht_' + ext)
+
+
+def test_zstd_save_tiny_table():
+    """Test zstd save with tiny table fails."""
+    savepath = utils.get_temp_filename("test.ct.zstd")
+
+    ht = khmer.Countgraph(1, 10, 1)
+    with assert_raises(OSError) as ar:
+        ht.save(savepath)
+    assert "ZSTD_ERROR" in str(ar.exception), str(ar.exception)
+
+
+def test_zstd_load_unzipped_table():
+    """test loading an unzipped table with .zstd extension"""
+    normal_path = utils.get_test_data("normC20k20.ct")
+    zstd_path = utils.get_temp_filename("test.ct.zstd")
+
+    shutil.copyfile(normal_path, zstd_path)
+
+    expected_err_msg = "Invalid zstd-compressed counting hash"
+
+    with assert_raises(OSError) as ar:
+        khmer.load_countgraph(zstd_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
+
+
+def test_load_zstd_bad_files():
+    """Test loading a zstd-compressed Countgraph w/ bad files"""
+    bad_files = [
+        ('badversion.ct.zstd', 'Incorrect file format version'),
+        ('badtype.ct.zstd', 'Incorrect file format type'),
+    ]
+
+    for fname, expected_err_msg in bad_files:
+        inpath = utils.get_test_data(fname)
+
+        # Check that a sane error is raised
+        with assert_raises(OSError) as ar:
+            khmer.load_countgraph(inpath)
+        err_msg = str(ar.exception)
+        assert expected_err_msg in err_msg, err_msg
+
+
+def test_zstd_load_truncated_table():
+    """Test loading a truncated zstd-compressed Countgraph"""
     inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
+    orig_path = utils.get_temp_filename("test.ct.zstd")
+    trunc_path = utils.get_temp_filename("trunc.ct.zstd")
 
-    sizes = list(PRIMES_1m)
-    sizes.append(1000005)
+    # Make a zstd-compressed hash table
+    orig_ht = khmer.Countgraph(12, 100000, 4)
+    orig_ht.consume_fasta(inpath)
+    orig_ht.save(orig_path)
+    del orig_ht
 
-    hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
-    hi.save(savepath)
+    # truncate the hash table
+    with open(orig_path, 'rb') as orig, open(trunc_path, 'wb') as trunc:
+        # write first 128 bytes header + a bit
+        trunc.write(orig.read(128))
 
-    ht = khmer._Countgraph(12, sizes)
-    try:
-        ht.load(savepath)
-    except OSError as err:
-        assert 0, 'Should not produce an OSError: ' + str(err)
+    # Check that a sane error is raised
+    expected_err_msg = "Unexpected end of k-mer count file"
+    with assert_raises(OSError) as ar:
+        khmer.load_countgraph(trunc_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
 
-    tracking = khmer._Nodegraph(12, sizes)
-    x = hi.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._Nodegraph(12, sizes)
-    y = ht.abundance_distribution(inpath, tracking)
+def test_zstd_load_nonexistant():
+    """test loading a nonexistant table with .zstd extension"""
+    zstd_path = utils.get_temp_filename("doesnotexist.ct.zstd")
 
-    assert sum(x) == 3966, sum(x)
-    assert x == y, (x, y)
+    expected_err_msg = "Cannot open k-mer count file"
+
+    with assert_raises(OSError) as ar:
+        khmer.load_countgraph(zstd_path)
+    err_msg = str(ar.exception)
+    assert expected_err_msg in err_msg, err_msg
 
 
 def test_load_empty_files():

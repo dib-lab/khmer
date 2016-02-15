@@ -36,6 +36,7 @@
 # Should we use the standard system zlib and libbz2?
 
 USE_SYSTEM_ZLIB ?= false
+USE_SYSTEM_ZSTD ?= false
 USE_SYSTEM_LIBBZ2 ?= false
 
 # Profile?
@@ -63,7 +64,9 @@ WANT_EXTRA_SANITY_CHECKING=false
 # when optimization is turned on).
 WANT_DEBUGGING=false
 
-PREFIX=/usr/local
+PREFIX	?= /usr/local
+CC	?= gcc
+CXX	?= g++
 
 ### NOTE: No user-serviceable parts below this line! ###
 
@@ -72,6 +75,10 @@ INCLUDES= -I ../third-party/seqan/core/include/ 	\
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../third-party/zlib/
+endif
+
+ifeq ($(USE_SYSTEM_ZSTD), false)
+INCLUDES += -I ../third-party/zstd/
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
@@ -95,7 +102,7 @@ CXXFLAGS += -Wstrict-null-sentinel -std=c++11
 CXXFLAGS += $(INCLUDES) $(CPPFLAGS)
 
 CFLAGS	 ?=
-CXXFLAGS += $(COMMON_FLAGS) $(WARNINGS)
+CFLAGS   += $(COMMON_FLAGS) $(WARNINGS)
 CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
 CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
@@ -218,6 +225,9 @@ BZIP2_OBJS_BASE= \
 
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
+# ZSTD
+ZSTD_DIR=../third-party/zstd
+ZSTD_OBJS=$(ZSTD_DIR)/libzstd.a
 
 #### oxli proper below here ####
 
@@ -244,6 +254,12 @@ PRECLEAN_TARGS += zlibclean
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
+LIBKHMER_OBJS  += $(ZSTD_OBJS)
+PRECOMILE_OBJS += $(ZSTD_OBJS)
+PRECLEAN_TARGS += zstdclean
+endif
+
+ifeq ($(USE_SYSTEM_LIBBZ2), false)
 LIBKHMER_OBJS  += $(BZIP2_OBJS)
 PRECOMILE_OBJS += $(BZIP2_OBJS)
 PRECLEAN_TARGS += libbz2clean
@@ -260,15 +276,19 @@ KHMER_HEADERS= \
 	traversal.hh \
 	read_aligner.hh \
 	read_parsers.hh \
-	subset.hh \
+	subset.hh
 
 # START OF RULES #
 
 # The all rule comes first!
 all: $(LIBKHMERSO) liboxli.a oxli.pc
 
+zstdclean:
+	(cd $(ZSTD_DIR) && make clean) || true
+
 zlibclean:
-	(cd $(ZLIB_DIR) && make distclean)
+	(cd $(ZLIB_DIR) && test Makefile -nt configure && make distclean) || true
+
 libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 
@@ -287,11 +307,17 @@ install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
 
+$(ZLIB_OBJS): CFLAGS += -fPIC
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure && make $(ZLIB_OBJS_BASE))
 
+$(BZIP2_OBJS): CFLAGS += -fPIC
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
+
+$(ZSTD_OBJS): CFLAGS += -fPIC
+$(ZSTD_OBJS):
+	$(MAKE) -X $(ZSTD_DIR) libzstd
 
 # MurMur3
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc

@@ -107,6 +107,9 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 
 ## clean       : clean up all temporary / machine-generated files
 clean: FORCE
+	make -C third-party/zstd/ clean || true
+	(cd third-party/zlib && test Makefile -nt configure && make distclean) || true
+	make -C third-party/bzip2/ clean || true
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
@@ -222,8 +225,8 @@ coverage-report: .coverage
 	coverage report
 
 coverage-gcovr.xml: coverage-debug .coverage
-	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
-          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*' \
+	gcovr --root=. --branches --output=coverage-gcovr.xml --xml	\
+          --gcov-exclude='.*third-party.*'				\
 	  --exclude-unreachable-branches
 
 diff-cover: coverage-gcovr.xml coverage.xml
