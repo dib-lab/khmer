@@ -639,7 +639,7 @@ def test_countgraph_consume_save_load_abund():
     """Test cycle of consume, save, load, abundance-dist with (un)zipped HT"""
 
     def _do_cg_consume_save_load_abund(outfile, infile='random-20-a.fa',
-                                        expected_sum=3966):
+                                       expected_sum=3966):
         inpath = utils.get_test_data(infile)
         savepath = utils.get_temp_filename(outfile)
 
