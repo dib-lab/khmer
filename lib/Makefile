@@ -64,7 +64,9 @@ WANT_EXTRA_SANITY_CHECKING=false
 # when optimization is turned on).
 WANT_DEBUGGING=false
 
-PREFIX=/usr/local
+PREFIX	?= /usr/local
+CC	?= gcc
+CXX	?= g++
 
 ### NOTE: No user-serviceable parts below this line! ###
 
