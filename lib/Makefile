@@ -100,7 +100,7 @@ CXXFLAGS += -Wstrict-null-sentinel -std=c++11
 CXXFLAGS += $(INCLUDES) $(CPPFLAGS)
 
 CFLAGS	 ?=
-CXXFLAGS += $(COMMON_FLAGS) $(WARNINGS)
+CFLAGS   += $(COMMON_FLAGS) $(WARNINGS)
 CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
 CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
