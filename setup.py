@@ -128,6 +128,7 @@ def check_for_openmp():
 # custom build_ext command strip out the bundled versions.
 
 ZLIBDIR = 'third-party/zlib'
+ZSTDDIR = 'third-party/zstd'
 BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = []
@@ -144,8 +145,6 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
-
-SOURCES.extend([path_join("third-party", "zstd", "zstd.c")])
 
 # Don't forget to update lib/Makefile with these flags!
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
@@ -256,8 +255,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     Only run the library setup when needed, not on every invocation.
 
-    Also strips out the bundled zlib and bzip2 libraries if
-    `--libraries z,bz2` is specified or the equivalent is in setup.cfg
+    Also strips out the bundled libraries if
+    `--libraries z,bz2,zstd` is specified or the equivalent is in setup.cfg
     """
 
     def run(self):
@@ -266,6 +265,13 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
 
+        if "zstd" not in self.libraries:
+            zcmd = ['bash', '-c',
+                    'cd ' + ZSTDDIR + ' && ( make zstd.o CFLAGS=-fPIC )']
+            spawn(cmd=zcmd, dry_run=self.dry_run)
+            self.extensions[0].extra_objects.extend(
+                [os.path.join(ZSTDDIR, 'zstd.o')],
+                )
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
