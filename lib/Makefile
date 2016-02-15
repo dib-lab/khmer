@@ -36,6 +36,7 @@
 # Should we use the standard system zlib and libbz2?
 
 USE_SYSTEM_ZLIB ?= false
+USE_SYSTEM_ZSTD ?= false
 USE_SYSTEM_LIBBZ2 ?= false
 
 # Profile?
@@ -75,7 +76,7 @@ INCLUDES += -I ../third-party/zlib/
 endif
 
 ifeq ($(USE_SYSTEM_ZSTD), false)
-INCLUDES += -I ../third-party/zstd/ 			\
+INCLUDES += -I ../third-party/zstd/
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
@@ -272,7 +273,7 @@ KHMER_HEADERS= \
 	traversal.hh \
 	read_aligner.hh \
 	read_parsers.hh \
-	subset.hh \
+	subset.hh
 
 # START OF RULES #
 
