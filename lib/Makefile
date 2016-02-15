@@ -283,7 +283,7 @@ KHMER_HEADERS= \
 all: $(LIBKHMERSO) liboxli.a oxli.pc
 
 zlibclean:
-	(cd $(ZLIB_DIR) && make distclean)
+	(cd $(ZLIB_DIR) && test Makefile -nt configure && make distclean) || true
 
 libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
