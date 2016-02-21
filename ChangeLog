@@ -1,3 +1,10 @@
+2016-02-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
+   pull requests with checklist using GitHub's new template feature
+   * doc/dev/coding-guidelines-and-review.rst: update developer docs with
+   compensatory changes
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * lib/subset.cc: check iterator before decrementing in
