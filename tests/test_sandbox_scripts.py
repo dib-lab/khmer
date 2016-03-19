@@ -317,6 +317,20 @@ def test_count_kmers_2_single():
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
 
 
+def test_count_kmers_2_single_threaded():
+    infile = utils.get_temp_filename('input.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+
+    script = scriptpath('count-kmers-single.py')
+    args = ['-T', '4', '-x', '1e7', '-k', '20', '-N', '2', infile]
+
+    status, out, err = utils.runscript(script, args, os.path.dirname(infile),
+                                       sandbox=True)
+
+    out = out.splitlines()
+    assert 'TTGTAACCTGTGTGGGGTCG,1' in out
+
+
 def test_multirename_fasta():
     infile1 = utils.get_temp_filename('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
