@@ -322,7 +322,7 @@ def test_count_kmers_2_single_threaded():
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
 
     script = scriptpath('count-kmers-single.py')
-    args = ['-T','4','-x', '1e7', '-k', '20', '-N', '2', infile]
+    args = ['-T', '4', '-x', '1e7', '-k', '20', '-N', '2', infile]
 
     status, out, err = utils.runscript(script, args, os.path.dirname(infile),
                                        sandbox=True)
