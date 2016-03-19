@@ -82,6 +82,23 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+
+def test_load_into_counting_threaded():
+    script = 'load-into-counting.py'
+    args = ['-T','4','-x', '1e3', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 94' in err, err
+    assert os.path.exists(outfile)
+
+
+
+
 def test_load_into_counting_autoargs_0():
     script = 'load-into-counting.py'
 
@@ -528,6 +545,28 @@ def test_filter_abund_2_singlefile():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_filter_abund_1_singlefile_threaded():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = 'filter-abund-single.py'
+    args = ['-T','4','-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
 
 
 def test_filter_abund_2_singlefile_fq_casava_18():
@@ -1146,6 +1185,23 @@ def test_partition_graph_1():
     assert x == (1, 0), x          # should be exactly one partition.
 
 
+def test_partition_graph_1_threaded():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    utils.runscript('partition-graph.py', ['-T','4',graphbase])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_nodegraph(graphbase)
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
+
+
 def test_partition_graph_nojoin_k21():
     # test with K=21
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
@@ -1726,6 +1782,24 @@ def test_do_partition():
     parts = set(parts)
     assert '2' in parts
     assert len(parts) == 1
+
+def test_do_partition_threaded():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = 'do-partition.py'
+    args = ["-k", "20","--threads","4", graphbase, seqfile]
+
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
 
 
 def test_do_partition_no_big_traverse():

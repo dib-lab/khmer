@@ -1,3 +1,11 @@
+2016-03-19 Christian Vögl <mail@2718-mail.de>
+   * tests/test_scripts.py, tests/test_sandbox_scripts.py:
+    added multithreaded tests for do-partitition.py, abundance-dist-single.py,
+    load-into-counting.py, partition-graph.py, count-kmer-singl.py
+ 
+
+
+
 2016-02-17  Daniel Standage <daniel.standage@gmail.com>
 
    * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
