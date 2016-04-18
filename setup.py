@@ -173,6 +173,7 @@ EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
 MINHASH_MOD = Extension("khmer._minhash",  # pylint: disable=W0142
                         sources=["khmer/_minhash.cc"],
                         language="c++",
+                        depends=["lib/kmer_min_hash.hh"],
                         extra_compile_args=EXTRA_COMPILE_ARGS)
                         
 SCRIPTS = []

@@ -49,44 +49,11 @@ extern "C" {
 
 
 #include <string>
-#include <set>
 #include <map>
 #include <exception>
 #include <iostream>
 
-#include "MurmurHash3.h"
-
-typedef unsigned long long HashIntoType;
-typedef std::set<HashIntoType> CMinHashType;
-int _hash_murmur32(const std::string& kmer);
-
-
-////
-
-class KmerMinHash
-{
-public:
-  unsigned int num;
-  unsigned int ksize;
-  long int prime;
-  bool is_protein;
-  CMinHashType mins;
-
-  KmerMinHash(unsigned int n, unsigned int k, long int p, bool prot) :
-    num(n), ksize(k), prime(p), is_protein(prot) { };
-
-  void add_hash(long int h)
-  {
-    h = ((h % prime) + prime) % prime;
-    mins.insert(h);
-
-    if (mins.size() > num) {
-      CMinHashType::iterator mi = mins.end();
-      mi--;
-      mins.erase(mi);
-    }
-  }
-};
+#include "kmer_min_hash.hh"
 
 ////
 
@@ -219,9 +186,7 @@ minhash_add_sequence(MinHash_Object * me, PyObject * args)
     std::string seq = sequence;
     for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
       std::string kmer = seq.substr(i, ksize);
-
-      h = _hash_murmur32(kmer);
-      mh->add_hash(h);
+      mh->add_kmer(kmer);
     }
   } else {                      // protein
     std::string seq = sequence;
@@ -229,14 +194,12 @@ minhash_add_sequence(MinHash_Object * me, PyObject * args)
       std::string kmer = seq.substr(i, ksize);
       std::string aa = _dna_to_aa(kmer);
 
-      h = _hash_murmur32(aa);
-      mh->add_hash(h);
-      
+      mh->add_kmer(aa);
+
       std::string rc = _revcomp(kmer);
       aa = _dna_to_aa(rc);
 
-      h = _hash_murmur32(aa);
-      mh->add_hash(h);
+      mh->add_kmer(aa);
     }
   }
     
@@ -387,15 +350,6 @@ std::string _revcomp(const std::string& kmer)
         out[ksize - i - 1] = complement;
     }
     return out;
-}
-
-int _hash_murmur32(const std::string& kmer)
-{
-  int out[2];
-  HashIntoType h, r;
-  uint32_t seed = 0;
-  MurmurHash3_x86_32((void *)kmer.c_str(), kmer.size(), seed, &out);
-  return out[0];
 }
 
 static PyMethodDef MinHashMethods[] = {
