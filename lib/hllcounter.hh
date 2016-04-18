@@ -96,6 +96,7 @@ public:
     {
         return _ksize;
     }
+    void set_M(std::vector<int>);
     std::vector<int> get_M()
     {
         return M;

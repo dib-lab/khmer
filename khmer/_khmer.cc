@@ -4642,6 +4642,35 @@ hllcounter_getcounters(khmer_KHLLCounter_Object * me)
     return x;
 }
 
+static
+int
+hllcounter_setcounters(khmer_KHLLCounter_Object * me,
+                       PyObject *value,
+                       void *closure) {
+    if (value == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute");
+        return -1;
+    }
+
+    /* TODO: use PyBytes instead of PyList? */
+    if (!PyList_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Please use a list to set counters");
+        return -1;
+    }
+
+    std::vector<int> counters;
+    PyObject *current = NULL;
+    for (Py_ssize_t i = 0; i < PyList_Size(value); i++) {
+        current = PyList_GetItem(value, i);
+        /* TODO: check if it is an int */
+        counters.push_back(PyInt_AsLong(current));
+    }
+    me->hllcounter->set_M(counters);
+
+    return 0;
+}
+
 static PyMethodDef khmer_hllcounter_methods[] = {
     {
         "add", (PyCFunction)hllcounter_add,
@@ -4698,7 +4727,7 @@ static PyGetSetDef khmer_hllcounter_getseters[] = {
     },
     {
         (char *)"counters",
-        (getter)hllcounter_getcounters, NULL,
+        (getter)hllcounter_getcounters, (setter)hllcounter_setcounters,
         (char *)"Read-only internal counters.",
         NULL
     },

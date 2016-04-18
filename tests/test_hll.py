@@ -290,6 +290,28 @@ def test_hll_get_counters():
     assert all(c == 0 for c in counters)
 
 
+def test_hll_set_counters():
+    hll = khmer.HLLCounter(0.36, K)
+    hll.counters = list(range(16))
+    counters = hll.counters
+    assert len(counters) == 2 ** 4
+    assert counters == list(range(16))
+
+    # TODO: should setting the counters after first counting be possible?
+    #hll.counters = list(range(0, 32, 2))
+    #counters = hll.counters
+    #assert len(counters) == 2 ** 4
+    #assert counters == list(range(0, 32, 2))
+
+    # TODO: what if we set counters with a different size than the original HLL?
+    # should we recalculate error rate, or raise an error?
+    #hll.counters = list(range(32))
+    #counters = hll.counters
+    #assert len(counters) == 2 ** 5
+    #assert counters == list(range(32))
+    #assert round(hll.error_rate, 2) == 0.18
+
+
 def test_hll_merge_1():
     hll = khmer.HLLCounter(0.36, K)
     hll2 = khmer.HLLCounter(0.36, K - 1)

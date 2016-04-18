@@ -310,6 +310,20 @@ void HLLCounter::set_erate(double error_rate)
     this->init(p, this->_ksize);
 }
 
+void HLLCounter::set_M(std::vector<int> newM)
+{
+    if (count(this->M.begin(), this->M.end(), 0) != this->m) {
+        // TODO: can we change after first counting?
+    }
+
+    if (newM.size() != m) {
+        // TODO: new counter array should be the same size as old one
+        // (or should error_rate/p/m/alpha be recalculated based on newM size?
+    }
+
+    M = newM;
+}
+
 void HLLCounter::set_ksize(WordLength new_ksize)
 {
     if (count(this->M.begin(), this->M.end(), 0) != this->m) {
