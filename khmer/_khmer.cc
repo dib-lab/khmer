@@ -1682,6 +1682,53 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
     return (PyObject*)ppi_obj;
 }
 
+typedef struct {                // @CTB => header, obviously.
+  PyObject_HEAD
+  KmerMinHash * mh;
+} MinHash_Object;
+
+KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
+{
+  // check type!! @CTB
+  MinHash_Object * obj = (MinHash_Object *) mh_obj;
+  return obj->mh;
+}
+
+static
+PyObject *
+hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * kmer_s = NULL;
+    PyObject * mh_obj = NULL;;
+
+    if (!PyArg_ParseTuple(args, "sO", &kmer_s, &mh_obj)) {
+        return NULL;
+    }
+
+    if (strlen(kmer_s) != hashtable->ksize()) {
+        PyErr_SetString( PyExc_ValueError,
+                         "k-mer size must equal the k-mer size of the presence table");
+        return NULL;
+    }
+
+    Kmer kmer = hashtable->build_kmer(kmer_s);
+    KmerMinHash * mh = extract_KmerMinHash(mh_obj);
+
+    Py_BEGIN_ALLOW_THREADS
+
+    SeenSet tagged_kmers;
+
+    hashtable->partition->build_neighborhood_minhash(kmer, tagged_kmers, *mh,
+                                                     hashtable->all_tags);
+
+    Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static
 PyObject *
 hashtable_assign_partition_id(khmer_KHashtable_Object * me, PyObject * args)
@@ -2541,6 +2588,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "consume_and_tag", (PyCFunction)hashtable_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
+    { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighborhood to a MinHash object" },    
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
     { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },

@@ -322,6 +322,15 @@ static PyTypeObject MinHash_Type = {
     MinHash_new,                        /* tp_new */
 };
 
+PyObject * build_MinHash_Object(KmerMinHash * mh)
+{
+  MinHash_Object * obj = (MinHash_Object *) \
+    PyObject_New(MinHash_Object, &MinHash_Type);
+  obj->mh = mh;
+
+  return (PyObject *) obj;
+}
+
 std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
