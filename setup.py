@@ -171,11 +171,13 @@ EXTENSION_MOD_DICT = \
 EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
                           ** EXTENSION_MOD_DICT)
 MINHASH_MOD = Extension("khmer._minhash",  # pylint: disable=W0142
-                        sources=["khmer/_minhash.cc"],
+                        sources=["khmer/_minhash.cc",
+                                 "third-party/smhasher/MurmurHash3.cc"],
                         language="c++",
-                        depends=["lib/kmer_min_hash.hh"],
+                        depends=["lib/kmer_min_hash.hh",
+                                 "lib/khmer.hh"],
                         extra_compile_args=EXTRA_COMPILE_ARGS)
-                        
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
