@@ -514,7 +514,8 @@ void SubsetPartition::build_neighborhood_minhash(
 
         // keep track of seen kmers
         keeper.insert(node);
-        minhash.add_kmer(node.get_string_rep(minhash.ksize));
+        minhash.add_kmer(_revhash(node.kmer_f, minhash.ksize));
+        minhash.add_kmer(_revhash(node.kmer_r, minhash.ksize));
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
