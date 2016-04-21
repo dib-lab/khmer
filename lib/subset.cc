@@ -1801,7 +1801,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   HashIntoType total_kmers = _ht->n_unique_kmers();
   HashIntoType total_tags = _ht->all_tags.size();
   unsigned int tag_ratio = total_kmers / total_tags;
-  unsigned int combine_this_many_tags = 50000 / tag_ratio; // arbitrary? @CTB
+  unsigned int combine_this_many_tags = 1000;  // arbitrary? @CTB
   unsigned int level2_mh_size = 500;                       // arbitrary? @CTB
   unsigned int total_combined = 0;
 
@@ -1809,10 +1809,15 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   
   std::map<HashIntoType, TagSet> tag_connections;
   std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
+
+
+  std::cout << "building nbhd minhashes\n" << std::flush;
   build_tag_minhashes(_ht->all_tags,
                       tag_connections,
                       tag_to_minhash);
+  std::cout << "built " << tag_to_minhash.size() << " nbhd minhashes.\n";
   std::cout << "tag ratio: " << tag_ratio << "\n";
+  std::cout << std::flush;
 
   std::map<HashIntoType, KmerMinHash *>::const_iterator mhi = \
     tag_to_minhash.begin();
@@ -1839,12 +1844,15 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
     unsigned int combined_tags = 0;
 
     // build a merged min hash...
-    while (combined_tags < combine_this_many_tags) {
-      bool did_combine = false;
+    bool did_combine = true;
+    while (combined_tags < combine_this_many_tags && did_combine) {
+      std::cout << "xxx " << combined_tags << " " << combine_this_many_tags << "\n";
+      std::cout << std::flush;
+      did_combine = false;
       
       TagSet::iterator ti;
 
-      while(1) {
+      while(combined_tags < combine_this_many_tags) {
         ti = to_be_merged.begin();
         if (ti == to_be_merged.end()) {
           break;
@@ -1878,10 +1886,6 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
         // remove:
         tag_connections.erase(posn2);
         to_be_merged.erase(ti);
-      }
-      
-      if (!did_combine) {
-        break;
       }
     }
     mhi++;
