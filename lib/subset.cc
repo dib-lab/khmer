@@ -1753,3 +1753,143 @@ void SubsetPartition::compare_to_partition(
 
     n_only2 -= n_shared;
 }
+
+
+// build_xxx
+
+void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
+                          std::map<HashIntoType, TagSet>& tag_connections,
+                          std::map<HashIntoType, KmerMinHash *>& tag_to_minhash
+                          )
+{
+  unsigned int n = 20;
+  unsigned int k = _ht->ksize();
+  long int p = 9999999967;
+  bool prot = false;
+
+  
+  SeenSet::const_iterator si;
+
+  // we want to build two things:
+  // first, a mapping from tag to minhash, just for records.
+  // second, a mapping from tag to other tags, so that we can merge
+  //    minhashes based on that.
+
+  for (si = all_tags.begin(); si != all_tags.end(); ++si) {
+    HashIntoType h, r, u;
+    u = _hash(_revhash(*si, _ht->ksize()).c_str(), _ht->ksize(), h, r);
+    Kmer start_kmer(h, r, u);
+    
+    KmerMinHash * minhash = new KmerMinHash(n, k, p, prot);
+    
+    build_neighborhood_minhash(start_kmer, tag_connections[*si],
+                               *minhash, all_tags);
+    // here, tagged_kmers will be tags encountered while traversing,
+    // and minhash will now be the neighborhood minhash.
+
+    tag_to_minhash[*si] = minhash;
+  }
+  std::cout << "calculated " << tag_to_minhash.size() << " minhashes.\n";
+}
+
+void SubsetPartition::foo()
+{
+  unsigned int k = _ht->ksize();
+  long int p = 9999999967;
+  bool prot = false;
+
+  HashIntoType total_kmers = _ht->n_unique_kmers();
+  HashIntoType total_tags = _ht->all_tags.size();
+  unsigned int tag_ratio = total_kmers / total_tags;
+  unsigned int combine_this_many_tags = 50000 / tag_ratio; // arbitrary? @CTB
+  unsigned int level2_mh_size = 200;                       // arbitrary? @CTB
+  unsigned int total_combined = 0;
+
+  std::map<HashIntoType, TagSet> tag_connections;
+  std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
+  build_tag_minhashes(_ht->all_tags,
+                      tag_connections,
+                      tag_to_minhash);
+  std::cout << "tag ratio: " << tag_ratio << "\n";
+
+  std::map<HashIntoType, KmerMinHash *>::const_iterator mhi = \
+    tag_to_minhash.begin();
+
+  // iterate over all tags...
+  while(mhi != tag_to_minhash.end()) {
+    std::cout << "next\n";
+    HashIntoType start_tag = mhi->first;
+
+    // already merged this 'un? keep on going.
+    std::map<HashIntoType, TagSet>::iterator posn;
+    posn = tag_connections.find(mhi->first);
+    if (posn == tag_connections.end()) {
+      mhi++;
+      continue;
+    }
+
+    KmerMinHash merged_mh(level2_mh_size, k, p, prot);
+    TagSet to_be_merged = posn->second;
+    
+    // clear merged tag from list
+    tag_connections.erase(posn);
+
+    unsigned int combined_tags = 0;
+
+    // build a merged min hash...
+    while (combined_tags < combine_this_many_tags) {
+      std::cout << "here!\n";
+      bool did_combine = false;
+      
+      TagSet::iterator ti;
+
+      std::cout << "...here?\n";
+
+      while(1) {
+        ti = to_be_merged.begin();
+        if (ti == to_be_merged.end()) {
+          break;
+        }
+        std::cout << "and here!\n";
+        std::map<HashIntoType, TagSet>::iterator posn2;
+        posn2 = tag_connections.find(*ti);
+
+        // already merged/erased?
+        if (posn2 == tag_connections.end()) {
+          to_be_merged.erase(ti);
+          continue;
+        }
+
+        // merge
+        KmerMinHash * mh = tag_to_minhash[*ti];
+        for (CMinHashType::iterator mi = mh->mins.begin();
+             mi != mh->mins.end(); mi++) {
+          std::cout << "merged!\n";
+          merged_mh.add_hash(*mi);
+          did_combine = true;
+        }
+        combined_tags++;
+        total_combined++;
+
+        // add the just-merged one's connected tags to to_be_merged
+        for (TagSet::iterator tti = posn2->second.begin();
+             tti != posn2->second.end();
+             tti++) {
+          to_be_merged.insert(*tti);
+        }
+        
+        // remove:
+        tag_connections.erase(posn2);
+        to_be_merged.erase(ti);
+      }
+      
+      if (!did_combine) {
+        break;
+      }
+    }
+    mhi++;
+  }
+  std::cout << "went from " << tag_to_minhash.size() << " to "
+            << tag_connections.size() << "\n";
+  std::cout << total_combined << "\n";
+}

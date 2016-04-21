@@ -1696,6 +1696,50 @@ KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
 
 static
 PyObject *
+hashtable_build_tag_minhashes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    Py_BEGIN_ALLOW_THREADS
+
+    std::map<HashIntoType, TagSet> tag_connections;
+    std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
+    hashtable->partition->build_tag_minhashes(hashtable->all_tags,
+                                              tag_connections,
+                                              tag_to_minhash);
+
+    Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
+hashtable_build_tag_foo(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    Py_BEGIN_ALLOW_THREADS
+
+      hashtable->partition->foo();
+
+    Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
 hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2588,6 +2632,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "consume_and_tag", (PyCFunction)hashtable_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
+    { "build_tag_minhashes", (PyCFunction)hashtable_build_tag_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
+    { "foo", (PyCFunction)hashtable_build_tag_foo, METH_VARARGS, "Add neighborhood to a MinHash object" },        
     { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighborhood to a MinHash object" },    
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },

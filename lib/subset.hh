@@ -194,6 +194,11 @@ public:
                               unsigned int &n_only1,
                               unsigned int &n_only2,
                               unsigned int &n_shared);
+
+    void build_tag_minhashes(const SeenSet&,
+             std::map<HashIntoType, TagSet>& tag_connections,
+             std::map<HashIntoType, KmerMinHash *>& tag_to_minhash);
+    void foo();
 };
 }
 
