@@ -55,6 +55,8 @@ extern "C" {
 
 #include "kmer_min_hash.hh"
 
+using namespace khmer;
+
 ////
 
 typedef struct {

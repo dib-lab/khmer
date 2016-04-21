@@ -198,7 +198,7 @@ public:
     void build_tag_minhashes(const SeenSet&,
              std::map<HashIntoType, TagSet>& tag_connections,
              std::map<HashIntoType, KmerMinHash *>& tag_to_minhash);
-    void build_level2_minhashes(std::vector<KmerMinHash *>&);
+    void build_level2_minhashes(std::vector<CombinedMinHash *>&);
 };
 }
 

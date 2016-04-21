@@ -1729,7 +1729,7 @@ hashtable_build_level2_minhashes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    std::vector<KmerMinHash *> level2_mhs;
+    std::vector<CombinedMinHash *> level2_mhs;
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -1739,7 +1739,8 @@ hashtable_build_level2_minhashes(khmer_KHashtable_Object * me, PyObject * args)
 
     PyObject * list_of_mhs = PyList_New(level2_mhs.size());
     for (unsigned int i = 0; i < level2_mhs.size(); i++) {
-      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(level2_mhs[i]));
+      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(level2_mhs[i]->mh));
+      delete level2_mhs[i];
     }
     
 

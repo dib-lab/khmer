@@ -1792,7 +1792,7 @@ void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
   std::cout << "calculated " << tag_to_minhash.size() << " minhashes.\n";
 }
 
-void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_mhs)
+void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& level2_mhs)
 {
   unsigned int k = _ht->ksize();
   long int p = 9999999967;
@@ -1805,11 +1805,8 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   unsigned int level2_mh_size = 500;                       // arbitrary? @CTB
   unsigned int total_combined = 0;
 
-  // std::vector<KmerMinHash *> level2_mhs;
-  
-  std::map<HashIntoType, TagSet> tag_connections;
-  std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
-
+  TagToTagSet tag_connections;
+  TagToMinHash tag_to_minhash;
 
   std::cout << "building nbhd minhashes\n" << std::flush;
   build_tag_minhashes(_ht->all_tags,
@@ -1819,10 +1816,9 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   std::cout << "tag ratio: " << tag_ratio << "\n";
   std::cout << std::flush;
 
-  std::map<HashIntoType, KmerMinHash *>::const_iterator mhi = \
-    tag_to_minhash.begin();
+  TagToMinHash::const_iterator mhi = tag_to_minhash.begin();
 
-  KmerMinHash * merged_mh = NULL;
+  CombinedMinHash * combined_mh = NULL;
   unsigned int combined_tags = 0;
 
   // iterate over all tags:
@@ -1830,7 +1826,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
     HashIntoType start_tag = mhi->first;
 
     // already merged this 'un? move to next.
-    std::map<HashIntoType, TagSet>::iterator posn;
+    TagToTagSet::iterator posn;
     posn = tag_connections.find(mhi->first);
     if (posn == tag_connections.end()) {
       mhi++;
@@ -1838,8 +1834,9 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
     }
 
     // build minhash to merge into:
-    if (merged_mh == NULL) {
-      merged_mh = new KmerMinHash(level2_mh_size, k, p, prot);
+    if (combined_mh == NULL) {
+      combined_mh = new CombinedMinHash;
+      combined_mh->mh = new KmerMinHash(level2_mh_size, k, p, prot);
     }
 
     // keep track of tags that could be merged into this:
@@ -1857,7 +1854,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
       TagSet::iterator ti;
       while(combined_tags < combine_this_many_tags && to_be_merged.size()) {
         // grab the first tag & its list of connected tags:
-        std::map<HashIntoType, TagSet>::iterator posn2;
+        TagToTagSet::iterator posn2;
         ti = to_be_merged.begin();
         posn2 = tag_connections.find(*ti);
 
@@ -1869,7 +1866,10 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
 
         // finally! merge.
         KmerMinHash * mh = tag_to_minhash[*ti];
-        merged_mh->merge(*mh);
+        combined_mh->mh->merge(*mh);
+        combined_mh->tags.insert(*ti);
+
+        // track info.
         did_combine = true;
         combined_tags++;
         total_combined++;
@@ -1883,16 +1883,16 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
       }
     }
     if (combined_tags >= combine_this_many_tags) {
-      level2_mhs.push_back(merged_mh);
-      merged_mh = NULL;
+      level2_mhs.push_back(combined_mh);
+      combined_mh = NULL;
       combined_tags = 0;
     }
 
     mhi++;
   }
-  if (merged_mh) {
-    level2_mhs.push_back(merged_mh);
-    merged_mh = NULL;
+  if (combined_mh) {
+    level2_mhs.push_back(combined_mh);
+    combined_mh = NULL;
   }
   std::cout << "went from " << tag_to_minhash.size() << " to "
             << level2_mhs.size() << " merged mhs.\n";

@@ -2,11 +2,14 @@
 #define KMER_MIN_HASH_HH
 
 #include <set>
+#include <map>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
 
 ////
+
+namespace khmer {
 
 typedef std::set<khmer::HashIntoType> CMinHashType;
 
@@ -58,4 +61,35 @@ public:
   }
 };
 
+typedef std::map<khmer::HashIntoType, khmer::TagSet> TagToTagSet;
+typedef std::map<khmer::HashIntoType, khmer::KmerMinHash *> TagToMinHash;
+
+class NeighborhoodMinHash {
+public:
+  TagToTagSet tag_connections;
+  TagToMinHash neighborhood_hash;
+
+  void cleanup_neighborhood_hash() {
+    for (TagToMinHash::iterator mhi = neighborhood_hash.begin();
+         mhi != neighborhood_hash.end(); mhi++) {
+      delete mhi->second;
+      mhi->second = NULL;
+    }
+  }
+};
+
+class CombinedMinHash {
+public:
+  TagSet tags;
+  KmerMinHash * mh;
+
+  CombinedMinHash() : mh(NULL) { }
+
+  void cleanup() {
+    delete mh;
+    mh = NULL;
+  }
+};
+
+}
 #endif // KMER_MIN_HASH_HH
