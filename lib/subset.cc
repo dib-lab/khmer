@@ -1758,9 +1758,7 @@ void SubsetPartition::compare_to_partition(
 // build_xxx
 
 void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
-                          std::map<HashIntoType, TagSet>& tag_connections,
-                          std::map<HashIntoType, KmerMinHash *>& tag_to_minhash
-                          )
+                                          NeighborhoodMinHash& nbhd_mh)
 {
   unsigned int n = 20;
   unsigned int k = _ht->ksize();
@@ -1782,14 +1780,15 @@ void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
     
     KmerMinHash * minhash = new KmerMinHash(n, k, p, prot);
     
-    build_neighborhood_minhash(start_kmer, tag_connections[*si],
+    build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
                                *minhash, all_tags);
     // here, tagged_kmers will be tags encountered while traversing,
     // and minhash will now be the neighborhood minhash.
 
-    tag_to_minhash[*si] = minhash;
+    nbhd_mh.neighborhood_hash[*si] = minhash;
   }
-  std::cout << "calculated " << tag_to_minhash.size() << " minhashes.\n";
+  std::cout << "calculated " << nbhd_mh.neighborhood_hash.size()
+            << " minhashes.\n";
 }
 
 void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& level2_mhs)
@@ -1806,29 +1805,28 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
   unsigned int total_combined = 0;
 
   TagToTagSet tag_connections;
-  TagToMinHash tag_to_minhash;
+  TagToMinHash neighborhood_hash;
 
   std::cout << "building nbhd minhashes\n" << std::flush;
-  build_tag_minhashes(_ht->all_tags,
-                      tag_connections,
-                      tag_to_minhash);
-  std::cout << "built " << tag_to_minhash.size() << " nbhd minhashes.\n";
+  NeighborhoodMinHash nbhd_mh;
+  build_tag_minhashes(_ht->all_tags, nbhd_mh);
+  std::cout << "built " << nbhd_mh.neighborhood_hash.size() << " nbhd minhashes.\n";
   std::cout << "tag ratio: " << tag_ratio << "\n";
   std::cout << std::flush;
 
-  TagToMinHash::const_iterator mhi = tag_to_minhash.begin();
+  TagToMinHash::const_iterator mhi = nbhd_mh.neighborhood_hash.begin();
 
   CombinedMinHash * combined_mh = NULL;
   unsigned int combined_tags = 0;
 
   // iterate over all tags:
-  while(mhi != tag_to_minhash.end()) {
+  while(mhi != nbhd_mh.neighborhood_hash.end()) {
     HashIntoType start_tag = mhi->first;
 
     // already merged this 'un? move to next.
     TagToTagSet::iterator posn;
-    posn = tag_connections.find(mhi->first);
-    if (posn == tag_connections.end()) {
+    posn = nbhd_mh.tag_connections.find(mhi->first);
+    if (posn == nbhd_mh.tag_connections.end()) {
       mhi++;
       continue;
     }
@@ -1843,7 +1841,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
     TagSet to_be_merged = posn->second;
     
     // & clear to-be-merged tag from list
-    tag_connections.erase(posn);
+    nbhd_mh.tag_connections.erase(posn);
 
     // merge nbhd minhashes in, tag by tag, until stop.
     bool did_combine = true;
@@ -1856,16 +1854,16 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
         // grab the first tag & its list of connected tags:
         TagToTagSet::iterator posn2;
         ti = to_be_merged.begin();
-        posn2 = tag_connections.find(*ti);
+        posn2 = nbhd_mh.tag_connections.find(*ti);
 
-        // already merged & removed from tag_connections? ok, ignore.
-        if (posn2 == tag_connections.end()) {
+        // already merged & removed from nbhd_mh.tag_connections? ok, ignore.
+        if (posn2 == nbhd_mh.tag_connections.end()) {
           to_be_merged.erase(ti);
           continue;
         }
 
         // finally! merge.
-        KmerMinHash * mh = tag_to_minhash[*ti];
+        KmerMinHash * mh = nbhd_mh.neighborhood_hash[*ti];
         combined_mh->mh->merge(*mh);
         combined_mh->tags.insert(*ti);
 
@@ -1878,7 +1876,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
         to_be_merged.insert(posn2->second.begin(), posn2->second.end());
         
         // remove:
-        tag_connections.erase(posn2);
+        nbhd_mh.tag_connections.erase(posn2);
         to_be_merged.erase(ti);
       }
     }
@@ -1894,6 +1892,6 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
     level2_mhs.push_back(combined_mh);
     combined_mh = NULL;
   }
-  std::cout << "went from " << tag_to_minhash.size() << " to "
+  std::cout << "went from " << nbhd_mh.neighborhood_hash.size() << " to "
             << level2_mhs.size() << " merged mhs.\n";
 }

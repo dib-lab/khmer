@@ -1705,15 +1705,19 @@ hashtable_build_tag_minhashes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
+    NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
+
     Py_BEGIN_ALLOW_THREADS
 
     std::map<HashIntoType, TagSet> tag_connections;
     std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
     hashtable->partition->build_tag_minhashes(hashtable->all_tags,
-                                              tag_connections,
-                                              tag_to_minhash);
+                                              *nbhd_mh);
 
     Py_END_ALLOW_THREADS
+
+    nbhd_mh->cleanup_neighborhood_hash();
+    delete nbhd_mh; nbhd_mh = NULL;
 
     Py_INCREF(Py_None);
     return Py_None;
