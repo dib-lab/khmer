@@ -1693,6 +1693,7 @@ KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
   MinHash_Object * obj = (MinHash_Object *) mh_obj;
   return obj->mh;
 }
+extern PyObject * build_MinHash_Object(KmerMinHash * mh);
 
 static
 PyObject *
@@ -1728,14 +1729,21 @@ hashtable_build_tag_foo(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
+    std::vector<KmerMinHash *> level2_mhs;
+
     Py_BEGIN_ALLOW_THREADS
 
-      hashtable->partition->foo();
+    hashtable->partition->foo(level2_mhs);
 
     Py_END_ALLOW_THREADS
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    PyObject * list_of_mhs = PyList_New(level2_mhs.size());
+    for (unsigned int i = 0; i < level2_mhs.size(); i++) {
+      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(level2_mhs[i]));
+    }
+    
+
+    return list_of_mhs;
 }
 
 static

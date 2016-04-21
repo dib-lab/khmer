@@ -39,12 +39,12 @@ from __future__ import print_function
 from math import log
 import json
 
+from khmer._minhash import MinHash
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._minhash import MinHash
 
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
