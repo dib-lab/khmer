@@ -1805,6 +1805,8 @@ void SubsetPartition::foo()
   unsigned int level2_mh_size = 200;                       // arbitrary? @CTB
   unsigned int total_combined = 0;
 
+  std::vector<KmerMinHash *> level2_mhs;
+
   std::map<HashIntoType, TagSet> tag_connections;
   std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
   build_tag_minhashes(_ht->all_tags,
@@ -1817,7 +1819,6 @@ void SubsetPartition::foo()
 
   // iterate over all tags...
   while(mhi != tag_to_minhash.end()) {
-    std::cout << "next\n";
     HashIntoType start_tag = mhi->first;
 
     // already merged this 'un? keep on going.
@@ -1828,7 +1829,8 @@ void SubsetPartition::foo()
       continue;
     }
 
-    KmerMinHash merged_mh(level2_mh_size, k, p, prot);
+    KmerMinHash * merged_mh = new KmerMinHash(level2_mh_size, k, p, prot);
+    level2_mhs.push_back(merged_mh);
     TagSet to_be_merged = posn->second;
     
     // clear merged tag from list
@@ -1838,19 +1840,15 @@ void SubsetPartition::foo()
 
     // build a merged min hash...
     while (combined_tags < combine_this_many_tags) {
-      std::cout << "here!\n";
       bool did_combine = false;
       
       TagSet::iterator ti;
-
-      std::cout << "...here?\n";
 
       while(1) {
         ti = to_be_merged.begin();
         if (ti == to_be_merged.end()) {
           break;
         }
-        std::cout << "and here!\n";
         std::map<HashIntoType, TagSet>::iterator posn2;
         posn2 = tag_connections.find(*ti);
 
@@ -1864,8 +1862,7 @@ void SubsetPartition::foo()
         KmerMinHash * mh = tag_to_minhash[*ti];
         for (CMinHashType::iterator mi = mh->mins.begin();
              mi != mh->mins.end(); mi++) {
-          std::cout << "merged!\n";
-          merged_mh.add_hash(*mi);
+          merged_mh->add_hash(*mi);
           did_combine = true;
         }
         combined_tags++;
@@ -1891,5 +1888,5 @@ void SubsetPartition::foo()
   }
   std::cout << "went from " << tag_to_minhash.size() << " to "
             << tag_connections.size() << "\n";
-  std::cout << total_combined << "\n";
+  std::cout << level2_mhs.size() << " merged mhs.\n";
 }
