@@ -1801,7 +1801,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   HashIntoType total_kmers = _ht->n_unique_kmers();
   HashIntoType total_tags = _ht->all_tags.size();
   unsigned int tag_ratio = total_kmers / total_tags;
-  unsigned int combine_this_many_tags = 1000;  // arbitrary? @CTB
+  unsigned int combine_this_many_tags = 10000;  // arbitrary? @CTB
   unsigned int level2_mh_size = 500;                       // arbitrary? @CTB
   unsigned int total_combined = 0;
 
@@ -1822,11 +1822,14 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
   std::map<HashIntoType, KmerMinHash *>::const_iterator mhi = \
     tag_to_minhash.begin();
 
-  // iterate over all tags...
+  KmerMinHash * merged_mh = NULL;
+  unsigned int combined_tags = 0;
+
+  // iterate over all tags:
   while(mhi != tag_to_minhash.end()) {
     HashIntoType start_tag = mhi->first;
 
-    // already merged this 'un? keep on going.
+    // already merged this 'un? move to next.
     std::map<HashIntoType, TagSet>::iterator posn;
     posn = tag_connections.find(mhi->first);
     if (posn == tag_connections.end()) {
@@ -1834,61 +1837,62 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
       continue;
     }
 
-    KmerMinHash * merged_mh = new KmerMinHash(level2_mh_size, k, p, prot);
-    level2_mhs.push_back(merged_mh);
+    // build minhash to merge into:
+    if (merged_mh == NULL) {
+      merged_mh = new KmerMinHash(level2_mh_size, k, p, prot);
+    }
+
+    // keep track of tags that could be merged into this:
     TagSet to_be_merged = posn->second;
     
-    // clear merged tag from list
+    // & clear to-be-merged tag from list
     tag_connections.erase(posn);
 
-    unsigned int combined_tags = 0;
-
-    // build a merged min hash...
+    // merge nbhd minhashes in, tag by tag, until stop.
     bool did_combine = true;
     while (combined_tags < combine_this_many_tags && did_combine) {
-      std::cout << "xxx " << combined_tags << " " << combine_this_many_tags << "\n";
-      std::cout << std::flush;
       did_combine = false;
-      
-      TagSet::iterator ti;
 
-      while(combined_tags < combine_this_many_tags) {
-        ti = to_be_merged.begin();
-        if (ti == to_be_merged.end()) {
-          break;
-        }
+      // walk through the list of tags to be merged:
+      TagSet::iterator ti;
+      while(combined_tags < combine_this_many_tags && to_be_merged.size()) {
+        // grab the first tag & its list of connected tags:
         std::map<HashIntoType, TagSet>::iterator posn2;
+        ti = to_be_merged.begin();
         posn2 = tag_connections.find(*ti);
 
-        // already merged/erased?
+        // already merged & removed from tag_connections? ok, ignore.
         if (posn2 == tag_connections.end()) {
           to_be_merged.erase(ti);
           continue;
         }
 
-        // merge
+        // finally! merge.
         KmerMinHash * mh = tag_to_minhash[*ti];
-        for (CMinHashType::iterator mi = mh->mins.begin();
-             mi != mh->mins.end(); mi++) {
-          merged_mh->add_hash(*mi);
-          did_combine = true;
-        }
+        merged_mh->merge(*mh);
+        did_combine = true;
         combined_tags++;
         total_combined++;
 
         // add the just-merged one's connected tags to to_be_merged
-        for (TagSet::iterator tti = posn2->second.begin();
-             tti != posn2->second.end();
-             tti++) {
-          to_be_merged.insert(*tti);
-        }
+        to_be_merged.insert(posn2->second.begin(), posn2->second.end());
         
         // remove:
         tag_connections.erase(posn2);
         to_be_merged.erase(ti);
       }
     }
+    if (combined_tags >= combine_this_many_tags) {
+      level2_mhs.push_back(merged_mh);
+      merged_mh = NULL;
+      combined_tags = 0;
+    }
+
     mhi++;
+  }
+  if (merged_mh) {
+    level2_mhs.push_back(merged_mh);
+    merged_mh = NULL;
   }
   std::cout << "went from " << tag_to_minhash.size() << " to "
             << tag_connections.size() << "\n";
