@@ -1895,6 +1895,5 @@ void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_
     merged_mh = NULL;
   }
   std::cout << "went from " << tag_to_minhash.size() << " to "
-            << tag_connections.size() << "\n";
-  std::cout << level2_mhs.size() << " merged mhs.\n";
+            << level2_mhs.size() << " merged mhs.\n";
 }
