@@ -1792,7 +1792,7 @@ void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
   std::cout << "calculated " << tag_to_minhash.size() << " minhashes.\n";
 }
 
-void SubsetPartition::foo(std::vector<KmerMinHash *>& level2_mhs)
+void SubsetPartition::build_level2_minhashes(std::vector<KmerMinHash *>& level2_mhs)
 {
   unsigned int k = _ht->ksize();
   long int p = 9999999967;
@@ -1802,7 +1802,7 @@ void SubsetPartition::foo(std::vector<KmerMinHash *>& level2_mhs)
   HashIntoType total_tags = _ht->all_tags.size();
   unsigned int tag_ratio = total_kmers / total_tags;
   unsigned int combine_this_many_tags = 50000 / tag_ratio; // arbitrary? @CTB
-  unsigned int level2_mh_size = 200;                       // arbitrary? @CTB
+  unsigned int level2_mh_size = 500;                       // arbitrary? @CTB
   unsigned int total_combined = 0;
 
   // std::vector<KmerMinHash *> level2_mhs;
