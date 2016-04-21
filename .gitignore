@@ -50,3 +50,7 @@ compile_commands.json
 pylint_report.txt
 pep8_report.txt
 pep257_report.txt
+*.sig
+*.py
+*.fa
+*.sh
