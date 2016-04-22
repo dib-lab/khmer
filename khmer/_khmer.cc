@@ -1650,7 +1650,9 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
 {
     Hashtable * hashtable = me->hashtable;
 
-    if (!PyArg_ParseTuple(args, "")) {
+    unsigned int mh_size;
+    long int mh_prime;
+    if (!PyArg_ParseTuple(args, "Il", &mh_size, &mh_prime)) {
         return NULL;
     }
 
@@ -1659,7 +1661,8 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
     Py_BEGIN_ALLOW_THREADS
 
     hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
-                                                       *nbhd_mh);
+                                                       *nbhd_mh,
+                                                       mh_size, mh_prime);
 
     Py_END_ALLOW_THREADS
 
@@ -2561,7 +2564,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighboring kmers to a MinHash object" },    
-    { "build_neighborhood_minhashes", (PyCFunction)hashtable_build_neighborhood_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
+    { "build_neighborhood_minhashes", (PyCFunction)hashtable_build_neighborhood_minhashes, METH_VARARGS, "Build MinHash objects for all tags" },
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
     { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },

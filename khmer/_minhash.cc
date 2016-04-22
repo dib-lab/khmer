@@ -526,14 +526,14 @@ static PyTypeObject NeighborhoodMinHash_Type = {
     NeighborhoodMinHash_methods,          /* tp_methods */
     0,                                    /* tp_members */
     0,                                    /* tp_getset */
-    0,                                         /* tp_base */
-    0,                                         /* tp_dict */
-    0,                                         /* tp_descr_get */
-    0,                                         /* tp_descr_set */
-    0,                                         /* tp_dictoffset */
-    0,                                         /* tp_init */
-    0,                                         /* tp_alloc */
-    NeighborhoodMinHash_new,                        /* tp_new */
+    0,                                    /* tp_base */
+    0,                                    /* tp_dict */
+    0,                                    /* tp_descr_get */
+    0,                                    /* tp_descr_set */
+    0,                                    /* tp_dictoffset */
+    0,                                    /* tp_init */
+    0,                                    /* tp_alloc */
+    NeighborhoodMinHash_new,              /* tp_new */
 };
 
 PyObject * build_NeighborhoodMinHash_Object(NeighborhoodMinHash * nbhd_mh)

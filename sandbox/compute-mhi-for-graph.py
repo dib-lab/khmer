@@ -38,7 +38,7 @@ def main():
     load_and_tag(ct, seqfile)
 
     print('building nbhd minhashes')
-    nbhd_mh = ct.build_neighborhood_minhashes()
+    nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967)
     print('building ~chromosome level minhashes')
     for n, mh in enumerate(nbhd_mh.build_combined_minhashes(10000, 500)):
         e = sourmash_lib.Estimators(n=0, ksize=KSIZE)

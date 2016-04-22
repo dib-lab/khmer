@@ -195,7 +195,9 @@ public:
                               unsigned int &n_only2,
                               unsigned int &n_shared);
 
-    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&);
+    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&,
+                                      unsigned int mh_size=20,
+                                      long int mh_prime=9999999967);
 };
 }
 

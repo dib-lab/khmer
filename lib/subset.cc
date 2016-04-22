@@ -1758,27 +1758,24 @@ void SubsetPartition::compare_to_partition(
 // build_neighborhood_minhashes
 
 void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
-                                              NeighborhoodMinHash& nbhd_mh)
+                                                   NeighborhoodMinHash& nbhd_mh,
+                                                   unsigned int mh_size,
+                                                   long int mh_prime)
 {
-  unsigned int n = 20;
   unsigned int k = _ht->ksize();
-  long int p = 9999999967;
-  bool prot = false;
-
   
-  SeenSet::const_iterator si;
-
   // we want to build two things:
   // first, a mapping from tag to minhash, just for records.
   // second, a mapping from tag to other tags, so that we can merge
   //    minhashes based on that.
 
+  SeenSet::const_iterator si;
   for (si = all_tags.begin(); si != all_tags.end(); ++si) {
     HashIntoType h, r, u;
     u = _hash(_revhash(*si, _ht->ksize()).c_str(), _ht->ksize(), h, r);
     Kmer start_kmer(h, r, u);
     
-    KmerMinHash * minhash = new KmerMinHash(n, k, p, prot);
+    KmerMinHash * minhash = new KmerMinHash(mh_size, k, mh_prime, false);
     
     build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
                                *minhash, all_tags);
@@ -1787,6 +1784,4 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
 
     nbhd_mh.tag_to_mh[*si] = minhash;
   }
-  std::cout << "calculated " << nbhd_mh.tag_to_mh.size()
-            << " minhashes.\n";
 }
