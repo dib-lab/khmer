@@ -40,7 +40,7 @@ def main():
     print('building nbhd minhashes')
     nbhd_mh = ct.build_neighborhood_minhashes()
     print('building ~chromosome level minhashes')
-    for n, mh in enumerate(nbhd_mh.build_combined_minhashes()):
+    for n, mh in enumerate(nbhd_mh.build_combined_minhashes(10000, 500)):
         e = sourmash_lib.Estimators(n=0, ksize=KSIZE)
         e.mh = mh
         sig = sourmash_signature.SourmashSignature('t@idyll.org', e)
