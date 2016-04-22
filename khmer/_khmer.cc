@@ -40,9 +40,6 @@ Contact: khmer-project@idyll.org
 // A module for Python that exports khmer C++ library functions.
 //
 
-// Must be first.
-#include <Python.h>
-
 #include <iostream>
 
 #include "khmer.hh"
@@ -55,46 +52,11 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
 
+#include "_khmer.hh"
+#include "_minhash.hh"
+
 using namespace khmer;
 using namespace read_parsers;
-
-//
-// Python 2/3 compatibility: PyInt and PyLong
-//
-
-#if (PY_MAJOR_VERSION >= 3)
-#define PyInt_Check(arg) PyLong_Check(arg)
-#define PyInt_AsLong(arg) PyLong_AsLong(arg)
-#define PyInt_FromLong(arg) PyLong_FromLong(arg)
-#endif
-
-//
-// Python 2/3 compatibility: PyBytes and PyString
-// https://docs.python.org/2/howto/cporting.html#str-unicode-unification
-//
-
-#include "bytesobject.h"
-
-//
-// Python 2/3 compatibility: Module initialization
-// http://python3porting.com/cextensions.html#module-initialization
-//
-
-#if PY_MAJOR_VERSION >= 3
-#define MOD_ERROR_VAL NULL
-#define MOD_SUCCESS_VAL(val) val
-#define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
-#define MOD_DEF(ob, name, doc, methods) \
-          static struct PyModuleDef moduledef = { \
-            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
-          ob = PyModule_Create(&moduledef);
-#else
-#define MOD_ERROR_VAL
-#define MOD_SUCCESS_VAL(val)
-#define MOD_INIT(name) void init##name(void)
-#define MOD_DEF(ob, name, doc, methods) \
-          ob = Py_InitModule3(name, methods, doc);
-#endif
 
 using namespace khmer;
 
@@ -1681,19 +1643,6 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
 
     return (PyObject*)ppi_obj;
 }
-
-typedef struct {                // @CTB => header, obviously.
-  PyObject_HEAD
-  KmerMinHash * mh;
-} MinHash_Object;
-
-KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
-{
-  // check type!! @CTB
-  MinHash_Object * obj = (MinHash_Object *) mh_obj;
-  return obj->mh;
-}
-extern PyObject * build_MinHash_Object(KmerMinHash * mh);
 
 static
 PyObject *
