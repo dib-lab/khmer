@@ -7,17 +7,20 @@ import os.path
 
 import sys
 sys.path.append('../sourmash')
-import sourmash_lib, sourmash_signature
+try:
+    import sourmash_lib, sourmash_signature
+except ImportError:
+    pass
 
 MH_LEN=50
 KSIZE=32
 
 def load_and_tag(ct, filename):
-    print 'reading and tagging sequences'
+    print('reading and tagging sequences')
     for record in screed.open(filename):
-        print '.', record.name
+        print('.', record.name)
         ct.consume_and_tag(record.sequence)
-    print '...done!'
+    print('...done!')
 
 def main():
     parser = argparse.ArgumentParser()

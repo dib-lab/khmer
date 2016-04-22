@@ -39,7 +39,7 @@ import khmer
 import os
 try:
     from pylab import *
-except ImportError:
+except (ImportError, RuntimeError):
     pass
 
 def main():
