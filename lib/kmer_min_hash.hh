@@ -69,6 +69,10 @@ public:
   TagToTagSet tag_connections;
   TagToMinHash tag_to_mh;
 
+  ~NeighborhoodMinHash() {
+    cleanup_neighborhood_hash();
+  }
+
   void cleanup_neighborhood_hash() {
     for (TagToMinHash::iterator mhi = tag_to_mh.begin();
          mhi != tag_to_mh.end(); mhi++) {
@@ -85,6 +89,8 @@ public:
 
   CombinedMinHash() : mh(NULL) { }
 
+  ~CombinedMinHash() { cleanup(); }
+  
   void cleanup() {
     delete mh;
     mh = NULL;

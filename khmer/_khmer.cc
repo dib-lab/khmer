@@ -1701,8 +1701,8 @@ hashtable_build_combined_minhashes(khmer_KHashtable_Object * me, PyObject * args
 
     PyObject * list_of_mhs = PyList_New(combined_mhs.size());
     for (unsigned int i = 0; i < combined_mhs.size(); i++) {
-      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(combined_mhs[i]->mh));
-      delete combined_mhs[i]; combined_mhs[i] = NULL;
+      PyList_SET_ITEM(list_of_mhs, i,
+                      build_CombinedMinHash_Object(combined_mhs[i]));
     }
     
 
