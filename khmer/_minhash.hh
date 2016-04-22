@@ -57,6 +57,7 @@ typedef struct {
   khmer::NeighborhoodMinHash * nbhd_mh;
 } NeighborhoodMinHash_Object;
 
+khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj);
 extern PyObject * build_NeighborhoodMinHash_Object(khmer::NeighborhoodMinHash * mh);
 
 typedef struct {
@@ -64,6 +65,7 @@ typedef struct {
   khmer::CombinedMinHash * combined_mh;
 } CombinedMinHash_Object;
 
+khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj);
 extern PyObject * build_CombinedMinHash_Object(khmer::CombinedMinHash * mh);
 
 #endif // _MINHASH_HH

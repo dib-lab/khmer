@@ -27,13 +27,6 @@ MinHash_dealloc(MinHash_Object * obj)
   Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
-{
-  // check type!! @CTB
-  MinHash_Object * obj = (MinHash_Object *) mh_obj;
-  return obj->mh;
-}
-
 static std::map<std::string, std::string> * _codon_table = NULL;
 
 static std::string _dna_to_aa(const std::string& dna)
@@ -299,6 +292,15 @@ PyObject * build_MinHash_Object(KmerMinHash * mh)
   return (PyObject *) obj;
 }
 
+khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
+{
+  if (!PyObject_TypeCheck(mh_obj, &MinHash_Type)) {
+    return NULL;
+  }
+  MinHash_Object * obj = (MinHash_Object *) mh_obj;
+  return obj->mh;
+}
+
 std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
@@ -428,6 +430,15 @@ PyObject * build_NeighborhoodMinHash_Object(NeighborhoodMinHash * nbhd_mh)
   return (PyObject *) obj;
 }
 
+khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj)
+{
+  if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
+    return NULL;
+  }
+  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) nbhd_obj;
+  return obj->nbhd_mh;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static
@@ -538,6 +549,15 @@ PyObject * build_CombinedMinHash_Object(CombinedMinHash * combined_mh)
   obj->combined_mh = combined_mh;
 
   return (PyObject *) obj;
+}
+
+khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
+{
+  if (!PyObject_TypeCheck(combined_obj, &CombinedMinHash_Type)) {
+    return NULL;
+  }
+  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) combined_obj;
+  return obj->combined_mh;
 }
 
 ///
