@@ -331,10 +331,6 @@ std::string _revcomp(const std::string& kmer)
     return out;
 }
 
-static PyMethodDef MinHashMethods[] = {
-    { NULL, NULL, 0, NULL } // sentinel
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 
 static
@@ -346,13 +342,131 @@ NeighborhoodMinHash_dealloc(NeighborhoodMinHash_Object * obj)
   Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
+void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
+                              std::vector<CombinedMinHash *>& combined_mhs)
+{
+  unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
+  unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
+  bool prot = nbhd_mh.tag_to_mh.begin()->second->is_protein;
+
+  unsigned int combine_this_many_tags = 10000; // arbitrary? @CTB
+  unsigned int combined_mh_size = 500;           // arbitrary? @CTB
+
+  TagToMinHash::const_iterator mhi = nbhd_mh.tag_to_mh.begin();
+
+  CombinedMinHash * combined_mh = NULL;
+  unsigned int total_combined = 0;
+  unsigned int combined_tags = 0;
+
+  // iterate over all tags:
+  while(mhi != nbhd_mh.tag_to_mh.end()) {
+    HashIntoType start_tag = mhi->first;
+
+    // already merged this 'un? move to next.
+    TagToTagSet::iterator posn;
+    posn = nbhd_mh.tag_connections.find(mhi->first);
+    if (posn == nbhd_mh.tag_connections.end()) {
+      mhi++;
+      continue;
+    }
+
+    // build minhash to merge into:
+    if (combined_mh == NULL) {
+      combined_mh = new CombinedMinHash;
+      combined_mh->mh = new KmerMinHash(combined_mh_size, k, p, prot);
+    }
+
+    // keep track of tags that could be merged into this:
+    TagSet to_be_merged = posn->second;
+    
+    // & clear to-be-merged tag from list
+    nbhd_mh.tag_connections.erase(posn);
+
+    // merge nbhd minhashes in, tag by tag, until stop.
+    bool did_combine = true;
+    while (combined_tags < combine_this_many_tags && did_combine) {
+      did_combine = false;
+
+      // walk through the list of tags to be merged:
+      TagSet::iterator ti;
+      while(combined_tags < combine_this_many_tags && to_be_merged.size()) {
+        // grab the first tag & its list of connected tags:
+        TagToTagSet::iterator posn2;
+        ti = to_be_merged.begin();
+        posn2 = nbhd_mh.tag_connections.find(*ti);
+
+        // already merged & removed from nbhd_mh.tag_connections? ok, ignore.
+        if (posn2 == nbhd_mh.tag_connections.end()) {
+          to_be_merged.erase(ti);
+          continue;
+        }
+
+        // finally! merge.
+        KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
+        combined_mh->mh->merge(*mh);
+        combined_mh->tags.insert(*ti);
+
+        // track info.
+        did_combine = true;
+        combined_tags++;
+        total_combined++;
+
+        // add the just-merged one's connected tags to to_be_merged
+        to_be_merged.insert(posn2->second.begin(), posn2->second.end());
+        
+        // remove:
+        nbhd_mh.tag_connections.erase(posn2);
+        to_be_merged.erase(ti);
+      }
+    }
+    if (combined_tags >= combine_this_many_tags) {
+      combined_mhs.push_back(combined_mh);
+      combined_mh = NULL;
+      combined_tags = 0;
+    }
+
+    mhi++;
+  }
+  if (combined_mh) {
+    combined_mhs.push_back(combined_mh);
+    combined_mh = NULL;
+  }
+}
+
+static
+PyObject *
+nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
+{
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    std::vector<CombinedMinHash *> combined_mhs;
+    NeighborhoodMinHash * nbhd_mh = me->nbhd_mh;
+
+    Py_BEGIN_ALLOW_THREADS
+
+    build_combined_minhashes(*nbhd_mh, combined_mhs);
+
+    std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
+              << combined_mhs.size() << " merged mhs.\n";
+
+    Py_END_ALLOW_THREADS
+
+    PyObject * list_of_mhs = PyList_New(combined_mhs.size());
+    for (unsigned int i = 0; i < combined_mhs.size(); i++) {
+      PyList_SET_ITEM(list_of_mhs, i,
+                      build_CombinedMinHash_Object(combined_mhs[i]));
+    }
+    
+
+    return list_of_mhs;
+}
+
 static PyMethodDef NeighborhoodMinHash_methods [] = {
-#if 0
-  { "add_sequence",
-    (PyCFunction)minhash_add_sequence, METH_VARARGS,
-    "Add kmer into MinHash"
-  },
-#endif
+  { "build_combined_minhashes",
+    (PyCFunction)nbhd_build_combined_minhashes,
+    METH_VARARGS, "Combine neighborhood minhashes" },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
@@ -562,6 +676,10 @@ khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
 
 ///
 
+static PyMethodDef MinHashModuleMethods[] = {
+   { NULL, NULL, 0, NULL } // sentinel
+};
+
 MOD_INIT(_minhash)
 {
     if (PyType_Ready( &MinHash_Type ) < 0) {
@@ -580,7 +698,7 @@ MOD_INIT(_minhash)
 
     MOD_DEF(m, "_minhash",
             "interface for the sourmash module low-level extensions",
-            MinHashMethods);
+            MinHashModuleMethods);
 
     if (m == NULL) {
         return MOD_ERROR_VAL;

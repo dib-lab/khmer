@@ -1668,39 +1668,6 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
 
 static
 PyObject *
-hashtable_build_combined_minhashes(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-    PyObject * nbhd_obj;
-
-    if (!PyArg_ParseTuple(args, "O", &nbhd_obj)) {
-        return NULL;
-    }
-
-    std::vector<CombinedMinHash *> combined_mhs;
-    NeighborhoodMinHash * nbhd_mh = extract_NeighborhoodMinHash(nbhd_obj);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    hashtable->partition->build_combined_minhashes(*nbhd_mh, combined_mhs);
-
-    std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
-              << combined_mhs.size() << " merged mhs.\n";
-
-    Py_END_ALLOW_THREADS
-
-    PyObject * list_of_mhs = PyList_New(combined_mhs.size());
-    for (unsigned int i = 0; i < combined_mhs.size(); i++) {
-      PyList_SET_ITEM(list_of_mhs, i,
-                      build_CombinedMinHash_Object(combined_mhs[i]));
-    }
-    
-
-    return list_of_mhs;
-}
-
-static
-PyObject *
 hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2595,7 +2562,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighboring kmers to a MinHash object" },    
     { "build_neighborhood_minhashes", (PyCFunction)hashtable_build_neighborhood_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
-    { "build_combined_minhashes", (PyCFunction)hashtable_build_combined_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
     { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
