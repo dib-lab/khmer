@@ -39,8 +39,19 @@ def main():
 
     print('building nbhd minhashes')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967)
+
+    xxx = []
+    for record in screed.open(seqfile):
+        print('.2', record.name)
+        x = []
+        for p, tag in ct.get_tags_and_positions(record.sequence):
+            x.append(tag)
+
+        xxx.append(nbhd_mh.combine_from_tags(500, x))
+    print(xxx)
+
     print('building ~chromosome level minhashes')
-    for n, mh in enumerate(nbhd_mh.build_combined_minhashes(10000, 500)):
+    for n, mh in enumerate(xxx): #enumerate(nbhd_mh.build_combined_minhashes(10000, 500)):
         e = sourmash_lib.Estimators(n=0, ksize=KSIZE)
         e.mh = mh
         sig = sourmash_signature.SourmashSignature('t@idyll.org', e)

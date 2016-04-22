@@ -431,6 +431,25 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
   }
 }
 
+void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
+                              TagSet& tagset,
+                              CombinedMinHash& combined_mh,
+                              unsigned int combined_minhash_size=500)
+{
+  unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
+  unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
+  bool prot = nbhd_mh.tag_to_mh.begin()->second->is_protein;
+
+  combined_mh.mh = new KmerMinHash(combined_minhash_size, k, p, prot);
+
+  TagSet::iterator ti;
+  for (ti = tagset.begin(); ti != tagset.end(); ti++) {
+    KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
+    combined_mh.mh->merge(*mh);
+    combined_mh.tags.insert(*ti);
+  }
+}
+
 static
 PyObject *
 nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
@@ -464,10 +483,49 @@ nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
     return list_of_mhs;
 }
 
+static
+PyObject *
+nbhd_combine_from_tags(NeighborhoodMinHash_Object * me, PyObject * args)
+{
+    unsigned int new_minhash_size;
+    PyObject * list_of_tags_o;
+    
+    if (!PyArg_ParseTuple(args, "IO",
+                          &new_minhash_size, &list_of_tags_o)) {
+      return NULL;
+    }
+
+    if (!PyList_Check(list_of_tags_o)) {
+      return NULL;
+    }
+
+    Py_ssize_t len = PyList_Size(list_of_tags_o);
+    TagSet tags;
+    for (Py_ssize_t i = 0; i < len; i++) {
+      PyObject * tag_o = PyList_GetItem(list_of_tags_o, i);
+      HashIntoType tag = PyLong_AsUnsignedLongLong(tag_o);
+      tags.insert(tag);
+    }
+
+    CombinedMinHash * combined_mh = new CombinedMinHash;
+    NeighborhoodMinHash * nbhd_mh = me->nbhd_mh;
+
+    Py_BEGIN_ALLOW_THREADS
+
+    combine_from_tags(*nbhd_mh, tags, *combined_mh, new_minhash_size);
+    
+    Py_END_ALLOW_THREADS
+
+    return build_CombinedMinHash_Object(combined_mh);
+}
+
 static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "build_combined_minhashes",
     (PyCFunction)nbhd_build_combined_minhashes,
     METH_VARARGS, "Combine neighborhood minhashes" },
+  { "combine_from_tags",
+    (PyCFunction)nbhd_combine_from_tags,
+    METH_VARARGS, "Combine nbhd minhashes from tags into one MinHash obj" },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
