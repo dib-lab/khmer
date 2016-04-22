@@ -1682,12 +1682,6 @@ hashtable_build_combined_minhashes(khmer_KHashtable_Object * me, PyObject * args
 
     Py_BEGIN_ALLOW_THREADS
 
-    std::cout << "building nbhd minhashes\n" << std::flush;
-    hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
-                                                       *nbhd_mh);
-    std::cout << "built " << nbhd_mh->tag_to_mh.size() << " nbhd minhashes.\n";
-    std::cout << std::flush;
-    
     hashtable->partition->build_combined_minhashes(*nbhd_mh, combined_mhs);
 
     std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
