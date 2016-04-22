@@ -1709,10 +1709,8 @@ hashtable_build_tag_minhashes(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_BEGIN_ALLOW_THREADS
 
-    std::map<HashIntoType, TagSet> tag_connections;
-    std::map<HashIntoType, KmerMinHash *> tag_to_minhash;
-    hashtable->partition->build_tag_minhashes(hashtable->all_tags,
-                                              *nbhd_mh);
+    hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
+                                                       *nbhd_mh);
 
     Py_END_ALLOW_THREADS
 
@@ -1725,7 +1723,7 @@ hashtable_build_tag_minhashes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_build_level2_minhashes(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_build_combined_minhashes(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
@@ -1733,18 +1731,29 @@ hashtable_build_level2_minhashes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    std::vector<CombinedMinHash *> level2_mhs;
+    std::vector<CombinedMinHash *> combined_mhs;
 
     Py_BEGIN_ALLOW_THREADS
 
-    hashtable->partition->build_level2_minhashes(level2_mhs);
+    NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
+
+    std::cout << "building nbhd minhashes\n" << std::flush;
+    hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
+                                                       *nbhd_mh);
+    std::cout << "built " << nbhd_mh->tag_to_mh.size() << " nbhd minhashes.\n";
+    std::cout << std::flush;
+    
+    hashtable->partition->build_combined_minhashes(*nbhd_mh, combined_mhs);
+
+    std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
+              << combined_mhs.size() << " merged mhs.\n";
 
     Py_END_ALLOW_THREADS
 
-    PyObject * list_of_mhs = PyList_New(level2_mhs.size());
-    for (unsigned int i = 0; i < level2_mhs.size(); i++) {
-      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(level2_mhs[i]->mh));
-      delete level2_mhs[i];
+    PyObject * list_of_mhs = PyList_New(combined_mhs.size());
+    for (unsigned int i = 0; i < combined_mhs.size(); i++) {
+      PyList_SET_ITEM(list_of_mhs, i, build_MinHash_Object(combined_mhs[i]->mh));
+      delete combined_mhs[i]; combined_mhs[i] = NULL;
     }
     
 
@@ -1766,7 +1775,7 @@ hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * ar
 
     if (strlen(kmer_s) != hashtable->ksize()) {
         PyErr_SetString( PyExc_ValueError,
-                         "k-mer size must equal the k-mer size of the presence table");
+                         "k-mer size must equal the k-mer size of the graph");
         return NULL;
     }
 
@@ -2646,7 +2655,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "build_tag_minhashes", (PyCFunction)hashtable_build_tag_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
-    { "build_level2_minhashes", (PyCFunction)hashtable_build_level2_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
+    { "build_combined_minhashes", (PyCFunction)hashtable_build_combined_minhashes, METH_VARARGS, "Add neighborhood to a MinHash object" },
     { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighborhood to a MinHash object" },    
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },

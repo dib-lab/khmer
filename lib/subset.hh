@@ -195,8 +195,9 @@ public:
                               unsigned int &n_only2,
                               unsigned int &n_shared);
 
-    void build_tag_minhashes(const SeenSet&, NeighborhoodMinHash&);
-    void build_level2_minhashes(std::vector<CombinedMinHash *>&);
+    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&);
+    void build_combined_minhashes(NeighborhoodMinHash&,
+                                  std::vector<CombinedMinHash *>&);
 };
 }
 

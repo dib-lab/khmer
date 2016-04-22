@@ -1755,10 +1755,10 @@ void SubsetPartition::compare_to_partition(
 }
 
 
-// build_xxx
+// build_neighborhood_minhashes
 
-void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
-                                          NeighborhoodMinHash& nbhd_mh)
+void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
+                                              NeighborhoodMinHash& nbhd_mh)
 {
   unsigned int n = 20;
   unsigned int k = _ht->ksize();
@@ -1785,13 +1785,14 @@ void SubsetPartition::build_tag_minhashes(const SeenSet& all_tags,
     // here, tagged_kmers will be tags encountered while traversing,
     // and minhash will now be the neighborhood minhash.
 
-    nbhd_mh.neighborhood_hash[*si] = minhash;
+    nbhd_mh.tag_to_mh[*si] = minhash;
   }
-  std::cout << "calculated " << nbhd_mh.neighborhood_hash.size()
+  std::cout << "calculated " << nbhd_mh.tag_to_mh.size()
             << " minhashes.\n";
 }
 
-void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& level2_mhs)
+void SubsetPartition::build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
+                                  std::vector<CombinedMinHash *>& combined_mhs)
 {
   unsigned int k = _ht->ksize();
   long int p = 9999999967;
@@ -1800,27 +1801,17 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
   HashIntoType total_kmers = _ht->n_unique_kmers();
   HashIntoType total_tags = _ht->all_tags.size();
   unsigned int tag_ratio = total_kmers / total_tags;
-  unsigned int combine_this_many_tags = 10000;  // arbitrary? @CTB
-  unsigned int level2_mh_size = 500;                       // arbitrary? @CTB
-  unsigned int total_combined = 0;
+  unsigned int combine_this_many_tags = 10000; // arbitrary? @CTB
+  unsigned int combined_mh_size = 500;           // arbitrary? @CTB
 
-  TagToTagSet tag_connections;
-  TagToMinHash neighborhood_hash;
-
-  std::cout << "building nbhd minhashes\n" << std::flush;
-  NeighborhoodMinHash nbhd_mh;
-  build_tag_minhashes(_ht->all_tags, nbhd_mh);
-  std::cout << "built " << nbhd_mh.neighborhood_hash.size() << " nbhd minhashes.\n";
-  std::cout << "tag ratio: " << tag_ratio << "\n";
-  std::cout << std::flush;
-
-  TagToMinHash::const_iterator mhi = nbhd_mh.neighborhood_hash.begin();
+  TagToMinHash::const_iterator mhi = nbhd_mh.tag_to_mh.begin();
 
   CombinedMinHash * combined_mh = NULL;
+  unsigned int total_combined = 0;
   unsigned int combined_tags = 0;
 
   // iterate over all tags:
-  while(mhi != nbhd_mh.neighborhood_hash.end()) {
+  while(mhi != nbhd_mh.tag_to_mh.end()) {
     HashIntoType start_tag = mhi->first;
 
     // already merged this 'un? move to next.
@@ -1834,7 +1825,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
     // build minhash to merge into:
     if (combined_mh == NULL) {
       combined_mh = new CombinedMinHash;
-      combined_mh->mh = new KmerMinHash(level2_mh_size, k, p, prot);
+      combined_mh->mh = new KmerMinHash(combined_mh_size, k, p, prot);
     }
 
     // keep track of tags that could be merged into this:
@@ -1863,7 +1854,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
         }
 
         // finally! merge.
-        KmerMinHash * mh = nbhd_mh.neighborhood_hash[*ti];
+        KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
         combined_mh->mh->merge(*mh);
         combined_mh->tags.insert(*ti);
 
@@ -1881,7 +1872,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
       }
     }
     if (combined_tags >= combine_this_many_tags) {
-      level2_mhs.push_back(combined_mh);
+      combined_mhs.push_back(combined_mh);
       combined_mh = NULL;
       combined_tags = 0;
     }
@@ -1889,9 +1880,7 @@ void SubsetPartition::build_level2_minhashes(std::vector<CombinedMinHash *>& lev
     mhi++;
   }
   if (combined_mh) {
-    level2_mhs.push_back(combined_mh);
+    combined_mhs.push_back(combined_mh);
     combined_mh = NULL;
   }
-  std::cout << "went from " << nbhd_mh.neighborhood_hash.size() << " to "
-            << level2_mhs.size() << " merged mhs.\n";
 }

@@ -67,11 +67,11 @@ typedef std::map<khmer::HashIntoType, khmer::KmerMinHash *> TagToMinHash;
 class NeighborhoodMinHash {
 public:
   TagToTagSet tag_connections;
-  TagToMinHash neighborhood_hash;
+  TagToMinHash tag_to_mh;
 
   void cleanup_neighborhood_hash() {
-    for (TagToMinHash::iterator mhi = neighborhood_hash.begin();
-         mhi != neighborhood_hash.end(); mhi++) {
+    for (TagToMinHash::iterator mhi = tag_to_mh.begin();
+         mhi != tag_to_mh.end(); mhi++) {
       delete mhi->second;
       mhi->second = NULL;
     }

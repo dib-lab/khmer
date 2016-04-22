@@ -34,7 +34,7 @@ def main():
     load_and_tag(ct, seqfile)
 
     print('building nbhd & ~chromosome level minhashes')
-    for n, mh in enumerate(ct.build_level2_minhashes()):
+    for n, mh in enumerate(ct.build_combined_minhashes()):
         e = sourmash_lib.Estimators(n=0, ksize=KSIZE)
         e.mh = mh
         sig = sourmash_signature.SourmashSignature('t@idyll.org', e)
