@@ -21,15 +21,22 @@ def load_and_tag(ct, filename):
     for record in screed.open(filename):
         print('.', record.name)
         ct.consume_and_tag(record.sequence)
-    print('...done!')
+    print('...done loading sequences!')
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('seqfile')
+    parser.add_argument('-o', '--output', metavar='output_filename')
     args = parser.parse_args()
     
     seqfile = args.seqfile
-    
+    outfile = args.output
+    if not outfile:
+        outfile = args.seqfile + '.mhi'
+
+    print('loading sequences from', seqfile)
+    print('will save MinHash index to', outfile)
+
     ct = khmer.Countgraph(KSIZE, 4e8, 2)
     ct._set_tag_density(200)
 
@@ -37,32 +44,10 @@ def main():
 
     load_and_tag(ct, seqfile)
 
-    print('building nbhd minhashes')
+    print('building nbhd minhashes...')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967)
-    nbhd_mh.save('jjj')
-
-    nbhd_mh = khmer._minhash.load_neighborhood_minhash('jjj')
-    print(type(khmer._minhash.load_neighborhood_minhash('jjj')))
-
-    xxx = []
-    for record in screed.open(seqfile):
-        print('.2', record.name)
-        x = []
-        for p, tag in ct.get_tags_and_positions(record.sequence):
-            x.append(tag)
-
-        xxx.append(nbhd_mh.combine_from_tags(500, x))
-    print(xxx)
-
-    print('building ~chromosome level minhashes')
-    for n, mh in enumerate(xxx): #enumerate(nbhd_mh.build_combined_minhashes(10000, 500)):
-        e = sourmash_lib.Estimators(n=0, ksize=KSIZE)
-        e.mh = mh
-        sig = sourmash_signature.SourmashSignature('t@idyll.org', e)
-        out = sourmash_signature.save_signatures([sig])
-        open('%s.%d.sig' % (os.path.basename(seqfile), n + 1), 'w').write(out)
-    print('wrote %d sigs' % (n + 1,))
-
+    nbhd_mh.save(outfile)
+    print('...done building! mhi saved to', outfile)
 
 if __name__ == '__main__':
     main()
