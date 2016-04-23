@@ -32,7 +32,7 @@ def main():
     seqfile = args.seqfile
     outfile = args.output
     if not outfile:
-        outfile = args.seqfile + '.mhi'
+        outfile = os.path.basename(args.seqfile) + '.mhi'
 
     print('loading sequences from', seqfile)
     print('will save MinHash index to', outfile)
