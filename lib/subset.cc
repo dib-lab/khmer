@@ -1770,7 +1770,7 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
   //    minhashes based on that.
 
   SeenSet::const_iterator si;
-  n = 0;
+  unsigned int n = 0;
   for (si = all_tags.begin(); si != all_tags.end(); ++si) {
     n += 1;
     if (n % 10000 == 0) {

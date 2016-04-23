@@ -38,7 +38,7 @@ def main():
     print('will save MinHash index to', outfile)
 
     ct = khmer.Countgraph(KSIZE, 5e8, 2)
-    ct._set_tag_density(40)
+    ct._set_tag_density(200)
 
     ###
 
