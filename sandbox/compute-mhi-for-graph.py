@@ -40,7 +40,6 @@ def main():
     print('building nbhd minhashes')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967)
     nbhd_mh.save('jjj')
-    nbhd_mh.save('jjj')
     print(type(khmer._minhash.load_neighborhood_minhash('jjj')))
     sys.exit(0)
 

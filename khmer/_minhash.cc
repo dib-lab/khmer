@@ -13,6 +13,8 @@ extern "C" {
 #include <map>
 #include <exception>
 #include <iostream>
+#include <fstream>
+#include <sstream> // IWYU pragma: keep
 
 using namespace khmer;
 
@@ -453,13 +455,157 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
 void save_neighborhood(const char * filename,
                        NeighborhoodMinHash * nbhd_mh)
 {
-  ;
+  std::ofstream outfile(filename, std::ios::binary);
+
+  outfile.write(SAVED_SIGNATURE, 4);
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_NEIGHBORHOOD_HASH;
+  outfile.write((const char *) &ht_type, 1);
+
+  ///
+
+  unsigned long num = nbhd_mh->tag_connections.size();
+  outfile.write((const char *) &num, sizeof(num));
+
+  for (TagToTagSet::iterator ni = nbhd_mh->tag_connections.begin();
+       ni != nbhd_mh->tag_connections.end(); ni++) {
+    TagSet * ts = &(ni->second);
+
+    HashIntoType tag = ni->first;
+    outfile.write((const char *) &tag, sizeof(tag));
+    unsigned int ts_size = ts->size();
+    outfile.write((const char *) &ts_size, sizeof(ts_size));
+    for (TagSet::iterator tsi = ts->begin(); tsi != ts->end(); tsi++) {
+      HashIntoType otag = *tsi;
+      outfile.write((const char *) &otag, sizeof(otag));
+    }
+  }
+
+  KmerMinHash * mh = nbhd_mh->tag_to_mh.begin()->second;
+  unsigned int mh_max_size = mh->num;
+  outfile.write((const char *) &num, sizeof(mh_max_size));
+
+  unsigned int ksize = mh->ksize;
+  outfile.write((const char *) &ksize, sizeof(ksize));
+  
+  long int prime = mh->prime;
+  outfile.write((const char *) &prime, sizeof(prime));
+  
+  char is_protein = mh->is_protein ? 1 : 0;
+  outfile.write((const char *) &is_protein, sizeof(is_protein));
+
+  for (TagToMinHash::iterator mhi = nbhd_mh->tag_to_mh.begin();
+       mhi != nbhd_mh->tag_to_mh.end(); mhi++) {
+    HashIntoType tag = mhi->first;
+    outfile.write((const char *) &tag, sizeof(tag));
+
+    mh = mhi->second;
+    CMinHashType * sketch = &(mh->mins);
+    
+    unsigned int mh_size = sketch->size();
+    outfile.write((const char*) &mh_size, sizeof(mh_size));
+
+    for (CMinHashType::iterator si = sketch->begin();
+         si != sketch->end(); si++) {
+      HashIntoType h = *si;
+      outfile.write((const char*) &h, sizeof(h));
+    }
+  }
+  
+  if (outfile.fail()) {
+    throw khmer_file_exception(strerror(errno));
+  }
+  outfile.close();
 }
 
-void load_neighborhood(const char * filename,
+void load_neighborhood(const char * infilename_c,
                        NeighborhoodMinHash * nbhd_mh)
 {
-  ;
+  std::string infilename(infilename_c);
+  std::ifstream infile;
+
+  // configure ifstream to raise exceptions for everything.
+  infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                    std::ifstream::eofbit);
+
+  try {
+    infile.open(infilename, std::ios::binary);
+  } catch (std::ifstream::failure &e) {
+    std::string err;
+    if (!(infile.is_open())) {
+      err = "Cannot open file: " + infilename;
+    } else {
+      err = "Unknown error in opening file: " + infilename;
+    }
+    throw khmer_file_exception(err);
+  }
+
+  unsigned char version, ht_type;
+
+  try {
+    char signature[4];
+    infile.read(signature, 4);
+    infile.read((char *) &version, 1);
+    infile.read((char *) &ht_type, 1);
+    if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+      std::ostringstream err;
+      err << "Incorrect file signature 0x";
+      for(size_t i=0; i < 4; ++i) {
+        err << std::hex << (int) signature[i];
+      }
+      err << " while reading from " << infilename
+          << "; should be " << SAVED_SIGNATURE;
+      throw khmer_file_exception(err.str());
+    } else if (!(version == SAVED_FORMAT_VERSION)) {
+      std::ostringstream err;
+      err << "Incorrect file format version " << (int) version
+          << " while reading from " << infilename
+          << "; should be " << (int) SAVED_FORMAT_VERSION;
+      throw khmer_file_exception(err.str());
+    } else if (!(ht_type == SAVED_NEIGHBORHOOD_HASH)) {
+      std::ostringstream err;
+      err << "Incorrect file format type " << (int) ht_type
+          << " while reading tagset from " << infilename;
+      throw khmer_file_exception(err.str());
+    }
+    return;
+  } catch (std::ifstream::failure &e) {
+    std::string err = "Error reading data from: " + infilename;
+    throw khmer_file_exception(err);
+  }
+  
+#if 0
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        if (!(save_ksize == _ksize)) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading tagset from " << infilename;
+            throw khmer_file_exception(err.str());
+        }
+
+        infile.read((char *) &tagset_size, sizeof(tagset_size));
+        infile.read((char *) &_tag_density, sizeof(_tag_density));
+
+        buf = new HashIntoType[tagset_size];
+
+        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+        for (unsigned int i = 0; i < tagset_size; i++) {
+            all_tags.insert(buf[i]);
+        }
+
+        delete[] buf;
+    } catch (std::ifstream::failure &e) {
+        std::string err = "Error reading data from: " + infilename;
+        if (buf != NULL) {
+            delete[] buf;
+        }
+        throw khmer_file_exception(err);
+    }
+#endif
 }
 
 

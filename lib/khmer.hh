@@ -91,6 +91,7 @@ private:\
 #   define SAVED_STOPTAGS 4
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
+#   define SAVED_NEIGHBORHOOD_HASH 7
 
 #   define VERBOSE_REPARTITION 0
 
