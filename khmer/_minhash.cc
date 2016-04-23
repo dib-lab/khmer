@@ -570,7 +570,60 @@ void load_neighborhood(const char * infilename_c,
           << " while reading tagset from " << infilename;
       throw khmer_file_exception(err.str());
     }
-    return;
+
+
+    unsigned long tag_connections_to_load = 0;
+    infile.read((char *) &tag_connections_to_load,
+                sizeof(tag_connections_to_load));
+    
+    for (unsigned int i = 0; i < tag_connections_to_load; i++) {
+      HashIntoType tag = 0;
+      infile.read((char *) &tag, sizeof(tag));
+      unsigned int ts_size = 0;
+      infile.read((char *) &ts_size, sizeof(ts_size));
+      
+      HashIntoType tag2;
+      TagSet tagset;
+      for (unsigned int j = 0; j < ts_size; j++) {
+        infile.read((char *) &tag2, sizeof(tag2));
+        tagset.insert(tag2);
+      }
+      nbhd_mh->tag_connections[tag] = tagset;
+    }
+
+    unsigned int mh_max_size = 0;
+    infile.read((char *) &mh_max_size, sizeof(mh_max_size));
+
+    unsigned int ksize = 0;
+    infile.read((char *) &ksize, sizeof(ksize));
+  
+    long int prime = 0;
+    infile.read((char *) &prime, sizeof(prime));
+  
+    char is_protein_ch;
+    infile.read((char *) &is_protein_ch, sizeof(is_protein_ch));
+    bool is_protein = is_protein_ch;
+
+    for (unsigned int i = 0; i < tag_connections_to_load; i++) {
+      KmerMinHash * mh = new KmerMinHash(mh_max_size, ksize, prime,
+                                         is_protein);
+
+      HashIntoType tag = 0;
+      infile.read((char *) &tag, sizeof(tag));
+
+      CMinHashType * sketch = &(mh->mins);
+      unsigned int mh_size = 0;
+      infile.read((char *) &mh_size, sizeof(mh_size));
+
+      HashIntoType h;
+      for (unsigned int i = 0; i < mh_size; i++) {
+        
+        infile.read((char *) &h, sizeof(h));
+        sketch->insert(h);
+      }
+
+      nbhd_mh->tag_to_mh[tag] = mh;
+    }
   } catch (std::ifstream::failure &e) {
     std::string err = "Error reading data from: " + infilename;
     throw khmer_file_exception(err);
