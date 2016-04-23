@@ -1770,7 +1770,13 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
   //    minhashes based on that.
 
   SeenSet::const_iterator si;
+  n = 0;
   for (si = all_tags.begin(); si != all_tags.end(); ++si) {
+    n += 1;
+    if (n % 10000 == 0) {
+      std::cout << n << " ... " << all_tags.size() << "\n";
+      std::cout << std::flush;
+    }
     HashIntoType h, r, u;
     u = _hash(_revhash(*si, _ht->ksize()).c_str(), _ht->ksize(), h, r);
     Kmer start_kmer(h, r, u);

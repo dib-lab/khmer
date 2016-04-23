@@ -37,8 +37,8 @@ def main():
     print('loading sequences from', seqfile)
     print('will save MinHash index to', outfile)
 
-    ct = khmer.Countgraph(KSIZE, 4e8, 2)
-    ct._set_tag_density(200)
+    ct = khmer.Countgraph(KSIZE, 5e8, 2)
+    ct._set_tag_density(40)
 
     ###
 
