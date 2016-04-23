@@ -18,6 +18,8 @@ extern "C" {
 
 using namespace khmer;
 
+bool check_IsMinHash(PyObject * mh);
+
 ////
 
 static
@@ -204,6 +206,65 @@ minhash_get_mins(MinHash_Object * me, PyObject * args)
   return(mins_o);
 }
 
+static PyObject * minhash___copy__(MinHash_Object * me, PyObject * args)
+{
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  KmerMinHash * mh = me->mh;
+  KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
+                                         mh->is_protein);
+  new_mh->merge(*mh);
+
+  return build_MinHash_Object(new_mh);
+}
+
+static PyObject * minhash___len__(MinHash_Object * me, PyObject * args)
+{
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  KmerMinHash * mh = me->mh;
+
+  return PyInt_FromLong(mh->mins.size());
+}
+
+static PyObject * minhash_count_common(MinHash_Object * me, PyObject * args)
+{
+  PyObject * other_mh;
+  
+  if (!PyArg_ParseTuple(args, "O", &other_mh)) {
+    return NULL;
+  }
+  
+  if (!check_IsMinHash(other_mh)) {
+    return NULL;
+  }
+
+  unsigned int n = me->mh->count_common(*((MinHash_Object*)other_mh)->mh);
+  return PyInt_FromLong(n);
+}
+
+static PyObject * minhash_compare(MinHash_Object * me, PyObject * args)
+{
+  PyObject * other_mh;
+  
+  if (!PyArg_ParseTuple(args, "O", &other_mh)) {
+    return NULL;
+  }
+  
+  if (!check_IsMinHash(other_mh)) {
+    return NULL;
+  }
+
+  unsigned int n = me->mh->count_common(*((MinHash_Object*)other_mh)->mh);
+  unsigned int size = me->mh->mins.size();
+
+  return PyFloat_FromDouble(float(n) / float(size));
+}
+
 static PyMethodDef MinHash_methods [] = {
   { "add_sequence",
     (PyCFunction)minhash_add_sequence, METH_VARARGS,
@@ -216,6 +277,22 @@ static PyMethodDef MinHash_methods [] = {
   { "get_mins",
     (PyCFunction)minhash_get_mins, METH_VARARGS,
     "Get MinHash signature"
+  },
+  { "__copy__",
+    (PyCFunction)minhash___copy__, METH_VARARGS,
+    "Copy this MinHash object",
+  },
+  { "__len__",                  // @CTB this doesn't work...?
+    (PyCFunction)minhash___len__, METH_VARARGS,
+    "Number of hashes in this MinHash object",
+  },
+  { "count_common",
+    (PyCFunction)minhash_count_common, METH_VARARGS,
+    "Get number of hashes in common with other."
+  },
+  { "compare",
+    (PyCFunction)minhash_compare, METH_VARARGS,
+    "Get the Jaccard similarity between this and other."
   },
   { NULL, NULL, 0, NULL } // sentinel
 };
@@ -292,6 +369,14 @@ PyObject * build_MinHash_Object(KmerMinHash * mh)
   obj->mh = mh;
 
   return (PyObject *) obj;
+}
+
+bool check_IsMinHash(PyObject * mh)
+{
+  if (!PyObject_TypeCheck(mh, &MinHash_Type)) {
+    return false;
+  }
+  return true;
 }
 
 khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
@@ -759,6 +844,28 @@ static PyObject * nbhd_save(NeighborhoodMinHash_Object * me, PyObject * args)
   return Py_None;
 }
 
+static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
+                                   PyObject * args)
+{
+  HashIntoType tag;
+  if (!PyArg_ParseTuple(args, "K", &tag)) {
+    return NULL;
+  }
+
+  TagToMinHash * tag_to_mh = &(me->nbhd_mh->tag_to_mh);
+  TagToMinHash::iterator tm = tag_to_mh->find(tag);
+  if (tm != tag_to_mh->end()) {
+    KmerMinHash * mh = tm->second;
+    KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
+                                           mh->is_protein);
+    new_mh->merge(*mh);
+
+    return build_MinHash_Object(new_mh);
+  }
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "build_combined_minhashes",
     (PyCFunction)nbhd_build_combined_minhashes,
@@ -769,6 +876,9 @@ static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "save",
     (PyCFunction)nbhd_save,
     METH_VARARGS, "Save nbhd hash to disk." },
+  { "get_minhash",
+    (PyCFunction)nbhd_get_minhash,
+    METH_VARARGS, "Get the MinHash for this tag." },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
@@ -868,35 +978,54 @@ CombinedMinHash_dealloc(CombinedMinHash_Object * obj)
 
 static
 PyObject *
-combined_get_mins(CombinedMinHash_Object * me, PyObject * args)
+combined_get_tags(CombinedMinHash_Object * me, PyObject * args)
+{
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  CombinedMinHash * combined_mh = me->combined_mh;
+  TagSet * tags = &(combined_mh->tags);
+  PyObject * tags_o = PyList_New(tags->size());
+
+  unsigned int j = 0;
+  for (TagSet::iterator tsi = tags->begin(); tsi != tags->end(); ++tsi) {
+    PyList_SET_ITEM(tags_o, j, PyLong_FromUnsignedLongLong(*tsi));
+    j++;
+  }
+  
+  return(tags_o);
+}
+
+static PyObject * combined_get_minhash(CombinedMinHash_Object * me,
+                                       PyObject * args)
 {
   if (!PyArg_ParseTuple(args, "")) {
     return NULL;
   }
 
   KmerMinHash * mh = me->combined_mh->mh;
-  PyObject * mins_o = PyList_New(mh->mins.size());
+  KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
+                                         mh->is_protein);
+  new_mh->merge(*mh);
 
-  unsigned int j = 0;
-  for (CMinHashType::iterator i = mh->mins.begin(); i != mh->mins.end(); ++i) {
-    PyList_SET_ITEM(mins_o, j, PyLong_FromUnsignedLongLong(*i));
-    j++;
-  }
-  return(mins_o);
+  return build_MinHash_Object(new_mh);
 }
 
 static PyMethodDef CombinedMinHash_methods [] = {
-  { "get_mins",
-    (PyCFunction)combined_get_mins, METH_VARARGS,
-    "Get MinHash signature"
-  },
+  { "get_tags",
+    (PyCFunction)combined_get_tags,
+    METH_VARARGS, "Get the list of tags in this combined set." },
+  { "get_minhash",
+    (PyCFunction)combined_get_minhash,
+    METH_VARARGS, "Get the MinHash for this combined set of tags." },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
 static
 PyObject *
 CombinedMinHash_new(PyTypeObject * subtype, PyObject * args,
-                        PyObject * kwds)
+                    PyObject * kwds)
 {
     PyObject * self     = subtype->tp_alloc( subtype, 1 );
     if (self == NULL) {

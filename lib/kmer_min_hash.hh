@@ -59,6 +59,19 @@ public:
     }
     _shrink();
   }
+  unsigned int count_common(const KmerMinHash& other)
+  {
+    CMinHashType combined;
+    
+    CMinHashType::iterator mi;
+    for (mi = mins.begin(); mi != mins.end(); ++mi) {
+      combined.insert(*mi);
+    }
+    for (mi = other.mins.begin(); mi != other.mins.end(); ++mi) {
+      combined.insert(*mi);
+    }
+    return mins.size() + other.mins.size() - combined.size();
+  }
 };
 
 typedef std::map<khmer::HashIntoType, khmer::TagSet> TagToTagSet;
