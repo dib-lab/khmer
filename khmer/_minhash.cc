@@ -450,6 +450,19 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
   }
 }
 
+void save_neighborhood(const char * filename,
+                       NeighborhoodMinHash * nbhd_mh)
+{
+  ;
+}
+
+void load_neighborhood(const char * filename,
+                       NeighborhoodMinHash * nbhd_mh)
+{
+  ;
+}
+
+
 static
 PyObject *
 nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
@@ -519,6 +532,34 @@ nbhd_combine_from_tags(NeighborhoodMinHash_Object * me, PyObject * args)
     return build_CombinedMinHash_Object(combined_mh);
 }
 
+static PyObject * nbhd_load(PyObject * self, PyObject * args)
+{
+  const char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
+  load_neighborhood(filename, nbhd_mh);
+  
+  return build_NeighborhoodMinHash_Object(nbhd_mh);
+}
+
+static PyObject * nbhd_save(NeighborhoodMinHash_Object * me, PyObject * args)
+{
+  const char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  save_neighborhood(filename, me->nbhd_mh);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "build_combined_minhashes",
     (PyCFunction)nbhd_build_combined_minhashes,
@@ -526,6 +567,9 @@ static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "combine_from_tags",
     (PyCFunction)nbhd_combine_from_tags,
     METH_VARARGS, "Combine nbhd minhashes from tags into one MinHash obj" },
+  { "save",
+    (PyCFunction)nbhd_save,
+    METH_VARARGS, "Save nbhd hash to disk." },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
@@ -736,7 +780,10 @@ khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
 ///
 
 static PyMethodDef MinHashModuleMethods[] = {
-   { NULL, NULL, 0, NULL } // sentinel
+  { "load_neighborhood_minhash",
+    (PyCFunction)nbhd_load,
+    METH_VARARGS, "load nbhd hash from disk." },
+  { NULL, NULL, 0, NULL } // sentinel
 };
 
 MOD_INIT(_minhash)
