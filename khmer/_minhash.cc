@@ -857,6 +857,44 @@ static PyObject * nbhd_save(NeighborhoodMinHash_Object * me, PyObject * args)
   return Py_None;
 }
 
+static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
+                              PyObject * args)
+{
+  double threshold;
+  PyObject * search_mh_obj;
+  
+  if (!PyArg_ParseTuple(args, "Od", &search_mh_obj, &threshold)) {
+    return NULL;
+  }
+
+  if (!check_IsMinHash(search_mh_obj)) {
+    return NULL;
+  }
+
+  NeighborhoodMinHash * nbhd_mh = me->nbhd_mh;
+  const KmerMinHash * search_mh = extract_KmerMinHash(search_mh_obj);
+
+  TagSet matching_tags;
+  for (TagToMinHash::const_iterator tsi = nbhd_mh->tag_to_mh.begin();
+       tsi != nbhd_mh->tag_to_mh.end(); tsi++) {
+    unsigned int common = tsi->second->count_common(*search_mh);
+    float similarity = float(common) / float(tsi->second->mins.size());
+    if (similarity >= threshold) {
+      matching_tags.insert(tsi->first);
+    }
+  }
+
+  PyObject * tags_o = PyList_New(matching_tags.size());
+  unsigned int j = 0;
+  for (TagSet::iterator ti = matching_tags.begin();
+       ti != matching_tags.end(); ++ti) {
+    PyList_SET_ITEM(tags_o, j, PyLong_FromUnsignedLongLong(*ti));
+    j++;
+  }
+
+  return tags_o;
+}
+
 static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
                                    PyObject * args)
 {
@@ -892,6 +930,9 @@ static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "get_minhash",
     (PyCFunction)nbhd_get_minhash,
     METH_VARARGS, "Get the MinHash for this tag." },
+  { "search",
+    (PyCFunction)nbhd_search,
+    METH_VARARGS, "Find all tags with MinHash comparisons above threshold" },
   { NULL, NULL, 0, NULL } // sentinel
 };
 
