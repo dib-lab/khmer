@@ -432,7 +432,8 @@ NeighborhoodMinHash_dealloc(NeighborhoodMinHash_Object * obj)
 void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                               std::vector<CombinedMinHash *>& combined_mhs,
                               unsigned int combine_this_many_tags=10000,
-                              unsigned int combined_minhash_size=500)
+                              unsigned int combined_minhash_size=500,
+                              HashIntoType start_tag=0)
 {
   unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
   unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
@@ -443,7 +444,12 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
   unsigned int combined_tags = 0;
 
   // iterate over all tags:
-  TagToMinHash::const_iterator mhi = nbhd_mh.tag_to_mh.begin();
+  TagToMinHash::const_iterator mhi;
+  if (start_tag == 0) {
+    mhi = nbhd_mh.tag_to_mh.begin();
+  } else {
+    mhi = nbhd_mh.tag_to_mh.find(start_tag);
+  }
   while(mhi != nbhd_mh.tag_to_mh.end()) {
     HashIntoType start_tag = mhi->first;
 
@@ -511,6 +517,10 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
     }
 
     mhi++;
+
+    if (start_tag && mhi == nbhd_mh.tag_to_mh.end()) {
+      mhi = nbhd_mh.tag_to_mh.begin();
+    }
   }
   if (combined_mh) {
     combined_mhs.push_back(combined_mh);
@@ -752,8 +762,10 @@ PyObject *
 nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
 {
     unsigned int num_tags_to_combine, new_minhash_size;
-    if (!PyArg_ParseTuple(args, "II",
-                          &num_tags_to_combine, &new_minhash_size)) {
+    unsigned int start_tag = 0;
+    if (!PyArg_ParseTuple(args, "II|K",
+                          &num_tags_to_combine, &new_minhash_size,
+                          &start_tag)) {
         return NULL;
     }
 
@@ -763,7 +775,8 @@ nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
     Py_BEGIN_ALLOW_THREADS
 
     build_combined_minhashes(*nbhd_mh, combined_mhs,
-                             num_tags_to_combine, new_minhash_size);
+                             num_tags_to_combine, new_minhash_size,
+                             start_tag=start_tag);
 
     std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
               << combined_mhs.size() << " merged mhs.\n";
