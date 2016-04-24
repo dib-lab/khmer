@@ -1652,8 +1652,15 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
 
     unsigned int mh_size;
     long int mh_prime;
-    if (!PyArg_ParseTuple(args, "Il", &mh_size, &mh_prime)) {
+    PyObject * is_protein_o = NULL;
+    bool is_protein = false;
+    if (!PyArg_ParseTuple(args, "Il|O", &mh_size, &mh_prime,
+                          &is_protein_o)) {
         return NULL;
+    }
+
+    if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
+      is_protein = true;
     }
 
     NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
@@ -1662,7 +1669,8 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
 
     hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
                                                        *nbhd_mh,
-                                                       mh_size, mh_prime);
+                                                       mh_size, mh_prime,
+                                                       is_protein);
 
     Py_END_ALLOW_THREADS
 

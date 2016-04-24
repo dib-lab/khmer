@@ -514,8 +514,8 @@ void SubsetPartition::build_neighborhood_minhash(
 
         // keep track of seen kmers
         keeper.insert(node);
-        minhash.add_kmer(_revhash(node.kmer_f, minhash.ksize));
-        minhash.add_kmer(_revhash(node.kmer_r, minhash.ksize));
+        minhash.add_sequence(_revhash(node.kmer_f, minhash.ksize).c_str());
+        minhash.add_sequence(_revhash(node.kmer_r, minhash.ksize).c_str());
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
@@ -1760,7 +1760,8 @@ void SubsetPartition::compare_to_partition(
 void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
                                                    NeighborhoodMinHash& nbhd_mh,
                                                    unsigned int mh_size,
-                                                   long int mh_prime)
+                                                   long int mh_prime,
+                                                   bool is_protein)
 {
   unsigned int k = _ht->ksize();
   
@@ -1780,8 +1781,8 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
     HashIntoType h, r, u;
     u = _hash(_revhash(*si, _ht->ksize()).c_str(), _ht->ksize(), h, r);
     Kmer start_kmer(h, r, u);
-    
-    KmerMinHash * minhash = new KmerMinHash(mh_size, k, mh_prime, false);
+
+    KmerMinHash * minhash = new KmerMinHash(mh_size, k, mh_prime, is_protein);
     
     build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
                                *minhash, all_tags);

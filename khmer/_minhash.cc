@@ -33,7 +33,7 @@ MinHash_dealloc(MinHash_Object * obj)
 
 static std::map<std::string, std::string> * _codon_table = NULL;
 
-static std::string _dna_to_aa(const std::string& dna)
+std::string khmer::_dna_to_aa(const std::string& dna)
 {
   if (_codon_table == NULL) {
     _codon_table = new std::map<std::string, std::string>;
@@ -119,14 +119,13 @@ static std::string _dna_to_aa(const std::string& dna)
   }
 
   std::string aa;
-  for (unsigned int j = 0; j < dna.size(); j += 3) {
+  unsigned int dna_size = (dna.size() / 3) * 3; // floor it
+  for (unsigned int j = 0; j < dna_size; j += 3) {
     std::string codon = dna.substr(j, 3);
     aa += (*_codon_table)[codon];
   }
   return aa;
 }
-
-std::string _revcomp(const std::string& kmer);
 
 static
 PyObject *
@@ -137,32 +136,37 @@ minhash_add_sequence(MinHash_Object * me, PyObject * args)
     return NULL;
   }
   KmerMinHash * mh = me->mh;
-  CMinHashType::iterator mins_end;
+
+  mh->add_sequence(sequence);
+    
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static
+PyObject *
+minhash_add_protein(MinHash_Object * me, PyObject * args)
+{
+  const char * sequence = NULL;
+  if (!PyArg_ParseTuple(args, "s", &sequence)) {
+    return NULL;
+  }
+  KmerMinHash * mh = me->mh;
   
   long int h = 0;
-  unsigned int ksize = mh->ksize;
+  unsigned int ksize = mh->ksize / 3;
+
+  if(strlen(sequence) < ksize) {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
 
   if (!mh->is_protein) {
-    std::string seq = sequence;
-    for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-      std::string kmer = seq.substr(i, ksize);
-      mh->add_kmer(kmer);
-    }
-    std::string rc = _revcomp(seq);
-    for (unsigned int i = 0; i < rc.length() - ksize + 1; i++) {
-      std::string kmer = rc.substr(i, ksize);
-      mh->add_kmer(kmer);
-    }
+    assert(0);
   } else {                      // protein
     std::string seq = sequence;
     for (unsigned int i = 0; i < seq.length() - ksize + 1; i ++) {
-      std::string kmer = seq.substr(i, ksize);
-      std::string aa = _dna_to_aa(kmer);
-
-      mh->add_kmer(aa);
-
-      std::string rc = _revcomp(kmer);
-      aa = _dna_to_aa(rc);
+      std::string aa = seq.substr(i, ksize);
 
       mh->add_kmer(aa);
     }
@@ -269,6 +273,10 @@ static PyMethodDef MinHash_methods [] = {
   { "add_sequence",
     (PyCFunction)minhash_add_sequence, METH_VARARGS,
     "Add kmer into MinHash"
+  },
+  { "add_protein",
+    (PyCFunction)minhash_add_protein, METH_VARARGS,
+    "Add AA kmer into protein MinHash"
   },
   { "add_hash",
     (PyCFunction)minhash_add_hash, METH_VARARGS,
@@ -386,36 +394,6 @@ khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
   }
   MinHash_Object * obj = (MinHash_Object *) mh_obj;
   return obj->mh;
-}
-
-std::string _revcomp(const std::string& kmer)
-{
-    std::string out = kmer;
-    size_t ksize = out.size();
-
-    for (size_t i=0; i < ksize; ++i) {
-        char complement;
-
-        switch(kmer[i]) {
-        case 'A':
-            complement = 'T';
-            break;
-        case 'C':
-            complement = 'G';
-            break;
-        case 'G':
-            complement = 'C';
-            break;
-        case 'T':
-            complement = 'A';
-            break;
-        default:
-            throw std::exception();
-            break;
-        }
-        out[ksize - i - 1] = complement;
-    }
-    return out;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

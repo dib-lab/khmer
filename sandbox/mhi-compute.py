@@ -27,6 +27,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('seqfile')
     parser.add_argument('-o', '--output', metavar='output_filename')
+    parser.add_argument('--protein', action='store_true')
+    parser.add_argument('-k', '--ksize', type=int, default=KSIZE)
     args = parser.parse_args()
     
     seqfile = args.seqfile
@@ -37,7 +39,7 @@ def main():
     print('loading sequences from', seqfile)
     print('will save MinHash index to', outfile)
 
-    ct = khmer.Countgraph(KSIZE, 5e8, 2)
+    ct = khmer.Countgraph(args.ksize, 5e8, 2)
     ct._set_tag_density(200)
 
     ###
@@ -45,7 +47,7 @@ def main():
     load_and_tag(ct, seqfile)
 
     print('building nbhd minhashes...')
-    nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967)
+    nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967, args.protein)
     nbhd_mh.save(outfile)
     print('...done building! mhi saved to', outfile)
 

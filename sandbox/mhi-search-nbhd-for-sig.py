@@ -23,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('infile')
     parser.add_argument('sigfile')
+    parser.add_argument('-k', '--ksize', type=int, default=KSIZE)
     args = parser.parse_args()
     
     infile = args.infile
@@ -32,7 +33,8 @@ def main():
     print('...done!')
 
     data = open(args.sigfile).read()
-    siglist  = sourmash_signature.load_signatures(data, select_ksize=KSIZE)
+    siglist  = sourmash_signature.load_signatures(data,
+                                                  select_ksize=args.ksize)
     assert len(siglist) == 1
     sig = siglist[0]
 

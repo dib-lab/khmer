@@ -197,7 +197,8 @@ public:
 
     void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&,
                                       unsigned int mh_size=20,
-                                      long int mh_prime=9999999967);
+                                      long int mh_prime=9999999967,
+                                      bool is_protein=false);
 };
 }
 
