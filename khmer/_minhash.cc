@@ -896,6 +896,48 @@ static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
   return Py_None;
 }
 
+static PyObject * nbhd_get_connected_tags(NeighborhoodMinHash_Object * me,
+                                          PyObject * args)
+{
+  HashIntoType tag;
+  if (!PyArg_ParseTuple(args, "K", &tag)) {
+    return NULL;
+  }
+
+  TagSet this_conn = me->nbhd_mh->tag_connections[tag];
+
+  PyObject * tags_o = PyList_New(this_conn.size());
+  unsigned int i;
+  for (TagSet::const_iterator tsi = this_conn.begin();
+       tsi != this_conn.end(); tsi++) {
+    PyList_SET_ITEM(tags_o, i, PyLong_FromUnsignedLongLong(*tsi));
+    i++;
+  }
+
+  return tags_o;
+}
+
+static PyObject * nbhd_get_all_tags(NeighborhoodMinHash_Object * me,
+                                    PyObject * args)
+{
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  TagToTagSet * tag_conn = &(me->nbhd_mh->tag_connections);
+
+  PyObject * tags_o = PyList_New(tag_conn->size());
+  unsigned int i = 0;
+  
+  TagToTagSet::iterator tsi = tag_conn->begin();
+  for (; tsi != tag_conn->end(); tsi++) {
+    PyList_SET_ITEM(tags_o, i, PyLong_FromUnsignedLongLong(tsi->first));
+    i++;
+  }
+
+  return tags_o;
+}
+
 static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "build_combined_minhashes",
     (PyCFunction)nbhd_build_combined_minhashes,
@@ -909,6 +951,12 @@ static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "get_minhash",
     (PyCFunction)nbhd_get_minhash,
     METH_VARARGS, "Get the MinHash for this tag." },
+  { "get_connected_tags",
+    (PyCFunction)nbhd_get_connected_tags,
+    METH_VARARGS, "Get the connections for this tag." },
+  { "get_all_tags",
+    (PyCFunction)nbhd_get_all_tags,
+    METH_VARARGS, "Get a list of all tags." },
   { "search",
     (PyCFunction)nbhd_search,
     METH_VARARGS, "Find all tags with MinHash comparisons above threshold" },
