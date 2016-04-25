@@ -19,6 +19,7 @@ extern "C" {
 using namespace khmer;
 
 bool check_IsMinHash(PyObject * mh);
+bool check_IsCombinedMinHash(PyObject * combined_mh);
 
 ////
 
@@ -1044,6 +1045,43 @@ static PyObject * combined_get_minhash(CombinedMinHash_Object * me,
   return build_MinHash_Object(new_mh);
 }
 
+static PyObject * combined_combine(CombinedMinHash_Object * me,
+                                 PyObject * args)
+{
+  PyObject * second_o;
+  unsigned int new_minhash_size = 0;
+  if (!PyArg_ParseTuple(args, "O|I", &second_o, &new_minhash_size)) {
+    return NULL;
+  }
+  if (!check_IsCombinedMinHash(second_o)) {
+    return NULL;
+  }
+  
+  CombinedMinHash * first = me->combined_mh;
+  if (new_minhash_size == 0) { new_minhash_size = first->mh->num; }
+  CombinedMinHash * second = ((CombinedMinHash_Object *)second_o)->combined_mh;
+
+  CombinedMinHash * combined = new CombinedMinHash;
+  for (TagSet::const_iterator tsi = first->tags.begin();
+       tsi != first->tags.end(); tsi++) {
+    combined->tags.insert(*tsi);
+  }
+  for (TagSet::const_iterator tsi = second->tags.begin();
+       tsi != second->tags.end(); tsi++) {
+    combined->tags.insert(*tsi);
+  }
+  
+  KmerMinHash * new_mh = new KmerMinHash(new_minhash_size,
+                                         first->mh->ksize,
+                                         first->mh->prime,
+                                         first->mh->is_protein);
+  new_mh->merge(*first->mh);
+  new_mh->merge(*second->mh);
+  combined->mh = new_mh;
+
+  return build_CombinedMinHash_Object(combined);
+}
+
 static PyMethodDef CombinedMinHash_methods [] = {
   { "get_tags",
     (PyCFunction)combined_get_tags,
@@ -1051,6 +1089,9 @@ static PyMethodDef CombinedMinHash_methods [] = {
   { "get_minhash",
     (PyCFunction)combined_get_minhash,
     METH_VARARGS, "Get the MinHash for this combined set of tags." },
+  { "combine",
+    (PyCFunction)combined_combine,
+    METH_VARARGS, "Combine this and another Combined MinHash into a new one."},
   { NULL, NULL, 0, NULL } // sentinel
 };
 
@@ -1126,6 +1167,14 @@ PyObject * build_CombinedMinHash_Object(CombinedMinHash * combined_mh)
   obj->combined_mh = combined_mh;
 
   return (PyObject *) obj;
+}
+
+bool check_IsCombinedMinHash(PyObject * combined_mh)
+{
+  if (!PyObject_TypeCheck(combined_mh, &CombinedMinHash_Type)) {
+    return false;
+  }
+  return true;
 }
 
 khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
