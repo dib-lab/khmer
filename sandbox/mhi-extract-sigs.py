@@ -69,7 +69,7 @@ def main():
 
     for n, mh in enumerate(combined):
         e = sourmash_lib.Estimators(n=0, ksize=KSIZE)
-        e.mh = mh
+        e.mh = mh.get_minhash()
         sig = sourmash_signature.SourmashSignature('t@idyll.org', e)
         out = sourmash_signature.save_signatures([sig])
         open('%s.%d.sig' % (basename, n + 1), 'w').write(out)
