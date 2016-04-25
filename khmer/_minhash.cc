@@ -794,36 +794,6 @@ void load_neighborhood(const char * infilename_c,
     throw khmer_file_exception(err);
   }
   
-#if 0
-
-        infile.read((char *) &save_ksize, sizeof(save_ksize));
-        if (!(save_ksize == _ksize)) {
-            std::ostringstream err;
-            err << "Incorrect k-mer size " << save_ksize
-                << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str());
-        }
-
-        infile.read((char *) &tagset_size, sizeof(tagset_size));
-        infile.read((char *) &_tag_density, sizeof(_tag_density));
-
-        buf = new HashIntoType[tagset_size];
-
-        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
-
-        for (unsigned int i = 0; i < tagset_size; i++) {
-            all_tags.insert(buf[i]);
-        }
-
-        delete[] buf;
-    } catch (std::ifstream::failure &e) {
-        std::string err = "Error reading data from: " + infilename;
-        if (buf != NULL) {
-            delete[] buf;
-        }
-        throw khmer_file_exception(err);
-    }
-#endif
 }
 
 
@@ -1163,6 +1133,14 @@ PyObject * build_NeighborhoodMinHash_Object(NeighborhoodMinHash * nbhd_mh)
   return (PyObject *) obj;
 }
 
+bool check_IsNeighborhoodMinHash(PyObject * nbhd_mh)
+{
+  if (!PyObject_TypeCheck(nbhd_mh, &NeighborhoodMinHash_Type)) {
+    return false;
+  }
+  return true;
+}
+
 khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj)
 {
   if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
@@ -1202,6 +1180,94 @@ combined_get_tags(CombinedMinHash_Object * me, PyObject * args)
   }
   
   return(tags_o);
+}
+
+static
+PyObject *
+combined_get_tag_neighbors(CombinedMinHash_Object * me, PyObject * args)
+{
+  PyObject * nbhd_mh_o;
+  if (!PyArg_ParseTuple(args, "O", &nbhd_mh_o)) {
+    return NULL;
+  }
+
+  if (!check_IsNeighborhoodMinHash(nbhd_mh_o)) {
+    return NULL;
+  }
+
+  CombinedMinHash * combined_mh = me->combined_mh;
+  NeighborhoodMinHash * nbhd_mh = extract_NeighborhoodMinHash(nbhd_mh_o);
+  
+  TagSet * my_tags = &(combined_mh->tags);
+  TagSet neighbor_tags;
+
+  // look at all tags in this combined tag set
+  for (TagSet::const_iterator mti = my_tags->begin();
+       mti != my_tags->end(); mti++) {
+
+    // ...and grab all their neighbors.
+    TagSet * otags = &(nbhd_mh->tag_connections[*mti]);
+    for (TagSet::const_iterator oti = otags->begin();
+         oti != otags->end(); oti++) {
+      if (my_tags->find(*oti) == my_tags->end()) { // not in set already.
+        neighbor_tags.insert(*mti);
+      }
+    }
+  }
+  
+  PyObject * tags_o = PyList_New(neighbor_tags.size());
+  unsigned int j = 0;
+  for (TagSet::iterator tsi = neighbor_tags.begin();
+       tsi != neighbor_tags.end(); ++tsi) {
+    PyList_SET_ITEM(tags_o, j, PyLong_FromUnsignedLongLong(*tsi));
+    j++;
+  }
+  
+  return(tags_o);
+}
+
+static
+PyObject *
+combined_extend(CombinedMinHash_Object * me, PyObject * args)
+{
+  PyObject * nbhd_mh_o;
+  PyObject * list_o;
+  if (!PyArg_ParseTuple(args, "OO", &nbhd_mh_o, &list_o)) {
+    return NULL;
+  }
+
+  if (!check_IsNeighborhoodMinHash(nbhd_mh_o)) {
+    return NULL;
+  }
+
+  if (!PyList_Check(list_o)) {
+    return NULL;
+  }
+
+  CombinedMinHash * combined_mh = me->combined_mh;
+  NeighborhoodMinHash * nbhd_mh = extract_NeighborhoodMinHash(nbhd_mh_o);
+
+  bool did_extend = false;
+  for (int i = 0; i < PyList_Size(list_o); i++) {
+    PyObject * o = PyList_GET_ITEM(list_o, i);
+    HashIntoType tag = PyLong_AsUnsignedLongLong(o);
+
+    if (nbhd_mh->tag_connections.find(tag) == nbhd_mh->tag_connections.end()) {
+      continue;
+    }
+
+    combined_mh->tags.insert(tag);
+    combined_mh->mh->merge(*nbhd_mh->tag_to_mh[tag]);
+    nbhd_mh->tag_connections.erase(tag);
+    did_extend = true;
+  }
+
+  if (did_extend) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  }
+  Py_INCREF(Py_False);
+  return Py_False;
 }
 
 static PyObject * combined_get_minhash(CombinedMinHash_Object * me,
@@ -1260,12 +1326,18 @@ static PyMethodDef CombinedMinHash_methods [] = {
   { "get_tags",
     (PyCFunction)combined_get_tags,
     METH_VARARGS, "Get the list of tags in this combined set." },
+  { "get_tag_neighbors",
+    (PyCFunction)combined_get_tag_neighbors,
+    METH_VARARGS, "Get the list of neighboring tags in this combined set." },
   { "get_minhash",
     (PyCFunction)combined_get_minhash,
     METH_VARARGS, "Get the MinHash for this combined set of tags." },
   { "combine",
     (PyCFunction)combined_combine,
     METH_VARARGS, "Combine this and another Combined MinHash into a new one."},
+  { "extend",
+    (PyCFunction)combined_extend,
+    METH_VARARGS, "Add the given tags into this combined MinHash."},
   { NULL, NULL, 0, NULL } // sentinel
 };
 
