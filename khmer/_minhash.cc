@@ -507,6 +507,97 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
   }
 }
 
+void build_combined_minhashes2(NeighborhoodMinHash& nbhd_mh,
+                               std::vector<CombinedMinHash *>& combined_mhs,
+                               unsigned int combined_minhash_size=500)
+{
+  unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
+  unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
+  bool prot = nbhd_mh.tag_to_mh.begin()->second->is_protein;
+
+  CombinedMinHash * combined_mh = NULL;
+  unsigned int total_combined = 0;
+  unsigned int combined_tags = 0;
+
+  // iterate over all tags:
+  TagToMinHash::const_iterator mhi;
+  mhi = nbhd_mh.tag_to_mh.begin();
+
+  while(mhi != nbhd_mh.tag_to_mh.end()) {
+    HashIntoType start_tag = mhi->first;
+
+    // already merged this 'un? move to next.
+    TagToTagSet::iterator posn;
+    posn = nbhd_mh.tag_connections.find(mhi->first);
+    if (posn == nbhd_mh.tag_connections.end() || posn->second.size() > 3) {
+      mhi++;
+      continue;
+    }
+
+    // build minhash to merge into:
+    if (combined_mh == NULL) {
+      combined_mh = new CombinedMinHash;
+      combined_mh->mh = new KmerMinHash(combined_minhash_size, k, p, prot);
+    }
+
+    // keep track of tags that could be merged into this:
+    TagSet to_be_merged = posn->second;
+    
+    // merge nbhd minhashes in, tag by tag, until stop.
+    bool did_combine = true;
+    while (did_combine) {
+      did_combine = false;
+
+      // walk through the list of tags to be merged:
+      TagSet::iterator ti;
+      while(to_be_merged.size()) {
+        // grab the first tag & its list of connected tags:
+        TagToTagSet::iterator posn2;
+        ti = to_be_merged.begin();
+        posn2 = nbhd_mh.tag_connections.find(*ti);
+
+        // already merged & removed from nbhd_mh.tag_connections? ok, ignore.
+        if (posn2 == nbhd_mh.tag_connections.end()) {
+          to_be_merged.erase(ti);
+          continue;
+        }
+
+        // more than three tags in its connections? ignore.
+        if (posn2->second.size() > 3) {
+          to_be_merged.erase(ti);
+          continue;
+        }
+
+        // finally! merge.
+        KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
+        combined_mh->mh->merge(*mh);
+        combined_mh->tags.insert(*ti);
+
+        // track info.
+        did_combine = true;
+        combined_tags++;
+        total_combined++;
+
+        // add the just-merged one's connected tags to to_be_merged
+        to_be_merged.insert(posn2->second.begin(), posn2->second.end());
+        
+        // remove:
+        nbhd_mh.tag_connections.erase(posn2);
+        to_be_merged.erase(ti);
+      }
+    }
+    combined_mhs.push_back(combined_mh);
+    combined_mh = NULL;
+    combined_tags = 0;
+
+    mhi++;
+  }
+  if (combined_mh) {
+    combined_mhs.push_back(combined_mh);
+    combined_mh = NULL;
+  }
+}
+
 void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
                               TagSet& tagset,
                               CombinedMinHash& combined_mh,
@@ -774,6 +865,38 @@ nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me, PyObject * args)
 
 static
 PyObject *
+nbhd_build_combined_minhashes2(NeighborhoodMinHash_Object * me,
+                               PyObject * args)
+{
+    unsigned int new_minhash_size;
+    if (!PyArg_ParseTuple(args, "I", &new_minhash_size)) {
+        return NULL;
+    }
+
+    std::vector<CombinedMinHash *> combined_mhs;
+    NeighborhoodMinHash * nbhd_mh = me->nbhd_mh;
+
+    Py_BEGIN_ALLOW_THREADS
+
+      build_combined_minhashes2(*nbhd_mh, combined_mhs, new_minhash_size);
+
+    std::cout << "2: went from " << nbhd_mh->tag_to_mh.size() << " to "
+              << combined_mhs.size() << " merged mhs.\n";
+
+    Py_END_ALLOW_THREADS
+
+    PyObject * list_of_mhs = PyList_New(combined_mhs.size());
+    for (unsigned int i = 0; i < combined_mhs.size(); i++) {
+      PyList_SET_ITEM(list_of_mhs, i,
+                      build_CombinedMinHash_Object(combined_mhs[i]));
+    }
+    
+
+    return list_of_mhs;
+}
+
+static
+PyObject *
 nbhd_combine_from_tags(NeighborhoodMinHash_Object * me, PyObject * args)
 {
     unsigned int new_minhash_size;
@@ -941,6 +1064,9 @@ static PyObject * nbhd_get_all_tags(NeighborhoodMinHash_Object * me,
 static PyMethodDef NeighborhoodMinHash_methods [] = {
   { "build_combined_minhashes",
     (PyCFunction)nbhd_build_combined_minhashes,
+    METH_VARARGS, "Combine neighborhood minhashes" },
+  { "build_combined_minhashes2",
+    (PyCFunction)nbhd_build_combined_minhashes2,
     METH_VARARGS, "Combine neighborhood minhashes" },
   { "combine_from_tags",
     (PyCFunction)nbhd_combine_from_tags,
