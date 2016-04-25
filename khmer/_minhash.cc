@@ -1171,26 +1171,28 @@ static PyMethodDef MinHashModuleMethods[] = {
 
 MOD_INIT(_minhash)
 {
-    if (PyType_Ready( &MinHash_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
     MinHash_Type.tp_methods = MinHash_methods;
     MinHash_Type.tp_dealloc = (destructor)MinHash_dealloc;
     MinHash_Type.tp_new = MinHash_new;
-    
-    if (PyType_Ready( &NeighborhoodMinHash_Type ) < 0) {
+
+    if (PyType_Ready( &MinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
+
     NeighborhoodMinHash_Type.tp_methods = NeighborhoodMinHash_methods;
     NeighborhoodMinHash_Type.tp_dealloc = (destructor)NeighborhoodMinHash_dealloc;
     NeighborhoodMinHash_Type.tp_new = NeighborhoodMinHash_new;
-    
-    if (PyType_Ready( &CombinedMinHash_Type ) < 0) {
+
+    if (PyType_Ready( &NeighborhoodMinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
+
     CombinedMinHash_Type.tp_methods = CombinedMinHash_methods;
     CombinedMinHash_Type.tp_dealloc = (destructor)CombinedMinHash_dealloc;
     CombinedMinHash_Type.tp_new = CombinedMinHash_new;
+    if (PyType_Ready( &CombinedMinHash_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
 
     PyObject * m;
 
