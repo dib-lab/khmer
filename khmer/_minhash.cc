@@ -32,102 +32,6 @@ MinHash_dealloc(MinHash_Object * obj)
   Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-static std::map<std::string, std::string> * _codon_table = NULL;
-
-std::string khmer::_dna_to_aa(const std::string& dna)
-{
-  if (_codon_table == NULL) {
-    _codon_table = new std::map<std::string, std::string>;
-    (*_codon_table)["TTT"] = "F";
-    (*_codon_table)["TTC"] = "F";
-    (*_codon_table)["TTA"] = "L";
-    (*_codon_table)["TTG"] = "L";
-    
-    (*_codon_table)["TCT"] = "S";
-    (*_codon_table)["TCC"] = "S";
-    (*_codon_table)["TCA"] = "S";
-    (*_codon_table)["TCG"] = "S";
-    
-    (*_codon_table)["TAT"] = "Y";
-    (*_codon_table)["TAC"] = "Y";
-    (*_codon_table)["TAA"] = "*";
-    (*_codon_table)["TAG"] = "*";
-    
-    (*_codon_table)["TGT"] = "C";
-    (*_codon_table)["TGC"] = "C";
-    (*_codon_table)["TGA"] = "*";
-    (*_codon_table)["TGG"] = "W";
-    
-    (*_codon_table)["CTT"] = "L";
-    (*_codon_table)["CTC"] = "L";
-    (*_codon_table)["CTA"] = "L";
-    (*_codon_table)["CTG"] = "L";
-    
-    (*_codon_table)["CCT"] = "P";
-    (*_codon_table)["CCC"] = "P";
-    (*_codon_table)["CCA"] = "P";
-    (*_codon_table)["CCG"] = "P";
-    
-    (*_codon_table)["CAT"] = "H";
-    (*_codon_table)["CAC"] = "H";
-    (*_codon_table)["CAA"] = "Q";
-    (*_codon_table)["CAG"] = "Q";
-    
-    (*_codon_table)["CGT"] = "R";
-    (*_codon_table)["CGC"] = "R";
-    (*_codon_table)["CGA"] = "R";
-    (*_codon_table)["CGG"] = "R";
-    
-    (*_codon_table)["ATT"] = "I";
-    (*_codon_table)["ATC"] = "I";
-    (*_codon_table)["ATA"] = "I";
-    (*_codon_table)["ATG"] = "M";
-    
-    (*_codon_table)["ACT"] = "T";
-    (*_codon_table)["ACC"] = "T";
-    (*_codon_table)["ACA"] = "T";
-    (*_codon_table)["ACG"] = "T";
-    
-    (*_codon_table)["AAT"] = "N";
-    (*_codon_table)["AAC"] = "N";
-    (*_codon_table)["AAA"] = "K";
-    (*_codon_table)["AAG"] = "K";
-    
-    (*_codon_table)["AGT"] = "S";
-    (*_codon_table)["AGC"] = "S";
-    (*_codon_table)["AGA"] = "R";
-    (*_codon_table)["AGG"] = "R";
-    
-    (*_codon_table)["GTT"] = "V";
-    (*_codon_table)["GTC"] = "V";
-    (*_codon_table)["GTA"] = "V";
-    (*_codon_table)["GTG"] = "V";
-    
-    (*_codon_table)["GCT"] = "A";
-    (*_codon_table)["GCC"] = "A";
-    (*_codon_table)["GCA"] = "A";
-    (*_codon_table)["GCG"] = "A";
-    
-    (*_codon_table)["GAT"] = "D";
-    (*_codon_table)["GAC"] = "D";
-    (*_codon_table)["GAA"] = "E";
-    (*_codon_table)["GAG"] = "E";
-    
-    (*_codon_table)["GGT"] = "G";
-    (*_codon_table)["GGC"] = "G";
-    (*_codon_table)["GGA"] = "G";
-    (*_codon_table)["GGG"] = "G";
-  }
-
-  std::string aa;
-  unsigned int dna_size = (dna.size() / 3) * 3; // floor it
-  for (unsigned int j = 0; j < dna_size; j += 3) {
-    std::string codon = dna.substr(j, 3);
-    aa += (*_codon_table)[codon];
-  }
-  return aa;
-}
-
 static
 PyObject *
 minhash_add_sequence(MinHash_Object * me, PyObject * args)
@@ -330,56 +234,6 @@ MinHash_new(PyTypeObject * subtype, PyObject * args, PyObject * kwds)
     return self;
 }
 
-static PyTypeObject MinHash_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_minhash.MinHash",                    /* tp_name */
-    sizeof(MinHash_Object),         /* tp_basicsize */
-    0,                                    /* tp_itemsize */
-    (destructor)MinHash_dealloc,    /* tp_dealloc */
-    0,                                    /* tp_print */
-    0,                                    /* tp_getattr */
-    0,                                    /* tp_setattr */
-    0,                                    /* tp_compare */
-    0,                                    /* tp_repr */
-    0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
-    0,                                    /* tp_as_mapping */
-    0,                                    /* tp_hash */
-    0,                                    /* tp_call */
-    0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
-    0,                                    /* tp_setattro */
-    0,                                    /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "A MinHash sketch.",                  /* tp_doc */
-    0,                                    /* tp_traverse */
-    0,                                    /* tp_clear */
-    0,                                    /* tp_richcompare */
-    0,                                    /* tp_weaklistoffset */
-    0,                                    /* tp_iter */
-    0,                                    /* tp_iternext */
-    MinHash_methods,               /* tp_methods */
-    0,                                    /* tp_members */
-    0,                                    /* tp_getset */
-    0,                                         /* tp_base */
-    0,                                         /* tp_dict */
-    0,                                         /* tp_descr_get */
-    0,                                         /* tp_descr_set */
-    0,                                         /* tp_dictoffset */
-    0,                                         /* tp_init */
-    0,                                         /* tp_alloc */
-    MinHash_new,                        /* tp_new */
-};
-
-PyObject * build_MinHash_Object(KmerMinHash * mh)
-{
-  MinHash_Object * obj = (MinHash_Object *) \
-    PyObject_New(MinHash_Object, &MinHash_Type);
-  obj->mh = mh;
-
-  return (PyObject *) obj;
-}
-
 bool check_IsMinHash(PyObject * mh)
 {
   if (!PyObject_TypeCheck(mh, &MinHash_Type)) {
@@ -388,14 +242,6 @@ bool check_IsMinHash(PyObject * mh)
   return true;
 }
 
-khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
-{
-  if (!PyObject_TypeCheck(mh_obj, &MinHash_Type)) {
-    return NULL;
-  }
-  MinHash_Object * obj = (MinHash_Object *) mh_obj;
-  return obj->mh;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1083,71 +929,12 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
     return self;
 }
 
-static PyTypeObject NeighborhoodMinHash_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_minhash.NeighborhoodMinHash",       /* tp_name */
-    sizeof(NeighborhoodMinHash_Object),   /* tp_basicsize */
-    0,                                    /* tp_itemsize */
-    (destructor)NeighborhoodMinHash_dealloc, /* tp_dealloc */
-    0,                                    /* tp_print */
-    0,                                    /* tp_getattr */
-    0,                                    /* tp_setattr */
-    0,                                    /* tp_compare */
-    0,                                    /* tp_repr */
-    0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
-    0,                                    /* tp_as_mapping */
-    0,                                    /* tp_hash */
-    0,                                    /* tp_call */
-    0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
-    0,                                    /* tp_setattro */
-    0,                                    /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
-    0,                                    /* tp_traverse */
-    0,                                    /* tp_clear */
-    0,                                    /* tp_richcompare */
-    0,                                    /* tp_weaklistoffset */
-    0,                                    /* tp_iter */
-    0,                                    /* tp_iternext */
-    NeighborhoodMinHash_methods,          /* tp_methods */
-    0,                                    /* tp_members */
-    0,                                    /* tp_getset */
-    0,                                    /* tp_base */
-    0,                                    /* tp_dict */
-    0,                                    /* tp_descr_get */
-    0,                                    /* tp_descr_set */
-    0,                                    /* tp_dictoffset */
-    0,                                    /* tp_init */
-    0,                                    /* tp_alloc */
-    NeighborhoodMinHash_new,              /* tp_new */
-};
-
-PyObject * build_NeighborhoodMinHash_Object(NeighborhoodMinHash * nbhd_mh)
-{
-  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) \
-    PyObject_New(NeighborhoodMinHash_Object, &NeighborhoodMinHash_Type);
-  obj->nbhd_mh = nbhd_mh;
-
-  return (PyObject *) obj;
-}
-
 bool check_IsNeighborhoodMinHash(PyObject * nbhd_mh)
 {
   if (!PyObject_TypeCheck(nbhd_mh, &NeighborhoodMinHash_Type)) {
     return false;
   }
   return true;
-}
-
-khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj)
-{
-  if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
-    return NULL;
-  }
-  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) nbhd_obj;
-  return obj->nbhd_mh;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1365,71 +1152,12 @@ CombinedMinHash_new(PyTypeObject * subtype, PyObject * args,
     return self;
 }
 
-static PyTypeObject CombinedMinHash_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_minhash.CombinedMinHash",       /* tp_name */
-    sizeof(CombinedMinHash_Object),   /* tp_basicsize */
-    0,                                    /* tp_itemsize */
-    (destructor)CombinedMinHash_dealloc, /* tp_dealloc */
-    0,                                    /* tp_print */
-    0,                                    /* tp_getattr */
-    0,                                    /* tp_setattr */
-    0,                                    /* tp_compare */
-    0,                                    /* tp_repr */
-    0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
-    0,                                    /* tp_as_mapping */
-    0,                                    /* tp_hash */
-    0,                                    /* tp_call */
-    0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
-    0,                                    /* tp_setattro */
-    0,                                    /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
-    0,                                    /* tp_traverse */
-    0,                                    /* tp_clear */
-    0,                                    /* tp_richcompare */
-    0,                                    /* tp_weaklistoffset */
-    0,                                    /* tp_iter */
-    0,                                    /* tp_iternext */
-    CombinedMinHash_methods,          /* tp_methods */
-    0,                                    /* tp_members */
-    0,                                    /* tp_getset */
-    0,                                         /* tp_base */
-    0,                                         /* tp_dict */
-    0,                                         /* tp_descr_get */
-    0,                                         /* tp_descr_set */
-    0,                                         /* tp_dictoffset */
-    0,                                         /* tp_init */
-    0,                                         /* tp_alloc */
-    CombinedMinHash_new,                        /* tp_new */
-};
-
-PyObject * build_CombinedMinHash_Object(CombinedMinHash * combined_mh)
-{
-  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) \
-    PyObject_New(CombinedMinHash_Object, &CombinedMinHash_Type);
-  obj->combined_mh = combined_mh;
-
-  return (PyObject *) obj;
-}
-
 bool check_IsCombinedMinHash(PyObject * combined_mh)
 {
   if (!PyObject_TypeCheck(combined_mh, &CombinedMinHash_Type)) {
     return false;
   }
   return true;
-}
-
-khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
-{
-  if (!PyObject_TypeCheck(combined_obj, &CombinedMinHash_Type)) {
-    return NULL;
-  }
-  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) combined_obj;
-  return obj->combined_mh;
 }
 
 ///
@@ -1446,14 +1174,23 @@ MOD_INIT(_minhash)
     if (PyType_Ready( &MinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
+    MinHash_Type.tp_methods = MinHash_methods;
+    MinHash_Type.tp_dealloc = (destructor)MinHash_dealloc;
+    MinHash_Type.tp_new = MinHash_new;
     
     if (PyType_Ready( &NeighborhoodMinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
+    NeighborhoodMinHash_Type.tp_methods = NeighborhoodMinHash_methods;
+    NeighborhoodMinHash_Type.tp_dealloc = (destructor)NeighborhoodMinHash_dealloc;
+    NeighborhoodMinHash_Type.tp_new = NeighborhoodMinHash_new;
     
     if (PyType_Ready( &CombinedMinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
+    CombinedMinHash_Type.tp_methods = CombinedMinHash_methods;
+    CombinedMinHash_Type.tp_dealloc = (destructor)CombinedMinHash_dealloc;
+    CombinedMinHash_Type.tp_new = CombinedMinHash_new;
 
     PyObject * m;
 

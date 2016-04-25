@@ -49,23 +49,141 @@ typedef struct {
   khmer::KmerMinHash * mh;
 } MinHash_Object;
 
-khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj);
-extern PyObject * build_MinHash_Object(khmer::KmerMinHash * mh);
+static PyTypeObject MinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "_minhash.MinHash",                   /* tp_name */
+    sizeof(MinHash_Object),               /* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    0,                                    /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    0,                                    /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+    "A MinHash sketch.",                  /* tp_doc */
+};
+
+khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
+{
+  if (!PyObject_TypeCheck(mh_obj, &MinHash_Type)) {
+    return NULL;
+  }
+  MinHash_Object * obj = (MinHash_Object *) mh_obj;
+  return obj->mh;
+}
+
+PyObject * build_MinHash_Object(khmer::KmerMinHash * mh)
+{
+  MinHash_Object * obj = (MinHash_Object *) \
+    PyObject_New(MinHash_Object, &MinHash_Type);
+  obj->mh = mh;
+
+  return (PyObject *) obj;
+}
 
 typedef struct {
   PyObject_HEAD
   khmer::NeighborhoodMinHash * nbhd_mh;
 } NeighborhoodMinHash_Object;
 
-khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj);
-extern PyObject * build_NeighborhoodMinHash_Object(khmer::NeighborhoodMinHash * mh);
+static PyTypeObject NeighborhoodMinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)            /* init & ob_size */
+    "_minhash.NeighborhoodMinHash",           /* tp_name */
+    sizeof(NeighborhoodMinHash_Object),       /* tp_basicsize */
+    0,                                        /* tp_itemsize */
+    0,                                        /* tp_dealloc */
+    0,                                        /* tp_print */
+    0,                                        /* tp_getattr */
+    0,                                        /* tp_setattr */
+    0,                                        /* tp_compare */
+    0,                                        /* tp_repr */
+    0,                                        /* tp_as_number */
+    0,                                        /* tp_as_sequence */
+    0,                                        /* tp_as_mapping */
+    0,                                        /* tp_hash */
+    0,                                        /* tp_call */
+    0,                                        /* tp_str */
+    0,                                        /* tp_getattro */
+    0,                                        /* tp_setattro */
+    0,                                        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                       /* tp_flags */
+    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
+};
+
+PyObject * build_NeighborhoodMinHash_Object(khmer::NeighborhoodMinHash * nbhd_mh)
+{
+  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) \
+    PyObject_New(NeighborhoodMinHash_Object, &NeighborhoodMinHash_Type);
+  obj->nbhd_mh = nbhd_mh;
+
+  return (PyObject *) obj;
+}
+
+khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj)
+{
+  if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
+    return NULL;
+  }
+  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) nbhd_obj;
+  return obj->nbhd_mh;
+}
 
 typedef struct {
   PyObject_HEAD
   khmer::CombinedMinHash * combined_mh;
 } CombinedMinHash_Object;
 
-khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj);
-extern PyObject * build_CombinedMinHash_Object(khmer::CombinedMinHash * mh);
+static PyTypeObject CombinedMinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)            /* init & ob_size */
+    "_minhash.CombinedMinHash",               /* tp_name */
+    sizeof(CombinedMinHash_Object),           /* tp_basicsize */
+    0,                                        /* tp_itemsize */
+    0,                                        /* tp_dealloc */
+    0,                                        /* tp_print */
+    0,                                        /* tp_getattr */
+    0,                                        /* tp_setattr */
+    0,                                        /* tp_compare */
+    0,                                        /* tp_repr */
+    0,                                        /* tp_as_number */
+    0,                                        /* tp_as_sequence */
+    0,                                        /* tp_as_mapping */
+    0,                                        /* tp_hash */
+    0,                                        /* tp_call */
+    0,                                        /* tp_str */
+    0,                                        /* tp_getattro */
+    0,                                        /* tp_setattro */
+    0,                                        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                       /* tp_flags */
+    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
+};
+
+PyObject * build_CombinedMinHash_Object(khmer::CombinedMinHash * combined_mh)
+{
+  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) \
+    PyObject_New(CombinedMinHash_Object, &CombinedMinHash_Type);
+  obj->combined_mh = combined_mh;
+
+  return (PyObject *) obj;
+}
+
+khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
+{
+  if (!PyObject_TypeCheck(combined_obj, &CombinedMinHash_Type)) {
+    return NULL;
+  }
+  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) combined_obj;
+  return obj->combined_mh;
+}
+
 
 #endif // _MINHASH_HH
