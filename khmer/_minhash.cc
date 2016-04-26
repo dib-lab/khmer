@@ -409,7 +409,7 @@ void build_combined_minhashes2(NeighborhoodMinHash& nbhd_mh,
         }
 
         // more than three tags in its connections? ignore.
-        if (posn2->second.size() > 3) {
+        if (posn2->second.size() > 5) {
           to_be_merged.erase(ti);
           continue;
         }
@@ -432,15 +432,24 @@ void build_combined_minhashes2(NeighborhoodMinHash& nbhd_mh,
         to_be_merged.erase(ti);
       }
     }
-    combined_mhs.push_back(combined_mh);
-    combined_mh = NULL;
-    combined_tags = 0;
+
+    if (combined_mh->tags.size()) {
+      combined_mhs.push_back(combined_mh);
+      combined_mh = NULL;
+      combined_tags = 0;
+    }
 
     mhi++;
   }
   if (combined_mh) {
-    combined_mhs.push_back(combined_mh);
-    combined_mh = NULL;
+    if (combined_mh->tags.size()) {
+      combined_mhs.push_back(combined_mh);
+      combined_mh = NULL;
+    }
+    else {
+      delete combined_mh;
+    }
+     
   }
 }
 
