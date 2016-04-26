@@ -6,7 +6,10 @@ import screed
 from cPickle import dump
 import argparse
 import os.path
-import numpy
+try:
+    import numpy
+except ImportError:
+    pass
 
 import sys
 sys.path.append('../sourmash')
