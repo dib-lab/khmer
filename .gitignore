@@ -54,3 +54,7 @@ pep257_report.txt
 *.py
 *.fa
 *.sh
+*.mhi
+*.pdf
+*.png
+*.txt
