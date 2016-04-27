@@ -153,6 +153,7 @@ def test_hash_murmur3():
     assert khmer.hash_murmur3('TTTT') == 526240128537019279
     assert khmer.hash_murmur3('CCCC') == 14391997331386449225
     assert khmer.hash_murmur3('GGGG') == 14391997331386449225
+    assert khmer.hash_murmur3('TATA') != 0
 
 
 def test_hash_no_rc_murmur3():
