@@ -44,7 +44,6 @@ import stat
 import shutil
 from io import StringIO
 import traceback
-from nose.plugins.attrib import attr
 import threading
 import bz2
 import gzip

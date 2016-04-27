@@ -39,7 +39,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import ReadParser
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+import pytest
 from functools import reduce  # pylint: disable=redefined-builtin
 
 
@@ -84,7 +84,7 @@ def test_num_reads():
     assert rparser.num_reads == 100
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_num_reads_threads():
     """Test threadsaftey of ReadParser's read counting"""
     import threading
@@ -200,7 +200,7 @@ def test_badbzip2():
         print(str(err))
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     import operator
@@ -233,12 +233,12 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         reads_counts_per_thread
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_with_multiple_threads_big():
     test_with_multiple_threads(testfile="test-large.fa")
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_old_illumina_pair_mating():
 
     import threading
@@ -264,7 +264,7 @@ def test_old_illumina_pair_mating():
     t2.join()
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_casava_1_8_pair_mating():
 
     import threading
@@ -313,7 +313,7 @@ def test_iterator_identities():
     assert rparser is rparser.iter_reads()
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_pair_iterator_in_error_mode():
     assert 0
 
@@ -346,7 +346,7 @@ def test_read_pair_iterator_in_error_mode():
     assert all(matches)  # Assert ALL the matches. :-]
 
 
-@attr('linux')
+@pytest.mark.linux
 def test_read_pair_iterator_in_error_mode_xfail():
 
     rparser = \
@@ -377,7 +377,7 @@ def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
     assert failed
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_pair_iterator_in_ignore_mode():
     assert 0
 

@@ -42,8 +42,8 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
-DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr nose pydocstyle \
-	screed pyenchant
+DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
+	pydocstyle screed pyenchant
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
@@ -75,9 +75,9 @@ CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR ?= '!known_failing,!jenkins,!huge'
+	TESTATTR ?= -m "not known_failing and not jenkins and not huge"
 else
-	TESTATTR ?= '!known_failing,!jenkins,!huge,!linux'
+	TESTATTR ?= -m "not known_failing and not jenkins and not huge and not linux"
 endif
 
 MODEXT=$(shell python -c \
@@ -225,8 +225,8 @@ diff_pylint_report: pylint_report.txt
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	./setup.py develop
 	coverage run --branch --source=scripts,khmer,oxli \
-		--omit=khmer/_version.py -m nose --with-xunit \
-		--attr $(TESTATTR) --processes=0
+		--omit=khmer/_version.py -m pytest --junitxml=nosetests.xml \
+		$(TESTATTR)
 
 coverage.xml: .coverage
 	coverage xml
@@ -253,7 +253,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 		--html-report diff-cover.html
 
 nosetests.xml: FORCE
-	./setup.py nosetests --with-xunit --attr $(TESTATTR)
+	py.test --junitxml=$@ ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code
 # helpful packages: doxygen graphviz
@@ -293,14 +293,14 @@ libtest: FORCE
 ## test        : run the khmer test suite
 test: FORCE
 	./setup.py develop
-	./setup.py nosetests --attr $(TESTATTR)
+	py.test ${TESTATTR}
 
 sloccount.sc: $(CPPSOURCES) $(PYSOURCES) $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
 		setup.py Makefile > sloccount.sc
 
 ## sloccount   : count lines of code
-sloccount: 
+sloccount:
 	sloccount lib khmer scripts tests setup.py Makefile
 
 coverity-build:
@@ -309,8 +309,8 @@ coverity-build:
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
 		cov-build --dir cov-int --c-coverage gcov \
 			--disable-gcov-arg-injection make coverage-debug; \
-		cov-capture --dir cov-int --c-coverage gcov python -m nose \
-			--attr $(TESTATTR) ; \
+		cov-capture --dir cov-int --c-coverage gcov python -m pytest \
+			$(TESTATTR) ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \

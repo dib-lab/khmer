@@ -36,10 +36,10 @@
 from __future__ import print_function, unicode_literals
 
 import khmer
-from nose.plugins.attrib import attr
+import pytest
 
 
-@attr('jenkins')
+@pytest.mark.jenkins
 def test_python_and_c_match():
     """checks c++ compiler option version against versioneer version"""
     print('c++ version {0}:'.format(khmer.__version_cpp__()))

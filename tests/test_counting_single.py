@@ -38,13 +38,15 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import khmer
+
+import pytest
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+
 
 MAX_COUNT = 255
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         khmer.Countgraph(4, 1000000000000, 1)

@@ -45,9 +45,10 @@ import os.path
 import shutil
 from io import StringIO
 import traceback
-import nose
 import glob
 import imp
+
+import pytest
 
 from . import khmer_tst_utils as utils
 import screed
@@ -65,7 +66,7 @@ def teardown():
 def test_import_all():
     sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
     if not os.path.exists(sandbox_path):
-        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+        pytest.skip("sandbox scripts are only tested in a repository")
 
     path = os.path.join(sandbox_path, "*.py")
     scripts = glob.glob(path)

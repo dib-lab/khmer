@@ -42,15 +42,17 @@ from khmer import ReadParser
 
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+
 
 
 def teardown():
     utils.cleanup()
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         khmer.Nodegraph(32, 1e13, 1)

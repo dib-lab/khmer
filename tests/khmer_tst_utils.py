@@ -40,12 +40,12 @@ import os
 import shutil
 import pkg_resources
 from pkg_resources import Requirement, resource_filename, ResolutionError
-import nose
 import sys
 import traceback
 import subprocess
 from io import open  # pylint: disable=redefined-builtin
 
+import pytest
 
 try:
     from StringIO import StringIO
@@ -125,7 +125,7 @@ def _runscript(scriptname, sandbox=False):
                     namespace)
                 return 0
         elif sandbox:
-            raise nose.SkipTest("sandbox tests are only run in a repository.")
+            pytest.skip("sandbox tests are only run in a repository.")
 
     return -1
 
@@ -165,8 +165,6 @@ def runscript(scriptname, args, in_directory=None,
             print('arguments', sysargs, file=oldout)
 
             status = _runscript(scriptname, sandbox=sandbox)
-        except nose.SkipTest:
-            raise
         except SystemExit as err:
             status = err.code
         except:  # pylint: disable=bare-except

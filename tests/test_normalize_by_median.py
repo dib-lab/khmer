@@ -42,8 +42,8 @@ import io
 import screed
 import khmer
 
+import pytest
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 from .test_scripts import _make_counting
 
 
@@ -257,7 +257,7 @@ def test_normalize_by_median_stdout_3():
     assert "I/O Errors" not in err
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_normalize_by_median_known_good():
     CUTOFF = '2'
 
@@ -328,7 +328,7 @@ def test_normalize_by_median_report_fp_hifreq():
     assert line == '200,1,0.005', line
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_normalize_by_median_report_fp_huge():
     # this tests reporting of diginorm stats => report.out for a large
     # file, with the default reporting interval of once every 100k.

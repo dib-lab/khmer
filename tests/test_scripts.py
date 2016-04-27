@@ -43,12 +43,12 @@ import sys
 import os
 import stat
 import shutil
-from nose.plugins.attrib import attr
 import threading
 import gzip
 import io
 import re
 
+import pytest
 from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
@@ -218,7 +218,7 @@ def test_load_into_counting_nonwritable():
     assert status == 1, status
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_load_into_counting_toobig():
     script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
@@ -839,7 +839,7 @@ def test_load_graph():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
@@ -870,7 +870,7 @@ def test_oxli_build_graph():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_unique_kmers_arg():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
@@ -903,7 +903,7 @@ def test_oxli_build_graph_unique_kmers_arg():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_nocommand():
     script = 'oxli'
 
@@ -934,7 +934,7 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_no_tags():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
@@ -972,7 +972,7 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_fail():
     script = 'oxli'
     args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -1009,7 +1009,7 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_write_fp():
     script = 'oxli'
     # use small HT
@@ -1044,7 +1044,7 @@ def test_load_graph_multithread():
     (status, out, err) = utils.runscript(script, args)
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_multithread():
     script = 'oxli'
 
@@ -2458,7 +2458,7 @@ def test_screed_streaming_bzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_screed_streaming_gzipfq():
     # gzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
@@ -2467,7 +2467,7 @@ def test_screed_streaming_gzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
         utils.get_test_data('test-abund-read-2.fa.gz'))
@@ -2486,7 +2486,7 @@ def test_read_parser_streaming_ufq():
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
@@ -2497,7 +2497,7 @@ def test_read_parser_streaming_gzfq():
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))

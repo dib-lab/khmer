@@ -41,8 +41,9 @@ import khmer
 from khmer import GraphLabels, CountingGraphLabels
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -53,7 +54,7 @@ def teardown():
 #  * thread-safety
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         GraphLabels(20, 1e13, 1)
