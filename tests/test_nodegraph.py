@@ -47,7 +47,6 @@ import pytest
 from . import khmer_tst_utils as utils
 
 
-
 def teardown():
     utils.cleanup()
 

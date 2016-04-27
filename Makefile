@@ -75,9 +75,9 @@ CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
-	TESTATTR ?= -m "not known_failing and not jenkins and not huge"
+	TESTATTR ?= 'not known_failing and not jenkins and not huge'
 else
-	TESTATTR ?= -m "not known_failing and not jenkins and not huge and not linux"
+	TESTATTR ?= 'not known_failing and not jenkins and not huge and not linux'
 endif
 
 MODEXT=$(shell python -c \
@@ -226,7 +226,7 @@ diff_pylint_report: pylint_report.txt
 	./setup.py develop
 	coverage run --branch --source=scripts,khmer,oxli \
 		--omit=khmer/_version.py -m pytest --junitxml=nosetests.xml \
-		$(TESTATTR)
+		-m $(TESTATTR)
 
 coverage.xml: .coverage
 	coverage xml
@@ -253,7 +253,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 		--html-report diff-cover.html
 
 nosetests.xml: FORCE
-	py.test --junitxml=$@ ${TESTATTR}
+	py.test --junitxml=$@ -m ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code
 # helpful packages: doxygen graphviz
@@ -293,7 +293,7 @@ libtest: FORCE
 ## test        : run the khmer test suite
 test: FORCE
 	./setup.py develop
-	py.test ${TESTATTR}
+	py.test -m ${TESTATTR}
 
 sloccount.sc: $(CPPSOURCES) $(PYSOURCES) $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
@@ -310,7 +310,7 @@ coverity-build:
 		cov-build --dir cov-int --c-coverage gcov \
 			--disable-gcov-arg-injection make coverage-debug; \
 		cov-capture --dir cov-int --c-coverage gcov python -m pytest \
-			$(TESTATTR) ; \
+			-m $(TESTATTR) ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
 	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
