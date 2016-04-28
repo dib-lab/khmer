@@ -16,6 +16,9 @@ except ImportError:
 KSIZE=32
 COMBINED_MH_SIZE=1000
 
+def filter_combined(combined, min_tagcount=100):
+    return [ c for c in combined if len(c.get_tags()) >= min_tagcount ]
+
 def load_and_tag(ct, filename):
     print('reading and tagging sequences')
     for record in screed.open(filename):
@@ -61,6 +64,7 @@ def main():
     else:
         print('building ~chromosome level minhashes')
         combined = nbhd_mh.build_combined_minhashes(COMBINED_MH_SIZE)
+        combined = filter_combined(combined)
 
         basename = os.path.basename(infile)
         if basename.endswith('.mhi'):
