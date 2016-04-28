@@ -9,6 +9,8 @@
 
 ////
 
+#define DEFAULT_MINHASH_PRIME 9999999967
+
 namespace khmer {
 
 typedef std::set<khmer::HashIntoType> CMinHashType;

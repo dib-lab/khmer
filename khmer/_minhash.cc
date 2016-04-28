@@ -318,16 +318,19 @@ MinHash_new(PyTypeObject * subtype, PyObject * args, PyObject * kwds)
     }
 
     unsigned int _n, _ksize;
-    long int _p;
-    PyObject * is_protein_o;
-    if (!PyArg_ParseTuple(args, "IIlO", &_n, &_ksize, &_p, &is_protein_o)){
+    long int _p = DEFAULT_MINHASH_PRIME;
+    PyObject * is_protein_o = NULL;
+    if (!PyArg_ParseTuple(args, "II|lO", &_n, &_ksize, &_p, &is_protein_o)){
       return NULL;
     }
     
     MinHash_Object * myself = (MinHash_Object *)self;
+    bool is_protein = false;
+    if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
+      is_protein = true;
+    }
 
-    myself->mh = new KmerMinHash(_n, _ksize, _p,\
-                                 PyObject_IsTrue(is_protein_o));
+    myself->mh = new KmerMinHash(_n, _ksize, _p, is_protein);
 
     return self;
 }
