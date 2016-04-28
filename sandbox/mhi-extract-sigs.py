@@ -64,7 +64,7 @@ def main():
         basename = os.path.basename(seqfile)
     else:
         print('building ~chromosome level minhashes')
-        combined = nbhd_mh.build_combined_minhashes2(COMBINED_MH_SIZE)
+        combined = nbhd_mh.build_combined_minhashes(COMBINED_MH_SIZE)
 
         basename = os.path.basename(infile)
         if basename.endswith('.mhi'):

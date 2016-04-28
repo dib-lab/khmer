@@ -30,7 +30,7 @@ def main():
     print('...done!')
     
     print('building ~chromosome level minhashes')
-    combined = nbhd_mh.build_combined_minhashes2(COMBINED_MH_SIZE)
+    combined = nbhd_mh.build_combined_minhashes(COMBINED_MH_SIZE)
 
     siglist = []
     for sigfile in args.sigfiles:

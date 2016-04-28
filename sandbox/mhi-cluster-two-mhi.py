@@ -43,14 +43,14 @@ def main():
     print('...done!')
 
     print('building ~chromosome level minhashes 1')
-    combined1 = nbhd_mh1.build_combined_minhashes2(COMBINED_MH_SIZE)
+    combined1 = nbhd_mh1.build_combined_minhashes(COMBINED_MH_SIZE)
     combined1 = filter_combined(combined1)
 
     tags_in_combined1 = sum([ len(c.get_tags()) for c in combined1 ])
     print('xxx', total_tags, tags_in_combined1)
 
     print('building ~chromosome level minhashes 2')
-    combined2 = nbhd_mh2.build_combined_minhashes2(COMBINED_MH_SIZE)
+    combined2 = nbhd_mh2.build_combined_minhashes(COMBINED_MH_SIZE)
 
     matched1 = set()
     matched2 = set()
