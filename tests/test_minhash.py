@@ -49,8 +49,9 @@ import screed
 # * nan on empty minhash
 
 def test_default_params():
+    # verify that MHs have these default parameters.
     mh = khmer.MinHash(100, 32)
-    mh2 = khmer.MinHash(100, 32, 9999999967, False)
+    mh2 = khmer.MinHash(100, 32, 9999999967, False)  # should not be changed!
 
     mh.add_hash(9999999968)
     mh2.add_hash(9999999968)
@@ -58,6 +59,7 @@ def test_default_params():
     assert mh.get_mins()[0] == 1
 
 def test_basic_dna():
+    # verify that MHs of size 1 stay size 1, & act properly as bottom sketches.
     mh = khmer.MinHash(1, 4)
     mh.add_sequence('ATGC')
     a = mh.get_mins()
@@ -71,6 +73,7 @@ def test_basic_dna():
 
 
 def test_protein():
+    # verify that we can hash protein/aa sequences
     mh = khmer.MinHash(1, 4, 9999999967, True)
     mh.add_protein('AGYYG')
 
