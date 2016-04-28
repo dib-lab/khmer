@@ -23,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('seqfile')
     parser.add_argument('-o', '--output', metavar='output_filename')
+    parser.add_argument('-S', '--savegraph', action='store_true')
     parser.add_argument('--protein', action='store_true')
     parser.add_argument('-k', '--ksize', type=int, default=KSIZE)
     args = parser.parse_args()
@@ -41,6 +42,11 @@ def main():
     ###
 
     load_and_tag(ct, seqfile)
+
+    if args.savegraph:
+        print('saving graph + tags...')
+        ct.save(outfile + '.cg')
+        ct.save_tagset(outfile + '.cg.tags')
 
     print('building nbhd minhashes...')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967, args.protein)
