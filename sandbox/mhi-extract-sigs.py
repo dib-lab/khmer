@@ -83,7 +83,7 @@ def main():
     if combined:
         print('wrote %d sigs to %s.%%d.sig' % (n + 1, basename))
     else:
-	print("no signatures to extract")
+        print("no signatures to extract")
 
 if __name__ == '__main__':
     main()
