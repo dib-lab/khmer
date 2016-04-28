@@ -2,7 +2,10 @@
 from __future__ import print_function
 import khmer
 import screed
-from cPickle import dump
+try:
+    from cPickle import dump
+except ImportError:
+    from pickle import dump
 import argparse
 import os.path
 
@@ -48,6 +51,7 @@ def main():
 
     print('building nbhd minhashes...')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967, args.protein)
+    #print(type(nbhd_mh))
     nbhd_mh.save(outfile)
     print('...done building! mhi saved to', outfile)
 

@@ -2,7 +2,10 @@
 from __future__ import print_function
 import khmer
 import screed
-from cPickle import dump
+try:
+    from cPickle import dump
+except ImportError:
+    from pickle import dump
 import argparse
 import os.path
 
@@ -11,6 +14,7 @@ sys.path.append('../sourmash')
 try:
     import sourmash_lib, sourmash_signature
 except ImportError:
+    raise
     pass
 
 MH_LEN=50
