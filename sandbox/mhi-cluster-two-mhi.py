@@ -34,12 +34,12 @@ def main():
     infile2 = args.infile2
     
     print('loading nbhd minhashes 1...')
-    nbhd_mh1 = khmer._minhash.load_neighborhood_minhash(infile1)
+    nbhd_mh1 = khmer.load_neighborhood_minhash(infile1)
     print('...done!')
     total_tags = len(nbhd_mh1.get_all_tags())
     
     print('loading nbhd minhashes 2...')
-    nbhd_mh2 = khmer._minhash.load_neighborhood_minhash(infile2)
+    nbhd_mh2 = khmer.load_neighborhood_minhash(infile2)
     print('...done!')
 
     print('building ~chromosome level minhashes 1')

@@ -45,7 +45,7 @@ def main():
     print('will load MinHash index from', infile)
 
     print('loading nbhd minhashes...')
-    nbhd_mh = khmer._minhash.load_neighborhood_minhash(infile)
+    nbhd_mh = khmer.load_neighborhood_minhash(infile)
     print('...done!')
 
     print('building ~chromosome level minhashes')

@@ -2,10 +2,6 @@
 from __future__ import print_function
 import khmer
 import screed
-try:
-    from cPickle import dump
-except ImportError:
-    from pickle import dump
 import argparse
 import os.path
 
@@ -39,7 +35,7 @@ def main():
     print('will load MinHash index from', infile)
 
     print('loading nbhd minhashes...')
-    nbhd_mh = khmer._minhash.load_neighborhood_minhash(infile)
+    nbhd_mh = khmer.load_neighborhood_minhash(infile)
     print('...done!')
 
     if seqfile:

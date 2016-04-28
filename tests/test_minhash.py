@@ -86,3 +86,21 @@ def test_build_nbhd():
     combined = nbhd_mh.build_combined_minhashes(500)
 
     assert len(combined) == 1, combined
+
+
+def test_build_save_load_nbhd():
+    ct = khmer.Countgraph(32, 1e7, 4)
+    inpath = utils.get_test_data('2kb-random.fa')
+    savepath = utils.get_temp_filename('save.mhi')
+
+    for record in screed.open(inpath):
+        ct.consume_and_tag(record.sequence)
+
+    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    nbhd_mh.save(savepath)
+    del nbhd_mh
+
+    nbhd_mh = khmer.load_neighborhood_minhash(savepath)
+    combined = nbhd_mh.build_combined_minhashes(500)
+
+    assert len(combined) == 1, combined
