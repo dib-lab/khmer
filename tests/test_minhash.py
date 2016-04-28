@@ -39,6 +39,7 @@ from __future__ import absolute_import, unicode_literals
 
 import khmer
 from . import khmer_tst_utils as utils
+import screed
 
 # add:
 # * get default params from Python
@@ -72,3 +73,16 @@ def test_protein():
     mh.add_protein('AGYYG')
 
     assert len(mh.get_mins()) == 1
+
+
+def test_build_nbhd():
+    ct = khmer.Countgraph(32, 1e7, 4)
+    inpath = utils.get_test_data('2kb-random.fa')
+
+    for record in screed.open(inpath):
+        ct.consume_and_tag(record.sequence)
+
+    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    combined = nbhd_mh.build_combined_minhashes(500)
+
+    assert len(combined) == 1, combined

@@ -1646,17 +1646,21 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
+                                       PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
     unsigned int mh_size;
-    long int mh_prime;
+    long int mh_prime = 0;
     PyObject * is_protein_o = NULL;
     bool is_protein = false;
-    if (!PyArg_ParseTuple(args, "Il|O", &mh_size, &mh_prime,
-                          &is_protein_o)) {
+    if (!PyArg_ParseTuple(args, "I|lO", &mh_size, &mh_prime, &is_protein_o)) {
         return NULL;
+    }
+
+    if (mh_prime == 0) {
+        mh_prime = DEFAULT_MINHASH_PRIME;
     }
 
     if (is_protein_o && PyObject_IsTrue(is_protein_o)) {

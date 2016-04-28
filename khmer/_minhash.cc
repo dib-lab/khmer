@@ -386,7 +386,7 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
         TagToTagSet::iterator posn;
         posn = nbhd_mh.tag_connections.find(mhi->first);
         if (posn == nbhd_mh.tag_connections.end() ||
-                posn->second.size() > nbhd_size_limit) {
+            posn->second.size() > nbhd_size_limit) {
             mhi++;
             continue;
         }
@@ -394,7 +394,8 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
         // build minhash to merge into:
         if (combined_mh == NULL) {
             combined_mh = new CombinedMinHash;
-            combined_mh->mh = new KmerMinHash(combined_minhash_size, k, p, prot);
+            combined_mh->mh = new KmerMinHash(combined_minhash_size,
+                                              k, p, prot);
         }
 
         // keep track of tags that could be merged into this:
@@ -420,7 +421,7 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                 }
 
                 // more than three tags in its connections? ignore.
-                if (posn2->second.size() > 5) {
+                if (posn2->second.size() > nbhd_size_limit) {
                     to_be_merged.erase(ti);
                     continue;
                 }
@@ -434,7 +435,8 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                 did_combine = true;
 
                 // add the just-merged one's connected tags to to_be_merged
-                to_be_merged.insert(posn2->second.begin(), posn2->second.end());
+                to_be_merged.insert(posn2->second.begin(),
+                                    posn2->second.end());
 
                 // remove:
                 nbhd_mh.tag_connections.erase(posn2);
