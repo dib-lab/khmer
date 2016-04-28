@@ -45,45 +45,45 @@
 #include "kmer_min_hash.hh"
 
 typedef struct {
-  PyObject_HEAD
-  khmer::KmerMinHash * mh;
+    PyObject_HEAD
+    khmer::KmerMinHash * mh;
 } MinHash_Object;
 
 khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
 {
-  //if (!PyObject_TypeCheck(mh_obj, &MinHash_Type)) {
-  //  return NULL;
-  //}
-  MinHash_Object * obj = (MinHash_Object *) mh_obj;
-  return obj->mh;
+    //if (!PyObject_TypeCheck(mh_obj, &MinHash_Type)) {
+    //  return NULL;
+    //}
+    MinHash_Object * obj = (MinHash_Object *) mh_obj;
+    return obj->mh;
 }
 
 typedef struct {
-  PyObject_HEAD
-  khmer::NeighborhoodMinHash * nbhd_mh;
+    PyObject_HEAD
+    khmer::NeighborhoodMinHash * nbhd_mh;
 } NeighborhoodMinHash_Object;
 
 khmer::NeighborhoodMinHash * extract_NeighborhoodMinHash(PyObject * nbhd_obj)
 {
-  //if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
-  //  return NULL;
-  //}
-  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) nbhd_obj;
-  return obj->nbhd_mh;
+    //if (!PyObject_TypeCheck(nbhd_obj, &NeighborhoodMinHash_Type)) {
+    //  return NULL;
+    //}
+    NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) nbhd_obj;
+    return obj->nbhd_mh;
 }
 
 typedef struct {
-  PyObject_HEAD
-  khmer::CombinedMinHash * combined_mh;
+    PyObject_HEAD
+    khmer::CombinedMinHash * combined_mh;
 } CombinedMinHash_Object;
 
 khmer::CombinedMinHash * extract_CombinedMinHash(PyObject * combined_obj)
 {
-  //if (!PyObject_TypeCheck(combined_obj, &CombinedMinHash_Type)) {
-  //  return NULL;
-  //}
-  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) combined_obj;
-  return obj->combined_mh;
+    //if (!PyObject_TypeCheck(combined_obj, &CombinedMinHash_Type)) {
+    //  return NULL;
+    //}
+    CombinedMinHash_Object * obj = (CombinedMinHash_Object *) combined_obj;
+    return obj->combined_mh;
 }
 
 
