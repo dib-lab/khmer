@@ -52,8 +52,8 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
 
-#include "_khmer.hh"
 #include "_minhash.hh"
+#include "_khmer.hh"
 
 using namespace khmer;
 using namespace read_parsers;
@@ -1663,7 +1663,28 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
       is_protein = true;
     }
 
-    NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
+    PyObject * module = PyImport_ImportModule("khmer._minhash");
+    if (module == NULL ){
+      return NULL;
+    }
+
+    PyObject * tname = PyObject_GetAttrString(module, "NeighborhoodMinHash");
+    if (tname == NULL ) {
+      Py_DECREF(module);
+      return NULL;
+    }
+    Py_DECREF(module);
+
+    PyObject * nbhd_mh_args = Py_BuildValue("()");
+    PyObject * nbhd_mh_o = PyObject_Call(tname, nbhd_mh_args, NULL);
+    Py_DECREF(nbhd_mh_args);
+    Py_DECREF(tname);
+
+    if (nbhd_mh_o == NULL) {
+      return NULL;
+    }
+
+    NeighborhoodMinHash * nbhd_mh = extract_NeighborhoodMinHash(nbhd_mh_o);
 
     Py_BEGIN_ALLOW_THREADS
 
@@ -1671,16 +1692,16 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me, PyObject * 
                                                        *nbhd_mh,
                                                        mh_size, mh_prime,
                                                        is_protein);
-
     Py_END_ALLOW_THREADS
 
-    return build_NeighborhoodMinHash_Object(nbhd_mh);
+    return nbhd_mh_o;
 }
 
 static
 PyObject *
 hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * args)
 {
+#if 0
     Hashtable * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
@@ -1707,7 +1728,7 @@ hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * ar
                                                      hashtable->all_tags);
 
     Py_END_ALLOW_THREADS
-
+#endif //0
     Py_INCREF(Py_None);
     return Py_None;
 }

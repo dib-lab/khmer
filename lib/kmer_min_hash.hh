@@ -46,8 +46,6 @@ public:
     add_hash(hash);
   }
   void add_sequence(const char * sequence) {
-    long int h = 0;
-
     if (!is_protein) {
       std::string seq = sequence;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {

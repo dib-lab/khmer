@@ -18,6 +18,105 @@ extern "C" {
 
 using namespace khmer;
 
+PyTypeObject MinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "_minhash.MinHash",                   /* tp_name */
+    sizeof(MinHash_Object),               /* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    0,                                    /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    0,                                    /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+    "A MinHash sketch.",                  /* tp_doc */
+};
+
+PyObject * build_MinHash_Object(khmer::KmerMinHash * mh)
+{
+  MinHash_Object * obj = (MinHash_Object *) \
+    PyObject_New(MinHash_Object, &MinHash_Type);
+  obj->mh = mh;
+
+  return (PyObject *) obj;
+}
+
+PyTypeObject NeighborhoodMinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)            /* init & ob_size */
+    "_minhash.NeighborhoodMinHash",           /* tp_name */
+    sizeof(NeighborhoodMinHash_Object),       /* tp_basicsize */
+    0,                                        /* tp_itemsize */
+    0,                                        /* tp_dealloc */
+    0,                                        /* tp_print */
+    0,                                        /* tp_getattr */
+    0,                                        /* tp_setattr */
+    0,                                        /* tp_compare */
+    0,                                        /* tp_repr */
+    0,                                        /* tp_as_number */
+    0,                                        /* tp_as_sequence */
+    0,                                        /* tp_as_mapping */
+    0,                                        /* tp_hash */
+    0,                                        /* tp_call */
+    0,                                        /* tp_str */
+    0,                                        /* tp_getattro */
+    0,                                        /* tp_setattro */
+    0,                                        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                       /* tp_flags */
+    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
+};
+
+PyObject * build_NeighborhoodMinHash_Object(khmer::NeighborhoodMinHash * nbhd_mh)
+{
+  NeighborhoodMinHash_Object * obj = (NeighborhoodMinHash_Object *) \
+    PyObject_New(NeighborhoodMinHash_Object, &NeighborhoodMinHash_Type);
+  obj->nbhd_mh = nbhd_mh;
+
+  return (PyObject *) obj;
+}
+
+PyTypeObject CombinedMinHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)            /* init & ob_size */
+    "_minhash.CombinedMinHash",               /* tp_name */
+    sizeof(CombinedMinHash_Object),           /* tp_basicsize */
+    0,                                        /* tp_itemsize */
+    0,                                        /* tp_dealloc */
+    0,                                        /* tp_print */
+    0,                                        /* tp_getattr */
+    0,                                        /* tp_setattr */
+    0,                                        /* tp_compare */
+    0,                                        /* tp_repr */
+    0,                                        /* tp_as_number */
+    0,                                        /* tp_as_sequence */
+    0,                                        /* tp_as_mapping */
+    0,                                        /* tp_hash */
+    0,                                        /* tp_call */
+    0,                                        /* tp_str */
+    0,                                        /* tp_getattro */
+    0,                                        /* tp_setattro */
+    0,                                        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                       /* tp_flags */
+    "A MinHash sketch on tag neighborhoods.", /* tp_doc */
+};
+
+PyObject * build_CombinedMinHash_Object(khmer::CombinedMinHash * combined_mh)
+{
+  CombinedMinHash_Object * obj = (CombinedMinHash_Object *) \
+    PyObject_New(CombinedMinHash_Object, &CombinedMinHash_Type);
+  obj->combined_mh = combined_mh;
+
+  return (PyObject *) obj;
+}
+
 bool check_IsMinHash(PyObject * mh);
 bool check_IsCombinedMinHash(PyObject * combined_mh);
 
@@ -58,7 +157,6 @@ minhash_add_protein(MinHash_Object * me, PyObject * args)
   }
   KmerMinHash * mh = me->mh;
   
-  long int h = 0;
   unsigned int ksize = mh->ksize / 3;
 
   if(strlen(sequence) < ksize) {
@@ -370,8 +468,6 @@ void build_combined_minhashes2(NeighborhoodMinHash& nbhd_mh,
   mhi = nbhd_mh.tag_to_mh.begin();
 
   while(mhi != nbhd_mh.tag_to_mh.end()) {
-    HashIntoType start_tag = mhi->first;
-
     // already merged this 'un? move to next.
     TagToTagSet::iterator posn;
     posn = nbhd_mh.tag_connections.find(mhi->first);
@@ -855,7 +951,7 @@ static PyObject * nbhd_get_connected_tags(NeighborhoodMinHash_Object * me,
   TagSet this_conn = me->nbhd_mh->tag_connections[tag];
 
   PyObject * tags_o = PyList_New(this_conn.size());
-  unsigned int i;
+  unsigned int i = 0;
   for (TagSet::const_iterator tsi = this_conn.begin();
        tsi != this_conn.end(); tsi++) {
     PyList_SET_ITEM(tags_o, i, PyLong_FromUnsignedLongLong(*tsi));
@@ -924,13 +1020,10 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
         return NULL;
     }
 
-    unsigned int _n, _ksize;
-    long int _p;
-    PyObject * is_protein_o;
-    if (!PyArg_ParseTuple(args, "IIlO", &_n, &_ksize, &_p, &is_protein_o)){
+    if (!PyArg_ParseTuple(args, "")) {
       return NULL;
     }
-    
+
     NeighborhoodMinHash_Object * myself = (NeighborhoodMinHash_Object *)self;
 
     myself->nbhd_mh = new NeighborhoodMinHash;
@@ -1218,13 +1311,14 @@ MOD_INIT(_minhash)
                             (PyObject *)&MinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
-    Py_INCREF(&MinHash_Type);
-    
+
+    Py_INCREF(&NeighborhoodMinHash_Type);
     if (PyModule_AddObject( m, "NeighborhoodMinHash",
                             (PyObject *)&NeighborhoodMinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
-    Py_INCREF(&MinHash_Type);
+
+    Py_INCREF(&CombinedMinHash_Type);
     if (PyModule_AddObject( m, "CombinedMinHash",
                             (PyObject *)&CombinedMinHash_Type ) < 0) {
         return MOD_ERROR_VAL;
