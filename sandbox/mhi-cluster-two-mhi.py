@@ -3,10 +3,6 @@
 from __future__ import print_function
 import khmer
 import screed
-try:
-    from cPickle import dump
-except ImportError:
-    from pickle import dump
 import argparse
 import os.path
 try:
@@ -14,16 +10,8 @@ try:
 except ImportError:
     pass
 
-import sys
-sys.path.append('../sourmash')
-try:
-    import sourmash_lib, sourmash_signature
-except ImportError:
-    pass
-
 KSIZE=32
-COMBINED_MH_SIZE=5000
-COMBINE_THIS_MANY=10000
+COMBINED_MH_SIZE=1000
 
 def load_and_tag(ct, filename):
     print('reading and tagging sequences')
@@ -55,37 +43,14 @@ def main():
     print('...done!')
 
     print('building ~chromosome level minhashes 1')
-    combined1 = nbhd_mh1.build_combined_minhashes2(1000)
+    combined1 = nbhd_mh1.build_combined_minhashes2(COMBINED_MH_SIZE)
     combined1 = filter_combined(combined1)
 
     tags_in_combined1 = sum([ len(c.get_tags()) for c in combined1 ])
     print('xxx', total_tags, tags_in_combined1)
 
-    if 1:
-        seqfile='head.fa'
-        print('loading sequences from', seqfile)
-
-        ct = khmer.Countgraph(KSIZE, 1, 1)
-        ct._set_tag_density(200)
-
-    ###
-
-        load_and_tag(ct, seqfile)
-
-        combined2 = []
-        for record in screed.open(seqfile):
-            print('.2', record.name)
-            x = []
-            for p, tag in ct.get_tags_and_positions(record.sequence):
-                x.append(tag)
-
-            combined2.append(nbhd_mh2.combine_from_tags(COMBINED_MH_SIZE, x))
-        print(combined2)
-        basename = os.path.basename(seqfile)
-    else:
-        print('building ~chromosome level minhashes 2')
-        combined2 = nbhd_mh2.build_combined_minhashes(COMBINE_THIS_MANY,
-                                                      COMBINED_MH_SIZE)
+    print('building ~chromosome level minhashes 2')
+    combined2 = nbhd_mh2.build_combined_minhashes2(COMBINED_MH_SIZE)
 
     matched1 = set()
     matched2 = set()

@@ -3,16 +3,8 @@
 from __future__ import print_function
 import khmer
 import screed
-try:
-    from cPickle import dump
-except ImportError:
-    from pickle import dump
 import argparse
 import os.path
-try:
-    import numpy
-except ImportError:
-    pass
 
 import sys
 sys.path.append('../sourmash')
@@ -22,8 +14,8 @@ except ImportError:
     pass
 
 KSIZE=32
-COMBINED_MH_SIZE=500
-COMBINE_THIS_MANY=10000
+COMBINED_MH_SIZE=1000
+THRESHOLD=0.1
 
 def main():
     parser = argparse.ArgumentParser()
@@ -38,8 +30,7 @@ def main():
     print('...done!')
     
     print('building ~chromosome level minhashes')
-    combined = nbhd_mh.build_combined_minhashes(COMBINE_THIS_MANY,
-                                                COMBINED_MH_SIZE)
+    combined = nbhd_mh.build_combined_minhashes2(COMBINED_MH_SIZE)
 
     siglist = []
     for sigfile in args.sigfiles:
@@ -52,9 +43,12 @@ def main():
         mh = sig.estimator.mh
         for x in combined:
             graph_mh = x.get_minhash()
-            if graph_mh.compare(mh) > 0.1:
+            if graph_mh.compare(mh) > THRESHOLD:
                 results.add(sig)
-    print("\n".join([r.name() for r in results]))
+
+    print('found match to following signatures at threshold', THRESHOLD)
+    for r in results:
+        print('\t', r.name())
 
 
 if __name__ == '__main__':

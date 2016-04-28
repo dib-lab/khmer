@@ -17,8 +17,8 @@ except ImportError:
     raise
     pass
 
-MH_LEN=50
 KSIZE=32
+COMBINED_MH_SIZE=1000
 
 def load_and_tag(ct, filename):
     print('reading and tagging sequences')
@@ -59,12 +59,12 @@ def main():
             for p, tag in ct.get_tags_and_positions(record.sequence):
                 x.append(tag)
 
-            combined.append(nbhd_mh.combine_from_tags(500, x))
+            combined.append(nbhd_mh.combine_from_tags(COMBINED_MH_SIZE, x))
         print(combined)
         basename = os.path.basename(seqfile)
     else:
         print('building ~chromosome level minhashes')
-        combined = nbhd_mh.build_combined_minhashes(10000, 500)
+        combined = nbhd_mh.build_combined_minhashes2(COMBINED_MH_SIZE)
 
         basename = os.path.basename(infile)
         if basename.endswith('.mhi'):

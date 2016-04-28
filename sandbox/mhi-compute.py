@@ -9,13 +9,6 @@ except ImportError:
 import argparse
 import os.path
 
-import sys
-sys.path.append('../sourmash')
-try:
-    import sourmash_lib, sourmash_signature
-except ImportError:
-    pass
-
 MH_LEN=50
 KSIZE=32
 
@@ -51,7 +44,6 @@ def main():
 
     print('building nbhd minhashes...')
     nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967, args.protein)
-    #print(type(nbhd_mh))
     nbhd_mh.save(outfile)
     print('...done building! mhi saved to', outfile)
 
