@@ -16,8 +16,11 @@ except ImportError:
 KSIZE=32
 COMBINED_MH_SIZE=1000
 
-def filter_combined(combined, min_tagcount=100):
-    return [ c for c in combined if len(c.get_tags()) >= min_tagcount ]
+def filter_combined(combined, min_tagcount=5000):
+    cc = [ (len(c.get_tags()), c) for c in combined ]
+    cc.sort(reverse=True)
+    print(cc[:10])
+    return [ c for (n, c) in cc if n >= min_tagcount ]
 
 def load_and_tag(ct, filename):
     print('reading and tagging sequences')
@@ -77,7 +80,10 @@ def main():
         sig = sourmash_signature.SourmashSignature('t@idyll.org', e)
         out = sourmash_signature.save_signatures([sig])
         open('%s.%d.sig' % (basename, n + 1), 'w').write(out)
-    print('wrote %d sigs to %s.%%d.sig' % (n + 1, basename))
+    if combined:
+        print('wrote %d sigs to %s.%%d.sig' % (n + 1, basename))
+    else:
+	print("no signatures to extract")
 
 if __name__ == '__main__':
     main()
