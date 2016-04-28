@@ -78,6 +78,10 @@ def test_protein():
 
 
 def test_build_nbhd():
+    # load in a sequence,
+    # calculate neighborhood minhashes,
+    # combine nbhd into combined minhashes,
+    # verify that there is only one.
     ct = khmer.Countgraph(32, 1e7, 4)
     inpath = utils.get_test_data('2kb-random.fa')
 
@@ -91,6 +95,11 @@ def test_build_nbhd():
 
 
 def test_build_save_load_nbhd():
+    # load in a sequence,
+    # calculate neighborhood minhashes,
+    # save, load
+    # combine nbhd into combined minhashes,
+    # verify that there is only one.
     ct = khmer.Countgraph(32, 1e7, 4)
     inpath = utils.get_test_data('2kb-random.fa')
     savepath = utils.get_temp_filename('save.mhi')
@@ -108,6 +117,10 @@ def test_build_save_load_nbhd():
     assert len(combined) == 1, combined
 
 def test_build_nbhd_2():
+    # load in two disconnected sequences,
+    # calculate neighborhood minhashes,
+    # combine nbhd into combined minhashes,
+    # verify that there are two.
     ct = khmer.Countgraph(32, 1e7, 4)
     inpath = utils.get_test_data('2kb-random.fa')
     inpath2 = utils.get_test_data('2kb-random-b.fa')
@@ -124,6 +137,11 @@ def test_build_nbhd_2():
 
 
 def test_build_save_load_nbhd_2():
+    # load in two disconnected sequences,
+    # calculate neighborhood minhashes,
+    # save, load
+    # combine nbhd into combined minhashes,
+    # verify that there are two.
     ct = khmer.Countgraph(32, 1e7, 4)
     inpath = utils.get_test_data('2kb-random.fa')
     inpath2 = utils.get_test_data('2kb-random-b.fa')
@@ -143,7 +161,13 @@ def test_build_save_load_nbhd_2():
 
     assert len(combined) == 2, combined
 
-def test_search_nbhd():
+def test_build_combined_minhashes_2():
+    # load in two (disconnected) sequences,
+    # calculate neighborhood minhashes,
+    # combine them into combined minhashes,
+    # verify that the signatures of the combined minhashes match the
+    #    minhash signatures of the two input sequences
+
     ct = khmer.Countgraph(32, 1e7, 4)
     inpath = utils.get_test_data('2kb-random.fa')
     inpath2 = utils.get_test_data('2kb-random-b.fa')
@@ -160,6 +184,8 @@ def test_search_nbhd():
 
     nbhd_mh = ct.build_neighborhood_minhashes(20)
     combined = nbhd_mh.build_combined_minhashes(1000)
+
+    assert len(combined) == 2
 
     # do we find the first signature in combined?
     found = False
