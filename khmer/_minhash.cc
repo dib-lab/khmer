@@ -414,7 +414,8 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                 ti = to_be_merged.begin();
                 posn2 = nbhd_mh.tag_connections.find(*ti);
 
-                // already merged & removed from nbhd_mh.tag_connections? ok, ignore.
+                // already merged & removed from
+                // nbhd_mh.tag_connections? ok, ignore.
                 if (posn2 == nbhd_mh.tag_connections.end()) {
                     to_be_merged.erase(ti);
                     continue;
@@ -465,6 +466,8 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
     }
 }
 
+// combine_from_tags: build a CombinedMinHash from a set of tags.
+
 void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
                        TagSet& tagset,
                        CombinedMinHash& combined_mh,
@@ -483,6 +486,8 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
         combined_mh.tags.insert(*ti);
     }
 }
+
+// save_neighborhood: save a NeighborhoodMinHash to disk.
 
 void save_neighborhood(const char * filename,
                        NeighborhoodMinHash * nbhd_mh)
@@ -551,6 +556,8 @@ void save_neighborhood(const char * filename,
     }
     outfile.close();
 }
+
+// load_neighborhood: load a NeighborhoodMinHash from disk.
 
 void load_neighborhood(const char * infilename_c,
                        NeighborhoodMinHash * nbhd_mh)
@@ -663,6 +670,9 @@ void load_neighborhood(const char * infilename_c,
 
 }
 
+////////////////////////////////////////////////////
+
+// CPython interfaces to NeighborhoodMinHash objects.
 
 static
 PyObject *
