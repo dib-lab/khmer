@@ -45,6 +45,8 @@ import screed
 # * get default params from Python
 # * keyword args for minhash constructor
 # * trap error from handing protein/non-DNA to a DNA MH
+# * fail on untagged/unloaded countgraph
+# * nan on empty minhash
 
 def test_default_params():
     mh = khmer.MinHash(100, 32)
@@ -141,3 +143,45 @@ def test_build_save_load_nbhd_2():
 
     assert len(combined) == 2, combined
 
+def test_search_nbhd():
+    ct = khmer.Countgraph(32, 1e7, 4)
+    inpath = utils.get_test_data('2kb-random.fa')
+    inpath2 = utils.get_test_data('2kb-random-b.fa')
+
+    mh1 = khmer.MinHash(1000, 32)
+    for record in screed.open(inpath):
+        ct.consume_and_tag(record.sequence)
+        mh1.add_sequence(record.sequence)
+        
+    mh2 = khmer.MinHash(1000, 32)
+    for record in screed.open(inpath2):
+        ct.consume_and_tag(record.sequence)
+        mh2.add_sequence(record.sequence)
+
+    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    combined = nbhd_mh.build_combined_minhashes(1000)
+
+    # do we find the first signature in combined?
+    found = False
+    for c in combined:
+        print(mh1.compare(c.get_minhash()))
+        if mh1.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
+            combined.remove(c)
+            found = True
+    assert found, "didn't find 2kb-random signature in combined"
+
+    # now that we've removed that match, do we find another? shouldn't.
+    found = False
+    for c in combined:
+        print(mh1.compare(c.get_minhash()))
+        if mh1.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
+            found = True
+    assert not found, "found the 2kb-random signature that I removed!"
+
+    # make sure we find the second signature, too.
+    found = False
+    for c in combined:
+        print(mh2.compare(c.get_minhash()))
+        if mh2.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
+            found = True
+    assert found, "didn't find 2kb-random-b signature in combined"
