@@ -39,7 +39,7 @@ def main():
     print('will save MinHash index to', outfile)
 
     if args.loadgraph:
-        ct = khmer.Countgraph(args.ksize, 1e9, 4)
+        ct = khmer.Countgraph(args.ksize, 1e8, 4)
         ct._set_tag_density(200)
         print('loading graph + tags...')
         ct.load(outfile + '.cg')
