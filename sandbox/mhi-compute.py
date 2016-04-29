@@ -9,7 +9,6 @@ except ImportError:
 import argparse
 import os.path
 
-MH_LEN=50
 KSIZE=32
 
 def load_and_tag(ct, filename):
@@ -45,7 +44,7 @@ def main():
         ct.load(outfile + '.cg')
         ct.load_tagset(outfile + '.cg.tags')
     else:
-        ct = khmer.Countgraph(args.ksize, 1e9, 4)
+        ct = khmer.Countgraph(args.ksize, 1e8, 4)
         ct._set_tag_density(200)
 
         load_and_tag(ct, seqfile)

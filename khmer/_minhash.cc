@@ -16,6 +16,8 @@ extern "C" {
 #include <fstream>
 #include <sstream> // IWYU pragma: keep
 
+#define NBHD_SIZE_LIMIT 5
+
 using namespace khmer;
 
 PyTypeObject MinHash_Type = {
@@ -369,7 +371,7 @@ NeighborhoodMinHash_dealloc(NeighborhoodMinHash_Object * obj)
 void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                               std::vector<CombinedMinHash *>& combined_mhs,
                               unsigned int combined_minhash_size=500,
-                              unsigned int nbhd_size_limit=3)
+                              unsigned int nbhd_size_limit=NBHD_SIZE_LIMIT)
 {
     unsigned int k = nbhd_mh.ksize;
     long int p = nbhd_mh.prime;
