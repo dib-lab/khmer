@@ -1,3 +1,7 @@
+2016-04-29  Luiz Irber  <khmer@luizirber.org>
+
+   * jenkins-build.sh: add codecov coverage upload tool.
+
 2016-02-17  Daniel Standage <daniel.standage@gmail.com>
 
    * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
