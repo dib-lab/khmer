@@ -900,13 +900,25 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
         return NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "")) {
+    WordLength ksize;
+    PyObject * is_protein_o = NULL;
+    long int mh_prime = 0;
+    if (!PyArg_ParseTuple(args, "b|Ol",
+                          &ksize, &is_protein_o, &mh_prime)) {
         return NULL;
+    }
+
+    bool is_protein = false;
+    if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
+        is_protein = true;
+    }
+    if (mh_prime == 0) {
+        mh_prime = DEFAULT_MINHASH_PRIME;
     }
 
     NeighborhoodMinHash_Object * myself = (NeighborhoodMinHash_Object *)self;
 
-    myself->nbhd_mh = new NeighborhoodMinHash(32); // @CTB
+    myself->nbhd_mh = new NeighborhoodMinHash(ksize, mh_prime, is_protein);
 
     return self;
 }

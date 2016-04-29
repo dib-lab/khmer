@@ -1654,7 +1654,7 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
     long int mh_prime = 0;
     PyObject * is_protein_o = NULL;
     bool is_protein = false;
-    if (!PyArg_ParseTuple(args, "")) { // @CTB |lO", &mh_prime, &is_protein_o)) {
+    if (!PyArg_ParseTuple(args, "|Ol", &is_protein_o, &mh_prime)) {
         return NULL;
     }
 
@@ -1678,8 +1678,10 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
     }
     Py_DECREF(module);
 
-    PyObject * nbhd_mh_args = Py_BuildValue("()"); //(b)",
-    // @CTB                                            (WordLength)hashtable->ksize());
+    PyObject * nbhd_mh_args = Py_BuildValue("bOl",
+                                            (WordLength)hashtable->ksize(),
+                                            is_protein ? Py_True : Py_False,
+                                            mh_prime);
     PyObject * nbhd_mh_o = PyObject_Call(tname, nbhd_mh_args, NULL);
     Py_DECREF(nbhd_mh_args);
     Py_DECREF(tname);
