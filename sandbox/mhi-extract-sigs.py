@@ -15,8 +15,9 @@ except ImportError:
 
 KSIZE=32
 COMBINED_MH_SIZE=1000
+TAGCOUNT_THRESHOLD=4000
 
-def filter_combined(combined, min_tagcount=5000):
+def filter_combined(combined, min_tagcount=TAGCOUNT_THRESHOLD):
     cc = [ (len(c.get_tags()), c) for c in combined ]
     cc.sort(reverse=True, key=lambda x: x[0])
     print(cc[:10])
