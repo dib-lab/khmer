@@ -967,7 +967,7 @@ void Hashtable::get_kmers(const std::string &s,
         return;
     }
     for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-        std::string sub = s.substr(i, i + _ksize);
+        std::string sub = s.substr(i, _ksize);
         kmers_vec.push_back(sub);
     }
 }
