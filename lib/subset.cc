@@ -462,13 +462,6 @@ void SubsetPartition::find_all_tags(
 //    connected to kmer_f/kmer_r in the graph, adding them to a minhash
 //    in the process.
 
-static int _hash_murmur32(const std::string& kmer) { // @CTB
-    int out[2];
-    uint32_t seed = 0;
-    MurmurHash3_x86_32((void *)kmer.c_str(), kmer.size(), seed, &out);
-    return out[0];
-}
-
 void SubsetPartition::build_neighborhood_minhash(
     Kmer start_kmer,
     SeenSet&		tagged_kmers,

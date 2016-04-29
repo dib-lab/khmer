@@ -6,6 +6,7 @@
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
+#include "kmer_hash.hh"
 
 ////
 
@@ -15,7 +16,6 @@ namespace khmer
 {
 
 typedef std::set<khmer::HashIntoType> CMinHashType;
-
 
 class KmerMinHash
 {
@@ -71,12 +71,6 @@ public:
                 add_kmer(aa);
             }
         }
-    }
-    int _hash_murmur32(const std::string& kmer) {
-        int out[2];
-        uint32_t seed = 0;
-        MurmurHash3_x86_32((void *)kmer.c_str(), kmer.size(), seed, &out);
-        return out[0];
     }
 
     std::string _dna_to_aa(const std::string& dna) {

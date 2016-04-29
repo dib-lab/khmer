@@ -109,7 +109,8 @@ HashIntoType _hash_murmur(const std::string& kmer);
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
-
+int _hash_murmur32(const std::string& kmer);
+    
 /**
  * \class Kmer
  *

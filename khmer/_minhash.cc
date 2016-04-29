@@ -608,7 +608,7 @@ void load_neighborhood(const char * infilename_c,
         infile.read((char *) &is_protein_ch, sizeof(is_protein_ch));
         bool is_protein = is_protein_ch;
 
-        *nbhd_mh = new NeighborhoodMinHash(ksize, prime, is_protein_ch);
+        *nbhd_mh = new NeighborhoodMinHash(ksize, prime, is_protein);
 
         unsigned long tag_connections_to_load = 0;
         infile.read((char *) &tag_connections_to_load,
@@ -748,11 +748,9 @@ static PyObject * nbhd_save(NeighborhoodMinHash_Object * me, PyObject * args)
 static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
                               PyObject * args)
 {
-#if 0
-    double threshold;
     PyObject * search_mh_obj;
 
-    if (!PyArg_ParseTuple(args, "Od", &search_mh_obj, &threshold)) {
+    if (!PyArg_ParseTuple(args, "O", &search_mh_obj)) {
         return NULL;
     }
 
@@ -766,9 +764,9 @@ static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
     TagSet matching_tags;
     for (TagToHash::const_iterator tsi = nbhd_mh->tag_to_hash.begin();
             tsi != nbhd_mh->tag_to_hash.end(); tsi++) {
-        unsigned int common = tsi->second->count_common(*search_mh);
-        float similarity = float(common) / float(tsi->second->mins.size());
-        if (similarity >= threshold) {
+
+        HashIntoType the_hash = tsi->second;
+        if (search_mh->mins.find(the_hash) != search_mh->mins.end()) {
             matching_tags.insert(tsi->first);
         }
     }
@@ -782,29 +780,22 @@ static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
     }
 
     return tags_o;
-#endif
 }
 
-static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
+static PyObject * nbhd_get_hash(NeighborhoodMinHash_Object * me,
                                    PyObject * args)
 {
-#if 0
     HashIntoType tag;
     if (!PyArg_ParseTuple(args, "K", &tag)) {
         return NULL;
     }
 
-    TagToHash * tag_to_mh = &(me->nbhd_mh->tag_to_mh);
-    TagToHash::iterator tm = tag_to_mh->find(tag);
-    if (tm != tag_to_mh->end()) {
-        KmerMinHash * mh = tm->second;
-        KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
-                                               mh->is_protein);
-        new_mh->merge(*mh);
-
-        return build_MinHash_Object(new_mh);
+    TagToHash * tag_to_hash = &(me->nbhd_mh->tag_to_hash);
+    TagToHash::iterator tm = tag_to_hash->find(tag);
+    if (tm != tag_to_hash->end()) {
+        return PyLong_FromUnsignedLongLong(tm->second);
     }
-#endif
+
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -868,9 +859,9 @@ static PyMethodDef NeighborhoodMinHash_methods [] = {
         METH_VARARGS, "Save nbhd hash to disk."
     },
     {
-        "get_minhash",
-        (PyCFunction)nbhd_get_minhash,
-        METH_VARARGS, "Get the MinHash for this tag."
+        "get_hash",
+        (PyCFunction)nbhd_get_hash,
+        METH_VARARGS, "Get the hash value for this tag."
     },
     {
         "get_connected_tags",
