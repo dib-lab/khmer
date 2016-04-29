@@ -371,17 +371,17 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                               unsigned int combined_minhash_size=500,
                               unsigned int nbhd_size_limit=3)
 {
-    unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
-    unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
-    bool prot = nbhd_mh.tag_to_mh.begin()->second->is_protein;
+    unsigned int k = nbhd_mh.ksize;
+    long int p = nbhd_mh.prime;
+    bool prot = nbhd_mh.is_protein;
 
     CombinedMinHash * combined_mh = NULL;
 
     // iterate over all tags:
-    TagToMinHash::const_iterator mhi;
-    mhi = nbhd_mh.tag_to_mh.begin();
+    TagToHash::const_iterator mhi;
+    mhi = nbhd_mh.tag_to_hash.begin();
 
-    while(mhi != nbhd_mh.tag_to_mh.end()) {
+    while(mhi != nbhd_mh.tag_to_hash.end()) {
         // already merged this 'un? move to next.
         TagToTagSet::iterator posn;
         posn = nbhd_mh.tag_connections.find(mhi->first);
@@ -428,8 +428,8 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                 }
 
                 // finally! merge.
-                KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
-                combined_mh->mh->merge(*mh);
+                HashIntoType mh = nbhd_mh.tag_to_hash[*ti];
+                combined_mh->mh->add_hash(mh);
                 combined_mh->tags.insert(*ti);
 
                 // track info.
@@ -473,16 +473,16 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
                        CombinedMinHash& combined_mh,
                        unsigned int combined_minhash_size=500)
 {
-    unsigned int k = nbhd_mh.tag_to_mh.begin()->second->ksize;
-    unsigned int p = nbhd_mh.tag_to_mh.begin()->second->prime;
-    bool prot = nbhd_mh.tag_to_mh.begin()->second->is_protein;
+    unsigned int k = nbhd_mh.ksize;
+    unsigned int p = nbhd_mh.prime;
+    bool prot = nbhd_mh.is_protein;
 
     combined_mh.mh = new KmerMinHash(combined_minhash_size, k, p, prot);
 
     TagSet::iterator ti;
     for (ti = tagset.begin(); ti != tagset.end(); ti++) {
-        KmerMinHash * mh = nbhd_mh.tag_to_mh[*ti];
-        combined_mh.mh->merge(*mh);
+        HashIntoType h = nbhd_mh.tag_to_hash[*ti];
+        combined_mh.mh->add_hash(h);
         combined_mh.tags.insert(*ti);
     }
 }
@@ -503,6 +503,15 @@ void save_neighborhood(const char * filename,
 
     ///
 
+    unsigned int ksize = nbhd_mh->ksize;
+    outfile.write((const char *) &ksize, sizeof(ksize));
+
+    long int prime = nbhd_mh->prime;
+    outfile.write((const char *) &prime, sizeof(prime));
+
+    char is_protein = nbhd_mh->is_protein ? 1 : 0;
+    outfile.write((const char *) &is_protein, sizeof(is_protein));
+
     unsigned long num = nbhd_mh->tag_connections.size();
     outfile.write((const char *) &num, sizeof(num));
 
@@ -520,35 +529,13 @@ void save_neighborhood(const char * filename,
         }
     }
 
-    KmerMinHash * mh = nbhd_mh->tag_to_mh.begin()->second;
-    unsigned int mh_max_size = mh->num;
-    outfile.write((const char *) &num, sizeof(mh_max_size));
-
-    unsigned int ksize = mh->ksize;
-    outfile.write((const char *) &ksize, sizeof(ksize));
-
-    long int prime = mh->prime;
-    outfile.write((const char *) &prime, sizeof(prime));
-
-    char is_protein = mh->is_protein ? 1 : 0;
-    outfile.write((const char *) &is_protein, sizeof(is_protein));
-
-    for (TagToMinHash::iterator mhi = nbhd_mh->tag_to_mh.begin();
-            mhi != nbhd_mh->tag_to_mh.end(); mhi++) {
+    for (TagToHash::iterator mhi = nbhd_mh->tag_to_hash.begin();
+            mhi != nbhd_mh->tag_to_hash.end(); mhi++) {
         HashIntoType tag = mhi->first;
         outfile.write((const char *) &tag, sizeof(tag));
 
-        mh = mhi->second;
-        CMinHashType * sketch = &(mh->mins);
-
-        unsigned int mh_size = sketch->size();
-        outfile.write((const char*) &mh_size, sizeof(mh_size));
-
-        for (CMinHashType::iterator si = sketch->begin();
-                si != sketch->end(); si++) {
-            HashIntoType h = *si;
-            outfile.write((const char*) &h, sizeof(h));
-        }
+        HashIntoType the_hash = mhi->second;
+        outfile.write((const char*) &the_hash, sizeof(the_hash));
     }
 
     if (outfile.fail()) {
@@ -560,7 +547,7 @@ void save_neighborhood(const char * filename,
 // load_neighborhood: load a NeighborhoodMinHash from disk.
 
 void load_neighborhood(const char * infilename_c,
-                       NeighborhoodMinHash * nbhd_mh)
+                       NeighborhoodMinHash ** nbhd_mh)
 {
     std::string infilename(infilename_c);
     std::ifstream infile;
@@ -611,6 +598,18 @@ void load_neighborhood(const char * infilename_c,
         }
 
 
+        unsigned int ksize = 0;
+        infile.read((char *) &ksize, sizeof(ksize));
+
+        long int prime = 0;
+        infile.read((char *) &prime, sizeof(prime));
+
+        char is_protein_ch;
+        infile.read((char *) &is_protein_ch, sizeof(is_protein_ch));
+        bool is_protein = is_protein_ch;
+
+        *nbhd_mh = new NeighborhoodMinHash(ksize, prime, is_protein_ch);
+
         unsigned long tag_connections_to_load = 0;
         infile.read((char *) &tag_connections_to_load,
                     sizeof(tag_connections_to_load));
@@ -627,41 +626,17 @@ void load_neighborhood(const char * infilename_c,
                 infile.read((char *) &tag2, sizeof(tag2));
                 tagset.insert(tag2);
             }
-            nbhd_mh->tag_connections[tag] = tagset;
+            (*nbhd_mh)->tag_connections[tag] = tagset;
         }
 
-        unsigned int mh_max_size = 0;
-        infile.read((char *) &mh_max_size, sizeof(mh_max_size));
-
-        unsigned int ksize = 0;
-        infile.read((char *) &ksize, sizeof(ksize));
-
-        long int prime = 0;
-        infile.read((char *) &prime, sizeof(prime));
-
-        char is_protein_ch;
-        infile.read((char *) &is_protein_ch, sizeof(is_protein_ch));
-        bool is_protein = is_protein_ch;
-
         for (unsigned int i = 0; i < tag_connections_to_load; i++) {
-            KmerMinHash * mh = new KmerMinHash(mh_max_size, ksize, prime,
-                                               is_protein);
-
             HashIntoType tag = 0;
             infile.read((char *) &tag, sizeof(tag));
 
-            CMinHashType * sketch = &(mh->mins);
-            unsigned int mh_size = 0;
-            infile.read((char *) &mh_size, sizeof(mh_size));
+            HashIntoType the_hash = 0;
+            infile.read((char *) &the_hash, sizeof(the_hash));
 
-            HashIntoType h;
-            for (unsigned int i = 0; i < mh_size; i++) {
-
-                infile.read((char *) &h, sizeof(h));
-                sketch->insert(h);
-            }
-
-            nbhd_mh->tag_to_mh[tag] = mh;
+            (*nbhd_mh)->tag_to_hash[tag] = the_hash;
         }
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
@@ -691,7 +666,7 @@ nbhd_build_combined_minhashes(NeighborhoodMinHash_Object * me,
 
     build_combined_minhashes(*nbhd_mh, combined_mhs, new_minhash_size);
 
-    std::cout << "went from " << nbhd_mh->tag_to_mh.size() << " to "
+    std::cout << "went from " << nbhd_mh->tag_to_hash.size() << " to "
               << combined_mhs.size() << " merged mhs.\n";
 
     Py_END_ALLOW_THREADS
@@ -750,8 +725,8 @@ static PyObject * nbhd_load(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    NeighborhoodMinHash * nbhd_mh = new NeighborhoodMinHash;
-    load_neighborhood(filename, nbhd_mh);
+    NeighborhoodMinHash * nbhd_mh;
+    load_neighborhood(filename, &nbhd_mh);
 
     return build_NeighborhoodMinHash_Object(nbhd_mh);
 }
@@ -773,6 +748,7 @@ static PyObject * nbhd_save(NeighborhoodMinHash_Object * me, PyObject * args)
 static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
                               PyObject * args)
 {
+#if 0
     double threshold;
     PyObject * search_mh_obj;
 
@@ -788,8 +764,8 @@ static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
     const KmerMinHash * search_mh = extract_KmerMinHash(search_mh_obj);
 
     TagSet matching_tags;
-    for (TagToMinHash::const_iterator tsi = nbhd_mh->tag_to_mh.begin();
-            tsi != nbhd_mh->tag_to_mh.end(); tsi++) {
+    for (TagToHash::const_iterator tsi = nbhd_mh->tag_to_hash.begin();
+            tsi != nbhd_mh->tag_to_hash.end(); tsi++) {
         unsigned int common = tsi->second->count_common(*search_mh);
         float similarity = float(common) / float(tsi->second->mins.size());
         if (similarity >= threshold) {
@@ -806,18 +782,20 @@ static PyObject * nbhd_search(NeighborhoodMinHash_Object *me,
     }
 
     return tags_o;
+#endif
 }
 
 static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
                                    PyObject * args)
 {
+#if 0
     HashIntoType tag;
     if (!PyArg_ParseTuple(args, "K", &tag)) {
         return NULL;
     }
 
-    TagToMinHash * tag_to_mh = &(me->nbhd_mh->tag_to_mh);
-    TagToMinHash::iterator tm = tag_to_mh->find(tag);
+    TagToHash * tag_to_mh = &(me->nbhd_mh->tag_to_mh);
+    TagToHash::iterator tm = tag_to_mh->find(tag);
     if (tm != tag_to_mh->end()) {
         KmerMinHash * mh = tm->second;
         KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
@@ -826,6 +804,7 @@ static PyObject * nbhd_get_minhash(NeighborhoodMinHash_Object * me,
 
         return build_MinHash_Object(new_mh);
     }
+#endif
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -927,7 +906,7 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
 
     NeighborhoodMinHash_Object * myself = (NeighborhoodMinHash_Object *)self;
 
-    myself->nbhd_mh = new NeighborhoodMinHash;
+    myself->nbhd_mh = new NeighborhoodMinHash(32); // @CTB
 
     return self;
 }
@@ -1047,7 +1026,7 @@ combined_extend(CombinedMinHash_Object * me, PyObject * args)
         }
 
         combined_mh->tags.insert(tag);
-        combined_mh->mh->merge(*nbhd_mh->tag_to_mh[tag]);
+        combined_mh->mh->add_hash(nbhd_mh->tag_to_hash[tag]);
         nbhd_mh->tag_connections.erase(tag);
         did_extend = true;
     }

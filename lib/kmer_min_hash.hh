@@ -184,25 +184,24 @@ private:
 };
 
 typedef std::map<khmer::HashIntoType, khmer::TagSet> TagToTagSet;
-typedef std::map<khmer::HashIntoType, khmer::KmerMinHash *> TagToMinHash;
+typedef std::map<khmer::HashIntoType, khmer::HashIntoType> TagToHash;
 
 class NeighborhoodMinHash
 {
 public:
+    unsigned int ksize;
+    long int prime;
+    bool is_protein;
+
     TagToTagSet tag_connections;
-    TagToMinHash tag_to_mh;
+    TagToHash tag_to_hash;
 
-    ~NeighborhoodMinHash() {
-        cleanup_neighborhood_hash();
-    }
-
-    void cleanup_neighborhood_hash() {
-        for (TagToMinHash::iterator mhi = tag_to_mh.begin();
-                mhi != tag_to_mh.end(); mhi++) {
-            delete mhi->second;
-            mhi->second = NULL;
-        }
-    }
+    NeighborhoodMinHash(unsigned int _k,
+                        long int _p=DEFAULT_MINHASH_PRIME,
+                        bool _is_p=false) : ksize(_k),
+                                            prime(_p),
+                                            is_protein(_is_p)
+    { ; }
 };
 
 class CombinedMinHash

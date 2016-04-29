@@ -1651,11 +1651,10 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
 {
     Hashtable * hashtable = me->hashtable;
 
-    unsigned int mh_size;
     long int mh_prime = 0;
     PyObject * is_protein_o = NULL;
     bool is_protein = false;
-    if (!PyArg_ParseTuple(args, "I|lO", &mh_size, &mh_prime, &is_protein_o)) {
+    if (!PyArg_ParseTuple(args, "")) { // @CTB |lO", &mh_prime, &is_protein_o)) {
         return NULL;
     }
 
@@ -1679,7 +1678,8 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
     }
     Py_DECREF(module);
 
-    PyObject * nbhd_mh_args = Py_BuildValue("()");
+    PyObject * nbhd_mh_args = Py_BuildValue("()"); //(b)",
+    // @CTB                                            (WordLength)hashtable->ksize());
     PyObject * nbhd_mh_o = PyObject_Call(tname, nbhd_mh_args, NULL);
     Py_DECREF(nbhd_mh_args);
     Py_DECREF(tname);
@@ -1693,9 +1693,7 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
     Py_BEGIN_ALLOW_THREADS
 
     hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
-                                                       *nbhd_mh,
-                                                       mh_size, mh_prime,
-                                                       is_protein);
+                                                       *nbhd_mh);
     Py_END_ALLOW_THREADS
 
     return nbhd_mh_o;

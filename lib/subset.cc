@@ -462,10 +462,18 @@ void SubsetPartition::find_all_tags(
 //    connected to kmer_f/kmer_r in the graph, adding them to a minhash
 //    in the process.
 
+static int _hash_murmur32(const std::string& kmer) { // @CTB
+    int out[2];
+    uint32_t seed = 0;
+    MurmurHash3_x86_32((void *)kmer.c_str(), kmer.size(), seed, &out);
+    return out[0];
+}
+
 void SubsetPartition::build_neighborhood_minhash(
     Kmer start_kmer,
     SeenSet&		tagged_kmers,
-    KmerMinHash &minhash,
+    HashIntoType& the_hash,
+    long int mh_prime,
     const SeenSet&	all_tags,
     bool		break_on_stop_tags,
     bool		stop_big_traversals)
@@ -514,8 +522,14 @@ void SubsetPartition::build_neighborhood_minhash(
 
         // keep track of seen kmers
         keeper.insert(node);
-        minhash.add_sequence(_revhash(node.kmer_f, minhash.ksize).c_str());
-        minhash.add_sequence(_revhash(node.kmer_r, minhash.ksize).c_str());
+
+        HashIntoType f = _hash_murmur32(_revhash(node.kmer_f, _ht->ksize()))
+            % mh_prime;
+        HashIntoType r = _hash_murmur32(_revhash(node.kmer_r, _ht->ksize()))
+            % mh_prime;
+
+        if (f < the_hash) { the_hash = f; }
+        if (r < the_hash) { the_hash = r; }
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
@@ -1758,13 +1772,8 @@ void SubsetPartition::compare_to_partition(
 // build_neighborhood_minhashes
 
 void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
-                                                   NeighborhoodMinHash& nbhd_mh,
-                                                   unsigned int mh_size,
-                                                   long int mh_prime,
-                                                   bool is_protein)
+                                                  NeighborhoodMinHash& nbhd_mh)
 {
-  unsigned int k = _ht->ksize();
-  
   // we want to build two things:
   // first, a mapping from tag to minhash, just for records.
   // second, a mapping from tag to other tags, so that we can merge
@@ -1779,16 +1788,17 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
       std::cout << std::flush;
     }
     HashIntoType h, r, u;
-    u = _hash(_revhash(*si, _ht->ksize()).c_str(), _ht->ksize(), h, r);
+    std::string start = _revhash(*si, _ht->ksize());
+    u = _hash(start.c_str(), _ht->ksize(), h, r);
     Kmer start_kmer(h, r, u);
 
-    KmerMinHash * minhash = new KmerMinHash(mh_size, k, mh_prime, is_protein);
-    
-    build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
-                               *minhash, all_tags);
-    // here, tagged_kmers will be tags encountered while traversing,
-    // and minhash will now be the neighborhood minhash.
+    HashIntoType the_hash = _hash_murmur32(start) % nbhd_mh.prime;
 
-    nbhd_mh.tag_to_mh[*si] = minhash;
+    build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
+                               the_hash, nbhd_mh.prime, all_tags);
+    // here, tagged_kmers will be tags encountered while traversing,
+    // and hash will now be the bottom neighborhood hash.
+
+    nbhd_mh.tag_to_hash[*si] = the_hash;
   }
 }

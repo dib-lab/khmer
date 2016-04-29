@@ -49,7 +49,7 @@ def main():
         ct.save_tagset(outfile + '.cg.tags')
 
     print('building nbhd minhashes...')
-    nbhd_mh = ct.build_neighborhood_minhashes(20, 9999999967, args.protein)
+    nbhd_mh = ct.build_neighborhood_minhashes()   #@CTB args.protein
     nbhd_mh.save(outfile)
     print('...done building! mhi saved to', outfile)
 

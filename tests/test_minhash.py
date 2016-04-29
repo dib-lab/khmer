@@ -91,10 +91,38 @@ def test_build_nbhd():
     for record in screed.open(inpath):
         ct.consume_and_tag(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    nbhd_mh = ct.build_neighborhood_minhashes()
     combined = nbhd_mh.build_combined_minhashes(500)
 
     assert len(combined) == 1, combined
+
+
+def test_build_nbhd_path():
+    # load in a sequence,
+    # calculate neighborhood minhashes,
+    # combine nbhd into combined minhashes using a path
+    # also combine nbhd into combined minhashes using traversal.
+    # compare.
+    ct = khmer.Countgraph(32, 1e7, 4)
+    inpath = utils.get_test_data('2kb-random.fa')
+
+    x = []
+    for record in screed.open(inpath):
+        ct.consume_and_tag(record.sequence)
+
+        for p, tag in ct.get_tags_and_positions(record.sequence):
+            x.append(tag)
+
+    nbhd_mh = ct.build_neighborhood_minhashes()
+    combined_path = nbhd_mh.combine_from_tags(500, x)
+    combined = nbhd_mh.build_combined_minhashes(500)
+
+    assert len(combined) == 1, combined
+
+    mh1 = combined[0].get_minhash()
+    mh2 = combined_path.get_minhash()
+    assert mh1.compare(mh2) == 1.0
+    assert mh2.compare(mh1) == 1.0
 
 
 def test_build_save_load_nbhd():
@@ -110,7 +138,7 @@ def test_build_save_load_nbhd():
     for record in screed.open(inpath):
         ct.consume_and_tag(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    nbhd_mh = ct.build_neighborhood_minhashes()
     nbhd_mh.save(savepath)
     del nbhd_mh
 
@@ -133,7 +161,7 @@ def test_build_nbhd_2():
     for record in screed.open(inpath2):
         ct.consume_and_tag(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    nbhd_mh = ct.build_neighborhood_minhashes()
     combined = nbhd_mh.build_combined_minhashes(500)
 
     assert len(combined) == 2, combined
@@ -155,7 +183,7 @@ def test_build_save_load_nbhd_2():
     for record in screed.open(inpath2):
         ct.consume_and_tag(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes(20)
+    nbhd_mh = ct.build_neighborhood_minhashes()
     nbhd_mh.save(savepath)
     del nbhd_mh
 
@@ -175,26 +203,26 @@ def test_build_combined_minhashes_2():
     inpath = utils.get_test_data('2kb-random.fa')
     inpath2 = utils.get_test_data('2kb-random-b.fa')
 
-    mh1 = khmer.MinHash(1000, 32)
+    mh1 = khmer.MinHash(10, 32)
     for record in screed.open(inpath):
         ct.consume_and_tag(record.sequence)
         mh1.add_sequence(record.sequence)
         
-    mh2 = khmer.MinHash(1000, 32)
+    mh2 = khmer.MinHash(10, 32)
     for record in screed.open(inpath2):
         ct.consume_and_tag(record.sequence)
         mh2.add_sequence(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes(20)
-    combined = nbhd_mh.build_combined_minhashes(1000)
+    nbhd_mh = ct.build_neighborhood_minhashes()
+    combined = nbhd_mh.build_combined_minhashes(20)
 
     assert len(combined) == 2
 
     # do we find the first signature in combined?
     found = False
     for c in combined:
-        print(mh1.compare(c.get_minhash()))
-        if mh1.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
+        print(mh1.compare(c.get_minhash()), c.get_minhash().compare(mh1))
+        if mh1.compare(c.get_minhash()) > 0.4:       # why not ~1?? CTB
             combined.remove(c)
             found = True
     assert found, "didn't find 2kb-random signature in combined"
@@ -202,7 +230,7 @@ def test_build_combined_minhashes_2():
     # now that we've removed that match, do we find another? shouldn't.
     found = False
     for c in combined:
-        print(mh1.compare(c.get_minhash()))
+        print(mh1.compare(c.get_minhash()), c.get_minhash().compare(mh1))
         if mh1.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
             found = True
     assert not found, "found the 2kb-random signature that I removed!"
@@ -210,7 +238,7 @@ def test_build_combined_minhashes_2():
     # make sure we find the second signature, too.
     found = False
     for c in combined:
-        print(mh2.compare(c.get_minhash()))
+        print(mh2.compare(c.get_minhash()), c.get_minhash().compare(mh2))
         if mh2.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
             found = True
     assert found, "didn't find 2kb-random-b signature in combined"

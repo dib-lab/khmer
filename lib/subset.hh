@@ -114,7 +114,8 @@ public:
 
     void build_neighborhood_minhash(Kmer start_kmer,
                                     SeenSet& tagged_kmers,
-                                    KmerMinHash& minhash,
+                                    HashIntoType& the_hash,
+                                    long int mh_prime,
                                     const SeenSet& all_tags,
                                     bool break_on_stop_tags=false,
                                     bool stop_big_traversals=false);
@@ -195,10 +196,7 @@ public:
                               unsigned int &n_only2,
                               unsigned int &n_shared);
 
-    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&,
-                                      unsigned int mh_size=20,
-                                      long int mh_prime=9999999967,
-                                      bool is_protein=false);
+    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&);
 };
 }
 

@@ -18,7 +18,7 @@ COMBINED_MH_SIZE=1000
 
 def filter_combined(combined, min_tagcount=5000):
     cc = [ (len(c.get_tags()), c) for c in combined ]
-    cc.sort(reverse=True)
+    cc.sort(reverse=True, key=lambda x: x[0])
     print(cc[:10])
     return [ c for (n, c) in cc if n >= min_tagcount ]
 
