@@ -58,3 +58,4 @@ pep257_report.txt
 *.pdf
 *.png
 *.txt
+*.mhi_sweep
