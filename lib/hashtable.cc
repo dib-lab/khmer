@@ -1320,7 +1320,12 @@ void Hashtable::find_high_degree_nodes(const std::string &s)
     Traverser traverser(this);
     KmerIterator kmers(sp, _ksize);
 
+    unsigned long n = 0;
     while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... find_high_degree_nodes: " << n << "\n";
+        }
         Kmer kmer = kmers.next();
         if ((traverser.degree(kmer)) > 2) {
             high_degree_nodes.insert(kmer);
