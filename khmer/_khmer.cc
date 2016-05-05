@@ -905,6 +905,102 @@ hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_is_high_degree_node(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * kmer_str;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+        return NULL;
+    }
+
+    if (strlen(kmer_str) != hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "kmer length must equal the hashtable k-mer size");
+        return NULL;
+    }
+    PyObject * ret;
+
+    KmerIterator kmers(kmer_str, hashtable->ksize());
+    Kmer start_kmer = kmers.next();
+
+    if (hashtable->high_degree_nodes.find(start_kmer) != \
+        hashtable->high_degree_nodes.end()) {
+        ret = Py_True;
+    }
+    else {
+        ret = Py_False;
+    }
+    Py_INCREF(ret);
+    return ret;
+}
+
+static
+PyObject *
+hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * kmer_str;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+        return NULL;
+    }
+
+    if (strlen(kmer_str) != hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "kmer length must equal the hashtable k-mer size");
+        return NULL;
+    }
+
+    SeenSet adj;
+    hashtable->traverse(kmer_str, adj);
+
+    PyObject * x =  PyList_New(adj.size());
+    if (x == NULL) {
+        return NULL;
+    }
+    SeenSet::iterator si;
+    unsigned long long i = 0;
+    for (si = adj.begin(); si != adj.end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    return x;
+}
+
+static
+PyObject *
+hashtable_get_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    SeenSet * hdg = &hashtable->high_degree_nodes;
+
+    PyObject * x =  PyList_New(hdg->size());
+    if (x == NULL) {
+        return NULL;
+    }
+    SeenSet::iterator si;
+    unsigned long long i = 0;
+    for (si = hdg->begin(); si != hdg->end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    return x;
+}
+
+static
+PyObject *
 hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2549,6 +2645,21 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "find_high_degree_nodes",
         (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
         "CTB",
+    },
+    {
+        "is_high_degree_node",
+        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
+        "CTB",
+    },
+    {
+        "traverse",
+        (PyCFunction)hashtable_traverse, METH_VARARGS,
+        "CTB 2",
+    },
+    {
+        "get_high_degree_nodes",
+        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
+        "CTB 2",
     },
     {
         "consume_fasta",

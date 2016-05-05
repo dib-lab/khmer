@@ -1316,7 +1316,6 @@ void Hashtable::get_kmer_counts(const std::string &s,
 void Hashtable::find_high_degree_nodes(const std::string &s)
 {
     const char * sp = s.c_str();
-    unsigned int n_consumed = 0;
 
     Traverser traverser(this);
     KmerIterator kmers(sp, _ksize);
@@ -1327,6 +1326,50 @@ void Hashtable::find_high_degree_nodes(const std::string &s)
             high_degree_nodes.insert(kmer);
         }
     }
+}
+
+unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies)
+{
+    unsigned int size = 0;
+    SeenSet keep;
+
+    auto filter = [&] (Kmer& n) -> bool {
+        return true;
+    };
+
+    Traverser traverser(this);
+
+    const char * sp = s.c_str();
+    KmerIterator kmers(sp, _ksize);
+    Kmer start_kmer = kmers.next();
+    std::vector<Kmer> to_be_visited;
+    to_be_visited.push_back(start_kmer);
+
+    while (to_be_visited.size()) {
+        start_kmer = to_be_visited.back();
+        to_be_visited.pop_back();
+        
+        keep.insert(start_kmer);
+        size += 1;
+
+        KmerQueue node_q;
+        traverser.traverse_right(start_kmer, node_q, filter);
+        traverser.traverse_left(start_kmer, node_q, filter);
+
+        while (node_q.size()) {
+            Kmer node = node_q.front();
+            node_q.pop();
+
+            if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
+                adjacencies.insert(node);
+            } else if (keep.find(node) != keep.end()) {
+                ;
+            } else {
+                to_be_visited.push_back(node);
+            }
+        }
+    }
+    return size;
 }
 
 // vim: set sts=2 sw=2:
