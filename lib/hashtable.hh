@@ -378,7 +378,8 @@ public:
 
     //
     void find_high_degree_nodes(const std::string &s);
-    unsigned int traverse(const std::string &s, SeenSet &adjacencies);
+    unsigned int traverse(const std::string &s, SeenSet &adjacencies,
+                          Hashtable& bf);
 };
 }
 

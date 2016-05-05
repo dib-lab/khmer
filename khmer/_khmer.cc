@@ -978,14 +978,16 @@ hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     HashIntoType val;
+    khmer_KHashbits_Object * nodegraph_o;
 
-    if (!PyArg_ParseTuple(args, "K", &val)) {
+    if (!PyArg_ParseTuple(args, "KO!", &val,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
 
     SeenSet adj;
     std::string s = _revhash(val, hashtable->ksize());
-    unsigned int size = hashtable->traverse(s, adj);
+    unsigned int size = hashtable->traverse(s, adj, *nodegraph_o->hashbits);
 
     PyObject * x =  PyList_New(adj.size());
     if (x == NULL) {

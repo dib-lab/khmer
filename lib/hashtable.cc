@@ -1328,7 +1328,8 @@ void Hashtable::find_high_degree_nodes(const std::string &s)
     }
 }
 
-unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies)
+unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
+                                 Hashtable &bf)
 {
     unsigned int size = 0;
     SeenSet keep;
@@ -1342,6 +1343,11 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies)
     const char * sp = s.c_str();
     KmerIterator kmers(sp, _ksize);
     Kmer start_kmer = kmers.next();
+
+    if (bf.get_count(start_kmer)) {
+        return 0;
+    }
+
     std::vector<Kmer> to_be_visited;
     to_be_visited.push_back(start_kmer);
 
@@ -1362,6 +1368,7 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies)
 
             if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
                 adjacencies.insert(node);
+                bf.get_count(node);
             } else if (keep.find(node) != keep.end()) {
                 ;
             } else {
