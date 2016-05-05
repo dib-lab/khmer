@@ -986,23 +986,37 @@ hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     SeenSet adj;
+    SeenSet visited;
     std::string s = _revhash(val, hashtable->ksize());
-    unsigned int size = hashtable->traverse(s, adj, *nodegraph_o->hashbits);
+    unsigned int size = hashtable->traverse(s, adj, visited,
+                                            *nodegraph_o->hashbits);
 
-    PyObject * x =  PyList_New(adj.size());
-    if (x == NULL) {
+    PyObject * adj_o =  PyList_New(adj.size());
+    if (adj_o == NULL) {
         return NULL;
     }
     SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = adj.begin(); si != adj.end(); ++si) {
+    unsigned long long i;
+    for (i = 0, si = adj.begin(); si != adj.end(); ++si) {
         // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        PyList_SET_ITEM(adj_o, i, Py_BuildValue("K", *si));
         i++;
     }
 
-    PyObject * ret = Py_BuildValue("kO", (unsigned long) size, x);
-    Py_DECREF(x);
+    PyObject * visited_o =  PyList_New(visited.size());
+    if (visited_o == NULL) {
+        return NULL;
+    }
+    for (i = 0, si = visited.begin(); si != visited.end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(visited_o, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    PyObject * ret = Py_BuildValue("kOO", (unsigned long) size, adj_o,
+                                   visited_o);
+    Py_DECREF(adj_o);
+    Py_DECREF(visited_o);
 
     return ret;
 }

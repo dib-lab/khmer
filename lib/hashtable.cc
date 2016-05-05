@@ -1334,10 +1334,9 @@ void Hashtable::find_high_degree_nodes(const std::string &s)
 }
 
 unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
-                                 Hashtable &bf)
+                                 SeenSet &visited, Hashtable &bf)
 {
     unsigned int size = 0;
-    SeenSet keep;
 
     auto filter = [&] (Kmer& n) -> bool {
         return true;
@@ -1360,7 +1359,7 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
         start_kmer = to_be_visited.back();
         to_be_visited.pop_back();
         
-        keep.insert(start_kmer);
+        visited.insert(start_kmer);
         size += 1;
 
         KmerQueue node_q;
@@ -1374,7 +1373,7 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
             if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
                 adjacencies.insert(node);
                 bf.get_count(node);
-            } else if (keep.find(node) != keep.end()) {
+            } else if (visited.find(node) != visited.end()) {
                 ;
             } else {
                 to_be_visited.push_back(node);
