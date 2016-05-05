@@ -909,23 +909,15 @@ hashtable_is_high_degree_node(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    const char * kmer_str;
+    HashIntoType val;
 
-    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+    if (!PyArg_ParseTuple(args, "K", &val)) {
         return NULL;
     }
 
-    if (strlen(kmer_str) != hashtable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "kmer length must equal the hashtable k-mer size");
-        return NULL;
-    }
     PyObject * ret;
 
-    KmerIterator kmers(kmer_str, hashtable->ksize());
-    Kmer start_kmer = kmers.next();
-
-    if (hashtable->high_degree_nodes.find(start_kmer) != \
+    if (hashtable->high_degree_nodes.find(val) != \
         hashtable->high_degree_nodes.end()) {
         ret = Py_True;
     }
@@ -938,24 +930,62 @@ hashtable_is_high_degree_node(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    HashIntoType val;
+
+    if (!PyArg_ParseTuple(args, "K", &val)) {
+        return NULL;
+    }
+
+    auto filter = [&] (Kmer& n) -> bool {
+        return true;
+    };
+
+    std::string s = _revhash(val, hashtable->ksize());
+    HashIntoType f, r, u;
+    u = _hash(s.c_str(), hashtable->ksize(), f, r);
+    Kmer start_kmer(f, r, u);
+
+    KmerQueue node_q;
+    Traverser traverser(hashtable);
+
+    traverser.traverse_right(start_kmer, node_q, filter);
+    traverser.traverse_left(start_kmer, node_q, filter);
+
+    PyObject * x =  PyList_New(node_q.size());
+    if (x == NULL) {
+        return NULL;
+    }
+
+    unsigned int i;
+    for (i = 0; node_q.size() > 0; i++) {
+        HashIntoType h = node_q.front();
+        node_q.pop();
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", h));
+    }
+
+    return x;
+}
+
+static
+PyObject *
 hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    const char * kmer_str;
+    HashIntoType val;
 
-    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
-        return NULL;
-    }
-
-    if (strlen(kmer_str) != hashtable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "kmer length must equal the hashtable k-mer size");
+    if (!PyArg_ParseTuple(args, "K", &val)) {
         return NULL;
     }
 
     SeenSet adj;
-    hashtable->traverse(kmer_str, adj);
+    std::string s = _revhash(val, hashtable->ksize());
+    unsigned int size = hashtable->traverse(s, adj);
 
     PyObject * x =  PyList_New(adj.size());
     if (x == NULL) {
@@ -969,7 +999,10 @@ hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
         i++;
     }
 
-    return x;
+    PyObject * ret = Py_BuildValue("kO", (unsigned long) size, x);
+    Py_DECREF(x);
+
+    return ret;
 }
 
 static
@@ -2654,6 +2687,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
     {
         "traverse",
         (PyCFunction)hashtable_traverse, METH_VARARGS,
+        "CTB 2",
+    },
+    {
+        "neighbors",
+        (PyCFunction)hashtable_neighbors, METH_VARARGS,
         "CTB 2",
     },
     {
