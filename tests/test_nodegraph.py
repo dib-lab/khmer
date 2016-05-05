@@ -888,8 +888,3 @@ def test_n_occupied_vs_countgraph_another_size():
 
     assert nodegraph.n_unique_kmers() == 3916, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 3916, countgraph.n_unique_kmers()
-
-
-def test_get_kmers():
-    nodegraph = khmer.Nodegraph(5, 1000, 4)
-    assert nodegraph.get_kmers("AGCTTTTC") == ['AGCTT', 'GCTTT', 'CTTTT', 'TTTTC']

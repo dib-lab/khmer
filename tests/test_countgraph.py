@@ -501,6 +501,9 @@ def test_get_kmers():
     kmers = hi.get_kmers("AAAAAAT")
     assert kmers == ["AAAAAA", "AAAAAT"]
 
+    kmers = hi.get_kmers("AGCTTTTC")
+    assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
+
 
 @attr("huge")
 def test_save_load_large():
