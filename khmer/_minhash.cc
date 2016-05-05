@@ -1161,11 +1161,26 @@ bool check_IsCombinedMinHash(PyObject * combined_mh)
 
 ///
 
+static PyObject * hash_murmur32(PyObject * self, PyObject * args)
+{
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(_hash_murmur32(kmer));
+}
+
 static PyMethodDef MinHashModuleMethods[] = {
     {
         "load_neighborhood_minhash",
         (PyCFunction)nbhd_load,
         METH_VARARGS, "load nbhd hash from disk."
+    },
+    {
+        "hash_murmur32",     hash_murmur32,
+        METH_VARARGS,       "",
     },
     { NULL, NULL, 0, NULL } // sentinel
 };
