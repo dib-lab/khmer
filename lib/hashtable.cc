@@ -1372,7 +1372,7 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
 
             if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
                 adjacencies.insert(node);
-                bf.get_count(node);
+                bf.count(start_kmer);
             } else if (visited.find(node) != visited.end()) {
                 ;
             } else {
