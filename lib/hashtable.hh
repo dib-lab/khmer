@@ -165,6 +165,7 @@ public:
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
+    SeenSet high_degree_nodes;
 
     // accessor to get 'k'
     const WordLength ksize() const
@@ -374,6 +375,9 @@ public:
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
+
+    //
+    void find_high_degree_nodes(const std::string &s);
 };
 }
 

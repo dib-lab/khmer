@@ -1309,4 +1309,24 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
+//
+// consume_string: run through every k-mer in the given string, & hash it.
+//
+
+void Hashtable::find_high_degree_nodes(const std::string &s)
+{
+    const char * sp = s.c_str();
+    unsigned int n_consumed = 0;
+
+    Traverser traverser(this);
+    KmerIterator kmers(sp, _ksize);
+
+    while(!kmers.done()) {
+        Kmer kmer = kmers.next();
+        if ((traverser.degree(kmer)) > 2) {
+            high_degree_nodes.insert(kmer);
+        }
+    }
+}
+
 // vim: set sts=2 sw=2:

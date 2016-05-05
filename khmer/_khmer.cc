@@ -881,6 +881,30 @@ hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    hashtable->find_high_degree_nodes(long_str);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
 hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2520,6 +2544,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "consume",
         (PyCFunction)hashtable_consume, METH_VARARGS,
         "Increment the counts of all of the k-mers in the string."
+    },
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "CTB",
     },
     {
         "consume_fasta",
