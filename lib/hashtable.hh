@@ -320,10 +320,6 @@ public:
                                     unsigned int max_count = MAX_KEEPER_SIZE)
     const;
 
-    unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
-            unsigned int threshold,
-            CountingHash &counting);
-
     virtual void print_tagset(std::string);
     virtual void print_stop_tags(std::string);
     virtual void save_stop_tags(std::string);
