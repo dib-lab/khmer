@@ -3,7 +3,8 @@
    * khmer/_khmer.cc, lib/{counting.cc,counting.hh,hashbits.cc,hashbits.hh,
      hashtable.cc,hashtable.hh,subset.cc,subset.hh},
    sandbox/{fasta-to-abundance-hist.py,find-high-abund-kmers.py
-     hi-lo-abundance-by-position.py,stoptag-abundance-hist.py},
+     hi-lo-abundance-by-position.py,stoptag-abundance-hist.py,
+     abundance-hist-by-position.py},
    tests/{test_countgraph.py,test_counting_single.py,test_filter.py,
      test_nodegraph.py,test_subset_graph.py}: removed unused functions,
    sandbox scripts, and tests for many functions. Specifically,
@@ -15,6 +16,8 @@
    fasta_count_kmers_by_position, output_fasta_kmer_pos_freq,
    compare_partitions/compare_to_partition, join_partitions_by_path,
    is_single_partition, and find_unpart function.
+
+   * sandbox/README.rst: updated for removed sandbox scripts.
 
 2016-04-29  Luiz Irber  <khmer@luizirber.org>
 
