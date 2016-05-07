@@ -314,11 +314,6 @@ public:
 
     size_t trim_on_stoptags(std::string sequence) const;
 
-    void traverse_from_tags(unsigned int distance,
-                            unsigned int threshold,
-                            unsigned int num_high_todo,
-                            CountingHash &counting);
-
     unsigned int traverse_from_kmer(Kmer start,
                                     unsigned int radius,
                                     KmerSet &keeper,

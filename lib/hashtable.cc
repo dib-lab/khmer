@@ -762,54 +762,6 @@ size_t Hashtable::trim_on_stoptags(std::string seq) const
     return seq.length();
 }
 
-void Hashtable::traverse_from_tags(unsigned int distance,
-                                   unsigned int threshold,
-                                   unsigned int frequency,
-                                   CountingHash &counting)
-{
-    unsigned int i = 0;
-    unsigned int n = 0;
-    unsigned int n_big = 0;
-    KmerSet keeper;
-
-#if VERBOSE_REPARTITION
-    std::cout << all_tags.size() << " tags...\n";
-#endif // 0
-
-    for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-            ++si, i++) {
-
-        n++;
-        Kmer tag = build_kmer(*si);
-        unsigned int count = traverse_from_kmer(tag, distance, keeper);
-
-        if (count >= threshold) {
-            n_big++;
-
-            KmerSet::const_iterator ti;
-            for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
-                if (counting.get_count(*ti) > frequency) {
-                    stop_tags.insert(*ti);
-                } else {
-                    counting.count(*ti);
-                }
-            }
-#if VERBOSE_REPARTITION
-            std::cout << "traversed from " << n << " tags total; "
-                      << n_big << " big; " << keeper.size() << "\n";
-#endif // 0
-        }
-        keeper.clear();
-
-        if (n % 100 == 0) {
-#if VERBOSE_REPARTITION
-            std::cout << "traversed " << n << " " << n_big << " " <<
-                      all_tags.size() << " " << stop_tags.size() << "\n";
-#endif // 0
-        }
-    }
-}
-
 unsigned int Hashtable::traverse_from_kmer(Kmer start,
         unsigned int radius,
         KmerSet &keeper,

@@ -1312,9 +1312,6 @@ hashtable_save_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hashtable_traverse_from_tags(khmer_KHashtable_Object * me,
-        PyObject * args);
-
 static PyObject * hashtable_repartition_largest_partition(
     khmer_KHashtable_Object * me,
     PyObject * args);
@@ -2473,7 +2470,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "set_partition_id", (PyCFunction)hashtable_set_partition_id, METH_VARARGS, "" },
     { "join_partitions", (PyCFunction)hashtable_join_partitions, METH_VARARGS, "" },
     { "get_partition_id", (PyCFunction)hashtable_get_partition_id, METH_VARARGS, "" },
-    { "traverse_from_tags", (PyCFunction)hashtable_traverse_from_tags, METH_VARARGS, "" },
     { "repartition_largest_partition", (PyCFunction)hashtable_repartition_largest_partition, METH_VARARGS, "" },
 
     // stop tags
@@ -3788,26 +3784,6 @@ static PyTypeObject khmer_KGraphLabels_Type = {
     0,                       /* tp_alloc */
     khmer_graphlabels_new,      /* tp_new */
 };
-
-static
-PyObject *
-hashtable_traverse_from_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    khmer_KCountingHash_Object * counting_o = NULL;
-    unsigned int distance, threshold, frequency;
-
-    if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountgraph_Type, &counting_o,
-                          &distance, &threshold, &frequency)) {
-        return NULL;
-    }
-
-    hashtable->traverse_from_tags(distance, threshold, frequency,
-                                  * counting_o->counting);
-
-    Py_RETURN_NONE;
-}
 
 static
 PyObject *
