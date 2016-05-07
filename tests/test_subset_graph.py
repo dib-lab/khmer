@@ -695,7 +695,7 @@ def test_partition_overlap_2():
     assert x == ([(3, 8)], 0), x
 
     x = p2.partition_sizes()
-    assert x == ([(3, 6), (5, 6)], 2), x
+    assert x == ([(3, 6), (5, 6)], 0), x
 
     x = p1.partition_average_coverages(kh)
     assert x == [(3, 11)]
