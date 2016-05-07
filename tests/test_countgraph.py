@@ -946,13 +946,6 @@ def test_get_hashsizes():
     assert kh.hashsizes() == expected, kh.hashsizes()
 
 
-# def test_collect_high_abundance_kmers():
-#    seqpath = utils.get_test_data('test-abund-read-2.fa')
-#
-#    kh = khmer.Countgraph(18, 1e6, 4)
-#    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
-
-
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
