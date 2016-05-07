@@ -968,29 +968,6 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-void Hashtable::identify_stop_tags_by_position(std::string seq,
-        std::vector<unsigned int> &posns)
-const
-{
-    if (!check_and_normalize_read(seq)) {
-        return;
-    }
-
-    KmerIterator kmers(seq.c_str(), _ksize);
-
-    unsigned int i = 0;
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (set_contains(stop_tags, kmer)) {
-            posns.push_back(i);
-        }
-        i++;
-    }
-
-    return;
-}
-
 void Hashtable::extract_unique_paths(std::string seq,
                                      unsigned int min_length,
                                      float min_unique_f,

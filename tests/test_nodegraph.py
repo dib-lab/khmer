@@ -465,24 +465,6 @@ def test_notag_across_stoptraverse():
     assert n == 2, n
 
 
-def test_find_stoptags():
-    nodegraph = khmer._Nodegraph(5, [1])
-    nodegraph.add_stop_tag("AAAAA")
-
-    assert nodegraph.identify_stoptags_by_position("AAAAA") == [0]
-    assert nodegraph.identify_stoptags_by_position("AAAAAA") == [0, 1]
-    assert nodegraph.identify_stoptags_by_position("TTTTT") == [0]
-    assert nodegraph.identify_stoptags_by_position("TTTTTT") == [0, 1]
-
-
-def test_find_stoptagsecond_seq():
-    nodegraph = khmer._Nodegraph(4, [1])
-    nodegraph.add_stop_tag("ATGC")
-
-    x = nodegraph.identify_stoptags_by_position("ATGCATGCGCAT")
-    assert x == [0, 2, 4, 8], x
-
-
 def test_get_ksize():
     kh = khmer._Nodegraph(22, [1])
     assert kh.ksize() == 22

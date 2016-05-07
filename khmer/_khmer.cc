@@ -1393,35 +1393,6 @@ hashtable_trim_on_stoptags(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_identify_stoptags_by_position(khmer_KHashtable_Object * me,
-                                        PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * seq = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &seq)) {
-        return NULL;
-    }
-
-    std::vector<unsigned int> posns;
-    Py_BEGIN_ALLOW_THREADS
-
-    hashtable->identify_stop_tags_by_position(seq, posns);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * x = PyList_New(posns.size());
-
-    for (unsigned int i = 0; i < posns.size(); i++) {
-        PyList_SET_ITEM(x, i, Py_BuildValue("I", posns[i]));
-    }
-
-    return x;
-}
-
-static
-PyObject *
 hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2477,7 +2448,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "save_stop_tags", (PyCFunction)hashtable_save_stop_tags, METH_VARARGS, "" },
     { "print_stop_tags", (PyCFunction)hashtable_print_stop_tags, METH_VARARGS, "" },
     { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
-    { "identify_stoptags_by_position", (PyCFunction)hashtable_identify_stoptags_by_position, METH_VARARGS, "" },
     { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
     { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
     { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
