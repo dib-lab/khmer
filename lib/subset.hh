@@ -151,12 +151,6 @@ public:
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    unsigned int find_unpart(const std::string &infilename,
-                             bool traverse,
-                             bool stop_big_traversals,
-                             CallbackFn callback=0,
-                             void * callback_data=0);
-
     bool is_single_partition(std::string sequence);
 
     void join_partitions_by_path(std::string sequence);

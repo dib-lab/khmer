@@ -1827,40 +1827,6 @@ hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_find_unpart(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    PyObject * traverse_o = NULL;
-    PyObject * stop_big_traversals_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "sOO", &filename, &traverse_o,
-                          &stop_big_traversals_o)) {
-        return NULL;
-    }
-
-    bool traverse = PyObject_IsTrue(traverse_o);
-    bool stop_big_traversals = PyObject_IsTrue(stop_big_traversals_o);
-    unsigned int n_singletons = 0;
-
-    try {
-        SubsetPartition * subset_p = hashtable->partition;
-        n_singletons = subset_p->find_unpart(filename, traverse,
-                                             stop_big_traversals);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return PyLong_FromLong(n_singletons);
-}
-
-static
-PyObject *
 hashtable_filter_if_present(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2560,7 +2526,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "find_all_tags", (PyCFunction)hashtable_find_all_tags, METH_VARARGS, "" },
     { "assign_partition_id", (PyCFunction)hashtable_assign_partition_id, METH_VARARGS, "" },
     { "output_partitions", (PyCFunction)hashtable_output_partitions, METH_VARARGS, "" },
-    { "find_unpart", (PyCFunction)hashtable_find_unpart, METH_VARARGS, "" },
     { "load_partitionmap", (PyCFunction)hashtable_load_partitionmap, METH_VARARGS, "" },
     { "save_partitionmap", (PyCFunction)hashtable_save_partitionmap, METH_VARARGS, "" },
     { "_validate_partitionmap", (PyCFunction)hashtable__validate_partitionmap, METH_VARARGS, "" },
