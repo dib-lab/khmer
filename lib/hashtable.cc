@@ -1036,6 +1036,8 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
     KmerIterator kmers(sp, _ksize);
     Kmer start_kmer = kmers.next();
 
+    // if this k-mer is in the Bloom filter, truncate search.
+    // This prevents paths from being traversed in two directions.
     if (bf.get_count(start_kmer)) {
         return 0;
     }
@@ -1059,7 +1061,9 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
             node_q.pop();
 
             if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
+                // if there are any adjacent high degree nodes, record;
                 adjacencies.insert(node);
+                // also, add this to the stop Bloom filter.
                 bf.count(start_kmer);
             } else if (visited.find(node) != visited.end()) {
                 ;

@@ -973,7 +973,7 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_traverse(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
@@ -2522,31 +2522,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Increment the counts of all of the k-mers in the string."
     },
     {
-        "find_high_degree_nodes",
-        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
-        "CTB",
-    },
-    {
-        "is_high_degree_node",
-        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
-        "CTB",
-    },
-    {
-        "traverse",
-        (PyCFunction)hashtable_traverse, METH_VARARGS,
-        "CTB 2",
-    },
-    {
-        "neighbors",
-        (PyCFunction)hashtable_neighbors, METH_VARARGS,
-        "CTB 2",
-    },
-    {
-        "get_high_degree_nodes",
-        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
-        "CTB 2",
-    },
-    {
         "consume_fasta",
         (PyCFunction)hashtable_consume_fasta, METH_VARARGS,
         "Incrment the counts of all the k-mers in the sequences in the "
@@ -2599,6 +2574,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
     //
 
     {
+        "neighbors",
+        (PyCFunction)hashtable_neighbors, METH_VARARGS,
+        "Get a list of neighbor nodes for this k-mer.",
+    },
+    {
         "calc_connected_graph_size",
         (PyCFunction)hashtable_calc_connected_graph_size, METH_VARARGS, ""
     },
@@ -2612,6 +2592,30 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "count_kmers_within_radius",
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
+    },
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "Examine the given sequence for degree > 2 nodes and add to internal "
+        "list; used in graph contraction.",
+    },
+    {
+        "is_high_degree_node",
+        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
+        "Check to see if this k-mer has degree > 2. "
+        "Used in graph contraction.",
+    },
+    {
+        "traverse_linear_path",
+        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
+        "Traverse the path through the graph starting with the given "
+        "k-mer and avoiding high-degree nodes, finding (and returning) "
+        "traversed k-mers and any encountered high-degree nodes.",
+    },
+    {
+        "get_high_degree_nodes",
+        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
+        "Return a list of all of the recorded high-degree nodes.",
     },
 
     //
