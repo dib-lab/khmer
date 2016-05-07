@@ -2685,34 +2685,6 @@ count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
 
 static
 PyObject *
-count_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
-                                    PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * inputfile;
-    int limit_by = 0;
-
-    if (!PyArg_ParseTuple(args, "si", &inputfile, &limit_by)) {
-        return NULL;
-    }
-
-    try {
-        counting->fasta_dump_kmers_by_abundance(inputfile,
-                                                limit_by);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
 count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 {
     CountingHash * counting = self->counting;
@@ -2998,7 +2970,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
     { "abundance_distribution", (PyCFunction)count_abundance_distribution, METH_VARARGS, "" },
     { "abundance_distribution_with_reads_parser", (PyCFunction)count_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
-    { "fasta_dump_kmers_by_abundance", (PyCFunction)count_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
     {
         "get_raw_tables", (PyCFunction)count_get_raw_tables,
         METH_VARARGS, "Get a list of the raw tables as memoryview objects"
