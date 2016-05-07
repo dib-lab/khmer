@@ -1806,32 +1806,6 @@ hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_filter_if_present(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    const char * output = NULL;
-
-    if (!PyArg_ParseTuple(args, "ss", &filename, &output)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->filter_if_present(filename, output);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
 hashtable_save_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2508,7 +2482,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "print_stop_tags", (PyCFunction)hashtable_print_stop_tags, METH_VARARGS, "" },
     { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
     { "identify_stoptags_by_position", (PyCFunction)hashtable_identify_stoptags_by_position, METH_VARARGS, "" },
-    { "filter_if_present", (PyCFunction)hashtable_filter_if_present, METH_VARARGS, "" },
     { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
     { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
     { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },

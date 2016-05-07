@@ -742,56 +742,6 @@ unsigned int Hashtable::kmer_degree(const char * kmer_s)
     return traverser.degree(node);
 }
 
-void Hashtable::filter_if_present(const std::string &infilename,
-                                  const std::string &outputfile)
-{
-    IParser* parser = IParser::get_parser(infilename);
-    ofstream outfile(outputfile.c_str());
-
-    unsigned int total_reads = 0;
-    unsigned int reads_kept = 0;
-
-    Read read;
-    string seq;
-
-    HashIntoType kmer;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        if (check_and_normalize_read(seq)) {
-            KmerIterator kmers(seq.c_str(), _ksize);
-            bool keep = true;
-
-            while (!kmers.done()) {
-                kmer = kmers.next();
-                if (get_count(kmer)) {
-                    keep = false;
-                    break;
-                }
-            }
-
-            if (keep) {
-                outfile << ">" << read.name;
-                outfile << "\n" << seq << "\n";
-                reads_kept++;
-            }
-
-            total_reads++;
-        }
-    }
-
-    delete parser;
-    parser = NULL;
-
-    return;
-}
-
 size_t Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {

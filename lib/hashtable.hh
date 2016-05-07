@@ -312,9 +312,6 @@ public:
     virtual std::vector<HashIntoType> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
 
-    void filter_if_present(const std::string &infilename,
-                           const std::string &outputfilename);
-
     size_t trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,

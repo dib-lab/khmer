@@ -271,21 +271,6 @@ def test_bloom_c_2():  # simple one
     assert other_nodegraph.n_unique_kmers() == 3
 
 
-def test_filter_if_present():
-    nodegraph = khmer._Nodegraph(32, [3, 5])
-
-    maskfile = utils.get_test_data('filter-test-A.fa')
-    inputfile = utils.get_test_data('filter-test-B.fa')
-    outfile = utils.get_temp_filename('filter')
-
-    nodegraph.consume_fasta(maskfile)
-    nodegraph.filter_if_present(inputfile, outfile)
-
-    records = list(screed.open(outfile))
-    assert len(records) == 1
-    assert records[0]['name'] == '3'
-
-
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     nodegraph = khmer._Nodegraph(32, [1])
