@@ -151,8 +151,6 @@ public:
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    bool is_single_partition(std::string sequence);
-
     void join_partitions_by_path(std::string sequence);
 
     void partition_sizes(PartitionCountMap &cm,

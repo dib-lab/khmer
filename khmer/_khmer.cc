@@ -2224,31 +2224,6 @@ hashtable_get_partition_id(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_is_single_partition(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * seq = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &seq)) {
-        return NULL;
-    }
-
-    bool v = hashtable->partition->is_single_partition(seq);
-
-    PyObject * val;
-    if (v) {
-        val = Py_True;
-    } else {
-        val = Py_False;
-    }
-    Py_INCREF(val);
-
-    return val;
-}
-
-static
-PyObject *
 hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
                                    PyObject * args)
 {
@@ -2547,7 +2522,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "set_partition_id", (PyCFunction)hashtable_set_partition_id, METH_VARARGS, "" },
     { "join_partitions", (PyCFunction)hashtable_join_partitions, METH_VARARGS, "" },
     { "get_partition_id", (PyCFunction)hashtable_get_partition_id, METH_VARARGS, "" },
-    { "is_single_partition", (PyCFunction)hashtable_is_single_partition, METH_VARARGS, "" },
     { "traverse_from_tags", (PyCFunction)hashtable_traverse_from_tags, METH_VARARGS, "" },
     { "repartition_largest_partition", (PyCFunction)hashtable_repartition_largest_partition, METH_VARARGS, "" },
 

@@ -191,12 +191,6 @@ size_t SubsetPartition::output_partitioned_file(
                     outfile << "\n" << seq << "\n";
                 }
             }
-#ifdef VALIDATE_PARTITIONS
-            std::cout << "checking: " << read.name << "\n";
-            if (!is_single_partition(seq)) {
-                throw khmer_exception();
-            }
-#endif // VALIDATE_PARTITIONS
 
             total_reads++;
 
@@ -1152,34 +1146,6 @@ void SubsetPartition::_clear_all_partitions()
     next_partition_id = 1;
 }
 
-
-bool SubsetPartition::is_single_partition(std::string seq)
-{
-    if (!_ht->check_and_normalize_read(seq)) {
-        return 0;
-    }
-
-    PartitionSet partitions;
-    PartitionID *pp;
-
-    KmerIterator kmers(seq.c_str(), _ht->ksize());
-    while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (partition_map.find(kmer) != partition_map.end()) {
-            pp = partition_map[kmer];
-            if (pp) {
-                partitions.insert(*pp);
-            }
-        }
-    }
-
-    if (partitions.size() > 1) {
-        return false;
-    }
-
-    return true;
-}
 
 void SubsetPartition::join_partitions_by_path(std::string seq)
 {
