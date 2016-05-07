@@ -1211,26 +1211,6 @@ def test_badtrim():
     countgraph.trim_on_abundance("AAAAAA", 1)
 
 
-def test_badfasta_count_kmers_by_position():
-    countgraph = khmer.Countgraph(4, 4 ** 4, 4)
-    try:
-        countgraph.fasta_count_kmers_by_position()
-    except TypeError as err:
-        print(str(err))
-
-    filename = utils.get_test_data("test-short.fa")
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, -1, 0)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, 0, -1)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-
-
 def test_badload():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:

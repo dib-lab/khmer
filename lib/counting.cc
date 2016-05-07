@@ -153,69 +153,6 @@ HashIntoType * CountingHash::abundance_distribution(
     return distribution;
 }
 
-HashIntoType * CountingHash::fasta_count_kmers_by_position(
-    const std::string   &inputfile,
-    const unsigned int  max_read_len,
-    BoundedCounterType  limit_by_count,
-    CallbackFn      callback,
-    void *      callback_data)
-{
-    unsigned long long *counts = new unsigned long long[max_read_len];
-
-    for (unsigned int i = 0; i < max_read_len; i++) {
-        counts[i] = 0;
-    }
-
-    Read read;
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    string name;
-    string seq;
-    unsigned long long read_num = 0;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-
-        seq = read.sequence;
-        bool valid_read = check_and_normalize_read(seq);
-
-        if (valid_read) {
-            for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-                string kmer = seq.substr(i, i + _ksize);
-                BoundedCounterType n = get_count(kmer.c_str());
-
-                if (limit_by_count == 0 || n == limit_by_count) {
-                    if (i < max_read_len) {
-                        counts[i]++;
-                    }
-                }
-            }
-        }
-
-        name.clear();
-        seq.clear();
-
-        read_num += 1;
-
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("fasta_file_count_kmers_by_position", callback_data,
-                         read_num, 0);
-            } catch (...) {
-                throw;
-            }
-        }
-    } // while reads
-
-    delete parser;
-
-    return counts;
-}
-
 void CountingHash::fasta_dump_kmers_by_abundance(
     const std::string   &inputfile,
     BoundedCounterType  limit_by_count,

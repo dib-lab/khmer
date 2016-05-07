@@ -281,12 +281,6 @@ public:
     HashIntoType * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 
-    HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
-            const unsigned int max_read_len,
-            BoundedCounterType limit_by_count=0,
-            CallbackFn callback = NULL,
-            void * callback_data = NULL);
-
     void fasta_dump_kmers_by_abundance(const std::string &inputfile,
                                        BoundedCounterType limit_by_count,
                                        CallbackFn callback = NULL,

@@ -2822,68 +2822,6 @@ count_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-count_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
-                                    PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * inputfile;
-    unsigned int max_read_len = 0;
-    long max_read_len_long;
-    int limit_by_count_int;
-
-    if (!PyArg_ParseTuple(args, "sli", &inputfile, &max_read_len_long,
-                          &limit_by_count_int)) {
-        return NULL;
-    }
-    if (max_read_len_long < 0 || max_read_len_long >= pow(2, 32)) {
-        PyErr_SetString(
-            PyExc_ValueError,
-            "The 2nd argument must be positive and less than 2^32");
-        return NULL;
-    }
-    if (limit_by_count_int < 0 || limit_by_count_int >= pow(2, 16)) {
-        PyErr_SetString(
-            PyExc_ValueError,
-            "The 3rd argument must be positive and less than 2^16");
-        return NULL;
-    }
-    max_read_len = (unsigned int) max_read_len_long;
-
-    unsigned long long * counts;
-    try {
-        counts = counting->fasta_count_kmers_by_position(inputfile,
-                 max_read_len,
-                 (unsigned short) limit_by_count_int);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(max_read_len);
-    if (x == NULL) {
-        delete[] counts;
-        return NULL;
-    }
-
-    for (unsigned int i = 0; i < max_read_len; i++) {
-        int ret = PyList_SetItem(x, i, PyLong_FromUnsignedLongLong(counts[i]));
-        if (ret < 0) {
-            delete[] counts;
-            return NULL;
-        }
-    }
-
-    delete[] counts;
-
-    return x;
-}
-
-static
-PyObject *
 count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         PyObject * args)
 {
@@ -3060,7 +2998,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
     { "abundance_distribution", (PyCFunction)count_abundance_distribution, METH_VARARGS, "" },
     { "abundance_distribution_with_reads_parser", (PyCFunction)count_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
-    { "fasta_count_kmers_by_position", (PyCFunction)count_fasta_count_kmers_by_position, METH_VARARGS, "" },
     { "fasta_dump_kmers_by_abundance", (PyCFunction)count_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
     {
         "get_raw_tables", (PyCFunction)count_get_raw_tables,
