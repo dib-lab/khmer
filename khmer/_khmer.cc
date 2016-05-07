@@ -1475,22 +1475,6 @@ hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_join_partitions_by_path(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * sequence = NULL;
-    if (!PyArg_ParseTuple(args, "s", &sequence)) {
-        return NULL;
-    }
-
-    hashtable->partition->join_partitions_by_path(sequence);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
 hashtable_merge_subset(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2510,7 +2494,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         METH_VARARGS, "Count all k-mers using a given reads parser"
     },
     { "consume_partitioned_fasta", (PyCFunction)hashtable_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-    { "join_partitions_by_path", (PyCFunction)hashtable_join_partitions_by_path, METH_VARARGS, "" },
     { "merge_subset", (PyCFunction)hashtable_merge_subset, METH_VARARGS, "" },
     { "merge_subset_from_disk", (PyCFunction)hashtable_merge_from_disk, METH_VARARGS, "" },
     { "count_partitions", (PyCFunction)hashtable_count_partitions, METH_VARARGS, "" },

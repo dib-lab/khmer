@@ -1148,23 +1148,6 @@ void SubsetPartition::_clear_all_partitions()
 }
 
 
-void SubsetPartition::join_partitions_by_path(std::string seq)
-{
-    SeenSet tagged_kmers;
-
-    KmerIterator kmers(seq.c_str(), _ht->ksize());
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
-            tagged_kmers.insert(kmer);
-        }
-    }
-
-    // assert(tagged_kmers.size());
-    assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
-}
-
 void SubsetPartition::partition_size_distribution(
     PartitionCountDistribution	&d,
     unsigned int		&n_unassigned)
