@@ -53,45 +53,6 @@ using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
-///
-/// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
-///
-
-void CountingHash::output_fasta_kmer_pos_freq(
-    const std::string &inputfile,
-    const std::string &outputfile)
-{
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    ofstream outfile;
-    outfile.open(outputfile.c_str());
-    string seq;
-    Read read;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        long numPos = seq.length() - _ksize + 1;
-
-        for (long i = 0; i < numPos; i++)  {
-            string kmer = seq.substr(i, _ksize);
-            outfile << (int)get_count(kmer.c_str()) << " ";
-        }
-        outfile << endl;
-    }
-
-    delete parser;
-    if (outfile.fail()) {
-        throw khmer_file_exception(strerror(errno));
-    }
-
-    outfile.close();
-}
-
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KmerIterator kmers(s.c_str(), _ksize);

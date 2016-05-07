@@ -2822,25 +2822,6 @@ count_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
 
 static
 PyObject *
-count_output_fasta_kmer_pos_freq(khmer_KCountingHash_Object * me,
-                                 PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * infile;
-    const char * outfile;
-
-    if (!PyArg_ParseTuple(args, "ss", &infile, &outfile)) {
-        return NULL;
-    }
-
-    counting->output_fasta_kmer_pos_freq(infile, outfile);
-
-    return PyLong_FromLong(0);
-}
-
-static
-PyObject *
 count_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
                                     PyObject * args)
 {
@@ -3072,7 +3053,6 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
 static PyMethodDef khmer_counting_methods[] = {
     { "set_use_bigcount", (PyCFunction)count_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", (PyCFunction)count_get_use_bigcount, METH_VARARGS, "" },
-    { "output_fasta_kmer_pos_freq", (PyCFunction)count_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
     { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },

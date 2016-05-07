@@ -272,9 +272,6 @@ public:
         return min_count;
     }
 
-    void output_fasta_kmer_pos_freq(const std::string &inputfile,
-                                    const std::string &outputfile);
-
     BoundedCounterType get_min_count(const std::string &s);
 
     BoundedCounterType get_max_count(const std::string &s);
