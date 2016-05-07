@@ -674,27 +674,6 @@ def test_partition_on_abundance_3():
     assert x == (2, 2)                  # two partitions, two ignored tags
 
 
-def test_partition_overlap_1():
-    kh = khmer.Countgraph(20, 1e3, 4)
-    for i in range(10):
-        kh.consume_and_tag(a)
-
-    for i in range(10):
-        kh.consume_and_tag(b)
-
-    # this will get paths only in 'a'
-    p1 = kh.do_subset_partition_with_abundance(10, 50)
-
-    # this will get paths only in 'a', again -- should be the same!
-    p2 = kh.do_subset_partition_with_abundance(10, 50)
-
-    # p1.report_on_partitions()
-    # p2.report_on_partitions()
-
-    x = p1.compare_partitions(3, p2, 3)
-    assert x == (0, 0, 14), x
-
-
 def test_partition_overlap_2():
     kh = khmer.Countgraph(20, 1e4, 4)
     for i in range(10):
@@ -711,12 +690,6 @@ def test_partition_overlap_2():
 
     # p1.report_on_partitions()
     # p2.report_on_partitions()
-
-    x = p1.compare_partitions(3, p2, 3)
-    assert x == (8, 6, 0), x
-
-    x = p1.compare_partitions(3, p2, 5)
-    assert x == (2, 0, 6), x
 
     x = p1.partition_sizes()
     assert x == ([(3, 8)], 0), x

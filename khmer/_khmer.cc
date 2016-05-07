@@ -3344,31 +3344,6 @@ subset_report_on_partitions(khmer_KSubsetPartition_Object * me, PyObject * args)
 
 static
 PyObject *
-subset_compare_partitions(khmer_KSubsetPartition_Object * me, PyObject * args)
-{
-    SubsetPartition * subset1_p = me->subset;
-
-    PyObject * subset2_obj = NULL;
-    PartitionID pid1, pid2; // @CTB ensure that these are unsigned?
-
-    if (!PyArg_ParseTuple(args, "IOI",
-                          &pid1, &subset2_obj, &pid2)) {
-        return NULL;
-    }
-
-    khmer_KSubsetPartition_Object *other = (khmer_KSubsetPartition_Object *)
-                                           subset2_obj;
-    SubsetPartition * subset2_p = other->subset;
-
-    unsigned int n_only1 = 0, n_only2 = 0, n_shared = 0;
-    subset1_p->compare_to_partition(pid1, subset2_p, pid2,
-                                    n_only1, n_only2, n_shared);
-
-    return Py_BuildValue("III", n_only1, n_only2, n_shared);
-}
-
-static
-PyObject *
 subset_partition_size_distribution(khmer_KSubsetPartition_Object * me,
                                    PyObject * args)
 {
@@ -3497,12 +3472,6 @@ static PyMethodDef khmer_subset_methods[] = {
     {
         "report_on_partitions",
         (PyCFunction)subset_report_on_partitions,
-        METH_VARARGS,
-        ""
-    },
-    {
-        "compare_partitions",
-        (PyCFunction)subset_compare_partitions,
         METH_VARARGS,
         ""
     },
