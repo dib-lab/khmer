@@ -1556,11 +1556,6 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
-static PyObject * hashtable_consume_fasta_and_traverse(
-    khmer_KHashtable_Object * me,
-    PyObject * args);
-
-
 static
 PyObject *
 hashtable_consume_fasta_and_tag_with_stoptags(khmer_KHashtable_Object * me,
@@ -2488,7 +2483,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "load_partitionmap", (PyCFunction)hashtable_load_partitionmap, METH_VARARGS, "" },
     { "save_partitionmap", (PyCFunction)hashtable_save_partitionmap, METH_VARARGS, "" },
     { "_validate_partitionmap", (PyCFunction)hashtable__validate_partitionmap, METH_VARARGS, "" },
-    { "consume_fasta_and_traverse", (PyCFunction)hashtable_consume_fasta_and_traverse, METH_VARARGS, "" },
     {
         "consume_fasta_and_tag_with_reads_parser", (PyCFunction)hashtable_consume_fasta_and_tag_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"
@@ -4108,39 +4102,6 @@ static PyTypeObject khmer_ReadAlignerType = {
     0,                         /* tp_alloc */
     khmer_ReadAligner_new,     /* tp_new */
 };
-
-static
-PyObject *
-hashtable_consume_fasta_and_traverse(khmer_KHashtable_Object * me,
-                                     PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename;
-    unsigned int radius, big_threshold, transfer_threshold;
-    khmer_KCountingHash_Object * counting_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "sIIIO!", &filename,
-                          &radius, &big_threshold, &transfer_threshold,
-                          &khmer_KCountgraph_Type, &counting_o)) {
-        return NULL;
-    }
-
-    CountingHash * counting = counting_o->counting;
-
-    try {
-        hashtable->consume_fasta_and_traverse(filename, radius, big_threshold,
-                                              transfer_threshold, *counting);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
 
 //
 // khmer_counting_dealloc -- clean up a counting hash object.

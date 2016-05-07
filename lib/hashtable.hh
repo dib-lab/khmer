@@ -301,11 +301,6 @@ public:
     void consume_fasta_and_tag_with_stoptags(const std::string &filename,
             unsigned int &total_reads,
             unsigned long long &n_consumed);
-    void consume_fasta_and_traverse(const std::string &filename,
-                                    unsigned int distance,
-                                    unsigned int big_threshold,
-                                    unsigned int transfer_threshold,
-                                    CountingHash &counting);
 
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
