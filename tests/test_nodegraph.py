@@ -416,55 +416,6 @@ def test_stop_traverse():
     assert n == 2, n
 
 
-def test_tag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # without tagging/joining across consume, this breaks into two partition;
-    # with, it is one partition.
-    nodegraph.add_stop_tag('CCGAATATATAACAGCGACG')
-
-    # DO join reads across
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-    subset = nodegraph.do_subset_partition(0, 0)
-    n, _ = nodegraph.count_partitions()
-    assert n == 99                       # reads only connected by traversal...
-
-    n, _ = nodegraph.subset_count_partitions(subset)
-    assert n == 2                        # but need main to cross stoptags.
-
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()         # ta-da!
-    assert n == 1, n
-
-
-def test_notag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # connecting k-mer at the beginning/end of a read: breaks up into two.
-    nodegraph.add_stop_tag('TTGCATACGTTGAGCCAGCG')
-
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 2, n
-
-
 def test_get_ksize():
     kh = khmer._Nodegraph(22, [1])
     assert kh.ksize() == 22

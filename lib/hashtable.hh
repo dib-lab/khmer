@@ -298,10 +298,6 @@ public:
                                   SeenSet * new_tags = 0);
 
 
-    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
-            unsigned int &total_reads,
-            unsigned long long &n_consumed);
-
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);

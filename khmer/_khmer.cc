@@ -1526,37 +1526,6 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
 
 static
 PyObject *
-hashtable_consume_fasta_and_tag_with_stoptags(khmer_KHashtable_Object * me,
-        PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-
-    unsigned long long  n_consumed;
-    unsigned int        total_reads;
-    try {
-        hashtable->consume_fasta_and_tag_with_stoptags(filename,
-                total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-static
-PyObject *
 hashtable_consume_partitioned_fasta(khmer_KHashtable_Object * me,
                                     PyObject * args)
 {
@@ -2450,8 +2419,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
     { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
     { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
-    { "consume_fasta_and_tag_with_stoptags", (PyCFunction)hashtable_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
-
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
