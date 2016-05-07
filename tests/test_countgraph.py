@@ -946,13 +946,6 @@ def test_get_hashsizes():
     assert kh.hashsizes() == expected, kh.hashsizes()
 
 
-# def test_collect_high_abundance_kmers():
-#    seqpath = utils.get_test_data('test-abund-read-2.fa')
-#
-#    kh = khmer.Countgraph(18, 1e6, 4)
-#    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
-
-
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
@@ -1209,26 +1202,6 @@ def test_badtrim():
     except TypeError as err:
         print(str(err))
     countgraph.trim_on_abundance("AAAAAA", 1)
-
-
-def test_badfasta_count_kmers_by_position():
-    countgraph = khmer.Countgraph(4, 4 ** 4, 4)
-    try:
-        countgraph.fasta_count_kmers_by_position()
-    except TypeError as err:
-        print(str(err))
-
-    filename = utils.get_test_data("test-short.fa")
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, -1, 0)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, 0, -1)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
 
 
 def test_badload():

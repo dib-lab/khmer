@@ -299,15 +299,6 @@ public:
                                   SeenSet * new_tags = 0);
 
 
-    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
-            unsigned int &total_reads,
-            unsigned long long &n_consumed);
-    void consume_fasta_and_traverse(const std::string &filename,
-                                    unsigned int distance,
-                                    unsigned int big_threshold,
-                                    unsigned int transfer_threshold,
-                                    CountingHash &counting);
-
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
@@ -318,15 +309,7 @@ public:
     virtual std::vector<HashIntoType> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
 
-    void filter_if_present(const std::string &infilename,
-                           const std::string &outputfilename);
-
     size_t trim_on_stoptags(std::string sequence) const;
-
-    void traverse_from_tags(unsigned int distance,
-                            unsigned int threshold,
-                            unsigned int num_high_todo,
-                            CountingHash &counting);
 
     unsigned int traverse_from_kmer(Kmer start,
                                     unsigned int radius,
@@ -334,18 +317,10 @@ public:
                                     unsigned int max_count = MAX_KEEPER_SIZE)
     const;
 
-    unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
-            unsigned int threshold,
-            CountingHash &counting);
-
     virtual void print_tagset(std::string);
     virtual void print_stop_tags(std::string);
     virtual void save_stop_tags(std::string);
     void load_stop_tags(std::string filename, bool clear_tags=true);
-
-    void identify_stop_tags_by_position(std::string sequence,
-                                        std::vector<unsigned int> &posns)
-    const;
 
     void extract_unique_paths(std::string seq,
                               unsigned int min_length,
