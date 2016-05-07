@@ -308,10 +308,9 @@ void SubsetPartition::find_all_tags(
     }
 }
 
-
-
 // Perform a breadth-first search starting from the k-mers in the given
-// sequence
+// sequence.
+
 unsigned int SubsetPartition::sweep_for_tags(
     const std::string&	seq,
     SeenSet&		tagged_kmers,
@@ -403,8 +402,8 @@ unsigned int SubsetPartition::sweep_for_tags(
     return total;
 }
 
-// find_all_tags: the core of the partitioning code.  finds all tagged k-mers
-//    connected to kmer_f/kmer_r in the graph.
+// find_all_tags_truncate_on_abundance: experimental code for streaming
+// partitioning.
 
 void SubsetPartition::find_all_tags_truncate_on_abundance(
     Kmer start_kmer,
@@ -506,7 +505,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     }
 }
 
-///////////////////////////////////////////////////////////////////////
+// do_partition: Main partitioning code, to find components in large graphs.
 
 void SubsetPartition::do_partition(
     HashIntoType	first_kmer,
@@ -561,6 +560,8 @@ void SubsetPartition::do_partition(
         }
     }
 }
+
+// do_partition with abundance: Experimental code to do streaming partitioning.
 
 void SubsetPartition::do_partition_with_abundance(
     HashIntoType	first_kmer,
