@@ -847,3 +847,14 @@ def test_diginorm_basic_functionality_5():
                         'b/1', 'b/2',
                         'c/1', 'c/2',
                         'd/1', 'd/2']), seqs
+
+
+def test_normalize_by_median_outfile_closed_err():
+    infile1 = utils.get_test_data('paired-mixed.fa.pe')
+    infile2 = utils.get_test_data("test-abund-read-2.fa")
+    outfile = utils.get_temp_filename('outfile_xxx')
+    script = 'normalize-by-median.py'
+    args = ['-o', outfile, infile1, infile2]
+    (status, out, err) = utils.runscript(script, args)
+    assert status == 0, (out, err)
+    assert os.path.exists(outfile)

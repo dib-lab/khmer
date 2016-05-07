@@ -1,3 +1,29 @@
+2016-04-29  Luiz Irber  <khmer@luizirber.org>
+
+   * jenkins-build.sh: add codecov coverage upload tool.
+
+2016-02-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
+   pull requests with checklist using GitHub's new template feature
+   * doc/dev/coding-guidelines-and-review.rst: update developer docs with
+   compensatory changes
+
+2015-08-14  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/subset.cc: check iterator before decrementing in
+   repartition_largest_partition
+
+2015-10-25  Titus Brown  <titus@idyll.org>
+
+   * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
+   and fix for close of --output file after first input file.
+
+2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * lib/magic: add file extensions, one media type, and a better comment
+   * khmer/__init__.py: Replace an errant 'Presence table' with 'node graph'
+
 2015-09-28  Lisa Cohen  <ljcohen@ucdavis.edu>
 
    * tests/test_read_handling.py: created new file with interleave-reads,
