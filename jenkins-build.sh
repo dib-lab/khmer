@@ -79,7 +79,7 @@ fi
 
 if type cppcheck >/dev/null 2>&1
 then
-	make cppcheck-result.xml
+	make cppcheck-result.xml SHELL=bash
 fi
 if type doxygen >/dev/null 2>&1
 then
