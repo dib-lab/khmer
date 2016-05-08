@@ -37,6 +37,7 @@ from __future__ import print_function
 import tempfile
 import os
 import shutil
+import pkg_resources
 from pkg_resources import Requirement, resource_filename, ResolutionError
 import nose
 import sys
@@ -83,8 +84,7 @@ def cleanup():
 
 
 def scriptpath(scriptname='interleave-reads.py'):
-    "Return the path to the scripts, in both dev and install situations."
-
+    """Return the path to the scripts, in both dev and install situations."""
     # note - it doesn't matter what the scriptname is here, as long as
     # it's some khmer script present in this version of khmer.
 
@@ -102,11 +102,7 @@ def scriptpath(scriptname='interleave-reads.py'):
 
 
 def _runscript(scriptname, sandbox=False):
-    """
-    Find & run a script with exec (i.e. not via os.system or subprocess).
-    """
-
-    import pkg_resources
+    """Find & run a script with exec (i.e. not via os.system or subprocess)."""
     namespace = {"__name__": "__main__"}
     namespace['sys'] = globals()['sys']
 

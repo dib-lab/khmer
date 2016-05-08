@@ -30,7 +30,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-'''Lightweight logging framework for khmer'''
+"""Lightweight logging framework for khmer."""
 
 from __future__ import print_function, unicode_literals
 import sys
@@ -39,7 +39,7 @@ __QUIET__ = False
 
 
 def configure_logging(quiet):
-    """Set the logging level"""
+    """Set the logging level."""
     global __QUIET__  # pylint: disable=global-statement
     __QUIET__ = quiet
 

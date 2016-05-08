@@ -33,9 +33,7 @@
 #
 # Contact: khmer-project@idyll.org
 
-"""
-A collection of functions for use throughout khmer/oxli
-"""
+"""A collection of functions for use throughout khmer/oxli."""
 
 from __future__ import print_function
 import threading
@@ -44,11 +42,13 @@ import khmer.utils
 
 def build_graph(ifilenames, graph, num_threads=1, tags=False):
     """
-    Algorithm to construct a counting graph from a set of input files
-    takes in list of input files, existing graph
-    optionally, number of threads and if there should be tags
-    """
+    Construct a counting graph from a set of input files.
 
+    - ifilenames: list of input files
+    - graph: existing graph
+    - num_threads: number of threads (optional)
+    - tags: should there be tags
+    """
     if tags:
         eat = graph.consume_fasta_and_tag_with_reads_parser
     else:

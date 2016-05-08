@@ -42,7 +42,7 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
-DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr nose pep257 \
+DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr nose pydocstyle \
 	screed pyenchant
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
@@ -182,17 +182,20 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
-## pep257      : check Python doc strings
-pep257: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 --ignore=D100,D101,D102,D103 \
+## pydocstyle      : check Python doc strings
+pep257: pydocstyle
+pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
+	pydocstyle --ignore=D100,D101,D102,D103,D203 \
 		setup.py khmer/ scripts/ tests/ oxli/ || true
 
-pep257_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep257 setup.py khmer/ scripts/ tests/ oxli/ \
-		> pep257_report.txt 2>&1 || true
+pep257_report.txt: pydocstyle_report.txt
+pydocstyle_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
+	pydocstyle setup.py khmer/ scripts/ tests/ oxli/ \
+		> pydocstyle_report.txt 2>&1 || true
 
-diff_pep257_report: pep257_report.txt
-	diff-quality --violations=pep8 pep257_report.txt
+diff_pep257_report: diff_pydocstyle_report
+diff_pydocstyle_report: pydocstyle_report.txt
+	diff-quality --violations=pep8 pydocstyle_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)

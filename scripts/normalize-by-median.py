@@ -152,7 +152,6 @@ class WithDiagnostics(object):
 
 
 class Normalizer(object):
-
     """Digital normalization algorithm."""
 
     def __init__(self, desired_coverage, countgraph):

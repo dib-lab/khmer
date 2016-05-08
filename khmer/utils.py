@@ -31,9 +31,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-"""
-Convenience methods for performing common argument-checking tasks in scripts.
-"""
+"""Helpful methods for performing common argument-checking tasks in scripts."""
 from __future__ import print_function, unicode_literals
 
 
@@ -135,7 +133,8 @@ def check_is_right(name):
 
 
 class UnpairedReadsError(ValueError):
-    """ValueError with refs to the read pair in question. """
+    """ValueError with refs to the read pair in question."""
+
     def __init__(self, msg, r1, r2):
         ValueError.__init__(self, msg)
         self.read1 = r1

@@ -137,7 +137,8 @@ checklist::
    - [ ] `make test` Did it pass the tests?
    - [ ] `make clean diff-cover` If it introduces new functionality in
      `scripts/` is it tested?
-   - [ ] `make format diff_pylint_report cppcheck doc` Is it well formatted?
+   - [ ] `make format diff_pylint_report cppcheck doc pydocstyle` Is it well
+     formatted?
    - [ ] Did it change the command-line interface? Only additions are allowed
      without a major version increment. Changing file formats also requires a
      major version number increment.

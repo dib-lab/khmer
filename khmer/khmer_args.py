@@ -90,12 +90,14 @@ class _VersionStdErrAction(_VersionAction):
 class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
                      argparse.RawDescriptionHelpFormatter):
     """Both ArgumentDefaults and RawDescription formatters."""
+
     pass
 
 
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal countgraph args where:
+    Utility function for estimating optimal countgraph args.
+
       - num_kmers: number of unique kmers [required]
       - mem_cap: the allotted amount of memory [optional, conflicts with f]
       - fp_rate: the desired false positive rate [optional, conflicts with M]
@@ -111,10 +113,10 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 
 def check_conflicting_args(args, hashtype):
     """
-    Utility function that takes in an args object and checks if there's things
-    that conflict, e.g. --loadgraph and --ksize being set.
+    Check argparse args object for conflicts.
+    
+    e.g. --loadgraph and --ksize being set.
     """
-
     if getattr(args, "quiet", None):
         configure_logging(args.quiet)
 
@@ -160,10 +162,11 @@ def check_conflicting_args(args, hashtype):
 # pylint: disable=invalid-name
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
-    Utility function for estimating optimal countgraph args where num_kmers
-    is the number of unique kmer and mem_cap is the allotted amount of memory
+    Estimate optimal countgraph args.
+    
+     - num_kmers: number of unique kmer
+     - mem_cap: the allotted amount of memory
     """
-
     n_tables = math.log(2) * (mem_cap / float(num_kmers))
     int_n_tables = int(n_tables)
     if int_n_tables == 0:
@@ -179,8 +182,10 @@ def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
 # pylint: disable=invalid-name
 def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     """
-    Utility function for estimating optimal memory where num_kmers  is the
-    number of unique kmers and des_fp_rate is the desired false positive rate
+    Estimate optimal memory.
+    
+    - num_kmers: the number of unique kmers
+    - des_fp_rate: the desired false positive rate
     """
     n_tables = math.log(des_fp_rate, 0.5)
     int_n_tables = int(n_tables)
@@ -199,8 +204,10 @@ def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
 
 def graphsize_args_report(unique_kmers, fp_rate):
     """
-    Assembles output string for optimal arg sandbox scripts
-    takes in unique_kmers and desired fp_rate
+    Assemble output string for optimal arg sandbox scripts.
+    
+    - unique_kmers: number of uniqe k-mers
+    - fp_rate: desired false positive rate
     """
     to_print = []
 
@@ -239,10 +246,11 @@ def graphsize_args_report(unique_kmers, fp_rate):
 
 def _check_fp_rate(args, desired_max_fp):
     """
-    Function to check if the desired_max_fp rate makes sense given specified
-    number of unique kmers and max_memory restrictions present in the args.
-
-    Takes in args object and desired_max_fp
+    Check if the desired_max_fp rate makes sense.
+    
+    - args: argparse args object, possible members: fp_rate, max_memory_usage,
+      unique_kmers, force, max_tablesize
+    - desired_max_fp: desired maximum false positive rate 
     """
     if not args.unique_kmers:
         return args
@@ -296,7 +304,6 @@ def _check_fp_rate(args, desired_max_fp):
 
 def build_graph_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
-
     if parser is None:
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
                                          formatter_class=ComboFormatter)
@@ -368,7 +375,7 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
 
 
 def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
-    """Creates and returns a nodegraph"""
+    """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
@@ -381,7 +388,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
 
 
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
-    """Creates and returns a countgraph"""
+    """Create and return a countgraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
@@ -463,7 +470,6 @@ def sanitize_help(parser):
 
 def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
-
     log_info("\n|| This is the script {name} in khmer.\n"
              "|| You are running khmer version {version}",
              name=scriptname, version=khmer.__version__)

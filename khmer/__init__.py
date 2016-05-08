@@ -1,3 +1,4 @@
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
@@ -177,7 +178,7 @@ def extract_countgraph_info(filename):
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):
-    """Do a quick & dirty expected collision rate calculation on a graph
+    """Do a quick & dirty expected collision rate calculation on a graph.
 
     Also check to see that collision rate is within threshold.
 
@@ -300,7 +301,6 @@ class Nodegraph(_Nodegraph):
 
 
 class HLLCounter(_HLLCounter):
-
     """HyperLogLog counter.
 
     A HyperLogLog counter is a probabilistic data structure specialized on
@@ -318,11 +318,11 @@ class HLLCounter(_HLLCounter):
     """
 
     def __len__(self):
+        """Return the cardinality estimate."""
         return _HLLCounter.estimate_cardinality(self)
 
 
 class ReadAligner(_ReadAligner):
-
     """Sequence to graph aligner.
 
     ReadAligner uses a Countgraph (the counts of k-mers in the target DNA
@@ -381,7 +381,7 @@ class ReadAligner(_ReadAligner):
 
     def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        ReadAligner initialization.
+        Initialize ReadAligner.
 
         HMM state notation abbreviations:
         M_t - trusted match; M_u - untrusted match

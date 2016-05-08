@@ -209,7 +209,7 @@ def is_block(fthing):
 
 
 def describe_file_handle(fthing):
-    """Returns name of file or a description."""
+    """Return the name of file or a description."""
     if is_block(fthing):
         return "block device"
     else:

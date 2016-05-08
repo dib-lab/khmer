@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
 #
@@ -83,7 +84,6 @@ def get_parser():
 
 
 class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
-
     """
     Output statistics for several data files.
 
@@ -95,6 +95,7 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
         self.formatter = formatter
 
     def __enter__(self):
+        """Write header upon entry."""
         self.formatter.write_header()
         return self
 
@@ -104,12 +105,12 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
             basepairs, seqs, basepairs / float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """No exception? Finalize the formatter on exit."""
         if exc_type is None:
             self.formatter.finalize()
 
 
 class CsvFormatter(object):
-
     """Format the statistics information as CSV."""
 
     headers = ['bp', 'seqs', 'avg_len', 'filename']
@@ -131,7 +132,6 @@ class CsvFormatter(object):
 
 
 class StdFormatter(object):
-
     """Format the statistics in a human readable string."""
 
     def __init__(self, underlying_file):
