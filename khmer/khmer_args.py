@@ -114,7 +114,7 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 def check_conflicting_args(args, hashtype):
     """
     Check argparse args object for conflicts.
-    
+
     e.g. --loadgraph and --ksize being set.
     """
     if getattr(args, "quiet", None):
@@ -163,7 +163,7 @@ def check_conflicting_args(args, hashtype):
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
     Estimate optimal countgraph args.
-    
+
      - num_kmers: number of unique kmer
      - mem_cap: the allotted amount of memory
     """
@@ -183,7 +183,7 @@ def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
 def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     """
     Estimate optimal memory.
-    
+
     - num_kmers: the number of unique kmers
     - des_fp_rate: the desired false positive rate
     """
@@ -205,7 +205,7 @@ def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
 def graphsize_args_report(unique_kmers, fp_rate):
     """
     Assemble output string for optimal arg sandbox scripts.
-    
+
     - unique_kmers: number of uniqe k-mers
     - fp_rate: desired false positive rate
     """
@@ -247,10 +247,10 @@ def graphsize_args_report(unique_kmers, fp_rate):
 def _check_fp_rate(args, desired_max_fp):
     """
     Check if the desired_max_fp rate makes sense.
-    
+
     - args: argparse args object, possible members: fp_rate, max_memory_usage,
       unique_kmers, force, max_tablesize
-    - desired_max_fp: desired maximum false positive rate 
+    - desired_max_fp: desired maximum false positive rate
     """
     if not args.unique_kmers:
         return args
