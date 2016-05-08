@@ -1,4 +1,4 @@
-2065-05-058 Michael R. Crusoe  <michael.crusoe@gmail.com>
+2015-05-08 Michael R. Crusoe  <michael.crusoe@gmail.com>
 
    * setup.py,sandbox/{readaligner_pairhmm_train.py,
    Makefile.read_aligner_training}: switch to BAM parsing using simplesam
