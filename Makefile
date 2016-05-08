@@ -183,17 +183,14 @@ diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
 ## pydocstyle      : check Python doc strings
-pep257: pydocstyle
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle --ignore=D100,D101,D102,D103,D203 \
 		setup.py khmer/ scripts/ tests/ oxli/ || true
 
-pep257_report.txt: pydocstyle_report.txt
 pydocstyle_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle setup.py khmer/ scripts/ tests/ oxli/ \
 		> pydocstyle_report.txt 2>&1 || true
 
-diff_pep257_report: diff_pydocstyle_report
 diff_pydocstyle_report: pydocstyle_report.txt
 	diff-quality --violations=pep8 pydocstyle_report.txt
 

@@ -16,11 +16,11 @@
    includes to Doxygen. Added simultaneous OS X, Debian, and Ubuntu
    compatibility to many targets. Added helper target to print the value of
    any variable via `make print-VARNAME`. Fixed the `make coverage-report`
-   target!
+   target. pep257 is now called pydocstyle
    * third-party/seqan/core/include/seqan/basic/debug_test_system.h,
    third-party/seqan/ChangeLog: silenced bogus import
-   * doc/dev/coding-guidelines-and-review.rst: reformulated checklist to list
-   action followed by a motivating question.
+   * doc/dev/coding-guidelines-and-review.rst,.github/PULL_REQUEST_TEMPLATE.md:
+   reformulated checklist to list action followed by a motivating question.
    * doc/dev/release.rst: added author management to release checklist
    * lib/counting.{cc,hh},sandbox/find-high-abund-kmers.py,
    sandbox/README.rsr: removed the unused function
@@ -28,7 +28,6 @@
    script that called it.
    * lib/kmer_hash.hh: make KmerFactory's default contrustor explicit to avoid
    auto-casting optimizations.
-   * setup.py: updated authors list. Set file encoding to `utf-8`.
    * */*.py: a multitude of pylint inspired cleanups and bug fixes. Some
    checks silenced in place.
 
