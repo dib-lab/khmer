@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -195,7 +195,7 @@ pylint: $(PYSOURCES) $(wildcard tests/*.py)
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		oxli/*.py || true
 
-pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
+pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py) $(wildcard sandbox/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		sandbox/*.py oxli/*.py > pylint_report.txt || true
