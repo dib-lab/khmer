@@ -2,7 +2,7 @@
 # vim: set fileencoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -231,7 +231,8 @@ SETUP_METADATA = \
         "install_requires": ['screed >= 0.9', 'bz2file'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
-                           'tests': ['nose >= 1.0']},
+                           'tests': ['nose >= 1.0'],
+                           'read_aligner_training': ['simplesam']},
         "scripts": SCRIPTS,
         # "entry_points": { # Not ready for distribution yet.
         #    'console_scripts': [

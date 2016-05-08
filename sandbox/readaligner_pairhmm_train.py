@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -41,18 +41,18 @@ import collections
 from math import log
 import json
 try:
-    import pysam
+    from simplesam import Reader
 except:
     pass
 
-cigar_to_state = {0: 'M', 1: 'Ir', 2: 'Ig'}
+CIGAR_TO_STATE = {'M': 'M', 'I': 'Ir', 'D': 'Ig'}
 
 
 def extract_cigar(cigar):
     ret = []
-    for t, length in cigar:
+    for length, cig in cigar:
         for i in range(length):
-            ret.append(cigar_to_state[t])
+            ret.append(CIGAR_TO_STATE[cig])
 
     return ret
 
@@ -75,7 +75,7 @@ def main():
     args = parser.parse_args()
 
     ht = khmer.load_countgraph(args.ht)
-    samfile = pysam.Samfile(args.bam_file)
+    samfile = Reader(open(args.bam_file, 'r'))
 
     k = ht.ksize()
     seq_cnt = 0
@@ -95,7 +95,7 @@ def main():
             dropped_seqs += 1
             continue
 
-        states = extract_cigar(cigar)
+        states = extract_cigar(rec.cigars)
 
         kmer = seq[:k]
         state = states[k] + trusted_str(ht.count(kmer), args.trusted_cutoff)
