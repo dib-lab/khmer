@@ -151,16 +151,6 @@ public:
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    unsigned int find_unpart(const std::string &infilename,
-                             bool traverse,
-                             bool stop_big_traversals,
-                             CallbackFn callback=0,
-                             void * callback_data=0);
-
-    bool is_single_partition(std::string sequence);
-
-    void join_partitions_by_path(std::string sequence);
-
     void partition_sizes(PartitionCountMap &cm,
                          unsigned int& n_unassigned) const;
 
@@ -181,11 +171,6 @@ public:
                       PartitionPtrMap& diskp_to_pp);
 
     void report_on_partitions();
-
-    void compare_to_partition(PartitionID, SubsetPartition *, PartitionID,
-                              unsigned int &n_only1,
-                              unsigned int &n_only2,
-                              unsigned int &n_shared);
 };
 }
 

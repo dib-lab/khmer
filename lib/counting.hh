@@ -272,9 +272,6 @@ public:
         return min_count;
     }
 
-    void output_fasta_kmer_pos_freq(const std::string &inputfile,
-                                    const std::string &outputfile);
-
     BoundedCounterType get_min_count(const std::string &s);
 
     BoundedCounterType get_max_count(const std::string &s);
@@ -284,28 +281,12 @@ public:
     HashIntoType * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 
-    HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
-            const unsigned int max_read_len,
-            BoundedCounterType limit_by_count=0,
-            CallbackFn callback = NULL,
-            void * callback_data = NULL);
-
-    void fasta_dump_kmers_by_abundance(const std::string &inputfile,
-                                       BoundedCounterType limit_by_count,
-                                       CallbackFn callback = NULL,
-                                       void * callback_data = NULL);
-
     unsigned long trim_on_abundance(std::string seq,
                                     BoundedCounterType min_abund) const;
     unsigned long trim_below_abundance(std::string seq,
                                        BoundedCounterType max_abund) const;
     std::vector<unsigned int> find_spectral_error_positions(std::string seq,
             BoundedCounterType min_abund) const;
-
-    void collect_high_abundance_kmers(const std::string &infilename,
-                                      unsigned int lower_count,
-                                      unsigned int upper_count,
-                                      SeenSet& kmers);
 };
 
 

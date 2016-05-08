@@ -271,21 +271,6 @@ def test_bloom_c_2():  # simple one
     assert other_nodegraph.n_unique_kmers() == 3
 
 
-def test_filter_if_present():
-    nodegraph = khmer._Nodegraph(32, [3, 5])
-
-    maskfile = utils.get_test_data('filter-test-A.fa')
-    inputfile = utils.get_test_data('filter-test-B.fa')
-    outfile = utils.get_temp_filename('filter')
-
-    nodegraph.consume_fasta(maskfile)
-    nodegraph.filter_if_present(inputfile, outfile)
-
-    records = list(screed.open(outfile))
-    assert len(records) == 1
-    assert records[0]['name'] == '3'
-
-
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     nodegraph = khmer._Nodegraph(32, [1])
@@ -431,73 +416,6 @@ def test_stop_traverse():
     assert n == 2, n
 
 
-def test_tag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # without tagging/joining across consume, this breaks into two partition;
-    # with, it is one partition.
-    nodegraph.add_stop_tag('CCGAATATATAACAGCGACG')
-
-    # DO join reads across
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-    subset = nodegraph.do_subset_partition(0, 0)
-    n, _ = nodegraph.count_partitions()
-    assert n == 99                       # reads only connected by traversal...
-
-    n, _ = nodegraph.subset_count_partitions(subset)
-    assert n == 2                        # but need main to cross stoptags.
-
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()         # ta-da!
-    assert n == 1, n
-
-
-def test_notag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # connecting k-mer at the beginning/end of a read: breaks up into two.
-    nodegraph.add_stop_tag('TTGCATACGTTGAGCCAGCG')
-
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 2, n
-
-
-def test_find_stoptags():
-    nodegraph = khmer._Nodegraph(5, [1])
-    nodegraph.add_stop_tag("AAAAA")
-
-    assert nodegraph.identify_stoptags_by_position("AAAAA") == [0]
-    assert nodegraph.identify_stoptags_by_position("AAAAAA") == [0, 1]
-    assert nodegraph.identify_stoptags_by_position("TTTTT") == [0]
-    assert nodegraph.identify_stoptags_by_position("TTTTTT") == [0, 1]
-
-
-def test_find_stoptagsecond_seq():
-    nodegraph = khmer._Nodegraph(4, [1])
-    nodegraph.add_stop_tag("ATGC")
-
-    x = nodegraph.identify_stoptags_by_position("ATGCATGCGCAT")
-    assert x == [0, 2, 4, 8], x
-
-
 def test_get_ksize():
     kh = khmer._Nodegraph(22, [1])
     assert kh.ksize() == 22
@@ -574,72 +492,6 @@ def test_get_raw_tables():
     for size, table in zip(kh.hashsizes(), tables):
         assert isinstance(table, memoryview)
         assert size == len(table)
-
-
-def test_find_unpart():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.even.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, True, False)
-    n, _ = nodegraph.count_partitions()
-    assert n == 1, n                     # all sequences connect
-
-
-def test_find_unpart_notraverse():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.even.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, False, False)     # <-- don't traverse
-    n, _ = nodegraph.count_partitions()
-    assert n == 99, n                    # all sequences disconnected
-
-
-def test_find_unpart_fail():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, True, False)
-    n, _ = nodegraph.count_partitions()
-    assert n == 49, n                    # only 49 sequences worth of tags
 
 
 def test_simple_median():

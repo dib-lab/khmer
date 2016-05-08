@@ -343,45 +343,6 @@ class Test_ConsumeString(object):
         except TypeError as err:
             print(str(err))
 
-    def test_abundance_by_pos(self):
-        kh = self.kh
-
-        for _ in range(0, 300):
-            kh.count('ATCG')
-
-        for _ in range(0, 10):
-            kh.count('ATGG')
-
-        short_filename = utils.get_test_data('test-short.fa')
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
-        assert dist[4] == 1
-        assert sum(dist) == 1
-
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, MAX_COUNT)
-        assert dist[0] == 1, dist[0]
-        assert dist[2] == 1
-        assert sum(dist) == 2
-
-    def test_abundance_by_pos_bigcount(self):
-        kh = self.kh
-        kh.set_use_bigcount(True)       # count past MAX_COUNT
-
-        for _ in range(0, 300):
-            kh.count('ATCG')
-
-        for _ in range(0, 10):
-            kh.count('ATGG')
-
-        short_filename = utils.get_test_data('test-short.fa')
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
-        assert dist[4] == 1
-        assert sum(dist) == 1
-
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 300)
-        assert dist[0] == 1, dist[0]
-        assert dist[2] == 1
-        assert sum(dist) == 2
-
     def test_simple(self):
         n = self.kh.consume('AAAA')
         assert n == 1
