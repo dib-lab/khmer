@@ -48,6 +48,7 @@ import sys
 import threading
 import os.path
 import os
+import gc
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,

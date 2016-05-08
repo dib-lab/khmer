@@ -49,6 +49,8 @@ import threading
 import argparse
 import textwrap
 import sys
+import gc
+import os.path
 
 from khmer import __version__, load_nodegraph
 from khmer.khmer_args import (add_threading_args, info, sanitize_help,
