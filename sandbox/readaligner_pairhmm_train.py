@@ -40,16 +40,19 @@ import argparse
 import collections
 from math import log
 import json
-from simplesam import Reader
+try:
+    from simplesam import Reader
+except:
+    pass
 
-cigar_to_state = {'M': 'M', 'I': 'Ir', 'D': 'Ig'}
+CIGAR_TO_STATE = {'M': 'M', 'I': 'Ir', 'D': 'Ig'}
 
 
 def extract_cigar(cigar):
     ret = []
-    for length, t in cigar:
+    for length, cig in cigar:
         for i in range(length):
-            ret.append(cigar_to_state[t])
+            ret.append(CIGAR_TO_STATE[cig])
 
     return ret
 

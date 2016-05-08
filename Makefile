@@ -194,7 +194,7 @@ pylint: $(PYSOURCES) $(wildcard tests/*.py)
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		oxli/*.py || true
 
-pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
+pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py) $(wildcard sandbox/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		sandbox/*.py oxli/*.py > pylint_report.txt || true
