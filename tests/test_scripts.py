@@ -1268,6 +1268,23 @@ def test_partition_find_knots_existing_stoptags():
     assert "these output stoptags will include the already" in err, err
 
 
+def test_partition_graph_too_many_threads():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+
+    utils.runscript('partition-graph.py', [graphbase, '--threads', '100'])
+    utils.runscript('merge-partitions.py', [graphbase, '-k', '20'])
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_nodegraph(graphbase)
+    ht.load_tagset(graphbase + '.tagset')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0), x          # should be exactly one partition.
+
+
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
@@ -1709,6 +1726,25 @@ def test_do_partition():
     assert len(parts) == 1
 
 
+def test_do_partition_no_big_traverse():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = 'do-partition.py'
+    args = ["-k", "20", "--no-big-traverse", "--threads=100", graphbase,
+            seqfile]
+
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+
 def test_do_partition_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -1837,6 +1873,11 @@ def execute_extract_paired_streaming(ifilename):
     thread.join()
     assert os.path.exists(outfile1), outfile1
     assert os.path.exists(outfile2), outfile2
+
+
+def test_extract_paired_streaming():
+    testinput = utils.get_test_data('paired-mixed.fa')
+    o = execute_extract_paired_streaming(testinput)
 
 
 def test_sample_reads_randomly():
