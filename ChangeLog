@@ -1,3 +1,8 @@
+2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up
+   duplicate `worker` partition function into a reusable place.
+
 2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
 
    * README.rst: add depsy badge
