@@ -99,8 +99,8 @@ def check_for_openmp():
         # Attempt to compile a test script.
         # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
-        file = open(filename, 'wt', 1)
-        file.write(
+        source = open(filename, 'wt', 1)
+        source.write(
             """
             #include <omp.h>
             #include <stdio.h>
@@ -116,7 +116,7 @@ def check_for_openmp():
                                         stdout=fnull, stderr=fnull)
 
         # Clean up
-        file.close()
+        source.close()
     finally:
         os.chdir(curdir)
         shutil.rmtree(tmpdir)
@@ -168,8 +168,7 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -249,7 +248,6 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
-
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.
@@ -306,6 +304,4 @@ def reinitialize_command(self, command, reinit_subcommands):
 Distribution.reinitialize_command = reinitialize_command
 
 
-# pylint: disable=W0142
-setup(cmdclass=CMDCLASS,
-      **SETUP_METADATA)
+setup(cmdclass=CMDCLASS, **SETUP_METADATA)

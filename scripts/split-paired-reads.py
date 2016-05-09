@@ -35,7 +35,7 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
-De-interleave a file.
+Deinterleave a file.
 
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
@@ -57,7 +57,7 @@ from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
-                         get_file_writer, is_block, describe_file_handle)
+                         get_file_writer, describe_file_handle)
 
 
 def get_parser():
@@ -191,7 +191,7 @@ def main():
                 counter3 += 1
     except UnpairedReadsError as e:
         print("Unpaired reads found starting at {name}; exiting".format(
-            name=e.r1.name), file=sys.stderr)
+            name=e.read1.name), file=sys.stderr)
         sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %

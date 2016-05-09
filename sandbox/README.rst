@@ -65,7 +65,7 @@ Scripts with recipes:
 
 To keep, document, and build recipes for:
 
-* `make-coverage.py - RPKM calculation script
+* make-coverage.py - RPKM calculation script
 * assemstats3.py - print out assembly statistics
 * build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol

@@ -41,7 +41,7 @@ The abundance is based on the k-mer counts in the given k-mer countgraph.
 Can be used to estimate expression levels (mRNAseq) or coverage
 (genomic/metagenomic).
 
-% scripts/count-median.py <htname> <input seqs> <output counts>
+% scripts/count-median.py <countgraph> <input seqs> <output counts>
 
 Use '-h' for parameter help.
 
@@ -73,7 +73,7 @@ def get_parser():
 
     Example::
 
-        load-into-countgraph.py counts tests/test-data/test-reads.fq.gz
+        load-into-counting.py counts tests/test-data/test-reads.fq.gz
         count-median.py counts tests/test-data/test-reads.fq.gz medians.txt
 
     NOTE: All 'N's in the input sequences are converted to 'A's.

@@ -46,11 +46,11 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import gc
-import os.path
 import argparse
 import textwrap
 import sys
+import gc
+import os.path
 
 from khmer import __version__, load_nodegraph
 from khmer.khmer_args import (add_threading_args, info, sanitize_help,

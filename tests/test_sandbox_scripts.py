@@ -46,12 +46,10 @@ import shutil
 from io import StringIO
 import traceback
 import nose
-from nose.plugins.attrib import attr
 import glob
 import imp
 
 from . import khmer_tst_utils as utils
-import khmer
 import screed
 from .test_scripts import _make_counting
 
@@ -76,7 +74,7 @@ def test_import_all():
         yield _checkImportSucceeds('test_sandbox_scripts.py', s)
 
 
-class _checkImportSucceeds(object):
+class _checkImportSucceeds(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, tag, filename):
         self.tag = tag
@@ -103,14 +101,14 @@ class _checkImportSucceeds(object):
         try:
             try:
                 global_dict = {'__name__': '__main__'}
-                exec(
+                exec(  # pylint: disable=exec-used
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
             except (ImportError, SyntaxError) as err:
                 print("{0}".format(err))
                 raise AssertionError("%s cannot be exec'd" % (self.filename),
                                      "{0}".format(traceback))
-            except:
+            except:  # pylint: disable=bare-except
                 pass                        # other failures are expected :)
         finally:
             sys.argv = oldargs

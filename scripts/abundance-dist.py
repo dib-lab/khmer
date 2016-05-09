@@ -37,7 +37,7 @@
 """
 Produce the k-mer abundance distribution for the given file.
 
-% python scripts/abundance-dist.py [ -z -s ] <htname> <data> <histout>
+% python scripts/abundance-dist.py [ -z -s ] <countgraph> <data> <histout>
 
 Use '-h' for parameter help.
 """
@@ -59,7 +59,7 @@ def get_parser():
     epilog = """\
     Example::
 
-        load-into-countgraph.py -x 1e7 -N 2 -k 17 counts \\
+        load-into-counting.py -x 1e7 -N 2 -k 17 counts \\
                 tests/test-data/test-abund-read-2.fa
         abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
     """
@@ -172,4 +172,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

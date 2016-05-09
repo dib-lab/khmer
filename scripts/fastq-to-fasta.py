@@ -48,7 +48,7 @@ import argparse
 import screed
 from khmer import __version__
 from khmer.kfile import (add_output_compression_type, get_file_writer,
-                         is_block, describe_file_handle)
+                         describe_file_handle)
 from khmer.utils import write_record
 from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
                               _VersionStdErrAction)
@@ -87,7 +87,6 @@ def main():
             print('...', n, file=sys.stderr)
 
         sequence = record['sequence']
-        name = record['name']
 
         if 'N' in sequence:
             if not args.n_keep:

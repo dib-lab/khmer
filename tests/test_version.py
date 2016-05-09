@@ -32,15 +32,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring
 from __future__ import print_function, unicode_literals
+
 import khmer
 from nose.plugins.attrib import attr
 
 
 @attr('jenkins')
 def test_python_and_c_match():
-    # checks c++ compiler option version against versioneer version
-    # (respectively)
+    """checks c++ compiler option version against versioneer version"""
     print('c++ version {0}:'.format(khmer.__version_cpp__()))
     print('versioneer (python) version: {0}'.format(khmer.__version__))
     assert khmer.__version_cpp__() == khmer.__version__
