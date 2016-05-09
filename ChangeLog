@@ -1,5 +1,12 @@
 2016-05-16  Luiz Irber  <khmer@luizirber.org>
 
+   * Makefile,jenkins-build.sh,setup.cfg,tests/khmer_tst_utils.py,
+   tests/test_{countgraph,counting_single,hll,labelhash,nodegraph,
+   normalize_by_median,read_aligner,read_handling,read_parsers,sandbox_scripts,
+   scripts,version}.py: replace nose with pytest, update configuration.
+
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
    * lib/hashtable.cc: fix bug with substr
    * tests/test_countgraph.py: add test to trigger the substr bug.
 
