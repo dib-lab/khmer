@@ -2625,6 +2625,24 @@ def test_trim_low_abund_2():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
+def test_trim_low_abund_2_o_gzip():
+    infile = utils.get_temp_filename('test.fa')
+    infile2 = utils.get_temp_filename('test2.fa')
+    outfile = utils.get_temp_filename('out.gz')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1',
+            "-o", outfile, "--gzip",
+            infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert os.path.exists(outfile), outfile
+    x = list(screed.open(outfile))
+    assert len(x)
+
 # make sure that FASTQ records are retained.
 
 

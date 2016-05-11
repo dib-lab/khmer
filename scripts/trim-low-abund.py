@@ -386,6 +386,11 @@ def main():
     written_bp = 0
     written_reads = 0
 
+    # only create the file writer once if outfp is specified; otherwise,
+    # create it for each file.
+    if args.output:
+        trimfp = get_file_writer(args.output, args.gzip, args.bzip)
+
     pass2list = []
     for filename in args.input_filenames:
         # figure out temporary filename for 2nd pass
@@ -394,13 +399,12 @@ def main():
         pass2fp = open(pass2filename, 'w')
 
         # construct output filenames
-        outfp = args.output
-        if outfp is None:
+        if args.output is None:
             # note: this will be saved in trimfp.
             outfp = open(os.path.basename(filename) + '.abundtrim', 'wb')
 
-        # get file handle w/gzip, bzip
-        trimfp = get_file_writer(outfp, args.gzip, args.bzip)
+            # get file handle w/gzip, bzip
+            trimfp = get_file_writer(outfp, args.gzip, args.bzip)
 
         # record all this info
         pass2list.append((filename, pass2filename, trimfp))
