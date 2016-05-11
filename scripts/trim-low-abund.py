@@ -394,6 +394,7 @@ def main():
         # construct output filenames
         outfp = args.output
         if outfp is None:
+            # note: this will be saved in trimfp.
             outfp = open(os.path.basename(filename) + '.abundtrim', 'wb')
 
         # get file handle w/gzip, bzip
@@ -473,6 +474,10 @@ def main():
 
         print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
+
+        # if we created our own trimfps, close 'em.
+        if not args.output:
+            trimfp.close()
 
     print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
