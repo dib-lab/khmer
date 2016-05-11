@@ -208,6 +208,7 @@ class Trimmer(object):
     Core trimming object; the two utility functions are 'pass1' and 'pass2',
     which execute the first and second pass across the data, respectively.
     """
+
     def __init__(self, graph, do_trim_low_abund, cutoff, trim_at_coverage):
         self.graph = graph
         self.do_trim_low_abund = do_trim_low_abund

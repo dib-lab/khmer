@@ -2625,6 +2625,7 @@ def test_trim_low_abund_2():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
+
 def test_trim_low_abund_2_o_gzip():
     infile = utils.get_temp_filename('test.fa')
     infile2 = utils.get_temp_filename('test2.fa')
