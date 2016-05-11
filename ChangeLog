@@ -9,8 +9,9 @@
    tests.
    * tests/test-data/README.rst: a new README for describing test files,
    how to generate them, and their uses.
-   * tests/test_scripts.py: added additional tests for trim-low-abund.py
-   functionality and error cases.
+   * tests/{test_scripts.py, test_streaming_io.py}: added additional
+   tests for trim-low-abund.py functionality and error cases.
+   * khmer/kfile.py: added a fix for gzip output to sys.stdout in Python 3.
 
 2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
