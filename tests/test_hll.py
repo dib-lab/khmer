@@ -32,11 +32,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,protected-access
+# pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 from __future__ import division, print_function, unicode_literals
 from __future__ import absolute_import
-
-import math
 
 import khmer
 
@@ -90,7 +88,7 @@ def test_hll_consume_string():
 
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    n_consumed = 0
+    n_consumed = n = 0
     for n, record in enumerate(fasta_iter(open(filename)), 1):
         n_consumed += hllcpp.consume_string(record['sequence'])
 
@@ -200,14 +198,14 @@ def test_hll_invalid_error_rate():
     # test if error_rate is a valid value
 
     with assert_raises(ValueError):
-        hllcpp = khmer.HLLCounter(-0.01, K)
+        khmer.HLLCounter(-0.01, K)
 
 
 def test_hll_invalid_error_rate_max():
     # test if error_rate is a valid value
 
     with assert_raises(ValueError):
-        hllcpp = khmer.HLLCounter(0.367696, K)
+        khmer.HLLCounter(0.367696, K)
 
 
 def test_hll_error_rate_max():
@@ -221,7 +219,7 @@ def test_hll_invalid_error_rate_min():
     # test if error_rate is a valid value
 
     with assert_raises(ValueError):
-        hllcpp = khmer.HLLCounter(0.0040624, K)
+        khmer.HLLCounter(0.0040624, K)
 
 
 def test_hll_error_rate_min():

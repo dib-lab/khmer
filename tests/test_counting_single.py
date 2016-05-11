@@ -32,7 +32,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=C0111,C0103
+# pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
+
 from __future__ import print_function
 from __future__ import absolute_import
 
@@ -46,7 +47,7 @@ MAX_COUNT = 255
 @attr('huge')
 def test_toobig():
     try:
-        ct = khmer.Countgraph(4, 1000000000000, 1)
+        khmer.Countgraph(4, 1000000000000, 1)
         assert 0, "this should fail"
     except MemoryError as err:
         print(str(err))

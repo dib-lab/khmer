@@ -32,14 +32,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,no-member,invalid-name,no-self-use
+# pylint: disable=protected-access
 from __future__ import print_function
 from __future__ import absolute_import
+
 import khmer
 import screed
 
 from . import khmer_tst_utils as utils
-
-from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -223,7 +224,6 @@ class Test_InexactGraphFu(object):
 class Test_Partitioning(object):
 
     def test_output_unassigned(self):
-        import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -240,7 +240,6 @@ class Test_Partitioning(object):
         assert len1 == len2, (len1, len2)
 
     def test_not_output_unassigned(self):
-        import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -341,18 +340,17 @@ class Test_PythonAPI(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
-        b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
         c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
 
         print(ht.consume(a))
         try:
-            ppi = ht.find_all_tags(c[:19])
+            ht.find_all_tags(c[:19])
             assert False, "should raise a ValueError for wrong k-mer size"
         except ValueError:
             pass
 
         try:
-            ppi = ht.find_all_tags(c[:21])
+            ht.find_all_tags(c[:21])
             assert False, "should raise a ValueError for wrong k-mer size"
         except ValueError:
             pass

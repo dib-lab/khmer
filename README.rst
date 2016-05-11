@@ -36,6 +36,11 @@
    
    Contact: khmer-project@idyll.org
 
+|Research software impact|
+
+.. |Research software impact| image:: http://depsy.org/api/package/pypi/khmer/badge.svg
+   :target: http://depsy.org/package/python/khmer
+
 khmer
 =====
 

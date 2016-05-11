@@ -37,6 +37,7 @@ doxygen.out
 Doxyfile
 doc/doxygen
 third-party/zlib/zconf.h
+third-party/zlib/zlib.3.pdf
 sloccount.sc
 cov-int/
 *.orig

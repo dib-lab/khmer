@@ -32,13 +32,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,protected-access
+# pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 from __future__ import print_function
 from __future__ import absolute_import
+
 import os
 import khmer
 from khmer import GraphLabels, CountingGraphLabels
-from screed.fasta import fasta_iter
 import screed
 
 from . import khmer_tst_utils as utils
@@ -56,7 +56,7 @@ def teardown():
 @attr('huge')
 def test_toobig():
     try:
-        lh = GraphLabels(20, 1e13, 1)
+        GraphLabels(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
         print(str(err))
@@ -65,7 +65,7 @@ def test_toobig():
 def test_error_create():
     from khmer import _GraphLabels
     try:
-        lh = _GraphLabels(None)
+        _GraphLabels(None)
         assert 0, "This should fail."
     except ValueError as err:
         print(str(err))
@@ -203,7 +203,7 @@ def test_consume_fasta_and_tag_with_labels():
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
-    total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
+    total_reads, _ = lb.consume_fasta_and_tag_with_labels(filename)
     print("doing get")
     assert lb.graph.get(read_1[:20])
     assert total_reads == 3
@@ -227,7 +227,7 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
 
-    total_reads, n_consumed = lb.consume_partitioned_fasta_and_tag_with_labels(
+    lb.consume_partitioned_fasta_and_tag_with_labels(
         filename)
     labels = set()
     for record in screed.open(filename):
@@ -245,7 +245,7 @@ def test_consume_sequence_and_tag_with_labels():
     label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
-    n_consumed = lb.consume_sequence_and_tag_with_labels(sequence, label)
+    lb.consume_sequence_and_tag_with_labels(sequence, label)
     labels = set()
     labels.update(lb.sweep_label_neighborhood(sequence))
 
@@ -272,13 +272,12 @@ def test_sweep_label_neighborhood():
     assert len(labels) == 1
     assert labels.pop() == 0
 
-'''
-* The test data set as four reads: A, B, C, and D
-* Overlaps are A <-> B <-> C, with D on its own
-* Thus, traversing from A should find labels from A and B,
-  traversing from B should find labels from A, B, and C,
-  and traversing from C should find labels from B and C
-'''
+#
+# * The test data set as four reads: A, B, C, and D
+# * Overlaps are A <-> B <-> C, with D on its own
+# * Thus, traversing from A should find labels from A and B,
+#   traversing from B should find labels from A, B, and C,
+#   and traversing from C should find labels from B and C
 
 
 def test_label_tag_correctness():

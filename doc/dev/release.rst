@@ -76,6 +76,11 @@ release makers, following this checklist by MRC.
 #. Review the issue list for any new bugs that will not be fixed in this
    release. Add them to ``doc/known-issues.txt``
 
+#. Check for new authors. Update ``.mailmap`` to normalize their email address
+   and name spelling. If they want to opt out update the ``list-*`` Makefile
+   targets to exclude them. Run ``make list-citation`` and adapt the output to
+   the relevant parts of ``CITATION``, ``setup.py``, ``doc/index.rst``.
+
 #. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
 
 #. Submit a build to Coverity Scan if it hasn't been done
