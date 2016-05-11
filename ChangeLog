@@ -13,6 +13,11 @@
    tests for trim-low-abund.py functionality and error cases.
    * khmer/kfile.py: added a fix for gzip output to sys.stdout in Python 3.
 
+2016-05-11  Titus Brown  <titus@idyll.org>
+
+   * tests/test_read_parsers.py: fixed syntax error introduced by previous
+   merge.
+
 2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up

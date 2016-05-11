@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -341,7 +341,7 @@ def test_read_pair_iterator_in_error_mode():
     for read_1, read_2 \
             in rparser.iter_read_pairs(ReadParser.PAIR_MODE_ERROR_ON_UNPAIRED):
         read_pairs_2.append([read_1, read_2])
-    matches = [(rp1, rp2) for rp1, rp2 in read_pairs_1, read_pairs_2
+    matches = [(rp1, rp2) for rp1, rp2 in zip(read_pairs_1, read_pairs_2)
                if rp1[0].name == rp2[0].name]
     assert all(matches)  # Assert ALL the matches. :-]
 
