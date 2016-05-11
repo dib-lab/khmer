@@ -152,7 +152,6 @@ class WithDiagnostics(object):
 
 
 class Normalizer(object):
-
     """Digital normalization algorithm."""
 
     def __init__(self, desired_coverage, countgraph):
@@ -400,7 +399,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     write_record(record, outfp)
 
             log_info('output in {name}', name=describe_file_handle(outfp))
-            if not is_block(outfp):
+            if not args.single_output_file:
                 outfp.close()
 
     # finished - print out some diagnostics.
@@ -427,4 +426,5 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

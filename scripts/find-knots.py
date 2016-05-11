@@ -43,7 +43,6 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 """
 from __future__ import print_function
 
-import argparse
 import glob
 import os
 import textwrap
@@ -51,9 +50,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config, sanitize_help,
-                              ComboFormatter)
+from khmer.khmer_args import (build_counting_args, info, sanitize_help)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes

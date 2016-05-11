@@ -33,6 +33,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=invalid-name,missing-docstring,no-member
 """
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
 
@@ -81,7 +82,7 @@ def get_parser():
 
     Note that the output reads will not necessarily be in the same order
     as the reads in the input files; if this is an important consideration,
-    use :program:`load-into-countgraph.py` and :program:`filter-abund.py`.
+    use :program:`load-into-counting.py` and :program:`filter-abund.py`.
     However, read pairs will be kept together, in "broken-paired" format; you
     can use :program:`extract-paired-reads.py` to extract read pairs and
     orphans.

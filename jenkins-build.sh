@@ -1,7 +1,7 @@
 #!/bin/bash
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -79,7 +79,7 @@ fi
 
 if type cppcheck >/dev/null 2>&1
 then
-	make cppcheck-result.xml
+	make cppcheck-result.xml SHELL=bash
 fi
 if type doxygen >/dev/null 2>&1
 then
@@ -113,3 +113,7 @@ unset CXXFLAGS
 
 # Don't do lib too, as we already compile as part of libtest
 make libtest
+
+# Upload code coverage to codecov.io
+pip install codecov
+codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml &> /dev/null

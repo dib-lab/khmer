@@ -191,12 +191,6 @@ size_t SubsetPartition::output_partitioned_file(
                     outfile << "\n" << seq << "\n";
                 }
             }
-#ifdef VALIDATE_PARTITIONS
-            std::cout << "checking: " << read.name << "\n";
-            if (!is_single_partition(seq)) {
-                throw khmer_exception();
-            }
-#endif // VALIDATE_PARTITIONS
 
             total_reads++;
 
@@ -219,148 +213,6 @@ size_t SubsetPartition::output_partitioned_file(
     parser = NULL;
 
     return partitions.size() + n_singletons;
-}
-
-unsigned int SubsetPartition::find_unpart(
-    const std::string	&infilename,
-    bool		traverse,
-    bool		stop_big_traversals,
-    CallbackFn		callback,
-    void *		callback_data)
-{
-    IParser* parser = IParser::get_parser(infilename);
-
-    unsigned int total_reads = 0;
-    unsigned int reads_kept = 0;
-    unsigned int n_singletons = 0;
-
-    Read read;
-    string seq;
-
-    SeenSet tags_todo;
-
-    //
-    // go through all the new reads, and consume & tag them.  keep track
-    // of all waypoints in the read in 'found_tags', and then check to
-    // see if we've found either tags with no partition, or tags from
-    // different partitions, or, heck, anything new.  if we did, then
-    // we have "new stuff" from the perspective of the graph.
-    //
-    // so, we can either traverse the graph, or just merge the partitions.
-    // the former is exact, the latter is inexact but way faster :)
-    //
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        if (_ht->check_and_normalize_read(seq)) {
-            unsigned long long n_consumed = 0;
-            SeenSet found_tags;
-            _ht->consume_sequence_and_tag(seq, n_consumed, &found_tags);
-
-            PartitionSet pset;
-            bool found_zero = false;
-
-            for (SeenSet::iterator si = found_tags.begin();
-                    si != found_tags.end(); ++si) {
-                PartitionMap::iterator pi = partition_map.find(*si);
-                PartitionID partition_id = 0;
-                if (pi != partition_map.end() && pi->second != NULL) {
-                    partition_id = *(pi->second);
-                }
-                if (partition_id == 0) {
-                    found_zero = true;
-                } else {
-                    pset.insert(partition_id);
-                }
-            }
-
-            if (pset.size() > 1 || found_zero || n_consumed) {
-
-                // ok, we found something unaccounted for by the current
-                // partitioning. We can either
-                //    (1) redo the partitioning of this area from scratch;
-                //    (2) just join tags that are on the same sequence (incl 0-tags);
-                // 1 is "perfect", 2 is imperfect but really fast.
-
-                // note, in the case of #2, we can dispense with the hashtable,
-                // and just use the tagset/partition map.
-
-                if (traverse) {
-                    // go with behavior #1
-
-                    if (n_consumed || found_zero) {
-                        for (SeenSet::iterator si = found_tags.begin(); si !=
-                                found_tags.end(); ++si) {
-                            tags_todo.insert(*si);
-                        }
-                    } else {
-                        assign_partition_id(*(found_tags.begin()), found_tags);
-                    }
-                } else {
-                    assign_partition_id(*(found_tags.begin()), found_tags);
-                }
-
-                //	std::cout << "got one! " << read.name << "\n";
-                // std::cout << pset.size() << " " << found_zero << " "
-                // << n_consumed << "\n";
-            }
-
-            total_reads++;
-
-            // run callback, if specified
-            if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-                try {
-                    callback("find_unpart", callback_data,
-                             total_reads, reads_kept);
-                } catch (...) {
-                    delete parser;
-                    parser = NULL;
-                    throw;
-                }
-            }
-        }
-    }
-
-    if (traverse) {
-        // std::cout << "new tags size: " << tags_todo.size() << "\n";
-
-        unsigned int n = 0;
-        SeenSet tagged_kmers;
-        for (SeenSet::iterator si = tags_todo.begin(); si != tags_todo.end();
-                ++si) {
-            n += 1;
-
-            Kmer kmer = _ht->build_kmer(*si);
-
-            // find all tagged kmers within range.
-            tagged_kmers.clear();
-            find_all_tags(kmer, tagged_kmers, _ht->all_tags,
-                          true, stop_big_traversals);
-
-            // std::cout << "found " << tagged_kmers.size() << "\n";
-
-            // assign the partition ID
-            // std::cout << next_partition_id << "\n";
-            assign_partition_id(kmer, tagged_kmers);
-
-            // print out
-            if (n % 1000 == 0) {
-                cout << "unpart-part " << n << " " << next_partition_id
-                     << "\n";
-            }
-        }
-    }
-
-    delete parser;
-    parser = NULL;
-
-    return n_singletons;
 }
 
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
@@ -456,10 +308,9 @@ void SubsetPartition::find_all_tags(
     }
 }
 
-
-
 // Perform a breadth-first search starting from the k-mers in the given
-// sequence
+// sequence.
+
 unsigned int SubsetPartition::sweep_for_tags(
     const std::string&	seq,
     SeenSet&		tagged_kmers,
@@ -551,8 +402,8 @@ unsigned int SubsetPartition::sweep_for_tags(
     return total;
 }
 
-// find_all_tags: the core of the partitioning code.  finds all tagged k-mers
-//    connected to kmer_f/kmer_r in the graph.
+// find_all_tags_truncate_on_abundance: experimental code for streaming
+// partitioning.
 
 void SubsetPartition::find_all_tags_truncate_on_abundance(
     Kmer start_kmer,
@@ -654,7 +505,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     }
 }
 
-///////////////////////////////////////////////////////////////////////
+// do_partition: Main partitioning code, to find components in large graphs.
 
 void SubsetPartition::do_partition(
     HashIntoType	first_kmer,
@@ -709,6 +560,8 @@ void SubsetPartition::do_partition(
         }
     }
 }
+
+// do_partition with abundance: Experimental code to do streaming partitioning.
 
 void SubsetPartition::do_partition_with_abundance(
     HashIntoType	first_kmer,
@@ -1295,51 +1148,6 @@ void SubsetPartition::_clear_all_partitions()
 }
 
 
-bool SubsetPartition::is_single_partition(std::string seq)
-{
-    if (!_ht->check_and_normalize_read(seq)) {
-        return 0;
-    }
-
-    PartitionSet partitions;
-    PartitionID *pp;
-
-    KmerIterator kmers(seq.c_str(), _ht->ksize());
-    while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (partition_map.find(kmer) != partition_map.end()) {
-            pp = partition_map[kmer];
-            if (pp) {
-                partitions.insert(*pp);
-            }
-        }
-    }
-
-    if (partitions.size() > 1) {
-        return false;
-    }
-
-    return true;
-}
-
-void SubsetPartition::join_partitions_by_path(std::string seq)
-{
-    SeenSet tagged_kmers;
-
-    KmerIterator kmers(seq.c_str(), _ht->ksize());
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
-            tagged_kmers.insert(kmer);
-        }
-    }
-
-    // assert(tagged_kmers.size());
-    assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
-}
-
 void SubsetPartition::partition_size_distribution(
     PartitionCountDistribution	&d,
     unsigned int		&n_unassigned)
@@ -1431,11 +1239,11 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 
     // find biggest.
     PartitionCountDistribution::const_iterator di = d.end();
-    --di;
 
     if (d.empty()) {
         throw khmer_exception();
     }
+    --di;
 
     for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
             ++cmi) {
@@ -1450,13 +1258,15 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 #if VERBOSE_REPARTITION
     std::cout << "biggest partition: " << di->first << "\n";
 #endif // 0
-    --di;
 
 #if VERBOSE_REPARTITION
     std::cout << "biggest partition ID: " << biggest_p << "\n";
 #endif // 0
 
-    next_largest = di->first;
+    if (di != d.begin()) {
+        --di;
+        next_largest = di->first;
+    }
 
 #if VERBOSE_REPARTITION
     std::cout << "next biggest partition: " << di->first << "\n";
@@ -1619,38 +1429,4 @@ void SubsetPartition::report_on_partitions()
         }
         std::cout << "--\n";
     }
-}
-
-void SubsetPartition::compare_to_partition(
-    PartitionID		pid1,
-    SubsetPartition	*p2,
-    PartitionID		pid2,
-    unsigned int	&n_only1,
-    unsigned int	&n_only2,
-    unsigned int	&n_shared)
-{
-    SubsetPartition * p1 = this;
-
-    for (PartitionMap::iterator pi = p1->partition_map.begin();
-            pi != p1->partition_map.end(); ++pi) {
-        PartitionID * pid = pi->second;
-        if (pid && *pid == pid1) {
-            PartitionID * pp2 = p2->partition_map[pi->first];
-            if (pp2 && *pp2 == pid2) {
-                n_shared++;
-            } else {
-                n_only1++;
-            }
-        }
-    }
-
-    for (PartitionMap::iterator pi = p2->partition_map.begin();
-            pi != p2->partition_map.end(); ++pi) {
-        PartitionID * pid = pi->second;
-        if (pid && *pid == pid2) {
-            n_only2++;
-        }
-    }
-
-    n_only2 -= n_shared;
 }

@@ -1,8 +1,8 @@
-2015-10-24  Titus Brown  <titus@idyll.org>
+2016-05-11  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: refactor to use generators; add --diginorm
    option to include digital normalization in trim-low-abund functionality.
-   * tests/test_script_output.py: added mD5sum hashing tests to pin down
+   * tests/test_script_output.py: added md5sum hashing tests to pin down
    functionality in trim-low-abund.py and normalize-by-median.py; verified
    that refactoring does not alter existing functionality.
    * tests/test-data/simple-genome-reads.fa: supporting file for md5sum
@@ -11,6 +11,95 @@
    how to generate them, and their uses.
    * tests/test_scripts.py: added additional tests for trim-low-abund.py
    functionality and error cases.
+
+2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up
+   duplicate `worker` partition function into a reusable place.
+
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * .dictionary, pylintrc:  added `pylint` configuration that checks spelling
+   in Python files. Added dictionary of project specific words.
+   * khmer/__init__.py, scripts/readstats.py, setup.py: Fixed typos.
+   * Makefile: line-wrapped; bumped up `pep8` version; beefed up `cppcheck`
+   target to correctly list the defines and includes for the current platform
+   which eliminates false positives; `*.pyc` files are now cleaned from the
+   `sandbox` as well as the `dist` directory. Added `cppcheck-long` target to
+   also examine the seqan headers. Fed the dynamically constucted list of
+   includes to Doxygen. Added simultaneous OS X, Debian, and Ubuntu
+   compatibility to many targets. Added helper target to print the value of
+   any variable via `make print-VARNAME`. Fixed the `make coverage-report`
+   target. pep257 is now called pydocstyle
+   * third-party/seqan/core/include/seqan/basic/debug_test_system.h,
+   third-party/seqan/ChangeLog: silenced bogus import
+   * doc/dev/coding-guidelines-and-review.rst,.github/PULL_REQUEST_TEMPLATE.md:
+   reformulated checklist to list action followed by a motivating question.
+   * doc/dev/release.rst: added author management to release checklist
+   * lib/counting.{cc,hh},sandbox/find-high-abund-kmers.py,
+   sandbox/README.rsr: removed the unused function
+   CountingHash::collect_high_abundance_kmers and the nonfunctional sandbox
+   script that called it.
+   * lib/kmer_hash.hh: make KmerFactory's default contrustor explicit to avoid
+   auto-casting optimizations.
+   * */*.py: a multitude of pylint inspired cleanups and bug fixes. Some
+   checks silenced in place.
+
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * README.rst: add depsy badge
+
+2016-05-08 Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * setup.py,sandbox/{readaligner_pairhmm_train.py,
+   Makefile.read_aligner_training}: switch to BAM parsing using simplesam
+
+2016-05-06  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{counting.cc,counting.hh,hashbits.cc,hashbits.hh,
+     hashtable.cc,hashtable.hh,subset.cc,subset.hh},
+   sandbox/{fasta-to-abundance-hist.py,find-high-abund-kmers.py
+     hi-lo-abundance-by-position.py,stoptag-abundance-hist.py,
+     abundance-hist-by-position.py},
+   tests/{test_countgraph.py,test_counting_single.py,test_filter.py,
+     test_nodegraph.py,test_subset_graph.py}: removed unused functions,
+   sandbox scripts, and tests for many functions. Specifically,
+   consume_fasta_and_tag_with_stoptags, identify_stop_tags_by_position and
+   identify_stoptags_by_position,
+   count_and_transfer_to_stoptags, traverse_from_tags,
+   filter_if_present, consume_fasta_and_traverse,
+   collect_high_abundance_kmers, fasta_dump_kmers_by_abundance,
+   fasta_count_kmers_by_position, output_fasta_kmer_pos_freq,
+   compare_partitions/compare_to_partition, join_partitions_by_path,
+   is_single_partition, and find_unpart function.
+
+   * sandbox/README.rst: updated for removed sandbox scripts.
+
+2016-04-29  Luiz Irber  <khmer@luizirber.org>
+
+   * jenkins-build.sh: add codecov coverage upload tool.
+
+2016-02-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
+   pull requests with checklist using GitHub's new template feature
+   * doc/dev/coding-guidelines-and-review.rst: update developer docs with
+   compensatory changes
+
+2015-08-14  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/subset.cc: check iterator before decrementing in
+   repartition_largest_partition
+
+2015-10-25  Titus Brown  <titus@idyll.org>
+
+   * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
+   and fix for close of --output file after first input file.
+
+2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * lib/magic: add file extensions, one media type, and a better comment
+   * khmer/__init__.py: Replace an errant 'Presence table' with 'node graph'
 
 2015-09-28  Lisa Cohen  <ljcohen@ucdavis.edu>
 

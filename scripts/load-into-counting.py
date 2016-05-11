@@ -33,11 +33,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring,invalid-name,no-member
 """
-Build a counting Bloom filter from the given sequences, save in <htname>.
+Build a counting Bloom filter from the given sequences, save in <countgraph>.
 
-% load-into-counting.py <htname> <data1> [ <data2> <...> ]
+% load-into-counting.py <countgraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -214,4 +214,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

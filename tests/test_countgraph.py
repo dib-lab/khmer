@@ -32,9 +32,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,protected-access
+# pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 from __future__ import print_function
 from __future__ import absolute_import, unicode_literals
+
 import gzip
 
 import os
@@ -45,7 +46,6 @@ from . import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
 
-import nose
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
@@ -173,7 +173,7 @@ def test_get_raw_tables_view():
 @attr('huge')
 def test_toobig():
     try:
-        ct = khmer.Countgraph(30, 1e13, 1)
+        khmer.Countgraph(30, 1e13, 1)
         assert 0, "this should fail"
     except MemoryError as err:
         print(str(err))
@@ -390,7 +390,7 @@ def test_median_at_least_exception():
     try:
         ht.median_at_least('ATGGCTGATCGAT', 1)
         assert 0, "should have thrown ValueError"
-    except ValueError as e:
+    except ValueError:
         pass
 
 
@@ -591,7 +591,7 @@ def test_load_truncated():
         fp.close()
 
         try:
-            ht = khmer.load_countgraph(truncpath)
+            khmer.load_countgraph(truncpath)
             assert 0, "this should not be reached!"
         except OSError as err:
             print(str(err))
@@ -665,7 +665,7 @@ def test_save_load_gz():
 def test_load_empty_files():
     def do_load_ct(fname):
         with assert_raises(OSError):
-            ct = khmer.load_countgraph(fname)
+            khmer.load_countgraph(fname)
 
     # Check empty files, compressed or not
     for ext in ['', '.gz']:
@@ -679,7 +679,7 @@ def test_trim_full():
     hi.consume(DNA)
     hi.consume(DNA)
 
-    seq, pos = hi.trim_on_abundance(DNA, 2)
+    seq, _ = hi.trim_on_abundance(DNA, 2)
     assert DNA == seq, seq
 
 
@@ -769,13 +769,13 @@ def test_find_spectral_error_positions_err():
     hi = khmer.Countgraph(8, 1e6, 2)
 
     try:
-        posns = hi.find_spectral_error_positions(DNA[:6], 1)
+        hi.find_spectral_error_positions(DNA[:6], 1)
         assert 0, "should raise ValueError; too short"
     except ValueError:
         pass
 
     try:
-        posns = hi.find_spectral_error_positions("ACGTACGN", 1)
+        hi.find_spectral_error_positions("ACGTACGN", 1)
         assert 0, "should raise ValueError; contains N"
     except ValueError:
         pass
@@ -787,7 +787,7 @@ def test_maxcount():
     kh.set_use_bigcount(False)
 
     last_count = None
-    for i in range(0, 1000):
+    for _ in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
 
@@ -805,7 +805,7 @@ def test_maxcount_with_bigcount():
     kh.set_use_bigcount(True)
 
     last_count = None
-    for i in range(0, 1000):
+    for _ in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
 
@@ -822,7 +822,7 @@ def test_maxcount_with_bigcount_save():
     kh = khmer.Countgraph(4, 4 ** 4, 4)
     kh.set_use_bigcount(True)
 
-    for i in range(0, 1000):
+    for _ in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
 
@@ -858,7 +858,7 @@ def test_bigcount_save():
 
     assert kh.get('AAAA') == 0
 
-    for i in range(0, 1000):
+    for _ in range(0, 1000):
         kh.count('AAAA')
         kh.get('AAAA')
 
@@ -882,7 +882,7 @@ def test_nobigcount_save():
 
     assert kh.get('AAAA') == 0
 
-    for i in range(0, 1000):
+    for _ in range(0, 1000):
         kh.count('AAAA')
         kh.get('AAAA')
 
@@ -927,7 +927,7 @@ def test_bigcount_overflow():
     kh = khmer.Countgraph(18, 1e7, 4)
     kh.set_use_bigcount(True)
 
-    for i in range(0, 70000):
+    for _ in range(0, 70000):
         kh.count('GGTTGACGGGGCTCAGGG')
 
     assert kh.get('GGTTGACGGGGCTCAGGG') == MAX_BIGCOUNT
@@ -944,13 +944,6 @@ def test_get_hashsizes():
     # supported any longer.
     expected = utils.longify([97, 89, 83, 79])
     assert kh.hashsizes() == expected, kh.hashsizes()
-
-
-# def test_collect_high_abundance_kmers():
-#    seqpath = utils.get_test_data('test-abund-read-2.fa')
-#
-#    kh = khmer.Countgraph(18, 1e6, 4)
-#    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
 
 
 def test_load_notexist_should_fail():
@@ -1060,8 +1053,6 @@ def test_counting_file_type_check():
 
 
 def test_counting_gz_file_type_check():
-    ht = khmer.Nodegraph(12, 1, 1)
-
     inpath = utils.get_test_data('goodversion-k12.ht.gz')
 
     kh = khmer.Countgraph(12, 1, 1)
@@ -1075,7 +1066,7 @@ def test_counting_gz_file_type_check():
 
 def test_counting_bad_primes_list():
     try:
-        ht = khmer._Countgraph(12, ["a", "b", "c"], 1)
+        khmer._Countgraph(12, ["a", "b", "c"], 1)
         assert 0, "bad list of primes should fail"
     except TypeError as e:
         print(str(e))
@@ -1211,26 +1202,6 @@ def test_badtrim():
     countgraph.trim_on_abundance("AAAAAA", 1)
 
 
-def test_badfasta_count_kmers_by_position():
-    countgraph = khmer.Countgraph(4, 4 ** 4, 4)
-    try:
-        countgraph.fasta_count_kmers_by_position()
-    except TypeError as err:
-        print(str(err))
-
-    filename = utils.get_test_data("test-short.fa")
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, -1, 0)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-    try:
-        countgraph.fasta_count_kmers_by_position(filename, 0, -1)
-        assert 0, "this should fail"
-    except ValueError as err:
-        print(str(err))
-
-
 def test_badload():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
@@ -1299,7 +1270,7 @@ def test_consume_and_retrieve_tags_1():
     ss = set()
     tt = set()
     for record in screed.open(utils.get_test_data('test-graph2.fa')):
-        for p, tag in ct.get_tags_and_positions(record.sequence):
+        for _, tag in ct.get_tags_and_positions(record.sequence):
             ss.add(tag)
 
         for start in range(len(record.sequence) - 3):
@@ -1322,7 +1293,7 @@ def test_consume_and_retrieve_tags_empty():
     ss = set()
     tt = set()
     for record in screed.open(utils.get_test_data('test-graph2.fa')):
-        for p, tag in ct.get_tags_and_positions(record.sequence):
+        for _, tag in ct.get_tags_and_positions(record.sequence):
             ss.add(tag)
 
         for start in range(len(record.sequence) - 3):
