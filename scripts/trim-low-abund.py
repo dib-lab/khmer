@@ -101,7 +101,8 @@ def get_parser():
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
-    parser.add_argument('--trim-at-coverage', '-Z', type=int,
+    parser.add_argument('--trim-at-coverage', '-Z', '--normalize-to',
+                        type=int,
                         help='trim reads when entire read above this coverage',
                         default=DEFAULT_TRIM_AT_COVERAGE)
 
