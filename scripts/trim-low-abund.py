@@ -222,6 +222,10 @@ class Trimmer(object):
         self.do_normalize = False
         self.diginorm_coverage = None
 
+    def set_diginorm(self, coverage):
+        self.do_normalize = True
+        self.diginorm_coverage = coverage
+
     def pass1(self, reader, saver):
         """
         The first pass across the read data does the following:
@@ -371,8 +375,7 @@ def main():
     trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
                       args.trim_at_coverage)
     if args.diginorm:
-        trimmer.do_normalize = True
-        trimmer.diginorm_coverage = int(args.diginorm_coverage)
+        trimmer.set_diginorm(args.diginorm_coverage)
 
     # ### FIRST PASS ###
 
