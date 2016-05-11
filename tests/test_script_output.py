@@ -188,5 +188,6 @@ def test_trim_low_abund_k21_M1e7_C4_variable_Z15():
                                           '-M', '1e7', '-o', outfile,
                                           infile])
 
-    hash = _calc_md5(open(outfile, 'rb'))
-    assert hash == 'b948ae4f2114be27279de37b46376f6d', hash
+    with open(outfile, 'rb') as output:
+        hashval = _calc_md5(output)
+    assert hashval == 'b948ae4f2114be27279de37b46376f6d', hash
