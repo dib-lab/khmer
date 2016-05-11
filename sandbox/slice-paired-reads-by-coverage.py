@@ -52,11 +52,11 @@ def main():
     parser.add_argument('-m', '--min-coverage', type=int, default=None)
     parser.add_argument('-M', '--max-coverage', type=int, default=None)
     parser.add_argument('input_count_graph')
-    parser.add_argument('output_readfile')
-    parser.add_argument('output_pairfile')
     parser.add_argument('input_readfile')
     parser.add_argument('input_pairfile')
-    parser.add_argument('output_singlefile', default=None)
+    parser.add_argument('output_readfile')
+    parser.add_argument('output_pairfile')
+    parser.add_argument('output_singlefile', default=None, nargs='?')
     args = parser.parse_args()
 
     print('min_coverage: %s' % args.min_coverage, file=sys.stderr)
@@ -83,7 +83,7 @@ def main():
 
     n_kept = 0
     n = 0
-    pair_iter = screed.open(args.input_pairfile)
+    pair_iter = iter(screed.open(args.input_pairfile))
 
     for n, record in enumerate(screed.open(args.input_readfile)):
         if n % 100000 == 0:
@@ -97,7 +97,7 @@ def main():
 
         try:
             med, _, _ = htable.get_median_count(seq)
-            pmed, _, _ = htable.get_median_count(pmed)
+            pmed, _, _ = htable.get_median_count(pseq)
         except ValueError:
             continue
 
@@ -116,17 +116,19 @@ def main():
                 pkeep = False
 
         if keep and pkeep:
-            n_kept += 1
+            n_kept += 2
             output_fp.write(output_single(record))
             output_pfp.write(output_single(pair_record))
 
         if args.output_singlefile:
             if keep and not pkeep:
+                n_kept += 1
                 output_sfp.write(output_single(record))
             if pkeep and not keep:
-                output_sfp.write(output_single(record))
+                n_kept += 1
+                output_sfp.write(output_single(pair_record))
 
-    print('consumed %d reads; kept %d' % (n, n_kept), file=sys.stderr)
+    print('consumed %d reads; kept %d' % (2 * (n + 1), n_kept), file=sys.stderr)
 
 if __name__ == '__main__':
     main()
