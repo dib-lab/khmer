@@ -1,3 +1,12 @@
+2016-05-11  Adam J. Orr  <adamjorr@gmail.com>
+   
+   * sandbox/slice-paired-reads-by-coverage.py: added script similar to slice-
+   reads-by-coverage.py, but supports paired reads
+   * tests/test_sandbox_scripts.py: added tests for slice-paired-reads-by-
+   coverage.py
+   * tests/test-data/{paired-slice.fq.1,paired-slice.fq.2,paired-slice.fq}:
+   added test data for slice-paired-reads-by-coverage.py
+
 2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up
