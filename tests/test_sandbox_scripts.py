@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -326,25 +326,28 @@ def test_multirename_fasta():
     r = open(infile2).read()
     assert r in out
 
+
 def test_slice_paired_reads_by_coverage_1():
     infile1 = utils.get_temp_filename('paired-slice.fq.1')
     infile2 = utils.get_temp_filename('paired-slice.fq.2')
     ht = utils.get_temp_filename('paired-slice.ht')
     outfile1 = utils.get_temp_filename('paired-sliced-1.fq')
     outfile2 = utils.get_temp_filename('paired-sliced-2.fq')
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'),infile1)
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'),infile2)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'), infile1)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'), infile2)
 
     ht_script = scriptpath('load-into-counting.py')
-    ht_args = [ht,infile1,infile2]
+    ht_args = [ht, infile1, infile2]
     script = scriptpath('slice-paired-reads-by-coverage.py')
-    args = [ht, infile1, infile2, outfile1, outfile2,'-m 2']
+    args = [ht, infile1, infile2, outfile1, outfile2, '-m 2']
 
-    ht_status, ht_out, ht_err = utils.runscript(ht_script,ht_args,sandbox=True)
+    ht_status, ht_out, ht_err = utils.runscript(ht_script, ht_args,
+                                                sandbox=True)
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert len([r for r in screed.open(outfile1)]) == 2
     assert len([r for r in screed.open(outfile2)]) == 2
+
 
 def test_slice_paired_reads_by_coverage_2():
     infile1 = utils.get_temp_filename('paired-slice.fq.1')
@@ -352,19 +355,21 @@ def test_slice_paired_reads_by_coverage_2():
     ht = utils.get_temp_filename('paired-slice.ht')
     outfile1 = utils.get_temp_filename('paired-sliced-1.fq')
     outfile2 = utils.get_temp_filename('paired-sliced-2.fq')
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'),infile1)
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'),infile2)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'), infile1)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'), infile2)
 
     ht_script = scriptpath('load-into-counting.py')
-    ht_args = [ht,infile1,infile2]
+    ht_args = [ht, infile1, infile2]
     script = scriptpath('slice-paired-reads-by-coverage.py')
-    args = [ht, infile1, infile2, outfile1, outfile2,'-M 2']
+    args = [ht, infile1, infile2, outfile1, outfile2, '-M 2']
 
-    ht_status, ht_out, ht_err = utils.runscript(ht_script,ht_args,sandbox=True)
+    ht_status, ht_out, ht_err = utils.runscript(ht_script, ht_args,
+                                                sandbox=True)
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert len([r for r in screed.open(outfile1)]) == 0
     assert len([r for r in screed.open(outfile2)]) == 0
+
 
 def test_slice_paired_reads_by_coverage_3():
     infile1 = utils.get_temp_filename('paired-slice.fq.1')
@@ -373,20 +378,22 @@ def test_slice_paired_reads_by_coverage_3():
     outfile1 = utils.get_temp_filename('paired-sliced-1.fq')
     outfile2 = utils.get_temp_filename('paired-sliced-2.fq')
     outfile3 = utils.get_temp_filename('singleton-sliced.fq')
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'),infile1)
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'),infile2)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'), infile1)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'), infile2)
 
     ht_script = scriptpath('load-into-counting.py')
-    ht_args = [ht,infile1,infile2]
+    ht_args = [ht, infile1, infile2]
     script = scriptpath('slice-paired-reads-by-coverage.py')
-    args = [ht, infile1, infile2, outfile1, outfile2, outfile3,'-m 2']
+    args = [ht, infile1, infile2, outfile1, outfile2, outfile3, '-m 2']
 
-    ht_status, ht_out, ht_err = utils.runscript(ht_script,ht_args,sandbox=True)
+    ht_status, ht_out, ht_err = utils.runscript(ht_script, ht_args,
+                                                sandbox=True)
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert len([r for r in screed.open(outfile1)]) == 2
     assert len([r for r in screed.open(outfile2)]) == 2
     assert len([r for r in screed.open(outfile3)]) == 1
+
 
 def test_slice_paired_reads_by_coverage_4():
     infile1 = utils.get_temp_filename('paired-slice.fq.1')
@@ -395,15 +402,16 @@ def test_slice_paired_reads_by_coverage_4():
     outfile1 = utils.get_temp_filename('paired-sliced-1.fq')
     outfile2 = utils.get_temp_filename('paired-sliced-2.fq')
     outfile3 = utils.get_temp_filename('singleton-sliced.fq')
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'),infile1)
-    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'),infile2)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.1'), infile1)
+    shutil.copyfile(utils.get_test_data('paired-slice.fq.2'), infile2)
 
     ht_script = scriptpath('load-into-counting.py')
-    ht_args = [ht,infile1,infile2]
+    ht_args = [ht, infile1, infile2]
     script = scriptpath('slice-paired-reads-by-coverage.py')
-    args = [ht, infile1, infile2, outfile1, outfile2, outfile3,'-M 2']
+    args = [ht, infile1, infile2, outfile1, outfile2, outfile3, '-M 2']
 
-    ht_status, ht_out, ht_err = utils.runscript(ht_script,ht_args,sandbox=True)
+    ht_status, ht_out, ht_err = utils.runscript(ht_script, ht_args,
+                                                sandbox=True)
     status, out, err = utils.runscript(script, args, sandbox=True)
 
     assert len([r for r in screed.open(outfile1)]) == 0
