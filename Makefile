@@ -220,8 +220,8 @@ diff_pylint_report: pylint_report.txt
 	diff-quality --violations=pylint pylint_report.txt
 
 # We need to get coverage to look at our scripts. Since they aren't in a
-# python module we can't tell nosetests to look for them (via an import
-# statement). So we run nose inside of coverage.
+# python module we can't tell pytest to look for them (via an import
+# statement). So we run pytest inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	./setup.py develop
 	coverage run --branch --source=scripts,khmer,oxli \
