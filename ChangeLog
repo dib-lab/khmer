@@ -1,3 +1,8 @@
+2016-05-11  Titus Brown  <titus@idyll.org>
+
+   * tests/test_read_parsers.py: fixed syntax error introduced by previous
+   merge.
+
 2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up
