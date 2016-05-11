@@ -232,6 +232,11 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
     if do_gzip and do_bzip:
         raise ValueError("Cannot specify both bzip and gzip compression!")
 
+    if file_handle is sys.stdout:         # needed for Python 3/gzip.
+        if hasattr(sys.stdout, 'detach'):
+            file_handle = sys.stdout.detach()
+            sys.stdout = None      # hack to prevent end-of-script exc
+
     if do_gzip:
         ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
     elif do_bzip:
