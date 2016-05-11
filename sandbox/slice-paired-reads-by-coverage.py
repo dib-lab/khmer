@@ -120,11 +120,11 @@ def main():
             output_fp.write(output_single(record))
             output_pfp.write(output_single(pair_record))
 
-        if args.output_singlefile:
-            if keep and not pkeep:
+        elif args.output_singlefile:
+            if keep:
                 n_kept += 1
                 output_sfp.write(output_single(record))
-            if pkeep and not keep:
+            if pkeep:
                 n_kept += 1
                 output_sfp.write(output_single(pair_record))
 
