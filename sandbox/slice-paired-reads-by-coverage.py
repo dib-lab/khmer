@@ -124,7 +124,7 @@ def main():
             if keep:
                 n_kept += 1
                 output_sfp.write(output_single(record))
-            if pkeep:
+            elif pkeep:
                 n_kept += 1
                 output_sfp.write(output_single(pair_record))
 
