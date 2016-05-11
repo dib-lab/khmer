@@ -667,6 +667,21 @@ static PyObject* khmer_HashSet_new(PyTypeObject * type, PyObject * args,
     return (PyObject *) self;
 }
 
+typedef struct {
+    PyObject_HEAD
+    SeenSet::iterator * it;
+} _HashSet_iterobj;
+
+static PyObject * _HashSet_iter(PyObject * self)
+{
+    ;
+}
+
+static PyObject * _HashSet_iternext(PyObject * self)
+{
+    ;
+}
+
 static PyTypeObject khmer_HashSet_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
     "_khmer.HashSet",                     /* tp_name */
@@ -693,8 +708,8 @@ static PyTypeObject khmer_HashSet_Type = {
     0,                                    /* tp_clear */
     0,                                    /* tp_richcompare */
     0,                                    /* tp_weaklistoffset */
-    0,                                    /* tp_iter */
-    0,                                    /* tp_iternext */
+    _HashSet_iter,                        /* tp_iter */
+    (iternextfunc)_HashSet_iternext,      /* tp_iternext */
     0,                                    /* tp_methods */
     0,                                    /* tp_members */
     0,                                    /* tp_getset */
