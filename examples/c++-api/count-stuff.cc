@@ -1,4 +1,8 @@
+// A demonstration of using khmer to count k-mers; in this case, the request
+// was for exact counting.
+
 #include <vector>
+#include <cmath>
 #include "khmer.hh"
 #include "counting.hh"
 
@@ -6,10 +10,16 @@ using namespace khmer;
 
 int main()
 {
+    unsigned int ksize = 11;
+
+    // for exact counting, you need to create one table that is
+    // >= 4**k.  This will be that size in bytes, note, so you
+    // will need the appropriate amount of memory.
+
     std::vector<HashIntoType> tablesize;
-    tablesize.push_back(4194304);
+    tablesize.push_back(pow(4, ksize));
     
-    CountingHash ktable(11, tablesize);
+    CountingHash ktable(ksize, tablesize);
 
     ktable.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
 
