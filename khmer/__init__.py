@@ -45,7 +45,6 @@ from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._khmer import HashSet
 from khmer._minhash import MinHash, load_neighborhood_minhash
 
 from khmer._khmer import forward_hash
