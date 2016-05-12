@@ -100,6 +100,7 @@ class Test_RandomData(object):
         assert total_reads == 6, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
 
         x = ht.do_subset_partition(divvy[0], divvy[4])
         ht.merge_subset(x)
@@ -120,6 +121,7 @@ class Test_RandomData(object):
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -139,6 +141,7 @@ class Test_RandomData(object):
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -158,6 +161,7 @@ class Test_RandomData(object):
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4, len(divvy)
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -181,6 +185,7 @@ class Test_RandomData(object):
         subsets = []
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
         divvy.append(0)
         for i in range(len(divvy) - 1):
             x = ht.do_subset_partition(divvy[i], divvy[i + 1])
@@ -212,6 +217,7 @@ class Test_RandomData(object):
         ht.load_tagset(savefile_tags)
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
         divvy.append(0)
 
         subsets = []
@@ -305,6 +311,7 @@ class Test_SaveLoadPmap(object):
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -374,6 +381,7 @@ class Test_SaveLoadPmap(object):
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')

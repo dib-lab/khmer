@@ -675,6 +675,8 @@ typedef struct {
     SeenSet * hashes;
 } khmer_HashSet_Object;
 
+static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h);
+
 static
 void
 khmer_HashSet_dealloc(khmer_HashSet_Object * obj)
@@ -860,6 +862,18 @@ static PyTypeObject khmer_HashSet_Type = {
     0,                                    /* tp_alloc */
     khmer_HashSet_new,                    /* tp_new */
 };
+
+static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h)
+{
+    khmer_HashSet_Object * self;
+
+    self = (khmer_HashSet_Object *)
+        khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
+    if (self != NULL) {
+        self->hashes = h;
+    }
+    return self;
+}
 
 /***********************************************************************/
 
@@ -1300,29 +1314,18 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    SeenSet tags;
+    SeenSet * tags = new SeenSet;
 
     Kmer start_kmer = hashtable->build_kmer(kmer_s);
 
     Py_BEGIN_ALLOW_THREADS
 
-    hashtable->partition->find_all_tags(start_kmer, tags,
+    hashtable->partition->find_all_tags(start_kmer, *tags,
                                         hashtable->all_tags);
 
     Py_END_ALLOW_THREADS
 
-    PyObject * x =  PyList_New(tags.size());
-    if (x == NULL) {
-        return NULL;
-    }
-    SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = tags.begin(); si != tags.end(); ++si) {
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-        i++;
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(tags);
     return x;
 }
 
@@ -2320,16 +2323,10 @@ hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    SeenSet divvy;
-    hashtable->divide_tags_into_subsets(subset_size, divvy);
+    SeenSet * divvy = new SeenSet;
+    hashtable->divide_tags_into_subsets(subset_size, *divvy);
 
-    PyObject * x = PyList_New(divvy.size());
-    unsigned int i = 0;
-    for (SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
-            ++si, i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(divvy);
     return x;
 }
 
@@ -3753,30 +3750,18 @@ labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    SeenSet tagged_kmers;
+    SeenSet * tagged_kmers = new SeenSet;
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->graph->partition->sweep_for_tags(seq, tagged_kmers,
+    labelhash->graph->partition->sweep_for_tags(seq, *tagged_kmers,
             labelhash->graph->all_tags,
             range, break_on_stop_tags,
             stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 
-    PyObject * x =  PyList_New(tagged_kmers.size());
-    if (x == NULL) {
-        return NULL;
-    }
-    SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = tagged_kmers.begin(); si != tagged_kmers.end(); ++si) {
-        //std::string kmer_s = _revhash(*si, labelhash->ksize());
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-        i++;
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(tagged_kmers);
     return x;
 }
 
