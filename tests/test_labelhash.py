@@ -260,7 +260,7 @@ def test_sweep_tag_neighborhood():
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
-    assert tags.pop() == 173473779682
+    assert list(tags) == [173473779682]
 
 
 def test_sweep_label_neighborhood():

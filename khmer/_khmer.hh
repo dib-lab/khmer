@@ -12,6 +12,7 @@
 #define PyInt_Check(arg) PyLong_Check(arg)
 #define PyInt_AsLong(arg) PyLong_AsLong(arg)
 #define PyInt_FromLong(arg) PyLong_FromLong(arg)
+#define Py_TPFLAGS_HAVE_ITER 0
 #endif
 
 //

@@ -629,6 +629,214 @@ static PyTypeObject khmer_PrePartitionInfo_Type = {
 
 
 /***********************************************************************/
+/***********************************************************************/
+
+typedef struct {
+    PyObject_HEAD
+    SeenSet * hashes;
+} khmer_HashSet_Object;
+
+static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h);
+
+static
+void
+khmer_HashSet_dealloc(khmer_HashSet_Object * obj)
+{
+    delete obj->hashes;
+    obj->hashes = NULL;
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject* khmer_HashSet_new(PyTypeObject * type, PyObject * args,
+                                   PyObject * kwds)
+{
+    khmer_HashSet_Object * self;
+
+    self = (khmer_HashSet_Object *)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * list_o = NULL;
+        if (!PyArg_ParseTuple(args, "|O!", &PyList_Type, &list_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->hashes = new SeenSet;
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+        if (list_o) {
+            Py_ssize_t size = PyList_Size(list_o);
+            for (Py_ssize_t i = 0; i < size; i++) {
+                PyObject * item = PyList_GET_ITEM(list_o, i);
+                HashIntoType h = PyLong_AsUnsignedLong(item);
+                self->hashes->insert(h);
+            }
+        }
+    }
+    return (PyObject *) self;
+}
+
+/***********************************************************************/
+
+typedef struct {
+    PyObject_HEAD
+    khmer_HashSet_Object * parent;
+    SeenSet::iterator * it;
+} _HashSet_iterobj;
+
+static
+void
+_HashSet_iter_dealloc(_HashSet_iterobj * obj)
+{
+    delete obj->it;
+    obj->it = NULL;
+    Py_DECREF(obj->parent);
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * _HashSet_iter(PyObject * self)
+{
+    return self;
+}
+
+static PyObject * _HashSet_iternext(PyObject * self)
+{
+    _HashSet_iterobj * iter_obj = (_HashSet_iterobj *) self;
+    SeenSet * hashes = iter_obj->parent->hashes;
+    if (*iter_obj->it != hashes->end()) {
+        PyObject * ret = PyLong_FromUnsignedLongLong(**iter_obj->it);
+        (*(iter_obj->it))++;
+        return ret;
+    }
+
+    PyErr_SetString(PyExc_StopIteration, "end of HashSet");
+    return NULL;
+}
+
+static PyTypeObject _HashSet_iter_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "_khmer.HashSet_iter",                /* tp_name */
+    sizeof(_HashSet_iterobj),        /* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    (destructor)_HashSet_iter_dealloc, /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    0,                                    /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
+    "iterator object for HashSet objects.", /* tp_doc */
+    0,                                    /* tp_traverse */
+    0,                                    /* tp_clear */
+    0,                                    /* tp_richcompare */
+    0,                                    /* tp_weaklistoffset */
+    _HashSet_iter,                        /* tp_iter */
+    _HashSet_iternext,                    /* tp_iternext */
+    0,                                    /* tp_methods */
+    0,                                    /* tp_members */
+    0,                                    /* tp_getset */
+    0,                                    /* tp_base */
+    0,                                    /* tp_dict */
+    0,                                    /* tp_descr_get */
+    0,                                    /* tp_descr_set */
+    0,                                    /* tp_dictoffset */
+    0,                                    /* tp_init */
+    0,                                    /* tp_alloc */
+    0,                                    /* tp_new */
+};
+
+static PyObject * khmer_HashSet_iter(PyObject * self)
+{
+    khmer_HashSet_Object * me = (khmer_HashSet_Object *) self;
+    _HashSet_iterobj * iter_obj = (_HashSet_iterobj *)
+        _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
+    if (iter_obj != NULL) {
+        Py_INCREF(me);
+        iter_obj->parent = me;
+
+        iter_obj->it = new SeenSet::iterator;
+        *iter_obj->it = me->hashes->begin();
+    }
+    return (PyObject *) iter_obj;
+}
+
+static int khmer_HashSet_len(khmer_HashSet_Object * o)
+{
+    return o->hashes->size();
+}
+
+static PySequenceMethods khmer_HashSet_seqmethods[] = {
+    (lenfunc)khmer_HashSet_len, /* sq_length */
+    0,                          /* sq_concat */
+};
+
+static PyTypeObject khmer_HashSet_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "_khmer.HashSet",                     /* tp_name */
+    sizeof(khmer_HashSet_Object),         /* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    (destructor)khmer_HashSet_dealloc,    /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    khmer_HashSet_seqmethods,             /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
+    "Stores a set of hashed k-mers.",     /* tp_doc */
+    0,                                    /* tp_traverse */
+    0,                                    /* tp_clear */
+    0,                                    /* tp_richcompare */
+    0,                                    /* tp_weaklistoffset */
+    khmer_HashSet_iter,                   /* tp_iter */
+    0,                                    /* tp_iternext */
+    0,                                    /* tp_methods */
+    0,                                    /* tp_members */
+    0,                                    /* tp_getset */
+    0,                                    /* tp_base */
+    0,                                    /* tp_dict */
+    0,                                    /* tp_descr_get */
+    0,                                    /* tp_descr_set */
+    0,                                    /* tp_dictoffset */
+    0,                                    /* tp_init */
+    0,                                    /* tp_alloc */
+    khmer_HashSet_new,                    /* tp_new */
+};
+
+static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h)
+{
+    khmer_HashSet_Object * self;
+
+    self = (khmer_HashSet_Object *)
+        khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
+    if (self != NULL) {
+        self->hashes = h;
+    }
+    return self;
+}
+
+/***********************************************************************/
 
 typedef struct {
     PyObject_HEAD
@@ -1236,29 +1444,18 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    SeenSet tags;
+    SeenSet * tags = new SeenSet;
 
     Kmer start_kmer = hashtable->build_kmer(kmer_s);
 
     Py_BEGIN_ALLOW_THREADS
 
-    hashtable->partition->find_all_tags(start_kmer, tags,
+    hashtable->partition->find_all_tags(start_kmer, *tags,
                                         hashtable->all_tags);
 
     Py_END_ALLOW_THREADS
 
-    PyObject * x =  PyList_New(tags.size());
-    if (x == NULL) {
-        return NULL;
-    }
-    SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = tags.begin(); si != tags.end(); ++si) {
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-        i++;
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(tags);
     return x;
 }
 
@@ -2349,16 +2546,10 @@ hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    SeenSet divvy;
-    hashtable->divide_tags_into_subsets(subset_size, divvy);
+    SeenSet * divvy = new SeenSet;
+    hashtable->divide_tags_into_subsets(subset_size, *divvy);
 
-    PyObject * x = PyList_New(divvy.size());
-    unsigned int i = 0;
-    for (SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
-            ++si, i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(divvy);
     return x;
 }
 
@@ -3813,30 +4004,18 @@ labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    SeenSet tagged_kmers;
+    SeenSet * tagged_kmers = new SeenSet;
 
     //Py_BEGIN_ALLOW_THREADS
 
-    labelhash->graph->partition->sweep_for_tags(seq, tagged_kmers,
+    labelhash->graph->partition->sweep_for_tags(seq, *tagged_kmers,
             labelhash->graph->all_tags,
             range, break_on_stop_tags,
             stop_big_traversals);
 
     //Py_END_ALLOW_THREADS
 
-    PyObject * x =  PyList_New(tagged_kmers.size());
-    if (x == NULL) {
-        return NULL;
-    }
-    SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = tagged_kmers.begin(); si != tagged_kmers.end(); ++si) {
-        //std::string kmer_s = _revhash(*si, labelhash->ksize());
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-        i++;
-    }
-
+    PyObject * x = (PyObject *) create_HashSet_Object(tagged_kmers);
     return x;
 }
 
@@ -4880,6 +5059,15 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    if (PyType_Ready(&_HashSet_iter_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_HashSet_Type.tp_new = khmer_HashSet_new;
+    if (PyType_Ready(&khmer_HashSet_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_KHLLCounter_Type);
     if (PyModule_AddObject(m, "HLLCounter",
                            (PyObject *)&khmer_KHLLCounter_Type) < 0) {
@@ -4889,6 +5077,12 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_ReadAlignerType);
     if (PyModule_AddObject(m, "ReadAligner",
                            (PyObject *)&khmer_ReadAlignerType) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_HashSet_Type);
+    if (PyModule_AddObject(m, "HashSet",
+                           (PyObject *)&khmer_HashSet_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 

@@ -45,9 +45,10 @@ from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._minhash import MinHash, load_neighborhood_minhash
-
+from khmer._khmer import HashSet
 from khmer._khmer import forward_hash
+
+from khmer._minhash import MinHash, load_neighborhood_minhash
 # tests/test_{functions,countgraph,counting_single}.py
 
 from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py

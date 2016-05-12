@@ -158,6 +158,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     # divide the tags up into subsets
     divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 

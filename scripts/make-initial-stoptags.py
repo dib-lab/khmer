@@ -127,6 +127,7 @@ def main():
 
     # divide up into SUBSET_SIZE fragments
     divvy = nodegraph.divide_tags_into_subsets(args.subset_size)
+    divvy = list(divvy)
 
     # pick off the first one
     if len(divvy) == 1:
