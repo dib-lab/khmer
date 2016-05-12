@@ -801,7 +801,9 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
     _HashSet_iterobj * iter_obj = (_HashSet_iterobj *)
         _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
     if (iter_obj != NULL) {
+        Py_INCREF(me);
         iter_obj->parent = me;
+
         iter_obj->it = new SeenSet::iterator;
         *iter_obj->it = me->hashes->begin();
     }
