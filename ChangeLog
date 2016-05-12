@@ -1,3 +1,11 @@
+2016-05-12  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: define new khmer_HashSet_Type and object.
+   * khmer/__init__.py: import new HashSet type from _khmer.
+   * scripts/{do-partition.py, make-initial-stoptags.py,
+   partition-graph.py},tests/{test_hashset.py,test_labelhash.py,
+   test_subset_graph.py}: refactor existing code to HashSet object.
+
 2016-05-11  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: refactor to use generators; add --diginorm
