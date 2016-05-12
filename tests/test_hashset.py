@@ -58,7 +58,7 @@ def test_new_1():
 def test_new_2():
     hs = khmer.HashSet([5])
     assert len(hs) == 1
-    
+
     x = iter(hs)
     x.__next__()
     try:
@@ -76,7 +76,7 @@ def test_iter_single():
 
 
 def test_iter_double():
-    x = [6, 9, 20]    
+    x = [6, 9, 20]
     hs = khmer.HashSet(x)
     for i, k in enumerate(hs):
         assert k == x[i], (k, x[i])
