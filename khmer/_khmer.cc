@@ -1227,10 +1227,6 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    auto filter = [&] (Kmer& n) -> bool {
-        return true;
-    };
-
     std::string s = _revhash(val, hashtable->ksize());
     HashIntoType f, r, u;
     u = _hash(s.c_str(), hashtable->ksize(), f, r);
@@ -1239,8 +1235,7 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     KmerQueue node_q;
     Traverser traverser(hashtable);
 
-    traverser.traverse_right(start_kmer, node_q, filter);
-    traverser.traverse_left(start_kmer, node_q, filter);
+    traverser.traverse(start_kmer, node_q);
 
     PyObject * x =  PyList_New(node_q.size());
     if (x == NULL) {
