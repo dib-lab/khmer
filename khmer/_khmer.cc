@@ -1220,17 +1220,26 @@ PyObject *
 hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
+    PyObject * val_obj;
 
-    HashIntoType val;
-
-    if (!PyArg_ParseTuple(args, "K", &val)) {
+    if (!PyArg_ParseTuple(args, "O", &val_obj)) {
         return NULL;
     }
 
-    std::string s = _revhash(val, hashtable->ksize());
-    HashIntoType f, r, u;
-    u = _hash(s.c_str(), hashtable->ksize(), f, r);
-    Kmer start_kmer(f, r, u);
+    Kmer start_kmer;
+    if (PyLong_Check(val_obj)) {
+        HashIntoType val = PyLong_AsUnsignedLongLong(val_obj);
+
+        start_kmer.set_from_unique_hash(val, hashtable->ksize());
+    } else if (PyUnicode_Check(val_obj))  {
+        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+                                            val_obj, "utf-8", "strict"));
+        start_kmer = Kmer(s, hashtable->ksize());
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "must pass in either a hash or a string");
+        return NULL;
+    }
 
     KmerQueue node_q;
     Traverser traverser(hashtable);

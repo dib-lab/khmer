@@ -354,16 +354,21 @@ def test_kmer_neighbors():
     nodegraph.consume_fasta(inpfile)
 
     h = khmer.forward_hash('AAAA', 4)
+    print(type('AAAA'))
     assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == [0, 0]  # AAAA on both sides
 
     h = khmer.forward_hash('AAAT', 4)
     assert nodegraph.neighbors(h) == [0]          # AAAA on one side
+    assert nodegraph.neighbors('AAAT') == [0]     # AAAA on one side
 
     h = khmer.forward_hash('AATA', 4)
     assert nodegraph.neighbors(h) == []           # no neighbors
+    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
 
     h = khmer.forward_hash('TAAA', 4)
     assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
+    assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
 
 
 def test_save_load_tagset():
