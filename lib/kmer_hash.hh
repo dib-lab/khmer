@@ -149,10 +149,24 @@ public:
         kmer_u = u;
     }
 
+    /** @param[in]   s     DNA k-mer
+        @param[in]   ksize k-mer size
+     */
+    Kmer(const std::string s, WordLength ksize)
+    {
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+    }
+
     /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
         kmer_f = kmer_r = kmer_u = 0;
+    }
+
+    void set_from_unique_hash(HashIntoType h, WordLength ksize)
+    {
+        std::string s = _revhash(h, ksize);
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
     }
 
     /// Allows complete backwards compatibility
