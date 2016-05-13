@@ -104,6 +104,17 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
     return h;			// return forward only
 }
 
+HashIntoType _hash(const std::string kmer, const WordLength k)
+{
+    return _hash(kmer.c_str(), k);
+}
+
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                    HashIntoType& h, HashIntoType& r)
+{
+    return _hash(kmer.c_str(), k, h, r);
+}
+
 //
 // _revhash: given an unsigned int, return the associated k-mer.
 //

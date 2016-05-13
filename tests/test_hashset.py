@@ -44,7 +44,7 @@ from . import khmer_tst_utils as utils
 
 
 def test_new_1():
-    hs = khmer.HashSet()
+    hs = khmer.HashSet(5)
     assert len(hs) == 0
 
     x = iter(hs)
@@ -56,7 +56,7 @@ def test_new_1():
 
 
 def test_new_2():
-    hs = khmer.HashSet([5])
+    hs = khmer.HashSet(5, [5])
     assert len(hs) == 1
 
     x = iter(hs)
@@ -69,7 +69,7 @@ def test_new_2():
 
 
 def test_iter_single():
-    hs = khmer.HashSet([6])
+    hs = khmer.HashSet(5, [6])
     for k in hs:
         assert k == 6
         print(k)
@@ -77,13 +77,13 @@ def test_iter_single():
 
 def test_iter_double():
     x = [6, 9, 20]
-    hs = khmer.HashSet(x)
+    hs = khmer.HashSet(5, x)
     for i, k in enumerate(hs):
         assert k == x[i], (k, x[i])
 
 
 def test_add():
-    hs = khmer.HashSet()
+    hs = khmer.HashSet(5)
     hs.add(7)
     hs.add(4)
 
@@ -91,7 +91,7 @@ def test_add():
 
 
 def test_update():
-    hs = khmer.HashSet()
+    hs = khmer.HashSet(5)
     x = [5, 10, 15]
     hs.update(x)
 
@@ -99,7 +99,7 @@ def test_update():
 
 
 def test_remove():
-    hs = khmer.HashSet([8, 10])
+    hs = khmer.HashSet(5, [8, 10])
     assert len(hs) == 2
     hs.remove(8)
     assert len(hs) == 1
@@ -107,7 +107,7 @@ def test_remove():
 
 
 def test_remove_2():
-    hs = khmer.HashSet([8, 10])
+    hs = khmer.HashSet(5, [8, 10])
     assert len(hs) == 2
     try:
         hs.remove(15)
