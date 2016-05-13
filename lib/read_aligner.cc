@@ -532,7 +532,7 @@ Alignment* ReadAligner::Align(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer.c_str(), k, fhash, rhash);
+    _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "
@@ -610,7 +610,7 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer.c_str(), k, fhash, rhash);
+    _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "

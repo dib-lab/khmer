@@ -632,7 +632,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     set_partition_id(kmer, p);
 }
@@ -802,7 +802,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     return get_partition_id(kmer);
 }
