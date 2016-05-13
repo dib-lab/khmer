@@ -817,6 +817,85 @@ static int khmer_HashSet_len(khmer_HashSet_Object * o)
     return o->hashes->size();
 }
 
+static PyObject *
+hashset_add(khmer_HashSet_Object * me, PyObject * args)
+{
+    HashIntoType h;
+    if (!PyArg_ParseTuple(args, "K", &h)) {
+        return NULL;
+    }
+    me->hashes->insert(h);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *
+hashset_remove(khmer_HashSet_Object * me, PyObject * args)
+{
+    HashIntoType h;
+    if (!PyArg_ParseTuple(args, "K", &h)) {
+        return NULL;
+    }
+    SeenSet::iterator it = me->hashes->find(h);
+    if (it == me->hashes->end()) {
+        PyErr_SetString(PyExc_ValueError, "h not in list");
+        return NULL;
+    }
+    me->hashes->erase(it);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *
+hashset_update(khmer_HashSet_Object * me, PyObject * args)
+{
+    PyObject * obj;
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return NULL;
+    }
+
+    PyObject * iterator = PyObject_GetIter(obj);
+    if (iterator == NULL) {
+        return NULL;
+    }
+    PyObject * item = PyIter_Next(iterator);
+    while(item) {
+        HashIntoType h = PyLong_AsUnsignedLongLong(item);
+        me->hashes->insert(h);
+        
+        Py_DECREF(item);
+        item = PyIter_Next(iterator);
+    }
+    Py_DECREF(iterator);
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef khmer_HashSet_methods[] = {
+    {
+        "add",
+        (PyCFunction)hashset_add, METH_VARARGS,
+        "Add element to the HashSet."
+    },
+    {
+        "remove",
+        (PyCFunction)hashset_remove, METH_VARARGS,
+        "Remove an element from the HashSet."
+    },
+    {
+        "update",
+        (PyCFunction)hashset_update, METH_VARARGS,
+        "Add a list of elements to the HashSet."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
 static PySequenceMethods khmer_HashSet_seqmethods[] = {
     (lenfunc)khmer_HashSet_len, /* sq_length */
     0,                          /* sq_concat */
@@ -850,7 +929,7 @@ static PyTypeObject khmer_HashSet_Type = {
     0,                                    /* tp_weaklistoffset */
     khmer_HashSet_iter,                   /* tp_iter */
     0,                                    /* tp_iternext */
-    0,                                    /* tp_methods */
+    khmer_HashSet_methods,                /* tp_methods */
     0,                                    /* tp_members */
     0,                                    /* tp_getset */
     0,                                    /* tp_base */

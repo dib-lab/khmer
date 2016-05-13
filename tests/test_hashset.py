@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -80,3 +80,39 @@ def test_iter_double():
     hs = khmer.HashSet(x)
     for i, k in enumerate(hs):
         assert k == x[i], (k, x[i])
+
+
+def test_add():
+    hs = khmer.HashSet()
+    hs.add(7)
+    hs.add(4)
+
+    assert list(sorted(hs)) == [4, 7]
+
+
+def test_update():
+    hs = khmer.HashSet()
+    x = [5, 10, 15]
+    hs.update(x)
+
+    assert list(sorted(hs)) == [5, 10, 15]
+
+
+def test_remove():
+    hs = khmer.HashSet([8, 10])
+    assert len(hs) == 2
+    hs.remove(8)
+    assert len(hs) == 1
+    assert list(hs) == [10]
+
+
+def test_remove_2():
+    hs = khmer.HashSet([8, 10])
+    assert len(hs) == 2
+    try:
+        hs.remove(15)
+        assert 0, "hs.remove should raise an Exception"
+    except ValueError:
+        pass
+    assert len(hs) == 2
+    assert list(sorted(hs)) == [8, 10]
