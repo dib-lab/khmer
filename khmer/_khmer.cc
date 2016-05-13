@@ -1348,6 +1348,43 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    PyObject * val_obj;
+
+    if (!PyArg_ParseTuple(args, "O", &val_obj)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_obj, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    KmerQueue node_q;
+    Traverser traverser(hashtable);
+
+    traverser.traverse(start_kmer, node_q);
+
+    PyObject * x =  PyList_New(node_q.size());
+    if (x == NULL) {
+        return NULL;
+    }
+
+    unsigned int i;
+    for (i = 0; node_q.size() > 0; i++) {
+        HashIntoType h = node_q.front();
+        node_q.pop();
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", h));
+    }
+
+    return x;
+}
+
+static
+PyObject *
 hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2728,6 +2765,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
     // graph/traversal functionality
     //
 
+    {
+        "neighbors",
+        (PyCFunction)hashtable_neighbors, METH_VARARGS,
+        "Get a list of neighbor nodes for this k-mer.",
+    },
     {
         "calc_connected_graph_size",
         (PyCFunction)hashtable_calc_connected_graph_size, METH_VARARGS, ""
