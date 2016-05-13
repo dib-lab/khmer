@@ -348,6 +348,24 @@ def test_count_kmer_degree():
     assert nodegraph.kmer_degree('TAAA') == 1
 
 
+def test_kmer_neighbors():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    h = khmer.forward_hash('AAAA', 4)
+    assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
+
+    h = khmer.forward_hash('AAAT', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on one side
+
+    h = khmer.forward_hash('AATA', 4)
+    assert nodegraph.neighbors(h) == []           # no neighbors
+
+    h = khmer.forward_hash('TAAA', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
+
+
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])
 

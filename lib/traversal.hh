@@ -72,10 +72,18 @@ public:
 
     unsigned int traverse_left(Kmer& node,
                                KmerQueue &node_q,
-                               std::function<bool (Kmer&)> filter);
+                               std::function<bool (Kmer&)> filter=0);
     unsigned int traverse_right(Kmer& node,
                                 KmerQueue &node_q,
-                                std::function<bool (Kmer&)> filter);
+                                std::function<bool (Kmer&)> filter=0);
+    unsigned int traverse(Kmer& node,
+                          KmerQueue &node_q,
+                          std::function<bool (Kmer&)> filter=0) {
+        unsigned int found;
+        found = traverse_left(node, node_q, filter);
+        found += traverse_right(node, node_q, filter);
+        return found;
+    };
 
     unsigned int degree_left(Kmer& node);
     unsigned int degree_right(Kmer& node);
