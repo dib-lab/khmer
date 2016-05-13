@@ -736,7 +736,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     set_partition_id(kmer, p);
 }
@@ -906,7 +906,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     return get_partition_id(kmer);
 }
@@ -1553,10 +1553,8 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
       std::cout << n << " ... " << all_tags.size() << "\n";
       std::cout << std::flush;
     }
-    HashIntoType h, r, u;
     std::string start = _revhash(*si, _ht->ksize());
-    u = _hash(start.c_str(), _ht->ksize(), h, r);
-    Kmer start_kmer(h, r, u);
+    Kmer start_kmer(start, _ht->ksize());
 
     HashIntoType the_hash = _hash_murmur32(start) % nbhd_mh.prime;
 
