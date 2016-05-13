@@ -102,7 +102,7 @@ def test_complete_no_collision():
     assert n_rc_filled == n_entries, n_rc_filled
     assert n_palindromes == 16, n_palindromes
     assert n_fwd_filled == n_entries // 2 + n_palindromes // 2, \
-        n_fwd_filled
+        (n_fwd_filled, n_entries // 2 + n_palindromes // 2)
 
 
 def test_complete_2_collision():
