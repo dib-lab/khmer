@@ -2995,31 +2995,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Return a list of all of the recorded high-degree nodes.",
     },
 
-    {
-        "find_high_degree_nodes",
-        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
-        "Examine the given sequence for degree > 2 nodes and add to internal "
-        "list; used in graph contraction.",
-    },
-    {
-        "is_high_degree_node",
-        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
-        "Check to see if this k-mer has degree > 2. "
-        "Used in graph contraction.",
-    },
-    {
-        "traverse_linear_path",
-        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
-        "Traverse the path through the graph starting with the given "
-        "k-mer and avoiding high-degree nodes, finding (and returning) "
-        "traversed k-mers and any encountered high-degree nodes.",
-    },
-    {
-        "get_high_degree_nodes",
-        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
-        "Return a list of all of the recorded high-degree nodes.",
-    },
-
     //
     // tagging / sparse graph functionality
     //
