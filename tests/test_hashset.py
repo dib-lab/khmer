@@ -116,3 +116,10 @@ def test_remove_2():
         pass
     assert len(hs) == 2
     assert list(sorted(hs)) == [8, 10]
+
+
+def test_contains_1():
+    hs = khmer.HashSet(5, [8, 10])
+    assert 8 in hs
+    assert 10 in hs
+    assert 5 not in hs

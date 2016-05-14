@@ -906,6 +906,18 @@ static int khmer_HashSet_len(khmer_HashSet_Object * o)
     return o->hashes->size();
 }
 
+static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
+{
+    if (PyInt_Check(val) || PyLong_Check(val)) {
+        HashIntoType v = PyLong_AsUnsignedLongLong(val);
+
+        if (set_contains(*o->hashes, v)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static PyObject *
 hashset_add(khmer_HashSet_Object * me, PyObject * args)
 {
@@ -988,6 +1000,14 @@ static PyMethodDef khmer_HashSet_methods[] = {
 static PySequenceMethods khmer_HashSet_seqmethods[] = {
     (lenfunc)khmer_HashSet_len, /* sq_length */
     0,                          /* sq_concat */
+    0,                          /* sq_repeat */
+    0,                          /* sq_item */
+    0,                          /* sq_slice */
+    0,                          /* sq_ass_item */
+    0,                          /* sq_ass_slice */
+    (objobjproc)khmer_HashSet_contains, /* sq_contains */
+    0,                          /* sq_inplace_concat */
+    0                           /* sq_inplace_repeat */
 };
 
 static PyTypeObject khmer_HashSet_Type = {
