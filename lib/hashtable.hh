@@ -147,7 +147,6 @@ public:
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    SeenSet high_degree_nodes;
 
     // accessor to get 'k'
     const WordLength ksize() const
@@ -334,9 +333,12 @@ public:
                          std::vector<BoundedCounterType> &counts) const;
 
     //
-    void find_high_degree_nodes(const std::string &s);
-    unsigned int traverse(const std::string &s, SeenSet &adjacencies,
-                          SeenSet &nodes, Hashtable& bf);
+    void find_high_degree_nodes(const std::string &s,
+                                SeenSet& high_degree_nodes) const;
+    unsigned int traverse_linear_path(const std::string &s,
+                                      SeenSet &adjacencies,
+                                      SeenSet &nodes, Hashtable& bf,
+                                      SeenSet &high_degree_nodes) const;
 };
 }
 
