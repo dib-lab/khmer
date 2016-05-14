@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
@@ -210,7 +211,7 @@ KmerIterator::KmerIterator(const char * seq,
     _nbits_sub_1 = (_ksize*2 - 2);
 
     index = _ksize - 1;
-    length = strlen(seq);
+    length = strlen(_seq);
     _kmer_f = 0;
     _kmer_r = 0;
 

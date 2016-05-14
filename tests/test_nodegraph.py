@@ -911,3 +911,39 @@ def test_n_occupied_vs_countgraph_another_size():
 
     assert nodegraph.n_unique_kmers() == 3916, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 3916, countgraph.n_unique_kmers()
+
+
+def test_traverse_linear_path():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = khmer.HashSet(K)
+    size, conns, visited = nodegraph.traverse_linear_path(contig[:K],
+                                                          degree_nodes,
+                                                          stopgraph)
+    assert size == 980
+    assert len(conns) == 0
+    assert len(visited) == 980
+
+
+def test_find_high_degree_nodes():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = khmer.HashSet(K)
+    nodegraph.find_high_degree_nodes(contig[:K], degree_nodes)
+    assert len(degree_nodes) == 0
