@@ -1390,16 +1390,16 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    SeenSet adj;
-    SeenSet visited;
+    SeenSet * adj = new SeenSet;
+    SeenSet * visited = new SeenSet;
     std::string s = _revhash(val, hashtable->ksize());
-    unsigned int size = hashtable->traverse_linear_path(s, adj, visited,
+    unsigned int size = hashtable->traverse_linear_path(s, *adj, *visited,
                                                         *nodegraph_o->hashbits,
                                                         *hdn_o->hashes);
 
-    khmer_HashSet_Object * adj_o = create_HashSet_Object(&adj,
+    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
                                                          hashtable->ksize());
-    khmer_HashSet_Object * visited_o = create_HashSet_Object(&visited,
+    khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
                                                            hashtable->ksize());
 
     PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
@@ -1585,8 +1585,8 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-        PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                                                          hashtable->ksize());
+    PyObject * x = (PyObject *) create_HashSet_Object(tags,
+                                                      hashtable->ksize());
     return x;
 }
 
