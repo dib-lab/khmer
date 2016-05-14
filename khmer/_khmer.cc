@@ -110,6 +110,11 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
 
 // Take a Python object and (try to) convert it to a HashIntoType..
 // Note: will set error condition and return false if cannot do.
+// Further note: the main difference between this and
+// convert_PyObject_to_Kmer is that this will not pass HashIntoType
+// numbers through the Kmer class, which means reverse complements
+// will not be calculated.  There is a test in test_nodegraph.py
+// that checks this.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
                                              HashIntoType& hashval,
@@ -2965,6 +2970,31 @@ static PyMethodDef khmer_hashtable_methods[] = {
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
     },
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "Examine the given sequence for degree > 2 nodes and add to internal "
+        "list; used in graph contraction.",
+    },
+    {
+        "is_high_degree_node",
+        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
+        "Check to see if this k-mer has degree > 2. "
+        "Used in graph contraction.",
+    },
+    {
+        "traverse_linear_path",
+        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
+        "Traverse the path through the graph starting with the given "
+        "k-mer and avoiding high-degree nodes, finding (and returning) "
+        "traversed k-mers and any encountered high-degree nodes.",
+    },
+    {
+        "get_high_degree_nodes",
+        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
+        "Return a list of all of the recorded high-degree nodes.",
+    },
+
     {
         "find_high_degree_nodes",
         (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,

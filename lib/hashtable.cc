@@ -997,10 +997,6 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
-//
-// consume_string: run through every k-mer in the given string, & hash it.
-//
-
 void Hashtable::find_high_degree_nodes(const std::string &s)
 {
     const char * sp = s.c_str();
@@ -1076,3 +1072,4 @@ unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
 }
 
 // vim: set sts=2 sw=2:
+
