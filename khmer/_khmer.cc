@@ -1380,20 +1380,24 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    HashIntoType val;
+    PyObject * val_o;
     khmer_KHashbits_Object * nodegraph_o;
     khmer_HashSet_Object * hdn_o;
 
-    if (!PyArg_ParseTuple(args, "KO!O!", &val,
+    if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
                           &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
         return NULL;
     }
 
     SeenSet * adj = new SeenSet;
     SeenSet * visited = new SeenSet;
-    std::string s = _revhash(val, hashtable->ksize());
-    unsigned int size = hashtable->traverse_linear_path(s, *adj, *visited,
+    unsigned int size = hashtable->traverse_linear_path(start_kmer,
+                                                        *adj, *visited,
                                                         *nodegraph_o->hashbits,
                                                         *hdn_o->hashes);
 

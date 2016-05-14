@@ -132,7 +132,6 @@ int _hash_murmur32(const std::string& kmer);
  */
 class Kmer
 {
-
 public:
 
     /// The forward hash
@@ -184,7 +183,7 @@ public:
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K)
+    std::string get_string_rep(WordLength K) const
     {
         return _revhash(kmer_u, K);
     }
@@ -210,7 +209,7 @@ public:
  *
  * Contact: camille.scott.w@gmail.com
  *
- */
+*/
 class KmerFactory
 {
 protected:

@@ -333,9 +333,9 @@ public:
                          std::vector<BoundedCounterType> &counts) const;
 
     //
-    void find_high_degree_nodes(const std::string &s,
+    void find_high_degree_nodes(const char * sequence,
                                 SeenSet& high_degree_nodes) const;
-    unsigned int traverse_linear_path(const std::string &s,
+    unsigned int traverse_linear_path(const Kmer start_kmer,
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
