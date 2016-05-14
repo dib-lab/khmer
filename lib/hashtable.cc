@@ -997,7 +997,9 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
-void Hashtable::find_high_degree_nodes(const std::string &s)
+void Hashtable::find_high_degree_nodes(const std::string &s,
+                                       SeenSet& high_degree_nodes)
+    const
 {
     const char * sp = s.c_str();
 
@@ -1017,8 +1019,11 @@ void Hashtable::find_high_degree_nodes(const std::string &s)
     }
 }
 
-unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
-                                 SeenSet &visited, Hashtable &bf)
+unsigned int Hashtable::traverse_linear_path(const std::string &s,
+                                             SeenSet &adjacencies,
+                                             SeenSet &visited, Hashtable &bf,
+                                             SeenSet &high_degree_nodes)
+    const
 {
     unsigned int size = 0;
 
