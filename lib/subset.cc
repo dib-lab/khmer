@@ -781,10 +781,10 @@ PartitionID SubsetPartition::join_partitions(
         return 0;
     }
 
-    if (reverse_pmap.find(orig) == reverse_pmap.end() ||
-            reverse_pmap.find(join) == reverse_pmap.end() ||
-            reverse_pmap[orig] == NULL ||
-            reverse_pmap[join] == NULL) {
+    if (!set_contains(reverse_pmap, orig) ||
+        !set_contains(reverse_pmap, join) ||
+        reverse_pmap[orig] == NULL ||
+        reverse_pmap[join] == NULL) {
         return 0;
     }
 
@@ -809,7 +809,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
 
 PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-    if (partition_map.find(kmer) != partition_map.end()) {
+    if (set_contains(partition_map, kmer)) {
         PartitionID * pp = partition_map[kmer];
         if (pp == NULL) {
             return 0;
