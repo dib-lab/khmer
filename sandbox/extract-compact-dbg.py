@@ -4,6 +4,7 @@ import khmer
 import screed
 import argparse
 from collections import OrderedDict
+import sys
 
 # graph settings
 DEFAULT_KSIZE=31
@@ -117,9 +118,13 @@ def main():
             # name them and cherish them. Don't do this on identical sequences.
             if min(stop_bf2.get_kmer_counts(record.sequence)) == 0:
                 stop_bf2.consume(record.sequence)
-                graph.find_high_degree_nodes(record.sequence[:args.ksize],
+                graph.find_high_degree_nodes(record.sequence,
                                              degree_nodes)
     del stop_bf2
+
+    if not len(degree_nodes):
+        print('no high degree nodes; exiting.')
+        sys.exit(0)
 
     # get all of the degree > 2 nodes and give them IDs.
     for node in degree_nodes:
