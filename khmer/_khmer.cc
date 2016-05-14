@@ -1412,33 +1412,6 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_get_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    SeenSet * hdg = &hashtable->high_degree_nodes;
-
-    PyObject * x =  PyList_New(hdg->size());
-    if (x == NULL) {
-        return NULL;
-    }
-    SeenSet::iterator si;
-    unsigned long long i = 0;
-    for (si = hdg->begin(); si != hdg->end(); ++si) {
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-        i++;
-    }
-
-    return x;
-}
-
-static
-PyObject *
 hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
