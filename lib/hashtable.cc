@@ -997,4 +997,79 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
+void Hashtable::find_high_degree_nodes(const std::string &s)
+{
+    const char * sp = s.c_str();
+
+    Traverser traverser(this);
+    KmerIterator kmers(sp, _ksize);
+
+    unsigned long n = 0;
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... find_high_degree_nodes: " << n << "\n";
+        }
+        Kmer kmer = kmers.next();
+        if ((traverser.degree(kmer)) > 2) {
+            high_degree_nodes.insert(kmer);
+        }
+    }
+}
+
+unsigned int Hashtable::traverse(const std::string &s, SeenSet &adjacencies,
+                                 SeenSet &visited, Hashtable &bf)
+{
+    unsigned int size = 0;
+
+    auto filter = [&] (Kmer& n) -> bool {
+        return true;
+    };
+
+    Traverser traverser(this);
+
+    const char * sp = s.c_str();
+    KmerIterator kmers(sp, _ksize);
+    Kmer start_kmer = kmers.next();
+
+    // if this k-mer is in the Bloom filter, truncate search.
+    // This prevents paths from being traversed in two directions.
+    if (bf.get_count(start_kmer)) {
+        return 0;
+    }
+
+    std::vector<Kmer> to_be_visited;
+    to_be_visited.push_back(start_kmer);
+
+    while (to_be_visited.size()) {
+        start_kmer = to_be_visited.back();
+        to_be_visited.pop_back();
+        
+        visited.insert(start_kmer);
+        size += 1;
+
+        KmerQueue node_q;
+        traverser.traverse_right(start_kmer, node_q, filter);
+        traverser.traverse_left(start_kmer, node_q, filter);
+
+        while (node_q.size()) {
+            Kmer node = node_q.front();
+            node_q.pop();
+
+            if (high_degree_nodes.find(node) != high_degree_nodes.end()) {
+                // if there are any adjacent high degree nodes, record;
+                adjacencies.insert(node);
+                // also, add this to the stop Bloom filter.
+                bf.count(start_kmer);
+            } else if (visited.find(node) != visited.end()) {
+                ;
+            } else {
+                to_be_visited.push_back(node);
+            }
+        }
+    }
+    return size;
+}
+
 // vim: set sts=2 sw=2:
+

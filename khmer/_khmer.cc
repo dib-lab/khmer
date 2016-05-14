@@ -1353,6 +1353,55 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    hashtable->find_high_degree_nodes(long_str);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
+hashtable_is_high_degree_node(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    HashIntoType val;
+
+    if (!PyArg_ParseTuple(args, "K", &val)) {
+        return NULL;
+    }
+
+    PyObject * ret;
+
+    if (hashtable->high_degree_nodes.find(val) != \
+        hashtable->high_degree_nodes.end()) {
+        ret = Py_True;
+    }
+    else {
+        ret = Py_False;
+    }
+    Py_INCREF(ret);
+    return ret;
+}
+
+static
+PyObject *
 hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1383,6 +1432,83 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
         node_q.pop();
         // type K for python unsigned long long
         PyList_SET_ITEM(x, i, Py_BuildValue("K", h));
+    }
+
+    return x;
+}
+
+static
+PyObject *
+hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    HashIntoType val;
+    khmer_KHashbits_Object * nodegraph_o;
+
+    if (!PyArg_ParseTuple(args, "KO!", &val,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+
+    SeenSet adj;
+    SeenSet visited;
+    std::string s = _revhash(val, hashtable->ksize());
+    unsigned int size = hashtable->traverse(s, adj, visited,
+                                            *nodegraph_o->hashbits);
+
+    PyObject * adj_o =  PyList_New(adj.size());
+    if (adj_o == NULL) {
+        return NULL;
+    }
+    SeenSet::iterator si;
+    unsigned long long i;
+    for (i = 0, si = adj.begin(); si != adj.end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(adj_o, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    PyObject * visited_o =  PyList_New(visited.size());
+    if (visited_o == NULL) {
+        return NULL;
+    }
+    for (i = 0, si = visited.begin(); si != visited.end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(visited_o, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    PyObject * ret = Py_BuildValue("kOO", (unsigned long) size, adj_o,
+                                   visited_o);
+    Py_DECREF(adj_o);
+    Py_DECREF(visited_o);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_get_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    SeenSet * hdg = &hashtable->high_degree_nodes;
+
+    PyObject * x =  PyList_New(hdg->size());
+    if (x == NULL) {
+        return NULL;
+    }
+    SeenSet::iterator si;
+    unsigned long long i = 0;
+    for (si = hdg->begin(); si != hdg->end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        i++;
     }
 
     return x;
@@ -2789,6 +2915,31 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "count_kmers_within_radius",
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
+    },
+
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "Examine the given sequence for degree > 2 nodes and add to internal "
+        "list; used in graph contraction.",
+    },
+    {
+        "is_high_degree_node",
+        (PyCFunction)hashtable_is_high_degree_node, METH_VARARGS,
+        "Check to see if this k-mer has degree > 2. "
+        "Used in graph contraction.",
+    },
+    {
+        "traverse_linear_path",
+        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
+        "Traverse the path through the graph starting with the given "
+        "k-mer and avoiding high-degree nodes, finding (and returning) "
+        "traversed k-mers and any encountered high-degree nodes.",
+    },
+    {
+        "get_high_degree_nodes",
+        (PyCFunction)hashtable_get_high_degree_nodes, METH_VARARGS,
+        "Return a list of all of the recorded high-degree nodes.",
     },
 
     //
