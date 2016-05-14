@@ -130,24 +130,6 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
-    {
-        // left-shift the previous hash over
-        h = h << 2;
-
-        // 'or' in the current nt
-        h |= twobit_repr(ch);
-
-        // mask off the 2 bits we shifted over.
-        h &= bitmask;
-
-        // now handle reverse complement
-        r = r >> 2;
-        r |= (twobit_comp(ch) << _nbits_sub_1);
-
-        return uniqify_rc(h, r);
-    }
-
     void _clear_all_partitions()
     {
         if (partition != NULL) {
