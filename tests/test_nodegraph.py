@@ -976,7 +976,7 @@ def test_traverse_linear_path_2():
     stopgraph = khmer.Nodegraph(K, 1e5, 4)
 
     nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G') # will add another neighbor
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
     print(nodegraph.neighbors(contig[101:122]))
 
     degree_nodes = nodegraph.find_high_degree_nodes(contig)
@@ -1029,7 +1029,7 @@ def test_traverse_linear_path_3_stopgraph():
     stopgraph = khmer.Nodegraph(K, 1e5, 4)
 
     nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G') # will add another neighbor
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
     print(nodegraph.neighbors(contig[101:122]))
 
     degree_nodes = nodegraph.find_high_degree_nodes(contig)
