@@ -123,3 +123,41 @@ def test_contains_1():
     assert 8 in hs
     assert 10 in hs
     assert 5 not in hs
+
+
+def test_concat_1():
+    hs = khmer.HashSet(5, [10, 12])
+    hs2 = khmer.HashSet(5, [10, 13])
+
+    hs3 = hs + hs2
+    assert list(sorted(hs3)) == [10, 12, 13]
+
+
+def test_concat_2():
+    hs = khmer.HashSet(5, [10, 12])
+    hs2 = khmer.HashSet(5, [10, 13])
+
+    hs += hs2
+    assert list(sorted(hs)) == [10, 12, 13]
+
+
+def test_concat_1_fail():
+    hs = khmer.HashSet(5, [10, 12])
+    hs2 = khmer.HashSet(4, [10, 13])
+
+    try:
+        hs3 = hs + hs2
+        assert 0, "concat should fail - different ksize"
+    except ValueError:
+        pass
+
+
+def test_concat_2_fail():
+    hs = khmer.HashSet(5, [10, 12])
+    hs2 = khmer.HashSet(4, [10, 13])
+
+    try:
+        hs += hs2
+        assert 0, "inplace concat should fail - different ksize"
+    except ValueError:
+            pass

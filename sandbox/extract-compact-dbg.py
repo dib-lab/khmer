@@ -118,8 +118,7 @@ def main():
             # name them and cherish them. Don't do this on identical sequences.
             if min(stop_bf2.get_kmer_counts(record.sequence)) == 0:
                 stop_bf2.consume(record.sequence)
-                graph.find_high_degree_nodes(record.sequence,
-                                             degree_nodes)
+                degree_nodes += graph.find_high_degree_nodes(record.sequence)
     del stop_bf2
 
     if not len(degree_nodes):
