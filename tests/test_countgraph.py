@@ -103,6 +103,14 @@ def test_count_2():
     assert hi.get(hashval) == 2
 
 
+def test_revhash_1():
+    hi = khmer._Countgraph(12, [1])
+    kmer = 'C'*12
+    hashval = hi.hash('C' * 12)
+
+    assert hi.reverse_hash(hashval) == kmer
+
+
 class Test_Countgraph(object):
 
     def setup(self):
