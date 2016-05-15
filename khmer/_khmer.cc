@@ -1528,6 +1528,37 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_HashSet_Object * hdn_o;
+
+    if (!PyArg_ParseTuple(args, "OO!", &val_o, &khmer_HashSet_Type, &hdn_o)) {
+        return NULL;
+    }
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    SeenSet * adj = new SeenSet;
+    std::string contig = hashtable->assemble_linear_path(start_kmer,
+                                                         *hdn_o->hashes,
+                                                         *adj);
+
+    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
+                                                         hashtable->ksize());
+
+    PyObject * ret = Py_BuildValue("sO", contig.c_str(), (PyObject *) adj_o);
+    Py_DECREF(adj_o);
+
+    return ret;
+}
+
+static
+PyObject *
 hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -2941,6 +2972,13 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Traverse the path through the graph starting with the given "
         "k-mer and avoiding high-degree nodes, finding (and returning) "
         "traversed k-mers and any encountered high-degree nodes.",
+    },
+    {
+        "assemble_linear_path",
+        (PyCFunction)hashtable_assemble_linear_path, METH_VARARGS,
+        "Assemble a purely linear path starting with the given "
+        "k-mer, returning traversed k-mers and any encountered high-degree "
+        "nodes.",
     },
 
     //

@@ -1047,3 +1047,24 @@ def test_traverse_linear_path_3_stopgraph():
     assert size == 0
     assert len(visited) == 0
     assert len(conns) == 0
+
+
+def test_assemble_linear_path():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G') # will add another neighbor
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+
+    contig, adj = nodegraph.assemble_linear_path(contig[0:K], degree_nodes)
+    print((contig,))
+    print(list(adj))
+    assert 0

@@ -339,6 +339,10 @@ public:
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
+
+    std::string assemble_linear_path(const Kmer seed_kmer,
+                                     SeenSet& high_degree_nodes,
+                                     SeenSet& adjacencies) const;
 };
 }
 

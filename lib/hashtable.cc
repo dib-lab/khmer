@@ -1070,5 +1070,44 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
     return size;
 }
 
+std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
+                                            SeenSet& high_degree_nodes,
+                                            SeenSet& adjacencies)
+    const
+{
+    Traverser traverser(this);
+    std::string contig;
+    std::vector<Kmer> to_be_visited;
+    SeenSet visited;
+    
+    to_be_visited.push_back(seed_kmer);
+
+    while (to_be_visited.size()) {
+        Kmer kmer = to_be_visited.back();
+        to_be_visited.pop_back();
+        
+        visited.insert(kmer);
+
+        KmerQueue node_q;
+        traverser.traverse(kmer, node_q);
+
+        while (node_q.size()) {
+            Kmer node = node_q.front();
+            node_q.pop();
+
+            if (set_contains(high_degree_nodes, node)) {
+                // if there are any adjacent high degree nodes, record;
+                adjacencies.insert(node);
+            } else if (set_contains(visited, node)) {
+                // do nothing - already visited
+                ;
+            } else {
+                to_be_visited.push_back(node);
+            }
+        }
+    }
+    return contig;
+}
+
 // vim: set sts=2 sw=2:
 
