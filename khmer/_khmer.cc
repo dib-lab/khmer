@@ -1533,26 +1533,26 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
-    khmer_HashSet_Object * hdn_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
 
-    if (!PyArg_ParseTuple(args, "OO!", &val_o, &khmer_HashSet_Type, &hdn_o)) {
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
+
     Kmer start_kmer;
     if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
         return NULL;
     }
 
-    SeenSet * adj = new SeenSet;
-    std::string contig = hashtable->assemble_linear_path(start_kmer,
-                                                         *hdn_o->hashes,
-                                                         *adj);
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
 
-    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
-                                                         hashtable->ksize());
+    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
 
-    PyObject * ret = Py_BuildValue("sO", contig.c_str(), (PyObject *) adj_o);
-    Py_DECREF(adj_o);
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
 
     return ret;
 }

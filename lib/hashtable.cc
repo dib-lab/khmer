@@ -1071,43 +1071,56 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
 }
 
 std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
-                                            SeenSet& high_degree_nodes,
-                                            SeenSet& adjacencies)
+                                            const Hashbits * stop_bf)
     const
 {
-    Traverser traverser(this);
-    std::string contig;
-    std::vector<Kmer> to_be_visited;
-    SeenSet visited;
-    
-    to_be_visited.push_back(seed_kmer);
+    std::string start_kmer = seed_kmer.get_string_rep(_ksize);
+    std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
 
-    while (to_be_visited.size()) {
-        Kmer kmer = to_be_visited.back();
-        to_be_visited.pop_back();
-        
-        visited.insert(kmer);
+    start_kmer = _revcomp(start_kmer);
+    std::string left = _assemble_right(start_kmer.c_str(), stop_bf);
 
-        KmerQueue node_q;
-        traverser.traverse(kmer, node_q);
+    left = left.substr(_ksize);
+    return _revcomp(left) + right;
+}
 
-        while (node_q.size()) {
-            Kmer node = node_q.front();
-            node_q.pop();
+std::string Hashtable::_assemble_right(const char * start_kmer,
+                                       const Hashbits * stop_bf)
+    const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = kmer;
 
-            if (set_contains(high_degree_nodes, node)) {
-                // if there are any adjacent high degree nodes, record;
-                adjacencies.insert(node);
-            } else if (set_contains(visited, node)) {
-                // do nothing - already visited
-                ;
-            } else {
-                to_be_visited.push_back(node);
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+        bool found2 = false;
+
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+            // a hit!
+            if (this->get_count(try_kmer.c_str())) {
+                if (found) {
+                    found2 = true;
+                    break;
+                }
+                found_base = (char) *base;
+                found = true;
             }
+            base++;
+        }
+        if (!found or found2) {
+            break;
+        } else {
+            contig += found_base;
+            kmer = kmer.substr(1) + found_base;
+            found = true;
         }
     }
     return contig;
 }
 
 // vim: set sts=2 sw=2:
-

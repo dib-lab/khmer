@@ -1049,7 +1049,7 @@ def test_traverse_linear_path_3_stopgraph():
     assert len(conns) == 0
 
 
-def test_assemble_linear_path():
+def test_assemble_linear_path_1():
     contigfile = utils.get_test_data('simple-genome.fa')
     contig = list(screed.open(contigfile))[0].sequence
     print('contig len', len(contig))
@@ -1057,14 +1057,45 @@ def test_assemble_linear_path():
     K = 21
 
     nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    stopgraph = khmer.Nodegraph(K, 1e5, 4)
 
     nodegraph.consume(contig)
     nodegraph.count(contig[101:121] + 'G') # will add another neighbor
 
-    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+    path = nodegraph.assemble_linear_path(contig[0:K])
+    len_path = len(path)
 
-    contig, adj = nodegraph.assemble_linear_path(contig[0:K], degree_nodes)
-    print((contig,))
-    print(list(adj))
-    assert 0
+    assert path == contig[:len_path]
+
+
+def test_assemble_linear_path_2():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G') # will add another neighbor
+
+    path = nodegraph.assemble_linear_path(contig[100:100+K])
+    len_path = len(path)
+
+    assert path == contig[:len_path]
+
+
+def test_assemble_linear_path_3():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    for start in range(0, len(contig), 150):
+        path = nodegraph.assemble_linear_path(contig[start:start + K])
+        assert path == contig or screed.rc(path) == contig, start

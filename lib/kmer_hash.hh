@@ -106,6 +106,7 @@ HashIntoType _hash(const std::string kmer, const WordLength k,
 HashIntoType _hash_forward(const char * kmer, WordLength k);
 
 std::string _revhash(HashIntoType hash, WordLength k);
+std::string _revcomp(const std::string& kmer);
 
 // two-way hash functions, MurmurHash3.
 HashIntoType _hash_murmur(const std::string& kmer);
