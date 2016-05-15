@@ -1408,10 +1408,8 @@ hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     const char * long_str;
-    khmer_HashSet_Object * hdn_o;
 
-    if (!PyArg_ParseTuple(args, "sO!", &long_str,
-                          &khmer_HashSet_Type, &hdn_o)) {
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
         return NULL;
     }
 
@@ -1421,10 +1419,13 @@ hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    hashtable->find_high_degree_nodes(long_str, *hdn_o->hashes);
+    SeenSet * hashes = new SeenSet;
+    hashtable->find_high_degree_nodes(long_str, *hashes);
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    khmer_HashSet_Object * o;
+    o = create_HashSet_Object(hashes, hashtable->ksize());
+
+    return (PyObject *) o;
 }
 
 static
