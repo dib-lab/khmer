@@ -43,31 +43,6 @@ import khmer
 from . import khmer_tst_utils as utils
 
 
-def test_new_1():
-    hs = khmer.HashSet(5)
-    assert len(hs) == 0
-
-    x = iter(hs)
-    try:
-        x.__next__()
-        assert 0, "should raise a StopIteration"
-    except StopIteration:
-        pass
-
-
-def test_new_2():
-    hs = khmer.HashSet(5, [5])
-    assert len(hs) == 1
-
-    x = iter(hs)
-    x.__next__()
-    try:
-        x.__next__()
-        assert 0, "should raise a StopIteration"
-    except StopIteration:
-        pass
-
-
 def test_iter_single():
     hs = khmer.HashSet(5, [6])
     for k in hs:
