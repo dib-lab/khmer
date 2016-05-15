@@ -848,9 +848,9 @@ static PyObject * _HashSet_iternext(PyObject * self)
 static PyTypeObject _HashSet_iter_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
     "_khmer.HashSet_iter",                /* tp_name */
-    sizeof(_HashSet_iterobj),        /* tp_basicsize */
+    sizeof(_HashSet_iterobj),             /* tp_basicsize */
     0,                                    /* tp_itemsize */
-    (destructor)_HashSet_iter_dealloc, /* tp_dealloc */
+    (destructor)_HashSet_iter_dealloc,    /* tp_dealloc */
     0,                                    /* tp_print */
     0,                                    /* tp_getattr */
     0,                                    /* tp_setattr */
@@ -904,6 +904,36 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
 static int khmer_HashSet_len(khmer_HashSet_Object * o)
 {
     return o->hashes->size();
+}
+
+static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
+                                       khmer_HashSet_Object * o2)
+{
+    if (o->ksize != o2->ksize) {
+        PyErr_SetString(PyExc_ValueError,
+                        "cannot add HashSets with different ksizes");
+        return NULL;
+    }
+    khmer_HashSet_Object * no = create_HashSet_Object(new SeenSet,
+                                                      o->ksize);
+    no->hashes->insert(o->hashes->begin(), o->hashes->end());
+    no->hashes->insert(o2->hashes->begin(), o2->hashes->end());
+
+    return (PyObject *) no;
+}
+
+static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
+                                               khmer_HashSet_Object * o2)
+{
+    if (o->ksize != o2->ksize) {
+        PyErr_SetString(PyExc_ValueError,
+                        "cannot add HashSets with different ksizes");
+        return NULL;
+    }
+    o->hashes->insert(o2->hashes->begin(), o2->hashes->end());
+
+    Py_INCREF(o);
+    return (PyObject *) o;
 }
 
 static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
@@ -999,14 +1029,14 @@ static PyMethodDef khmer_HashSet_methods[] = {
 
 static PySequenceMethods khmer_HashSet_seqmethods[] = {
     (lenfunc)khmer_HashSet_len, /* sq_length */
-    0,                          /* sq_concat */
+    (binaryfunc)khmer_HashSet_concat,      /* sq_concat */
     0,                          /* sq_repeat */
     0,                          /* sq_item */
     0,                          /* sq_slice */
     0,                          /* sq_ass_item */
     0,                          /* sq_ass_slice */
     (objobjproc)khmer_HashSet_contains, /* sq_contains */
-    0,                          /* sq_inplace_concat */
+    (binaryfunc)khmer_HashSet_concat_inplace,      /* sq_inplace_concat */
     0                           /* sq_inplace_repeat */
 };
 
