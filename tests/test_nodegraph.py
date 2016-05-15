@@ -371,6 +371,29 @@ def test_kmer_neighbors():
     assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
 
 
+def test_kmer_neighbors_wrong_ksize():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    try:
+        nodegraph.neighbors('AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors(b'AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors({})
+        assert 0, "neighbors() should fail with non hash/str arg"
+    except ValueError:
+        pass
+
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])
 
