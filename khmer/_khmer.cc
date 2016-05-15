@@ -116,7 +116,12 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
                                      Kmer& kmer, WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
-        HashIntoType h = PyLong_AsUnsignedLongLong(value);
+        HashIntoType h;
+        if (PyLong_Check(value)) {
+            h = PyLong_AsUnsignedLongLong(value);
+        } else {
+            h = PyInt_AsLong(value);
+        }
 
         kmer.set_from_unique_hash(h, ksize);
         return true;
@@ -160,7 +165,11 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
                                              WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
-        hashval = PyLong_AsUnsignedLongLong(value);
+        if (PyLong_Check(value)) {
+            hashval = PyLong_AsUnsignedLongLong(value);
+        } else {
+            hashval = PyInt_AsLong(value);
+        }
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
@@ -903,7 +912,7 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
 
 static int khmer_HashSet_len(khmer_HashSet_Object * o)
 {
-    return o->hashes->size();
+    return (Py_Ssize_t) o->hashes->size();
 }
 
 static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
@@ -939,7 +948,12 @@ static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
 static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 {
     if (PyInt_Check(val) || PyLong_Check(val)) {
-        HashIntoType v = PyLong_AsUnsignedLongLong(val);
+        HashIntoType v;
+        if (PyLong_Check(val)) {
+            v = PyLong_AsUnsignedLongLong(val);
+        } else {
+            v = PyInt_AsLong(val);
+        }
 
         if (set_contains(*o->hashes, v)) {
             return 1;
@@ -993,7 +1007,16 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
     }
     PyObject * item = PyIter_Next(iterator);
     while(item) {
-        HashIntoType h = PyLong_AsUnsignedLongLong(item);
+        HashIntoType h;
+        if (PyLong_Check(item)) {
+            h = PyLong_AsUnsignedLongLong(item);
+        } else if (PyInt_Check(item)) {                // assume PyInt
+            h = PyInt_AsLong(item);
+        } else {
+            PyErr_SetString(PyExc_ValueError, "unknown item type for update");
+            Py_DECREF(item);
+            return NULL;
+        }
         me->hashes->insert(h);
         
         Py_DECREF(item);
@@ -1267,19 +1290,17 @@ hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    const char * kmer;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+    PyObject * v;
+    if (!PyArg_ParseTuple(args, "O", &v)) {
         return NULL;
     }
 
-    if (strlen(kmer) != hashtable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
+    HashIntoType hashval;
+    if (!convert_PyObject_to_HashIntoType(v, hashval, hashtable->ksize())) {
         return NULL;
     }
 
-    hashtable->count(kmer);
+    hashtable->count(hashval);
 
     return PyLong_FromLong(1);
 }
