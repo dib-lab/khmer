@@ -85,6 +85,12 @@ def test_count_1():
     assert hi.get(kmer) == 2
     assert hi.get(hashval) == 2
 
+    kmer = 'G'*11
+    try:
+        hi.hash(kmer)
+        assert 0, "incorrect kmer size should fail"
+    except RuntimeError:
+        pass
 
 def test_count_2():
     hi = khmer._Countgraph(12, PRIMES_1m)

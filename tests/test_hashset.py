@@ -43,6 +43,20 @@ import khmer
 from . import khmer_tst_utils as utils
 
 
+def test_bad_construct():
+    try:
+        hs = khmer.HashSet()
+        assert 0, "HashSet constructor should fail w/o argument"
+    except TypeError:
+        pass
+
+    try:
+        hs = khmer.HashSet(5, [{}])
+        assert 0, "HashSet constructor should fail w/o list of k-mers"
+    except ValueError:
+        pass
+
+
 def test_iter_single():
     hs = khmer.HashSet(5, [6])
     for k in hs:
@@ -57,6 +71,13 @@ def test_iter_double():
         assert k == x[i], (k, x[i])
 
 
+def test_iter_single():
+    hs = khmer.HashSet(5, [6])
+    k = iter(hs)
+    k2 = iter(k)
+    assert k == k2
+
+
 def test_add():
     hs = khmer.HashSet(5)
     hs.add(7)
@@ -67,10 +88,20 @@ def test_add():
 
 def test_update():
     hs = khmer.HashSet(5)
-    x = [5, 10, 15]
+    x = [5, 10, 15, 2**35]
     hs.update(x)
 
-    assert list(sorted(hs)) == [5, 10, 15]
+    assert list(sorted(hs)) == [5, 10, 15, 2**35]
+
+
+def test_update_bad():
+    hs = khmer.HashSet(5)
+    x = [5, 10, 15, 2**35, {}]
+    try:
+        hs.update(x)
+        assert 0, "cannot add dict to a HashSet"
+    except ValueError:
+        pass
 
 
 def test_remove():
@@ -97,7 +128,7 @@ def test_contains_1():
     hs = khmer.HashSet(5, [8, 10])
     assert 8 in hs
     assert 10 in hs
-    assert 5 not in hs
+    assert 2**35 not in hs
 
 
 def test_concat_1():
