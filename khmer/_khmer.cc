@@ -912,7 +912,7 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
 
 static int khmer_HashSet_len(khmer_HashSet_Object * o)
 {
-    return (Py_Ssize_t) o->hashes->size();
+    return (Py_ssize_t) o->hashes->size();
 }
 
 static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
