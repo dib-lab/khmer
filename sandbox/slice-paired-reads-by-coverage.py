@@ -112,7 +112,7 @@ def main():
         if args.max_coverage:
             if med > args.max_coverage:
                 keep = False
-            if pmed > args.min_coverage:
+            if pmed > args.max_coverage:
                 pkeep = False
 
         if keep and pkeep:
