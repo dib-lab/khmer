@@ -31,7 +31,7 @@ unsafe-load-any-extension=yes
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code
-extension-pkg-whitelist=khmer,_khmer,khmer._khmer,nose,nose.tools,distutils
+extension-pkg-whitelist=khmer,_khmer,khmer._khmer,pytest,distutils
 
 # Allow optimization of some AST trees. This will activate a peephole AST
 # optimizer, which will apply various small optimizations. For instance, it can

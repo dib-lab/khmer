@@ -68,7 +68,7 @@ then
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 	python setup.py build_ext --build-temp $PWD --debug --inplace \
 		--libraries gcov develop
-	make coverage-gcovr.xml coverage.xml TESTATTR='!known_failing,!huge'
+	make coverage-gcovr.xml coverage.xml TESTATTR='"not known_failing and not huge"'
 	./setup.py install
 else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
