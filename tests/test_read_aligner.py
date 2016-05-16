@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -38,7 +38,6 @@ from __future__ import absolute_import
 
 import khmer
 from . import khmer_tst_utils as utils
-from nose.tools import assert_almost_equals
 
 
 def pretty_compare(a, b):
@@ -635,7 +634,7 @@ def check_query(aligner, query):
         (readAlign, query["read_aln"])
     eq_(trunc, query["truncated"])
     if query["score"] > 0:
-        assert_almost_equals(score, query["score"])
+        assert round(score - query["score"], 7) == 0
 
 
 def test_readalign_new():
