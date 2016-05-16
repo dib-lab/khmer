@@ -129,6 +129,7 @@ def check_for_openmp():
 
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
+SPARSEHASHDIR = 'third-party/sparsehash'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
@@ -280,6 +281,11 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                 path_join("third-party", "bzip2", bn + ".o") for bn in [
                     "blocksort", "huffman", "crctable", "randtable",
                     "compress", "decompress", "bzlib"])
+        if "sparsehash" not in self.libraries:
+            scmd = ['bash', '-c', 'cd ' + SPARSEHASHDIR + ' && ( test Makefile'
+                    ' -nt configure || bash ./configure ) && make '
+                    'src/sparsehash/internal/sparseconfig.h']
+            spawn(cmd=scmd, dry_run=self.dry_run)
         _build_ext.run(self)
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})

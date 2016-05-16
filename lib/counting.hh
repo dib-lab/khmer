@@ -46,6 +46,8 @@ Contact: khmer-project@idyll.org
 #include <utility>
 #include <vector>
 
+#include <sparsehash/sparsetable>
+
 #include "hashtable.hh"
 #include "khmer.hh"
 #include "kmer_hash.hh"
@@ -88,16 +90,16 @@ protected:
     HashIntoType _n_unique_kmers;
     HashIntoType _occupied_bins;
 
-    Byte ** _counts;
+    std::vector< google::sparsetable<Byte> > _counts;
+
 
     virtual void _allocate_counters()
     {
         _n_tables = _tablesizes.size();
 
-        _counts = new Byte*[_n_tables];
         for (size_t i = 0; i < _n_tables; i++) {
-            _counts[i] = new Byte[_tablesizes[i]];
-            memset(_counts[i], 0, _tablesizes[i]);
+            google::sparsetable<Byte> new_table(_tablesizes[i]);
+            _counts.push_back(new_table);
         }
     }
 public:
@@ -123,26 +125,14 @@ public:
 
     virtual ~CountingHash()
     {
-        if (_counts) {
-            for (size_t i = 0; i < _n_tables; i++) {
-                if (_counts[i]) {
-                    delete[] _counts[i];
-                    _counts[i] = NULL;
-                }
-            }
-
-            delete[] _counts;
-            _counts = NULL;
-
-            _n_tables = 0;
-        }
     }
 
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
     Byte ** get_raw_tables()
     {
-        return _counts;
+        //return _counts;
+        return NULL;
     }
 
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
@@ -205,7 +195,7 @@ public:
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
-            Byte current_count = _counts[ i ][ bin ];
+            Byte current_count = _counts[i][bin];
             if (!is_new_kmer) {
                 if (current_count == 0) {
                     is_new_kmer = true;
@@ -221,7 +211,7 @@ public:
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
             if ( _max_count > current_count ) {
-                __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+                _counts[i][bin] = _counts[i][bin] + 1;
             } else {
                 n_full++;
             }

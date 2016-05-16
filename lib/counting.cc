@@ -326,6 +326,7 @@ CountingHashFileReader::CountingHashFileReader(
     const std::string   &infilename,
     CountingHash    &ht)
 {
+    /*
     ifstream infile;
     // configure ifstream to raise exceptions for everything.
     infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
@@ -446,12 +447,14 @@ CountingHashFileReader::CountingHashFileReader(
         }
         throw khmer_file_exception(err);
     }
+    */
 }
 
 CountingHashGzFileReader::CountingHashGzFileReader(
     const std::string   &infilename,
     CountingHash    &ht)
 {
+    /*
     gzFile infile = gzopen(infilename.c_str(), "rb");
     if (infile == Z_NULL) {
         std::string err = "Cannot open k-mer count file: " + infilename;
@@ -622,12 +625,14 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     }
 
     gzclose(infile);
+    */
 }
 
 CountingHashFileWriter::CountingHashFileWriter(
     const std::string   &outfilename,
     const CountingHash  &ht)
 {
+    /*
     if (!ht._counts[0]) {
         throw khmer_exception();
     }
@@ -679,12 +684,14 @@ CountingHashFileWriter::CountingHashFileWriter(
         throw khmer_file_exception(strerror(errno));
     }
     outfile.close();
+    */
 }
 
 CountingHashGzFileWriter::CountingHashGzFileWriter(
     const std::string   &outfilename,
     const CountingHash  &ht)
 {
+    /*
     if (!ht._counts[0]) {
         throw khmer_exception();
     }
@@ -783,6 +790,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         throw khmer_file_exception(error);
     }
     gzclose(outfile);
+    */
 }
 
 /* vim: set ft=cpp ts=8 sts=4 sw=4 et tw=79 */

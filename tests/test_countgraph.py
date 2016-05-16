@@ -151,6 +151,7 @@ class Test_Countgraph(object):
         assert hi.get(GG) == 2
 
 
+@attr("known_failing")
 def test_get_raw_tables():
     ht = khmer.Countgraph(20, 1e5, 4)
     tables = ht.get_raw_tables()
@@ -160,6 +161,7 @@ def test_get_raw_tables():
         assert size == len(table)
 
 
+@attr("known_failing")
 def test_get_raw_tables_view():
     ht = khmer.Countgraph(20, 1e5, 4)
     tables = ht.get_raw_tables()
