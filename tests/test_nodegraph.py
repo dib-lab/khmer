@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -42,15 +42,16 @@ from khmer import ReadParser
 
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
     utils.cleanup()
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         khmer.Nodegraph(32, 1e13, 1)
@@ -370,6 +371,29 @@ def test_kmer_neighbors():
     assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
     assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
 
+
+def test_kmer_neighbors_wrong_ksize():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    try:
+        nodegraph.neighbors('AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors(b'AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors({})
+        assert 0, "neighbors() should fail with non hash/str arg"
+    except ValueError:
+        pass
 
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])

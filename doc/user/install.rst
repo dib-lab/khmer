@@ -94,17 +94,3 @@ Installing khmer inside the virtualenv
    reactivate the virtualenv first::
 
       source khmerEnv/bin/activate
-
-Run the tests
-^^^^^^^^^^^^^
-
-After installing you can run the embedded test suite. If you are running an
-OSX system you should also add `!linux` to prevent linux-specific tests from
-failing.::
-
-      nosetests khmer --attr '!known_failing,!huge'
-
-If the nosetests binary isn't installed then::
-
-      pip2 install khmer[tests]
-      nosetests khmer --attr '!known_failing,!huge'

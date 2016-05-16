@@ -1,4 +1,4 @@
-2016-05-12  Titus Brown  <titus@idyll.org>
+2016-05-16  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc: define new khmer_HashSet_Type and khmer_HashSet_Object;
    lots of associated cleanup of k-mer <-> C++ interface; added
@@ -20,6 +20,18 @@
    partition-graph.py},tests/{test_labelhash.py, test_subset_graph.py}:
    refactor existing code to use HashSet object.
    * tests/test_counting_single.py: add printout to assert.
+
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
+   * Makefile,jenkins-build.sh,setup.cfg,tests/khmer_tst_utils.py,
+   tests/test_{countgraph,counting_single,hll,labelhash,nodegraph,
+   normalize_by_median,read_aligner,read_handling,read_parsers,sandbox_scripts,
+   scripts,version}.py: replace nose with pytest, update configuration.
+
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/hashtable.cc: fix bug with substr
+   * tests/test_countgraph.py: add test to trigger the substr bug.
 
 2016-05-11  Titus Brown  <titus@idyll.org>
 

@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -967,7 +967,7 @@ void Hashtable::get_kmers(const std::string &s,
         return;
     }
     for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-        std::string sub = s.substr(i, i + _ksize);
+        std::string sub = s.substr(i, _ksize);
         kmers_vec.push_back(sub);
     }
 }
