@@ -798,6 +798,7 @@ _HashSet_iter_dealloc(_HashSet_iterobj * obj)
 
 static PyObject * _HashSet_iter(PyObject * self)
 {
+    Py_INCREF(self);
     return self;
 }
 

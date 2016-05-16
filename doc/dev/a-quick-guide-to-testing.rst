@@ -119,10 +119,10 @@ scratch, or copy an existing one.  (We recommend the latter.)
 
 To write a new one, you'll need to know how to write tests. For
 getting an idea of the syntax, read this `introductory guide
-<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `official
-documentation
-<https://nose.readthedocs.org/en/latest/writing_tests.html>`__.  Then
-find the right file in ``tests/*.py`` and add your test!
+<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `writing tests
+documentation from Astropy
+<http://docs.astropy.org/en/v1.1/development/testguide.html#writing-tests>`__.
+Then find the right file in ``tests/*.py`` and add your test!
 
 A better approach is, frankly, to go into the existing test code, find
 a test that does something similar to what you want to do, copy it,
@@ -139,7 +139,11 @@ review.
 
 To run one specific test rather than all of them, you can do::
 
-  ./setup.py nosetests --tests tests/test_scripts.py:test_load_into_counting
+  ./setup.py test --addopts "tests/test_scripts.py::test_load_into_counting"
 
 Here, you're running just one test -- the test function named
 ``test_load_into_counting`` in the file ``test_scripts.py``.
+
+You can also use py.test directly, it is a bit less verbose::
+
+  py.test tests/test_scripts.py::test_load_into_counting
