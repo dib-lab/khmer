@@ -1,3 +1,8 @@
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/hashtable.cc: fix bug with substr
+   * tests/test_countgraph.py: add test to trigger the substr bug.
+
 2016-05-11  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: refactor to use generators; add --diginorm
