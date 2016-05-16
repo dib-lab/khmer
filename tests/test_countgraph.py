@@ -46,9 +46,7 @@ from . import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
 
-from nose.plugins.attrib import attr
-from nose.tools import assert_raises
-
+import pytest
 
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
@@ -170,7 +168,7 @@ def test_get_raw_tables_view():
         assert sum(tab.tolist()) == 1
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         khmer.Countgraph(30, 1e13, 1)
@@ -505,7 +503,7 @@ def test_get_kmers():
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
 
 
-@attr("huge")
+@pytest.mark.huge
 def test_save_load_large():
     def do_test(ctfile):
         inpath = utils.get_test_data('random-20-a.fa')
@@ -667,7 +665,7 @@ def test_save_load_gz():
 
 def test_load_empty_files():
     def do_load_ct(fname):
-        with assert_raises(OSError):
+        with pytest.raises(OSError):
             khmer.load_countgraph(fname)
 
     # Check empty files, compressed or not
