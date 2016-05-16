@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -500,6 +500,9 @@ def test_get_kmers():
 
     kmers = hi.get_kmers("AAAAAAT")
     assert kmers == ["AAAAAA", "AAAAAT"]
+
+    kmers = hi.get_kmers("AGCTTTTC")
+    assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
 
 
 @attr("huge")
