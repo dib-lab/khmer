@@ -292,7 +292,7 @@ def reinitialize_command(self, command, reinit_subcommands):
     """Monkeypatch the original version from distutils.
 
     It's supposed to match the behavior of Distribution.get_command_obj()
-    This fixes issues with 'pip install -e' and './setup.py nosetests' not
+    This fixes issues with 'pip install -e' and './setup.py test' not
     respecting the setup.cfg configuration directives for the build_ext
     command.
     """
