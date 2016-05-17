@@ -395,6 +395,7 @@ def test_kmer_neighbors_wrong_ksize():
     except ValueError:
         pass
 
+
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])
 
