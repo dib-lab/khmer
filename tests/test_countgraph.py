@@ -90,6 +90,7 @@ def test_count_1():
     except RuntimeError:
         pass
 
+
 def test_count_2():
     hi = khmer._Countgraph(12, PRIMES_1m)
     kmer = 'G'*12
