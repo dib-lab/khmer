@@ -545,7 +545,7 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
                        unsigned int combined_minhash_size=500)
 {
     unsigned int k = nbhd_mh.ksize;
-    unsigned int p = nbhd_mh.prime;
+    long int p = nbhd_mh.prime;
     bool prot = nbhd_mh.is_protein;
 
     combined_mh.mh = new KmerMinHash(combined_minhash_size, k, p, prot);
