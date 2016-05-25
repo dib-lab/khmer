@@ -349,6 +349,53 @@ def test_count_kmer_degree():
     assert nodegraph.kmer_degree('TAAA') == 1
 
 
+def test_kmer_neighbors():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    h = khmer.forward_hash('AAAA', 4)
+    print(type('AAAA'))
+    assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == [0, 0]  # AAAA on both sides
+
+    h = khmer.forward_hash('AAAT', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on one side
+    assert nodegraph.neighbors('AAAT') == [0]     # AAAA on one side
+
+    h = khmer.forward_hash('AATA', 4)
+    assert nodegraph.neighbors(h) == []           # no neighbors
+    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
+
+    h = khmer.forward_hash('TAAA', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
+    assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
+
+
+def test_kmer_neighbors_wrong_ksize():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    try:
+        nodegraph.neighbors('AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors(b'AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors({})
+        assert 0, "neighbors() should fail with non hash/str arg"
+    except ValueError:
+        pass
+
+
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])
 

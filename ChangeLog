@@ -1,3 +1,26 @@
+2016-05-16  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: define new khmer_HashSet_Type and khmer_HashSet_Object;
+   lots of associated cleanup of k-mer <-> C++ interface; added
+   Hashtable::neighbors; added Hashtable::hash and Hashtable::reverse_hash;
+   CPython 'hashtable.count(...)' function now takes either hash or string.
+   * lib/{kmer_hash.cc, kmer_hash.hh}: added some function overloads so that
+   _hash(...) could take strings as arguments without conversion; added
+   Kmer::set_from_unique_hash convenience function.
+   * lib/{hashtable.cc, hashtable.hh}: minor cleanup;
+   * lib/{read_aligner.cc, subset.cc}: minor refactoring.
+   * lib/{traversal.cc, traversal.hh}: made 'filter' argument to traverse*
+   functions optional; added 'traverse' function for combine traversal.
+   * tests/test_hashset.py: tests for new HashSet class.
+   * tests/test_countgraph.py: tests for new hash/reverse_hash functions,
+   and 'count' behavior.
+   * tests/test_nodegraph.py: tests for new neighbors function.
+   * khmer/__init__.py: import new HashSet type from _khmer.
+   * scripts/{do-partition.py, make-initial-stoptags.py,
+   partition-graph.py},tests/{test_labelhash.py, test_subset_graph.py}:
+   refactor existing code to use HashSet object.
+   * tests/test_counting_single.py: add printout to assert.
+
 2016-05-16  Luiz Irber  <khmer@luizirber.org>
 
    * Makefile,jenkins-build.sh,setup.cfg,tests/khmer_tst_utils.py,

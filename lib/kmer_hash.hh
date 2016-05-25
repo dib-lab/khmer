@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -100,6 +100,9 @@ namespace khmer
 HashIntoType _hash(const char * kmer, const WordLength k);
 HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& h, HashIntoType& r);
+HashIntoType _hash(const std::string kmer, const WordLength k);
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_forward(const char * kmer, WordLength k);
 
 std::string _revhash(HashIntoType hash, WordLength k);
@@ -149,10 +152,24 @@ public:
         kmer_u = u;
     }
 
+    /** @param[in]   s     DNA k-mer
+        @param[in]   ksize k-mer size
+     */
+    Kmer(const std::string s, WordLength ksize)
+    {
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+    }
+
     /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
         kmer_f = kmer_r = kmer_u = 0;
+    }
+
+    void set_from_unique_hash(HashIntoType h, WordLength ksize)
+    {
+        std::string s = _revhash(h, ksize);
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
     }
 
     /// Allows complete backwards compatibility

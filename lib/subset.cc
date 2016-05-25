@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -632,7 +632,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     set_partition_id(kmer, p);
 }
@@ -781,10 +781,10 @@ PartitionID SubsetPartition::join_partitions(
         return 0;
     }
 
-    if (reverse_pmap.find(orig) == reverse_pmap.end() ||
-            reverse_pmap.find(join) == reverse_pmap.end() ||
-            reverse_pmap[orig] == NULL ||
-            reverse_pmap[join] == NULL) {
+    if (!set_contains(reverse_pmap, orig) ||
+        !set_contains(reverse_pmap, join) ||
+        reverse_pmap[orig] == NULL ||
+        reverse_pmap[join] == NULL) {
         return 0;
     }
 
@@ -802,14 +802,14 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _hash(kmer_s, _ht->ksize());
 
     return get_partition_id(kmer);
 }
 
 PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-    if (partition_map.find(kmer) != partition_map.end()) {
+    if (set_contains(partition_map, kmer)) {
         PartitionID * pp = partition_map[kmer];
         if (pp == NULL) {
             return 0;
