@@ -1,3 +1,9 @@
+2016-05-25  Titus Brown  <titus@idyll.org>
+
+   * scripts/trim-low-abund.py: switched to watermark-based reporting to
+   isolate a hard-to-trigger undefined variable error in reporting.
+   * tests/test_scripts.py: added a test for basic reporting functionality.
+
 2016-05-16  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc: define new khmer_HashSet_Type and khmer_HashSet_Object;
