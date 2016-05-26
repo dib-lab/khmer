@@ -1,4 +1,4 @@
-2016-05-25  Titus Brown  <t@Titus-MacBook-Air-3.local>
+2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to
    isolate a hard-to-trigger undefined variable error in reporting.
