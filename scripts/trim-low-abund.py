@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2012-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -67,6 +67,8 @@ from khmer.kfile import (check_space, check_space_for_graph,
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
 DEFAULT_DIGINORM_COVERAGE = 20
+
+REPORT_EVERY_N_READS = 10000
 
 
 def get_parser():
@@ -418,11 +420,14 @@ def main():
         # main loop through the file.
         n_start = trimmer.n_reads
         save_start = trimmer.n_saved
+
+        watermark = REPORT_EVERY_N_READS
         for read in trimmer.pass1(paired_iter, pass2fp):
-            if (trimmer.n_reads - n_start) % 10000 == 0:
-                print('...', n, filename, trimmer.n_saved,
+            if (trimmer.n_reads - n_start) > watermark:
+                print('...', filename, trimmer.n_saved,
                       trimmer.n_reads, trimmer.n_bp,
                       written_reads, written_bp, file=sys.stderr)
+                watermark += REPORT_EVERY_N_READS
 
             # write out the trimmed/etc sequences that AREN'T going to be
             # revisited in a 2nd pass.
@@ -468,12 +473,14 @@ def main():
         paired_iter = broken_paired_reader(screed_iter, min_length=K,
                                            force_single=True)
 
+        watermark = REPORT_EVERY_N_READS
         for read in trimmer.pass2(paired_iter):
-            if (trimmer.n_reads - n_start) % 10000 == 0:
+            if (trimmer.n_reads - n_start) > watermark:
                 print('... x 2', trimmer.n_reads - n_start,
                       pass2filename, trimmer.n_saved,
                       trimmer.n_reads, trimmer.n_bp,
                       written_reads, written_bp, file=sys.stderr)
+                watermark += REPORT_EVERY_N_READS
 
             write_record(read, trimfp)
             written_reads += 1
