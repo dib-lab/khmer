@@ -1494,8 +1494,8 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o;
-    khmer_HashSet_Object * hdn_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    khmer_HashSet_Object * hdn_o = NULL;
 
     if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
