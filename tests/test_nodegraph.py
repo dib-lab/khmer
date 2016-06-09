@@ -1364,3 +1364,57 @@ def test_assemble_labeled_paths_2():
             found = True
             break
     assert found
+
+
+def test_assemble_labeled_paths_3():
+    # assemble entire contig + branch points b/c of labels
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    lh = khmer._GraphLabels(nodegraph)
+
+    nodegraph.consume(contig)
+    branch = contig[:120] + 'TGATGGACAG'
+    nodegraph.consume(branch)  # will add a branch
+    branch2 = contig[:120] + 'GCGGATGGATGGAGCCGAT'
+    nodegraph.consume(branch2)  # will add a third branch
+
+    hdn = nodegraph.find_high_degree_nodes(contig)
+    hdn += nodegraph.find_high_degree_nodes(branch)
+    hdn += nodegraph.find_high_degree_nodes(branch2)
+    print(list(hdn))
+    lh.label_across_high_degree_nodes(contig, hdn, 1)
+    lh.label_across_high_degree_nodes(branch, hdn, 2)
+    lh.label_across_high_degree_nodes(branch2, hdn, 3)
+    print(lh.get_tag_labels(list(hdn)[0]))
+
+    paths = lh.assemble_labeled_path(contig[:K])
+    print([ len(x) for x in paths ])
+    len_path = len(paths)
+
+    print('len path:', len_path)
+
+    found = False
+    for path in paths:
+        if _equals_rc(path, contig):
+            found = True
+            break
+    assert found
+
+    found = False
+    for path in paths:
+        if _equals_rc(path, branch):
+            found = True
+            break
+    assert found
+
+    found = False
+    for path in paths:
+        if _equals_rc(path, branch2):
+            found = True
+            break
+    assert found

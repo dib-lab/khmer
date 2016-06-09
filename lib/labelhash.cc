@@ -657,29 +657,32 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 
         LabelSet labels = get_tag_labels(path_begin);
 
-        std::cout << "n labels: " << labels.size() << "\n";
+        // std::cout << "n labels: " << labels.size() << "\n";
         LabelSet::const_iterator li;
         std::vector<std::string> xpaths;
         for (li = labels.begin(); li != labels.end(); li++) {
             Label label = *li;
 
-            std::cout << "working with " << label << "\n";
+            // std::cout << "working with " << label << "\n";
             xpaths.push_back(_assemble_linear_labels(kmer.c_str(),
                                                      label));
         }
-        std::cout << "xpaths is: " << xpaths.size() << "\n";
+        // std::cout << "xpaths is: " << xpaths.size() << "\n";
 
-        if (xpaths.size() == 1) {
-            contig += xpaths[0];
+        for (unsigned int j = 0; j < xpaths.size(); j++) {
+            std::string this_contig = contig;
+            this_contig += xpaths[j];
             //std::cout << "recurse " << xpaths[0] << "\n";
-            const char * start_again = contig.substr(contig.length() - kmer.length()).c_str();
+            const char * start_again = this_contig.substr(this_contig.length() - kmer.length()).c_str();
             //std::cout << "starting from " << start_again << "\n";
             std::vector<std::string> newpaths;
+
             _assemble_labeled_right(start_again, newpaths);
-            std::string xxx = newpaths[0];
-            //std::cout << "and got " << xxx << "\n";
-            contig += xxx.substr(kmer.length());
-            paths.push_back(contig);
+            for (unsigned int i = 0; i < newpaths.size(); i++) {
+                std::string xxx = newpaths[i];
+                this_contig += xxx.substr(kmer.length());
+                paths.push_back(this_contig);
+            }
         }
     } else {
         paths.push_back(contig);
@@ -700,26 +703,26 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
         bool found = false;
         char found_base;
 
-        std::cout << "now at kmer " << kmer << "\n";
+        // std::cout << "now at kmer " << kmer << "\n";
 
         while(*base != 0) {
             std::string try_kmer = kmer.substr(1) + (char) *base;
 
-            std::cout << "trying " << (char) *base << "\n";
+            // std::cout << "trying " << (char) *base << "\n";
 
             // a hit!
             if (graph->get_count(try_kmer.c_str())) {
                 Kmer tag(try_kmer.c_str(), try_kmer.length());
                 LabelSet ls = get_tag_labels(tag);
 
-                std::cout << "got count; now ls: " << ls.size() << "\n";
+                // std::cout << "got count; now ls: " << ls.size() << "\n";
                 if (set_contains(ls, label)) {
                     if (found) {
-                        std::cout << "found 2..." << (char) *base << "\n";
+                        // std::cout << "found 2..." << (char) *base << "\n";
                         found2 = true;
                         break;
                     }
-                    std::cout << "found 1..." << (char) *base << "\n";
+                    // std::cout << "found 1..." << (char) *base << "\n";
                     found_base = (char) *base;
                     found = true;
                 }
@@ -728,7 +731,7 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
         }
         if (!found || found2) {
             if (!found) {
-                std::cout << "ending.\n";
+                // std::cout << "ending.\n";
             }
             break;
         } else {
