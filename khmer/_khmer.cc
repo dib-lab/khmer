@@ -4277,9 +4277,12 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    std::string contig = labelhash->assemble_labeled_path(start_kmer);
+    std::vector<std::string> contigs = labelhash->assemble_labeled_path(start_kmer);
 
-    PyObject * ret = Py_BuildValue("s", contig.c_str());
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
 
     return ret;
 }

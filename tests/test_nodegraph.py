@@ -1295,7 +1295,7 @@ def test_assemble_linear_path_10():
     assert _equals_rc(path, 'T' + contig[101:])
 
 
-def test_assemble_labelled_paths():
+def test_assemble_labeled_paths():
     # assemble entire contig, ignoring branch point b/c of labels
     contigfile = utils.get_test_data('simple-genome.fa')
     contig = list(screed.open(contigfile))[0].sequence
@@ -1307,15 +1307,60 @@ def test_assemble_labelled_paths():
     lh = khmer._GraphLabels(nodegraph)
 
     nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
+    nodegraph.count(contig[100:120] + 'T')  # will add another neighbor
+
+    print(contig[100:125])
 
     hdn = nodegraph.find_high_degree_nodes(contig)
     lh.label_across_high_degree_nodes(contig, hdn, 1)
 
     path = lh.assemble_labeled_path(contig[:K])
+    path = path[0]                        #@CTB
     len_path = len(path)
 
     print('len path:', len_path)
 
     assert _equals_rc(path, contig)
-    assert 0
+
+
+def test_assemble_labeled_paths_2():
+    # assemble entire contig + branch point b/c of labels
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    lh = khmer._GraphLabels(nodegraph)
+
+    nodegraph.consume(contig)
+    branch = contig[:120] + 'TGATGGACAG'
+    nodegraph.consume(branch)  # will add a branch
+
+    hdn = nodegraph.find_high_degree_nodes(contig)
+    hdn += nodegraph.find_high_degree_nodes(branch)
+    print(list(hdn))
+    lh.label_across_high_degree_nodes(contig, hdn, 1)
+    lh.label_across_high_degree_nodes(branch, hdn, 2)
+    print(lh.get_tag_labels(list(hdn)[0]))
+
+    paths = lh.assemble_labeled_path(contig[:K])
+    print([ len(x) for x in paths ])
+    len_path = len(paths)
+
+    print('len path:', len_path)
+
+    found = False
+    for path in paths:
+        if _equals_rc(path, contig):
+            found = True
+            break
+    assert found
+
+    found = False
+    for path in paths:
+        if _equals_rc(path, branch):
+            found = True
+            break
+    assert found

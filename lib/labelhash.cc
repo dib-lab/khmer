@@ -334,7 +334,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelSet LabelHash::get_tag_labels(const HashIntoType tag)
+LabelSet LabelHash::get_tag_labels(const HashIntoType tag) const
 {
     LabelSet labels;
     if (set_contains(graph->all_tags, tag)) {
@@ -598,17 +598,22 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
 
-std::string LabelHash::assemble_labeled_path(const Kmer seed_kmer)
+std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
     const
 {
+    std::vector<std::string> paths;
     std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
     std::string right = _assemble_labeled_right(start_kmer.c_str());
+    paths.push_back(right);
+    paths.push_back(right);
 
     start_kmer = _revcomp(start_kmer);
     std::string left = _assemble_labeled_right(start_kmer.c_str());
 
     left = left.substr(graph->_ksize);
-    return _revcomp(left) + right;
+    // return _revcomp(left) + right;
+
+    return paths;
 }
 
 std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
@@ -617,12 +622,12 @@ std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
     const char bases[] = "ACGT";
     std::string kmer = start_kmer;
     std::string contig = kmer;
+    bool found2 = false;
 
     while (1) {
         const char * base = &bases[0];
         bool found = false;
         char found_base;
-        bool found2 = false;
 
         while(*base != 0) {
             std::string try_kmer = kmer.substr(1) + (char) *base;
@@ -646,7 +651,89 @@ std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
             found = true;
         }
     }
+
+    if (found2) {               // hit a HDN
+        //std::cout << "HDN: " << kmer.length() << "\n";
+
+        Kmer path_begin(kmer.c_str(), kmer.length());
+
+        LabelSet labels = get_tag_labels(path_begin);
+
+        std::cout << "n labels: " << labels.size() << "\n";
+        LabelSet::const_iterator li;
+        std::vector<std::string> xpaths;
+        for (li = labels.begin(); li != labels.end(); li++) {
+            Label label = *li;
+
+            std::cout << "working with " << label << "\n";
+            xpaths.push_back(_assemble_linear_labels(kmer.c_str(),
+                                                     label));
+        }
+        std::cout << "xpaths is: " << xpaths.size() << "\n";
+        if (xpaths.size() == 1) {
+            contig += xpaths[0];
+            //std::cout << "recurse " << xpaths[0] << "\n";
+            const char * start_again = contig.substr(contig.length() - kmer.length()).c_str();
+            //std::cout << "starting from " << start_again << "\n";
+            std::string xxx = _assemble_labeled_right(start_again);
+            //std::cout << "and got " << xxx << "\n";
+            contig += xxx.substr(kmer.length());
+        }
+    }
+
     return contig;
 }
 
+std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
+                                               const Label label)
+    const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = "";
+    bool found2 = false;
+
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+
+        std::cout << "now at kmer " << kmer << "\n";
+
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+            std::cout << "trying " << (char) *base << "\n";
+
+            // a hit!
+            if (graph->get_count(try_kmer.c_str())) {
+                Kmer tag(try_kmer.c_str(), try_kmer.length());
+                LabelSet ls = get_tag_labels(tag);
+
+                std::cout << "got count; now ls: " << ls.size() << "\n";
+                if (set_contains(ls, label)) {
+                    if (found) {
+                        std::cout << "found 2..." << (char) *base << "\n";
+                        found2 = true;
+                        break;
+                    }
+                    std::cout << "found 1..." << (char) *base << "\n";
+                    found_base = (char) *base;
+                    found = true;
+                }
+            }
+            base++;
+        }
+        if (!found || found2) {
+            if (!found) {
+                std::cout << "ending.\n";
+            }
+            break;
+        } else {
+            contig += found_base;
+            kmer = kmer.substr(1) + found_base;
+        }
+    }
+    return contig;
+}
 // vim: set sts=2 sw=2:

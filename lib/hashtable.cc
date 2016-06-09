@@ -1125,7 +1125,7 @@ std::string Hashtable::_assemble_right(const char * start_kmer,
             }
             base++;
         }
-        if (!found or found2) {
+        if (!found || found2) {
             break;
         } else {
             contig += found_base;
