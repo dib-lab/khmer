@@ -601,15 +601,25 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
 std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
     const
 {
-    std::vector<std::string> paths;
     std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
-    _assemble_labeled_right(start_kmer.c_str(), paths);
+
+    std::vector<std::string> fwd_paths;
+    _assemble_labeled_right(start_kmer.c_str(), fwd_paths);
 
     start_kmer = _revcomp(start_kmer);
-    // std::string left = _assemble_labeled_right(start_kmer.c_str());
 
-    // left = left.substr(graph->_ksize);
-    // return _revcomp(left) + right;
+    std::vector<std::string> rev_paths;
+    _assemble_labeled_right(start_kmer.c_str(), rev_paths);
+
+    std::vector<std::string> paths;
+    for (unsigned int i = 0; i < rev_paths.size(); i++) {
+        for (unsigned int j = 0; j < fwd_paths.size(); j++) {
+            std::string left = rev_paths[i];
+            left = left.substr(graph->_ksize);
+            std::string contig = _revcomp(left) + fwd_paths[j];
+            paths.push_back(contig);
+        }
+    }
 
     return paths;
 }
