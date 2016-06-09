@@ -97,7 +97,7 @@ protected:
 
     unsigned int _get_tag_labels(const HashIntoType tag,
                                  const TagLabelMap cmap,
-                                 LabelSet& found_labels)
+                                 LabelSet& found_labels) const
     {
         unsigned int num_labels = 0;
         std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;

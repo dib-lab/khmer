@@ -337,8 +337,9 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
 LabelSet LabelHash::get_tag_labels(const HashIntoType tag)
 {
     LabelSet labels;
-    //unsigned int num_labels;
-    _get_tag_labels(tag, tag_labels, labels);
+    if (set_contains(graph->all_tags, tag)) {
+        _get_tag_labels(tag, tag_labels, labels);
+    }
     return labels;
 }
 
@@ -581,8 +582,10 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
         }
         if (set_contains(high_degree_nodes, kmer)) {
             graph->add_tag(prev_kmer);
+            graph->add_tag(kmer);
             graph->add_tag(next_kmer);
             link_tag_and_label(prev_kmer, label);
+            link_tag_and_label(kmer, label);
             link_tag_and_label(next_kmer, label);
         }
         prev_kmer = kmer;
