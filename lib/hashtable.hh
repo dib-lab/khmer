@@ -335,7 +335,7 @@ public:
     //
     void find_high_degree_nodes(const char * sequence,
                                 SeenSet& high_degree_nodes) const;
-                         
+
     unsigned int traverse_linear_path(const Kmer start_kmer,
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
