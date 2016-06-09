@@ -66,14 +66,14 @@ class LabelHash
 {
 protected:
     // Does the given tag already have the given label?
-    bool _cmap_contains_label(const TagLabelPtrMap& cmap,
-                              HashIntoType& kmer,
-                              Label& the_label)
+    bool _cmap_contains_label(const TagLabelMap& cmap,
+                              const HashIntoType kmer,
+                              const Label the_label)
     {
-        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
+        std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
         ret = cmap.equal_range(kmer);
-        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            if (*(it->second) == the_label) {
+        for (TagLabelMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            if (it->second == the_label) {
                 return true;
             }
         }
@@ -95,14 +95,14 @@ protected:
         return false;
     }
 
-    unsigned int _get_tag_labels(const HashIntoType& tag,
-                                 const TagLabelPtrMap& cmap,
-                                 LabelPtrSet& found_labels)
+    unsigned int _get_tag_labels(const HashIntoType tag,
+                                 const TagLabelMap cmap,
+                                 LabelSet& found_labels)
     {
         unsigned int num_labels = 0;
-        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
+        std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
         ret = cmap.equal_range(tag);
-        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+        for (TagLabelMap::const_iterator it=ret.first; it!=ret.second; ++it) {
             found_labels.insert(it->second);
             ++num_labels;
         }
@@ -136,27 +136,16 @@ public:
 
     ~LabelHash();
 
-    TagLabelPtrMap tag_labels;
-    LabelTagMap label_tag_ptrs;
-    LabelPtrMap label_ptrs;
+    TagLabelMap tag_labels;
+    LabelTagMap label_tag;
+    LabelSet all_labels;
 
     size_t n_labels() const
     {
-        return label_ptrs.size();
+        return all_labels.size();
     }
 
 
-    Label * check_and_allocate_label(Label new_label)
-    {
-        Label * c;
-        if (label_ptrs.count(new_label)) {
-            c = label_ptrs[new_label];
-        } else {
-            c = new Label(new_label);
-            label_ptrs[*c] = c;
-        }
-        return c;
-    }
     void consume_fasta_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -179,21 +168,21 @@ public:
 
     void consume_sequence_and_tag_with_labels(const std::string& seq,
             unsigned long long& n_consumed,
-            Label& current_label,
+            Label current_label,
             SeenSet * new_tags = 0);
 
-    LabelPtrSet get_tag_labels(const HashIntoType& tag);
+    LabelSet get_tag_labels(const HashIntoType tag);
 
-    void link_tag_and_label(HashIntoType& kmer, Label& label);
+    void link_tag_and_label(const HashIntoType kmer, const Label label);
 
     unsigned int sweep_label_neighborhood(const std::string & seq,
-                                          LabelPtrSet& found_labels,
+                                          LabelSet& found_labels,
                                           unsigned int range,
                                           bool break_on_stoptags,
                                           bool stop_big_traversals);
 
-    void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-                                     LabelPtrSet& found_labels);
+    void traverse_labels_and_resolve(const SeenSet tagged_kmers,
+                                     LabelSet& found_labels);
 
     void save_labels_and_tags(std::string);
     void load_labels_and_tags(std::string);
