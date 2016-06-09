@@ -191,7 +191,7 @@ public:
                                         SeenSet& high_degree_nodes,
                                         const Label label);
     std::vector<std::string> assemble_labeled_path(const Kmer seed_kmer) const;
-    std::string _assemble_labeled_right(const char * start_kmer) const;
+    void _assemble_labeled_right(const char * start_kmer, std::vector<std::string>&) const;
     std::string _assemble_linear_labels(const std::string kmer,
                                         const Label label) const;
 };

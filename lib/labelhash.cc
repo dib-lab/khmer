@@ -603,20 +603,18 @@ std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
 {
     std::vector<std::string> paths;
     std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
-    std::string right = _assemble_labeled_right(start_kmer.c_str());
-    paths.push_back(right);
-    paths.push_back(right);
+    _assemble_labeled_right(start_kmer.c_str(), paths);
 
     start_kmer = _revcomp(start_kmer);
-    std::string left = _assemble_labeled_right(start_kmer.c_str());
+    // std::string left = _assemble_labeled_right(start_kmer.c_str());
 
-    left = left.substr(graph->_ksize);
+    // left = left.substr(graph->_ksize);
     // return _revcomp(left) + right;
 
     return paths;
 }
 
-std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
+void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std::string>& paths)
     const
 {
     const char bases[] = "ACGT";
@@ -670,18 +668,22 @@ std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
                                                      label));
         }
         std::cout << "xpaths is: " << xpaths.size() << "\n";
+
         if (xpaths.size() == 1) {
             contig += xpaths[0];
             //std::cout << "recurse " << xpaths[0] << "\n";
             const char * start_again = contig.substr(contig.length() - kmer.length()).c_str();
             //std::cout << "starting from " << start_again << "\n";
-            std::string xxx = _assemble_labeled_right(start_again);
+            std::vector<std::string> newpaths;
+            _assemble_labeled_right(start_again, newpaths);
+            std::string xxx = newpaths[0];
             //std::cout << "and got " << xxx << "\n";
             contig += xxx.substr(kmer.length());
+            paths.push_back(contig);
         }
+    } else {
+        paths.push_back(contig);
     }
-
-    return contig;
 }
 
 std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
