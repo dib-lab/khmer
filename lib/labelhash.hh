@@ -190,6 +190,8 @@ public:
     void label_across_high_degree_nodes(const char * sequence,
                                         SeenSet& high_degree_nodes,
                                         const Label label);
+    std::string assemble_labeled_path(const Kmer seed_kmer) const;
+    std::string _assemble_labeled_right(const char * start_kmer) const;
 };
 }
 

@@ -1293,3 +1293,29 @@ def test_assemble_linear_path_10():
     print('len path:', len_path)
 
     assert _equals_rc(path, 'T' + contig[101:])
+
+
+def test_assemble_labelled_paths():
+    # assemble entire contig, ignoring branch point b/c of labels
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    lh = khmer._GraphLabels(nodegraph)
+
+    nodegraph.consume(contig)
+    nodegraph.count('T' + contig[101:121])  # will add another neighbor
+
+    hdn = nodegraph.find_high_degree_nodes(contig)
+    lh.label_across_high_degree_nodes(contig, hdn, 1)
+
+    path = lh.assemble_labeled_path(contig[:K])
+    len_path = len(path)
+
+    print('len path:', len_path)
+
+    assert _equals_rc(path, contig)
+    assert 0

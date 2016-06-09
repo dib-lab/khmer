@@ -4260,6 +4260,32 @@ labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
 
 static
 PyObject *
+labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
+                                PyObject * args)
+{
+    LabelHash* labelhash = me->labelhash;
+
+    PyObject * val_o;
+
+    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer,
+                                  labelhash->graph->ksize())) {
+        return NULL;
+    }
+
+    std::string contig = labelhash->assemble_labeled_path(start_kmer);
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
+
+    return ret;
+}
+
+static
+PyObject *
 labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
@@ -4313,6 +4339,11 @@ static PyMethodDef khmer_graphlabels_methods[] = {
         "label_across_high_degree_nodes",
         (PyCFunction)labelhash_label_across_high_degree_nodes, METH_VARARGS,
         "Connect graph across high degree nodes using labels.",
+    },
+    {
+        "assemble_labeled_path",
+        (PyCFunction)labelhash_assemble_labeled_path, METH_VARARGS,
+        "Assemble all paths, using labels to negotiate tricky bits."
     },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */

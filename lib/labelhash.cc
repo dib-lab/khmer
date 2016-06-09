@@ -593,3 +593,60 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
         next_kmer = kmers.next();
     }
 }
+
+
+// Starting from the given seed k-mer, assemble all maximal linear paths in
+// both directions, using labels to skip over tricky bits.
+
+std::string LabelHash::assemble_labeled_path(const Kmer seed_kmer)
+    const
+{
+    std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
+    std::string right = _assemble_labeled_right(start_kmer.c_str());
+
+    start_kmer = _revcomp(start_kmer);
+    std::string left = _assemble_labeled_right(start_kmer.c_str());
+
+    left = left.substr(graph->_ksize);
+    return _revcomp(left) + right;
+}
+
+std::string LabelHash::_assemble_labeled_right(const char * start_kmer)
+    const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = kmer;
+
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+        bool found2 = false;
+
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+            // a hit!
+            if (graph->get_count(try_kmer.c_str())) {
+                if (found) {
+                    found2 = true;
+                    break;
+                }
+                found_base = (char) *base;
+                found = true;
+            }
+            base++;
+        }
+        if (!found or found2) {
+            break;
+        } else {
+            contig += found_base;
+            kmer = kmer.substr(1) + found_base;
+            found = true;
+        }
+    }
+    return contig;
+}
+
+// vim: set sts=2 sw=2:
