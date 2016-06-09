@@ -1017,6 +1017,7 @@ void Hashtable::find_high_degree_nodes(const char * s,
     }
 }
 
+
 unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
                                              SeenSet &adjacencies,
                                              SeenSet &visited, Hashtable &bf,

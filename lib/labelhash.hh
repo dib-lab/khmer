@@ -187,6 +187,9 @@ public:
     void save_labels_and_tags(std::string);
     void load_labels_and_tags(std::string);
 
+    void label_across_high_degree_nodes(const char * sequence,
+                                        SeenSet& high_degree_nodes,
+                                        const Label label);
 };
 }
 

@@ -4233,6 +4233,33 @@ labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 
 static
 PyObject *
+labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
+                                         PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    const char * long_str;
+    khmer_HashSet_Object * hdn_o = NULL;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "sO!K", &long_str,
+                          &khmer_HashSet_Type, &hdn_o, &label)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < labelhash->graph->ksize()) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    labelhash->label_across_high_degree_nodes(long_str, *hdn_o->hashes, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
 labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
@@ -4282,6 +4309,11 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
+    {
+        "label_across_high_degree_nodes",
+        (PyCFunction)labelhash_label_across_high_degree_nodes, METH_VARARGS,
+        "Connect graph across high degree nodes using labels.",
+    },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
