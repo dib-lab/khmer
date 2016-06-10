@@ -661,33 +661,55 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
     }
 
     if (found2) {               // hit a HDN
-        //std::cout << "HDN: " << kmer.length() << "\n";
+#if DEBUG
+        std::cout << "HDN: " << kmer.length() << "\n";
+#endif // DEBUG
 
         Kmer path_begin(kmer.c_str(), kmer.length());
 
         LabelSet labels = get_tag_labels(path_begin);
 
-        // std::cout << "n labels: " << labels.size() << "\n";
+#if DEBUG
+        std::cout << "n labels: " << labels.size() << "\n";
+#endif // DEBUG
         LabelSet::const_iterator li;
         std::vector<std::string> xpaths;
         for (li = labels.begin(); li != labels.end(); li++) {
             Label label = *li;
 
-            // std::cout << "working with " << label << "\n";
+#if DEBUG
+            std::cout << "working with " << label << "\n";
+#endif // DEBUG
             xpaths.push_back(_assemble_linear_labels(kmer.c_str(),
                                                      label));
         }
-        // std::cout << "xpaths is: " << xpaths.size() << "\n";
+#if DEBUG
+        std::cout << "xpaths is: " << xpaths.size() << "\n";
+#endif // DEBUG
+
+        if (xpaths.size() == 0) {
+            paths.push_back(contig);
+            return;
+        }
 
         for (unsigned int j = 0; j < xpaths.size(); j++) {
             std::string this_contig = contig;
             this_contig += xpaths[j];
-            //std::cout << "recurse " << xpaths[0] << "\n";
+#if DEBUG
+            std::cout << "recurse " << xpaths[0] << "\n";
+#endif // DEBUG
             const char * start_again = this_contig.substr(this_contig.length() - kmer.length()).c_str();
-            //std::cout << "starting from " << start_again << "\n";
+#if DEBUG
+            std::cout << "starting from " << start_again << "\n";
+#endif // DEBUG
             std::vector<std::string> newpaths;
 
             _assemble_labeled_right(start_again, newpaths);
+
+            if (newpaths.size() == 0) {
+                paths.push_back(this_contig);
+            }
+
             for (unsigned int i = 0; i < newpaths.size(); i++) {
                 std::string xxx = newpaths[i];
                 this_contig += xxx.substr(kmer.length());
@@ -713,26 +735,36 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
         bool found = false;
         char found_base;
 
-        // std::cout << "now at kmer " << kmer << "\n";
+#if DEBUG
+        std::cout << "now at kmer " << kmer << "\n";
+#endif // DEBUG
 
         while(*base != 0) {
             std::string try_kmer = kmer.substr(1) + (char) *base;
 
-            // std::cout << "trying " << (char) *base << "\n";
+#if DEBUG
+            std::cout << "trying " << (char) *base << "\n";
+#endif // DEBUG
 
             // a hit!
             if (graph->get_count(try_kmer.c_str())) {
                 Kmer tag(try_kmer.c_str(), try_kmer.length());
                 LabelSet ls = get_tag_labels(tag);
 
-                // std::cout << "got count; now ls: " << ls.size() << "\n";
+#if DEBUG
+                std::cout << "got count; now ls: " << ls.size() << "\n";
+#endif // DEBUG
                 if (set_contains(ls, label)) {
                     if (found) {
-                        // std::cout << "found 2..." << (char) *base << "\n";
+#if DEBUG
+                        std::cout << "found 2..." << (char) *base << "\n";
+#endif // DEBUG
                         found2 = true;
                         break;
                     }
-                    // std::cout << "found 1..." << (char) *base << "\n";
+#if DEBUG
+                    std::cout << "found 1..." << (char) *base << "\n";
+#endif // DEBUG
                     found_base = (char) *base;
                     found = true;
                 }
@@ -741,7 +773,9 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
         }
         if (!found || found2) {
             if (!found) {
-                // std::cout << "ending.\n";
+#if DEBUG
+                std::cout << "ending.\n";
+#endif
             }
             break;
         } else {
