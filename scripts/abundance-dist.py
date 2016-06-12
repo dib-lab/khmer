@@ -89,12 +89,15 @@ def get_parser():
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     return parser
 
 
 def main():
-    info('abundance-dist.py', ['counting'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('abundance-dist.py', ['counting'])
 
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
