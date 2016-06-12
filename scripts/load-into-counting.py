@@ -97,14 +97,17 @@ def get_parser():
                         " default)")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     return parser
 
 
 def main():
 
-    info('load-into-counting.py', ['counting', 'SeqAn'])
-
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('load-into-counting.py', ['counting', 'SeqAn'])
+
     report_on_config(args)
 
     base = args.output_countgraph_filename

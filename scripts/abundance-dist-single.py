@@ -97,12 +97,15 @@ def get_parser():
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     return parser
 
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
-    info('abundance-dist-single.py', ['counting', 'SeqAn'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('abundance-dist-single.py', ['counting', 'SeqAn'])
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)
