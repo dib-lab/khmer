@@ -103,15 +103,17 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('filter-abund.py', ['counting'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('filter-abund.py', ['counting'])
 
-    check_input_files(args.input_graph, args.force)
     infiles = args.input_filename
     if ('-' in infiles or '/dev/stdin' in infiles) and not \
        args.single_output_file:
