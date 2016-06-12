@@ -2786,6 +2786,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Increment the count of this k-mer."
     },
     {
+        "add",
+        (PyCFunction)hashtable_count, METH_VARARGS,
+        "Increment the count of this k-mer. (Synonym for 'count'.)"
+    },
+    {
         "consume",
         (PyCFunction)hashtable_consume, METH_VARARGS,
         "Increment the counts of all of the k-mers in the string."
