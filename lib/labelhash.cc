@@ -53,6 +53,8 @@ Contact: khmer-project@idyll.org
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
+#define DEBUG 0
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -631,6 +633,7 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
     std::string kmer = start_kmer;
     std::string contig = kmer;
     bool found2 = false;
+    SeenSet visited;
 
     while (1) {
         const char * base = &bases[0];
@@ -642,6 +645,13 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 
             // a hit!
             if (graph->get_count(try_kmer.c_str())) {
+                if (set_contains(visited, _hash(try_kmer.c_str(), graph->_ksize))) {
+#if DEBUG
+                    std::cout << "loop.\n";
+#endif // DEBUG
+                    base++;
+                    continue;
+                }
                 if (found) {
                     found2 = true;
                     break;
@@ -657,8 +667,13 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
             contig += found_base;
             kmer = kmer.substr(1) + found_base;
             found = true;
+            visited.insert(_hash(kmer.c_str(), graph->_ksize));
+#if DEBUG
+            std::cout << "extending.\n";
+#endif // DEBUG
         }
     }
+    visited.clear();
 
     if (found2) {               // hit a HDN
 #if DEBUG

@@ -1472,3 +1472,31 @@ def test_assemble_labeled_paths_4():
             found = True
             break
     assert found
+
+
+def test_assemble_labeled_paths_5():
+    # assemble entire contig + one of two paths through a bubble
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    lh = khmer._GraphLabels(nodegraph)
+
+    nodegraph.consume(contig)
+    contig2 = contig[:200] + 'G' contig[201:]
+    nodegraph.consume(contig2)
+
+    hdn = nodegraph.find_high_degree_nodes(contig)
+    assert len(hdn) == 2
+    lh.label_across_high_degree_nodes(contig, hdn, 1)
+
+    path = lh.assemble_labeled_path(contig[:K])
+    path = path[0]                        #@CTB
+    len_path = len(path)
+
+    print('len path:', len_path)
+
+    assert _equals_rc(path, contig)
