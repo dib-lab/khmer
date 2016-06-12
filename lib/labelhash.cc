@@ -53,6 +53,8 @@ Contact: khmer-project@idyll.org
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
+#define DEBUG 0
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -98,9 +100,8 @@ LabelHash::consume_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    Label _tag_label = 0;
+    Label the_label = 0;
 
-    Label * the_label;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
         try {
@@ -112,11 +113,10 @@ LabelHash::consume_fasta_and_tag_with_labels(
         if (graph->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!
             unsigned long long this_n_consumed = 0;
-            the_label = check_and_allocate_label(_tag_label);
             consume_sequence_and_tag_with_labels( read.sequence,
                                                   this_n_consumed,
-                                                  *the_label );
-            _tag_label++;
+                                                  the_label );
+            the_label++;
 
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
@@ -169,7 +169,6 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     //
     // iterate through the FASTA file & consume the reads.
     //
-    Label * c;
     PartitionID p;
     while(!parser->is_complete())  {
         read = parser->get_next_read();
@@ -180,13 +179,10 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
             // save that.
             printdbg(parsing partition id)
             p = _parse_partition_id(read.name);
-            printdbg(checking label and allocating if necessary) {
-                c = check_and_allocate_label(p);
-            }
             printdbg(consuming sequence and tagging)
             consume_sequence_and_tag_with_labels( seq,
                                                   n_consumed,
-                                                  *c );
+                                                  p );
             printdbg(back in consume_partitioned)
         }
 
@@ -214,17 +210,19 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
-void LabelHash::link_tag_and_label(HashIntoType& kmer, Label& kmer_label)
+void LabelHash::link_tag_and_label(const HashIntoType kmer,
+                                   const Label kmer_label)
 {
     printdbg(linking tag and label)
-    tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
-    label_tag_ptrs.insert(LabelTagPair(kmer_label, kmer));
+    tag_labels.insert(TagLabelPair(kmer, kmer_label));
+    label_tag.insert(LabelTagPair(kmer_label, kmer));
+    all_labels.insert(kmer_label);
     printdbg(done linking tag and label)
 }
 
 void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
         unsigned long long& n_consumed,
-        Label& current_label,
+        Label current_label,
         SeenSet * found_tags)
 {
 
@@ -246,7 +244,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }
-#if (1)
             if (is_new_kmer) {
                 printdbg(new kmer...)
                 ++since;
@@ -277,16 +274,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     ++since;
                 }
             }
-#else
-            if (!is_new_kmer && set_contains(graph->all_tags, kmer)) {
-                since = 1;
-                if (found_tags) {
-                    found_tags->insert(kmer);
-                }
-            } else {
-                since++;
-            }
-#endif
             //
             if (since >= graph->_tag_density) {
                 printdbg(exceeded tag density: drop a tag and label --
@@ -327,7 +314,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 }
 
 unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
-        LabelPtrSet& found_labels,
+        LabelSet& found_labels,
         unsigned int range,
         bool break_on_stoptags,
         bool stop_big_traversals)
@@ -349,16 +336,17 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag)
+LabelSet LabelHash::get_tag_labels(const HashIntoType tag) const
 {
-    LabelPtrSet labels;
-    //unsigned int num_labels;
-    _get_tag_labels(tag, tag_labels, labels);
+    LabelSet labels;
+    if (set_contains(graph->all_tags, tag)) {
+        _get_tag_labels(tag, tag_labels, labels);
+    }
     return labels;
 }
 
-void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-        LabelPtrSet& found_labels)
+void LabelHash::traverse_labels_and_resolve(const SeenSet tagged_kmers,
+        LabelSet& found_labels)
 {
 
     SeenSet::const_iterator si;
@@ -375,10 +363,7 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
 
 LabelHash::~LabelHash()
 {
-    for (LabelPtrMap::iterator itr=label_ptrs.begin();
-            itr!=label_ptrs.end(); ++itr) {
-        delete itr->second;
-    }
+    ;
 }
 
 
@@ -410,14 +395,14 @@ void LabelHash::save_labels_and_tags(std::string filename)
     // For each tag in the partition map, save the tag and the associated
     // partition ID.
 
-    TagLabelPtrMap::const_iterator pi = tag_labels.begin();
+    TagLabelMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
         HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
         *k_p = pi->first;
         n_bytes += sizeof(HashIntoType);
 
         Label * l_p = (Label *) (buf + n_bytes);
-        *l_p = *(pi->second);
+        *l_p = pi->second;
         n_bytes += sizeof(Label);
 
         // flush to disk
@@ -548,11 +533,9 @@ void LabelHash::load_labels_and_tags(std::string filename)
             labelp = (Label *) (buf + i);
             i += sizeof(Label);
 
-            Label * labelp2;
-
             graph->all_tags.insert(*kmer_p);
-            labelp2 = check_and_allocate_label(*labelp);
-            link_tag_and_label(*kmer_p, *labelp2);
+            all_labels.insert(*labelp);
+            link_tag_and_label(*kmer_p, *labelp);
 
             loaded++;
         }
@@ -575,3 +558,246 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
     delete[] buf;
 }
+
+// tag & label k-mers on either side of an HDN.
+
+void LabelHash::label_across_high_degree_nodes(const char * s,
+                                               SeenSet& high_degree_nodes,
+                                               const Label label)
+{
+    KmerIterator kmers(s, graph->_ksize);
+
+    unsigned long n = 0;
+
+    Kmer prev_kmer = kmers.next();
+    if (kmers.done()) { return; }
+    Kmer kmer = kmers.next();
+    if (kmers.done()) { return; }
+    Kmer next_kmer = kmers.next();
+
+    // ignore any situation where HDN is at beginning or end of sequence
+    // @CTB testme :)
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... label_across_hdn: " << n << "\n";
+        }
+        if (set_contains(high_degree_nodes, kmer)) {
+            graph->add_tag(prev_kmer);
+            graph->add_tag(kmer);
+            graph->add_tag(next_kmer);
+            link_tag_and_label(prev_kmer, label);
+            link_tag_and_label(kmer, label);
+            link_tag_and_label(next_kmer, label);
+        }
+        prev_kmer = kmer;
+        kmer = next_kmer;
+        next_kmer = kmers.next();
+    }
+}
+
+
+// Starting from the given seed k-mer, assemble all maximal linear paths in
+// both directions, using labels to skip over tricky bits.
+
+std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
+    const
+{
+    std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
+
+    std::vector<std::string> fwd_paths;
+    _assemble_labeled_right(start_kmer.c_str(), fwd_paths);
+
+    start_kmer = _revcomp(start_kmer);
+
+    std::vector<std::string> rev_paths;
+    _assemble_labeled_right(start_kmer.c_str(), rev_paths);
+
+    std::vector<std::string> paths;
+    for (unsigned int i = 0; i < rev_paths.size(); i++) {
+        for (unsigned int j = 0; j < fwd_paths.size(); j++) {
+            std::string left = rev_paths[i];
+            left = left.substr(graph->_ksize);
+            std::string contig = _revcomp(left) + fwd_paths[j];
+            paths.push_back(contig);
+        }
+    }
+
+    return paths;
+}
+
+void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std::string>& paths)
+    const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = kmer;
+    bool found2 = false;
+    SeenSet visited;
+
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+            // a hit!
+            if (graph->get_count(try_kmer.c_str())) {
+                if (set_contains(visited, _hash(try_kmer.c_str(), graph->_ksize))) {
+#if DEBUG
+                    std::cout << "loop.\n";
+#endif // DEBUG
+                    base++;
+                    continue;
+                }
+                if (found) {
+                    found2 = true;
+                    break;
+                }
+                found_base = (char) *base;
+                found = true;
+            }
+            base++;
+        }
+        if (!found or found2) {
+            break;
+        } else {
+            contig += found_base;
+            kmer = kmer.substr(1) + found_base;
+            found = true;
+            visited.insert(_hash(kmer.c_str(), graph->_ksize));
+#if DEBUG
+            std::cout << "extending.\n";
+#endif // DEBUG
+        }
+    }
+    visited.clear();
+
+    if (found2) {               // hit a HDN
+#if DEBUG
+        std::cout << "HDN: " << kmer.length() << "\n";
+#endif // DEBUG
+
+        Kmer path_begin(kmer.c_str(), kmer.length());
+
+        LabelSet labels = get_tag_labels(path_begin);
+
+#if DEBUG
+        std::cout << "n labels: " << labels.size() << "\n";
+#endif // DEBUG
+        LabelSet::const_iterator li;
+        std::vector<std::string> xpaths;
+        for (li = labels.begin(); li != labels.end(); li++) {
+            Label label = *li;
+
+#if DEBUG
+            std::cout << "working with " << label << "\n";
+#endif // DEBUG
+            xpaths.push_back(_assemble_linear_labels(kmer.c_str(),
+                                                     label));
+        }
+#if DEBUG
+        std::cout << "xpaths is: " << xpaths.size() << "\n";
+#endif // DEBUG
+
+        if (xpaths.size() == 0) {
+            paths.push_back(contig);
+            return;
+        }
+
+        for (unsigned int j = 0; j < xpaths.size(); j++) {
+            std::string this_contig = contig;
+            this_contig += xpaths[j];
+#if DEBUG
+            std::cout << "recurse " << xpaths[0] << "\n";
+#endif // DEBUG
+            const char * start_again = this_contig.substr(this_contig.length() - kmer.length()).c_str();
+#if DEBUG
+            std::cout << "starting from " << start_again << "\n";
+#endif // DEBUG
+            std::vector<std::string> newpaths;
+
+            _assemble_labeled_right(start_again, newpaths);
+
+            if (newpaths.size() == 0) {
+                paths.push_back(this_contig);
+            }
+
+            for (unsigned int i = 0; i < newpaths.size(); i++) {
+                std::string xxx = newpaths[i];
+                this_contig += xxx.substr(kmer.length());
+                paths.push_back(this_contig);
+            }
+        }
+    } else {
+        paths.push_back(contig);
+    }
+}
+
+std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
+                                               const Label label)
+    const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = "";
+    bool found2 = false;
+
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+
+#if DEBUG
+        std::cout << "now at kmer " << kmer << "\n";
+#endif // DEBUG
+
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+#if DEBUG
+            std::cout << "trying " << (char) *base << "\n";
+#endif // DEBUG
+
+            // a hit!
+            if (graph->get_count(try_kmer.c_str())) {
+                Kmer tag(try_kmer.c_str(), try_kmer.length());
+                LabelSet ls = get_tag_labels(tag);
+
+#if DEBUG
+                std::cout << "got count; now ls: " << ls.size() << "\n";
+#endif // DEBUG
+                if (set_contains(ls, label)) {
+                    if (found) {
+#if DEBUG
+                        std::cout << "found 2..." << (char) *base << "\n";
+#endif // DEBUG
+                        found2 = true;
+                        break;
+                    }
+#if DEBUG
+                    std::cout << "found 1..." << (char) *base << "\n";
+#endif // DEBUG
+                    found_base = (char) *base;
+                    found = true;
+                }
+            }
+            base++;
+        }
+        if (!found || found2) {
+            if (!found) {
+#if DEBUG
+                std::cout << "ending.\n";
+#endif
+            }
+            break;
+        } else {
+            contig += found_base;
+            kmer = kmer.substr(1) + found_base;
+        }
+    }
+    return contig;
+}
+// vim: set sts=2 sw=2:
