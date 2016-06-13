@@ -125,6 +125,8 @@ def get_parser():
     parser.add_argument('-s', '--savegraph', metavar="filename", default='',
                         help='save the k-mer countgraph to disk after all'
                         'reads are loaded.')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
@@ -319,9 +321,10 @@ class Trimmer(object):
 
 
 def main():
-    info('trim-low-abund.py', ['streaming'])
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
+    if not args.quiet:
+        info('trim-low-abund.py', ['streaming'])
 
     ###
 
