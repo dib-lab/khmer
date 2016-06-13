@@ -92,13 +92,16 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('filter-abund-single.py', ['counting', 'SeqAn'])
 
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
