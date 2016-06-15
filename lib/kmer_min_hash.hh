@@ -3,19 +3,20 @@
 
 #include <set>
 #include <map>
+#include <exception>
+#include <string>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
 #include "kmer_hash.hh"
 
+uint64_t _hash_murmur64(const std::string& kmer);
+
+namespace khmer {
+
 ////
 
-#define DEFAULT_MINHASH_PRIME 9999999967
-
-namespace khmer
-{
-
-typedef std::set<khmer::HashIntoType> CMinHashType;
+typedef std::set<HashIntoType> CMinHashType;
 
 class minhash_exception : public std::exception
 {
@@ -39,12 +40,11 @@ class KmerMinHash
 public:
     const unsigned int num;
     const unsigned int ksize;
-    const long int prime;
     const bool is_protein;
     CMinHashType mins;
 
-    KmerMinHash(unsigned int n, unsigned int k, long int p, bool prot) :
-        num(n), ksize(k), prime(p), is_protein(prot) { };
+    KmerMinHash(unsigned int n, unsigned int k, bool prot) :
+        num(n), ksize(k), is_protein(prot) { };
 
     void _shrink() {
         while (mins.size() > num) {
@@ -53,39 +53,40 @@ public:
             mins.erase(mi);
         }
     }
-    void add_hash(long int h) {
-        h = ((h % prime) + prime) % prime;
+    void add_hash(HashIntoType h) {
         mins.insert(h);
         _shrink();
     }
-    void add_kmer(std::string kmer) {
-        long int hash = _hash_murmur32(kmer);
+    void add_word(std::string word) {
+        HashIntoType hash = _hash_murmur64(word);
         add_hash(hash);
     }
-    void add_sequence(const char * sequence) {
+    void add_sequence(const char * sequence, bool force=false) {
+        if (strlen(sequence) < ksize) {
+            return;
+        }
+        const std::string seq = _checkdna(sequence, force);
         if (!is_protein) {
-            std::string seq = sequence;
             for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
                 std::string kmer = seq.substr(i, ksize);
-                add_kmer(kmer);
-            }
-            std::string rc = _revcomp(seq);
-            for (unsigned int i = 0; i < rc.length() - ksize + 1; i++) {
-                std::string kmer = rc.substr(i, ksize);
-                add_kmer(kmer);
+                std::string rc = _revcomp(kmer);
+                if (kmer < rc) {
+                    add_word(kmer);
+                } else {
+                    add_word(rc);
+                }
             }
         } else {                      // protein
-            std::string seq = sequence;
             for (unsigned int i = 0; i < seq.length() - ksize + 1; i ++) {
                 std::string kmer = seq.substr(i, ksize);
                 std::string aa = _dna_to_aa(kmer);
 
-                add_kmer(aa);
+                add_word(aa);
 
                 std::string rc = _revcomp(kmer);
                 aa = _dna_to_aa(rc);
 
-                add_kmer(aa);
+                add_word(aa);
             }
         }
     }
@@ -100,7 +101,33 @@ public:
         return aa;
     }
 
-    std::string _revcomp(const std::string& kmer) {
+    std::string _checkdna(const char * s, bool force=false) const {
+        size_t seqsize = strlen(s);
+
+        std::string seq = s;
+
+        for (size_t i=0; i < seqsize; ++i) {
+            switch(seq[i]) {
+            case 'A':
+            case 'C':
+            case 'G':
+            case 'T':
+                break;
+            default:
+                if (force) {
+                    seq[i] = 'N';
+                } else {
+                    std::string msg = "invalid DNA character in sequence: ";
+                    msg += seq[i];
+                    throw minhash_exception(msg);
+                }
+                break;
+            }
+        }
+        return seq;
+    }
+
+    std::string _revcomp(const std::string& kmer) const {
         std::string out = kmer;
         size_t ksize = out.size();
 
@@ -120,9 +147,14 @@ public:
             case 'T':
                 complement = 'A';
                 break;
-            default:
-                throw std::exception();
+            case 'N':
+                complement = 'N';
                 break;
+            default:
+                std::string msg = "invalid DNA character in sequence: ";
+                msg += kmer[i];
+
+                throw minhash_exception(msg);
             }
             out[ksize - i - 1] = complement;
         }
@@ -134,11 +166,8 @@ public:
         if (ksize != other.ksize) {
             throw minhash_exception("different ksizes cannot be merged");
         }
-        if (prime != other.prime) {
-            throw minhash_exception("different primes cannot be merged");
-        }
         if (is_protein != other.is_protein) {
-            throw minhash_exception("different primes cannot be merged");
+            throw minhash_exception("DNA/prot minhashes cannot be merged");
         }
         for (mi = other.mins.begin(); mi != other.mins.end(); ++mi) {
             mins.insert(*mi);
@@ -151,11 +180,8 @@ public:
         if (ksize != other.ksize) {
             throw minhash_exception("different ksizes cannot be compared");
         }
-        if (prime != other.prime) {
-            throw minhash_exception("different primes cannot be compared");
-        }
         if (is_protein != other.is_protein) {
-            throw minhash_exception("different primes cannot be compared");
+            throw minhash_exception("DNA/prot minhashes cannot be compared");
         }
 
         CMinHashType::iterator mi;
@@ -220,16 +246,13 @@ class NeighborhoodMinHash
 {
 public:
     unsigned int ksize;
-    long int prime;
     bool is_protein;
 
     TagToTagSet tag_connections;
     TagToHash tag_to_hash;
 
     NeighborhoodMinHash(unsigned int _k,
-                        long int _p=DEFAULT_MINHASH_PRIME,
                         bool _is_p=false) : ksize(_k),
-                                            prime(_p),
                                             is_protein(_is_p)
     { ; }
 };

@@ -115,7 +115,6 @@ public:
     void build_neighborhood_minhash(Kmer start_kmer,
                                     SeenSet& tagged_kmers,
                                     HashIntoType& the_hash,
-                                    long int mh_prime,
                                     const SeenSet& all_tags,
                                     bool break_on_stop_tags=false,
                                     bool stop_big_traversals=false);

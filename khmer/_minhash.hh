@@ -44,9 +44,11 @@
 
 #include "kmer_min_hash.hh"
 
+using namespace khmer;
+
 typedef struct {
     PyObject_HEAD
-    khmer::KmerMinHash * mh;
+    KmerMinHash * mh;
 } MinHash_Object;
 
 khmer::KmerMinHash * extract_KmerMinHash(PyObject * mh_obj)
