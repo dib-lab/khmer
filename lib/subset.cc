@@ -316,7 +316,6 @@ void SubsetPartition::build_neighborhood_minhash(
     Kmer start_kmer,
     SeenSet&		tagged_kmers,
     HashIntoType& the_hash,
-    long int mh_prime,
     const SeenSet&	all_tags,
     bool		break_on_stop_tags,
     bool		stop_big_traversals)
@@ -366,10 +365,8 @@ void SubsetPartition::build_neighborhood_minhash(
         // keep track of seen kmers
         keeper.insert(node);
 
-        HashIntoType f = _hash_murmur32(_revhash(node.kmer_f, _ht->ksize()))
-            % mh_prime;
-        HashIntoType r = _hash_murmur32(_revhash(node.kmer_r, _ht->ksize()))
-            % mh_prime;
+        HashIntoType f = _hash_murmur(_revhash(node.kmer_f, _ht->ksize()));
+        HashIntoType r = _hash_murmur(_revhash(node.kmer_r, _ht->ksize()));
 
         if (f < the_hash) { the_hash = f; }
         if (r < the_hash) { the_hash = r; }
@@ -1556,10 +1553,10 @@ void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
     std::string start = _revhash(*si, _ht->ksize());
     Kmer start_kmer(start, _ht->ksize());
 
-    HashIntoType the_hash = _hash_murmur32(start) % nbhd_mh.prime;
+    HashIntoType the_hash = _hash_murmur(start);
 
     build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
-                               the_hash, nbhd_mh.prime, all_tags);
+                               the_hash, all_tags);
     // here, tagged_kmers will be tags encountered while traversing,
     // and hash will now be the bottom neighborhood hash.
 

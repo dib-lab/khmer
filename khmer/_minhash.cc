@@ -1,3 +1,14 @@
+#include <string>
+#include <map>
+#include <exception>
+#include <iostream>
+#include <fstream>
+#include <sstream> // IWYU pragma: keep
+
+#include "khmer.hh"
+
+using namespace khmer;
+
 #include "_minhash.hh"
 
 //
@@ -9,16 +20,7 @@ extern "C" {
 }
 
 
-#include <string>
-#include <map>
-#include <exception>
-#include <iostream>
-#include <fstream>
-#include <sstream> // IWYU pragma: keep
-
 #define NBHD_SIZE_LIMIT 5
-
-using namespace khmer;
 
 static int _MinHash_len(PyObject *);
 static PyObject * _MinHash_concat_inplace(PyObject *, PyObject *);
@@ -87,12 +89,22 @@ PyObject *
 minhash_add_sequence(MinHash_Object * me, PyObject * args)
 {
     const char * sequence = NULL;
-    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+    PyObject * force_o = NULL;
+    if (!PyArg_ParseTuple(args, "s|O", &sequence, &force_o)) {
         return NULL;
     }
     KmerMinHash * mh = me->mh;
+    bool force = false;
+    if (force_o && PyObject_IsTrue(force_o)) {
+        force = true;
+    }
 
-    mh->add_sequence(sequence);
+    try {
+        mh->add_sequence(sequence, force);
+    } catch (minhash_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -115,14 +127,17 @@ minhash_add_protein(MinHash_Object * me, PyObject * args)
         return Py_None;
     }
 
+
     if (!mh->is_protein) {
-        assert(0);
+        PyErr_SetString(PyExc_ValueError,
+                        "cannot add amino acid sequence to DNA MinHash!");
+        return NULL;
     } else {                      // protein
         std::string seq = sequence;
         for (unsigned int i = 0; i < seq.length() - ksize + 1; i ++) {
             std::string aa = seq.substr(i, ksize);
 
-            mh->add_kmer(aa);
+            mh->add_word(aa);
         }
     }
 
@@ -134,8 +149,8 @@ static
 PyObject *
 minhash_add_hash(MinHash_Object * me, PyObject * args)
 {
-    long int hh;
-    if (!PyArg_ParseTuple(args, "l", &hh)) {
+    HashIntoType hh;
+    if (!PyArg_ParseTuple(args, "K", &hh)) {
         return NULL;
     }
 
@@ -195,8 +210,7 @@ static PyObject * minhash___copy__(MinHash_Object * me, PyObject * args)
     }
 
     KmerMinHash * mh = me->mh;
-    KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
-                                           mh->is_protein);
+    KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->is_protein);
     new_mh->merge(*mh);
 
     return build_MinHash_Object(new_mh);
@@ -330,9 +344,8 @@ MinHash_new(PyTypeObject * subtype, PyObject * args, PyObject * kwds)
     }
 
     unsigned int _n, _ksize;
-    long int _p = DEFAULT_MINHASH_PRIME;
     PyObject * is_protein_o = NULL;
-    if (!PyArg_ParseTuple(args, "II|lO", &_n, &_ksize, &_p, &is_protein_o)) {
+    if (!PyArg_ParseTuple(args, "II|O", &_n, &_ksize, &is_protein_o)) {
         return NULL;
     }
 
@@ -342,7 +355,7 @@ MinHash_new(PyTypeObject * subtype, PyObject * args, PyObject * kwds)
         is_protein = true;
     }
 
-    myself->mh = new KmerMinHash(_n, _ksize, _p, is_protein);
+    myself->mh = new KmerMinHash(_n, _ksize, is_protein);
 
     return self;
 }
@@ -353,6 +366,15 @@ bool check_IsMinHash(PyObject * mh)
         return false;
     }
     return true;
+}
+
+
+uint64_t _hash_murmur64(const std::string& kmer) {
+    uint64_t out[2];
+    out[0] = 0; out[1] = 0;
+    uint32_t seed = 42;
+    MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
+    return out[0];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -443,7 +465,6 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
                               unsigned int nbhd_size_limit=NBHD_SIZE_LIMIT)
 {
     unsigned int k = nbhd_mh.ksize;
-    long int p = nbhd_mh.prime;
     bool prot = nbhd_mh.is_protein;
 
     CombinedMinHash * combined_mh = NULL;
@@ -466,7 +487,7 @@ void build_combined_minhashes(NeighborhoodMinHash& nbhd_mh,
         if (combined_mh == NULL) {
             combined_mh = new CombinedMinHash;
             combined_mh->mh = new KmerMinHash(combined_minhash_size,
-                                              k, p, prot);
+                                              k, prot);
         }
 
         // keep track of tags that could be merged into this:
@@ -545,10 +566,9 @@ void combine_from_tags(NeighborhoodMinHash& nbhd_mh,
                        unsigned int combined_minhash_size=500)
 {
     unsigned int k = nbhd_mh.ksize;
-    long int p = nbhd_mh.prime;
     bool prot = nbhd_mh.is_protein;
 
-    combined_mh.mh = new KmerMinHash(combined_minhash_size, k, p, prot);
+    combined_mh.mh = new KmerMinHash(combined_minhash_size, k, prot);
 
     TagSet::iterator ti;
     for (ti = tagset.begin(); ti != tagset.end(); ti++) {
@@ -576,9 +596,6 @@ void save_neighborhood(const char * filename,
 
     unsigned int ksize = nbhd_mh->ksize;
     outfile.write((const char *) &ksize, sizeof(ksize));
-
-    long int prime = nbhd_mh->prime;
-    outfile.write((const char *) &prime, sizeof(prime));
 
     char is_protein = nbhd_mh->is_protein ? 1 : 0;
     outfile.write((const char *) &is_protein, sizeof(is_protein));
@@ -672,14 +689,11 @@ void load_neighborhood(const char * infilename_c,
         unsigned int ksize = 0;
         infile.read((char *) &ksize, sizeof(ksize));
 
-        long int prime = 0;
-        infile.read((char *) &prime, sizeof(prime));
-
         char is_protein_ch;
         infile.read((char *) &is_protein_ch, sizeof(is_protein_ch));
         bool is_protein = is_protein_ch;
 
-        *nbhd_mh = new NeighborhoodMinHash(ksize, prime, is_protein);
+        *nbhd_mh = new NeighborhoodMinHash(ksize, is_protein);
 
         unsigned long tag_connections_to_load = 0;
         infile.read((char *) &tag_connections_to_load,
@@ -964,9 +978,8 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
 
     WordLength ksize;
     PyObject * is_protein_o = NULL;
-    long int mh_prime = 0;
     if (!PyArg_ParseTuple(args, "b|Ol",
-                          &ksize, &is_protein_o, &mh_prime)) {
+                          &ksize, &is_protein_o)) {
         return NULL;
     }
 
@@ -974,13 +987,10 @@ NeighborhoodMinHash_new(PyTypeObject * subtype, PyObject * args,
     if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
         is_protein = true;
     }
-    if (mh_prime == 0) {
-        mh_prime = DEFAULT_MINHASH_PRIME;
-    }
 
     NeighborhoodMinHash_Object * myself = (NeighborhoodMinHash_Object *)self;
 
-    myself->nbhd_mh = new NeighborhoodMinHash(ksize, mh_prime, is_protein);
+    myself->nbhd_mh = new NeighborhoodMinHash(ksize, is_protein);
 
     return self;
 }
@@ -1121,7 +1131,7 @@ static PyObject * combined_get_minhash(CombinedMinHash_Object * me,
     }
 
     KmerMinHash * mh = me->combined_mh->mh;
-    KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize, mh->prime,
+    KmerMinHash * new_mh = new KmerMinHash(mh->num, mh->ksize,
                                            mh->is_protein);
     new_mh->merge(*mh);
 
@@ -1158,7 +1168,6 @@ static PyObject * combined_combine(CombinedMinHash_Object * me,
 
     KmerMinHash * new_mh = new KmerMinHash(new_minhash_size,
                                            first->mh->ksize,
-                                           first->mh->prime,
                                            first->mh->is_protein);
     new_mh->merge(*first->mh);
     new_mh->merge(*second->mh);
@@ -1230,7 +1239,7 @@ bool check_IsCombinedMinHash(PyObject * combined_mh)
 
 ///
 
-static PyObject * hash_murmur32(PyObject * self, PyObject * args)
+static PyObject * hash_murmur(PyObject * self, PyObject * args)
 {
     const char * kmer;
 
@@ -1238,7 +1247,7 @@ static PyObject * hash_murmur32(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(_hash_murmur32(kmer));
+    return PyLong_FromUnsignedLongLong(_hash_murmur64(kmer));
 }
 
 static PyMethodDef MinHashModuleMethods[] = {
@@ -1248,7 +1257,7 @@ static PyMethodDef MinHashModuleMethods[] = {
         METH_VARARGS, "load nbhd hash from disk."
     },
     {
-        "hash_murmur32",     hash_murmur32,
+        "hash_murmur",     hash_murmur,
         METH_VARARGS,       "",
     },
     { NULL, NULL, 0, NULL } // sentinel

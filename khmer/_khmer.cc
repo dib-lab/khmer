@@ -52,8 +52,8 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
 
-#include "_minhash.hh"
 #include "_khmer.hh"
+#include "_minhash.hh"
 
 using namespace khmer;
 using namespace read_parsers;
@@ -2152,15 +2152,10 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
 {
     Hashtable * hashtable = me->hashtable;
 
-    long int mh_prime = 0;
     PyObject * is_protein_o = NULL;
     bool is_protein = false;
-    if (!PyArg_ParseTuple(args, "|Ol", &is_protein_o, &mh_prime)) {
+    if (!PyArg_ParseTuple(args, "|O", &is_protein_o)) {
         return NULL;
-    }
-
-    if (mh_prime == 0) {
-        mh_prime = DEFAULT_MINHASH_PRIME;
     }
 
     if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
@@ -2179,10 +2174,9 @@ hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
     }
     Py_DECREF(module);
 
-    PyObject * nbhd_mh_args = Py_BuildValue("bOl",
+    PyObject * nbhd_mh_args = Py_BuildValue("bO",
                                             (WordLength)hashtable->ksize(),
-                                            is_protein ? Py_True : Py_False,
-                                            mh_prime);
+                                            is_protein ? Py_True : Py_False);
     PyObject * nbhd_mh_o = PyObject_Call(tname, nbhd_mh_args, NULL);
     Py_DECREF(nbhd_mh_args);
     Py_DECREF(tname);

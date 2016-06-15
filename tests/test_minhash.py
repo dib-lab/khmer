@@ -1,6 +1,5 @@
-# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015-2016, The Regents of the University of California.
+# This file is part of sourmash, https://github.com/dib-lab/sourmash/, and is
+# Copyright (C) 2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -31,14 +30,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Contact: khmer-project@idyll.org
+# Contact: titus@idyll.org
 # pylint: disable=missing-docstring,protected-access
 
 from __future__ import print_function
 from __future__ import absolute_import, unicode_literals
 
-import khmer
-from . import khmer_tst_utils as utils
+from khmer._minhash import MinHash, hash_murmur
 import screed
 
 # add:
@@ -47,20 +45,11 @@ import screed
 # * trap error from handing protein/non-DNA to a DNA MH
 # * fail on untagged/unloaded countgraph
 # * nan on empty minhash
-
-def test_default_params():
-    # verify that MHs have these default parameters.
-    mh = khmer.MinHash(100, 32)
-    mh2 = khmer.MinHash(100, 32, 9999999967, False)  # should not be changed!
-
-    mh.add_hash(9999999968)
-    mh2.add_hash(9999999968)
-    assert mh.get_mins() == mh2.get_mins()
-    assert mh.get_mins()[0] == 1
+# * define equals
 
 def test_basic_dna():
     # verify that MHs of size 1 stay size 1, & act properly as bottom sketches.
-    mh = khmer.MinHash(1, 4)
+    mh = MinHash(1, 4)
     mh.add_sequence('ATGC')
     a = mh.get_mins()
 
@@ -74,171 +63,330 @@ def test_basic_dna():
 
 def test_protein():
     # verify that we can hash protein/aa sequences
-    mh = khmer.MinHash(1, 4, 9999999967, True)
+    mh = MinHash(10, 6, True)
     mh.add_protein('AGYYG')
 
+    assert len(mh.get_mins()) == 4
+
+
+def test_protein_short():
+    # verify that we can hash protein/aa sequences
+    mh = MinHash(10, 9, True)
+    mh.add_protein('AG')
+
+    assert len(mh.get_mins()) == 0, mh.get_mins()
+
+
+def test_basic_dna_bad():
+    # test behavior on bad DNA
+    mh = MinHash(1, 4)
+    try:
+        mh.add_sequence('ATGR')
+        assert 0, "should fail on invalid DNA sequence"
+    except ValueError:
+        pass
+
+
+def test_basic_dna_bad_2():
+    # test behavior on bad DNA
+    mh = MinHash(1, 6)
+    try:
+        mh.add_protein('YYYY')
+        assert 0, "should fail => this is a DNA MinHash"
+    except ValueError:
+        pass
+
+
+def test_basic_dna_bad_force():
+    # test behavior on bad DNA
+    mh = MinHash(1, 4)
+    assert len(mh.get_mins()) == 0
+    mh.add_sequence('ATGR', True)
+    assert len(mh.get_mins()) == 1
+    mh.add_sequence('ATGN', True)         # R --> N w/force
+    assert len(mh.get_mins()) == 1
+    mh.add_sequence('NCAT', True)         # reverse complement of N -> N
     assert len(mh.get_mins()) == 1
 
 
-def test_build_nbhd():
-    # load in a sequence,
-    # calculate neighborhood minhashes,
-    # combine nbhd into combined minhashes,
-    # verify that there is only one.
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
+def test_compare_1():
+    a = MinHash(20, 10)
+    b = MinHash(20, 10)
 
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
+    a.add_sequence('TGCCGCCCAGCACCGGGTGACTAGGTTGAGCCATGATTAACCTGCAATGA')
+    b.add_sequence('TGCCGCCCAGCACCGGGTGACTAGGTTGAGCCATGATTAACCTGCAATGA')
 
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    combined = nbhd_mh.build_combined_minhashes(500)
+    assert a.compare(b) == 1.0
+    assert b.compare(b) == 1.0
+    assert b.compare(a) == 1.0
+    assert a.compare(a) == 1.0
 
-    assert len(combined) == 1, combined
+    # add same sequence again
+    b.add_sequence('TGCCGCCCAGCACCGGGTGACTAGGTTGAGCCATGATTAACCTGCAATGA')
+    assert a.compare(b) == 1.0
+    assert b.compare(b) == 1.0
+    assert b.compare(a) == 1.0
+    assert a.compare(a) == 1.0
 
-
-def test_build_nbhd_path():
-    # load in a sequence,
-    # calculate neighborhood minhashes,
-    # combine nbhd into combined minhashes using a path
-    # also combine nbhd into combined minhashes using traversal.
-    # compare.
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
-
-    x = []
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
-
-        for p, tag in ct.get_tags_and_positions(record.sequence):
-            x.append(tag)
-
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    combined_path = nbhd_mh.combine_from_tags(500, x)
-    combined = nbhd_mh.build_combined_minhashes(500)
-
-    assert len(combined) == 1, combined
-
-    mh1 = combined[0].get_minhash()
-    mh2 = combined_path.get_minhash()
-    assert mh1.compare(mh2) == 1.0
-    assert mh2.compare(mh1) == 1.0
+    
+    b.add_sequence('GATTGGTGCACACTTAACTGGGTGCCGCGCTGGTGCTGATCCATGAAGTT')
+    x = a.compare(b)
+    assert x >= 0.3, x
+    
+    x = b.compare(a)
+    assert x >= 0.3, x
+    assert a.compare(a) == 1.0
+    assert b.compare(b) == 1.0
 
 
-def test_build_save_load_nbhd():
-    # load in a sequence,
-    # calculate neighborhood minhashes,
-    # save, load
-    # combine nbhd into combined minhashes,
-    # verify that there is only one.
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
-    savepath = utils.get_temp_filename('save.mhi')
+def test_mh_copy():
+    a = MinHash(20, 10)
 
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
-
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    nbhd_mh.save(savepath)
-    del nbhd_mh
-
-    nbhd_mh = khmer.load_neighborhood_minhash(savepath)
-    combined = nbhd_mh.build_combined_minhashes(500)
-
-    assert len(combined) == 1, combined
-
-def test_build_nbhd_2():
-    # load in two disconnected sequences,
-    # calculate neighborhood minhashes,
-    # combine nbhd into combined minhashes,
-    # verify that there are two.
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
-    inpath2 = utils.get_test_data('2kb-random-b.fa')
-
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
-    for record in screed.open(inpath2):
-        ct.consume_and_tag(record.sequence)
-
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    combined = nbhd_mh.build_combined_minhashes(500)
-
-    assert len(combined) == 2, combined
+    a.add_sequence('TGCCGCCCAGCACCGGGTGACTAGGTTGAGCCATGATTAACCTGCAATGA')
+    b = a.__copy__()
+    assert b.compare(a) == 1.0
 
 
-def test_build_save_load_nbhd_2():
-    # load in two disconnected sequences,
-    # calculate neighborhood minhashes,
-    # save, load
-    # combine nbhd into combined minhashes,
-    # verify that there are two.
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
-    inpath2 = utils.get_test_data('2kb-random-b.fa')
-    savepath = utils.get_temp_filename('save.mhi')
+def test_mh_len():
+    a = MinHash(20, 10)
 
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
-    for record in screed.open(inpath2):
-        ct.consume_and_tag(record.sequence)
+    assert len(a) == 20
+    a.add_sequence('TGCCGCCCAGCACCGGGTGACTAGGTTGAGCCATGATTAACCTGCAATGA')
+    assert len(a) == 20
 
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    nbhd_mh.save(savepath)
-    del nbhd_mh
 
-    nbhd_mh = khmer.load_neighborhood_minhash(savepath)
-    combined = nbhd_mh.build_combined_minhashes(500)
+def test_mh_len():
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
 
-    assert len(combined) == 2, combined
+    assert a.get_mins() == list(range(0, 40, 2))
 
-def test_build_combined_minhashes_2():
-    # load in two (disconnected) sequences,
-    # calculate neighborhood minhashes,
-    # combine them into combined minhashes,
-    # verify that the signatures of the combined minhashes match the
-    #    minhash signatures of the two input sequences
 
-    ct = khmer.Countgraph(32, 1e7, 4)
-    inpath = utils.get_test_data('2kb-random.fa')
-    inpath2 = utils.get_test_data('2kb-random-b.fa')
+def test_mh_unsigned_long_long():
+    a = MinHash(20, 10)
+    a.add_hash(9227159859419181011)        # too big for a C long int.
+    assert 9227159859419181011 in a.get_mins()
 
-    mh1 = khmer.MinHash(10, 32)
-    for record in screed.open(inpath):
-        ct.consume_and_tag(record.sequence)
-        mh1.add_sequence(record.sequence)
-        
-    mh2 = khmer.MinHash(10, 32)
-    for record in screed.open(inpath2):
-        ct.consume_and_tag(record.sequence)
-        mh2.add_sequence(record.sequence)
 
-    nbhd_mh = ct.build_neighborhood_minhashes()
-    combined = nbhd_mh.build_combined_minhashes(20)
+def test_mh_count_common():
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
 
-    assert len(combined) == 2
+    b = MinHash(20, 10)
+    for i in range(0, 80, 4):
+        b.add_hash(i)
 
-    # do we find the first signature in combined?
-    found = False
-    for c in combined:
-        print(mh1.compare(c.get_minhash()), c.get_minhash().compare(mh1))
-        if mh1.compare(c.get_minhash()) > 0.4:       # why not ~1?? CTB
-            combined.remove(c)
-            found = True
-    assert found, "didn't find 2kb-random signature in combined"
+    assert a.count_common(b) == 10
+    assert b.count_common(a) == 10
 
-    # now that we've removed that match, do we find another? shouldn't.
-    found = False
-    for c in combined:
-        print(mh1.compare(c.get_minhash()), c.get_minhash().compare(mh1))
-        if mh1.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
-            found = True
-    assert not found, "found the 2kb-random signature that I removed!"
 
-    # make sure we find the second signature, too.
-    found = False
-    for c in combined:
-        print(mh2.compare(c.get_minhash()), c.get_minhash().compare(mh2))
-        if mh2.compare(c.get_minhash()) > 0.4:   # why not ~1?? CTB
-            found = True
-    assert found, "didn't find 2kb-random-b signature in combined"
+def test_mh_count_common_diff_protein():
+    a = MinHash(20, 5, False)
+    b = MinHash(20, 5, True)
+
+    try:
+        a.count_common(b)
+        assert 0, "count_common should fail with DNA vs protein"
+    except ValueError:
+        pass
+
+
+def test_mh_count_common_diff_ksize():
+    a = MinHash(20, 5)
+    b = MinHash(20, 6)
+
+    try:
+        a.count_common(b)
+        assert 0, "count_common should fail with different ksize"
+    except ValueError:
+        pass
+
+
+def test_mh_asymmetric():
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
+
+    b = MinHash(10, 10)                   # different size: 10
+    for i in range(0, 80, 4):
+        b.add_hash(i)
+
+    assert a.count_common(b) == 10
+    assert b.count_common(a) == 10
+
+    assert a.compare(b) == 0.5
+    assert b.compare(a) == 1.0
+
+
+def test_mh_merge():
+    # test merging two identically configured minhashes
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
+
+    b = MinHash(20, 10)
+    for i in range(0, 80, 4):
+        b.add_hash(i)
+
+    c = a.merge(b)
+    d = b.merge(a)
+
+    assert len(c) == len(d)
+    assert c.get_mins() == d.get_mins()
+    assert c.compare(d) == 1.0
+    assert d.compare(c) == 1.0
+
+
+
+
+def test_mh_asymmetric_merge():
+    # test merging two asymmetric (different size) MHs
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
+
+    b = MinHash(10, 10)                   # different size: 10
+    for i in range(0, 80, 4):
+        b.add_hash(i)
+
+    c = a.merge(b)
+    d = b.merge(a)
+
+    assert len(a) == 20
+    assert len(b) == 10
+    assert len(c) == len(a)
+    assert len(d) == len(b)
+
+    assert d.compare(a) == 1.0
+    assert c.compare(b) == 0.5
+
+
+def test_mh_inplace_concat_asymmetric():
+    # test merging two asymmetric (different size) MHs
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
+
+    b = MinHash(10, 10)                   # different size: 10
+    for i in range(0, 80, 4):
+        b.add_hash(i)
+
+    c = a.__copy__()
+    c += b
+
+    d = b.__copy__()
+    d += a
+
+    assert len(a) == 20
+    assert len(b) == 10
+    assert len(c) == len(a)
+    assert len(d) == len(b)
+
+    assert d.compare(a) == 1.0
+    assert c.compare(b) == 0.5
+
+
+def test_mh_inplace_concat():
+    # test merging two identically configured minhashes
+    a = MinHash(20, 10)
+    for i in range(0, 40, 2):
+        a.add_hash(i)
+
+    b = MinHash(20, 10)
+    for i in range(0, 80, 4):
+        b.add_hash(i)
+
+    c = a.__copy__()
+    c += b
+    d = b.__copy__()
+    d += a
+
+    assert len(c) == len(d)
+    assert c.get_mins() == d.get_mins()
+    assert c.compare(d) == 1.0
+    assert d.compare(c) == 1.0
+
+def test_mh_merge_diff_protein():
+    a = MinHash(20, 5, False)
+    b = MinHash(20, 5, True)
+
+    try:
+        a.merge(b)
+        assert 0, "merge should fail with DNA vs protein"
+    except ValueError:
+        pass
+
+
+def test_mh_merge_diff_ksize():
+    a = MinHash(20, 5)
+    b = MinHash(20, 6)
+
+    try:
+        a.merge(b)
+        assert 0, "merge should fail with different ksize"
+    except ValueError:
+        pass
+
+
+def test_mh_compare_diff_protein():
+    a = MinHash(20, 5, False)
+    b = MinHash(20, 5, True)
+
+    try:
+        a.compare(b)
+        assert 0, "compare should fail with DNA vs protein"
+    except ValueError:
+        pass
+
+
+def test_mh_compare_diff_ksize():
+    a = MinHash(20, 5)
+    b = MinHash(20, 6)
+
+    try:
+        a.compare(b)
+        assert 0, "compare should fail with different ksize"
+    except ValueError:
+        pass
+
+
+def test_mh_concat_diff_protein():
+    a = MinHash(20, 5, False)
+    b = MinHash(20, 5, True)
+
+    try:
+        a += b
+        assert 0, "concat should fail with DNA vs protein"
+    except ValueError:
+        pass
+
+
+def test_mh_concat_diff_ksize():
+    a = MinHash(20, 5)
+    b = MinHash(20, 6)
+
+    try:
+        a += b
+        assert 0, "concat should fail with different ksize"
+    except ValueError:
+        pass
+
+
+def test_short_sequence():
+    a = MinHash(20, 5)
+    a.add_sequence('GGGG')
+    # adding a short sequence should fail silently
+    assert len(a.get_mins()) == 0
+
+
+def test_murmur():
+    x = hash_murmur("ACG")
+    assert x == 1731421407650554201
+
+    try:
+        x = hash_murmur()
+        assert 0, "hash_murmur requires an argument"
+    except TypeError:
+        pass
