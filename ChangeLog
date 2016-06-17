@@ -3,7 +3,9 @@
    * scripts/filter-abund-single.py: add -o/--outfile option.
    * tests/test_script_output.py: mov function to calculate file MD5 hashes to
    test utils module (tests/khmer_tst_utils.py).
-   * tests/test_filter_abund.py: add minimal tests for new -o option.
+   * tests/test_filter_abund.py: add minimal test for new -o option.
+   * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+   new test
    * .gitignore: add .cache/ directory, which appears to be an artifact of the
    py.test framework.
 
