@@ -44,6 +44,7 @@ import sys
 import traceback
 import subprocess
 from io import open  # pylint: disable=redefined-builtin
+from hashlib import md5
 
 import pytest
 
@@ -51,6 +52,12 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+
+def _calc_md5(fp):
+    m = md5()
+    m.update(fp.read())
+    return m.hexdigest()
 
 
 def get_test_data(filename):
