@@ -401,7 +401,6 @@ _ReadParser_iternext( PyObject * self )
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
-    // cppcheck-suppress unreadVariable
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
@@ -460,7 +459,6 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
-    // cppcheck-suppress unreadVariable
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
@@ -1864,7 +1862,6 @@ hashtable_trim_on_stoptags(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    // cppcheck-suppress unusedVariable
     size_t trim_at;
     Py_BEGIN_ALLOW_THREADS
 

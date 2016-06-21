@@ -1,7 +1,7 @@
 2016-06-20  Daniel Standage <daniel.standage@gmail.com>
 
-   * khmer/_khmer.cc: added inline cppcheck suppressions and made a minor
-   performance-related fix.
+   * khmer/_khmer.cc, lib/kmer_hash.cc: added inline cppcheck suppressions and
+   made a minor performance-related fix.
 
 2016-05-25  Titus Brown  <titus@idyll.org>
 
