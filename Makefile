@@ -64,13 +64,15 @@ INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
 PYINCLUDE=$(shell python -c \
 	  "import sysconfig;print(sysconfig.get_path('include'))")
+SYSPYINCLUDE=$(shell python -c \
+      "from __future__ import print_function; from distutils.sysconfig import get_python_inc; print(get_python_inc())")
 
 CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
-	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
-	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
+	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' --file-list=- \
+	 --platform=unix64 --std=c++11 --inline-suppr --quiet -Ilib \
+	 -Ithird-party/bzip2 -Ithird-party/zlib -Ithird-party/smhasher \
+	 -Ithird-party/seqan/core/include -I$(PYINCLUDE) -I$(SYSPYINCLUDE) \
 	 $(DEFINES) $(INCLUDEOPTS)
 
 UNAME := $(shell uname)

@@ -104,11 +104,13 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
     return h;			// return forward only
 }
 
+// cppcheck-suppress passedByValue
 HashIntoType _hash(const std::string kmer, const WordLength k)
 {
     return _hash(kmer.c_str(), k);
 }
 
+// cppcheck-suppress passedByValue
 HashIntoType _hash(const std::string kmer, const WordLength k,
                     HashIntoType& h, HashIntoType& r)
 {

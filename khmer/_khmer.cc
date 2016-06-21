@@ -1019,7 +1019,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
             return NULL;
         }
         me->hashes->insert(h);
-        
+
         Py_DECREF(item);
         item = PyIter_Next(iterator);
     }
@@ -1450,7 +1450,7 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     unsigned int i;
-    for (i = 0; node_q.size() > 0; i++) {
+    for (i = 0; !node_q.empty(); i++) {
         HashIntoType h = node_q.front();
         node_q.pop();
         // type K for python unsigned long long
