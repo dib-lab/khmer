@@ -8,9 +8,8 @@ import os.path
 import sys
 sys.path.append('../sourmash')
 try:
-    import sourmash_lib, sourmash_signature
+    import sourmash_lib
 except ImportError:
-    raise
     pass
 
 KSIZE=32
