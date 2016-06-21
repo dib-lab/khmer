@@ -401,6 +401,7 @@ _ReadParser_iternext( PyObject * self )
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
+    // cppcheck-suppress unreadVariable
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
@@ -459,6 +460,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
+    // cppcheck-suppress unreadVariable
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
@@ -1019,7 +1021,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
             return NULL;
         }
         me->hashes->insert(h);
-        
+
         Py_DECREF(item);
         item = PyIter_Next(iterator);
     }
@@ -1450,7 +1452,7 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     unsigned int i;
-    for (i = 0; node_q.size() > 0; i++) {
+    for (i = 0; !node_q.empty(); i++) {
         HashIntoType h = node_q.front();
         node_q.pop();
         // type K for python unsigned long long
@@ -1862,6 +1864,7 @@ hashtable_trim_on_stoptags(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
+    // cppcheck-suppress unusedVariable
     size_t trim_at;
     Py_BEGIN_ALLOW_THREADS
 
