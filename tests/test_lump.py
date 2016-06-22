@@ -1,16 +1,43 @@
-from __future__ import absolute_import
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# pylint: disable=missing-docstring
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,no-member,protected-access,invalid-name
+from __future__ import absolute_import
+
 import khmer
-import screed
 
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
 # which the last 79 bases are common between the 3 sequences.
@@ -25,7 +52,7 @@ def test_fakelump_together():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
 # try loading stop tags from previously saved
@@ -44,7 +71,7 @@ def test_fakelump_stop():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # check specific insertion of stop tag
@@ -61,7 +88,7 @@ def test_fakelump_stop2():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # try repartitioning
@@ -77,7 +104,7 @@ def test_fakelump_repartitioning():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once
@@ -106,7 +133,7 @@ def test_fakelump_repartitioning():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 6, n_partitions
 
 
@@ -120,7 +147,7 @@ def test_fakelump_load_stop_tags_trunc():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once

@@ -1,4 +1,40 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2011-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
 
 An assembly handbook for khmer - rough draft
 ############################################
@@ -56,14 +92,18 @@ Genome assembly, including MDA samples and highly polymorphic genomes
 Broadly, normalize each insert library separately, in the following way:
 
 For high-coverage libraries (> ~50x), do three-pass digital
-normalization: run normalize-by-median to C=20 and then run
-:program:`filter-abund.py` with C=1.  Now split out the remaining
+normalization: run :program:`normalize-by-median.py` with :option:`--cutoff=20
+<normalize-by-median.py --cutoff>` and then run :program:`filter-abund.py` with
+:option:`--cutoff=1 <filter-abund.py --cutoff>`.  Now split out the remaining
 paired-end/interleaved and single-end reads using
-:program:`extract-paired-reads.py`, and :program:`normalize-by-median.py` the
-paired-end and single-end files (using :option:`--unpaired-reads`) to C=5.
+:program:`extract-paired-reads.py`, and run :program:`normalize-by-median.py`
+on the paired-end and single-end files (using :option:`--unpaired-reads
+<normalize-by-median.py --unpaired-reads>`) with :option:`--cutoff=5
+<normalize-by-median.py --cutoff>`.
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
-run :program:`normalize-by-median.py` to C=10.
+run :program:`normalize-by-median.py` to :option:`--cutoff=10
+<normalize-by-median.py --cutoff>`.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
    reads into singletons using :program:`extract-paired-reads.py`
@@ -78,7 +118,8 @@ mRNAseq assembly
 ~~~~~~~~~~~~~~~~
 
 1. Apply single-pass digital normalization.
-   Run :program:`normalize-by-median.py` to C=20.
+   Run :program:`normalize-by-median.py` with :option:`--cutoff=20
+   <normalize-by-median.py --cutoff>`.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
    reads into singletons using :program:`extract-paired-reads.py`
@@ -93,12 +134,17 @@ Metagenome assembly
 ~~~~~~~~~~~~~~~~~~~
 
 1. Apply single-pass digital normalization.
-   Run :program:`normalize-by-median.py` to C=20 (we've also found C=10 works
+   Run :program:`normalize-by-median.py` with :option:`--cutoff=20
+   <normalize-by-median.py --cutoff>` (we've also found :option:`--cutoff=10
+   <normalize-by-median.py --cutoff>` works
    fine).
 
-2. Run ``sandbox/filter-below-abund.py`` with C=50 (if you diginormed to C=10)
-   or C=100 (if you diginormed to C=20);
-
+2. Run ``sandbox/filter-below-abund.py`` with ``--cutoff=50`` (if you
+   ran :program:`normalize-by-median.py` with :option:`--cutoff=10
+   <normalize-by-median.py --cutoff>`) or wiht ``--cutoff=100`` if you ran
+   :program:`normalize-by-median.py` with :option:`--cutoff=20
+   <normalize-by-median.py --cutoff>`)
+ 
 3. Partition reads with :program:`load-graph.py`, etc. etc.
 
 4. Assemble groups as normal, extracting paired-end reads and lumping
@@ -119,16 +165,16 @@ Metatranscriptome assembly
 
 (Not tested by us!)
 
-1. Apply single-pass digital normalization.
-
-Run normalize-by-median to C=20.
+1. Apply single-pass digital normalization by running
+   :program:`normalize-by-median.py` with :option:`--cutoff=20
+   <normalize-by-median.py --cutoff>`.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
-reads into singletons using :program:`extract-paired-reads.py`.
+   reads into singletons using :program:`extract-paired-reads.py`.
 
 3. Then assemble with a genome or metagenome assembler, *not* an
-mRNAseq assembler. Use appropriate insert size specs etc. for the
-paired end reads.
+   mRNAseq assembler. Use appropriate insert size specs etc. for the
+   paired end reads.
 
 Preprocessing Illumina for other applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,7 +188,8 @@ correcting PacBio reads
 <http://www.ncbi.nlm.nih.gov/pubmed?term=22750884>`__.
 
 Our suggestion for this, based on no evidence whatsoever, is to
-diginorm the Illumina data to C=20.
+run :program:`normalize-by-median.py` with :option:`--cutoff=20
+<normalize-by-median.py --cutoff>` on the Illumina data.
 
 Quantifying mRNAseq or metagenomes assembled with digital normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,7 +209,8 @@ you should load in paired end reads, or longer reads, first.
 Iterative and independent normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use :option:`--loadgraph` and :option:`--savegraph` to do iterative
+You can use :option:`--loadgraph <normalize-by-median.py --loadgraph>` and
+:option:`--savegraph <normalize-by-median.py --savegraph>` to do iterative
 normalizations on multiple files in multiple steps. For example, break ::
 
   normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa

@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2014-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring,no-member
 """
 Estimate number of unique k-mers, with precision <= ERROR_RATE.
@@ -25,10 +53,8 @@ import textwrap
 import khmer
 from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
                               _VersionStdErrAction, sanitize_help)
-from khmer.utils import write_record
 from khmer.khmer_args import graphsize_args_report
 from khmer import __version__
-import screed
 
 
 def get_parser():
@@ -115,15 +141,14 @@ def main():
 
     report_fp = args.report
     input_filename = None
-    for index, input_filename in enumerate(args.input_filenames):
+    for _, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
         hllcpp.consume_fasta(input_filename,
                              stream_records=args.stream_records)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(
-              args.ksize, input_filename, cardinality),
-              file=sys.stderr)
+            args.ksize, input_filename, cardinality), file=sys.stderr)
 
         if report_fp:
             print(cardinality, args.ksize, '(total)', file=report_fp)
@@ -132,8 +157,7 @@ def main():
 
     cardinality = total_hll.estimate_cardinality()
     print('Total estimated number of unique {0}-mers: {1}'.format(
-          args.ksize, cardinality),
-          file=sys.stderr)
+        args.ksize, cardinality), file=sys.stderr)
 
     to_print = graphsize_args_report(cardinality, args.error_rate)
     if args.diagnostics:

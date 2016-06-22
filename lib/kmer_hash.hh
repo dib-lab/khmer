@@ -1,10 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef KMER_HASH_HH
 #define KMER_HASH_HH
 
@@ -70,6 +100,9 @@ namespace khmer
 HashIntoType _hash(const char * kmer, const WordLength k);
 HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& h, HashIntoType& r);
+HashIntoType _hash(const std::string kmer, const WordLength k);
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_forward(const char * kmer, WordLength k);
 
 std::string _revhash(HashIntoType hash, WordLength k);
@@ -119,20 +152,39 @@ public:
         kmer_u = u;
     }
 
+    /** @param[in]   s     DNA k-mer
+        @param[in]   ksize k-mer size
+     */
+    Kmer(const std::string s, WordLength ksize)
+    {
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+    }
+
     /// @warning The default constructor builds an invalid k-mer.
-	Kmer()
-	{
-		kmer_f = kmer_r = kmer_u = 0;
-	}
+    Kmer()
+    {
+        kmer_f = kmer_r = kmer_u = 0;
+    }
+
+    void set_from_unique_hash(HashIntoType h, WordLength ksize)
+    {
+        std::string s = _revhash(h, ksize);
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+    }
 
     /// Allows complete backwards compatibility
-    operator HashIntoType() const { return kmer_u; }
+    operator HashIntoType() const
+    {
+        return kmer_u;
+    }
 
-    bool operator< (const Kmer &other) const {
+    bool operator< (const Kmer &other) const
+    {
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K) {
+    std::string get_string_rep(WordLength K)
+    {
         return _revhash(kmer_u, K);
     }
 
@@ -150,7 +202,7 @@ public:
  * between the (kmer_u, K) and (kmer_f, kmer_r) cases. This
  * implementation also allows a logical architecture wherein
  * KmerIterator and Hashtable inherit directly from KmerFactory,
- * extending the latter's purpose of "create k-mers" to 
+ * extending the latter's purpose of "create k-mers" to
  * "emit k-mers from a sequence" and "create and store k-mers".
  *
  * \author Camille Scott
@@ -165,7 +217,7 @@ protected:
 
 public:
 
-    KmerFactory(WordLength K): _ksize(K) {}
+    explicit KmerFactory(WordLength K): _ksize(K) {}
 
     /** @param[in]  kmer_u Uniqified hash value.
      *  @return A complete Kmer object.
@@ -173,7 +225,7 @@ public:
     Kmer build_kmer(HashIntoType kmer_u)
     {
         HashIntoType kmer_f, kmer_r;
-		std:: string kmer_s = _revhash(kmer_u, _ksize);
+        std:: string kmer_s = _revhash(kmer_u, _ksize);
         _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
@@ -208,7 +260,7 @@ public:
      *
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
-     */ 
+     */
     Kmer build_kmer(const char * kmer_c)
     {
         HashIntoType kmer_f, kmer_r, kmer_u;

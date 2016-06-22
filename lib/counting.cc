@@ -1,9 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015, The Regents of the University of California.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 
 #include <errno.h>
 #include <algorithm>
@@ -21,45 +52,6 @@
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
-
-///
-/// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
-///
-
-void CountingHash::output_fasta_kmer_pos_freq(
-    const std::string &inputfile,
-    const std::string &outputfile)
-{
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    ofstream outfile;
-    outfile.open(outputfile.c_str());
-    string seq;
-    Read read;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        long numPos = seq.length() - _ksize + 1;
-
-        for (long i = 0; i < numPos; i++)  {
-            string kmer = seq.substr(i, _ksize);
-            outfile << (int)get_count(kmer.c_str()) << " ";
-        }
-        outfile << endl;
-    }
-
-    delete parser;
-    if (outfile.fail()) {
-        throw khmer_file_exception(strerror(errno));
-    }
-
-    outfile.close();
-}
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
@@ -159,124 +151,6 @@ HashIntoType * CountingHash::abundance_distribution(
     HashIntoType * distribution = abundance_distribution(parser, tracking);
     delete parser;
     return distribution;
-}
-
-HashIntoType * CountingHash::fasta_count_kmers_by_position(
-    const std::string   &inputfile,
-    const unsigned int  max_read_len,
-    BoundedCounterType  limit_by_count,
-    CallbackFn      callback,
-    void *      callback_data)
-{
-    unsigned long long *counts = new unsigned long long[max_read_len];
-
-    for (unsigned int i = 0; i < max_read_len; i++) {
-        counts[i] = 0;
-    }
-
-    Read read;
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    string name;
-    string seq;
-    unsigned long long read_num = 0;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-
-        seq = read.sequence;
-        bool valid_read = check_and_normalize_read(seq);
-
-        if (valid_read) {
-            for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-                string kmer = seq.substr(i, i + _ksize);
-                BoundedCounterType n = get_count(kmer.c_str());
-
-                if (limit_by_count == 0 || n == limit_by_count) {
-                    if (i < max_read_len) {
-                        counts[i]++;
-                    }
-                }
-            }
-        }
-
-        name.clear();
-        seq.clear();
-
-        read_num += 1;
-
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("fasta_file_count_kmers_by_position", callback_data,
-                         read_num, 0);
-            } catch (...) {
-                throw;
-            }
-        }
-    } // while reads
-
-    delete parser;
-
-    return counts;
-}
-
-void CountingHash::fasta_dump_kmers_by_abundance(
-    const std::string   &inputfile,
-    BoundedCounterType  limit_by_count,
-    CallbackFn      callback,
-    void *      callback_data)
-{
-    Read read;
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    string name;
-    string seq;
-    unsigned long long read_num = 0;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        bool valid_read = check_and_normalize_read(seq);
-        seq = read.sequence;
-
-        if (valid_read) {
-            for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-                string kmer = seq.substr(i, i + _ksize);
-                BoundedCounterType n = get_count(kmer.c_str());
-                char * ss = new char[_ksize + 1];
-                strncpy(ss, kmer.c_str(), _ksize);
-                ss[_ksize] = 0;
-
-                if (n == limit_by_count) {
-                    cout << *ss << endl;
-                }
-		delete[] ss;
-            }
-        }
-
-        name.clear();
-        seq.clear();
-
-        read_num += 1;
-
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("fasta_file_dump_kmers_by_abundance", callback_data,
-                         read_num, 0);
-            } catch (...) {
-                throw;
-            }
-        }
-    } // while reads
-
-    delete parser;
 }
 
 void CountingHash::save(std::string outfilename)
@@ -909,102 +783,6 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         throw khmer_file_exception(error);
     }
     gzclose(outfile);
-}
-
-void CountingHash::collect_high_abundance_kmers(
-    const std::string   &filename,
-    unsigned int    lower_count,
-    unsigned int    upper_count,
-    SeenSet&        found_kmers)
-{
-    unsigned long long total_reads = 0;
-
-    IParser* parser = IParser::get_parser(filename.c_str());
-    Read read;
-
-    string currSeq = "";
-
-    //
-    // iterate through the FASTA file & consume the reads, until we hit
-    // upper_count.
-    //
-
-    bool done = false;
-    while(!parser->is_complete() && !done)  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        currSeq = read.sequence;
-
-        // do we want to process it?
-        if (check_and_normalize_read(currSeq)) {
-            const char * sp = currSeq.c_str();
-
-            KmerIterator kmers(sp, _ksize);
-
-            while(!kmers.done()) {
-                HashIntoType kmer = kmers.next();
-
-                count(kmer);
-                if (get_count(kmer) >= upper_count) {
-                    done = true;
-                }
-            }
-        }
-
-        // increment read number
-        total_reads++;
-
-        if (total_reads % 100000 == 0) {
-            std::cout << "..." << total_reads << "\n";
-        }
-    }
-
-    delete parser;
-
-    unsigned long long stop_at_read = total_reads;
-
-    //
-    // go back through the file again, and store all k-mers >= lower_count
-    //
-
-    parser = IParser::get_parser(filename.c_str());
-
-    total_reads = 0;
-    while(!parser->is_complete() && total_reads != stop_at_read)  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        currSeq = read.sequence;
-
-        // do we want to process it?
-        if (check_and_normalize_read(currSeq)) {
-            const char * sp = currSeq.c_str();
-
-            KmerIterator kmers(sp, _ksize);
-
-            while(!kmers.done()) {
-                HashIntoType kmer = kmers.next();
-
-                if (get_count(kmer) >= lower_count) {
-                    found_kmers.insert(kmer);
-                }
-            }
-        }
-
-        // increment read number
-        total_reads++;
-
-        if (total_reads % 100000 == 0) {
-            std::cout << "... x 2 " << total_reads << "\n";
-        }
-    }
-    delete parser;
-    parser = NULL;
 }
 
 /* vim: set ft=cpp ts=8 sts=4 sw=4 et tw=79 */

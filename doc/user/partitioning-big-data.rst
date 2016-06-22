@@ -1,4 +1,40 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2010-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
 
 =========================================
 Partitioning large data sets (50m+ reads)
@@ -55,7 +91,7 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   
   # the next command will create a '50m.ct' and a '50m.tagset',
   # representing the de Bruijn graph
-  load-into-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz
+  load-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz
   
   # this will then partition that graph. should take a while.
   # update threads to something higher if you have more cores.
@@ -81,7 +117,7 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   mv iowa-corn-50m.group0005.fa corn-50m.lump.fa
   
   # create graph,
-  load-into-graph.py -x 8e9 lump corn-50m.lump.fa
+  load-graph.py -x 8e9 lump corn-50m.lump.fa
 
   # create an initial set of stoptags to help in knot-traversal; otherwise,
   # partitioning and knot-traversal (which is systematic) is really expensive.
@@ -97,12 +133,12 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   filter-stoptags.py *.stoptags corn-50m.lump.fa
 
   # now, reload the filtered data set in and partition again.
-  # NOTE: 'load-into-graph.py' uses the file extension to determine
+  # NOTE: 'load-graph.py' uses the file extension to determine
   # if the file is formatted as FASTA or FASTQ. The default is
   # fasta, therefore if your files are fastq formatted you need
-  # to append 'fastq' to the name so that 'load-into-graph.py'
+  # to append 'fastq' to the name so that 'load-graph.py'
   # will parse the file correctly
-  load-into-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
+  load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
   partition-graph.py -T 4 lumpfilt
   merge-partitions.py lumpfilt
   annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt

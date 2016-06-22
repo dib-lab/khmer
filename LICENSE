@@ -2,33 +2,114 @@
 License
 =======
 
-Copyright (c) 2010-2014, Michigan State University.  All rights reserved.
+Files: *
+Copyright: 2010-2015, Michigan State University.
+Copyright: 2015, The Regents of the University of California.
+License: BSD-3-Clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are
+ met:
+ 
+     * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+ 
+     * Redistributions in binary form must reproduce the above
+       copyright notice, this list of conditions and the following
+       disclaimer in the documentation and/or other materials provided
+       with the distribution.
+ 
+     * Neither the name of the Michigan State University, nor The Regents of
+       the University of California, nor the names of its contributors may be
+       used to endorse or promote products derived from this software without
+       specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+Files: sandbox/memusg 
+Copyright: 2010, Jaeho Shin <netj@sparcs.org>
+License: none.
+ From https://gist.github.com/netj/526585
 
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
+Files: versioneer.py
+       khmer/_version.py
+Copyright: none
+License: public-domain
+ To make Versioneer easier to embed, all its code is hereby released into the
+ public domain. The `_version.py` that it creates is also in the public
+ domain.
 
-    * Redistributions in binary form must reproduce the above
-      copyright notice, this list of conditions and the following
-      disclaimer in the documentation and/or other materials provided
-      with the distribution.
+Files: third-party/bzip2/*
+Copyright: 1995-2010, Julian Seward <jseward@bzip.org>
+License: BSD-4-Clause
 
-    * Neither the name of the Michigan State University nor the names
-      of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written
-      permission.
+Files: third-party/bzip2/dlltest.c
+Copyright: Yoshioka Tsuneo (tsuneo@rr.iij4u.or.jp)
+License: public-domain
+ This file is Public Domain.  Welcome any email to me.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Files: third-party/seqan/*
+Copyright: 2006-2013, Knut Reinert, FU Berline
+License: BSD-3-Clause
+
+Files: third-party/seqan/*/boost*.h
+       third-party/seqan/*/concept_checking.h
+       third-party/seqan/*/fundamental_concepts.h
+Copyright: (c) 2002, Paul Mensonides
+ (c) 2001, Housemarque Oy
+ (c) 2000-2003, John Maddock
+ (c) 2001, Darin Adler
+ (c) 2001, Peter Dimov
+ (c) 2002, Bill Kempf
+ (c) 2002, Jens Maurer
+ (c) 2002-2003, 2006, David Abrahams
+ (c) 2003, Gennaro Prota
+ (c) 2003, Eric Friedman
+ (c) 2010, Eric Jourdanneau, Joel Falcou
+ (C) 2000, Jeremy Siek
+ 2002, The Trustees of Indiana University
+License: boost-1.0   
+
+Files: third-party/smhasher/*
+Copyright: none.
+License: public-domain
+ Quoting from the file header: "MurmurHash3 was written by Austin Appleby,
+ and is placed in the public domain. The author hereby disclaims copyright to
+ this source code."
+
+Files: third-party/zlib/*
+Copyright: (C) 1995-2013, Jean-loup Gailly and Mark Adler
+License: other
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+  
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+  
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+  
+  Jean-loup Gailly        Mark Adler
+  jloup@gzip.org          madler@alumni.caltech.edu
+  
+  Acknowledgments:
+  The deflate format used by zlib was defined by Phil Katz. The deflate
+  and zlib specifications were written by Peter Deutsch. Thanks to all the
+  people who reported problems and suggested various improvements in zlib;
+  they are too numerous to cite here.

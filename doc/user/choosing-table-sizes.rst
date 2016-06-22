@@ -1,27 +1,67 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2012-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
 
 ==========================
 Setting khmer memory usage
 ==========================
 
 If you look at the documentation for the scripts (:doc:`scripts`) you'll
-see a :option:`-M` parameter that sets the maximum memory usage for
-any script that uses k-mer counting tables or k-mer graphs.  What is this?
+see a :option:`-M <load-into-counting.py -M>` parameter that sets the maximum
+memory usage for any script that uses k-mer counting tables or k-mer graphs. 
+What is this?
 
 khmer uses a special data structure that lets it store counting tables
 and k-mer graphs in very low memory; the trick is that you must fix
 the amount of memory khmer can use before running it. (See `Pell et
 al., 2012 <http://www.ncbi.nlm.nih.gov/pubmed/22847406>`__ and `Zhang
 et al., 2014 <http://www.ncbi.nlm.nih.gov/pubmed/25062443>`__ for the
-details.)  This is what the :option:`-M` parameter does.
+details.)  This is what the :option:`-M <load-into-counting.py -M>` parameter
+does.
 
 If you set it too low, khmer will warn you to set it higher at the end.
 See below for some good choices for various kinds of data.
 
-**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M`
-parameter sets the :option:`-N`/:option:`--n_tables` and
-:option:`-x`/:option:`--max_tablesize` parameters automatically.
-You can still set these parameters directly if you wish.
+**Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M
+<load-into-counting.py -M>` parameter sets the
+:option:`-N <load-into-counting.py -N>`/:option:`--n_tables
+<load-into-counting.py --n_tables>` and :option:`-x <load-into-counting.py -x>`
+/:option:`--max-tablesize <load-into-counting.py --max-tablesize>` parameters
+automatically. You can still set these parameters directly if you wish.
 
 The really short version
 ========================
@@ -41,7 +81,7 @@ This parameter specifies the maximum memory usage of the primary data
 structure in khmer, which is basically N big hash tables of size x.
 The **product** of the number of hash tables and the size of the hash
 tables specifies the total amount of memory used, which is what the
-:option:`-M` parameter sets.
+:option:`-M <load-into-counting.py -M>` parameter sets.
 
 These tables are used to track k-mers.  If they are too small, khmer
 will fail in various ways (and will complain), but there is no harm
@@ -51,7 +91,7 @@ you of the total memory usage, and (at the end) will complain if it's
 too small.
 
 Life is a bit more complicated than this, however, because some scripts --
-:program:`load-into-counting.py` and :program:`load-into-graph.py` -- keep
+:program:`load-into-counting.py` and :program:`load-graph.py` -- keep
 ancillary information that will consume memory beyond this table data
 structure.  So if you run out of memory, decrease the table size.
 

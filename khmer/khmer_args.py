@@ -1,16 +1,44 @@
-#
 # vim: set encoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+"""Common argparse constructs."""
 
 from __future__ import unicode_literals
 from __future__ import print_function
 
 import sys
-import os
 import argparse
 import math
 import textwrap
@@ -19,7 +47,7 @@ from collections import namedtuple
 
 import screed
 import khmer
-from khmer import extract_countgraph_info, extract_nodegraph_info
+from khmer import extract_countgraph_info
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
@@ -30,8 +58,24 @@ DEFAULT_N_TABLES = 4
 DEFAULT_MAX_TABLESIZE = 1e6
 DEFAULT_N_THREADS = 1
 
+ALGORITHMS = {
+    'software': 'MR Crusoe et al., '
+                '2015. http://dx.doi.org/10.12688/f1000research.6924.1',
+    'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
+    'streaming': 'Q Zhang, S Awad, CT Brown, '
+                 'https://dx.doi.org/10.7287/peerj.preprints.890v1',
+    'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
+    'counting': 'Q Zhang et al., '
+                'http://dx.doi.org/10.1371/journal.pone.0101271',
+    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
+    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
+    'hll': 'Irber and Brown, unpublished'
+}
+
 
 class _VersionStdErrAction(_VersionAction):
+    # pylint: disable=too-few-public-methods, protected-access
+    """Force output to StdErr."""
 
     def __call__(self, parser, namespace, values, option_string=None):
         version = self.version
@@ -45,12 +89,15 @@ class _VersionStdErrAction(_VersionAction):
 
 class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
                      argparse.RawDescriptionHelpFormatter):
+    """Both ArgumentDefaults and RawDescription formatters."""
+
     pass
 
 
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
-    Utility function for estimating optimal countgraph args where:
+    Utility function for estimating optimal countgraph args.
+
       - num_kmers: number of unique kmers [required]
       - mem_cap: the allotted amount of memory [optional, conflicts with f]
       - fp_rate: the desired false positive rate [optional, conflicts with M]
@@ -66,10 +113,10 @@ def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
 
 def check_conflicting_args(args, hashtype):
     """
-    Utility function that takes in an args object and checks if there's things
-    that conflict, e.g. --loadgraph and --ksize being set.
-    """
+    Check argparse args object for conflicts.
 
+    e.g. --loadgraph and --ksize being set.
+    """
     if getattr(args, "quiet", None):
         configure_logging(args.quiet)
 
@@ -112,12 +159,14 @@ def check_conflicting_args(args, hashtype):
             args.max_tablesize = max_tablesize
 
 
+# pylint: disable=invalid-name
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
-    Utility function for estimating optimal countgraph args where num_kmers
-    is the number of unique kmer and mem_cap is the allotted amount of memory
-    """
+    Estimate optimal countgraph args.
 
+     - num_kmers: number of unique kmer
+     - mem_cap: the allotted amount of memory
+    """
     n_tables = math.log(2) * (mem_cap / float(num_kmers))
     int_n_tables = int(n_tables)
     if int_n_tables == 0:
@@ -130,10 +179,13 @@ def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     return res(int_n_tables, ht_size, mem_cap, fp_rate)
 
 
+# pylint: disable=invalid-name
 def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
     """
-    Utility function for estimating optimal memory where num_kmers  is the
-    number of unique kmers and des_fp_rate is the desired false positive rate
+    Estimate optimal memory.
+
+    - num_kmers: the number of unique kmers
+    - des_fp_rate: the desired false positive rate
     """
     n_tables = math.log(des_fp_rate, 0.5)
     int_n_tables = int(n_tables)
@@ -152,8 +204,10 @@ def estimate_optimal_with_K_and_f(num_kmers, des_fp_rate):
 
 def graphsize_args_report(unique_kmers, fp_rate):
     """
-    Assembles output string for optimal arg sandbox scripts
-    takes in unique_kmers and desired fp_rate
+    Assemble output string for optimal arg sandbox scripts.
+
+    - unique_kmers: number of uniqe k-mers
+    - fp_rate: desired false positive rate
     """
     to_print = []
 
@@ -192,10 +246,11 @@ def graphsize_args_report(unique_kmers, fp_rate):
 
 def _check_fp_rate(args, desired_max_fp):
     """
-    Function to check if the desired_max_fp rate makes sense given specified
-    number of unique kmers and max_memory restrictions present in the args.
+    Check if the desired_max_fp rate makes sense.
 
-    Takes in args object and desired_max_fp
+    - args: argparse args object, possible members: fp_rate, max_memory_usage,
+      unique_kmers, force, max_tablesize
+    - desired_max_fp: desired maximum false positive rate
     """
     if not args.unique_kmers:
         return args
@@ -249,7 +304,6 @@ def _check_fp_rate(args, desired_max_fp):
 
 def build_graph_args(descr=None, epilog=None, parser=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
-
     if parser is None:
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
                                          formatter_class=ComboFormatter)
@@ -295,15 +349,15 @@ def build_nodegraph_args(descr=None, epilog=None, parser=None):
 
     return parser
 
-# add an argument for loadgraph with warning about parameters
-
 
 def add_loadgraph_args(parser):
+    """Common loadgraph argument."""
     parser.add_argument('-l', '--loadgraph', metavar="filename", default=None,
                         help='load a precomputed k-mer graph from disk')
 
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
+    """Transform the table parameters into a size."""
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
@@ -321,7 +375,7 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
 
 
 def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
-    """Creates and returns a nodegraph"""
+    """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
@@ -334,7 +388,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
 
 
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
-    """Creates and returns a countgraph"""
+    """Create and return a countgraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
         ksize = args.ksize
@@ -413,25 +467,9 @@ def sanitize_help(parser):
     parser.epilog = newlog
     return parser
 
-_algorithms = {
-    'software': 'MR Crusoe et al., '
-    '2015. http://dx.doi.org/10.12688/f1000research.6924.1',
-    'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
-    'streaming': 'Q Zhang, S Awad, CT Brown, '
-    'https://dx.doi.org/10.7287/peerj.preprints.890v1',
-    'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
-    'counting': 'Q Zhang et al., '
-    'http://dx.doi.org/10.1371/journal.pone.0101271',
-    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
-    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
-    'hll': 'Irber and Brown, unpublished'
-}
-
 
 def info(scriptname, algorithm_list=None):
     """Print version and project info to stderr."""
-    import khmer
-
     log_info("\n|| This is the script {name} in khmer.\n"
              "|| You are running khmer version {version}",
              name=scriptname, version=khmer.__version__)
@@ -447,7 +485,7 @@ def info(scriptname, algorithm_list=None):
     algorithm_list.insert(0, 'software')
 
     for alg in algorithm_list:
-        algstr = "||   * " + _algorithms[alg].encode(
+        algstr = "||   * " + ALGORITHMS[alg].encode(
             'utf-8', 'surrogateescape').decode('utf-8', 'replace')
         try:
             log_info(algstr)
@@ -457,4 +495,5 @@ def info(scriptname, algorithm_list=None):
     log_info("||\n|| Please see http://khmer.readthedocs.org/en/"
              "latest/citations.html for details.\n")
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name, missing-docstring
 """
 Partition a graph.
@@ -18,16 +46,17 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import gc
-import os.path
 import argparse
 import textwrap
 import sys
+import gc
+import os.path
 
 from khmer import __version__, load_nodegraph
 from khmer.khmer_args import (add_threading_args, info, sanitize_help,
                               ComboFormatter, _VersionStdErrAction)
 from khmer.kfile import check_input_files
+from oxli.partition import worker
 
 # stdlib queue module was renamed on Python 3
 try:
@@ -37,32 +66,6 @@ except ImportError:
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
-
-
-def worker(tasks, basename, stop_big_traversals):
-    while True:
-        try:
-            (nodegraph, index, start, stop) = tasks.get(False)
-        except queue.Empty:
-            print('exiting', file=sys.stderr)
-            return
-
-        outfile = basename + '.subset.%d.pmap' % (index,)
-        if os.path.exists(outfile):
-            print('SKIPPING', outfile, ' -- already exists', file=sys.stderr)
-            continue
-
-        print('starting:', basename, index, file=sys.stderr)
-
-        # pay attention to stoptags when partitioning; take command line
-        # direction on whether or not to exhaustively traverse.
-        subset = nodegraph.do_subset_partition(start, stop, True,
-                                               stop_big_traversals)
-
-        print('saving:', basename, index, file=sys.stderr)
-        nodegraph.save_subset_partitionmap(subset, outfile)
-        del subset
-        gc.collect()
 
 
 def get_parser():
@@ -133,6 +136,7 @@ def main():
 
     # divide the tags up into subsets
     divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 

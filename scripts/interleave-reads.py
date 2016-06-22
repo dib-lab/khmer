@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
 Interleave left and right reads.
@@ -20,11 +48,10 @@ from __future__ import print_function
 
 import screed
 import sys
-import os
 import textwrap
 import argparse
 from khmer import __version__
-from khmer.kfile import check_input_files, check_space, is_block
+from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
                               _VersionStdErrAction)
 from khmer.kfile import (add_output_compression_type, get_file_writer,
@@ -47,6 +74,8 @@ def get_parser():
     As a "bonus", this file ensures that if read names are not already
     formatted properly, they are reformatted consistently, such that
     they look like the pre-1.8 Casava format (`@name/1`, `@name/2`).
+    This reformatting can be switched off with the
+    :option:`--no-reformat` flag.
 
     Example::
 
@@ -63,6 +92,9 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--no-reformat', default=False, action='store_true',
+                        help='Do not reformat read names or enforce\
+                              consistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -79,8 +111,6 @@ def main():
 
     s1_file = args.left
     s2_file = args.right
-
-    fail = False
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
@@ -100,19 +130,21 @@ def main():
         counter += 1
 
         name1 = read1.name
-        if not check_is_left(name1):
-            name1 += '/1'
         name2 = read2.name
-        if not check_is_right(name2):
-            name2 += '/2'
 
-        read1.name = name1
-        read2.name = name2
+        if not args.no_reformat:
+            if not check_is_left(name1):
+                name1 += '/1'
+            if not check_is_right(name2):
+                name2 += '/2'
 
-        if not check_is_pair(read1, read2):
-            print("ERROR: This doesn't look like paired data! "
-                  "%s %s" % (read1.name, read2.name), file=sys.stderr)
-            sys.exit(1)
+            read1.name = name1
+            read2.name = name2
+
+            if not check_is_pair(read1, read2):
+                print("ERROR: This doesn't look like paired data! "
+                      "%s %s" % (read1.name, read2.name), file=sys.stderr)
+                sys.exit(1)
 
         write_record_pair(read1, read2, outfp)
 
