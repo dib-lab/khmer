@@ -124,4 +124,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

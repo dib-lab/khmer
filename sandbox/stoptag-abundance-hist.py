@@ -38,6 +38,8 @@ import sys
 import khmer
 import os
 try:
+    import matplotlib
+    matplotlib.use('Agg')
     from pylab import *
 except ImportError:
     pass

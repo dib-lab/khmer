@@ -51,7 +51,7 @@ import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args,
                               calculate_graphsize)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
 from oxli import functions as oxfuncs
 
@@ -129,4 +129,5 @@ def main(args):
 if __name__ == '__main__':
     main(None)
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,7 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,protected-access,no-member,
+# pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 
 from __future__ import print_function
 from __future__ import absolute_import
@@ -42,18 +42,19 @@ from khmer import ReadParser
 
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
     utils.cleanup()
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
-        pt = khmer.Nodegraph(32, 1e13, 1)
+        khmer.Nodegraph(32, 1e13, 1)
         assert 0, "This should fail"
     except MemoryError as err:
         print(str(err))
@@ -192,8 +193,8 @@ def test_bloom_python_1():
     for _, record in enumerate(screed.open(filename)):
         sequence = record.sequence
         seq_len = len(sequence)
-        for n in range(0, seq_len + 1 - ksize):
-            kmer = sequence[n:n + ksize]
+        for num in range(0, seq_len + 1 - ksize):
+            kmer = sequence[num:num + ksize]
             if not nodegraph.get(kmer):
                 n_unique += 1
             nodegraph.count(kmer)
@@ -225,8 +226,6 @@ def test_bloom_c_1():
 
 def test_n_occupied_2():  # simple one
     ksize = 4
-    htable_size = 10  # use 11
-    num_nodegraphs = 1
 
     nodegraph = khmer._Nodegraph(ksize, [11])
     nodegraph.count('AAAA')  # 00 00 00 00 = 0
@@ -269,21 +268,6 @@ def test_bloom_c_2():  # simple one
     # collision with both 2nd and 3rd kmers
 
     assert other_nodegraph.n_unique_kmers() == 3
-
-
-def test_filter_if_present():
-    nodegraph = khmer._Nodegraph(32, [3, 5])
-
-    maskfile = utils.get_test_data('filter-test-A.fa')
-    inputfile = utils.get_test_data('filter-test-B.fa')
-    outfile = utils.get_temp_filename('filter')
-
-    nodegraph.consume_fasta(maskfile)
-    nodegraph.filter_if_present(inputfile, outfile)
-
-    records = list(screed.open(outfile))
-    assert len(records) == 1
-    assert records[0]['name'] == '3'
 
 
 def test_combine_pe():
@@ -365,6 +349,53 @@ def test_count_kmer_degree():
     assert nodegraph.kmer_degree('TAAA') == 1
 
 
+def test_kmer_neighbors():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    h = khmer.forward_hash('AAAA', 4)
+    print(type('AAAA'))
+    assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == [0, 0]  # AAAA on both sides
+
+    h = khmer.forward_hash('AAAT', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on one side
+    assert nodegraph.neighbors('AAAT') == [0]     # AAAA on one side
+
+    h = khmer.forward_hash('AATA', 4)
+    assert nodegraph.neighbors(h) == []           # no neighbors
+    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
+
+    h = khmer.forward_hash('TAAA', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
+    assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
+
+
+def test_kmer_neighbors_wrong_ksize():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    try:
+        nodegraph.neighbors('AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors(b'AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors({})
+        assert 0, "neighbors() should fail with non hash/str arg"
+    except ValueError:
+        pass
+
+
 def test_save_load_tagset():
     nodegraph = khmer._Nodegraph(32, [1])
 
@@ -429,73 +460,6 @@ def test_stop_traverse():
 
     n, _ = nodegraph.count_partitions()
     assert n == 2, n
-
-
-def test_tag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # without tagging/joining across consume, this breaks into two partition;
-    # with, it is one partition.
-    nodegraph.add_stop_tag('CCGAATATATAACAGCGACG')
-
-    # DO join reads across
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-    subset = nodegraph.do_subset_partition(0, 0)
-    n, _ = nodegraph.count_partitions()
-    assert n == 99                       # reads only connected by traversal...
-
-    n, _ = nodegraph.subset_count_partitions(subset)
-    assert n == 2                        # but need main to cross stoptags.
-
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()         # ta-da!
-    assert n == 1, n
-
-
-def test_notag_across_stoptraverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # connecting k-mer at the beginning/end of a read: breaks up into two.
-    nodegraph.add_stop_tag('TTGCATACGTTGAGCCAGCG')
-
-    nodegraph.consume_fasta_and_tag_with_stoptags(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 2, n
-
-
-def test_find_stoptags():
-    nodegraph = khmer._Nodegraph(5, [1])
-    nodegraph.add_stop_tag("AAAAA")
-
-    assert nodegraph.identify_stoptags_by_position("AAAAA") == [0]
-    assert nodegraph.identify_stoptags_by_position("AAAAAA") == [0, 1]
-    assert nodegraph.identify_stoptags_by_position("TTTTT") == [0]
-    assert nodegraph.identify_stoptags_by_position("TTTTTT") == [0, 1]
-
-
-def test_find_stoptagsecond_seq():
-    nodegraph = khmer._Nodegraph(4, [1])
-    nodegraph.add_stop_tag("ATGC")
-
-    x = nodegraph.identify_stoptags_by_position("ATGCATGCGCAT")
-    assert x == [0, 2, 4, 8], x
 
 
 def test_get_ksize():
@@ -574,72 +538,6 @@ def test_get_raw_tables():
     for size, table in zip(kh.hashsizes(), tables):
         assert isinstance(table, memoryview)
         assert size == len(table)
-
-
-def test_find_unpart():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.even.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, True, False)
-    n, _ = nodegraph.count_partitions()
-    assert n == 1, n                     # all sequences connect
-
-
-def test_find_unpart_notraverse():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.even.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, False, False)     # <-- don't traverse
-    n, _ = nodegraph.count_partitions()
-    assert n == 99, n                    # all sequences disconnected
-
-
-def test_find_unpart_fail():
-    filename = utils.get_test_data('random-20-a.odd.fa')
-    filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-    nodegraph.consume_fasta_and_tag(filename)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 49
-
-    nodegraph.find_unpart(filename2, True, False)
-    n, _ = nodegraph.count_partitions()
-    assert n == 49, n                    # only 49 sequences worth of tags
 
 
 def test_simple_median():
@@ -775,7 +673,7 @@ def _build_testfiles():
     # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer.Nodegraph(12, 2)
+    hi = khmer._Nodegraph(12, 2)
     hi.consume_fasta(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
@@ -925,7 +823,7 @@ def test_tagset_filetype_check():
 
 def test_bad_primes_list():
     try:
-        coutingtable = khmer._Nodegraph(31, ["a", "b", "c"], 1)
+        khmer._Nodegraph(31, ["a", "b", "c"], 1)
         assert 0, "Bad primes list should fail"
     except TypeError as e:
         print(str(e))
@@ -950,7 +848,7 @@ def test_consume_absentfasta_with_reads_parser():
 
 def test_bad_primes():
     try:
-        countgraph = khmer._Nodegraph.__new__(
+        khmer._Nodegraph.__new__(
             khmer._Nodegraph, 6, ["a", "b", "c"])
         assert 0, "this should fail"
     except TypeError as e:
@@ -1000,7 +898,7 @@ def test_n_occupied_vs_countgraph():
     assert nodegraph.n_unique_kmers() == 0, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 0, countgraph.n_unique_kmers()
 
-    for n, record in enumerate(screed.open(filename)):
+    for _, record in enumerate(screed.open(filename)):
         nodegraph.consume(record.sequence)
         countgraph.consume(record.sequence)
 
@@ -1026,7 +924,7 @@ def test_n_occupied_vs_countgraph_another_size():
     assert nodegraph.n_unique_kmers() == 0, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 0, countgraph.n_unique_kmers()
 
-    for n, record in enumerate(screed.open(filename)):
+    for _, record in enumerate(screed.open(filename)):
         nodegraph.consume(record.sequence)
         countgraph.consume(record.sequence)
 

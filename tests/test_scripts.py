@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,25 +32,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=C0111,C0103,E1103,W0612
+# pylint: disable=C0111,C0103,E1103,unused-variable,protected-access
 
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import json
 import sys
 import os
 import stat
 import shutil
-from io import StringIO
-import traceback
-from nose.plugins.attrib import attr
 import threading
-import bz2
 import gzip
 import io
 import re
 
+import pytest
 from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
@@ -220,7 +218,7 @@ def test_load_into_counting_nonwritable():
     assert status == 1, status
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_load_into_counting_toobig():
     script = 'load-into-counting.py'
     args = ['-x', '1e12', '-N', '2', '-k', '20', '--force']
@@ -864,7 +862,7 @@ def test_load_graph():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20']
@@ -895,7 +893,7 @@ def test_oxli_build_graph():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_unique_kmers_arg():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-U', '3960']
@@ -928,7 +926,7 @@ def test_oxli_build_graph_unique_kmers_arg():
     assert x == (1, 0), x
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_nocommand():
     script = 'oxli'
 
@@ -959,7 +957,7 @@ def test_load_graph_no_tags():
     # loading the ht file...
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_no_tags():
     script = 'oxli'
     args = ['build-graph', '-x', '1e7', '-N', '2', '-k', '20', '-n']
@@ -997,7 +995,7 @@ def test_load_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_fail():
     script = 'oxli'
     args = ['build-graph', '-x', '1e3', '-N', '2', '-k', '20']  # use small HT
@@ -1034,7 +1032,7 @@ def test_load_graph_write_fp():
     assert 'false positive rate estimated to be 0.002' in data
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_write_fp():
     script = 'oxli'
     # use small HT
@@ -1069,7 +1067,7 @@ def test_load_graph_multithread():
     (status, out, err) = utils.runscript(script, args)
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_oxli_build_graph_multithread():
     script = 'oxli'
 
@@ -2483,7 +2481,7 @@ def test_screed_streaming_bzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_screed_streaming_gzipfq():
     # gzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
@@ -2492,7 +2490,7 @@ def test_screed_streaming_gzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
         utils.get_test_data('test-abund-read-2.fa.gz'))
@@ -2511,7 +2509,7 @@ def test_read_parser_streaming_ufq():
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_parser_streaming_bzfq():
     # bzip compressed FASTQ
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
@@ -2522,7 +2520,7 @@ def test_read_parser_streaming_gzfq():
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_parser_streaming_bzfa():
     # bzip compressed FASTA
     _execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
@@ -2649,6 +2647,25 @@ def test_trim_low_abund_2():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_2_o_gzip():
+    infile = utils.get_temp_filename('test.fa')
+    infile2 = utils.get_temp_filename('test2.fa')
+    outfile = utils.get_temp_filename('out.gz')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1',
+            "-o", outfile, "--gzip",
+            infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert os.path.exists(outfile), outfile
+    x = list(screed.open(outfile))
+    assert len(x)
 
 # make sure that FASTQ records are retained.
 
@@ -2893,6 +2910,75 @@ def test_trim_low_abund_stdout():
     assert 'GGTTGACGGGGCTCAGGG' in out
 
 
+def test_trim_low_abund_diginorm_coverage_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "--diginorm-coverage", "21"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert 'Error: --diginorm-coverage given, but --diginorm not specified.' \
+           in err, err
+
+
+def test_trim_low_abund_diginorm_single_pass():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "--diginorm", "--single-pass"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert "Error: --diginorm and --single-pass are incompatible!" \
+           in err, err
+
+
+def test_trim_low_abund_varcov_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-Z", "21"]
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                       fail_ok=True)
+
+    assert status == 1
+    assert 'Error: --trim-at-coverage/-Z given' in err, err
+
+
+def test_trim_low_abund_single_pass():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-V", '--single-pass']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+
+
+def test_trim_low_abund_reporting():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+    assert '11157 11161 848236 2 152' in err
+
+
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
@@ -2932,7 +3018,7 @@ def test_roundtrip_casava_format_2():
     assert r == r2, (r, r2)
 
 
-def test_existance_failure():
+def test_existence_failure():
     expected_output = 'ERROR: Input file'
 
     args = [utils.get_temp_filename('thisfiledoesnotexistatall')]

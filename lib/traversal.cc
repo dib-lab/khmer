@@ -1,6 +1,6 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -77,7 +77,7 @@ unsigned int Traverser::traverse_left(Kmer& node,
     char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
-        if (graph->get_count(prev_node) && filter(prev_node)) {
+        if (graph->get_count(prev_node) && (!filter || filter(prev_node))) {
             node_q.push(prev_node);
             ++found;
         }
@@ -97,7 +97,7 @@ unsigned int Traverser::traverse_right(Kmer& node,
     char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
-        if (graph->get_count(next_node) && filter(next_node)) {
+        if (graph->get_count(next_node) && (!filter || filter(next_node))) {
             node_q.push(next_node);
             ++found;
         }

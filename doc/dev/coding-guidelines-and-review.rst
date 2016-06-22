@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2014-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 Coding guidelines and code review checklist
@@ -70,11 +70,11 @@ indentation can be set with::
 	set softtabstop=4
 
 For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
-standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
+standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful.
 
-Code, scripts, and documentation must have their spelling checked. 
+Code, scripts, and documentation must have their spelling checked.
 
-Python-based `codespell` can be applied to multiple files easily. `codespell` 
+Python-based `codespell` can be applied to multiple files easily. `codespell`
 can be installed via the following::
 
         mkdir ~/bin
@@ -98,12 +98,12 @@ To run codespell over a single file::
 To make codespell fix the issues it finds automatically::
 
         codespell -w path/to/file
-        
+
 Please note that as `codespell` works off of a listing of possible
 misspellings it may not catch all errors. If you find a spelling error that
 is not caught by `codespell` feel free to open a pull request at the `project
-page <https://github.com/lucasdemarchi/codespell>`_ to add it to the 
-dictionary. 
+page <https://github.com/lucasdemarchi/codespell>`_ to add it to the
+dictionary.
 
 Vim users can run::
 
@@ -130,20 +130,19 @@ See also `Code reviews: the lab meeting for code
 Checklist
 ---------
 
-Copy and paste the following into a pull request comment when it is
-ready for review::
-   
+Each pull request should be automatically populated with the following
+checklist::
+
    - [ ] Is it mergeable?
-   - [ ] Did it pass the tests?
-   - [ ] If it introduces new functionality in scripts/ is it tested?
-     Check for code coverage with `make clean diff-cover`
-   - [ ] Is it well formatted? Look at `make pep8`, `make diff_pylint_report`,
-     `make cppcheck`, and `make doc` output. Use `make format` and manual
-     fixing as needed.
+   - [ ] `make test` Did it pass the tests?
+   - [ ] `make clean diff-cover` If it introduces new functionality in
+     `scripts/` is it tested?
+   - [ ] `make format diff_pylint_report cppcheck doc pydocstyle` Is it well
+     formatted?
    - [ ] Did it change the command-line interface? Only additions are allowed
      without a major version increment. Changing file formats also requires a
      major version number increment.
-   - [ ] Is it documented in the ChangeLog?
+   - [ ] Is it documented in the `ChangeLog`?
      http://en.wikipedia.org/wiki/Changelog#Format
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
@@ -151,7 +150,7 @@ ready for review::
      tested for streaming IO?)
    - [ ] Is the Copyright year up to date?
 
-**Note** that after you submit the comment you can check and uncheck
+**Note** that after you submit the pull request you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y
 in the middle.
 

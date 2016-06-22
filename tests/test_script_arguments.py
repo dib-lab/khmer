@@ -32,6 +32,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,invalid-name,no-member
 """
 Tests for various argument-handling code.
 """
@@ -43,7 +44,6 @@ import io
 import collections
 from . import khmer_tst_utils as utils
 
-import argparse
 import khmer.kfile
 from khmer import khmer_args
 try:
@@ -51,12 +51,10 @@ try:
 except ImportError:
     from io import StringIO
 
-import sys
-
 
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
-    long = int
+    long = int  # pylint: disable=redefined-builtin
 
 
 def test_check_space():
@@ -197,7 +195,7 @@ def test_create_countgraph_3():
     sys.stderr = capture = StringIO()
 
     try:
-        countgraph = khmer_args.create_countgraph(args, ksize=35)
+        khmer_args.create_countgraph(args, ksize=35)
         assert 0, "should not reach this"
     except SystemExit:
         err = capture.getvalue()
@@ -259,11 +257,10 @@ def test_create_nodegraph_3():
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
-    old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
 
     try:
-        nodegraph = khmer_args.create_nodegraph(args, ksize=35)
+        khmer_args.create_nodegraph(args, ksize=35)
         assert 0, "should not reach this"
     except SystemExit:
         err = capture.getvalue()
@@ -309,7 +306,7 @@ def test_fail_calculate_foograph_size():
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0)
 
     try:
-        nodegraph = khmer_args.calculate_graphsize(args, 'foograph')
+        khmer_args.calculate_graphsize(args, 'foograph')
         assert 0, "previous statement should fail"
     except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)

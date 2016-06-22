@@ -155,8 +155,8 @@ One-time Preparation
        cd khmer
        make install-dependencies
 
-   (This installs `Sphinx <http://sphinx-doc.org/>`__ and `nose
-   <https://nose.readthedocs.org/en/latest/>`__, packages we use for
+   (This installs `Sphinx <http://sphinx-doc.org/>`__ and `pytest
+   <https://pytest.org/>`__, packages we use for
    building the documentation and running the tests.)
 
    In Conda to activate the previously created environment and install
@@ -227,9 +227,7 @@ Building khmer and running the tests
 
    You should see lots of output, with something like::
 
-      Ran 633 tests in 47.446s
-
-      OK
+      ====== 658 passed, 22 deselected in 40.93 seconds =======
 
    at the end.
 

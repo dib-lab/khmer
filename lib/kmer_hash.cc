@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -102,6 +102,17 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
 
     khmer::_hash(kmer, k, h, r);
     return h;			// return forward only
+}
+
+HashIntoType _hash(const std::string kmer, const WordLength k)
+{
+    return _hash(kmer.c_str(), k);
+}
+
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                    HashIntoType& h, HashIntoType& r)
+{
+    return _hash(kmer.c_str(), k, h, r);
 }
 
 //

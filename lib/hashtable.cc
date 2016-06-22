@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -494,111 +494,6 @@ consume_fasta_and_tag(
 }
 
 //
-// consume_fasta_and_tag_with_stoptags: consume a FASTA file of reads,
-//     tagging reads every so often.  Do not insert matches to stoptags,
-//     and join the tags across those gaps.
-//
-
-void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
-        unsigned int &total_reads,
-        unsigned long long &n_consumed)
-{
-    total_reads = 0;
-    n_consumed = 0;
-
-    IParser* parser = IParser::get_parser(filename.c_str());
-    Read read;
-
-    string seq = "";
-
-    SeenSet read_tags;
-
-    //
-    // iterate through the FASTA file & consume the reads.
-    //
-
-    while(!parser->is_complete())  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        read_tags.clear();
-
-        // n_consumed += this_n_consumed;
-
-        if (check_and_normalize_read(seq)) {	// process?
-            bool is_new_kmer;
-            KmerIterator kmers(seq.c_str(), _ksize);
-
-            HashIntoType kmer, last_kmer;
-            bool is_first_kmer = true;
-
-            unsigned int since = _tag_density / 2 + 1;
-            while (!kmers.done()) {
-                kmer = kmers.next();
-
-                if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
-                    is_new_kmer = (bool) !get_count(kmer);
-                    if (is_new_kmer) {
-                        count(kmer);
-                        n_consumed++;
-                    }
-
-                    if (!is_new_kmer && set_contains(all_tags, kmer)) {
-                        read_tags.insert(kmer);
-                        since = 1;
-                    } else {
-                        since++;
-                    }
-
-                    if (since >= _tag_density) {
-                        all_tags.insert(kmer);
-                        read_tags.insert(kmer);
-                        since = 1;
-                    }
-                } else {		// stop tag!  do not insert, but connect.
-                    // before first tag insertion; insert last kmer.
-                    if (!is_first_kmer && read_tags.empty()) {
-                        read_tags.insert(last_kmer);
-                        all_tags.insert(last_kmer);
-                    }
-
-                    since = _tag_density - 1; // insert next kmer, too.
-                }
-
-                last_kmer = kmer;
-                is_first_kmer = false;
-            }
-
-            if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
-                is_new_kmer = (bool) !get_count(kmer);
-                if (is_new_kmer) {
-                    count(kmer);
-                    n_consumed++;
-                }
-
-                if (since >= _tag_density/2 - 1) {
-                    all_tags.insert(kmer);	// insert the last k-mer, too.
-                    read_tags.insert(kmer);
-                }
-            }
-        }
-
-        if (read_tags.size() > 1) {
-            partition->assign_partition_id(*(read_tags.begin()), read_tags);
-        }
-
-        // reset the sequence info, increment read number
-        total_reads++;
-
-    }
-    delete parser;
-}
-
-//
 // divide_tags_into_subsets - take all of the tags in 'all_tags', and
 //   divide them into subsets (based on starting tag) of <= given size.
 //
@@ -658,7 +553,7 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
             n_consumed += consume_string(seq); // @CTB why are we doing this?
 
             // Next, compute the tag & set the partition, if nonzero
-            HashIntoType kmer = _hash(seq.c_str(), _ksize);
+            HashIntoType kmer = _hash(seq, _ksize);
             all_tags.insert(kmer);
             if (p > 0) {
                 partition->set_partition_id(kmer, p);
@@ -669,73 +564,6 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
         total_reads++;
     }
 
-    delete parser;
-}
-
-//
-// consume_fasta: consume a FASTA file of reads
-//
-
-void Hashtable::consume_fasta_and_traverse(const std::string &filename,
-        unsigned int radius,
-        unsigned int big_threshold,
-        unsigned int transfer_threshold,
-        CountingHash &counting)
-{
-    unsigned long long total_reads = 0;
-
-    IParser* parser = IParser::get_parser(filename.c_str());
-    Read read;
-
-    string seq = "";
-
-    //
-    // iterate through the FASTA file & consume the reads.
-    //
-
-    while(!parser->is_complete())  {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        if (check_and_normalize_read(seq)) {	// process?
-            KmerIterator kmers(seq.c_str(), _ksize);
-
-            bool is_first_kmer = true;
-            Kmer kmer(0,0,0);
-            while (!kmers.done()) {
-                kmer = kmers.next();
-
-                if (set_contains(stop_tags, kmer)) {
-                    break;
-                }
-                count(kmer);
-                is_first_kmer = false;
-            }
-
-            if (!is_first_kmer) {	// traverse
-                KmerSet keeper;
-                unsigned int n = traverse_from_kmer(kmer, radius, keeper);
-                if (n >= big_threshold) {
-#if VERBOSE_REPARTITION
-                    std::cout << "lmp: " << n << "; added: " << stop_tags.size() << "\n";
-#endif // VERBOSE_REPARTITION
-                    count_and_transfer_to_stoptags(keeper, transfer_threshold, counting);
-                }
-            }
-        }
-
-        // reset the sequence info, increment read number
-        total_reads++;
-
-        // run callback, if specified
-        if (total_reads % CALLBACK_PERIOD == 0) {
-            std::cout << "n reads: " << total_reads << "\n";
-        }
-    }
     delete parser;
 }
 
@@ -809,56 +637,6 @@ unsigned int Hashtable::kmer_degree(const char * kmer_s)
     return traverser.degree(node);
 }
 
-void Hashtable::filter_if_present(const std::string &infilename,
-                                  const std::string &outputfile)
-{
-    IParser* parser = IParser::get_parser(infilename);
-    ofstream outfile(outputfile.c_str());
-
-    unsigned int total_reads = 0;
-    unsigned int reads_kept = 0;
-
-    Read read;
-    string seq;
-
-    HashIntoType kmer;
-
-    while(!parser->is_complete()) {
-        try {
-            read = parser->get_next_read();
-        } catch (NoMoreReadsAvailable &exc) {
-            break;
-        }
-        seq = read.sequence;
-
-        if (check_and_normalize_read(seq)) {
-            KmerIterator kmers(seq.c_str(), _ksize);
-            bool keep = true;
-
-            while (!kmers.done()) {
-                kmer = kmers.next();
-                if (get_count(kmer)) {
-                    keep = false;
-                    break;
-                }
-            }
-
-            if (keep) {
-                outfile << ">" << read.name;
-                outfile << "\n" << seq << "\n";
-                reads_kept++;
-            }
-
-            total_reads++;
-        }
-    }
-
-    delete parser;
-    parser = NULL;
-
-    return;
-}
-
 size_t Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
@@ -877,54 +655,6 @@ size_t Hashtable::trim_on_stoptags(std::string seq) const
     }
 
     return seq.length();
-}
-
-void Hashtable::traverse_from_tags(unsigned int distance,
-                                   unsigned int threshold,
-                                   unsigned int frequency,
-                                   CountingHash &counting)
-{
-    unsigned int i = 0;
-    unsigned int n = 0;
-    unsigned int n_big = 0;
-    KmerSet keeper;
-
-#if VERBOSE_REPARTITION
-    std::cout << all_tags.size() << " tags...\n";
-#endif // 0
-
-    for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-            ++si, i++) {
-
-        n++;
-        Kmer tag = build_kmer(*si);
-        unsigned int count = traverse_from_kmer(tag, distance, keeper);
-
-        if (count >= threshold) {
-            n_big++;
-
-            KmerSet::const_iterator ti;
-            for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
-                if (counting.get_count(*ti) > frequency) {
-                    stop_tags.insert(*ti);
-                } else {
-                    counting.count(*ti);
-                }
-            }
-#if VERBOSE_REPARTITION
-            std::cout << "traversed from " << n << " tags total; "
-                      << n_big << " big; " << keeper.size() << "\n";
-#endif // 0
-        }
-        keeper.clear();
-
-        if (n % 100 == 0) {
-#if VERBOSE_REPARTITION
-            std::cout << "traversed " << n << " " << n_big << " " <<
-                      all_tags.size() << " " << stop_tags.size() << "\n";
-#endif // 0
-        }
-    }
 }
 
 unsigned int Hashtable::traverse_from_kmer(Kmer start,
@@ -1133,48 +863,6 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-unsigned int Hashtable::count_and_transfer_to_stoptags(KmerSet &keeper,
-        unsigned int threshold,
-        CountingHash &counting)
-{
-    unsigned int n_inserted = 0;
-
-    KmerSet::const_iterator ti;
-    for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
-        if (counting.get_count(*ti) >= threshold) {
-            stop_tags.insert(*ti);
-            n_inserted++;
-        } else {
-            counting.count(*ti);
-        }
-    }
-
-    return n_inserted;
-}
-
-void Hashtable::identify_stop_tags_by_position(std::string seq,
-        std::vector<unsigned int> &posns)
-const
-{
-    if (!check_and_normalize_read(seq)) {
-        return;
-    }
-
-    KmerIterator kmers(seq.c_str(), _ksize);
-
-    unsigned int i = 0;
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (set_contains(stop_tags, kmer)) {
-            posns.push_back(i);
-        }
-        i++;
-    }
-
-    return;
-}
-
 void Hashtable::extract_unique_paths(std::string seq,
                                      unsigned int min_length,
                                      float min_unique_f,
@@ -1279,7 +967,7 @@ void Hashtable::get_kmers(const std::string &s,
         return;
     }
     for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-        std::string sub = s.substr(i, i + _ksize);
+        std::string sub = s.substr(i, _ksize);
         kmers_vec.push_back(sub);
     }
 }
