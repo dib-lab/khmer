@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
 Find highly-connected k-mers.
@@ -15,7 +43,6 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 """
 from __future__ import print_function
 
-import argparse
 import glob
 import os
 import textwrap
@@ -23,8 +50,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config)
+from khmer.khmer_args import (build_counting_args, info, sanitize_help)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -48,13 +74,15 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 
 def get_parser():
-    epilog = """
-    Load an k-mer nodegraph/tagset pair created by load-graph, and a set
-    of pmap files created by partition-graph. Go through each pmap file,
+    epilog = """\
+    Load an k-mer nodegraph/tagset pair created by
+    :program:`load-graph.py`, and a set of pmap files created by
+    :program:`partition-graph.py`. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that
-    partition; this should identify all of the HCKs in that partition. These
-    HCKs are output to <graphbase>.stoptags after each pmap file.
+    partition; this should identify all of the Highly Connected Kmers in that
+    partition. These HCKs are output to ``<graphbase>.stoptags`` after each
+    pmap file.
 
     Parameter choice is reasonably important. See the pipeline in
     :doc:`partitioning-big-data` for an example run.
@@ -77,7 +105,13 @@ def get_parser():
 
 def main():
     info('find-knots.py', ['graph'])
-    args = get_parser().parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        ":doc:`partitioning-big-data`",
+        "http://khmer.readthedocs.org/en/stable/user/"
+        "partitioning-big-data.html"
+    )
+    args = sanitize_help(parser).parse_args()
 
     graphbase = args.graphbase
 

@@ -1,15 +1,43 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring
 """
 Produce the k-mer abundance distribution for the given file.
 
-% python scripts/abundance-dist.py [ -z -s ] <htname> <data> <histout>
+% python scripts/abundance-dist.py [ -z -s ] <countgraph> <data> <histout>
 
 Use '-h' for parameter help.
 """
@@ -19,16 +47,26 @@ import sys
 import csv
 import khmer
 import argparse
+import textwrap
 import os
+from khmer import __version__
 from khmer.kfile import check_input_files
-from khmer.khmer_args import info
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        load-into-counting.py -x 1e7 -N 2 -k 17 counts \\
+                tests/test-data/test-abund-read-2.fa
+        abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
+    """
     parser = argparse.ArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
         "the sequence file using a pre-made k-mer countgraph.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
                         ' input k-mer countgraph file.')
@@ -39,15 +77,15 @@ def get_parser():
                         'count, (4) fraction of total distinct k-mers.')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
-                        help='Do not output 0-count bins')
+                        help='Do not output zero-count bins')
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite existing output_histogram_filename')
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')
@@ -56,7 +94,7 @@ def get_parser():
 
 def main():
     info('abundance-dist.py', ['counting'])
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
@@ -134,4 +172,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

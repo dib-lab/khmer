@@ -4,7 +4,8 @@
 License
 =======
 
-Copyright (c) 2010-2014, Michigan State University.  All rights reserved.
+Copyright (c) 2010-2015, Michigan State University.
+Copyright (c) 2015, The Regents of the University of California
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

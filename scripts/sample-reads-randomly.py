@@ -1,10 +1,38 @@
 #! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# This script is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
 # pylint: disable=invalid-name,missing-docstring
 """
 Subsample sequences from multiple files.
@@ -26,10 +54,11 @@ import random
 import textwrap
 import sys
 
-import khmer
+from khmer import __version__
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -38,8 +67,7 @@ DEBUG = True
 
 
 def get_parser():
-    epilog = ("""
-
+    epilog = """\
     Take a list of files containing sequences, and subsample 100,000
     sequences (:option:`-N`/:option:`--num_reads`) uniformly, using
     reservoir sampling.  Stop after first 100m sequences
@@ -47,17 +75,16 @@ def get_parser():
     but take :option:`-S`/:option:`--samples` samples if specified.
 
     The output is placed in :option:`-o`/:option:`--output` <file>
-    (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
+    (for a single sample) or in ``<file>.subset.0`` to ``<file>.subset.S-1``
     (for more than one sample).
 
     This script uses the `reservoir sampling
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
-    """)   # noqa
+    """
 
     parser = argparse.ArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        epilog=textwrap.dedent(epilog))
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
@@ -66,14 +93,15 @@ def get_parser():
                         default=DEFAULT_MAX_READS)
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
-    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
+    parser.add_argument('-R', '--random-seed', type=int, dest='random_seed',
+                        help='Provide a random seed for the generator')
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)
@@ -82,10 +110,16 @@ def get_parser():
 
 def main():
     info('sample-reads-randomly.py')
-    args = get_parser().parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        "`reservoir sampling\n"
+        "<http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.",
+        "reservoir sampling algorithm. "
+        "http://en.wikipedia.org/wiki/Reservoir_sampling")
+    args = sanitize_help(parser).parse_args()
 
-    for _ in args.filenames:
-        check_input_files(_, args.force)
+    for name in args.filenames:
+        check_input_files(name, args.force)
 
     # seed the random number generator?
     if args.random_seed:
@@ -129,7 +163,7 @@ def main():
         print('', file=sys.stderr)
 
     reads = []
-    for n in range(num_samples):
+    for _ in range(num_samples):
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
@@ -137,9 +171,8 @@ def main():
         print('opening', filename, 'for reading', file=sys.stderr)
         screed_iter = screed.open(filename)
 
-        for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                screed_iter,
-                force_single=args.force_single)):
+        for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
+                screed_iter, force_single=args.force_single)):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
@@ -149,10 +182,11 @@ def main():
 
             # collect first N reads
             if count < args.num_reads:
-                for n in range(num_samples):
-                    reads[n].append((rcrd1, rcrd2))
+                for sample in range(num_samples):
+                    reads[sample].append((rcrd1, rcrd2))
             else:
-                assert len(reads[n]) <= count
+                for sample in range(num_samples):
+                    assert len(reads[sample]) <= count
 
                 # use reservoir sampling to replace reads at random
                 # see http://en.wikipedia.org/wiki/Reservoir_sampling

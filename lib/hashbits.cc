@@ -1,10 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #include <errno.h>
 #include <sstream> // IWYU pragma: keep
 
@@ -170,6 +200,7 @@ void Hashbits::update_from(const Hashbits &other)
     if (_tablesizes != other._tablesizes) {
         throw khmer_exception("both nodegraphs must have same table sizes");
     }
+    Byte tmp = 0;
     for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
         Byte * me = _counts[table_num];
         Byte * ot = other._counts[table_num];
@@ -177,7 +208,23 @@ void Hashbits::update_from(const Hashbits &other)
         HashIntoType tablebytes = tablesize / 8 + 1;
 
         for (HashIntoType index = 0; index < tablebytes; index++) {
-            me[index] |= ot[index];     // bitwise or
+            // Bloom filters can be unioned with bitwise OR.
+            // First, get the new value
+            tmp = me[index] | ot[index];
+            if (table_num == 0) {
+                // We'd like for the merged filter to have an accurate
+                // count of occupied bins.  First, observe that
+                // HammingDistance(x,y) is equivalent to
+                // HammingWeight(x^y).  Then, observe that the number
+                // of additional occupied bins from the update is the
+                // hamming distance between the original bin and the
+                // OR'd bin. Thus, we can use the builtin popcountll
+                // function, which calls a hardware instruction for
+                // hamming weight, with the original and merged bin,
+                // to find the number of additional occupied bins.
+                _occupied_bins += __builtin_popcountll(me[index] ^ tmp);
+            }
+            me[index] = tmp;
         }
     }
 }

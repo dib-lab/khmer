@@ -1,3 +1,41 @@
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2014-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
+
 Sandbox scripts
 ===============
 
@@ -27,20 +65,16 @@ Scripts with recipes:
 
 To keep, document, and build recipes for:
 
-* `make-coverage.py - RPKM calculation script
-* abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
+* make-coverage.py - RPKM calculation script
 * assemstats3.py - print out assembly statistics
 * build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
 * collect-variants.py - used in a `gist <https://gist.github.com/ctb/6eaef7971ea429ab348d>`__
 * extract-single-partition.py - extract all the sequences that belong to a specific partition, from a file with multiple partitions
-* fasta-to-abundance-hist.py - generate abundance of k-mers by position within reads; use with abundance-hist-by-position.py
 * filter-below-abund.py - like filter-abund, but trim off high-abundance k-mers
 * filter-median-and-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
 * filter-median.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
-* find-high-abund-kmers.py - extract high-abundance k-mers into a list
 * graph-size.py - filter reads based on size of connected graph
-* hi-lo-abundance-by-position.py - look at high and low-abundance k-mers by position within read
 * memusg - memory usage analysis
 * multi-rename.py - rename sequences from multiple files with a common prefix
 * normalize-by-median-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
@@ -49,7 +83,6 @@ To keep, document, and build recipes for:
 * renumber-partitions.py - systematically renumber partitions
 * shuffle-reverse-rotary.py - FASTA file shuffler for larger FASTA files
 * split-fasta.py - break a FASTA file up into smaller chunks
-* stoptag-abundance-hist.py - print out abundance histogram of stoptags
 * stoptags-by-position.py - print out where stoptags tend to occur
 * strip-partition.py - clear off partition information
 * subset-report.py - report stats on pmap files
@@ -68,6 +101,15 @@ Good ideas to rewrite using newer tools/approaches:
 * split-sequences-by-length.py - break up short reads by length
 
 ----
+
+Present in commit ff7f047b5b0d9acb6c1eb73d54cfd39c9e3d1393 but removed
+thereafter:
+
+* abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
+* fasta-to-abundance-hist.py - generate abundance of k-mers by position within reads; use with abundance-hist-by-position.py
+* find-high-abund-kmers.py - extract high-abundance k-mers into a list
+* hi-lo-abundance-by-position.py - look at high and low-abundance k-mers by position within read
+* stoptag-abundance-hist.py - print out abundance histogram of stoptags
 
 Present in commit 19b0a09353cddc45070edcf1283cae2c83c13b0e but removed
 thereafter:

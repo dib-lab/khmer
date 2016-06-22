@@ -1,14 +1,43 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring,invalid-name,no-member
 """
-Build a counting Bloom filter from the given sequences, save in <htname>.
+Build a counting Bloom filter from the given sequences, save in <countgraph>.
 
-% load-into-counting.py <htname> <data1> [ <data2> <...> ]
+% load-into-counting.py <countgraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -21,31 +50,32 @@ import threading
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args, calculate_graphsize
+from khmer.khmer_args import (build_counting_args, report_on_config, info,
+                              add_threading_args, calculate_graphsize,
+                              sanitize_help)
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
 
 
 def get_parser():
-    epilog = """
-    Note: with :option:`-b` the output will be the exact size of the
-    k-mer countgraph and this script will use a constant amount of memory.
-    In exchange k-mer counts will stop at 255. The memory usage of this script
-    with :option:`-b` will be about 1.15x the product of the :option:`-x` and
-    :option:`-N` numbers.
+    epilog = """\
+    Note: with :option:`-b`/:option:`--no-bigcount` the output will be the
+    exact size of the k-mer countgraph and this script will use a constant
+    amount of memory. In exchange k-mer counts will stop at 255. The memory
+    usage of this script with :option:`-b` will be about 1.15x the product of
+    the :option:`-x` and :option:`-N` numbers.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"
@@ -63,7 +93,8 @@ def get_parser():
     parser.add_argument('--summary-info', '-s', type=str, default=None,
                         metavar="FORMAT", choices=[str('json'), str('tsv')],
                         help="What format should the machine readable run "
-                        "summary be in? (json or tsv, disabled by default)")
+                        "summary be in? (`json` or `tsv`, disabled by"
+                        " default)")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
@@ -73,7 +104,7 @@ def main():
 
     info('load-into-counting.py', ['counting', 'SeqAn'])
 
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     report_on_config(args)
 
     base = args.output_countgraph_filename
@@ -183,4 +214,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

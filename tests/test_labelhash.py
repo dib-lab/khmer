@@ -1,20 +1,49 @@
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 from __future__ import print_function
 from __future__ import absolute_import
-#
-# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
-#
-# pylint: disable=missing-docstring,protected-access
+
 import os
 import khmer
 from khmer import GraphLabels, CountingGraphLabels
-from screed.fasta import fasta_iter
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -25,10 +54,10 @@ def teardown():
 #  * thread-safety
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
-        lh = GraphLabels(20, 1e13, 1)
+        GraphLabels(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
         print(str(err))
@@ -37,7 +66,7 @@ def test_toobig():
 def test_error_create():
     from khmer import _GraphLabels
     try:
-        lh = _GraphLabels(None)
+        _GraphLabels(None)
         assert 0, "This should fail."
     except ValueError as err:
         print(str(err))
@@ -175,7 +204,7 @@ def test_consume_fasta_and_tag_with_labels():
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
-    total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
+    total_reads, _ = lb.consume_fasta_and_tag_with_labels(filename)
     print("doing get")
     assert lb.graph.get(read_1[:20])
     assert total_reads == 3
@@ -199,7 +228,7 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
 
-    total_reads, n_consumed = lb.consume_partitioned_fasta_and_tag_with_labels(
+    lb.consume_partitioned_fasta_and_tag_with_labels(
         filename)
     labels = set()
     for record in screed.open(filename):
@@ -217,7 +246,7 @@ def test_consume_sequence_and_tag_with_labels():
     label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
-    n_consumed = lb.consume_sequence_and_tag_with_labels(sequence, label)
+    lb.consume_sequence_and_tag_with_labels(sequence, label)
     labels = set()
     labels.update(lb.sweep_label_neighborhood(sequence))
 
@@ -232,7 +261,7 @@ def test_sweep_tag_neighborhood():
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
-    assert tags.pop() == 173473779682
+    assert list(tags) == [173473779682]
 
 
 def test_sweep_label_neighborhood():
@@ -244,13 +273,12 @@ def test_sweep_label_neighborhood():
     assert len(labels) == 1
     assert labels.pop() == 0
 
-'''
-* The test data set as four reads: A, B, C, and D
-* Overlaps are A <-> B <-> C, with D on its own
-* Thus, traversing from A should find labels from A and B,
-  traversing from B should find labels from A, B, and C,
-  and traversing from C should find labels from B and C
-'''
+#
+# * The test data set as four reads: A, B, C, and D
+# * Overlaps are A <-> B <-> C, with D on its own
+# * Thus, traversing from A should find labels from A and B,
+#   traversing from B should find labels from A, B, and C,
+#   and traversing from C should find labels from B and C
 
 
 def test_label_tag_correctness():

@@ -117,7 +117,7 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'default'
+html_theme = 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -228,3 +228,4 @@ latex_documents = [
 
 # If false, no module index is generated.
 latex_use_modindex = False
+latex_domain_indices = False

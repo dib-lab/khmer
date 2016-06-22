@@ -1,4 +1,40 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2013-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
 
 ================================
 Releasing a new version of khmer
@@ -40,7 +76,12 @@ release makers, following this checklist by MRC.
 #. Review the issue list for any new bugs that will not be fixed in this
    release. Add them to ``doc/known-issues.txt``
 
-#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
+#. Check for new authors. Update ``.mailmap`` to normalize their email address
+   and name spelling. If they want to opt out update the ``list-*`` Makefile
+   targets to exclude them. Run ``make list-citation`` and adapt the output to
+   the relevant parts of ``CITATION``, ``setup.py``, ``doc/index.rst``.
+
+#. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
 
 #. Submit a build to Coverity Scan if it hasn't been done
    recently. You can get the token from
@@ -221,7 +262,7 @@ cross-platform testing environment.
 Setuptools Bootstrap
 --------------------
 
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
+`ez_setup.py` is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
 
 Before major releases it should be examined to see if there are new
 versions available and if the change would be useful

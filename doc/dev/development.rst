@@ -1,4 +1,40 @@
-.. vim: set filetype=rst textwidth=80
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2012-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
 
 Development miscellany
 ======================
@@ -15,7 +51,7 @@ tag.
 Build framework
 ---------------
 
-'make' should build everything, including tests and "development" code.
+`make` should build everything, including tests and "development" code.
 
 git and GitHub strategies
 -------------------------
@@ -54,13 +90,13 @@ Pipelines
 ---------
 
 All khmer scripts used by a published recommended analysis pipeline must be
-included in scripts/ and meet the standards therein implied.
+included in ``scripts/`` and meet the standards therein implied.
 
 Command line scripts
 --------------------
 
 Python command-line scripts should use '-' instead of '_' in the name.
-(Only filenames containing code for import imported should use _.)
+(Only filenames containing code for import should use _.)
 
 Please follow the command-line conventions used under scripts/.  This
 includes most especially standardization of '-x' to be hash table size,
@@ -83,19 +119,12 @@ Command line thoughts:
 
 ----
 
-All code in scripts/ must have automated tests; see tests/test_scripts.py.
-Otherwise it belongs in sandbox/.
+All code in ``scripts/`` must have automated tests; see
+``tests/test_scripts.py``. Otherwise it belongs in ``sandbox/``.
 
 When files are overwritten, they should only be opened to be overwritten
 after the input files have been shown to exist.  That prevents stupid
-command like mistakes from trashing important files.
-
-It would be nice to allow piping from one command to another where possible.
-But this seems complicated.
-
-CTB: should we squash output files (overwrite them if they exist), or not?
-So far, leaning towards 'not', as that way no one is surprised and loses
-their data.
+command line mistakes from trashing important files.
 
 A general error should be signaled by exit code `1` and success by `0`. Linux
 supports exit codes from `0` to `255` where the value `1` means a general
@@ -115,7 +144,7 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-khmer/_khmermodule.CC
+``khmer/_khmermodule.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.

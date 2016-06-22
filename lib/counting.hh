@@ -1,10 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
@@ -135,7 +165,7 @@ public:
     }
 
     virtual const HashIntoType n_unique_kmers() const
-    { 
+    {
         return _n_unique_kmers;
     }
 
@@ -180,7 +210,7 @@ public:
                 if (current_count == 0) {
                     is_new_kmer = true;
                     if (i == 0) {
-                       __sync_add_and_fetch(&_occupied_bins, 1);
+                        __sync_add_and_fetch(&_occupied_bins, 1);
                     }
                 }
             }
@@ -242,9 +272,6 @@ public:
         return min_count;
     }
 
-    void output_fasta_kmer_pos_freq(const std::string &inputfile,
-                                    const std::string &outputfile);
-
     BoundedCounterType get_min_count(const std::string &s);
 
     BoundedCounterType get_max_count(const std::string &s);
@@ -254,28 +281,12 @@ public:
     HashIntoType * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 
-    HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
-            const unsigned int max_read_len,
-            BoundedCounterType limit_by_count=0,
-            CallbackFn callback = NULL,
-            void * callback_data = NULL);
-
-    void fasta_dump_kmers_by_abundance(const std::string &inputfile,
-                                       BoundedCounterType limit_by_count,
-                                       CallbackFn callback = NULL,
-                                       void * callback_data = NULL);
-
     unsigned long trim_on_abundance(std::string seq,
                                     BoundedCounterType min_abund) const;
     unsigned long trim_below_abundance(std::string seq,
                                        BoundedCounterType max_abund) const;
     std::vector<unsigned int> find_spectral_error_positions(std::string seq,
             BoundedCounterType min_abund) const;
-
-    void collect_high_abundance_kmers(const std::string &infilename,
-                                      unsigned int lower_count,
-                                      unsigned int upper_count,
-                                      SeenSet& kmers);
 };
 
 
