@@ -3857,7 +3857,6 @@ labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args)
         if (val != NULL) {
             PyList_SetItem(d, i, val);
         }
-        Py_XDECREF(val);
         i++;
     }
 
