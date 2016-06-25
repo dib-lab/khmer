@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -120,16 +120,17 @@ def main():
     check_space_for_graph(args.output_countgraph_filename, tablesize,
                           args.force)
 
+    info_filename = base + ".info"
     check_file_writable(base)
-    check_file_writable(base + ".info")
+    check_file_writable(info_filename)
 
     print('Saving k-mer countgraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
           repr(filenames), file=sys.stderr)
 
     # clobber the '.info' file now, as we always open in append mode below
-    if os.path.exists(base + '.info'):
-        os.remove(base + '.info')
+    with open(info_filename, 'w') as info_fp:
+        print('khmer version:', khmer.__version__, file=info_fp)
 
     print('making countgraph', file=sys.stderr)
     countgraph = khmer_args.create_countgraph(args)
@@ -162,13 +163,13 @@ def main():
             print('mid-save', base, file=sys.stderr)
 
             countgraph.save(base)
-        with open(base + '.info', 'a') as info_fh:
+        with open(info_filename, 'a') as info_fh:
             print('through', filename, file=info_fh)
         total_num_reads += rparser.num_reads
 
     n_kmers = countgraph.n_unique_kmers()
     print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
-    with open(base + '.info', 'a') as info_fp:
+    with open(info_filename, 'a') as info_fp:
         print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
     print('saving', base, file=sys.stderr)
@@ -179,7 +180,7 @@ def main():
         khmer.calc_expected_collisions(
             countgraph, args.force, max_false_pos=.2)
 
-    with open(base + '.info', 'a') as info_fp:
+    with open(info_filename, 'a') as info_fp:
         print('fp rate estimated to be %1.3f\n' % fp_rate, file=info_fp)
 
     if args.summary_info:
@@ -212,7 +213,7 @@ def main():
     print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
 
     print('DONE.', file=sys.stderr)
-    print('wrote to:', base + '.info', file=sys.stderr)
+    print('wrote to:', info_filename, file=sys.stderr)
 
 if __name__ == '__main__':
     main()
