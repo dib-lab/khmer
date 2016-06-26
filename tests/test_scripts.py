@@ -80,6 +80,21 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_quiet():
+    script = 'load-into-counting.py'
+    args = ['-q', '-x', '1e3', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert len(out) == 0
+    assert len(err) == 0
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_autoargs_0():
     script = 'load-into-counting.py'
 
