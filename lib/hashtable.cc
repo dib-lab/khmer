@@ -1009,6 +1009,7 @@ void Hashtable::find_high_degree_nodes(const char * s,
         n++;
         if (n % 10000 == 0) {
             std::cout << "... find_high_degree_nodes: " << n << "\n";
+            std::cout << std::flush;
         }
         Kmer kmer = kmers.next();
         if ((traverser.degree(kmer)) > 2) {
