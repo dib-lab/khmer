@@ -1,3 +1,11 @@
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * lib/khmer.hh,lib/{labelhash.cc,labelhash.hh}: removed label pointer-based
+   indirection from labelhash code.
+   * khmer/_khmer.cc: updated CPython API to match new behavior.
+   * tests/test_labelhash.py: renamed to match new API; no changes in test
+   logic.
+
 2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to
