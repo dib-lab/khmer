@@ -1,3 +1,16 @@
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, tests/test_nodegraph.py: 'add' is now a synonym for
+   graph.count(kmer).
+   * khmer/thread_utils.py: update verbose_loader function to take 'verbose'
+   argument.
+   * scripts/{abundance-dist-single.py, abundance-dist.py,
+   filter-abund-single.py, filter-abund.py, load-into-counting.py,
+   normalize-by-median.py,trim-low-abund.py}: updated to
+   respect -q/--quiet.
+   * tests/test_scripts.py: tests for '-q'.
+   * scripts/partition-graph.py: fix typo in args help message.
+
 2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to
