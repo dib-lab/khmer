@@ -53,6 +53,8 @@ from khmer import __version__
 from khmer.kfile import check_input_files
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
                               _VersionStdErrAction)
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 
 def get_parser():
@@ -99,21 +101,22 @@ def main():
     if not args.quiet:
         info('abundance-dist.py', ['counting'])
 
+    configure_logging(args.quiet)
+
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
     for infile in infiles:
         check_input_files(infile, False)
 
-    print('Counting graph from', args.input_count_graph_filename,
-          file=sys.stderr)
+    log_info('Loading counting graph from {graph}',
+             graph=args.input_count_graph_filename)
     countgraph = khmer.load_countgraph(
         args.input_count_graph_filename)
 
     if not countgraph.get_use_bigcount() and args.bigcount:
-        print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
-              " reporting is ENABLED--counts higher than 255 will not be "
-              "reported.",
-              file=sys.stderr)
+        log_warn("WARNING: The loaded graph has bigcount DISABLED while "
+                 "bigcount reporting is ENABLED--counts higher than 255 will "
+                 "not be reported.")
 
     countgraph.set_use_bigcount(args.bigcount)
 
@@ -122,31 +125,29 @@ def main():
     tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print('K:', kmer_size, file=sys.stderr)
-    print('outputting to', args.output_histogram_filename, file=sys.stderr)
+    log_info('K: {ksize}', ksize=kmer_size)
+    log_info('outputting to {output}', output=args.output_histogram_filename)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
         pass
     elif os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
-            print('ERROR: %s exists; not squashing.' %
-                  args.output_histogram_filename,
-                  file=sys.stderr)
+            log_error('ERROR: {output} exists; not squashing.',
+                      output=args.output_histogram_filename)
             sys.exit(1)
 
-        print('** squashing existing file %s' %
-              args.output_histogram_filename, file=sys.stderr)
+        log_info('** squashing existing file {output}',
+                 output=args.output_histogram_filename)
 
-    print('preparing hist...', file=sys.stderr)
+    log_info('preparing hist...')
     abundances = countgraph.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
 
     if 0 == total:
-        print("ERROR: abundance distribution is uniformly zero; "
-              "nothing to report.", file=sys.stderr)
-        print("\tPlease verify that the input files are valid.",
-              file=sys.stderr)
+        log_error("ERROR: abundance distribution is uniformly zero; "
+                  "nothing to report.")
+        log_error("\tPlease verify that the input files are valid.")
         sys.exit(1)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):

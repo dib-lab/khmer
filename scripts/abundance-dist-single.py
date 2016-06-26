@@ -55,6 +55,8 @@ from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info, calculate_graphsize,
                               sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 
 def get_parser():
@@ -106,6 +108,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     args = sanitize_help(get_parser()).parse_args()
     if not args.quiet:
         info('abundance-dist-single.py', ['counting', 'SeqAn'])
+
+    configure_logging(args.quiet)
     report_on_config(args)
 
     check_input_files(args.input_sequence_filename, args.force)
@@ -114,8 +118,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
-        print('ERROR: %s exists; not squashing.' %
-              args.output_histogram_filename, file=sys.stderr)
+        log_error('ERROR: {output} exists; not squashing.',
+                  output=args.output_histogram_filename)
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
@@ -124,23 +128,22 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         hist_fp_csv.writerow(['abundance', 'count', 'cumulative',
                               'cumulative_fraction'])
 
-    print('making countgraph', file=sys.stderr)
+    log_info('making countgraph')
     countgraph = khmer_args.create_countgraph(args, multiplier=1.1)
     countgraph.set_use_bigcount(args.bigcount)
 
-    print('building k-mer tracking graph', file=sys.stderr)
+    log_info('building k-mer tracking graph')
     tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
 
-    print('kmer_size:', countgraph.ksize(), file=sys.stderr)
-    print('k-mer countgraph sizes:',
-          countgraph.hashsizes(), file=sys.stderr)
-    print('outputting to', args.output_histogram_filename, file=sys.stderr)
+    log_info('kmer_size: {ksize}', ksize=countgraph.ksize())
+    log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
+    log_info('outputting to {output}', output=args.output_histogram_filename)
 
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print('consuming input, round 1 --',
-          args.input_sequence_filename, file=sys.stderr)
+    log_info('consuming input, round 1 -- {input}',
+             input=args.input_sequence_filename)
     for _ in range(args.threads):
         thread = \
             threading.Thread(
@@ -153,8 +156,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for thread in threads:
         thread.join()
 
-    print('Total number of unique k-mers: {0}'.format(
-        countgraph.n_unique_kmers()), file=sys.stderr)
+    log_info('Total number of unique k-mers: {nk}',
+             nk=countgraph.n_unique_kmers())
 
     abundance_lists = []
 
@@ -163,12 +166,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             read_parser, tracking)
         abundance_lists.append(abundances)
 
-    print('preparing hist from %s...' %
-          args.input_sequence_filename, file=sys.stderr)
+    log_info('preparing hist from {seqfile}...',
+             seqfile=args.input_sequence_filename)
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
-    print('consuming input, round 2 --',
-          args.input_sequence_filename, file=sys.stderr)
+    log_info('consuming input, round 2 -- {filename}',
+             filename=args.input_sequence_filename)
     for _ in range(args.threads):
         thread = \
             threading.Thread(
@@ -190,10 +193,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     total = sum(abundance.values())
 
     if 0 == total:
-        print("ERROR: abundance distribution is uniformly zero; "
-              "nothing to report.", file=sys.stderr)
-        print(
-            "\tPlease verify that the input files are valid.", file=sys.stderr)
+        log_error("ERROR: abundance distribution is uniformly zero; "
+                  "nothing to report.")
+        log_error("\tPlease verify that the input files are valid.")
         sys.exit(1)
 
     sofar = 0
@@ -210,11 +212,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             break
 
     if args.savegraph:
-        print('Saving k-mer countgraph ', args.savegraph, file=sys.stderr)
-        print('...saving to', args.savegraph, file=sys.stderr)
+        log_info('Saving k-mer countgraph to {savegraph}',
+                 savegraph=args.savegraph)
         countgraph.save(args.savegraph)
 
-    print('wrote to: ' + args.output_histogram_filename, file=sys.stderr)
+    log_info('wrote to: {output}', output=args.output_histogram_filename)
+
 
 if __name__ == '__main__':
     main()
