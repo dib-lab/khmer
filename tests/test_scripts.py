@@ -3269,7 +3269,7 @@ def check_version_and_basic_citation(scriptname):
     assert status == 0, status
     print(out)
     print(err)
-    #assert "publication" in err, err
+    # assert "publication" in err, err
     assert version.search(err) is not None, err
 
 
