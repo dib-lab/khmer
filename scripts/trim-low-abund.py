@@ -63,6 +63,8 @@ from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
@@ -326,31 +328,29 @@ def main():
     if not args.quiet:
         info('trim-low-abund.py', ['streaming'])
 
+    configure_logging(args.quiet)
+
     ###
 
     if len(set(args.input_filenames)) != len(args.input_filenames):
-        print("Error: Cannot input the same filename multiple times.",
-              file=sys.stderr)
+        log_error("Error: Cannot input the same filename multiple times.")
         sys.exit(1)
 
     if args.trim_at_coverage != DEFAULT_TRIM_AT_COVERAGE and \
        not args.variable_coverage:
-        print("Error: --trim-at-coverage/-Z given, but",
-              "--variable-coverage/-V not specified.",
-              file=sys.stderr)
+        log_error("Error: --trim-at-coverage/-Z given, but "
+                  "--variable-coverage/-V not specified.")
         sys.exit(1)
 
     if args.diginorm_coverage != DEFAULT_DIGINORM_COVERAGE and \
        not args.diginorm:
-        print("Error: --diginorm-coverage given, but",
-              "--diginorm not specified.",
-              file=sys.stderr)
+        log_error("Error: --diginorm-coverage given, but "
+                  "--diginorm not specified.")
         sys.exit(1)
 
     if args.diginorm and args.single_pass:
-        print("Error: --diginorm and --single-pass are incompatible!\n"
-              "You probably want to use normalize-by-median.py instead.",
-              file=sys.stderr)
+        log_error("Error: --diginorm and --single-pass are incompatible!\n"
+                  "You probably want to use normalize-by-median.py instead.")
         sys.exit(1)
 
     ###
@@ -364,21 +364,21 @@ def main():
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
        and not args.output:
-        print("Accepting input from stdin; output filename must "
-              "be provided with -o.", file=sys.stderr)
+        log_error("Accepting input from stdin; output filename must "
+                  "be provided with -o.")
         sys.exit(1)
 
     if args.loadgraph:
-        print('loading countgraph from', args.loadgraph, file=sys.stderr)
+        log_info('loading countgraph from {graph}', graph=args.loadgraph)
         ct = khmer.load_countgraph(args.loadgraph)
     else:
-        print('making countgraph', file=sys.stderr)
+        log_info('making countgraph')
         ct = khmer_args.create_countgraph(args)
 
     K = ct.ksize()
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print('created temporary directory %s; '
-          'use -T to change location' % tempdir, file=sys.stderr)
+    log_info('created temporary directory {temp};\n'
+             'use -T to change location', temp=tempdir)
 
     trimmer = Trimmer(ct, not args.variable_coverage, args.cutoff,
                       args.trim_at_coverage)
@@ -427,9 +427,11 @@ def main():
         watermark = REPORT_EVERY_N_READS
         for read in trimmer.pass1(paired_iter, pass2fp):
             if (trimmer.n_reads - n_start) > watermark:
-                print('...', filename, trimmer.n_saved,
-                      trimmer.n_reads, trimmer.n_bp,
-                      written_reads, written_bp, file=sys.stderr)
+                log_info("... {filename} {n_saved} {n_reads} {n_bp} "
+                         "{w_reads} {w_bp}", filename=filename,
+                         n_saved=trimmer.n_saved, n_reads=trimmer.n_reads,
+                         n_bp=trimmer.n_bp, w_reads=written_reads,
+                         w_bp=written_bp)
                 watermark += REPORT_EVERY_N_READS
 
             # write out the trimmed/etc sequences that AREN'T going to be
@@ -439,11 +441,9 @@ def main():
             written_reads += 1
         pass2fp.close()
 
-        print('%s: kept aside %d of %d from first pass, in %s' %
-              (filename,
-               trimmer.n_saved - save_start, trimmer.n_reads - n_start,
-               filename),
-              file=sys.stderr)
+        log_info("{filename}: kept aside {kept} of {total} from first pass",
+                 filename=filename, kept=trimmer.n_saved - save_start,
+                 total=trimmer.n_reads - n_start)
 
     # first pass goes across all the data, so record relevant stats...
     n_reads = trimmer.n_reads
@@ -463,9 +463,8 @@ def main():
 
     # go back through all the files again.
     for _, pass2filename, trimfp in pass2list:
-        print('second pass: looking at sequences kept aside in %s' %
-              pass2filename,
-              file=sys.stderr)
+        log_info('second pass: looking at sequences kept aside in {pass2}',
+                 pass2=pass2filename)
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
@@ -479,24 +478,25 @@ def main():
         watermark = REPORT_EVERY_N_READS
         for read in trimmer.pass2(paired_iter):
             if (trimmer.n_reads - n_start) > watermark:
-                print('... x 2', trimmer.n_reads - n_start,
-                      pass2filename, trimmer.n_saved,
-                      trimmer.n_reads, trimmer.n_bp,
-                      written_reads, written_bp, file=sys.stderr)
+                log_info('... x 2 {a} {b} {c} {d} {e} {f} {g}',
+                         a=trimmer.n_reads - n_start,
+                         b=pass2filename, c=trimmer.n_saved,
+                         d=trimmer.n_reads, e=trimmer.n_bp,
+                         f=written_reads, g=written_bp)
                 watermark += REPORT_EVERY_N_READS
 
             write_record(read, trimfp)
             written_reads += 1
             written_bp += len(read)
 
-        print('removing %s' % pass2filename, file=sys.stderr)
+        log_info('removing {pass2}', pass2=pass2filename)
         os.unlink(pass2filename)
 
         # if we created our own trimfps, close 'em.
         if not args.output:
             trimfp.close()
 
-    print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
+    log_info('removing temp directory & contents ({temp})', temp=tempdir)
     shutil.rmtree(tempdir)
 
     trimmed_reads = trimmer.trimmed_reads
@@ -505,39 +505,32 @@ def main():
     percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print('read %d reads, %d bp' % (n_reads, n_bp,), file=sys.stderr)
-    print('wrote %d reads, %d bp' % (written_reads, written_bp,),
-          file=sys.stderr)
-    print('looked at %d reads twice (%.2f passes)' % (save_pass2_total,
-                                                      n_passes),
-          file=sys.stderr)
-    print('removed %d reads and trimmed %d reads (%.2f%%)' %
-          (n_reads - written_reads, trimmed_reads, percent_reads_trimmed),
-          file=sys.stderr)
-    print('trimmed or removed %.2f%% of bases (%d total)' %
-          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp),
-          file=sys.stderr)
+    log_info('read {read} reads, {bp} bp', read=n_reads, bp=n_bp)
+    log_info('wrote {wr} reads, {wbp} bp', wr=written_reads, wbp=written_bp)
+    log_info('looked at {st} reads twice ({np:.2f} passes)',
+             st=save_pass2_total, np=n_passes)
+    log_info('removed {r} reads and trimmed {t} reads ({p:.2f}%)',
+             r=n_reads - written_reads, t=trimmed_reads,
+             p=percent_reads_trimmed)
+    log_info('trimmed or removed {p:.2f}%% of bases ({bp} total)',
+             p=(1 - (written_bp / float(n_bp))) * 100.0, bp=n_bp - written_bp)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - n_skipped) / n_reads
-        print('%d reads were high coverage (%.2f%%);' % (n_reads - n_skipped,
-                                                         percent_reads_hicov),
-              file=sys.stderr)
-        print('skipped %d reads/%d bases because of low coverage' %
-              (n_skipped, bp_skipped),
-              file=sys.stderr)
+        log_info('{n} reads were high coverage ({p:.2f}%);',
+                 n=n_reads - n_skipped, p=percent_reads_hicov)
+        log_info('skipped {r} reads/{bp} bases because of low coverage',
+                 r=n_skipped, bp=bp_skipped)
 
     fp_rate = \
         khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
-    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
-          file=sys.stderr)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    print('output in *.abundtrim', file=sys.stderr)
+    log_info('output in *.abundtrim')
 
     if args.savegraph:
-        print("Saving k-mer countgraph to",
-              args.savegraph, file=sys.stderr)
+        log_info("Saving k-mer countgraph to {graph}", graph=args.savegraph)
         ct.save(args.savegraph)
 
 

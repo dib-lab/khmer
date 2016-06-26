@@ -175,7 +175,7 @@ def main():
     with open(info_filename, 'a') as info_fp:
         print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
-    log_info('saving {base}}', base=base)
+    log_info('saving {base}', base=base)
     countgraph.save(base)
 
     # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
@@ -213,7 +213,7 @@ def main():
                 ]
                 mr_fh.write("\t".join(vals) + "\n")
 
-    log_info('fp rate estimated to be {fpr:%1.3f}', fpr=fp_rate)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     log_info('DONE.')
     log_info('wrote to: {filename}', filename=info_filename)

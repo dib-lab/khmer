@@ -3042,6 +3042,7 @@ def test_trim_low_abund_diginorm_coverage_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --diginorm-coverage given, but --diginorm not specified.' \
            in err, err
@@ -3072,6 +3073,7 @@ def test_trim_low_abund_varcov_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --trim-at-coverage/-Z given' in err, err
 
@@ -3086,6 +3088,20 @@ def test_trim_low_abund_single_pass():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
     assert status == 0
+
+
+def test_trim_low_abund_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    args = ["-q", "-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+    assert len(out) == 0
+    assert len(err) == 0
 
 
 def test_trim_low_abund_reporting():
