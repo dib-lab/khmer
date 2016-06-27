@@ -1,3 +1,8 @@
+2016-06-27  Titus Brown  <titus@idyll.org>
+
+   * doc/requirements.txt: updated sphinx-autoprogram requirement for building
+   documentation, to point at released version.
+
 2016-06-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
