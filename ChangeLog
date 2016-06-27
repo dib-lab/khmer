@@ -6,8 +6,10 @@
    * lib/kmer_hash.cc: minor change to use object member _seq instead of
    constructor argument seq in KmerIterator.
    * lib/kmer_hash.hh: added const to Kmer::get_string_rep(...) signature.
-   * sandbox/{extract-compact-dbg.py, graph_writer.py}: new sandbox script to
-   extract compact De Bruijn graphs (that contract linear paths).
+   * sandbox/extract-compact-dbg.py: new sandbox script to
+   extract compact De Bruijn graphs (with linear paths contracted).
+   * tests/test_sandbox_scripts.py: added tests for the extract-compact-dbg.py
+   script.
 
 2016-05-25  Titus Brown  <titus@idyll.org>
 
