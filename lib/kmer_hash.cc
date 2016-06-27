@@ -40,7 +40,6 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
-#include <iostream>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"

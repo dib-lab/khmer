@@ -1,3 +1,16 @@
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
+   tests/test-data/simple-genome.fa, tests/test_nodegraph.py: added functions
+   'find_high_degree_nodes' and 'traverse_linear_path' to hashtables/graphs.
+   * lib/kmer_hash.cc: minor change to use object member _seq instead of
+   constructor argument seq in KmerIterator.
+   * lib/kmer_hash.hh: added const to Kmer::get_string_rep(...) signature.
+   * sandbox/extract-compact-dbg.py: new sandbox script to
+   extract compact De Bruijn graphs (with linear paths contracted).
+   * tests/test_sandbox_scripts.py: added tests for the extract-compact-dbg.py
+   script.
+
 2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to

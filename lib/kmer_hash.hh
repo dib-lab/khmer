@@ -133,6 +133,7 @@ int _hash_murmur32(const std::string& kmer);
  */
 class Kmer
 {
+
 public:
 
     /// The forward hash
@@ -210,7 +211,7 @@ public:
  *
  * Contact: camille.scott.w@gmail.com
  *
-*/
+ */
 class KmerFactory
 {
 protected:
