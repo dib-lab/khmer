@@ -1026,10 +1026,6 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
 {
     unsigned int size = 0;
 
-    auto filter = [&] (Kmer& n) -> bool {
-        return true;
-    };
-
     Traverser traverser(this);
 
     // if this k-mer is in the Bloom filter, truncate search.
@@ -1049,7 +1045,7 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
         size += 1;
 
         KmerQueue node_q;
-        traverser.traverse(kmer, node_q, filter);
+        traverser.traverse(kmer, node_q);
 
         while (node_q.size()) {
             Kmer node = node_q.front();
