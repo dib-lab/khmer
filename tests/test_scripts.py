@@ -331,6 +331,29 @@ def test_load_into_counting_bad_summary_fmt():
     assert "invalid choice: 'badfmt'" in err, err
 
 
+def test_load_into_counting_info_version():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    with open(info_file) as info_fp:
+        versionline = info_fp.readline()
+    version = versionline.split(':')[1].strip()
+    assert versionline.startswith('khmer version:'), versionline
+    assert version == khmer.__version__, version
+
+
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = 'load-into-counting.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]

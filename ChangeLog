@@ -144,6 +144,10 @@
    * doc/dev/coding-guidelines-and-review.rst: update developer docs with
    compensatory changes
 
+2016-02-15  Kevin Murray <spam@kdmurray.id.au>
+
+   * scripts/load-into-counting.py: Insert khmer's version into .info files
+
 2015-08-14  Luiz Irber  <khmer@luizirber.org>
 
    * lib/subset.cc: check iterator before decrementing in
