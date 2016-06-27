@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -88,6 +88,10 @@ def get_parser():
     parser.add_argument('--savegraph', metavar="filename", default='',
                         help="If present, the name of the file to save the "
                         "k-mer countgraph to")
+    parser.add_argument('-o', '--outfile', metavar='optional_output_filename',
+                        default=None, help='Override default output filename '
+                        'and output trimmed sequences into a file with the '
+                        'given filename.')
     parser.add_argument('datafile', metavar='input_sequence_filename',
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -153,14 +157,17 @@ def main():
 
     # the filtering loop
     print('filtering', args.datafile, file=sys.stderr)
-    outfile = os.path.basename(args.datafile) + '.abundfilt'
-    outfile = open(outfile, 'wb')
-    outfp = get_file_writer(outfile, args.gzip, args.bzip)
+    if args.outfile is None:
+        outfile = os.path.basename(args.datafile) + '.abundfilt'
+    else:
+        outfile = args.outfile
+    outfp = open(outfile, 'wb')
+    outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print('output in', outfile.name, file=sys.stderr)
+    print('output in', outfile, file=sys.stderr)
 
     if args.savegraph:
         print('Saving k-mer countgraph filename',

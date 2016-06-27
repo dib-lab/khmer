@@ -1,3 +1,48 @@
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
+   tests/test-data/simple-genome.fa, tests/test_nodegraph.py: added functions
+   'find_high_degree_nodes' and 'traverse_linear_path' to hashtables/graphs.
+   * lib/kmer_hash.cc: minor change to use object member _seq instead of
+   constructor argument seq in KmerIterator.
+   * lib/kmer_hash.hh: added const to Kmer::get_string_rep(...) signature.
+   * sandbox/extract-compact-dbg.py: new sandbox script to
+   extract compact De Bruijn graphs (with linear paths contracted).
+   * tests/test_sandbox_scripts.py: added tests for the extract-compact-dbg.py
+   script.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * lib/khmer.hh,lib/{labelhash.cc,labelhash.hh}: removed label pointer-based
+   indirection from labelhash code.
+   * khmer/_khmer.cc: updated CPython API to match new behavior.
+   * tests/test_labelhash.py: renamed to match new API; no changes in test
+   logic.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * scripts/filter-abund-single.py: add -o/--outfile option.
+   * tests/test_script_output.py: move `_calc_md5` function for calculating
+   file MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+   * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+   dedicated test script, add minimal test for new -o option.
+   * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+   new test.
+   * .gitignore: add .cache/ directory, which appears to be an artifact of the
+   py.test framework.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+  * scripts/filter-abund-single.py: add -o/--outfile option.
+  * tests/test_script_output.py: move `_calc_md5` function for calculating file
+  MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+  * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+  dedicated test script, add minimal test for new -o option.
+  * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+  new test.
+  * .gitignore: add .cache/ directory, which appears to be an artifact of the
+  py.test framework.
+
 2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to
