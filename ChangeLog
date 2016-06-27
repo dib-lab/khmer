@@ -209,6 +209,13 @@
    * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
    and fix for close of --output file after first input file.
 
+2015-10-19  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * versioneer.py,khmer/_version.py,setup.py,setup.cfg: upgrade Versioneer to
+   version 0.15+dev, Mon Jun 29 2015 99d5d9341830945f7080537ddd3bbd79c4aa1732
+   * doc/conf.py, lib/Makefile: update method of retrieving current version
+   * lib/get_version.py: no longer needed, removed
+
 2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * lib/magic: add file extensions, one media type, and a better comment
