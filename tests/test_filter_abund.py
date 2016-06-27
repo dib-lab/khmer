@@ -408,21 +408,6 @@ def test_filter_abund_1_quiet():
 
     assert os.path.exists(outfile), outfile
 
-    seqs = set([r.sequence for r in screed.open(outfile)])
-
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-    args = [n_counting_ht, n_infile]
-    utils.runscript(script, args, n_in_dir)
-
-    seqs = set([r.sequence for r in screed.open(n_infile)])
-    assert os.path.exists(n_outfile), n_outfile
-
-    args = [n_counting_ht, n_infile, '-o', n_outfile2]
-    utils.runscript(script, args, in_dir)
-    assert os.path.exists(n_outfile2), n_outfile2
-
 
 def test_filter_abund_1_singlefile_quiet():
     infile = utils.get_temp_filename('test.fa')
@@ -438,7 +423,3 @@ def test_filter_abund_1_singlefile_quiet():
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
