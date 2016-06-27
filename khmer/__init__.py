@@ -33,7 +33,7 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=too-few-public-methods,no-init,missing-docstring
-"""This is khmer; please see http://khmer.readthedocs.org/."""
+"""This is khmer; please see http://khmer.readthedocs.io/."""
 
 
 from __future__ import print_function

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -108,7 +108,7 @@ def main():
     parser = get_parser()
     parser.epilog = parser.epilog.replace(
         ":doc:`partitioning-big-data`",
-        "http://khmer.readthedocs.org/en/stable/user/"
+        "http://khmer.readthedocs.io/en/stable/user/"
         "partitioning-big-data.html"
     )
     args = sanitize_help(parser).parse_args()

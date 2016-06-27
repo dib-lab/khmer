@@ -1,7 +1,7 @@
 # vim: set encoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -492,7 +492,7 @@ def info(scriptname, algorithm_list=None):
         except UnicodeEncodeError:
             log_info(algstr.encode(sys.getfilesystemencoding(), 'replace'))
 
-    log_info("||\n|| Please see http://khmer.readthedocs.org/en/"
+    log_info("||\n|| Please see http://khmer.readthedocs.io/en/"
              "latest/citations.html for details.\n")
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

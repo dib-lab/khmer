@@ -60,3 +60,4 @@ pep257_report.txt
 *.png
 *.txt
 *.mhi_sweep
+.cache/
