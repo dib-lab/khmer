@@ -306,9 +306,12 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-    info('normalize-by-median.py', ['diginorm'])
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
+
+    if not args.quiet:
+        info('normalize-by-median.py', ['diginorm'])
+
     configure_logging(args.quiet)
     report_on_config(args)
 

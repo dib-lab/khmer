@@ -41,6 +41,7 @@ import threading
 import sys
 import screed
 from khmer.utils import write_record, check_is_pair
+from khmer.khmer_logger import log_info
 # stdlib queue module was renamed on Python 3
 try:
     import queue
@@ -56,7 +57,7 @@ def verbose_loader(filename):
     screed_iter = screed.open(filename)
     for num, record in enumerate(screed_iter):
         if num % 100000 == 0:
-            print('... filtering', num, file=sys.stderr)
+            log_info('... filtering {num}', num=num)
         yield record
 
 verbose_fasta_iter = verbose_loader  # pylint: disable=invalid-name

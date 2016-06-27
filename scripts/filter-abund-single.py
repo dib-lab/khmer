@@ -60,6 +60,9 @@ from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
                          get_file_writer)
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
+
 
 DEFAULT_CUTOFF = 2
 
@@ -96,14 +99,18 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('filter-abund-single.py', ['counting', 'SeqAn'])
 
+    configure_logging(args.quiet)
     check_input_files(args.datafile, args.force)
     check_space([args.datafile], args.force)
 
@@ -113,13 +120,13 @@ def main():
 
     report_on_config(args)
 
-    print('making countgraph', file=sys.stderr)
+    log_info('making countgraph')
     graph = khmer_args.create_countgraph(args)
 
     # first, load reads into graph
     rparser = khmer.ReadParser(args.datafile)
     threads = []
-    print('consuming input, round 1 --', args.datafile, file=sys.stderr)
+    log_info('consuming input, round 1 -- {datafile}', datafile=args.datafile)
     for _ in range(args.threads):
         cur_thread = \
             threading.Thread(
@@ -132,11 +139,10 @@ def main():
     for _ in threads:
         _.join()
 
-    print('Total number of unique k-mers: {0}'.format(
-        graph.n_unique_kmers()), file=sys.stderr)
+    log_info('Total number of unique k-mers: {nk}', nk=graph.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(graph, args.force)
-    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     # now, trim.
 
@@ -156,7 +162,7 @@ def main():
         return None, None
 
     # the filtering loop
-    print('filtering', args.datafile, file=sys.stderr)
+    log_info('filtering {datafile}', datafile=args.datafile)
     if args.outfile is None:
         outfile = os.path.basename(args.datafile) + '.abundfilt'
     else:
@@ -164,14 +170,14 @@ def main():
     outfp = open(outfile, 'wb')
     outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    tsp = ThreadedSequenceProcessor(process_fn)
+    tsp = ThreadedSequenceProcessor(process_fn, verbose=not args.quiet)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print('output in', outfile, file=sys.stderr)
+    log_info('output in {outfile}', outfile=outfile)
 
     if args.savegraph:
-        print('Saving k-mer countgraph filename',
-              args.savegraph, file=sys.stderr)
+        log_info('Saving k-mer countgraph filename {graph}',
+                 graph=args.savegraph)
         graph.save(args.savegraph)
 
 if __name__ == '__main__':

@@ -241,6 +241,23 @@ def test_n_occupied_2():  # simple one
     assert nodegraph.n_occupied() == 2, nodegraph.n_occupied()
 
 
+def test_n_occupied_2_add_is_count():  # 'add' synonym for 'count'
+    ksize = 4
+
+    nodegraph = khmer._Nodegraph(ksize, [11])
+    nodegraph.add('AAAA')  # 00 00 00 00 = 0
+    assert nodegraph.n_occupied() == 1
+
+    nodegraph.add('ACTG')  # 00 10 01 11 =
+    assert nodegraph.n_occupied() == 2
+
+    nodegraph.add('AACG')  # 00 00 10 11 = 11  # collision 1
+
+    assert nodegraph.n_occupied() == 2
+    nodegraph.add('AGAC')   # 00  11 00 10 # collision 2
+    assert nodegraph.n_occupied() == 2, nodegraph.n_occupied()
+
+
 def test_bloom_c_2():  # simple one
     ksize = 4
 
