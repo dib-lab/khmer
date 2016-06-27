@@ -331,6 +331,29 @@ def test_load_into_counting_bad_summary_fmt():
     assert "invalid choice: 'badfmt'" in err, err
 
 
+def test_load_into_counting_info_version():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    with open(info_file) as info_fp:
+        versionline = info_fp.readline()
+    version = versionline.split(':')[1].strip()
+    assert versionline.startswith('khmer version:'), versionline
+    assert version == khmer.__version__, version
+
+
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = 'load-into-counting.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
@@ -2941,6 +2964,19 @@ def test_trim_low_abund_single_pass():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
     assert status == 0
+
+
+def test_trim_low_abund_reporting():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    args = ["-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+    assert '11157 11161 848236 2 152' in err
 
 
 def test_roundtrip_casava_format_1():
