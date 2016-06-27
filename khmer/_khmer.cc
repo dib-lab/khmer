@@ -1425,6 +1425,33 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    SeenSet * hashes = new SeenSet;
+    hashtable->find_high_degree_nodes(long_str, *hashes);
+
+    khmer_HashSet_Object * o;
+    o = create_HashSet_Object(hashes, hashtable->ksize());
+
+    return (PyObject *) o;
+}
+
+static
+PyObject *
 hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1458,6 +1485,46 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     return x;
+}
+
+static
+PyObject *
+hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o;
+    khmer_HashSet_Object * hdn_o;
+
+    if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
+                          &khmer_HashSet_Type, &hdn_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    SeenSet * adj = new SeenSet;
+    SeenSet * visited = new SeenSet;
+    unsigned int size = hashtable->traverse_linear_path(start_kmer,
+                                                        *adj, *visited,
+                                                        *nodegraph_o->hashbits,
+                                                        *hdn_o->hashes);
+
+    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
+                                                         hashtable->ksize());
+    khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
+                                                           hashtable->ksize());
+
+    PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
+                                   (PyObject *) adj_o, (PyObject *) visited_o);
+    Py_DECREF(adj_o);
+    Py_DECREF(visited_o);
+
+    return ret;
 }
 
 static
@@ -1614,8 +1681,8 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-        PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                                                          hashtable->ksize());
+    PyObject * x = (PyObject *) create_HashSet_Object(tags,
+                                                      hashtable->ksize());
     return x;
 }
 
@@ -2866,6 +2933,20 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "count_kmers_within_radius",
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
+    },
+
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "Examine the given sequence for degree > 2 nodes and add to  "
+        "list; used in graph contraction.",
+    },
+    {
+        "traverse_linear_path",
+        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
+        "Traverse the path through the graph starting with the given "
+        "k-mer and avoiding high-degree nodes, finding (and returning) "
+        "traversed k-mers and any encountered high-degree nodes.",
     },
 
     //
