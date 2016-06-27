@@ -3841,24 +3841,23 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
 
 static
 PyObject *
-labelhash_get_label_dict(khmer_KGraphLabels_Object * me, PyObject * args)
+labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * hb = me->labelhash;
 
-    PyObject * d = PyDict_New();
+    PyObject * d = PyList_New(hb->all_labels.size());
     if (d == NULL) {
         return NULL;
     }
-    LabelPtrMap::iterator it;
+    LabelSet::iterator it;
 
-    for (it = hb->label_ptrs.begin(); it != hb->label_ptrs.end(); ++it) {
-        PyObject * key = Py_BuildValue("K", it->first);
-        PyObject * val = Py_BuildValue("K", it->second);
-        if (key != NULL && val != NULL) {
-            PyDict_SetItem(d, key, val);
+    unsigned long long i = 0;
+    for (it = hb->all_labels.begin(); it != hb->all_labels.end(); ++it) {
+        PyObject * val = Py_BuildValue("K", *it);
+        if (val != NULL) {
+            PyList_SetItem(d, i, val);
         }
-        Py_XDECREF(key);
-        Py_XDECREF(val);
+        i++;
     }
 
     return d;
@@ -3948,9 +3947,8 @@ labelhash_consume_sequence_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         return NULL;
     }
     unsigned long long n_consumed = 0;
-    Label * the_label = hb->check_and_allocate_label(c);
 
-    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
+    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, c);
     return Py_BuildValue("K", n_consumed);
 }
 
@@ -3992,8 +3990,8 @@ labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
-    LabelPtrSet found_labels;
+    //std::pair<TagLabelPair::iterator, TagLabelPair::iterator> ret;
+    LabelSet found_labels;
 
     //unsigned int num_traversed = 0;
     //Py_BEGIN_ALLOW_THREADS
@@ -4004,10 +4002,10 @@ labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
     //printf("...%u kmers traversed\n", num_traversed);
 
     PyObject * x =  PyList_New(found_labels.size());
-    LabelPtrSet::const_iterator si;
+    LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = found_labels.begin(); si != found_labels.end(); ++si) {
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }
 
@@ -4084,16 +4082,16 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
         return NULL;
     }
 
-    LabelPtrSet labels;
+    LabelSet labels;
 
     labels = labelhash->get_tag_labels(tag);
 
     PyObject * x =  PyList_New(labels.size());
-    LabelPtrSet::const_iterator si;
+    LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = labels.begin(); si != labels.end(); ++si) {
         //std::string kmer_s = _revhash(*si, labelhash->ksize());
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }
 
@@ -4163,7 +4161,7 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"get_tag_labels", (PyCFunction)labelhash_get_tag_labels, METH_VARARGS, ""},
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
-    {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
+    {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
