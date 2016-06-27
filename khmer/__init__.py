@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,7 +32,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-"""This is khmer; please see http://khmer.readthedocs.org/."""
+# pylint: disable=too-few-public-methods,no-init,missing-docstring
+"""This is khmer; please see http://khmer.readthedocs.io/."""
 
 
 from __future__ import print_function
@@ -44,7 +45,7 @@ from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-
+from khmer._khmer import HashSet
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
 
@@ -177,7 +178,7 @@ def extract_countgraph_info(filename):
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):
-    """Do a quick & dirty expected collision rate calculation on a graph
+    """Do a quick & dirty expected collision rate calculation on a graph.
 
     Also check to see that collision rate is within threshold.
 
@@ -266,41 +267,40 @@ class Countgraph(_Countgraph):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        c = _Countgraph.__new__(cls, k, primes)
-        c.primes = primes
-        return c
+        countgraph = _Countgraph.__new__(cls, k, primes)
+        countgraph.primes = primes
+        return countgraph
 
 
 class GraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
-        hb = Nodegraph(k, starting_size, n_tables)
-        c = _GraphLabels.__new__(cls, hb)
-        c.graph = hb
-        return c
+        nodegraph = Nodegraph(k, starting_size, n_tables)
+        graphlabels = _GraphLabels.__new__(cls, nodegraph)
+        graphlabels.graph = nodegraph
+        return graphlabels
 
 
 class CountingGraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        hb = _Countgraph(k, primes)
-        c = _GraphLabels.__new__(cls, hb)
-        c.graph = hb
-        return c
+        countgraph = _Countgraph(k, primes)
+        class_ = _GraphLabels.__new__(cls, countgraph)
+        class_.graph = countgraph
+        return class_
 
 
 class Nodegraph(_Nodegraph):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
-        c = _Nodegraph.__new__(cls, k, primes)
-        c.primes = primes
-        return c
+        nodegraph = _Nodegraph.__new__(cls, k, primes)
+        nodegraph.primes = primes
+        return nodegraph
 
 
 class HLLCounter(_HLLCounter):
-
     """HyperLogLog counter.
 
     A HyperLogLog counter is a probabilistic data structure specialized on
@@ -318,11 +318,11 @@ class HLLCounter(_HLLCounter):
     """
 
     def __len__(self):
-        return self.estimate_cardinality()
+        """Return the cardinality estimate."""
+        return _HLLCounter.estimate_cardinality(self)
 
 
 class ReadAligner(_ReadAligner):
-
     """Sequence to graph aligner.
 
     ReadAligner uses a Countgraph (the counts of k-mers in the target DNA
@@ -373,15 +373,15 @@ class ReadAligner(_ReadAligner):
             else:
                 transition_probabilities = \
                     ReadAligner.defaultTransitionProbabilities
-        r = _ReadAligner.__new__(cls, count_graph, trusted_cov_cutoff,
-                                 bits_theta, scoring_matrix,
-                                 transition_probabilities)
-        r.graph = count_graph
-        return r
+        readaligner = _ReadAligner.__new__(
+            cls, count_graph, trusted_cov_cutoff, bits_theta, scoring_matrix,
+            transition_probabilities)
+        readaligner.graph = count_graph
+        return readaligner
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        ReadAligner initialization.
+        Initialize ReadAligner.
 
         HMM state notation abbreviations:
         M_t - trusted match; M_u - untrusted match
@@ -391,7 +391,7 @@ class ReadAligner(_ReadAligner):
         Keyword arguments:
         filename - a path to a JSON encoded file providing the scoring matrix
             for the HMM in an entry named 'scoring_matrix' and the transition
-            probababilties for the HMM in an entry named
+            probabilities for the HMM in an entry named
             'transition_probabilities'. If provided the remaining keyword
             arguments are ignored. (default: None)
         scoring_matrix - a list of floats: trusted match, trusted mismatch,

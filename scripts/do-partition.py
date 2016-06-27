@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -46,17 +46,16 @@ from __future__ import print_function
 import khmer
 import sys
 import threading
-import gc
 import os.path
 import os
+import gc
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
                               add_threading_args, sanitize_help)
 import glob
 from khmer.kfile import check_input_files, check_space
-import re
-import platform
+from oxli.partition import worker
 
 # stdlib queue module was renamed on Python 3
 try:
@@ -67,32 +66,6 @@ except ImportError:
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
-
-
-def worker(tasks, basename, stop_big_traversals):
-    while True:
-        try:
-            (nodegraph, index, start, stop) = tasks.get(False)
-        except queue.Empty:
-            print('exiting', file=sys.stderr)
-            return
-
-        outfile = basename + '.subset.%d.pmap' % (index,)
-        if os.path.exists(outfile):
-            print('SKIPPING', outfile, ' -- already exists', file=sys.stderr)
-            continue
-
-        print('starting:', basename, index, file=sys.stderr)
-
-        # pay attention to stoptags when partitioning; take command line
-        # direction on whether or not to exhaustively traverse.
-        subset = nodegraph.do_subset_partition(start, stop, True,
-                                               stop_big_traversals)
-
-        print('saving:', basename, index, file=sys.stderr)
-        nodegraph.save_subset_partitionmap(subset, outfile)
-        del subset
-        gc.collect()
 
 
 def get_parser():
@@ -185,6 +158,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     # divide the tags up into subsets
     divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -259,4 +233,5 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

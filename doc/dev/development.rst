@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2012-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 Development miscellany
@@ -144,12 +144,12 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-``khmer/_khmermodule.cc``
+``khmer/_khmer.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.
 
-https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
+https://gcc-python-plugin.readthedocs.io/en/latest/cpychecker.html
 
 Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev
 package
@@ -168,13 +168,13 @@ Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 
 Warnings to address: ::
 
-        khmer/_khmermodule.cc:3109:1: note: this function is too complicated
+        khmer/_khmer.cc:3109:1: note: this function is too complicated
         for the reference-count checker to fully analyze: not all paths were
         analyzed
 
 Adjust --maxtrans and re-run. ::
 
-	khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
+	khmer/_khmer.cc:2191:61: warning: Mismatching type in call to
 	Py_BuildValue with format code "i" [enabled by default]
 	  argument 2 ("D.68937") had type
 	    "long long unsigned int"
@@ -183,7 +183,7 @@ Adjust --maxtrans and re-run. ::
 	  for format code "i"
 
 See below for a format string cheat sheet One also benefits by matching C type
-with the function signature used later. 
+with the function signature used later.
 
 "I" for unsigned int
 "K" for unsigned long long a.k.a khmer::HashIntoType.

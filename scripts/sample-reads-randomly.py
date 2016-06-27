@@ -118,8 +118,8 @@ def main():
         "http://en.wikipedia.org/wiki/Reservoir_sampling")
     args = sanitize_help(parser).parse_args()
 
-    for _ in args.filenames:
-        check_input_files(_, args.force)
+    for name in args.filenames:
+        check_input_files(name, args.force)
 
     # seed the random number generator?
     if args.random_seed:
@@ -163,7 +163,7 @@ def main():
         print('', file=sys.stderr)
 
     reads = []
-    for n in range(num_samples):
+    for _ in range(num_samples):
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
@@ -171,9 +171,8 @@ def main():
         print('opening', filename, 'for reading', file=sys.stderr)
         screed_iter = screed.open(filename)
 
-        for count, (_, ispair, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                screed_iter,
-                force_single=args.force_single)):
+        for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
+                screed_iter, force_single=args.force_single)):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
@@ -183,10 +182,11 @@ def main():
 
             # collect first N reads
             if count < args.num_reads:
-                for n in range(num_samples):
-                    reads[n].append((rcrd1, rcrd2))
+                for sample in range(num_samples):
+                    reads[sample].append((rcrd1, rcrd2))
             else:
-                assert len(reads[n]) <= count
+                for sample in range(num_samples):
+                    assert len(reads[sample]) <= count
 
                 # use reservoir sampling to replace reads at random
                 # see http://en.wikipedia.org/wiki/Reservoir_sampling

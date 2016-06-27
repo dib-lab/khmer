@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -128,24 +128,6 @@ protected:
             bitmask = (bitmask << 2) | 3;
         }
         _nbits_sub_1 = (_ksize*2 - 2);
-    }
-
-    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
-    {
-        // left-shift the previous hash over
-        h = h << 2;
-
-        // 'or' in the current nt
-        h |= twobit_repr(ch);
-
-        // mask off the 2 bits we shifted over.
-        h &= bitmask;
-
-        // now handle reverse complement
-        r = r >> 2;
-        r |= (twobit_comp(ch) << _nbits_sub_1);
-
-        return uniqify_rc(h, r);
     }
 
     void _clear_all_partitions()
@@ -298,15 +280,6 @@ public:
                                   SeenSet * new_tags = 0);
 
 
-    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
-            unsigned int &total_reads,
-            unsigned long long &n_consumed);
-    void consume_fasta_and_traverse(const std::string &filename,
-                                    unsigned int distance,
-                                    unsigned int big_threshold,
-                                    unsigned int transfer_threshold,
-                                    CountingHash &counting);
-
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
@@ -317,15 +290,7 @@ public:
     virtual std::vector<HashIntoType> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
 
-    void filter_if_present(const std::string &infilename,
-                           const std::string &outputfilename);
-
     size_t trim_on_stoptags(std::string sequence) const;
-
-    void traverse_from_tags(unsigned int distance,
-                            unsigned int threshold,
-                            unsigned int num_high_todo,
-                            CountingHash &counting);
 
     unsigned int traverse_from_kmer(Kmer start,
                                     unsigned int radius,
@@ -333,18 +298,10 @@ public:
                                     unsigned int max_count = MAX_KEEPER_SIZE)
     const;
 
-    unsigned int count_and_transfer_to_stoptags(KmerSet &keeper,
-            unsigned int threshold,
-            CountingHash &counting);
-
     virtual void print_tagset(std::string);
     virtual void print_stop_tags(std::string);
     virtual void save_stop_tags(std::string);
     void load_stop_tags(std::string filename, bool clear_tags=true);
-
-    void identify_stop_tags_by_position(std::string sequence,
-                                        std::vector<unsigned int> &posns)
-    const;
 
     void extract_unique_paths(std::string seq,
                               unsigned int min_length,
@@ -374,6 +331,14 @@ public:
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
+
+    //
+    void find_high_degree_nodes(const char * sequence,
+                                SeenSet& high_degree_nodes) const;
+    unsigned int traverse_linear_path(const Kmer start_kmer,
+                                      SeenSet &adjacencies,
+                                      SeenSet &nodes, Hashtable& bf,
+                                      SeenSet &high_degree_nodes) const;
 };
 }
 

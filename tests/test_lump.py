@@ -32,13 +32,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,no-member,protected-access,invalid-name
 from __future__ import absolute_import
+
 import khmer
-import screed
 
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
 # which the last 79 bases are common between the 3 sequences.
@@ -53,7 +52,7 @@ def test_fakelump_together():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
 # try loading stop tags from previously saved
@@ -72,7 +71,7 @@ def test_fakelump_stop():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # check specific insertion of stop tag
@@ -89,7 +88,7 @@ def test_fakelump_stop2():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # try repartitioning
@@ -105,7 +104,7 @@ def test_fakelump_repartitioning():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once
@@ -134,7 +133,7 @@ def test_fakelump_repartitioning():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 6, n_partitions
 
 
@@ -148,7 +147,7 @@ def test_fakelump_load_stop_tags_trunc():
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once
