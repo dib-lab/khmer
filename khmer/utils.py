@@ -1,12 +1,39 @@
-from __future__ import print_function, unicode_literals
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# Convenience functions for performing common argument-checking tasks in
-# scripts.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+"""Helpful methods for performing common argument-checking tasks in scripts."""
+from __future__ import print_function, unicode_literals
 
 
 def print_error(msg):
@@ -107,10 +134,12 @@ def check_is_right(name):
 
 
 class UnpairedReadsError(ValueError):
+    """ValueError with refs to the read pair in question."""
+
     def __init__(self, msg, r1, r2):
-        super(ValueError, self).__init__(msg)
-        self.r1 = r1
-        self.r2 = r2
+        ValueError.__init__(self, msg)
+        self.read1 = r1
+        self.read2 = r2
 
 
 def broken_paired_reader(screed_iter, min_length=None,
@@ -140,7 +169,7 @@ def broken_paired_reader(screed_iter, min_length=None,
     """
     record = None
     prev_record = None
-    n = 0
+    num = 0
 
     if force_single and require_paired:
         raise ValueError("force_single and require_paired cannot both be set!")
@@ -154,16 +183,17 @@ def broken_paired_reader(screed_iter, min_length=None,
 
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
-                yield n, True, prev_record, record  # it's a pair!
-                n += 2
+                yield num, True, prev_record, record  # it's a pair!
+                num += 2
                 record = None
             else:                                   # orphan.
                 if require_paired:
-                    e = UnpairedReadsError("Unpaired reads when require_paired"
-                                           " is set!", prev_record, record)
-                    raise e
-                yield n, False, prev_record, None
-                n += 1
+                    err = UnpairedReadsError(
+                        "Unpaired reads when require_paired is set!",
+                        prev_record, record)
+                    raise err
+                yield num, False, prev_record, None
+                num += 1
 
         prev_record = record
         record = None
@@ -173,7 +203,7 @@ def broken_paired_reader(screed_iter, min_length=None,
         if require_paired:
             raise UnpairedReadsError("Unpaired reads when require_paired "
                                      "is set!", prev_record, None)
-        yield n, False, prev_record, None
+        yield num, False, prev_record, None
 
 
 def write_record(record, fileobj):
@@ -202,4 +232,5 @@ def write_record_pair(read1, read2, fileobj):
     write_record(read2, fileobj)
 
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

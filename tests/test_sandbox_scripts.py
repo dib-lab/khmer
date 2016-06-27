@@ -1,9 +1,37 @@
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2014-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
@@ -17,13 +45,12 @@ import os.path
 import shutil
 from io import StringIO
 import traceback
-import nose
-from nose.plugins.attrib import attr
 import glob
 import imp
 
+import pytest
+
 from . import khmer_tst_utils as utils
-import khmer
 import screed
 from .test_scripts import _make_counting
 
@@ -39,7 +66,7 @@ def teardown():
 def test_import_all():
     sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
     if not os.path.exists(sandbox_path):
-        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+        pytest.skip("sandbox scripts are only tested in a repository")
 
     path = os.path.join(sandbox_path, "*.py")
     scripts = glob.glob(path)
@@ -48,7 +75,7 @@ def test_import_all():
         yield _checkImportSucceeds('test_sandbox_scripts.py', s)
 
 
-class _checkImportSucceeds(object):
+class _checkImportSucceeds(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, tag, filename):
         self.tag = tag
@@ -75,14 +102,14 @@ class _checkImportSucceeds(object):
         try:
             try:
                 global_dict = {'__name__': '__main__'}
-                exec(
+                exec(  # pylint: disable=exec-used
                     compile(open(self.filename).read(), self.filename, 'exec'),
                     global_dict)
             except (ImportError, SyntaxError) as err:
                 print("{0}".format(err))
                 raise AssertionError("%s cannot be exec'd" % (self.filename),
                                      "{0}".format(traceback))
-            except:
+            except:  # pylint: disable=bare-except
                 pass                        # other failures are expected :)
         finally:
             sys.argv = oldargs
@@ -299,3 +326,16 @@ def test_multirename_fasta():
     _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
     r = open(infile2).read()
     assert r in out
+
+
+def test_extract_compact_dbg_1():
+    infile = utils.get_test_data('simple-genome.fa')
+    outfile = utils.get_temp_filename('out.gml')
+    args = ['-x', '1e4', '-o', outfile, infile]
+    _, out, err = utils.runscript('extract-compact-dbg.py', args, sandbox=True)
+
+    print(out)
+    print(err)
+    assert os.path.exists(outfile)
+
+    assert '174 segments, containing 2803 nodes' in out

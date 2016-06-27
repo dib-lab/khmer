@@ -1,10 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2013-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef LABELHASH_HH
 #define LABELHASH_HH
 
@@ -36,14 +66,14 @@ class LabelHash
 {
 protected:
     // Does the given tag already have the given label?
-    bool _cmap_contains_label(const TagLabelPtrMap& cmap,
-                              HashIntoType& kmer,
-                              Label& the_label)
+    bool _cmap_contains_label(const TagLabelMap& cmap,
+                              const HashIntoType kmer,
+                              const Label the_label)
     {
-        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
+        std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
         ret = cmap.equal_range(kmer);
-        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            if (*(it->second) == the_label) {
+        for (TagLabelMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            if (it->second == the_label) {
                 return true;
             }
         }
@@ -65,14 +95,14 @@ protected:
         return false;
     }
 
-    unsigned int _get_tag_labels(const HashIntoType& tag,
-                                 const TagLabelPtrMap& cmap,
-                                 LabelPtrSet& found_labels)
+    unsigned int _get_tag_labels(const HashIntoType tag,
+                                 const TagLabelMap cmap,
+                                 LabelSet& found_labels)
     {
         unsigned int num_labels = 0;
-        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
+        std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
         ret = cmap.equal_range(tag);
-        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+        for (TagLabelMap::const_iterator it=ret.first; it!=ret.second; ++it) {
             found_labels.insert(it->second);
             ++num_labels;
         }
@@ -106,27 +136,16 @@ public:
 
     ~LabelHash();
 
-    TagLabelPtrMap tag_labels;
-    LabelTagMap label_tag_ptrs;
-    LabelPtrMap label_ptrs;
+    TagLabelMap tag_labels;
+    LabelTagMap label_tag;
+    LabelSet all_labels;
 
     size_t n_labels() const
     {
-        return label_ptrs.size();
+        return all_labels.size();
     }
 
 
-    Label * check_and_allocate_label(Label new_label)
-    {
-        Label * c;
-        if (label_ptrs.count(new_label)) {
-            c = label_ptrs[new_label];
-        } else {
-            c = new Label(new_label);
-            label_ptrs[*c] = c;
-        }
-        return c;
-    }
     void consume_fasta_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -149,21 +168,21 @@ public:
 
     void consume_sequence_and_tag_with_labels(const std::string& seq,
             unsigned long long& n_consumed,
-            Label& current_label,
+            Label current_label,
             SeenSet * new_tags = 0);
 
-    LabelPtrSet get_tag_labels(const HashIntoType& tag);
+    LabelSet get_tag_labels(const HashIntoType tag);
 
-    void link_tag_and_label(HashIntoType& kmer, Label& label);
+    void link_tag_and_label(const HashIntoType kmer, const Label label);
 
     unsigned int sweep_label_neighborhood(const std::string & seq,
-                                          LabelPtrSet& found_labels,
+                                          LabelSet& found_labels,
                                           unsigned int range,
                                           bool break_on_stoptags,
                                           bool stop_big_traversals);
 
-    void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-                                     LabelPtrSet& found_labels);
+    void traverse_labels_and_resolve(const SeenSet tagged_kmers,
+                                     LabelSet& found_labels);
 
     void save_labels_and_tags(std::string);
     void load_labels_and_tags(std::string);

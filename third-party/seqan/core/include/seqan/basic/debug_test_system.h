@@ -233,7 +233,7 @@ bool foo(MyEnum x) {
 
 // Any SeqAn headers or headers including SeqAn headers have to come AFTER the
 // definition of SEQAN_ENABLE_CHECKPOINT above.
-#include <seqan/base.h>
+// #include <seqan/base.h>
 
 int main(int argc, char const ** argv)
 {

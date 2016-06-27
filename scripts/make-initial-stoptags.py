@@ -1,10 +1,38 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
 Find an initial set of highly connected k-mers, to save on repartitioning time.
@@ -17,7 +45,7 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, sanitize_epilog)
+from khmer.khmer_args import (build_counting_args, info, sanitize_help)
 from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -41,9 +69,9 @@ EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 
 def get_parser():
-    epilog = """
+    epilog = """\
     Loads a k-mer nodegraph/tagset pair created by
-    :program:`load-into-nodegraph.py`, and
+    :program:`load-graph.py`, and
     does a small set of traversals from graph waypoints; on these traversals,
     looks for k-mers that are repeatedly traversed in high-density regions of
     the graph, i.e. are highly connected. Outputs those k-mers as an initial
@@ -73,7 +101,7 @@ def get_parser():
 def main():
 
     info('make-initial-stoptags.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     graphbase = args.graphbase
 
@@ -99,6 +127,7 @@ def main():
 
     # divide up into SUBSET_SIZE fragments
     divvy = nodegraph.divide_tags_into_subsets(args.subset_size)
+    divvy = list(divvy)
 
     # pick off the first one
     if len(divvy) == 1:

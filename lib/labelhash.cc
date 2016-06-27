@@ -1,10 +1,40 @@
-//
-// This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2015. It is licensed under
-// the three-clause BSD license; see LICENSE.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2013-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #include <errno.h>
 #include <string.h>
 #include <iostream>
@@ -68,9 +98,8 @@ LabelHash::consume_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    Label _tag_label = 0;
+    Label the_label = 0;
 
-    Label * the_label;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
         try {
@@ -82,11 +111,10 @@ LabelHash::consume_fasta_and_tag_with_labels(
         if (graph->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!
             unsigned long long this_n_consumed = 0;
-            the_label = check_and_allocate_label(_tag_label);
             consume_sequence_and_tag_with_labels( read.sequence,
                                                   this_n_consumed,
-                                                  *the_label );
-            _tag_label++;
+                                                  the_label );
+            the_label++;
 
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
@@ -139,7 +167,6 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     //
     // iterate through the FASTA file & consume the reads.
     //
-    Label * c;
     PartitionID p;
     while(!parser->is_complete())  {
         read = parser->get_next_read();
@@ -150,13 +177,10 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
             // save that.
             printdbg(parsing partition id)
             p = _parse_partition_id(read.name);
-            printdbg(checking label and allocating if necessary) {
-                c = check_and_allocate_label(p);
-            }
             printdbg(consuming sequence and tagging)
             consume_sequence_and_tag_with_labels( seq,
                                                   n_consumed,
-                                                  *c );
+                                                  p );
             printdbg(back in consume_partitioned)
         }
 
@@ -183,18 +207,19 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     printdbg(deleted parser and exiting)
 }
 
-// @cswelcher: double-check -- is it valid to pull the address from a reference?
-void LabelHash::link_tag_and_label(HashIntoType& kmer, Label& kmer_label)
+void LabelHash::link_tag_and_label(const HashIntoType kmer,
+                                   const Label kmer_label)
 {
     printdbg(linking tag and label)
-    tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
-    label_tag_ptrs.insert(LabelTagPair(kmer_label, kmer));
+    tag_labels.insert(TagLabelPair(kmer, kmer_label));
+    label_tag.insert(LabelTagPair(kmer_label, kmer));
+    all_labels.insert(kmer_label);
     printdbg(done linking tag and label)
 }
 
 void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
         unsigned long long& n_consumed,
-        Label& current_label,
+        Label current_label,
         SeenSet * found_tags)
 {
 
@@ -216,7 +241,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }
-#if (1)
             if (is_new_kmer) {
                 printdbg(new kmer...)
                 ++since;
@@ -247,16 +271,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     ++since;
                 }
             }
-#else
-            if (!is_new_kmer && set_contains(graph->all_tags, kmer)) {
-                since = 1;
-                if (found_tags) {
-                    found_tags->insert(kmer);
-                }
-            } else {
-                since++;
-            }
-#endif
             //
             if (since >= graph->_tag_density) {
                 printdbg(exceeded tag density: drop a tag and label --
@@ -297,7 +311,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 }
 
 unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
-        LabelPtrSet& found_labels,
+        LabelSet& found_labels,
         unsigned int range,
         bool break_on_stoptags,
         bool stop_big_traversals)
@@ -319,16 +333,16 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag)
+LabelSet LabelHash::get_tag_labels(const HashIntoType tag)
 {
-    LabelPtrSet labels;
+    LabelSet labels;
     //unsigned int num_labels;
     _get_tag_labels(tag, tag_labels, labels);
     return labels;
 }
 
-void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-        LabelPtrSet& found_labels)
+void LabelHash::traverse_labels_and_resolve(const SeenSet tagged_kmers,
+        LabelSet& found_labels)
 {
 
     SeenSet::const_iterator si;
@@ -345,10 +359,7 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
 
 LabelHash::~LabelHash()
 {
-    for (LabelPtrMap::iterator itr=label_ptrs.begin();
-            itr!=label_ptrs.end(); ++itr) {
-        delete itr->second;
-    }
+    ;
 }
 
 
@@ -380,14 +391,14 @@ void LabelHash::save_labels_and_tags(std::string filename)
     // For each tag in the partition map, save the tag and the associated
     // partition ID.
 
-    TagLabelPtrMap::const_iterator pi = tag_labels.begin();
+    TagLabelMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
         HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
         *k_p = pi->first;
         n_bytes += sizeof(HashIntoType);
 
         Label * l_p = (Label *) (buf + n_bytes);
-        *l_p = *(pi->second);
+        *l_p = pi->second;
         n_bytes += sizeof(Label);
 
         // flush to disk
@@ -518,11 +529,9 @@ void LabelHash::load_labels_and_tags(std::string filename)
             labelp = (Label *) (buf + i);
             i += sizeof(Label);
 
-            Label * labelp2;
-
             graph->all_tags.insert(*kmer_p);
-            labelp2 = check_and_allocate_label(*labelp);
-            link_tag_and_label(*kmer_p, *labelp2);
+            all_labels.insert(*labelp);
+            link_tag_and_label(*kmer_p, *labelp);
 
             loaded++;
         }

@@ -1,10 +1,39 @@
 #! /usr/bin/env python
-#
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see LICENSE.
-# Contact: khmer-project@idyll.org
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Contact: khmer-project@idyll.org
+# pylint: disable=invalid-name,missing-docstring
 """
 Extract partitioned sequences into files grouped by partition size.
 
@@ -23,12 +52,17 @@ import sys
 import screed
 import argparse
 import textwrap
+<<<<<<< HEAD
 from contextlib import contextmanager
 import khmer
+=======
+from khmer import __version__
+>>>>>>> master
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import info, sanitize_epilog
+from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
+                              _VersionStdErrAction)
 from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -43,25 +77,29 @@ def read_partition_file(filename):
 
 
 def get_parser():
+<<<<<<< HEAD
     """Create parser for extract-partitions.py."""
     epilog = """
+=======
+    epilog = """\
+>>>>>>> master
     Example (results will be in ``example.group0000.fa``)::
 
-        load-into-nodegraph.py -k 20 example tests/test-data/random-20-a.fa
+        load-graph.py -k 20 example tests/test-data/random-20-a.fa
         partition-graph.py example
         merge-partitions.py -k 20 example
         annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
         extract-partitions.py example random-20-a.fa.part
 
-        (extract-partitions.py will produce a partition size distribution
-        in <base>.dist. The columns are: (1) number of reads, (2) count
-        of partitions with n reads, (3) cumulative sum of partitions,
-        (4) cumulative sum of reads.)
+    (:program:`extract-partitions.py` will produce a partition size
+    distribution in <base>.dist. The columns are: (1) number of reads,
+    (2) count of partitions with n reads, (3) cumulative sum of partitions,
+    (4) cumulative sum of reads.)
     """
     parser = argparse.ArgumentParser(
         description="Separate sequences that are annotated with partitions "
         "into grouped files.", epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter)
     parser.add_argument('prefix', metavar='output_filename_prefix')
     parser.add_argument('part_filenames', metavar='input_partition_filename',
                         nargs='+')
@@ -77,8 +115,8 @@ def get_parser():
     parser.add_argument('--output-unassigned', '-U', default=False,
                         action='store_true',
                         help='Output unassigned sequences, too')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -224,7 +262,7 @@ class PartitionExtractor(object):
 
 def main():
     info('extract-partitions.py', ['graph'])
-    args = sanitize_epilog(get_parser()).parse_args()
+    args = sanitize_help(get_parser()).parse_args()
 
     distfilename = args.prefix + '.dist'
 
