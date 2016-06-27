@@ -150,7 +150,7 @@ endif
 ifneq ($(PACKAGE_VERSION),)
 VERSION = $(PACKAGE_VERSION)
 else
-VERSION = $(shell ./get_version.py)
+VERSION = $(./setup.py version | grep Version | awk '{print $2}')
 endif
 
 # The ABI version of liboxli

@@ -57,16 +57,9 @@ Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown'''
 
 # The full version, including alpha/beta/rc tags.
 
-sys.path.insert(0, '../')
-import versioneer
-versioneer.VCS = 'git'
-versioneer.versionfile_source = '../khmer/_version.py'
-versioneer.versionfile_build = '../khmer/_version.py'
-versioneer.tag_prefix = 'v'  # tags are like v1.2.0
-versioneer.parentdir_prefix = '..'
-release = versioneer.get_version()
-del versioneer
-sys.path.remove('../')
+from khmer._version import get_versions
+release = get_versions()['version']
+del get_versions
 
 # The short X.Y version.
 
