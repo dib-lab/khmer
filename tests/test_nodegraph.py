@@ -1486,7 +1486,7 @@ def test_assemble_labeled_paths_5():
     lh = khmer._GraphLabels(nodegraph)
 
     nodegraph.consume(contig)
-    contig2 = contig[:200] + 'G' contig[201:]
+    contig2 = contig[:200] + 'G' + contig[201:]
     nodegraph.consume(contig2)
 
     hdn = nodegraph.find_high_degree_nodes(contig)
