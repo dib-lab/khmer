@@ -1,7 +1,7 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2010-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
 
@@ -61,8 +61,8 @@ line.  See :doc:`our command line documentation <user/scripts>`.
 
 We have **additional documentation** in several places, including
 `protocols for metagenome and mRNAseq assembly
-<https://khmer-protocols.readthedocs.org/>`__ and `recipes for several
-common research tasks <https://khmer-recipes.readthedocs.org/>`__.
+<https://khmer-protocols.readthedocs.io/>`__ and `recipes for several
+common research tasks <https://khmer-recipes.readthedocs.io/>`__.
 You might also be interested in :doc:`papers using or citing khmer
 <user/biblio>`.
 

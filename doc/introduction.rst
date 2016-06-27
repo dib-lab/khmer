@@ -1,7 +1,7 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2011-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
 
@@ -77,8 +77,8 @@ khmer is implemented in C++ with a Python wrapper, which is what all of the
 scripts use.
 
 Documentation for khmer is provided on the Web sites for
-`khmer-protocols <http://khmer-protocols.readthedocs.org>`__ and `khmer-recipes
-<http://khmer-recipes.readthedocs.org>`__. khmer-protocols provides detailed
+`khmer-protocols <http://khmer-protocols.readthedocs.io>`__ and `khmer-recipes
+<http://khmer-recipes.readthedocs.io>`__. khmer-protocols provides detailed
 protocols for using khmer to analyze either a transcriptome or a metagenome.
 khmer-recipes provides individual recipes for using khmer in a variety of
 sequence-oriented tasks such as extracting reads by coverage, estimating a
