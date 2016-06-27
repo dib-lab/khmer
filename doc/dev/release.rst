@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2013-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 ================================
@@ -61,9 +61,9 @@ release makers, following this checklist by MRC.
         versioneer-installer
 
         git diff
-        
+
         ./setup.py versioneer
-        git diff 
+        git diff
         git commit -m -a "new version of versioneer.py"
         # or
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
@@ -116,7 +116,7 @@ release makers, following this checklist by MRC.
         virtualenv testenv3
         virtualenv testenv4
         # First we test the tag
-        
+
         cd testenv1
         source bin/activate
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/dib-lab/khmer.git
@@ -132,7 +132,7 @@ release makers, following this checklist by MRC.
 
 
         # Secondly we test via pip
-        
+
         cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
@@ -150,7 +150,7 @@ release makers, following this checklist by MRC.
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
-        
+
         cd ../testenv3/
         source bin/activate
         pip install -U setuptools==3.4.1
@@ -224,11 +224,11 @@ so:
         ./setup.py bdist_wheel upload
 
 #. Update Read the Docs to point to the new version. Visit
-   https://readthedocs.org/builds/khmer/ and 'Build Version: master' to pick up
+   https://readthedocs.io/builds/khmer/ and 'Build Version: master' to pick up
    the new tag. Once that build has finished check the "Activate" box next to
-   the new version at https://readthedocs.org/dashboard/khmer/versions/ under
+   the new version at https://readthedocs.io/dashboard/khmer/versions/ under
    "Choose Active Versions". Finally change the default version at
-   https://readthedocs.org/dashboard/khmer/advanced/ to the new version.
+   https://readthedocs.io/dashboard/khmer/advanced/ to the new version.
 
 #. Delete any RC tags created::
 
@@ -277,7 +277,7 @@ files ``versioneer.py``, the top of ``khmer/__init__.py``,
 ``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the
 implementation.
 
-The version number is determined through several methods: see 
+The version number is determined through several methods: see
 https://github.com/warner/python-versioneer#version-identifiers
 
 If the source tree is from a git checkout then the version number is derived by

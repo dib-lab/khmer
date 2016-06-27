@@ -6,7 +6,7 @@ includedir=${prefix}/include
 
 Name: oxli
 Description: The unsupported core C++ library from the khmer project
-URL: http://khmer.readthedocs.org/
+URL: http://khmer.readthedocs.io/
 Version: @VERSION@
 
 Requires:
