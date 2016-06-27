@@ -936,3 +936,139 @@ def test_n_occupied_vs_countgraph_another_size():
 
     assert nodegraph.n_unique_kmers() == 3916, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 3916, countgraph.n_unique_kmers()
+
+
+def test_traverse_linear_path():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = khmer.HashSet(K)
+    size, conns, visited = nodegraph.traverse_linear_path(contig[:K],
+                                                          degree_nodes,
+                                                          stopgraph)
+    assert size == 980
+    assert len(conns) == 0
+    assert len(visited) == 980
+
+
+def test_find_high_degree_nodes():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+    assert len(degree_nodes) == 0
+
+
+def test_find_high_degree_nodes_2():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[2:22] + 'G')   # will add another neighbor to 1:22
+    print(nodegraph.neighbors(contig[1:22]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[1:22]) in degree_nodes
+
+
+def test_traverse_linear_path_2():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+    print(nodegraph.neighbors(contig[101:122]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[100:121]) in degree_nodes
+
+    # traverse from start, should end at node 100:121
+    size, conns, visited = nodegraph.traverse_linear_path(contig[0:21],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), list(visited))
+    assert size == 100
+    assert len(visited) == 100
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+    # traverse from immediately after 100:121, should end at the end
+    size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), list(visited))
+    assert size == 879
+    assert len(visited) == 879
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+    # traverse from end, should end at 100:121
+    size, conns, visited = nodegraph.traverse_linear_path(contig[-21:],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), len(visited))
+    assert size == 879
+    assert len(visited) == 879
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+
+def test_traverse_linear_path_3_stopgraph():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+    print(nodegraph.neighbors(contig[101:122]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[100:121]) in degree_nodes
+
+    stopgraph.count(contig[101:122])      # stop traversal - only adj to start
+
+    size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), len(visited))
+    assert size == 0
+    assert len(visited) == 0
+    assert len(conns) == 0
