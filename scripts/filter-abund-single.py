@@ -157,16 +157,17 @@ def main():
 
     # the filtering loop
     print('filtering', args.datafile, file=sys.stderr)
-    outfile = os.path.basename(args.datafile) + '.abundfilt'
-    if args.outfile is not None:
+    if args.outfile is None:
+        outfile = os.path.basename(args.datafile) + '.abundfilt'
+    else:
         outfile = args.outfile
-    outfile = open(outfile, 'wb')
-    outfp = get_file_writer(outfile, args.gzip, args.bzip)
+    outfp = open(outfile, 'wb')
+    outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print('output in', outfile.name, file=sys.stderr)
+    print('output in', outfile, file=sys.stderr)
 
     if args.savegraph:
         print('Saving k-mer countgraph filename',
