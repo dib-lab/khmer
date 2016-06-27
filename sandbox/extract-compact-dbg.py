@@ -8,7 +8,7 @@ import sys
 
 # graph settings
 DEFAULT_KSIZE=31
-NODEGRAPH_SIZE=8e8 # small, big is 2e8
+NODEGRAPH_SIZE=8e8
 
 # minhash settings
 MH_SIZE_DIVISOR=50
@@ -72,9 +72,8 @@ def main():
     parser.add_argument('-o', '--output', default=None)
     parser.add_argument('-k', '--ksize', default=DEFAULT_KSIZE, type=int)
     parser.add_argument('-x', '--tablesize', default=NODEGRAPH_SIZE,
-                            type=float)
+                        type=float)
     parser.add_argument('--force', action='store_true')
-    #parser.add_argument('--gml', action='store_true')
     args = parser.parse_args()
 
     assert args.ksize % 2, "ksize must be odd"
