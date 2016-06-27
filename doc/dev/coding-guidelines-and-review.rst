@@ -183,6 +183,6 @@ Here's a checklist for new CPython types with future-proofing for Python 3::
      (`Py_DECREF(self);`) before each error-path exit (`return NULL;`)
    - [ ] No factory methods. Example: `khmer_new_readaligner`
    - [ ] Type object is passed to `PyType_Ready` and its return code is checked
-     in `init_khmer()`
+     in `MOD_INIT()`
    - [ ] The reference count for the type object is incremented before adding
      it to the module: `Py_INCREF(&khmer_${OBJECTNAME}_Type);`.
