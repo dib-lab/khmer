@@ -380,3 +380,46 @@ def test_outfile():
     (status, out, err) = utils.runscript(script, args)
     md5hash = utils._calc_md5(open(outfile, 'rb'))
     assert md5hash == 'f17122f4c0c3dc0bcc4eeb375de93040', md5hash
+
+
+def test_filter_abund_1_quiet():
+    script = 'filter-abund.py'
+
+    infile = utils.get_temp_filename('test.fa')
+    n_infile = utils.get_temp_filename('test-fastq-n-reads.fq')
+
+    in_dir = os.path.dirname(infile)
+    n_in_dir = os.path.dirname(n_infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
+
+    counting_ht = _make_counting(infile, K=17)
+    n_counting_ht = _make_counting(n_infile, K=17)
+
+    args = ['-q', counting_ht, infile]
+    status, out, err = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
+
+    outfile = infile + '.abundfilt'
+    n_outfile = n_infile + '.abundfilt'
+    n_outfile2 = n_infile + '2.abundfilt'
+
+    assert os.path.exists(outfile), outfile
+
+
+def test_filter_abund_1_singlefile_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = 'filter-abund-single.py'
+    args = ['-q', '-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
