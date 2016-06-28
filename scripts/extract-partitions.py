@@ -52,17 +52,14 @@ import sys
 import screed
 import argparse
 import textwrap
-<<<<<<< HEAD
 from contextlib import contextmanager
 import khmer
-=======
-from khmer import __version__
->>>>>>> master
+
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+                              _VersionStdErrAction, __version__)
 from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -77,12 +74,8 @@ def read_partition_file(filename):
 
 
 def get_parser():
-<<<<<<< HEAD
     """Create parser for extract-partitions.py."""
     epilog = """
-=======
-    epilog = """\
->>>>>>> master
     Example (results will be in ``example.group0000.fa``)::
 
         load-graph.py -k 20 example tests/test-data/random-20-a.fa
