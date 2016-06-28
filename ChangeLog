@@ -394,6 +394,12 @@
    * tests/test_streaming_io.py: Fix unique-kmers tests, use new option.
    * khmer/_khmer.cc, lib/hllcounter.cc: Rename some variables for consistency.
 
+2015-08-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+      * scripts/extract-partitions.py: refactored much of the processing into
+      generators
+      * tests/test_scripts.py: added test
+
 2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/{codebase-guide,coding-guidelines-and-review,development,

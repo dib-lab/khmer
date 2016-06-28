@@ -1064,6 +1064,34 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
+def test_extract_paired_inconsistent_formats():
+    fa_seqfile = utils.get_test_data('random-20-a.fa')
+    fq_seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(
+        fa_seqfile, do_partition=True, annotate_partitions=True)
+    fa_in_dir = os.path.dirname(graphbase)
+    graphbase = _make_graph(
+        fq_seqfile, do_partition=True, annotate_partitions=True)
+    fq_in_dir = os.path.dirname(graphbase)
+    # XXX
+    # get the final part file
+    fa_partfile = os.path.join(fa_in_dir, 'random-20-a.fa.part')
+    fq_partfile = os.path.join(fq_in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = 'extract-partitions.py'
+    args = ['extracted', fa_partfile, fq_partfile]
+
+    failed = True
+    try:
+        utils.runscript(script, args, fa_in_dir)
+        failed = False
+    except AssertionError as err:
+        assert "Input files must have consistent format." in str(err), err
+
+    assert failed, "Expected to fail"
+
+
 def test_extract_partitions_header_whitespace():
     seqfile = utils.get_test_data('test-overlap2.fa')
     graphbase = _make_graph(
