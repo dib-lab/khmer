@@ -327,11 +327,15 @@ def build_graph_args(descr=None, epilog=None, parser=None):
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
-                       help='upper bound on tablesize to use; overrides ' +
-                       '--max-memory-usage/-M.')
+                       help='upper bound on tablesize to use; overrides '
+                       '--max-memory-usage/-M')
     group.add_argument('-M', '--max-memory-usage', type=float,
-                       help='maximum amount of memory to use for data ' +
-                       'structure.')
+                       help='maximum amount of memory to use for data '
+                       'structure')
+    group.add_argument('-a', '--auto-mem', action='store_true',
+                       help='automagically allocate memory for data structure;'
+                       ' use 80%% of available memory or 16GB, whichever is '
+                       'smaller')
 
     return parser
 
@@ -362,12 +366,14 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
-        if graphtype == 'countgraph':
-            tablesize = args.max_memory_usage / args.n_tables / \
-                float(multiplier)
-        elif graphtype == 'nodegraph':
-            tablesize = 8. * args.max_memory_usage / args.n_tables / \
-                float(multiplier)
+        tablesize = args.max_memory_usage / args.n_tables / float(multiplier)
+        if graphtype == 'nodegraph':
+            tablesize *= 8.0
+    elif args.auto_mem:
+        avail = min(psutil.virtual_memory().available * 0.8, 16 * (10 ** 3))
+        tablesize = avail / args.n_tables / float(multiplier)
+        if graphtype == 'nodegraph':
+            tablesize *= 8.0
     else:
         tablesize = args.max_tablesize
 
