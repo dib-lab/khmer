@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2012-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,28 +33,28 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 ==========================
 Setting khmer memory usage
 ==========================
 
-If you look at the documentation for the scripts (:doc:`scripts`) you'll
-see a :option:`-M <load-into-counting.py -M>` parameter that sets the maximum
-memory usage for any script that uses k-mer counting tables or k-mer graphs. 
-What is this?
+If you look at the documentation for the scripts (:doc:`scripts`) you'll see
+several parameters related to setting memory usage for any script that uses
+k-mer counting tables or k-mer graphs. What is all this?
 
 khmer uses a special data structure that lets it store counting tables
 and k-mer graphs in very low memory; the trick is that you must fix
 the amount of memory khmer can use before running it. (See `Pell et
 al., 2012 <http://www.ncbi.nlm.nih.gov/pubmed/22847406>`__ and `Zhang
 et al., 2014 <http://www.ncbi.nlm.nih.gov/pubmed/25062443>`__ for the
-details.)  This is what the :option:`-M <load-into-counting.py -M>` parameter
-does.
+details.)
 
-If you set it too low, khmer will warn you to set it higher at the end.
-See below for some good choices for various kinds of data.
+If you set it too low, khmer will warn you to set it higher at the end. On the
+other hand, there is no risk with allocating *too much* memory (as long as you
+don't exceed the available memory on your machine). See below for some good
+choices for various kinds of data.
 
 **Note for khmer 1.x users:** As of khmer 2.0, the :option:`-M
 <load-into-counting.py -M>` parameter sets the
@@ -67,21 +67,31 @@ The really short version
 ========================
 
 There is no way (except for experience, rules of thumb, and intuition) to
-know what this parameter should be up front.  So, use the maximum
-available memory::
+know how memory usage should be set up front. Luckily, a couple of simple
+recommendations should work for most situations.
 
-  -M 16e9
+- If you're on a laptop or desktop, it's easiest to let khmer allocate memory
+  for you with the :option:`--auto-mem <load-into-counting.py -a>` option.
 
-for a machine with 16 GB of free memory, for example.
+- If you're using a shared computing environment (cluster, server, HPC, etc.),
+  it's best to set khmer's memory usage yourself using the
+  :option:`-M <load-into-counting.py -M>` option. For example, use::
+
+    -M 16e9
+
+  if there are 16 GB of available memory.
 
 The short version
 =================
 
-This parameter specifies the maximum memory usage of the primary data
-structure in khmer, which is basically N big hash tables of size x.
+These parameters specify the maximum memory usage of the primary data
+structure in khmer, which is basically `N` big hash tables of size `x`.
 The **product** of the number of hash tables and the size of the hash
-tables specifies the total amount of memory used, which is what the
-:option:`-M <load-into-counting.py -M>` parameter sets.
+tables specifies the total amount of memory used, which the parameter that the
+:option:`-M <load-into-counting.py -M>` option sets. (The
+:option:`--auto-mem <load-into-counting.py -a>` option will set the total
+amount of memory used to 80% of the available memory on the system, or 16 GB,
+whichever is smaller.)
 
 These tables are used to track k-mers.  If they are too small, khmer
 will fail in various ways (and will complain), but there is no harm
@@ -100,7 +110,7 @@ Also see the rules of thumb, below.
 The long version
 =====================
 
-khmer's scripts, at their heart, represents k-mers in a very memory
+khmer's scripts, at their heart, represent k-mers in a very memory
 efficient way by taking advantage of two data structures, `Bloom
 filters <http://en.wikipedia.org/wiki/Bloom_filter>`__ and `Count-Min
 Sketches <http://en.wikipedia.org/wiki/Count%E2%80%93min_sketch>`__, that are
