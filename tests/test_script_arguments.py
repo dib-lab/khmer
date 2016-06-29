@@ -333,7 +333,7 @@ def test_calculate_graphsize_auto():
     tablesize = khmer_args.calculate_graphsize(args, "countgraph",
                                                _sysmem=sysmem)
     target = sysmem * 0.8 / 4
-    assert tablesize == target, (aggregatehashsize, target)
+    assert tablesize == target, (tablesize, target)
 
 
 def test_calculate_graphsize_auto_bigmem():
@@ -346,4 +346,4 @@ def test_calculate_graphsize_auto_bigmem():
     tablesize = khmer_args.calculate_graphsize(args, "countgraph",
                                                _sysmem=sysmem)
     target = 16e9 / 4
-    assert tablesize == target, (aggregatehashsize, target)
+    assert tablesize == target, (tablesize, target)
