@@ -42,6 +42,7 @@ import sys
 import argparse
 import math
 import textwrap
+import psutil
 from argparse import _VersionAction
 from collections import namedtuple
 
