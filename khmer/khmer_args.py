@@ -361,8 +361,7 @@ def add_loadgraph_args(parser):
                         help='load a precomputed k-mer graph from disk')
 
 
-def calculate_graphsize(args, graphtype, multiplier=1.0,
-                        sysmem=psutil.virtual_memory().available):
+def calculate_graphsize(args, graphtype, multiplier=1.0, _sysmem=None):
     """Transform the table parameters into a size."""
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
@@ -372,7 +371,9 @@ def calculate_graphsize(args, graphtype, multiplier=1.0,
         if graphtype == 'nodegraph':
             tablesize *= 8.0
     elif args.auto_mem:
-        avail = min(sysmem * 0.8, 16 * (1000 ** 3))
+        if _sysmem is None:
+            _sysmem = psutil.virtual_memory().available
+        avail = min(_sysmem * 0.8, 16 * (1000 ** 3))
         tablesize = avail / args.n_tables / float(multiplier)
         if graphtype == 'nodegraph':
             tablesize *= 8.0
@@ -382,8 +383,7 @@ def calculate_graphsize(args, graphtype, multiplier=1.0,
     return tablesize
 
 
-def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01,
-                     sysmem=psutil.virtual_memory().available):
+def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
@@ -392,13 +392,11 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01,
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_graphsize(args, 'nodegraph', multiplier=multiplier,
-                                    sysmem=sysmem)
+    tablesize = calculate_graphsize(args, 'nodegraph', multiplier=multiplier)
     return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
-def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1,
-                      sysmem=psutil.virtual_memory().available):
+def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     """Create and return a countgraph."""
     args = _check_fp_rate(args, fp_rate)
     if ksize is None:
@@ -407,8 +405,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1,
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier,
-                                    sysmem=sysmem)
+    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
     return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 

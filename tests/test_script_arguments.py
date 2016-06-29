@@ -222,36 +222,6 @@ def test_create_countgraph_4_multiplier():
         sum(countgraph.hashsizes())
 
 
-def test_create_countgraph_auto():
-    ksize = khmer_args.DEFAULT_K
-    n_tables = khmer_args.DEFAULT_N_TABLES
-    sysmem = 4e9
-
-    args = FakeArgparseObject(ksize, n_tables, None, None, True, 0)
-
-    countgraph = khmer_args.create_countgraph(args, sysmem=sysmem)
-    aggregatehashsize = sum(countgraph.hashsizes())
-    target = sysmem * 0.8
-    perctarget = float(aggregatehashsize) / target
-    assert aggregatehashsize < target and perctarget > 0.99, \
-        (aggregatehashsize, target)
-
-
-def test_create_countgraph_auto_bigmem():
-    ksize = khmer_args.DEFAULT_K
-    n_tables = khmer_args.DEFAULT_N_TABLES
-    sysmem = 64e9
-
-    args = FakeArgparseObject(ksize, n_tables, None, None, True, 0)
-
-    countgraph = khmer_args.create_countgraph(args, sysmem=sysmem)
-    aggregatehashsize = sum(countgraph.hashsizes())
-    target = 16e9
-    perctarget = float(aggregatehashsize) / target
-    assert aggregatehashsize < target and perctarget > 0.99, \
-        (aggregatehashsize, target)
-
-
 def test_create_nodegraph_1():
     ksize = khmer_args.DEFAULT_K
     n_tables = khmer_args.DEFAULT_N_TABLES
@@ -351,3 +321,29 @@ def test_fail_calculate_foograph_size():
         assert 0, "previous statement should fail"
     except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
+
+
+def test_calculate_graphsize_auto():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    sysmem = 4e9
+
+    args = FakeArgparseObject(ksize, n_tables, None, None, True, 0)
+
+    tablesize = khmer_args.calculate_graphsize(args, "countgraph",
+                                               _sysmem=sysmem)
+    target = sysmem * 0.8 / 4
+    assert tablesize == target, (aggregatehashsize, target)
+
+
+def test_calculate_graphsize_auto_bigmem():
+    ksize = khmer_args.DEFAULT_K
+    n_tables = khmer_args.DEFAULT_N_TABLES
+    sysmem = 64e9
+
+    args = FakeArgparseObject(ksize, n_tables, None, None, True, 0)
+
+    tablesize = khmer_args.calculate_graphsize(args, "countgraph",
+                                               _sysmem=sysmem)
+    target = 16e9 / 4
+    assert tablesize == target, (aggregatehashsize, target)
