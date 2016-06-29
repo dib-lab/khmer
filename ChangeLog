@@ -1,3 +1,10 @@
+2016-06-29  Daniel Standage <daniel.standage@gmail.com>
+
+   * khmer/khmer_args.py: added new -a/--auto-mem option for automatically
+   calculating memory to allocate for graphs based on available system memory.
+   * setup.py: declared new dependency package 'psutil'
+   * tests/test_script_arguments.py: tests functionality of new option.
+
 2016-06-27  Titus Brown  <titus@idyll.org>
 
    * doc/requirements.txt: updated sphinx-autoprogram requirement for building
