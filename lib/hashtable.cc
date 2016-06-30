@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -553,7 +553,7 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
             n_consumed += consume_string(seq); // @CTB why are we doing this?
 
             // Next, compute the tag & set the partition, if nonzero
-            HashIntoType kmer = _hash(seq.c_str(), _ksize);
+            HashIntoType kmer = _hash(seq, _ksize);
             all_tags.insert(kmer);
             if (p > 0) {
                 partition->set_partition_id(kmer, p);
@@ -967,7 +967,7 @@ void Hashtable::get_kmers(const std::string &s,
         return;
     }
     for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-        std::string sub = s.substr(i, i + _ksize);
+        std::string sub = s.substr(i, _ksize);
         kmers_vec.push_back(sub);
     }
 }
@@ -997,4 +997,75 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
+void Hashtable::find_high_degree_nodes(const char * s,
+                                       SeenSet& high_degree_nodes)
+    const
+{
+    Traverser traverser(this);
+    KmerIterator kmers(s, _ksize);
+
+    unsigned long n = 0;
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... find_high_degree_nodes: " << n << "\n";
+            std::cout << std::flush;
+        }
+        Kmer kmer = kmers.next();
+        if ((traverser.degree(kmer)) > 2) {
+            high_degree_nodes.insert(kmer);
+        }
+    }
+}
+
+unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
+                                             SeenSet &adjacencies,
+                                             SeenSet &visited, Hashtable &bf,
+                                             SeenSet &high_degree_nodes)
+    const
+{
+    unsigned int size = 0;
+
+    Traverser traverser(this);
+
+    // if this k-mer is in the Bloom filter, truncate search.
+    // This prevents paths from being traversed in two directions.
+    if (bf.get_count(seed_kmer)) {
+        return 0;
+    }
+
+    std::vector<Kmer> to_be_visited;
+    to_be_visited.push_back(seed_kmer);
+
+    while (to_be_visited.size()) {
+        Kmer kmer = to_be_visited.back();
+        to_be_visited.pop_back();
+        
+        visited.insert(kmer);
+        size += 1;
+
+        KmerQueue node_q;
+        traverser.traverse(kmer, node_q);
+
+        while (node_q.size()) {
+            Kmer node = node_q.front();
+            node_q.pop();
+
+            if (set_contains(high_degree_nodes, node)) {
+                // if there are any adjacent high degree nodes, record;
+                adjacencies.insert(node);
+                // also, add this to the stop Bloom filter.
+                bf.count(kmer);
+            } else if (set_contains(visited, node)) {
+                // do nothing - already visited
+                ;
+            } else {
+                to_be_visited.push_back(node);
+            }
+        }
+    }
+    return size;
+}
+
 // vim: set sts=2 sw=2:
+

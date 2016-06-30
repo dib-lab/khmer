@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -42,15 +42,16 @@ from khmer import ReadParser
 
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
     utils.cleanup()
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         khmer.Nodegraph(32, 1e13, 1)
@@ -240,6 +241,23 @@ def test_n_occupied_2():  # simple one
     assert nodegraph.n_occupied() == 2, nodegraph.n_occupied()
 
 
+def test_n_occupied_2_add_is_count():  # 'add' synonym for 'count'
+    ksize = 4
+
+    nodegraph = khmer._Nodegraph(ksize, [11])
+    nodegraph.add('AAAA')  # 00 00 00 00 = 0
+    assert nodegraph.n_occupied() == 1
+
+    nodegraph.add('ACTG')  # 00 10 01 11 =
+    assert nodegraph.n_occupied() == 2
+
+    nodegraph.add('AACG')  # 00 00 10 11 = 11  # collision 1
+
+    assert nodegraph.n_occupied() == 2
+    nodegraph.add('AGAC')   # 00  11 00 10 # collision 2
+    assert nodegraph.n_occupied() == 2, nodegraph.n_occupied()
+
+
 def test_bloom_c_2():  # simple one
     ksize = 4
 
@@ -346,6 +364,53 @@ def test_count_kmer_degree():
     assert nodegraph.kmer_degree('AAAT') == 1
     assert nodegraph.kmer_degree('AATA') == 0
     assert nodegraph.kmer_degree('TAAA') == 1
+
+
+def test_kmer_neighbors():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    h = khmer.forward_hash('AAAA', 4)
+    print(type('AAAA'))
+    assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == [0, 0]  # AAAA on both sides
+
+    h = khmer.forward_hash('AAAT', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on one side
+    assert nodegraph.neighbors('AAAT') == [0]     # AAAA on one side
+
+    h = khmer.forward_hash('AATA', 4)
+    assert nodegraph.neighbors(h) == []           # no neighbors
+    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
+
+    h = khmer.forward_hash('TAAA', 4)
+    assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
+    assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
+
+
+def test_kmer_neighbors_wrong_ksize():
+    inpfile = utils.get_test_data('all-A.fa')
+    nodegraph = khmer._Nodegraph(4, [3, 5])
+    nodegraph.consume_fasta(inpfile)
+
+    try:
+        nodegraph.neighbors('AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors(b'AAAAA')
+        assert 0, "neighbors() should fail with too long string"
+    except ValueError:
+        pass
+
+    try:
+        nodegraph.neighbors({})
+        assert 0, "neighbors() should fail with non hash/str arg"
+    except ValueError:
+        pass
 
 
 def test_save_load_tagset():
@@ -888,3 +953,139 @@ def test_n_occupied_vs_countgraph_another_size():
 
     assert nodegraph.n_unique_kmers() == 3916, nodegraph.n_unique_kmers()
     assert countgraph.n_unique_kmers() == 3916, countgraph.n_unique_kmers()
+
+
+def test_traverse_linear_path():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = khmer.HashSet(K)
+    size, conns, visited = nodegraph.traverse_linear_path(contig[:K],
+                                                          degree_nodes,
+                                                          stopgraph)
+    assert size == 980
+    assert len(conns) == 0
+    assert len(visited) == 980
+
+
+def test_find_high_degree_nodes():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+    assert len(degree_nodes) == 0
+
+
+def test_find_high_degree_nodes_2():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[2:22] + 'G')   # will add another neighbor to 1:22
+    print(nodegraph.neighbors(contig[1:22]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[1:22]) in degree_nodes
+
+
+def test_traverse_linear_path_2():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+    print(nodegraph.neighbors(contig[101:122]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[100:121]) in degree_nodes
+
+    # traverse from start, should end at node 100:121
+    size, conns, visited = nodegraph.traverse_linear_path(contig[0:21],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), list(visited))
+    assert size == 100
+    assert len(visited) == 100
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+    # traverse from immediately after 100:121, should end at the end
+    size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), list(visited))
+    assert size == 879
+    assert len(visited) == 879
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+    # traverse from end, should end at 100:121
+    size, conns, visited = nodegraph.traverse_linear_path(contig[-21:],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), len(visited))
+    assert size == 879
+    assert len(visited) == 879
+    assert nodegraph.hash(contig[100:121]) in conns
+    assert len(conns) == 1
+
+
+def test_traverse_linear_path_3_stopgraph():
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+    stopgraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+    print(nodegraph.neighbors(contig[101:122]))
+
+    degree_nodes = nodegraph.find_high_degree_nodes(contig)
+
+    assert len(degree_nodes) == 1
+    assert nodegraph.hash(contig[100:121]) in degree_nodes
+
+    stopgraph.count(contig[101:122])      # stop traversal - only adj to start
+
+    size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
+                                                          degree_nodes,
+                                                          stopgraph)
+
+    print(size, list(conns), len(visited))
+    assert size == 0
+    assert len(visited) == 0
+    assert len(conns) == 0

@@ -1,2 +1,2 @@
-http://ci.oxli.org:8080/userContent/sphinxcontrib-autoprogram-0.1.1-khmerdev-20140331.tar.gz#egg=sphinxcontrib-autoprogram==0.1.1-khmerdev-20140331
+sphinxcontrib-autoprogram>=0.1.2
 setuptools==3.4.1

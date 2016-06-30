@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=too-few-public-methods,no-init,missing-docstring
-"""This is khmer; please see http://khmer.readthedocs.org/."""
+"""This is khmer; please see http://khmer.readthedocs.io/."""
 
 
 from __future__ import print_function
@@ -45,7 +45,7 @@ from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-
+from khmer._khmer import HashSet
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
 

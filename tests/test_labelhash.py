@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -41,8 +41,9 @@ import khmer
 from khmer import GraphLabels, CountingGraphLabels
 import screed
 
+import pytest
+
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -53,7 +54,7 @@ def teardown():
 #  * thread-safety
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
         GraphLabels(20, 1e13, 1)
@@ -80,12 +81,12 @@ def test_n_labels():
     assert lh.n_labels() == 4
 
 
-def test_get_label_dict():
+def test_get_all_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
 
-    labels = lb.get_label_dict()
+    labels = lb.get_all_labels()
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -93,7 +94,7 @@ def test_get_label_dict():
         assert a_label in expected
 
 
-def test_get_label_dict_save_load():
+def test_get_labels_save_load():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
@@ -109,7 +110,7 @@ def test_get_label_dict_save_load():
     lb = GraphLabels(20, 1e7, 4)
     lb.load_labels_and_tags(savepath)
 
-    labels = lb.get_label_dict()
+    labels = lb.get_all_labels()
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -117,7 +118,7 @@ def test_get_label_dict_save_load():
         assert a_label in expected
 
 
-def test_get_label_dict_save_load_wrong_ksize():
+def test_get_labels_save_load_wrong_ksize():
     lb_pre = GraphLabels(19, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
@@ -209,8 +210,8 @@ def test_consume_fasta_and_tag_with_labels():
     assert total_reads == 3
     print("doing n_labels")
     print(lb.n_labels())
-    print("doing label dict")
-    print(lb.get_label_dict())
+    print("doing all labels")
+    print(lb.get_all_labels())
     print("get tagset")
     for tag in lb.graph.get_tagset():
         print("forward hash")
@@ -260,7 +261,7 @@ def test_sweep_tag_neighborhood():
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
-    assert tags.pop() == 173473779682
+    assert list(tags) == [173473779682]
 
 
 def test_sweep_label_neighborhood():

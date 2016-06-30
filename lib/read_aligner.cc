@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2013-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -532,7 +532,7 @@ Alignment* ReadAligner::Align(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer.c_str(), k, fhash, rhash);
+    _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "
@@ -610,7 +610,7 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer.c_str(), k, fhash, rhash);
+    _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "

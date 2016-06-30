@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -78,7 +78,7 @@ def get_parser():
         "connectivity", epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
 
-    parser.add_argument('basename', help="basename of the input k-mer"
+    parser.add_argument('basename', help="basename of the input k-mer "
                         "nodegraph  + tagset files")
     parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
@@ -136,6 +136,7 @@ def main():
 
     # divide the tags up into subsets
     divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 

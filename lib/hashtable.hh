@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -128,24 +128,6 @@ protected:
             bitmask = (bitmask << 2) | 3;
         }
         _nbits_sub_1 = (_ksize*2 - 2);
-    }
-
-    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
-    {
-        // left-shift the previous hash over
-        h = h << 2;
-
-        // 'or' in the current nt
-        h |= twobit_repr(ch);
-
-        // mask off the 2 bits we shifted over.
-        h &= bitmask;
-
-        // now handle reverse complement
-        r = r >> 2;
-        r |= (twobit_comp(ch) << _nbits_sub_1);
-
-        return uniqify_rc(h, r);
     }
 
     void _clear_all_partitions()
@@ -349,6 +331,14 @@ public:
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
+
+    //
+    void find_high_degree_nodes(const char * sequence,
+                                SeenSet& high_degree_nodes) const;
+    unsigned int traverse_linear_path(const Kmer start_kmer,
+                                      SeenSet &adjacencies,
+                                      SeenSet &nodes, Hashtable& bf,
+                                      SeenSet &high_degree_nodes) const;
 };
 }
 

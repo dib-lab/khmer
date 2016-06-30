@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -45,9 +45,10 @@ import os.path
 import shutil
 from io import StringIO
 import traceback
-import nose
 import glob
 import imp
+
+import pytest
 
 from . import khmer_tst_utils as utils
 import screed
@@ -65,7 +66,7 @@ def teardown():
 def test_import_all():
     sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
     if not os.path.exists(sandbox_path):
-        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+        pytest.skip("sandbox scripts are only tested in a repository")
 
     path = os.path.join(sandbox_path, "*.py")
     scripts = glob.glob(path)
@@ -325,3 +326,16 @@ def test_multirename_fasta():
     _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
     r = open(infile2).read()
     assert r in out
+
+
+def test_extract_compact_dbg_1():
+    infile = utils.get_test_data('simple-genome.fa')
+    outfile = utils.get_temp_filename('out.gml')
+    args = ['-x', '1e4', '-o', outfile, infile]
+    _, out, err = utils.runscript('extract-compact-dbg.py', args, sandbox=True)
+
+    print(out)
+    print(err)
+    assert os.path.exists(outfile)
+
+    assert '174 segments, containing 2803 nodes' in out
