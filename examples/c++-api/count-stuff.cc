@@ -18,7 +18,7 @@ int main()
 
     std::vector<HashIntoType> tablesize;
     tablesize.push_back(pow(4, ksize));
-    
+
     CountingHash ktable(ksize, tablesize);
 
     ktable.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
@@ -26,7 +26,7 @@ int main()
     std::cout << "count for: " << "ATGGCGATGGC" << " is " <<
         ktable.get_count("ATGGCGATGGC") << "\n";
 
-    ktable.count("ATGGCGATGGC");
+    ktable.add("ATGGCGATGGC");
 
     std::cout << "count for: " << "ATGGCGATGGC" << " is " <<
         ktable.get_count("ATGGCGATGGC") << "\n";
