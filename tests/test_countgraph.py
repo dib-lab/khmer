@@ -1,6 +1,7 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
 # Copyright (C) 2015-2016, The Regents of the University of California.
+# Copyright (C) 2016-2017, Google, Inc
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -1376,8 +1377,7 @@ def test_find_all_tags_list_error():
 
 
 def test_abund_dist_gz_bigcount():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     script = 'load-into-counting.py'
     htfile = utils.get_temp_filename('test_ct')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
@@ -1413,40 +1413,39 @@ def test_abund_dist_gz_bigcount():
 
 
 def test_abund_dist_gz_bigcount_compressed_first():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    script = 'load-into-counting.py'
-    htfile = utils.get_temp_filename('test_ct.gz')
-    args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
-    utils.runscript(script, args)  # create a bigcount table
-    assert os.path.exists(htfile)
-    data = gzip.open(htfile, 'rb').read()  # read compressed bigcount table
+        infile = utils.copy_test_data('test-abund-read-2.fa')
+        script = 'load-into-counting.py'
+        htfile = utils.get_temp_filename('test_ct.gz')
+        args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
+        utils.runscript(script, args)  # create a bigcount table
+        assert os.path.exists(htfile)
+        data = gzip.open(htfile, 'rb').read()  # read compressed bigcount table
 
-    outfile = utils.get_temp_filename('test_ct')
-    f_out = open(outfile, 'wb')  # output the bigcount table
-    f_out.write(data)
-    f_out.close()
-    # load the compressed bigcount table
-    try:
-        countgraph = khmer.load_countgraph(outfile)
-    except OSError as err:
-        assert 0, 'Should not produce OSError: ' + str(err)
+        outfile = utils.get_temp_filename('test_ct')
+        f_out = open(outfile, 'wb')  # output the bigcount table
+        f_out.write(data)
+        f_out.close()
+        # load the compressed bigcount table
+        try:
+            countgraph = khmer.load_countgraph(outfile)
+        except OSError as err:
+            assert 0, 'Should not produce OSError: ' + str(err)
 
-    assert countgraph.n_occupied() != 0
-    hashsizes = countgraph.hashsizes()
-    kmer_size = countgraph.ksize()
-    tracking = khmer._Nodegraph(kmer_size, hashsizes)
-    abundances = countgraph.abundance_distribution(infile, tracking)
-    # calculate abundance distribution for compressed bigcount table
-    flag = False
-    # check if abundance is > 255
-    # if ok  gzipped bigcount was loaded correctly
-    for _, i in enumerate(abundances):
-        print(_, i)
-        if _ > 255 and i > 0:
-            flag = True
-            break
-    assert flag
+        assert countgraph.n_occupied() != 0
+        hashsizes = countgraph.hashsizes()
+        kmer_size = countgraph.ksize()
+        tracking = khmer._Nodegraph(kmer_size, hashsizes)
+        abundances = countgraph.abundance_distribution(infile, tracking)
+        # calculate abundance distribution for compressed bigcount table
+        flag = False
+        # check if abundance is > 255
+        # if ok  gzipped bigcount was loaded correctly
+        for _, i in enumerate(abundances):
+            print(_, i)
+            if _ > 255 and i > 0:
+                flag = True
+                break
+        assert flag
 
 
 def test_counting_load_bigcount():
