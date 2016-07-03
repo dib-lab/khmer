@@ -540,6 +540,42 @@ def test_get_kmer_hashes():
     assert hi.get(hashes[1]) == 3
 
 
+def test_get_kmer_hashes_as_hashset():
+    hi = khmer.Countgraph(6, 1e6, 2)
+    def get_counts(hs):
+        return list(sorted([ hi.get(h) for h in hs ]))
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes_as_hashset("AAAAAA")
+    print(hashes)
+    assert len(hashes) == 1
+    assert [1] == get_counts(hashes)
+
+    hi.consume("AAAAAA")
+    hashes = hi.get_kmer_hashes_as_hashset("AAAAAA")
+    print(hashes)
+    assert len(hashes) == 1
+    assert [2] == get_counts(hashes)
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes_as_hashset("AAAAAAT")
+    print(hashes)
+    assert len(hashes) == 2
+    assert [1, 2] == get_counts(hashes)
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes_as_hashset("AAAAAAT")
+    print(hashes)
+    assert len(hashes) == 2
+    assert [2, 2] == get_counts(hashes)
+
+    hi.consume("AAAAAT")
+    hashes = hi.get_kmer_hashes_as_hashset("AAAAAAT")
+    print(hashes)
+    assert len(hashes) == 2
+    assert [2, 3] == get_counts(hashes)
+
+
 def test_get_kmers():
     hi = khmer.Countgraph(6, 1e6, 2)
 
