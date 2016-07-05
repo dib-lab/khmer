@@ -325,13 +325,21 @@ def test_memory_setting():
     assert khmer_args.memory_setting('16T') == 16e12
     try:
         _ = khmer_args.memory_setting('16Tb')
+        assert False, 'previous command should have failed'
     except ValueError as err:
         assert 'cannot parse memory setting' in str(err)
     try:
         _ = khmer_args.memory_setting('16E')
+        assert False, 'previous command should have failed'
     except ValueError as err:
         assert 'cannot parse memory setting' in str(err)
     try:
         _ = khmer_args.memory_setting('16Ki')
+        assert False, 'previous command should have failed'
+    except ValueError as err:
+        assert 'cannot parse memory setting' in str(err)
+    try:
+        _ = khmer_args.memory_setting('b0gu$G')
+        assert False, 'previous command should have failed'
     except ValueError as err:
         assert 'cannot parse memory setting' in str(err)
