@@ -2817,6 +2817,27 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 }
 
 
+static
+PyObject *
+hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    SeenSet * hashes = new SeenSet;
+    hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
+
+    PyObject * x = (PyObject *) create_HashSet_Object(hashes,
+                                                      hashtable->ksize());
+
+    return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
     //
     // Basic methods
@@ -2903,6 +2924,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "get_kmer_hashes",
         (PyCFunction)hashtable_get_kmer_hashes, METH_VARARGS,
         "Retrieve an ordered list of all hashes of all k-mers in the string."
+    },
+    {
+        "get_kmer_hashes_as_hashset",
+        (PyCFunction)hashtable_get_kmer_hashes_as_hashset, METH_VARARGS,
+        "Retrieve a HashSet containing all the k-mers in the string."
     },
     {
         "get_kmer_counts",

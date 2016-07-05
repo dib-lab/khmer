@@ -1,3 +1,10 @@
+2016-07-03  Titus Brown  <titus@idyll.org>
+
+   * lib{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   graphs.
+   * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
+   * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
+
 2016-06-27  Titus Brown  <titus@idyll.org>
 
    * doc/requirements.txt: updated sphinx-autoprogram requirement for building
