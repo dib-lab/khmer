@@ -221,6 +221,7 @@ def longify(listofints):
         return map(long, listofints)  # pylint: disable=bad-builtin
     return listofints
 
+
 def copy_test_data(testfile):
     infile = get_temp_filename('test.fq')
     shutil.copyfile(get_test_data(testfile), infile)
