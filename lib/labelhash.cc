@@ -713,7 +713,8 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 #if DEBUG
             std::cout << "recurse " << xpaths[0] << "\n";
 #endif // DEBUG
-            const char * start_again = this_contig.substr(this_contig.length() - kmer.length()).c_str();
+            std::string last_kmer = this_contig.substr(this_contig.length() - kmer.length());
+            const char * start_again = last_kmer.c_str();
 #if DEBUG
             std::cout << "starting from " << start_again << "\n";
 #endif // DEBUG
