@@ -80,6 +80,21 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_quiet():
+    script = 'load-into-counting.py'
+    args = ['-q', '-x', '1e3', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert len(out) == 0
+    assert len(err) == 0
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_autoargs_0():
     script = 'load-into-counting.py'
 
@@ -331,6 +346,29 @@ def test_load_into_counting_bad_summary_fmt():
     assert "invalid choice: 'badfmt'" in err, err
 
 
+def test_load_into_counting_info_version():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    with open(info_file) as info_fp:
+        versionline = info_fp.readline()
+    version = versionline.split(':')[1].strip()
+    assert versionline.startswith('khmer version:'), versionline
+    assert version == khmer.__version__, version
+
+
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = 'load-into-counting.py'
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
@@ -346,338 +384,6 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     assert os.path.exists(outfile)
 
     return outfile
-
-
-def test_filter_abund_1():
-    script = 'filter-abund.py'
-
-    infile = utils.get_temp_filename('test.fa')
-    n_infile = utils.get_temp_filename('test-fastq-n-reads.fq')
-
-    in_dir = os.path.dirname(infile)
-    n_in_dir = os.path.dirname(n_infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
-
-    counting_ht = _make_counting(infile, K=17)
-    n_counting_ht = _make_counting(n_infile, K=17)
-
-    args = [counting_ht, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    n_outfile = n_infile + '.abundfilt'
-    n_outfile2 = n_infile + '2.abundfilt'
-
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-    args = [n_counting_ht, n_infile]
-    utils.runscript(script, args, n_in_dir)
-
-    seqs = set([r.sequence for r in screed.open(n_infile)])
-    assert os.path.exists(n_outfile), n_outfile
-
-    args = [n_counting_ht, n_infile, '-o', n_outfile2]
-    utils.runscript(script, args, in_dir)
-    assert os.path.exists(n_outfile2), n_outfile2
-
-
-def test_filter_abund_2():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-C', '1', counting_ht, infile, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-
-def test_filter_abund_2_stdin():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-C', '1', counting_ht, '-']
-    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    assert status == 1
-    assert "Accepting input from stdin; output filename must be provided" \
-           in str(err)
-
-
-def test_filter_abund_2_stdin_gzip_out():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-    outfile = utils.get_temp_filename('out.fa.gz')
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-C', '1', counting_ht, infile, '-o', outfile, '--gzip']
-    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
-    print(out)
-    print(err)
-    assert status == 0
-
-# make sure that FASTQ records are retained.
-
-
-def test_filter_abund_3_fq_retained():
-    infile = utils.get_temp_filename('test.fq')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-C', '1', counting_ht, infile, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-    # check for 'quality' string.
-    quals = set([r.quality for r in screed.open(outfile)])
-    assert len(quals) == 2, quals
-    assert '##################' in quals
-
-
-# make sure that FASTQ names are properly parsed, both formats.
-
-
-def test_filter_abund_4_fq_casava_18():
-    infile = utils.get_temp_filename('test.fq')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
-                    infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = [counting_ht, infile, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.name for r in screed.open(outfile)])
-    assert 'pair:foo 1::N' in seqs, seqs
-
-
-def test_filter_abund_1_singlefile():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    assert 'Total number of unique k-mers: 98' in err, err
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-
-def test_filter_abund_2_singlefile():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-    tabfile = utils.get_temp_filename('test-savegraph.ct')
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '--savegraph',
-            tabfile, infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    assert 'Total number of unique k-mers: 98' in err, err
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-
-def test_filter_abund_2_singlefile_fq_casava_18():
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
-                    infile)
-
-    script = 'filter-abund-single.py'
-    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
-    (status, out, err) = utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.name for r in screed.open(outfile)])
-    assert 'pair:foo 1::N' in seqs, seqs
-
-
-def test_filter_abund_4_retain_low_abund():
-    # test that the -V option does not trim sequences that are low abundance
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-V', counting_ht, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-
-def test_filter_abund_5_trim_high_abund():
-    # test that the -V option *does* trim sequences that are high abundance
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-V', counting_ht, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-
-    # trimmed sequence @ error
-    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
-
-
-def test_filter_abund_6_trim_high_abund_Z():
-    # test that -V/-Z settings interact properly -
-    # trimming should not happen if -Z is set high enough.
-
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-V', '-Z', '25', counting_ht, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-
-    # untrimmed seq.
-    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
-             'GATTTCCGGGCGG'
-    assert badseq in seqs       # should be there, untrimmed
-
-
-def test_filter_abund_7_retain_Ns():
-    # check that filter-abund retains sequences with Ns, and treats them as As.
-
-    infile = utils.get_temp_filename('test.fq')
-    in_dir = os.path.dirname(infile)
-
-    # copy test file over to test.fq & load into countgraph
-    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
-    counting_ht = _make_counting(infile, K=17)
-
-    script = 'filter-abund.py'
-    args = ['-C', '3', counting_ht, infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile)])
-    assert '895:1:37:17593:9954 1::FOO_withN' in names, names
-
-    # check to see if that 'N' was properly changed to an 'A'
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAG' not in seqs, seqs
-
-    # ...and that an 'N' remains in the output sequences
-    found_N = False
-    for s in seqs:
-        if 'N' in s:
-            found_N = True
-    assert found_N, seqs
-
-
-def test_filter_abund_single_8_retain_Ns():
-    # check that filter-abund-single retains
-    # sequences with Ns, and treats them as As.
-
-    infile = utils.get_temp_filename('test.fq')
-    in_dir = os.path.dirname(infile)
-
-    # copy test file over to test.fq & load into countgraph
-    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
-
-    script = 'filter-abund-single.py'
-    args = ['-k', '17', '-x', '1e7', '-N', '2', '-C', '3', infile]
-    utils.runscript(script, args, in_dir)
-
-    outfile = infile + '.abundfilt'
-    assert os.path.exists(outfile), outfile
-
-    # test for a sequence with an 'N' in it --
-    names = set([r.name for r in screed.open(outfile)])
-    assert '895:1:37:17593:9954 1::FOO_withN' in names, names
-
-    # check to see if that 'N' was properly changed to an 'A'
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAG' not in seqs, seqs
-
-    # ...and that an 'N' remains in the output sequences
-    found_N = False
-    for s in seqs:
-        if 'N' in s:
-            found_N = True
-    assert found_N, seqs
 
 
 def test_filter_stoptags():
@@ -1358,6 +1064,34 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
+def test_extract_paired_inconsistent_formats():
+    fa_seqfile = utils.get_test_data('random-20-a.fa')
+    fq_seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(
+        fa_seqfile, do_partition=True, annotate_partitions=True)
+    fa_in_dir = os.path.dirname(graphbase)
+    graphbase = _make_graph(
+        fq_seqfile, do_partition=True, annotate_partitions=True)
+    fq_in_dir = os.path.dirname(graphbase)
+    # XXX
+    # get the final part file
+    fa_partfile = os.path.join(fa_in_dir, 'random-20-a.fa.part')
+    fq_partfile = os.path.join(fq_in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = 'extract-partitions.py'
+    args = ['extracted', fa_partfile, fq_partfile]
+
+    failed = True
+    try:
+        utils.runscript(script, args, fa_in_dir)
+        failed = False
+    except AssertionError as err:
+        assert "Input files must have consistent format." in str(err), err
+
+    assert failed, "Expected to fail"
+
+
 def test_extract_partitions_header_whitespace():
     seqfile = utils.get_test_data('test-overlap2.fa')
     graphbase = _make_graph(
@@ -1569,6 +1303,30 @@ def test_abundance_dist():
         assert line == '1001,2,98,1.0', line
 
 
+def test_abundance_dist_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = 'abundance-dist.py'
+    args = ['-z', '-q', htfile, infile, outfile]
+    status, out, err = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
+
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
+
+
 def test_abundance_dist_stdout():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -1678,6 +1436,27 @@ def test_abundance_dist_single_nosquash():
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     utils.runscript(script, args, in_dir)
+
+    with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
+
+
+def test_abundance_dist_single_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = 'abundance-dist-single.py'
+    args = ['-q', '-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
+    status, out, err = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
 
     with open(outfile) as fp:
         line = fp.readline().strip()    # skip header
@@ -2897,6 +2676,7 @@ def test_trim_low_abund_diginorm_coverage_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --diginorm-coverage given, but --diginorm not specified.' \
            in err, err
@@ -2927,6 +2707,7 @@ def test_trim_low_abund_varcov_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --trim-at-coverage/-Z given' in err, err
 
@@ -2941,6 +2722,20 @@ def test_trim_low_abund_single_pass():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
     assert status == 0
+
+
+def test_trim_low_abund_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    args = ["-q", "-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+    assert len(out) == 0
+    assert len(err) == 0
 
 
 def test_trim_low_abund_reporting():
@@ -3106,7 +2901,9 @@ def check_version_and_basic_citation(scriptname):
     version = re.compile("^khmer .*$", re.MULTILINE)
     status, out, err = utils.runscript(scriptname, ["--version"])
     assert status == 0, status
-    assert "publication" in err, err
+    print(out)
+    print(err)
+    # assert "publication" in err, err
     assert version.search(err) is not None, err
 
 

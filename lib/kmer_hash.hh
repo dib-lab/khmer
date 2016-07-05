@@ -183,7 +183,7 @@ public:
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K)
+    std::string get_string_rep(WordLength K) const
     {
         return _revhash(kmer_u, K);
     }
