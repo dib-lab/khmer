@@ -95,6 +95,39 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
+def memory_setting(label):
+    """
+    Parse user-supplied memory setting.
+
+    Converts strings into floats, representing a number of bytes. Supports the
+    following notations.
+      - raw integers: 1, 1000, 1000000000
+      - scientific notation: 1, 1e3, 1e9
+      - "common" notation: 1, 1K, 1G
+
+    Suffixes supported: K/k, M/m, G/g, T/t. Do not include a trailing B/b.
+    """
+    suffixes = {
+        'K': 1000.0,
+        'M': 1000.0 ** 2,
+        'G': 1000.0 ** 3,
+        'T': 1000.0 ** 4,
+    }
+    try:
+        mem = float(label)
+        return mem
+    except ValueError:
+        prefix = label[:-1]
+        suffix = label[-1:].upper()
+        if suffix not in suffixes.keys():
+            raise ValueError('cannot parse memory setting "{}"'.format(label))
+        try:
+            multiplier = float(prefix)
+            return multiplier * suffixes[suffix]
+        except ValueError:
+            raise ValueError('cannot parse memory setting "{}"'.format(label))
+
+
 def optimal_size(num_kmers, mem_cap=None, fp_rate=None):
     """
     Utility function for estimating optimal countgraph args.
@@ -337,7 +370,6 @@ def build_graph_args(descr=None, epilog=None, parser=None):
                        help='automagically allocate memory for data structure;'
                        ' use 80%% of available memory or 16GB, whichever is '
                        'smaller')
-
     return parser
 
 
