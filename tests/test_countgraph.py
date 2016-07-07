@@ -542,8 +542,9 @@ def test_get_kmer_hashes():
 
 def test_get_kmer_hashes_as_hashset():
     hi = khmer.Countgraph(6, 1e6, 2)
+
     def get_counts(hs):
-        return list(sorted([ hi.get(h) for h in hs ]))
+        return list(sorted([hi.get(h) for h in hs]))
 
     hi.consume("AAAAAA")
     hashes = hi.get_kmer_hashes_as_hashset("AAAAAA")

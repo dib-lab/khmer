@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -310,3 +310,36 @@ def test_fail_calculate_foograph_size():
         assert 0, "previous statement should fail"
     except ValueError as err:
         assert "unknown graph type: foograph" in str(err), str(err)
+
+
+def test_memory_setting():
+    assert khmer_args.memory_setting('1') == 1.0
+    assert khmer_args.memory_setting('42') == 42.0
+    assert khmer_args.memory_setting('10000') == 1e4
+    assert khmer_args.memory_setting('2.3e5') == 230000.0
+    assert khmer_args.memory_setting('1e9') == 1e9
+    assert khmer_args.memory_setting('1K') == 1e3
+    assert khmer_args.memory_setting('3.14m') == 3.14e6
+    assert khmer_args.memory_setting('8G') == 8e9
+    assert khmer_args.memory_setting('8g') == 8e9
+    assert khmer_args.memory_setting('16T') == 16e12
+    try:
+        _ = khmer_args.memory_setting('16Tb')
+        assert False, 'previous command should have failed'
+    except ValueError as err:
+        assert 'cannot parse memory setting' in str(err)
+    try:
+        _ = khmer_args.memory_setting('16E')
+        assert False, 'previous command should have failed'
+    except ValueError as err:
+        assert 'cannot parse memory setting' in str(err)
+    try:
+        _ = khmer_args.memory_setting('16Ki')
+        assert False, 'previous command should have failed'
+    except ValueError as err:
+        assert 'cannot parse memory setting' in str(err)
+    try:
+        _ = khmer_args.memory_setting('b0gu$G')
+        assert False, 'previous command should have failed'
+    except ValueError as err:
+        assert 'cannot parse memory setting' in str(err)
