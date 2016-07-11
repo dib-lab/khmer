@@ -1,6 +1,7 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
 # Copyright (C) 2015-2016, The Regents of the University of California.
+# Copyright (C) 2016, Google, Inc
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -1413,8 +1414,7 @@ def test_find_all_tags_list_error():
 
 
 def test_abund_dist_gz_bigcount():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     script = 'load-into-counting.py'
     htfile = utils.get_temp_filename('test_ct')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
@@ -1450,8 +1450,7 @@ def test_abund_dist_gz_bigcount():
 
 
 def test_abund_dist_gz_bigcount_compressed_first():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     script = 'load-into-counting.py'
     htfile = utils.get_temp_filename('test_ct.gz')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
