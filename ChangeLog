@@ -1,6 +1,10 @@
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
 2016-07-03  Titus Brown  <titus@idyll.org>
 
-   * lib{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
    graphs.
    * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
    * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
