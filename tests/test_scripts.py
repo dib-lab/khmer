@@ -80,6 +80,21 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_quiet():
+    script = 'load-into-counting.py'
+    args = ['-q', '-x', '1e3', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert len(out) == 0
+    assert len(err) == 0
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_autoargs_0():
     script = 'load-into-counting.py'
 
@@ -1049,6 +1064,34 @@ def test_extract_partitions():
     assert len(parts) == 1, len(parts)
 
 
+def test_extract_paired_inconsistent_formats():
+    fa_seqfile = utils.get_test_data('random-20-a.fa')
+    fq_seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(
+        fa_seqfile, do_partition=True, annotate_partitions=True)
+    fa_in_dir = os.path.dirname(graphbase)
+    graphbase = _make_graph(
+        fq_seqfile, do_partition=True, annotate_partitions=True)
+    fq_in_dir = os.path.dirname(graphbase)
+    # XXX
+    # get the final part file
+    fa_partfile = os.path.join(fa_in_dir, 'random-20-a.fa.part')
+    fq_partfile = os.path.join(fq_in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = 'extract-partitions.py'
+    args = ['extracted', fa_partfile, fq_partfile]
+
+    failed = True
+    try:
+        utils.runscript(script, args, fa_in_dir)
+        failed = False
+    except AssertionError as err:
+        assert "Input files must have consistent format." in str(err), err
+
+    assert failed, "Expected to fail"
+
+
 def test_extract_partitions_header_whitespace():
     seqfile = utils.get_test_data('test-overlap2.fa')
     graphbase = _make_graph(
@@ -1260,6 +1303,30 @@ def test_abundance_dist():
         assert line == '1001,2,98,1.0', line
 
 
+def test_abundance_dist_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = 'abundance-dist.py'
+    args = ['-z', '-q', htfile, infile, outfile]
+    status, out, err = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
+
+    with open(outfile) as fp:
+        line = fp.readline().strip()
+        assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
+
+
 def test_abundance_dist_stdout():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -1369,6 +1436,27 @@ def test_abundance_dist_single_nosquash():
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     utils.runscript(script, args, in_dir)
+
+    with open(outfile) as fp:
+        line = fp.readline().strip()    # skip header
+        line = fp.readline().strip()
+        assert line == '1,96,96,0.98', line
+        line = fp.readline().strip()
+        assert line == '1001,2,98,1.0', line
+
+
+def test_abundance_dist_single_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = 'abundance-dist-single.py'
+    args = ['-q', '-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
+    status, out, err = utils.runscript(script, args, in_dir)
+
+    assert len(err) == 0
 
     with open(outfile) as fp:
         line = fp.readline().strip()    # skip header
@@ -2588,6 +2676,7 @@ def test_trim_low_abund_diginorm_coverage_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --diginorm-coverage given, but --diginorm not specified.' \
            in err, err
@@ -2618,6 +2707,7 @@ def test_trim_low_abund_varcov_err():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
                                        fail_ok=True)
 
+    print(out, err)
     assert status == 1
     assert 'Error: --trim-at-coverage/-Z given' in err, err
 
@@ -2632,6 +2722,20 @@ def test_trim_low_abund_single_pass():
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
     assert status == 0
+
+
+def test_trim_low_abund_quiet():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
+
+    args = ["-q", "-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
+    status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert status == 0
+    assert len(out) == 0
+    assert len(err) == 0
 
 
 def test_trim_low_abund_reporting():
@@ -2797,7 +2901,9 @@ def check_version_and_basic_citation(scriptname):
     version = re.compile("^khmer .*$", re.MULTILINE)
     status, out, err = utils.runscript(scriptname, ["--version"])
     assert status == 0, status
-    assert "publication" in err, err
+    print(out)
+    print(err)
+    # assert "publication" in err, err
     assert version.search(err) is not None, err
 
 
