@@ -87,6 +87,9 @@ def main():
             if n and n % 10000 == 0:
                 print('...', n, file=sys.stderr)
 
+            if len(record.sequence) < K:
+                continue
+
             cov, _, _ = cg.get_median_count(record.sequence)
             if cov < 20:
                 kept += 1
