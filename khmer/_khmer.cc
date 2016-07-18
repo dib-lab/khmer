@@ -462,6 +462,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
@@ -471,9 +472,11 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            exc_string = exc.what();
+            file_exception = exc_string.c_str();
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            exc_string = exc.what();
+            value_exception = exc_string.c_str();
         }
     }
     Py_END_ALLOW_THREADS
