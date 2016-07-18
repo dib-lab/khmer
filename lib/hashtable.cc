@@ -132,10 +132,16 @@ consume_fasta(
     Read			  read;
 
     // Iterate through the reads and consume their k-mers.
+    unsigned long n = 0;
     while (!parser->is_complete( )) {
         bool is_valid;
         try {
             read = parser->get_next_read( );
+            n++;
+            if (n % 10000 == 0) {
+                std::cout << "... consume_fasta: " << n << std::endl;
+                std::cout << std::flush;
+            }
         } catch (NoMoreReadsAvailable) {
             break;
         }
@@ -1020,7 +1026,7 @@ void Hashtable::find_high_degree_nodes(const char * s,
     while(!kmers.done()) {
         n++;
         if (n % 10000 == 0) {
-            std::cout << "... find_high_degree_nodes: " << n << "\n";
+            std::cout << "... find_high_degree_nodes: " << n << std::endl;
             std::cout << std::flush;
         }
         Kmer kmer = kmers.next();
@@ -1052,7 +1058,7 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
     while (to_be_visited.size()) {
         Kmer kmer = to_be_visited.back();
         to_be_visited.pop_back();
-        
+
         visited.insert(kmer);
         size += 1;
 
@@ -1080,4 +1086,3 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
 }
 
 // vim: set sts=2 sw=2:
-
