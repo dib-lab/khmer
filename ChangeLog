@@ -1,3 +1,32 @@
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
+2016-07-03  Titus Brown  <titus@idyll.org>
+
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   graphs.
+   * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
+   * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
+
+2016-06-27  Titus Brown  <titus@idyll.org>
+
+   * doc/requirements.txt: updated sphinx-autoprogram requirement for building
+   documentation, to point at released version.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, tests/test_nodegraph.py: 'add' is now a synonym for
+   graph.count(kmer).
+   * khmer/thread_utils.py: update verbose_loader function to take 'verbose'
+   argument.
+   * scripts/{abundance-dist-single.py, abundance-dist.py,
+   filter-abund-single.py, filter-abund.py, load-into-counting.py,
+   normalize-by-median.py,trim-low-abund.py}: updated to
+   respect -q/--quiet.
+   * tests/test_filter_abund.py: tests for '-q'.
+   * scripts/partition-graph.py: fix typo in args help message.
+
 2016-06-26  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
@@ -191,6 +220,13 @@
    * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
    and fix for close of --output file after first input file.
 
+2015-10-19  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * versioneer.py,khmer/_version.py,setup.py,setup.cfg: upgrade Versioneer to
+   version 0.15+dev, Mon Jun 29 2015 99d5d9341830945f7080537ddd3bbd79c4aa1732
+   * doc/conf.py, lib/Makefile: update method of retrieving current version
+   * lib/get_version.py: no longer needed, removed
+
 2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * lib/magic: add file extensions, one media type, and a better comment
@@ -368,6 +404,12 @@
    * scripts/unique-kmers.py: Rename option --stream-out to --stream-records.
    * tests/test_streaming_io.py: Fix unique-kmers tests, use new option.
    * khmer/_khmer.cc, lib/hllcounter.cc: Rename some variables for consistency.
+
+2015-08-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+      * scripts/extract-partitions.py: refactored much of the processing into
+      generators
+      * tests/test_scripts.py: added test
 
 2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
 
