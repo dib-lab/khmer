@@ -328,9 +328,21 @@ public:
     void get_kmer_hashes(const std::string &s,
                          std::vector<HashIntoType> &kmers) const;
 
+    // return hash values for all k-mer substrings in a SeenSet
+    void get_kmer_hashes_as_hashset(const std::string &s,
+                                    SeenSet& hashes) const;
+
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
+
+    //
+    void find_high_degree_nodes(const char * sequence,
+                                SeenSet& high_degree_nodes) const;
+    unsigned int traverse_linear_path(const Kmer start_kmer,
+                                      SeenSet &adjacencies,
+                                      SeenSet &nodes, Hashtable& bf,
+                                      SeenSet &high_degree_nodes) const;
 };
 }
 

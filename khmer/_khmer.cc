@@ -400,6 +400,7 @@ _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
+    std::string exc_string;
 
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
@@ -419,9 +420,11 @@ _ReadParser_iternext( PyObject * self )
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            exc_string = exc.what();
+            file_exception = exc_string.c_str();
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            exc_string = exc.what();
+            value_exception = exc_string.c_str();
         }
     }
     Py_END_ALLOW_THREADS
@@ -462,6 +465,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
@@ -471,9 +475,11 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            exc_string = exc.what();
+            file_exception = exc_string.c_str();
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            exc_string = exc.what();
+            value_exception = exc_string.c_str();
         }
     }
     Py_END_ALLOW_THREADS
@@ -1355,14 +1361,17 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     unsigned int        total_reads     = 0;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -1425,6 +1434,33 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    SeenSet * hashes = new SeenSet;
+    hashtable->find_high_degree_nodes(long_str, *hashes);
+
+    khmer_HashSet_Object * o;
+    o = create_HashSet_Object(hashes, hashtable->ksize());
+
+    return (PyObject *) o;
+}
+
+static
+PyObject *
 hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1458,6 +1494,46 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     return x;
+}
+
+static
+PyObject *
+hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o;
+    khmer_HashSet_Object * hdn_o;
+
+    if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
+                          &khmer_HashSet_Type, &hdn_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    SeenSet * adj = new SeenSet;
+    SeenSet * visited = new SeenSet;
+    unsigned int size = hashtable->traverse_linear_path(start_kmer,
+                                                        *adj, *visited,
+                                                        *nodegraph_o->hashbits,
+                                                        *hdn_o->hashes);
+
+    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
+                                                         hashtable->ksize());
+    khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
+                                                           hashtable->ksize());
+
+    PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
+                                   (PyObject *) adj_o, (PyObject *) visited_o);
+    Py_DECREF(adj_o);
+    Py_DECREF(visited_o);
+
+    return ret;
 }
 
 static
@@ -1614,8 +1690,8 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-        PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                                                          hashtable->ksize());
+    PyObject * x = (PyObject *) create_HashSet_Object(tags,
+                                                      hashtable->ksize());
     return x;
 }
 
@@ -1990,14 +2066,17 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
     const char         *file_exception  = NULL;
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta_and_tag(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -2470,11 +2549,13 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
 
     const char         *file_exception  = NULL;
 
+    std::string exc_string ;
     Py_BEGIN_ALLOW_THREADS
     try {
         subset_p->load_partitionmap(filename);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -2750,6 +2831,27 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 }
 
 
+static
+PyObject *
+hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+    const char * sequence;
+
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    SeenSet * hashes = new SeenSet;
+    hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
+
+    PyObject * x = (PyObject *) create_HashSet_Object(hashes,
+                                                      hashtable->ksize());
+
+    return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
     //
     // Basic methods
@@ -2784,6 +2886,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "count",
         (PyCFunction)hashtable_count, METH_VARARGS,
         "Increment the count of this k-mer."
+    },
+    {
+        "add",
+        (PyCFunction)hashtable_count, METH_VARARGS,
+        "Increment the count of this k-mer. (Synonym for 'count'.)"
     },
     {
         "consume",
@@ -2833,6 +2940,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Retrieve an ordered list of all hashes of all k-mers in the string."
     },
     {
+        "get_kmer_hashes_as_hashset",
+        (PyCFunction)hashtable_get_kmer_hashes_as_hashset, METH_VARARGS,
+        "Retrieve a HashSet containing all the k-mers in the string."
+    },
+    {
         "get_kmer_counts",
         (PyCFunction)hashtable_get_kmer_counts, METH_VARARGS,
         "Retrieve an ordered list of the counts of all k-mers in the string."
@@ -2861,6 +2973,20 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "count_kmers_within_radius",
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
+    },
+
+    {
+        "find_high_degree_nodes",
+        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
+        "Examine the given sequence for degree > 2 nodes and add to  "
+        "list; used in graph contraction.",
+    },
+    {
+        "traverse_linear_path",
+        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
+        "Traverse the path through the graph starting with the given "
+        "k-mer and avoiding high-degree nodes, finding (and returning) "
+        "traversed k-mers and any encountered high-degree nodes.",
     },
 
     //
@@ -3210,14 +3336,17 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
     HashIntoType       *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(rparser, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -3260,13 +3389,17 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
     HashIntoType       *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
+    
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -3841,24 +3974,23 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
 
 static
 PyObject *
-labelhash_get_label_dict(khmer_KGraphLabels_Object * me, PyObject * args)
+labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * hb = me->labelhash;
 
-    PyObject * d = PyDict_New();
+    PyObject * d = PyList_New(hb->all_labels.size());
     if (d == NULL) {
         return NULL;
     }
-    LabelPtrMap::iterator it;
+    LabelSet::iterator it;
 
-    for (it = hb->label_ptrs.begin(); it != hb->label_ptrs.end(); ++it) {
-        PyObject * key = Py_BuildValue("K", it->first);
-        PyObject * val = Py_BuildValue("K", it->second);
-        if (key != NULL && val != NULL) {
-            PyDict_SetItem(d, key, val);
+    unsigned long long i = 0;
+    for (it = hb->all_labels.begin(); it != hb->all_labels.end(); ++it) {
+        PyObject * val = Py_BuildValue("K", *it);
+        if (val != NULL) {
+            PyList_SetItem(d, i, val);
         }
-        Py_XDECREF(key);
-        Py_XDECREF(val);
+        i++;
     }
 
     return d;
@@ -3881,14 +4013,18 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
     const char         *file_exception  = NULL;
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
+    std::string exc_string;
+    
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
                                               n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     //Py_END_ALLOW_THREADS
 
@@ -3948,9 +4084,8 @@ labelhash_consume_sequence_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         return NULL;
     }
     unsigned long long n_consumed = 0;
-    Label * the_label = hb->check_and_allocate_label(c);
 
-    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
+    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, c);
     return Py_BuildValue("K", n_consumed);
 }
 
@@ -3992,8 +4127,8 @@ labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
-    LabelPtrSet found_labels;
+    //std::pair<TagLabelPair::iterator, TagLabelPair::iterator> ret;
+    LabelSet found_labels;
 
     //unsigned int num_traversed = 0;
     //Py_BEGIN_ALLOW_THREADS
@@ -4004,10 +4139,10 @@ labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
     //printf("...%u kmers traversed\n", num_traversed);
 
     PyObject * x =  PyList_New(found_labels.size());
-    LabelPtrSet::const_iterator si;
+    LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = found_labels.begin(); si != found_labels.end(); ++si) {
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }
 
@@ -4084,16 +4219,16 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
         return NULL;
     }
 
-    LabelPtrSet labels;
+    LabelSet labels;
 
     labels = labelhash->get_tag_labels(tag);
 
     PyObject * x =  PyList_New(labels.size());
-    LabelPtrSet::const_iterator si;
+    LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = labels.begin(); si != labels.end(); ++si) {
         //std::string kmer_s = _revhash(*si, labelhash->ksize());
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }
 
@@ -4163,7 +4298,7 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"get_tag_labels", (PyCFunction)labelhash_get_tag_labels, METH_VARARGS, ""},
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
-    {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
+    {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };

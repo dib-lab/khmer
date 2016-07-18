@@ -985,6 +985,18 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 }
 
 
+void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
+                                           SeenSet& hashes) const
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        hashes.insert(kmer);
+    }
+}
+
+
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
@@ -997,4 +1009,75 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
+void Hashtable::find_high_degree_nodes(const char * s,
+                                       SeenSet& high_degree_nodes)
+    const
+{
+    Traverser traverser(this);
+    KmerIterator kmers(s, _ksize);
+
+    unsigned long n = 0;
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... find_high_degree_nodes: " << n << "\n";
+            std::cout << std::flush;
+        }
+        Kmer kmer = kmers.next();
+        if ((traverser.degree(kmer)) > 2) {
+            high_degree_nodes.insert(kmer);
+        }
+    }
+}
+
+unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
+                                             SeenSet &adjacencies,
+                                             SeenSet &visited, Hashtable &bf,
+                                             SeenSet &high_degree_nodes)
+    const
+{
+    unsigned int size = 0;
+
+    Traverser traverser(this);
+
+    // if this k-mer is in the Bloom filter, truncate search.
+    // This prevents paths from being traversed in two directions.
+    if (bf.get_count(seed_kmer)) {
+        return 0;
+    }
+
+    std::vector<Kmer> to_be_visited;
+    to_be_visited.push_back(seed_kmer);
+
+    while (to_be_visited.size()) {
+        Kmer kmer = to_be_visited.back();
+        to_be_visited.pop_back();
+        
+        visited.insert(kmer);
+        size += 1;
+
+        KmerQueue node_q;
+        traverser.traverse(kmer, node_q);
+
+        while (node_q.size()) {
+            Kmer node = node_q.front();
+            node_q.pop();
+
+            if (set_contains(high_degree_nodes, node)) {
+                // if there are any adjacent high degree nodes, record;
+                adjacencies.insert(node);
+                // also, add this to the stop Bloom filter.
+                bf.count(kmer);
+            } else if (set_contains(visited, node)) {
+                // do nothing - already visited
+                ;
+            } else {
+                to_be_visited.push_back(node);
+            }
+        }
+    }
+    return size;
+}
+
 // vim: set sts=2 sw=2:
+

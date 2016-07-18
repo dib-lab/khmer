@@ -57,11 +57,6 @@ from distutils.errors import DistutilsPlatformError
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'khmer/_version.py'
-versioneer.versionfile_build = 'khmer/_version.py'
-versioneer.tag_prefix = 'v'  # tags are like v1.2.0
-versioneer.parentdir_prefix = '.'
 CMDCLASS = versioneer.get_cmdclass()
 
 # strip out -Wstrict-prototypes; a hack suggested by
@@ -224,7 +219,7 @@ SETUP_METADATA = \
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
-        "url": 'https://khmer.readthedocs.org/',
+        "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],

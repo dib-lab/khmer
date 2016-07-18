@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -56,6 +56,8 @@ from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer import __version__
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -103,20 +105,24 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('filter-abund.py', ['counting'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('filter-abund.py', ['counting'])
 
-    check_input_files(args.input_graph, args.force)
+    configure_logging(args.quiet)
+
     infiles = args.input_filename
     if ('-' in infiles or '/dev/stdin' in infiles) and not \
        args.single_output_file:
-        print("Accepting input from stdin; output filename must "
-              "be provided with -o.", file=sys.stderr)
+        log_error("Accepting input from stdin; output filename must "
+                  "be provided with -o.")
         sys.exit(1)
 
     for filename in infiles:
@@ -124,12 +130,11 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading countgraph:', args.input_graph,
-          file=sys.stderr)
+    log_info('loading countgraph: {graph}', graph=args.input_graph)
     countgraph = khmer.load_countgraph(args.input_graph)
     ksize = countgraph.ksize()
 
-    print("K:", ksize, file=sys.stderr)
+    log_info("K: {ksize}", ksize=ksize)
 
     # the filtering function.
     def process_fn(record):
@@ -157,16 +162,17 @@ def main():
 
     # the filtering loop
     for infile in infiles:
-        print('filtering', infile, file=sys.stderr)
+        log_info('filtering {infile}', infile=infile)
         if not args.single_output_file:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
+        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads,
+                                        verbose=not args.quiet)
         tsp.start(verbose_loader(infile), outfp)
 
-        print('output in', outfile, file=sys.stderr)
+        log_info('output in {outfile}', outfile=outfile)
 
 
 if __name__ == '__main__':

@@ -78,7 +78,7 @@ def get_parser():
         "connectivity", epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
 
-    parser.add_argument('basename', help="basename of the input k-mer"
+    parser.add_argument('basename', help="basename of the input k-mer "
                         "nodegraph  + tagset files")
     parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")

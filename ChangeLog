@@ -1,3 +1,77 @@
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
+2016-07-03  Titus Brown  <titus@idyll.org>
+
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   graphs.
+   * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
+   * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
+
+2016-06-27  Titus Brown  <titus@idyll.org>
+
+   * doc/requirements.txt: updated sphinx-autoprogram requirement for building
+   documentation, to point at released version.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, tests/test_nodegraph.py: 'add' is now a synonym for
+   graph.count(kmer).
+   * khmer/thread_utils.py: update verbose_loader function to take 'verbose'
+   argument.
+   * scripts/{abundance-dist-single.py, abundance-dist.py,
+   filter-abund-single.py, filter-abund.py, load-into-counting.py,
+   normalize-by-median.py,trim-low-abund.py}: updated to
+   respect -q/--quiet.
+   * tests/test_filter_abund.py: tests for '-q'.
+   * scripts/partition-graph.py: fix typo in args help message.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
+   tests/test-data/simple-genome.fa, tests/test_nodegraph.py: added functions
+   'find_high_degree_nodes' and 'traverse_linear_path' to hashtables/graphs.
+   * lib/kmer_hash.cc: minor change to use object member _seq instead of
+   constructor argument seq in KmerIterator.
+   * lib/kmer_hash.hh: added const to Kmer::get_string_rep(...) signature.
+   * sandbox/extract-compact-dbg.py: new sandbox script to
+   extract compact De Bruijn graphs (with linear paths contracted).
+   * tests/test_sandbox_scripts.py: added tests for the extract-compact-dbg.py
+   script.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * lib/khmer.hh,lib/{labelhash.cc,labelhash.hh}: removed label pointer-based
+   indirection from labelhash code.
+   * khmer/_khmer.cc: updated CPython API to match new behavior.
+   * tests/test_labelhash.py: renamed to match new API; no changes in test
+   logic.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * scripts/filter-abund-single.py: add -o/--outfile option.
+   * tests/test_script_output.py: move `_calc_md5` function for calculating
+   file MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+   * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+   dedicated test script, add minimal test for new -o option.
+   * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+   new test.
+   * .gitignore: add .cache/ directory, which appears to be an artifact of the
+   py.test framework.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+  * scripts/filter-abund-single.py: add -o/--outfile option.
+  * tests/test_script_output.py: move `_calc_md5` function for calculating file
+  MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+  * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+  dedicated test script, add minimal test for new -o option.
+  * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+  new test.
+  * .gitignore: add .cache/ directory, which appears to be an artifact of the
+  py.test framework.
+
 2016-05-25  Titus Brown  <titus@idyll.org>
 
    * scripts/trim-low-abund.py: switched to watermark-based reporting to
@@ -145,6 +219,13 @@
 
    * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
    and fix for close of --output file after first input file.
+
+2015-10-19  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * versioneer.py,khmer/_version.py,setup.py,setup.cfg: upgrade Versioneer to
+   version 0.15+dev, Mon Jun 29 2015 99d5d9341830945f7080537ddd3bbd79c4aa1732
+   * doc/conf.py, lib/Makefile: update method of retrieving current version
+   * lib/get_version.py: no longer needed, removed
 
 2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
@@ -323,6 +404,12 @@
    * scripts/unique-kmers.py: Rename option --stream-out to --stream-records.
    * tests/test_streaming_io.py: Fix unique-kmers tests, use new option.
    * khmer/_khmer.cc, lib/hllcounter.cc: Rename some variables for consistency.
+
+2015-08-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+      * scripts/extract-partitions.py: refactored much of the processing into
+      generators
+      * tests/test_scripts.py: added test
 
 2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
 

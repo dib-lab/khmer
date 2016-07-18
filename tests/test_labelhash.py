@@ -81,12 +81,12 @@ def test_n_labels():
     assert lh.n_labels() == 4
 
 
-def test_get_label_dict():
+def test_get_all_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_fasta_and_tag_with_labels(filename)
 
-    labels = lb.get_label_dict()
+    labels = lb.get_all_labels()
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -94,7 +94,7 @@ def test_get_label_dict():
         assert a_label in expected
 
 
-def test_get_label_dict_save_load():
+def test_get_labels_save_load():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
@@ -110,7 +110,7 @@ def test_get_label_dict_save_load():
     lb = GraphLabels(20, 1e7, 4)
     lb.load_labels_and_tags(savepath)
 
-    labels = lb.get_label_dict()
+    labels = lb.get_all_labels()
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -118,7 +118,7 @@ def test_get_label_dict_save_load():
         assert a_label in expected
 
 
-def test_get_label_dict_save_load_wrong_ksize():
+def test_get_labels_save_load_wrong_ksize():
     lb_pre = GraphLabels(19, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_fasta_and_tag_with_labels(filename)
@@ -210,8 +210,8 @@ def test_consume_fasta_and_tag_with_labels():
     assert total_reads == 3
     print("doing n_labels")
     print(lb.n_labels())
-    print("doing label dict")
-    print(lb.get_label_dict())
+    print("doing all labels")
+    print(lb.get_all_labels())
     print("get tagset")
     for tag in lb.graph.get_tagset():
         print("forward hash")
