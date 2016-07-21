@@ -232,6 +232,7 @@ LIBKHMER_OBJS= \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
+	progress_indicator.o \
 	murmur3.o
 
 PRECOMILE_OBJS ?=
@@ -261,6 +262,7 @@ KHMER_HEADERS= \
 	read_aligner.hh \
 	read_parsers.hh \
 	subset.hh \
+	progress_indicator.hh
 
 # START OF RULES #
 

@@ -129,13 +129,13 @@ BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "traversal"])
+    "traversal", "progress_indicator"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal"])
+    "hllcounter", "traversal", "progress_indicator"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
