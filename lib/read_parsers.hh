@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
+#include "progress_indicator.hh"
 
 namespace khmer
 {
@@ -118,6 +119,7 @@ struct IParser {
     );
 
     IParser( );
+    IParser(progress_indicator::ProgressIndicator prind);
     virtual ~IParser( );
 
     virtual bool		is_complete( ) = 0;
@@ -148,11 +150,13 @@ struct IParser {
 
 protected:
 
-    size_t		_num_reads;
-    bool        _have_qualities;
-    regex_t		_re_read_2_nosub;
-    regex_t		_re_read_1;
-    regex_t		_re_read_2;
+    size_t		            _num_reads;
+    bool                    _have_qualities;
+    regex_t		            _re_read_2_nosub;
+    regex_t		            _re_read_1;
+    regex_t		            _re_read_2;
+    progress_indicator::
+    ProgressIndicator       _prind;
 
 #if (0)
     void		_imprint_next_read_pair_in_allow_mode(
@@ -169,6 +173,10 @@ protected:
     bool		_is_valid_read_pair(
         ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
     );
+
+private:
+
+    void re_init();
 
 }; // struct IParser
 

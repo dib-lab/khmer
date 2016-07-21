@@ -153,10 +153,17 @@ get_parser(
     return new SeqAnParser(ifile_name.c_str());
 }
 
+IParser::IParser( )
+{
+    re_init();
+}
 
-IParser::
-IParser(
-)
+IParser::IParser(progress_indicator::ProgressIndicator prind) : _prind(prind)
+{
+    re_init();
+}
+
+void IParser::re_init()
 {
     int regex_rc =
         regcomp(

@@ -49,9 +49,9 @@ namespace progress_indicator
 struct ProgressIndicator {
 
 public:
-    ProgressIndicator(unsigned int update_interval, std::string base_message);
-    ProgressIndicator(unsigned int update_interval, std::string base_message,
-                      std::ostream& stream = std::cerr);
+    ProgressIndicator( );
+    ProgressIndicator(unsigned int interval, std::string msg,
+                      std::ostream& output = std::cerr);
     void increment(unsigned int by = 1);
     unsigned int get_count();
 
