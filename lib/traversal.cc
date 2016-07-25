@@ -67,9 +67,11 @@ Kmer Traverser::get_right(Kmer& node, const char ch)
     return build_kmer(kmer_f, kmer_r);
 }
 
+
 unsigned int Traverser::traverse_left(Kmer& node,
                                       KmerQueue & node_q,
-                                      std::function<bool (Kmer&)> filter)
+                                      std::function<bool (Kmer&)> filter,
+                                      unsigned short max_neighbors)
 {
     unsigned int found = 0;
 
@@ -80,6 +82,9 @@ unsigned int Traverser::traverse_left(Kmer& node,
         if (graph->get_count(prev_node) && (!filter || filter(prev_node))) {
             node_q.push(prev_node);
             ++found;
+            if (found > max_neighbors) {
+                return found;
+            }
         }
         ++base;
     }
@@ -89,7 +94,8 @@ unsigned int Traverser::traverse_left(Kmer& node,
 
 unsigned int Traverser::traverse_right(Kmer& node,
                                        KmerQueue & node_q,
-                                       std::function<bool (Kmer&)> filter)
+                                       std::function<bool (Kmer&)> filter,
+                                       unsigned short max_neighbors)
 {
     unsigned int found = 0;
 
@@ -100,6 +106,9 @@ unsigned int Traverser::traverse_right(Kmer& node,
         if (graph->get_count(next_node) && (!filter || filter(next_node))) {
             node_q.push(next_node);
             ++found;
+            if (found > max_neighbors) {
+                return found;
+            }
         }
         ++base;
     }

@@ -50,6 +50,7 @@ Contact: khmer-project@idyll.org
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
+#include "assembler.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
 #include "khmer_exception.hh"
@@ -1025,7 +1026,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
             return NULL;
         }
         me->hashes->insert(h);
-        
+
         Py_DECREF(item);
         item = PyIter_Next(iterator);
     }
@@ -1559,8 +1560,9 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     if (nodegraph_o) {
         stop_bf = nodegraph_o->hashbits;
     }
+    Assembler assembler(hashtable);
 
-    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
+    std::string contig = assembler.assemble_linear_path(start_kmer, stop_bf);
 
     PyObject * ret = Py_BuildValue("s", contig.c_str());
 
@@ -3428,7 +3430,7 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
     std::string exc_string;
-    
+
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
@@ -4052,7 +4054,7 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
     std::string exc_string;
-    
+
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,

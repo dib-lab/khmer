@@ -34,8 +34,8 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef TRAVERSAL_HH
-#define TRAVERSAL_HH
+#ifndef ASSEMBLER_HH
+#define ASSEMBLER_HH
 
 #include <queue>
 #include <functional>
@@ -47,49 +47,28 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "hashtable.hh"
 
+
 namespace khmer
 {
 
 class Hashtable;
 
-class Traverser: public KmerFactory
+class Assembler: public Traverser
 {
     friend class Hashtable;
 
-protected:
-
-    HashIntoType bitmask;
-    unsigned int rc_left_shift;
-
 public:
 
-    const Hashtable * graph;
+    explicit Assembler(const Hashtable * ht);
+    std::string assemble_linear_path(const Kmer seed_kmer,
+                                     const Hashtable * stop_bf=0) const;
+    std::string _assemble_right(const char * start_kmer,
+                                const Hashtable * stop_bf=0) const;
 
-    explicit Traverser(const Hashtable * ht);
+    //std::string _assemble_directed(const char * start_kmer,
+    //                               const Hashtable * stop_bf,
+    //                               const bool assemble_left=false) const;
 
-    Kmer get_left(Kmer& node, const char ch);
-    Kmer get_right(Kmer& node, const char ch);
-
-    unsigned int traverse_left(Kmer& node,
-                               KmerQueue &node_q,
-                               std::function<bool (Kmer&)> filter=0,
-                               unsigned short max_neighbors=4);
-    unsigned int traverse_right(Kmer& node,
-                                KmerQueue &node_q,
-                                std::function<bool (Kmer&)> filter=0,
-                                unsigned short max_neighbors=4);
-    unsigned int traverse(Kmer& node,
-                          KmerQueue &node_q,
-                          std::function<bool (Kmer&)> filter=0) {
-        unsigned int found;
-        found = traverse_left(node, node_q, filter);
-        found += traverse_right(node, node_q, filter);
-        return found;
-    };
-
-    unsigned int degree_left(Kmer& node);
-    unsigned int degree_right(Kmer& node);
-    unsigned int degree(Kmer& node);
 };
 
 }
