@@ -249,7 +249,7 @@ public:
      *  @param[in]  kmer_s String representation of a k-mer.
      *  @return A complete Kmer object hashed from the given string.
      */
-    Kmer build_kmer(std::string kmer_s)
+    Kmer build_kmer(std::string kmer_s) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
@@ -262,7 +262,7 @@ public:
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
      */
-    Kmer build_kmer(const char * kmer_c)
+    Kmer build_kmer(const char * kmer_c) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
