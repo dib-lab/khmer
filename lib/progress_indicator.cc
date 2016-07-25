@@ -44,8 +44,8 @@ namespace progress_indicator
 
 ProgressIndicator::
 ProgressIndicator()
-    : update_interval(10000), message("progress "), stream(std::cerr),
-      _counter(0), _threshold(10000)
+    : update_interval(0), message("progress "), stream(std::cerr),
+      _counter(0), _threshold(0)
 {
 }
 
@@ -59,7 +59,7 @@ ProgressIndicator(unsigned int interval, std::string msg, std::ostream& output)
 void ProgressIndicator::increment(unsigned int by)
 {
     _counter += by;
-    if(_counter >= _threshold) {
+    if(_threshold > 0 && _counter >= _threshold) {
         stream << message << _counter << std::endl;
         _threshold += update_interval;
     }
