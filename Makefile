@@ -104,7 +104,7 @@ install-dependencies:
 sharedobj: $(EXTENSION_MODULE)
 
 $(EXTENSION_MODULE): $(CPPSOURCES)
-	./setup.py build_ext --inplace
+	pip install git+https://github.com/dib-lab/screed.git; ./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
