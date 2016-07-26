@@ -62,17 +62,25 @@ std::string Assembler::assemble_linear_path(const Kmer seed_kmer,
     const
 {
     std::string start_kmer = seed_kmer.get_string_rep(_ksize);
-    std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
 
-    start_kmer = _revcomp(start_kmer);
-    std::string left = _assemble_right(start_kmer.c_str(), stop_bf);
+    std::string right = _assemble_right(start_kmer, stop_bf);
+    std::string left = _assemble_left(start_kmer, stop_bf);
 
-    left = left.substr(_ksize);
-    return _revcomp(left) + right;
+    right = right.substr(_ksize);
+    return left + right;
 }
 
 
-std::string Assembler::_assemble_right(const char * start_kmer,
+std::string Assembler::_assemble_left(const std::string start_kmer,
+                                      const Hashtable * stop_bf)
+    const
+{
+    std::string contig = _assemble_right(_revcomp(start_kmer), stop_bf);
+    return _revcomp(contig);
+}
+
+
+std::string Assembler::_assemble_right(const std::string start_kmer,
                                        const Hashtable * stop_bf)
     const
 {
