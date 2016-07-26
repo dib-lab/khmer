@@ -1127,7 +1127,7 @@ def test_assemble_linear_path_2():
     nodegraph.consume(contig)
     nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
 
-    path = nodegraph.assemble_linear_path(contig[100:100+K])
+    path = nodegraph.assemble_linear_path(contig[100:100 + K])
     len_path = len(path)
 
     assert _equals_rc(path, contig[:len_path])
@@ -1332,7 +1332,7 @@ def test_assemble_labeled_paths():
     lh.label_across_high_degree_nodes(contig, hdn, 1)
 
     path = lh.assemble_labeled_path(contig[:K])
-    path = path[0]                        #@CTB
+    path = path[0]  # @CTB
     len_path = len(path)
 
     print('len path:', len_path)
@@ -1363,7 +1363,7 @@ def test_assemble_labeled_paths_2():
     print(lh.get_tag_labels(list(hdn)[0]))
 
     paths = lh.assemble_labeled_path(contig[:K])
-    print([ len(x) for x in paths ])
+    print([len(x) for x in paths])
     len_path = len(paths)
 
     print('len path:', len_path)
@@ -1410,7 +1410,7 @@ def test_assemble_labeled_paths_3():
     print(lh.get_tag_labels(list(hdn)[0]))
 
     paths = lh.assemble_labeled_path(contig[:K])
-    print([ len(x) for x in paths ])
+    print([len(x) for x in paths])
     len_path = len(paths)
 
     print('len path:', len_path)
@@ -1449,9 +1449,9 @@ def test_assemble_labeled_paths_4():
     lh = khmer._GraphLabels(nodegraph)
 
     nodegraph.consume(contig)
-    branch = 'TGATGGACAG' + contig[120:];
+    branch = 'TGATGGACAG' + contig[120:]
     nodegraph.consume(branch)  # will add a branch
-    branch2 =  'GCGGATGGATGGAGCCGAT' + contig[120:];
+    branch2 = 'GCGGATGGATGGAGCCGAT' + contig[120:]
     nodegraph.consume(branch2)  # will add a third branch
 
     hdn = nodegraph.find_high_degree_nodes(contig)
@@ -1464,7 +1464,7 @@ def test_assemble_labeled_paths_4():
     print(lh.get_tag_labels(list(hdn)[0]))
 
     paths = lh.assemble_labeled_path(contig[-K:])
-    print([ len(x) for x in paths ])
+    print([len(x) for x in paths])
     len_path = len(paths)
 
     print('len path:', len_path)
@@ -1511,7 +1511,7 @@ def test_assemble_labeled_paths_5():
     lh.label_across_high_degree_nodes(contig, hdn, 1)
 
     path = lh.assemble_labeled_path(contig[:K])
-    path = path[0]                        #@CTB
+    path = path[0]  # @CTB
     len_path = len(path)
 
     print('len path:', len_path)

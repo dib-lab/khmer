@@ -166,4 +166,4 @@ def test_concat_2_fail():
         hs += hs2
         assert 0, "inplace concat should fail - different ksize"
     except ValueError:
-            pass
+        pass
