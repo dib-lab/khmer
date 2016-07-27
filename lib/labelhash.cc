@@ -53,7 +53,7 @@ Contact: khmer-project@idyll.org
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
-#define DEBUG 0
+#define DEBUG 1
 
 using namespace std;
 using namespace khmer;
