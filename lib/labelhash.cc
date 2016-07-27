@@ -605,14 +605,22 @@ std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
 {
     std::string start_kmer = seed_kmer.get_string_rep(graph->_ksize);
 
+#if DEBUG
+    std::cout << "assemble right: " << start_kmer << std::endl;
+#endif
     std::vector<std::string> fwd_paths;
     _assemble_labeled_right(start_kmer.c_str(), fwd_paths);
 
+#if DEBUG
+    std::cout << "assemble left: " << start_kmer << std::endl;
+#endif
     start_kmer = _revcomp(start_kmer);
-
     std::vector<std::string> rev_paths;
     _assemble_labeled_right(start_kmer.c_str(), rev_paths);
 
+#if DEBUG
+    std::cout << "join right and left contigs: " << rev_paths.size() << std::endl;
+#endif
     std::vector<std::string> paths;
     for (unsigned int i = 0; i < rev_paths.size(); i++) {
         for (unsigned int j = 0; j < fwd_paths.size(); j++) {
@@ -706,6 +714,13 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
             paths.push_back(contig);
             return;
         }
+#if DEBUG
+        for (unsigned int j = 0; j < xpaths.size(); j++) {
+            std::string this_contig = contig;
+            this_contig += xpaths[j];
+            std::cout << "xpath " << j << ": " << this_contig << std::endl;
+        }
+#endif
 
         for (unsigned int j = 0; j < xpaths.size(); j++) {
             std::string this_contig = contig;
