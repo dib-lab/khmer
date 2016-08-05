@@ -336,13 +336,20 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelSet LabelHash::get_tag_labels(const HashIntoType tag) const
+void LabelHash::get_tag_labels(const HashIntoType tag,
+                                   LabelSet& labels) const
 {
-    LabelSet labels;
     if (set_contains(graph->all_tags, tag)) {
         _get_tag_labels(tag, tag_labels, labels);
     }
-    return labels;
+}
+
+void LabelHash::get_tags_from_label(const Label label,
+                                      TagSet& tags) const
+{
+    if(set_contains(all_labels, label)) {
+        _get_tags_from_label(label, label_tag, tags);
+    }
 }
 
 void LabelHash::traverse_labels_and_resolve(const SeenSet tagged_kmers,

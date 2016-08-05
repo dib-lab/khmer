@@ -111,7 +111,7 @@ protected:
 
     unsigned int _get_tags_from_label(const Label& label,
                                       const LabelTagMap& cmap,
-                                      TagSet& labeled_tags)
+                                      TagSet& labeled_tags) const
     {
         unsigned int num_tags = 0;
         std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
@@ -171,7 +171,10 @@ public:
             Label current_label,
             SeenSet * new_tags = 0);
 
-    LabelSet get_tag_labels(const HashIntoType tag) const;
+    void get_tag_labels(const HashIntoType tag,
+                            LabelSet& labels) const;
+    void get_tags_from_label(const Label label,
+                               TagSet& tags) const;
 
     void link_tag_and_label(const HashIntoType kmer, const Label label);
 

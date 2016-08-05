@@ -4260,8 +4260,7 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     }
 
     LabelSet labels;
-
-    labels = labelhash->get_tag_labels(tag);
+    labelhash->get_tag_labels(tag, labels);
 
     PyObject * x =  PyList_New(labels.size());
     LabelSet::const_iterator si;
