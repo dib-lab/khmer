@@ -36,6 +36,7 @@ Contact: khmer-project@idyll.org
 */
 #include "hashtable.hh"
 #include "traversal.hh"
+#include "symbols.hh"
 
 using namespace khmer;
 using namespace std;
@@ -74,9 +75,8 @@ unsigned int Traverser::traverse_left(Kmer& node,
                                       unsigned short max_neighbors)
 {
     unsigned int found = 0;
+    char * base = alphabets::DNA_SIMPLE;
 
-    char bases[] = "ACGT";
-    char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
         if (graph->get_count(prev_node) && (!filter || filter(prev_node))) {
@@ -98,9 +98,8 @@ unsigned int Traverser::traverse_right(Kmer& node,
                                        unsigned short max_neighbors)
 {
     unsigned int found = 0;
+    char * base = alphabets::DNA_SIMPLE;
 
-    char bases[] = "ACGT";
-    char * base = bases;
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
         if (graph->get_count(next_node) && (!filter || filter(next_node))) {
@@ -119,9 +118,8 @@ unsigned int Traverser::traverse_right(Kmer& node,
 unsigned int Traverser::degree_left(Kmer& node)
 {
     unsigned int degree = 0;
+    char * base = alphabets::DNA_SIMPLE;
 
-    char bases[] = "ACGT";
-    char * base = bases;
     while(*base != '\0') {
         Kmer prev_node = get_left(node, *base);
         if (graph->get_count(prev_node)) {
@@ -136,9 +134,8 @@ unsigned int Traverser::degree_left(Kmer& node)
 unsigned int Traverser::degree_right(Kmer& node)
 {
     unsigned int degree = 0;
-
-    char bases[] = "ACGT";
-    char * base = bases;
+    char * base = alphabets::DNA_SIMPLE;
+    
     while(*base != '\0') {
         Kmer next_node = get_right(node, *base);
         if (graph->get_count(next_node)) {

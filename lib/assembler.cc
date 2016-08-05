@@ -109,12 +109,11 @@ std::string Assembler::_assemble_right(const std::string start_kmer,
                                        std::list<KmerFilter>& node_filters)
     const
 {
-    const char bases[] = "ACGT";
     std::string kmer = start_kmer;
     std::string contig = kmer;
 
     while (1) {
-        const char * base = &bases[0];
+        char * base = alphabets::DNA_SIMPLE;
         bool found = false;
         char found_base;
         bool found2 = false;
@@ -146,55 +145,3 @@ std::string Assembler::_assemble_right(const std::string start_kmer,
     }
     return contig;
 }
-
-/*
-std::string Assembler::_assemble_directed(const char * start_kmer,
-                                       const Hashtable * stop_bf,
-                                       const bool assemble_left)
-    const
-{
-    Kmer kmer = this->build_kmer(start_kmer);
-    std::cout << "starting on kmer " << kmer.get_string_rep(_ksize) << std::endl;
-    std::string contig = start_kmer;
-    Traverser traverser(this);
-    KmerQueue neighbors;
-    unsigned short found;
-
-    auto keep_func = [&] (Kmer& node) {
-        return !stop_bf || !stop_bf->get_count(node);
-    };
-
-    std::cout << "start loop" << std::endl;
-    while (1) {
-        if (assemble_left) {
-            found = traverser.traverse_left(kmer, neighbors, keep_func, 1);
-        } else {
-            found = traverser.traverse_right(kmer, neighbors, keep_func, 1);
-        }
-        //std::cout << "check traverser result" << std::endl;
-        if (found == 0) {
-            std::cout << "no neighbors, break" << std::endl;
-            break;
-        } else if (found > 1) {
-            KmerQueue().swap(neighbors); // clear queue
-            std::cout << "break" << std::endl;
-            break;
-        } else {
-            //std::cout << "put base on contig" << std::endl;
-            //contig += revtwobit_repr(kmer & 3);
-            //std::cout << "get new kmer" << std::endl;
-            kmer = neighbors.front();
-            if (assemble_left) {
-                contig += (kmer.get_string_rep(this->_ksize)[0]);
-            } else {
-                contig += (kmer.get_string_rep(this->_ksize)[this->_ksize-1]);
-
-            }
-
-            //std::cout << "pop!" << std::endl;
-            neighbors.pop();
-        }
-    }
-    return contig;
-}
-*/
