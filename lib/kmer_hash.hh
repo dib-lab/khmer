@@ -189,7 +189,13 @@ public:
         return _revhash(kmer_u, K);
     }
 
+    char get_last_base() const
+    {
+        return revtwobit_repr(kmer_f & 3);
+    }
+
 };
+
 
 /**
  * \class KmerFactory

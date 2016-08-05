@@ -37,30 +37,107 @@ Contact: khmer-project@idyll.org
 #include "hashtable.hh"
 #include "traversal.hh"
 #include "assembler.hh"
+#include "symbols.hh"
+
+#include <algorithm>
+#include <iostream>
 
 using namespace khmer;
 using namespace std;
+
+AssemblerTraverser::AssemblerTraverser(const Hashtable * ht,
+                                 Kmer start_kmer,
+                                 KmerFilterList filters,
+                                 bool traverse_right) :
+    Traverser(ht), filters(filters), traverse_right(traverse_right)
+{
+    cursor = start_kmer;
+    contig_kmers.push_back(cursor);
+}
+
+void AssemblerTraverser::gather_linear_path()
+{
+    while (1) {
+        char * base = alphabets::DNA_SIMPLE;
+        short found = 0;
+        Kmer neighbor;
+
+        while(*base != '\0') {
+
+            if(traverse_right) { // NOTE: hoping this gets optimized out because const
+                neighbor = get_right(cursor, *base);
+            } else {
+                neighbor = get_left(cursor, *base);
+            }
+            std::cout << "Try: " << (char)*base << " (" << neighbor << ")" << std::endl;
+            if (graph->get_count(neighbor) &&
+                !apply_kmer_filters(neighbor, filters)) {
+                std::cout << "Found " << (char)*base << std::endl;
+                found++;
+                if (found > 1) {
+                    break;
+                }
+            }
+            base++;
+        }
+        std::cout << "Found: " << found << std::endl;
+        if (found != 1) {
+            break;
+        } else {
+            contig_kmers.push_back(neighbor);
+            cursor = neighbor;
+        }
+    }
+}
+
+unsigned int AssemblerTraverser::get_path_length()
+    const
+{
+    return _ksize + (contig_kmers.size() - 1);
+}
+
+std::string AssemblerTraverser::build_contig()
+    const
+{
+
+    if (traverse_right) {
+        auto it = contig_kmers.begin();
+        std::string contig = (*it).get_string_rep(_ksize);
+        ++it;
+
+        for (; it!=contig_kmers.end(); it++) {
+            //contig += revtwobit_repr((*it) & 3); // just get the last base
+            contig += (*it).get_last_base();
+        }
+        std::cout << "Right (" << contig.length() << "):" << contig << std::endl;
+        std::cout << "Path Length: " << get_path_length() << std::endl;
+        return contig;
+    } else {
+        auto it = contig_kmers.rbegin();
+        std::string contig = (*it).get_string_rep(_ksize);
+        ++it;
+
+        for (; it!=contig_kmers.rend(); it++) {
+            //contig += revtwobit_repr((*it) & 3); // just get the last base
+            contig += (*it).get_last_base();
+
+        }
+        std::cout << "Left (" << contig.length() << "):" << contig << std::endl;
+        std::cout << "Left Length: " << get_path_length() << std::endl;
+        return contig;
+    }
+}
+
+std::string AssemblerTraverser::assemble()
+{
+    gather_linear_path();
+    return build_contig();
+}
 
 Assembler::Assembler(const Hashtable * ht) :
     Traverser(ht)
 {
 
-}
-
-
-bool Assembler::filter_node(Kmer& node, std::list<KmerFilter>& filters)
-    const
-{
-    if (!filters.size()) {
-        return false;
-    }
-
-    for(auto filter : filters) {
-        if (filter(node)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 
@@ -86,10 +163,16 @@ std::string Assembler::assemble_linear_path(const Kmer seed_kmer,
         node_filters.push_back(stop_bf_filter);
     }
 
-    std::string start_kmer = seed_kmer.get_string_rep(_ksize);
+    AssemblerTraverser right_traverser(graph, seed_kmer, node_filters);
+    AssemblerTraverser left_traverser(graph, seed_kmer, node_filters, 0);
 
-    std::string right = _assemble_right(start_kmer, node_filters);
-    std::string left = _assemble_left(start_kmer, node_filters);
+    //std::string start_kmer = seed_kmer.get_string_rep(_ksize);
+
+    //std::string right = _assemble_right(start_kmer, node_filters);
+    //std::string left = _assemble_left(start_kmer, node_filters);
+
+    std::string right = right_traverser.assemble();
+    std::string left = left_traverser.assemble();
 
     right = right.substr(_ksize);
     return left + right;
@@ -124,7 +207,7 @@ std::string Assembler::_assemble_right(const std::string start_kmer,
 
             // a hit!
             if (graph->get_count(try_hashed) &&
-                !filter_node(try_hashed, node_filters)) {
+                !apply_kmer_filters(try_hashed, node_filters)) {
 
                 if (found) {
                     found2 = true;

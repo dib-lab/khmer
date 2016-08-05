@@ -53,7 +53,7 @@ Contact: khmer-project@idyll.org
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
-#define DEBUG 1
+#define DEBUG 0
 
 using namespace std;
 using namespace khmer;
@@ -616,15 +616,17 @@ std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
     std::cout << "assemble right: " << start_kmer << std::endl;
 #endif
     std::vector<std::string> fwd_paths;
-    _assemble_labeled_right(start_kmer.c_str(), fwd_paths);
+    SeenSet visited;
+    _assemble_labeled_right(start_kmer.c_str(), fwd_paths, visited);
 
 #if DEBUG
     std::cout << "assemble left: " << start_kmer << std::endl;
 #endif
+
     start_kmer = _revcomp(start_kmer);
     std::vector<std::string> rev_paths;
-    _assemble_labeled_right(start_kmer.c_str(), rev_paths);
-
+    _assemble_labeled_right(start_kmer.c_str(), rev_paths, visited);
+    visited.clear();
 #if DEBUG
     std::cout << "join right and left contigs: " << rev_paths.size() << std::endl;
 #endif
@@ -638,17 +640,25 @@ std::vector<std::string> LabelHash::assemble_labeled_path(const Kmer seed_kmer)
         }
     }
 
+    paths.clear();
+
     return paths;
 }
 
-void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std::string>& paths)
+void LabelHash::_assemble_labeled_right(const char * start_kmer,
+                                        std::vector<std::string>& paths,
+                                        SeenSet& visited)
     const
 {
     const char bases[] = "ACGT";
     std::string kmer = start_kmer;
     std::string contig = kmer;
     bool found2 = false;
-    SeenSet visited;
+    int cycle = 0;
+
+#if DEBUG
+    std::cout << "Seen: " << visited.size() << std::endl;
+#endif
 
     while (1) {
         const char * base = &bases[0];
@@ -660,14 +670,21 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 
             // a hit!
             if (graph->get_count(try_kmer.c_str())) {
+#if DEBUG
+                std::cout << "hit: " << (char) *base << std::endl;
+#endif
                 if (set_contains(visited, _hash(try_kmer.c_str(), graph->_ksize))) {
 #if DEBUG
                     std::cout << "loop.\n";
 #endif // DEBUG
                     base++;
+                    cycle++;
                     continue;
                 }
                 if (found) {
+#if DEBUG
+                    std::cout << "found 2 neighbors.\n";
+#endif
                     found2 = true;
                     break;
                 }
@@ -688,16 +705,24 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 #endif // DEBUG
         }
     }
-    visited.clear();
+    //visited.clear();
+
+    /* We've stopped on a node with outdegree > 1. We've tagged+labeled such nodes already,
+     * so we'll first grab the associated labels. Then, for each label, we'll assemble
+     * a path guided by it, up to the next branch, stored in xpaths.
+     */
 
     if (found2) {               // hit a HDN
 #if DEBUG
-        std::cout << "HDN: " << kmer.length() << "\n";
+        std::cout << "Cycle: " << cycle << std::endl;
+        std::cout << "Contig thus far: " << contig << std::endl;
+        std::cout << "HDN: " << kmer << "\n";
 #endif // DEBUG
 
         Kmer path_begin(kmer.c_str(), kmer.length());
 
-        LabelSet labels = get_tag_labels(path_begin);
+        LabelSet labels;
+        get_tag_labels(path_begin, labels);
 
 #if DEBUG
         std::cout << "n labels: " << labels.size() << "\n";
@@ -711,7 +736,8 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
             std::cout << "working with " << label << "\n";
 #endif // DEBUG
             xpaths.push_back(_assemble_linear_labels(kmer.c_str(),
-                                                     label));
+                                                     label,
+                                                     visited));
         }
 #if DEBUG
         std::cout << "xpaths is: " << xpaths.size() << "\n";
@@ -742,7 +768,7 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 #endif // DEBUG
             std::vector<std::string> newpaths;
 
-            _assemble_labeled_right(start_again, newpaths);
+            _assemble_labeled_right(start_again, newpaths, visited);
 
             if (newpaths.size() == 0) {
                 paths.push_back(this_contig);
@@ -760,7 +786,8 @@ void LabelHash::_assemble_labeled_right(const char * start_kmer, std::vector<std
 }
 
 std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
-                                               const Label label)
+                                               const Label label,
+                                               SeenSet& visited)
     const
 {
     const char bases[] = "ACGT";
@@ -768,6 +795,19 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
     std::string contig = "";
     bool found2 = false;
 
+#if DEBUG
+    std::cout << "_assemble_linear_labels" << std::endl << "Tags: ";
+#endif
+
+/*
+#if DEBUG
+    TagSet tags = get_tags_from_label(label);
+    for (auto li = tags.begin(); li != tags.end(); li++) {
+        std::cout << graph->build_kmer(*li).get_string_rep(graph->_ksize) << " ";
+    }
+    std::cout << std::endl;
+#endif
+*/
     while (1) {
         const char * base = &bases[0];
         bool found = false;
@@ -787,12 +827,20 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
             // a hit!
             if (graph->get_count(try_kmer.c_str())) {
                 Kmer tag(try_kmer.c_str(), try_kmer.length());
-                LabelSet ls = get_tag_labels(tag);
+                LabelSet ls;
+                get_tag_labels(tag, ls);
 
 #if DEBUG
                 std::cout << "got count; now ls: " << ls.size() << "\n";
 #endif // DEBUG
                 if (set_contains(ls, label)) {
+                    if (set_contains(visited, tag)) {
+    #if DEBUG
+                        std::cout << "loop.\n";
+    #endif // DEBUG
+                        base++;
+                        continue;
+                    }
                     if (found) {
 #if DEBUG
                         std::cout << "found 2..." << (char) *base << "\n";
@@ -819,6 +867,7 @@ std::string LabelHash::_assemble_linear_labels(const std::string start_kmer,
         } else {
             contig += found_base;
             kmer = kmer.substr(1) + found_base;
+            visited.insert(_hash(kmer.c_str(), graph->_ksize));
         }
     }
     return contig;

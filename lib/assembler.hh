@@ -51,9 +51,56 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-typedef std::function<bool (Kmer&)> KmerFilter;
-
 class Hashtable;
+
+// A function which takes a Kmer and returns true if it
+// is to be filtered / ignored
+typedef std::function<bool (Kmer&)> KmerFilter;
+typedef std::list<KmerFilter> KmerFilterList;
+// list instead of vector because: better insertation at ends, more
+// space efficient, don't need random access
+typedef std::list<Kmer> OrderedKmers;
+
+
+inline bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
+{
+    if (!filters.size()) {
+        return false;
+    }
+
+    for(auto filter : filters) {
+        if (filter(node)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+class AssemblerTraverser: public Traverser
+{
+
+protected:
+
+    OrderedKmers contig_kmers;
+    Kmer cursor;
+    KmerFilterList filters;
+    const bool traverse_right; // 0 for left, 1 for right
+
+public:
+
+    explicit AssemblerTraverser(const Hashtable * ht,
+                             Kmer start_kmer,
+                             KmerFilterList filters,
+                             bool traverse_right = 1);
+
+    void gather_linear_path();
+    unsigned int get_path_length() const;
+    std::string build_contig() const;
+    std::string assemble();
+
+
+};
 
 class Assembler: public Traverser
 {
@@ -62,8 +109,6 @@ class Assembler: public Traverser
 public:
 
     explicit Assembler(const Hashtable * ht);
-
-    bool filter_node(Kmer& node, std::list<KmerFilter>& filters) const;
 
     std::string assemble_linear_path(const Kmer seed_kmer,
                                      const Hashtable * stop_bf=0) const;
