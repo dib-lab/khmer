@@ -5210,6 +5210,23 @@ static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(_hash_murmur_forward(kmer));
 }
 
+static PyObject * reverse_complement(PyObject * self, PyObject * args)
+{
+    const char * sequence;
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::string s(sequence);
+    try {
+        s = _revcomp(s);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    return PyUnicode_FromString(s.c_str());
+}
+
 //
 // technique for resolving literal below found here:
 // https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
@@ -5256,6 +5273,12 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,
         "Calculate the hash value of a k-mer using MurmurHash3 "
         "(no reverse complement)",
+    },
+    { "reverse_complement",
+       reverse_complement,
+       METH_VARARGS,
+       "Calculate the reverse-complement of the DNA sequence "
+       "with alphabet ACGT",
     },
     {
         "get_version_cpp", get_version_cpp,

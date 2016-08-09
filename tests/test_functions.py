@@ -49,6 +49,8 @@ try:
 except ImportError:
     from io import StringIO
 
+import pytest
+
 
 def test_forward_hash():
     assert khmer.forward_hash('AAAA', 4) == 0
@@ -96,6 +98,25 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_complement():
+    s = 'AATTCCGG'
+    assert khmer.reverse_complement(s) == 'CCGGAATT'
+
+    s = 'A'
+    assert khmer.reverse_complement(s) == 'T'
+    s = 'T'
+    assert khmer.reverse_complement(s) == 'A'
+    s = 'C'
+    assert khmer.reverse_complement(s) == 'G'
+    s = 'G'
+    assert khmer.reverse_complement(s) == 'C'
+
+
+def test_reverse_complement_exception():
+    with pytest.raises(RuntimeError):
+        khmer.reverse_complement('FGF')
 
 
 def test_hash_murmur3():
