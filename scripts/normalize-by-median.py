@@ -56,7 +56,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, check_argument_range)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -267,9 +267,10 @@ def get_parser():
         epilog=textwrap.dedent(epilog))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('-C', '--cutoff', type=int, help="when the median "
-                        "k-mer coverage level above is above this numer the "
+    parser.add_argument('-C', '--cutoff', help="when the median "
+                        "k-mer coverage level above is this numer the "
                         "read is not kept.",
+                        type=check_argument_range(0, 256, "cutoff"),
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')

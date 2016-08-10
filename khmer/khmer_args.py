@@ -192,6 +192,21 @@ def check_conflicting_args(args, hashtype):
             args.max_tablesize = max_tablesize
 
 
+def check_argument_range(low, high, parameter_name):
+    """Check if parameter value is in the range `low` to `high`."""
+    def _in_range(x):
+        x = int(x)
+        if not (low <= x < high):
+            print_error("\n** ERROR: khmer only supports "
+                        "%i <= %s < %i.\n" % (low, parameter_name, high))
+            sys.exit(1)
+
+        else:
+            return x
+
+    return _in_range
+
+
 # pylint: disable=invalid-name
 def estimate_optimal_with_K_and_M(num_kmers, mem_cap):
     """
