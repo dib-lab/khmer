@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "hashtable.hh"
 
-#define DEBUG 1
 
 namespace khmer
 {
@@ -74,15 +73,10 @@ inline bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
 
     for(auto filter : filters) {
         if (filter(node)) {
-            #if DEBUG
-            std::cout << "Filtered!" << std::endl;
-            #endif
             return true;
         }
     }
-    #if DEBUG
-    std::cout << "Not filtered." << std::endl;
-    #endif
+
     return false;
 }
 
