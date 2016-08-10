@@ -1560,9 +1560,9 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     if (nodegraph_o) {
         stop_bf = nodegraph_o->hashbits;
     }
-    Assembler assembler(hashtable);
+    LinearAssembler assembler(hashtable);
 
-    std::string contig = assembler.assemble_linear_path(start_kmer, stop_bf);
+    std::string contig = assembler.assemble(start_kmer, stop_bf);
 
     PyObject * ret = Py_BuildValue("s", contig.c_str());
 
