@@ -194,6 +194,14 @@ public:
         return revtwobit_repr(kmer_f & 3);
     }
 
+    std::string repr(WordLength K)
+    {
+        std::string s = "<Us=" + _revhash(kmer_u, K) + ", Fs=" +
+            _revhash(kmer_f, K) + ", Rs=" + _revhash(kmer_r, K) +
+            ", U=" + std::to_string(kmer_u) + ", F=" + std::to_string(kmer_f) +
+            ", R=" + std::to_string(kmer_r) + ">";
+        return s;
+    }
 };
 
 
