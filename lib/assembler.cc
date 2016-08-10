@@ -173,6 +173,9 @@ std::string LinearAssembler::assemble_left(const Kmer start_kmer,
     const
 {
     std::string contig = start_kmer.get_string_rep(_ksize);
+    if (!start_kmer.is_forward()) {
+        contig = _revcomp(contig);
+    }
     #if DEBUG
     std::cout << "## assemble_left\nStart Contig: " << contig << std::endl;
     #endif

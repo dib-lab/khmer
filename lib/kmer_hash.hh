@@ -202,6 +202,10 @@ public:
             ", R=" + std::to_string(kmer_r) + ">";
         return s;
     }
+
+    bool is_forward() const {
+        return kmer_f == kmer_u;
+    }
 };
 
 

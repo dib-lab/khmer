@@ -1114,6 +1114,25 @@ def test_assemble_linear_path_1():
     assert _equals_rc(path, contig[:len_path])
 
 
+def test_assemble_linear_path_1_rc():
+    # assemble from beginning of contig, up until branch point
+    # starting from rev comp
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+
+    path = nodegraph.assemble_linear_path(khmer.reverse_complement(contig[0:K]))
+    len_path = len(path)
+
+    assert _equals_rc(path, contig[:len_path])
+
 def test_assemble_linear_path_2():
     # assemble from branch point back to beginning of contig
     contigfile = utils.get_test_data('simple-genome.fa')
@@ -1128,6 +1147,25 @@ def test_assemble_linear_path_2():
     nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
 
     path = nodegraph.assemble_linear_path(contig[100:100 + K])
+    len_path = len(path)
+
+    assert _equals_rc(path, contig[:len_path])
+
+
+def test_assemble_linear_path_2_rc():
+    # assemble from branch point back to beginning of contig
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
+
+    path = nodegraph.assemble_linear_path(khmer.reverse_complement(contig[100:100 + K]))
     len_path = len(path)
 
     assert _equals_rc(path, contig[:len_path])
