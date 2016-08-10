@@ -52,7 +52,8 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
-                              sanitize_help, _VersionStdErrAction)
+                              sanitize_help, _VersionStdErrAction,
+                              check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer import __version__
@@ -85,7 +86,8 @@ def get_parser():
                         help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
-                        default=DEFAULT_CUTOFF, type=int,
+                        default=DEFAULT_CUTOFF,
+                        type=check_argument_range(0, 256, 'cutoff'),
                         help="Trim at k-mers below this abundance.")
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         dest='variable_coverage', default=False,
