@@ -174,7 +174,7 @@ std::string LinearAssembler::assemble(const Kmer seed_kmer,
 
 
 Kmer LinearAssembler::assemble_left(std::string& contig,
-                                    AssemblerTraverser<RIGHT>& cursor)
+                                    AssemblerTraverser<LEFT`>& cursor)
     const
 {
     contig = start_kmer.get_string_rep(_ksize);
@@ -200,7 +200,7 @@ Kmer LinearAssembler::assemble_left(std::string& contig,
 
 
 Kmer LinearAssembler::assemble_right(std::string& contig,
-                                     AssemblerTraverser<LEFT>& cursor)
+                                     AssemblerTraverser<RIGHT>& cursor)
     const
 {
     contig = start_kmer.get_string_rep(_ksize);
@@ -213,5 +213,8 @@ Kmer LinearAssembler::assemble_right(std::string& contig,
     while ((next_base = cursor.next_symbol()) != '\0') {
         contig += next_base;
     }
+
+    return cursor.get_cursor();
+}
     return contig;
 }
