@@ -216,5 +216,3 @@ Kmer LinearAssembler::assemble_right(std::string& contig,
 
     return cursor.get_cursor();
 }
-    return contig;
-}
