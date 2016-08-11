@@ -80,7 +80,7 @@ inline bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
     return false;
 }
 
-<template bool direction>
+template<bool direction>
 class AssemblerTraverser: public Traverser
 {
 
@@ -91,9 +91,6 @@ protected:
 
 private:
 
-    std::function<Kmer(AssemblerTraverser<template bool direction>*,
-                       Kmer& node,
-                       const char symbol)> redirector = &AssemblerTraverser<template bool direction>::get_right;
     Kmer get_neighbor(Kmer& node, const char symbol);
 
 public:
@@ -127,11 +124,6 @@ public:
 
     Kmer assemble_left(std::string& contig,
                        AssemblerTraverser<LEFT>& cursor) const;
-
-};
-
-    std::string assemble_left(const Kmer start_kmer,
-                               std::list<KmerFilter>& node_filters) const;
 
 };
 
