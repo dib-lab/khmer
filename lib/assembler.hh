@@ -60,9 +60,8 @@ class Hashtable;
 // is to be filtered / ignored
 typedef std::function<bool (Kmer&)> KmerFilter;
 typedef std::list<KmerFilter> KmerFilterList;
-// list instead of vector because: better insertation at ends, more
-// space efficient, don't need random access
-typedef std::list<Kmer> OrderedKmers;
+
+typedef std::vector<std::string> StringVector;
 
 
 inline bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
@@ -102,10 +101,30 @@ public:
     char next_symbol();
     bool set_cursor(Kmer& node);
     Kmer get_cursor();
+    void add_filter(KmerFilter filter);
 
 };
 
 
+/**
+ * \class LinearAssembler
+ *
+ * \brief Naively assemble linear paths.
+ *
+ * The LinearAssember is the basic building block of general assembly.
+ * The core function, _assemble_directed, takes a direction and branch-specialiazed
+ * AssemblerTraverser and gathers a contig up until any branch points. The behavior
+ * of this function can be modified by passing it a cursor with varying
+ * filtering functions.
+ *
+ * The assemble, assemble_right, and assemble_left functions are for convenience.
+ * They take care of building the filters and creating the contig strings.
+ *
+ * \author Camille Scott
+ *
+ * Contact: camille.scott.w@gmail.com
+ *
+ */
 class LinearAssembler
 {
     friend class Hashtable;
@@ -119,11 +138,52 @@ public:
     std::string assemble(const Kmer seed_kmer,
                          const Hashtable * stop_bf=0) const;
 
-    Kmer assemble_right(std::string& contig,
-                        AssemblerTraverser<RIGHT>& cursor) const;
+    std::string assemble_right(const Kmer seed_kmer,
+                        const Hashtable * stop_bf = 0) const;
 
-    Kmer assemble_left(std::string& contig,
-                       AssemblerTraverser<LEFT>& cursor) const;
+    std::string assemble_left(const Kmer seed_kmer,
+                        const Hashtable * stop_bf = 0) const;
+
+    std::string _assemble_directed(AssemblerTraverser<RIGHT>& cursor) const;
+
+    std::string _assemble_directed(AssemblerTraverser<LEFT>& cursor) const;
+
+    KmerFilter get_stop_bf_filter(const Hashtable * stop_bf) const;
+};
+
+
+class LabeledLinearAssembler
+{
+    friend class Hashtable;
+    const LinearAssembler * linear_asm;
+    const Hashtable * graph;
+    const LabelHash * lh;
+    WordLength _ksize;
+
+public:
+
+    explicit LabeledLinearAssembler(const LabelHash * lh);
+/*
+    KmerFilter get_label_filter(Kmer& node,
+                                Label label,
+                                const LabelHash * lh) const;
+*/
+    StringVector assemble(const Kmer seed_kmer,
+                         const Hashtable * stop_bf=0) const;
+
+    void _assemble_directed(AssemblerTraverser<RIGHT>& start_cursor,
+                            StringVector& paths) const;
+/*
+    void assemble_right(const Kmer start_kmer,
+                        StringVector& paths,
+                        KmerFilterList& node_filters) const;
+
+    void assemble_left(const Kmer start_kmer,
+                        StringVector& paths,
+                        KmerFilterList& node_filters) const;
+*/
+    std::string _assemble_across_labels(AssemblerTraverser& start_cursor,
+                                        const Label label) const;
 
 };
 
