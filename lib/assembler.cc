@@ -47,7 +47,7 @@ Contact: khmer-project@idyll.org
 using namespace khmer;
 using namespace std;
 
-
+<template bool direction>
 AssemblerTraverser::AssemblerTraverser(const Hashtable * ht,
                                  Kmer start_kmer,
                                  KmerFilterList filters,
@@ -60,12 +60,12 @@ AssemblerTraverser::AssemblerTraverser(const Hashtable * ht,
     }
 }
 
-
+<template bool direction>
 Kmer AssemblerTraverser::get_neighbor(Kmer& node, const char symbol) {
     return redirector(this, node, symbol);
 }
 
-
+<template bool direction>
 char AssemblerTraverser::next_symbol()
 {
     char * symbol_ptr = alphabets::DNA_SIMPLE;
@@ -109,7 +109,7 @@ char AssemblerTraverser::next_symbol()
     }
 }
 
-
+<template bool direction>
 bool AssemblerTraverser::set_cursor(Kmer& node)
 {
     if(!apply_kmer_filters(node, filters)) {
@@ -117,6 +117,12 @@ bool AssemblerTraverser::set_cursor(Kmer& node)
         return true;
     }
     return false;
+}
+
+<template bool direction>
+Kmer AssemblerTraverser::get_cursor()
+{
+    return cursor;
 }
 
 
@@ -138,7 +144,7 @@ LinearAssembler::LinearAssembler(const Hashtable * ht) :
 // that assembling from two different directions may yield different
 // results.
 std::string LinearAssembler::assemble(const Kmer seed_kmer,
-                                const Hashtable * stop_bf)
+                                      const Hashtable * stop_bf)
     const
 {
     std::list<KmerFilter> node_filters;
@@ -149,24 +155,29 @@ std::string LinearAssembler::assemble(const Kmer seed_kmer,
         node_filters.push_back(stop_bf_filter);
     }
 
-    std::string right = assemble_right(seed_kmer, node_filters);
-    std::string left = assemble_left(seed_kmer, node_filters);
+    std::string right_contig;
+    AssemblerTraverser<RIGHT> right_cursor(graph, start_kmer, node_filters);
+    assemble_right(seed_kmer, right_contig, node_filters);
+
+    std::string left_contig;
+    AssemblerTraverser<LEFT> left_cursor(graph, start_kmer, node_filters);
+    assemble_left(seed_kmer, left_contig, left_cursor);
 
     #if DEBUG
-    std::cout << "Left: " << left << std::endl;
-    std::cout << "Right: " << right << std::endl;
+    std::cout << "Left: " << left_contig << std::endl;
+    std::cout << "Right: " << right_contig << std::endl;
     #endif
 
-    right = right.substr(_ksize);
-    return left + right;
+    right_contig = right_contig.substr(_ksize);
+    return left_contig + right_contig;
 }
 
 
-std::string LinearAssembler::assemble_left(const Kmer start_kmer,
-                                      std::list<KmerFilter>& node_filters)
+Kmer LinearAssembler::assemble_left(std::string& contig,
+                                    AssemblerTraverser<RIGHT>& cursor)
     const
 {
-    std::string contig = start_kmer.get_string_rep(_ksize);
+    contig = start_kmer.get_string_rep(_ksize);
     if (!start_kmer.is_forward()) {
         contig = _revcomp(contig);
     }
@@ -176,7 +187,6 @@ std::string LinearAssembler::assemble_left(const Kmer start_kmer,
     #endif
 
     reverse(contig.begin(), contig.end());
-    AssemblerTraverser cursor(graph, start_kmer, node_filters, ASSEMBLE_LEFT);
     char next_base;
 
     while ((next_base = cursor.next_symbol()) != '\0') {
@@ -184,16 +194,16 @@ std::string LinearAssembler::assemble_left(const Kmer start_kmer,
     }
 
     reverse(contig.begin(), contig.end());
-    return contig;
+
+    return cursor.get_cursor();
 }
 
 
-std::string LinearAssembler::assemble_right(const Kmer start_kmer,
-                                       std::list<KmerFilter>& node_filters)
+Kmer LinearAssembler::assemble_right(std::string& contig,
+                                     AssemblerTraverser<LEFT>& cursor)
     const
 {
-    AssemblerTraverser cursor(graph, start_kmer, node_filters);
-    std::string contig = start_kmer.get_string_rep(_ksize);
+    contig = start_kmer.get_string_rep(_ksize);
     char next_base;
 
     #if DEBUG
