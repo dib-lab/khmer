@@ -228,8 +228,10 @@ def test_filter_abund_4_retain_low_abund():
 
     counting_ht = _make_counting(infile, K=17)
 
-    for script, args in (('filter-abund.py', ['-V', counting_ht, infile]),
-                         ('filter-abund-single.py', ['-k', '17', '-V', infile])):
+    for script, args in (('filter-abund.py',
+                          ['-V', counting_ht, infile]),
+                         ('filter-abund-single.py',
+                          ['-k', '17', '-V', infile])):
         utils.runscript(script, args, in_dir)
 
         outfile = infile + '.abundfilt'
@@ -247,8 +249,10 @@ def test_filter_abund_5_trim_high_abund():
 
     counting_ht = _make_counting(infile, K=17)
 
-    for script, args in (('filter-abund.py', ['-V', counting_ht, infile]),
-                         ('filter-abund-single.py', ['-k', '17', '-V', infile])):
+    for script, args in (('filter-abund.py',
+                          ['-V', counting_ht, infile]),
+                         ('filter-abund-single.py',
+                          ['-k', '17', '-V', infile])):
         utils.runscript(script, args, in_dir)
 
         outfile = infile + '.abundfilt'
@@ -283,8 +287,8 @@ def test_filter_abund_6_trim_high_abund_Z():
         assert len(seqs) == 2, seqs
 
         # untrimmed seq.
-        badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
-                 'GATTTCCGGGCGG'
+        badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTG' \
+                 'TCGTCAGGGGATTTCCGGGCGG'
         assert badseq in seqs       # should be there, untrimmed
 
 
