@@ -41,11 +41,12 @@ Contact: khmer-project@idyll.org
 #include <functional>
 
 #include "khmer.hh"
-
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
+#include "labelhash.hh"
+#include "kmer_filters.hh"
 
 
 namespace khmer
@@ -55,29 +56,10 @@ namespace khmer
 #define RIGHT 1
 
 class Hashtable;
-
-// A function which takes a Kmer and returns true if it
-// is to be filtered / ignored
-typedef std::function<bool (Kmer&)> KmerFilter;
-typedef std::list<KmerFilter> KmerFilterList;
+class LabelHash;
 
 typedef std::vector<std::string> StringVector;
 
-
-inline bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
-{
-    if (!filters.size()) {
-        return false;
-    }
-
-    for(auto filter : filters) {
-        if (filter(node)) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 template<bool direction>
 class AssemblerTraverser: public Traverser
@@ -85,7 +67,6 @@ class AssemblerTraverser: public Traverser
 
 protected:
 
-    Kmer cursor;
     KmerFilterList filters;
 
 private:
@@ -94,15 +75,33 @@ private:
 
 public:
 
+    Kmer cursor;
+
     explicit AssemblerTraverser(const Hashtable * ht,
                              Kmer start_kmer,
                              KmerFilterList filters);
 
     char next_symbol();
     bool set_cursor(Kmer& node);
-    Kmer get_cursor();
-    void add_filter(KmerFilter filter);
+    void push_filter(KmerFilter filter);
+    KmerFilter pop_filter();
+};
 
+
+template<bool direction>
+class NonLoopingAT: public AssemblerTraverser<direction>
+{
+protected:
+
+    const SeenSet * visited;
+
+public:
+
+    explicit NonLoopingAT(const Hashtable * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters,
+                          const SeenSet * visited);
+    char next_symbol();
 };
 
 
@@ -147,8 +146,6 @@ public:
     std::string _assemble_directed(AssemblerTraverser<RIGHT>& cursor) const;
 
     std::string _assemble_directed(AssemblerTraverser<LEFT>& cursor) const;
-
-    KmerFilter get_stop_bf_filter(const Hashtable * stop_bf) const;
 };
 
 
@@ -171,7 +168,7 @@ public:
     StringVector assemble(const Kmer seed_kmer,
                          const Hashtable * stop_bf=0) const;
 
-    void _assemble_directed(AssemblerTraverser<RIGHT>& start_cursor,
+    void _assemble_directed(NonLoopingAT<RIGHT>& start_cursor,
                             StringVector& paths) const;
 /*
     void assemble_right(const Kmer start_kmer,
@@ -182,9 +179,6 @@ public:
                         StringVector& paths,
                         KmerFilterList& node_filters) const;
 */
-    std::string _assemble_across_labels(AssemblerTraverser& start_cursor,
-                                        const Label label) const;
-
 };
 
 }

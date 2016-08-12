@@ -42,7 +42,8 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG 0
+#define DEBUG 1
+#define DEBUG_AT 1
 
 using namespace khmer;
 using namespace std;
@@ -77,23 +78,26 @@ char AssemblerTraverser<direction>::next_symbol()
     Kmer neighbor;
     Kmer cursor_next;
 
-    #if DEBUG
-    std::cout << "** start next_symbol (start: " << cursor.repr(_ksize) <<  ") **" << std::endl;
-    #endif
+    //#if DEBUG_AT
+    //std::cout << "** start next_symbol (start: " << cursor.repr(_ksize) <<  ") **" << std::endl;
+    //#endif
 
     while(*symbol_ptr != '\0') {
         neighbor = get_neighbor(cursor, *symbol_ptr);
 
-        #if DEBUG
-            std::cout << "Try: " << *symbol_ptr << " " << neighbor.repr(_ksize)
-                << direction << " Count: " << graph->get_count(neighbor) << std::endl;
-        #endif
+        //#if DEBUG_AT
+        //    std::cout << "Try: " << *symbol_ptr << " " << neighbor.repr(_ksize)
+        //        << direction << " Count: " << graph->get_count(neighbor) << std::endl;
+        //#endif
 
         if (graph->get_count(neighbor) &&
             !apply_kmer_filters(neighbor, filters)) {
 
             found++;
             if (found > 1) {
+                #if DEBUG_AT
+                std::cout << "Stopped on HDN" << std::endl;
+                #endif
                 return '\0';
             }
             base = *symbol_ptr;
@@ -101,16 +105,18 @@ char AssemblerTraverser<direction>::next_symbol()
         }
         symbol_ptr++;
     }
-    #if DEBUG
-    std::cout << "** end next_symbol: " << found << " neighbors. **" << std::endl;
-    #endif
+
     if (!found) {
+        #if DEBUG_AT
+        std::cout << "No valid neighbors" << std::endl;
+        #endif
         return '\0';
     } else {
         cursor = cursor_next;
         return base;
     }
 }
+
 
 template<bool direction>
 bool AssemblerTraverser<direction>::set_cursor(Kmer& node)
@@ -122,34 +128,49 @@ bool AssemblerTraverser<direction>::set_cursor(Kmer& node)
     return false;
 }
 
-
 template<bool direction>
-Kmer AssemblerTraverser<direction>::get_cursor()
+void AssemblerTraverser<direction>::push_filter(KmerFilter filter)
 {
-    return cursor;
+    filters.push_back(filter);
 }
 
 template<bool direction>
-void AssemblerTraverser<direction>::add_filter(KmerFlter filter)
+KmerFilter AssemblerTraverser<direction>::pop_filter()
 {
-    node_filters.push_back(filter);
+    KmerFilter back = filters.back();
+    filters.pop_back();
+    return back;
 }
 
+template<bool direction>
+NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters,
+                                      const SeenSet * visited) :
+    AssemblerTraverser<direction>(ht, start_kmer, filters), visited(visited)
+{
+    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+}
+
+template<bool direction>
+char NonLoopingAT<direction>::next_symbol()
+{
+    visited->insert(AssemblerTraverser<direction>::cursor);
+    #if DEBUG
+    std::cout << "next_symbol; visited " << visited->size() << std::endl;
+    #endif
+    return AssemblerTraverser<direction>::next_symbol();
+}
+
+/********************************
+ * Simple Linear Assembly
+ ********************************/
 
 LinearAssembler::LinearAssembler(const Hashtable * ht) :
     graph(ht), _ksize(ht->ksize())
 {
 
 }
-
-KmerFilter LinearAssembler::get_stop_bf_filter(const Hashtable * stop_bf) const
-{
-    auto filter = [&] (Kmer& n) {
-        return stop_bf->get_count(n);
-    };
-    return filter;
-}
-
 
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
@@ -204,8 +225,8 @@ std::string LinearAssembler::assemble_left(const Kmer seed_kmer,
 std::string LinearAssembler::_assemble_directed(AssemblerTraverser<LEFT>& cursor)
     const
 {
-    std::string contig = cursor.get_cursor().get_string_rep(_ksize);
-    if (!cursor.get_cursor().is_forward()) {
+    std::string contig = cursor.cursor.get_string_rep(_ksize);
+    if (!cursor.cursor.is_forward()) {
         contig = _revcomp(contig);
     }
 
@@ -229,7 +250,7 @@ std::string LinearAssembler::_assemble_directed(AssemblerTraverser<LEFT>& cursor
 std::string LinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& cursor)
     const
 {
-    std::string contig = cursor.get_cursor().get_string_rep(_ksize);
+    std::string contig = cursor.cursor.get_string_rep(_ksize);
     char next_base;
 
     #if DEBUG
@@ -244,47 +265,35 @@ std::string LinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& curso
 }
 
 
-
 /********************************
  * Labeled Assembly
  ********************************/
 
-LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * labels) :
-    graph(labels->graph), lh(lh), _ksize(graph->ksize())
+LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * lh) :
+    graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
 {
-
+    linear_asm = new LinearAssembler(graph);
 }
 
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
-
 StringVector LabeledLinearAssembler::assemble(const Kmer seed_kmer,
-                                              const Hashtable * stop_bf=0)
+                                              const Hashtable * stop_bf)
     const
 {
+    #if DEBUG
+    std::cout << "Assemble Labeled: " << seed_kmer.repr(_ksize) << std::endl;
+    #endif
+
     KmerFilterList node_filters;
     if (stop_bf) {
-        node_filters.push_back(linear_asm->get_stop_bf_filter(stop_bf);
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
-
-    SeenSet visited;
-    KmerFilter visited_filter = [&] (Kmer& n) {
-        if(set_contains(visited, n)) {
-            return true;
-        } else {
-            visited.insert(n);
-            return false;
-        }
-    };
-    node_filters.push_back(visited_filter);
-
-#if DEBUG
-    std::cout << "assemble right: " << start_kmer << std::endl;
-#endif
-
     StringVector fwd_paths;
-    AssemblerTraverser<RIGHT> rcursor(graph, seed_kmer, node_filters);
+
+    SeenSet * visited = new SeenSet();
+    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     _assemble_directed(rcursor, fwd_paths);
 /*
 #if DEBUG
@@ -308,18 +317,19 @@ StringVector LabeledLinearAssembler::assemble(const Kmer seed_kmer,
         }
     }
 */
+    visited->clear();
     return fwd_paths;
 }
 
-void LabeledLinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& start_cursor,
+void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<RIGHT>& start_cursor,
                                                 StringVector& paths)
     const
 {
 
     std::string root_contig = linear_asm->_assemble_directed(start_cursor);
-    Kmer end_kmer = start_cursor.get_cursor();
+    Kmer end_kmer = start_cursor.cursor;
 
-    if (right_degree(end_kmer) > 1) {               // hit a HDN
+    if (start_cursor.degree_right(end_kmer) > 1) {               // hit a HDN
 #if DEBUG
         std::cout << "Contig thus far: " << root_contig << std::endl;
         std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
@@ -338,26 +348,45 @@ void LabeledLinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& start
          */
         if(labels.size() == 0) {
             // if no labels are found there's nothing to be done, return
+            #if DEBUG
+            std::cout << "no labels" << std::endl;
+            #endif
             paths.push_back(root_contig);
             return;
         } else {
-            for (auto label : labels) {
-                // Copy the current cursor at end_cursor for the spanning function
-                AssemblerTraverser<RIGHT> span_cursor(start_cursor);
-                std::string spanning_contig = assemble_across_label(span_cursor, label);
-                std::string extended_contig = root_contig
+            #if DEBUG
+            std::cout << "num labels: " << labels.size() << std::endl;
+            #endif
+            for (Label label : labels) {
+                /* Copy the current cursor at end_cursor for the spanning function.
+                 * We'll now assemble, following the given label, as far as we can.
+                 * We add an extra filter to the list: now, if we find no labels, we
+                 * continue assembling; if we find labels and ours is included, we
+                 * continue; and if we find labels and ours is not included, we stop.
+                 * This cursor should also have the filters for visited k-mers and
+                 * the stop bloom filter already.
+                 */
+                #if DEBUG
+                std::cout << "label: " << label << std::endl;
+                #endif
+                NonLoopingAT<RIGHT> span_cursor(start_cursor);
+                span_cursor.push_filter(get_label_filter(label, lh));
+                std::string spanning_contig = linear_asm->_assemble_directed(span_cursor);
 
-                // Creata a new cursor with the start cursor's filters
-                // but set it to the end of the extended contig
-                AssemblerTraverser<RIGHT> continue_cursor(start_cursor);
-                continue_cursor.set_cursor(span_cursor.get_cursor());
+                if(spanning_contig.length() == _ksize) {
+                    paths.push_back(root_contig);
+                    continue;
+                }
+
+                // Remove the label filter
+                span_cursor.pop_filter();
 
                 // Recurse and gather paths
                 StringVector continue_contigs;
-                _assemble_directed(continue_cursor, continue_contigs);
+                _assemble_directed(span_cursor, continue_contigs);
 
                 if (continue_contigs.size() == 0) {
-                    paths.push_back(extended_contig);
+                    paths.push_back(root_contig + spanning_contig.substr(_ksize));
                 } else {
                     for (auto continue_contig : continue_contigs) {
                         std::string full_contig = root_contig + spanning_contig.substr(_ksize);
@@ -368,32 +397,6 @@ void LabeledLinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& start
             } //end for
         }
     } else {
-        paths.push_back(contig);
+        paths.push_back(root_contig);
     }
-}
-
-//TODO make member function to create this filter
-std::string LabeledLinearAssembler::_assemble_across_labels(AssemblerTraverser& start_cursor,
-                                                            const Label label)
-    const
-{
-    /* We'll now assemble, following the given label, as far as we can.
-     * We add an extra filter to the list: now, if we find no labels, we
-     * continue assembling; if we find labels and ours is included, we
-     * continue; and if we find labels and ours is not included, we stop.
-     * This cursor should also have the filters for visited k-mers and
-     * the stop bloom filter already.
-     */
-    KmerFilter label_filter = [&] (Kmer& node) {
-        LabelSet ls;
-        lh->get_tag_labels(node, ls);
-        if (ls.size() == 0) {
-            return false;
-        } else {
-            return !set_contains(ls, label);
-        }
-    };
-    start_cursor.add_filter(label_filter);
-
-    return linear_asm._assemble_directed(start_cursor);
 }
