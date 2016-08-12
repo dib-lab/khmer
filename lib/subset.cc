@@ -782,9 +782,9 @@ PartitionID SubsetPartition::join_partitions(
     }
 
     if (!set_contains(reverse_pmap, orig) ||
-        !set_contains(reverse_pmap, join) ||
-        reverse_pmap[orig] == NULL ||
-        reverse_pmap[join] == NULL) {
+            !set_contains(reverse_pmap, join) ||
+            reverse_pmap[orig] == NULL ||
+            reverse_pmap[join] == NULL) {
         return 0;
     }
 
