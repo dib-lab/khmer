@@ -228,6 +228,7 @@ class PartitionExtractor(object):
 
         Takes PartitionExtractor and PartitionedReadIterator objects
         """
+
         def __init__(self, extractor):
             self.extractor = extractor
 

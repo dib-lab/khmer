@@ -69,7 +69,7 @@ def teardown():
 def test_count_1():
     hi = khmer._Countgraph(12, PRIMES_1m)
 
-    kmer = 'G'*12
+    kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
 
     assert hi.get(kmer) == 0
@@ -83,7 +83,7 @@ def test_count_1():
     assert hi.get(kmer) == 2
     assert hi.get(hashval) == 2
 
-    kmer = 'G'*11
+    kmer = 'G' * 11
     try:
         hi.hash(kmer)
         assert 0, "incorrect kmer size should fail"
@@ -93,7 +93,7 @@ def test_count_1():
 
 def test_count_2():
     hi = khmer._Countgraph(12, PRIMES_1m)
-    kmer = 'G'*12
+    kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
 
     assert hi.get(kmer) == 0
@@ -110,7 +110,7 @@ def test_count_2():
 
 def test_revhash_1():
     hi = khmer._Countgraph(12, [1])
-    kmer = 'C'*12
+    kmer = 'C' * 12
     hashval = hi.hash('C' * 12)
 
     assert hi.reverse_hash(hashval) == kmer
