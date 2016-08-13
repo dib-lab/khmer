@@ -42,11 +42,12 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG 1
-#define DEBUG_AT 1
+#define DEBUG 0
+#define DEBUG_AT 0
 
 using namespace khmer;
 using namespace std;
+
 
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const Hashtable * ht,
@@ -59,7 +60,7 @@ AssemblerTraverser<direction>::AssemblerTraverser(const Hashtable * ht,
 
 template<>
 Kmer AssemblerTraverser<LEFT>::get_neighbor(Kmer& node,
-                                                 const char symbol) {
+                                            const char symbol) {
     return get_left(node, symbol);
 }
 
@@ -67,6 +68,36 @@ template<>
 Kmer AssemblerTraverser<RIGHT>::get_neighbor(Kmer& node,
                                              const char symbol) {
     return get_right(node, symbol);
+}
+
+template<>
+unsigned int AssemblerTraverser<LEFT>::cursor_degree()
+    const
+{
+    return degree_left(cursor);
+}
+
+template<>
+unsigned int AssemblerTraverser<RIGHT>::cursor_degree()
+    const
+{
+    return degree_right(cursor);
+}
+
+template <>
+std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
+                                                           std::string& contig_b)
+    const
+{
+    return contig_a + contig_b.substr(_ksize);
+}
+
+template <>
+std::string AssemblerTraverser<LEFT>::join_contigs(std::string& contig_a,
+                                                         std::string& contig_b)
+    const
+{
+    return contig_b + contig_a.substr(_ksize);
 }
 
 template<bool direction>
@@ -78,26 +109,14 @@ char AssemblerTraverser<direction>::next_symbol()
     Kmer neighbor;
     Kmer cursor_next;
 
-    //#if DEBUG_AT
-    //std::cout << "** start next_symbol (start: " << cursor.repr(_ksize) <<  ") **" << std::endl;
-    //#endif
-
     while(*symbol_ptr != '\0') {
         neighbor = get_neighbor(cursor, *symbol_ptr);
-
-        //#if DEBUG_AT
-        //    std::cout << "Try: " << *symbol_ptr << " " << neighbor.repr(_ksize)
-        //        << direction << " Count: " << graph->get_count(neighbor) << std::endl;
-        //#endif
 
         if (graph->get_count(neighbor) &&
             !apply_kmer_filters(neighbor, filters)) {
 
             found++;
             if (found > 1) {
-                #if DEBUG_AT
-                std::cout << "Stopped on HDN" << std::endl;
-                #endif
                 return '\0';
             }
             base = *symbol_ptr;
@@ -107,9 +126,6 @@ char AssemblerTraverser<direction>::next_symbol()
     }
 
     if (!found) {
-        #if DEBUG_AT
-        std::cout << "No valid neighbors" << std::endl;
-        #endif
         return '\0';
     } else {
         cursor = cursor_next;
@@ -290,38 +306,39 @@ StringVector LabeledLinearAssembler::assemble(const Kmer seed_kmer,
     if (stop_bf) {
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
-    StringVector fwd_paths;
 
     SeenSet * visited = new SeenSet();
-    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
-    _assemble_directed(rcursor, fwd_paths);
-/*
-#if DEBUG
-    std::cout << "assemble left: " << start_kmer << std::endl;
-#endif
 
-    start_kmer = _revcomp(start_kmer);
-    std::vector<std::string> rev_paths;
-    _assemble_labeled_right(start_kmer.c_str(), rev_paths, visited);
-    visited.clear();
-#if DEBUG
-    std::cout << "join right and left contigs: " << rev_paths.size() << std::endl;
-#endif
-    std::vector<std::string> paths;
-    for (unsigned int i = 0; i < rev_paths.size(); i++) {
-        for (unsigned int j = 0; j < fwd_paths.size(); j++) {
-            std::string left = rev_paths[i];
-            left = left.substr(graph->_ksize);
-            std::string contig = _revcomp(left) + fwd_paths[j];
+    #if DEBUG
+    std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
+    #endif
+    StringVector right_paths;
+    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
+    _assemble_directed<RIGHT>(rcursor, right_paths);
+
+    #if DEBUG
+    std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize) << std::endl;
+    #endif
+    StringVector left_paths;
+    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, visited);
+    _assemble_directed<LEFT>(lcursor, left_paths);
+
+    StringVector paths;
+    for (unsigned int i = 0; i < left_paths.size(); i++) {
+        for (unsigned int j = 0; j < right_paths.size(); j++) {
+            std::string right = right_paths[j];
+            right = right.substr(_ksize);
+            std::string contig = left_paths[i] + right;
             paths.push_back(contig);
         }
     }
-*/
+
     visited->clear();
-    return fwd_paths;
+    return paths;
 }
 
-void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<RIGHT>& start_cursor,
+template <bool direction>
+void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>& start_cursor,
                                                 StringVector& paths)
     const
 {
@@ -329,7 +346,7 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<RIGHT>& start_curso
     std::string root_contig = linear_asm->_assemble_directed(start_cursor);
     Kmer end_kmer = start_cursor.cursor;
 
-    if (start_cursor.degree_right(end_kmer) > 1) {               // hit a HDN
+    if (start_cursor.cursor_degree() > 1) {               // hit a HDN
 #if DEBUG
         std::cout << "Contig thus far: " << root_contig << std::endl;
         std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
@@ -369,11 +386,14 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<RIGHT>& start_curso
                 #if DEBUG
                 std::cout << "label: " << label << std::endl;
                 #endif
-                NonLoopingAT<RIGHT> span_cursor(start_cursor);
+                NonLoopingAT<direction> span_cursor(start_cursor);
                 span_cursor.push_filter(get_label_filter(label, lh));
                 std::string spanning_contig = linear_asm->_assemble_directed(span_cursor);
 
                 if(spanning_contig.length() == _ksize) {
+                   #if DEBUG
+                   std::cout << "zero length spanning contig" << spanning_contig << std::endl;
+                   #endif
                     paths.push_back(root_contig);
                     continue;
                 }
@@ -383,15 +403,16 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<RIGHT>& start_curso
 
                 // Recurse and gather paths
                 StringVector continue_contigs;
-                _assemble_directed(span_cursor, continue_contigs);
+                _assemble_directed<direction>(span_cursor, continue_contigs);
 
                 if (continue_contigs.size() == 0) {
-                    paths.push_back(root_contig + spanning_contig.substr(_ksize));
+                    paths.push_back(span_cursor.join_contigs(root_contig,
+                                                             spanning_contig));
                 } else {
                     for (auto continue_contig : continue_contigs) {
-                        std::string full_contig = root_contig + spanning_contig.substr(_ksize);
-                        full_contig += continue_contig.substr(_ksize);
-                        paths.push_back(full_contig);
+                        std::string full_contig = span_cursor.join_contigs(root_contig,
+                                                                           spanning_contig);
+                        paths.push_back(span_cursor.join_contigs(full_contig, continue_contig));
                     }
                 }
             } //end for

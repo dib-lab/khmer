@@ -67,29 +67,29 @@ public:
 
     explicit Traverser(const Hashtable * ht);
 
-    Kmer get_left(Kmer& node, const char ch);
-    Kmer get_right(Kmer& node, const char ch);
+    Kmer get_left(const Kmer& node, const char ch) const;
+    Kmer get_right(const Kmer& node, const char ch) const;
 
     unsigned int traverse_left(Kmer& node,
                                KmerQueue &node_q,
                                std::function<bool (Kmer&)> filter=0,
-                               unsigned short max_neighbors=4);
+                               unsigned short max_neighbors=4) const;
     unsigned int traverse_right(Kmer& node,
                                 KmerQueue &node_q,
                                 std::function<bool (Kmer&)> filter=0,
-                                unsigned short max_neighbors=4);
+                                unsigned short max_neighbors=4) const;
     unsigned int traverse(Kmer& node,
                           KmerQueue &node_q,
-                          std::function<bool (Kmer&)> filter=0) {
+                          std::function<bool (Kmer&)> filter=0) const {
         unsigned int found;
         found = traverse_left(node, node_q, filter);
         found += traverse_right(node, node_q, filter);
         return found;
     };
 
-    unsigned int degree_left(Kmer& node);
-    unsigned int degree_right(Kmer& node);
-    unsigned int degree(Kmer& node);
+    unsigned int degree_left(const Kmer& node) const;
+    unsigned int degree_right(const Kmer& node) const;
+    unsigned int degree(const Kmer& node) const;
 };
 
 }

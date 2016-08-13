@@ -53,7 +53,8 @@ Traverser::Traverser(const Hashtable * ht) :
     rc_left_shift = _ksize * 2 - 2;
 }
 
-Kmer Traverser::get_left(Kmer& node, const char ch)
+Kmer Traverser::get_left(const Kmer& node, const char ch)
+    const
 {
     HashIntoType kmer_f, kmer_r;
     kmer_f = ((node.kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift);
@@ -62,7 +63,8 @@ Kmer Traverser::get_left(Kmer& node, const char ch)
 }
 
 
-Kmer Traverser::get_right(Kmer& node, const char ch)
+Kmer Traverser::get_right(const Kmer& node, const char ch)
+    const
 {
     HashIntoType kmer_f, kmer_r;
     kmer_f = (((node.kmer_f) << 2) & bitmask) | (twobit_repr(ch));
@@ -75,6 +77,7 @@ unsigned int Traverser::traverse_left(Kmer& node,
                                       KmerQueue & node_q,
                                       std::function<bool (Kmer&)> filter,
                                       unsigned short max_neighbors)
+    const
 {
     unsigned int found = 0;
     char * base = alphabets::DNA_SIMPLE;
@@ -98,6 +101,7 @@ unsigned int Traverser::traverse_right(Kmer& node,
                                        KmerQueue & node_q,
                                        std::function<bool (Kmer&)> filter,
                                        unsigned short max_neighbors)
+    const
 {
     unsigned int found = 0;
     char * base = alphabets::DNA_SIMPLE;
@@ -117,7 +121,8 @@ unsigned int Traverser::traverse_right(Kmer& node,
     return found;
 }
 
-unsigned int Traverser::degree_left(Kmer& node)
+unsigned int Traverser::degree_left(const Kmer& node)
+    const
 {
     unsigned int degree = 0;
     char * base = alphabets::DNA_SIMPLE;
@@ -133,7 +138,8 @@ unsigned int Traverser::degree_left(Kmer& node)
     return degree;
 }
 
-unsigned int Traverser::degree_right(Kmer& node)
+unsigned int Traverser::degree_right(const Kmer& node)
+    const
 {
     unsigned int degree = 0;
     char * base = alphabets::DNA_SIMPLE;
@@ -149,7 +155,8 @@ unsigned int Traverser::degree_right(Kmer& node)
     return degree;
 }
 
-unsigned int Traverser::degree(Kmer& node)
+unsigned int Traverser::degree(const Kmer& node)
+    const
 {
     return degree_right(node) + degree_left(node);
 }

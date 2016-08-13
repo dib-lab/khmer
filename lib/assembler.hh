@@ -60,7 +60,6 @@ class LabelHash;
 
 typedef std::vector<std::string> StringVector;
 
-
 template<bool direction>
 class AssemblerTraverser: public Traverser
 {
@@ -85,6 +84,9 @@ public:
     bool set_cursor(Kmer& node);
     void push_filter(KmerFilter filter);
     KmerFilter pop_filter();
+    unsigned int cursor_degree() const;
+
+    std::string join_contigs(std::string& contig_a, std::string& contig_b) const;
 };
 
 
@@ -160,25 +162,14 @@ class LabeledLinearAssembler
 public:
 
     explicit LabeledLinearAssembler(const LabelHash * lh);
-/*
-    KmerFilter get_label_filter(Kmer& node,
-                                Label label,
-                                const LabelHash * lh) const;
-*/
+
     StringVector assemble(const Kmer seed_kmer,
                          const Hashtable * stop_bf=0) const;
 
-    void _assemble_directed(NonLoopingAT<RIGHT>& start_cursor,
+    template <bool direction>
+    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
                             StringVector& paths) const;
-/*
-    void assemble_right(const Kmer start_kmer,
-                        StringVector& paths,
-                        KmerFilterList& node_filters) const;
 
-    void assemble_left(const Kmer start_kmer,
-                        StringVector& paths,
-                        KmerFilterList& node_filters) const;
-*/
 };
 
 }

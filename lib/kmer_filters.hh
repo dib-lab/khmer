@@ -80,7 +80,14 @@ inline KmerFilter get_label_filter(const Label label, const LabelHash * lh)
     KmerFilter filter = [=] (Kmer& node) {
         LabelSet ls;
         lh->get_tag_labels(node, ls);
+        #if DEBUG_FILTERS
+        if (ls.size() == 0) {
+            std::cout << "no labels to jump to!" << std::endl;
+        }
+        #endif
+
         return !set_contains(ls, label);
+
     };
     return filter;
 }
@@ -98,6 +105,11 @@ inline KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
 inline KmerFilter get_visited_filter(const SeenSet * visited)
 {
     KmerFilter filter = [=] (Kmer& node) {
+        #if DEBUG_FILTERS
+        if(set_contains(*visited, node)) {
+            std::cout << "loop!" << std::endl;
+        }
+        #endif
         return set_contains(*visited, node);
     };
     return filter;

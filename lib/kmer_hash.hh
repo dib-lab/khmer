@@ -242,6 +242,7 @@ public:
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_u)
+        const
     {
         HashIntoType kmer_f, kmer_r;
         std:: string kmer_s = _revhash(kmer_u, _ksize);
@@ -256,6 +257,7 @@ public:
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
+        const
     {
         HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
