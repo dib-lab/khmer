@@ -45,9 +45,9 @@ Contact: khmer-project@idyll.org
 #define DEBUG 0
 #define DEBUG_AT 0
 
-using namespace khmer;
 using namespace std;
 
+namespace khmer {
 
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const Hashtable * ht,
@@ -420,4 +420,6 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>& start_c
     } else {
         paths.push_back(root_contig);
     }
+}
+
 }
