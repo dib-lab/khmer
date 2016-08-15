@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include <list>
 #include <map>
 #include <queue>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>

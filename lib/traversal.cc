@@ -40,8 +40,10 @@ Contact: khmer-project@idyll.org
 
 #define DEBUG 1
 
-using namespace khmer;
 using namespace std;
+
+namespace khmer {
+
 
 Traverser::Traverser(const Hashtable * ht) :
     KmerFactory(ht->ksize()), graph(ht)
@@ -160,3 +162,136 @@ unsigned int Traverser::degree(const Kmer& node)
 {
     return degree_right(node) + degree_left(node);
 }
+
+
+
+template<bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const Hashtable * ht,
+                                 Kmer start_kmer,
+                                 KmerFilterList filters) :
+    Traverser(ht), filters(filters)
+{
+    cursor = start_kmer;
+}
+
+template<>
+Kmer AssemblerTraverser<LEFT>::get_neighbor(Kmer& node,
+                                            const char symbol) {
+    return get_left(node, symbol);
+}
+
+template<>
+Kmer AssemblerTraverser<RIGHT>::get_neighbor(Kmer& node,
+                                             const char symbol) {
+    return get_right(node, symbol);
+}
+
+template<>
+unsigned int AssemblerTraverser<LEFT>::cursor_degree()
+    const
+{
+    return degree_left(cursor);
+}
+
+template<>
+unsigned int AssemblerTraverser<RIGHT>::cursor_degree()
+    const
+{
+    return degree_right(cursor);
+}
+
+template <>
+std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
+                                                           std::string& contig_b)
+    const
+{
+    return contig_a + contig_b.substr(_ksize);
+}
+
+template <>
+std::string AssemblerTraverser<LEFT>::join_contigs(std::string& contig_a,
+                                                         std::string& contig_b)
+    const
+{
+    return contig_b + contig_a.substr(_ksize);
+}
+
+template<bool direction>
+char AssemblerTraverser<direction>::next_symbol()
+{
+    char * symbol_ptr = alphabets::DNA_SIMPLE;
+    char base;
+    short found = 0;
+    Kmer neighbor;
+    Kmer cursor_next;
+
+    while(*symbol_ptr != '\0') {
+        neighbor = get_neighbor(cursor, *symbol_ptr);
+
+        if (graph->get_count(neighbor) &&
+            !apply_kmer_filters(neighbor, filters)) {
+
+            found++;
+            if (found > 1) {
+                return '\0';
+            }
+            base = *symbol_ptr;
+            cursor_next = neighbor;
+        }
+        symbol_ptr++;
+    }
+
+    if (!found) {
+        return '\0';
+    } else {
+        cursor = cursor_next;
+        return base;
+    }
+}
+
+
+template<bool direction>
+bool AssemblerTraverser<direction>::set_cursor(Kmer& node)
+{
+    if(!apply_kmer_filters(node, filters)) {
+        cursor = node;
+        return true;
+    }
+    return false;
+}
+
+template<bool direction>
+void AssemblerTraverser<direction>::push_filter(KmerFilter filter)
+{
+    filters.push_back(filter);
+}
+
+template<bool direction>
+KmerFilter AssemblerTraverser<direction>::pop_filter()
+{
+    KmerFilter back = filters.back();
+    filters.pop_back();
+    return back;
+}
+
+template<bool direction>
+NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters,
+                                      const SeenSet * visited) :
+    AssemblerTraverser<direction>(ht, start_kmer, filters), visited(visited)
+{
+    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+}
+
+template<bool direction>
+char NonLoopingAT<direction>::next_symbol()
+{
+    visited->insert(AssemblerTraverser<direction>::cursor);
+    #if DEBUG
+    std::cout << "next_symbol; visited " << visited->size() << std::endl;
+    #endif
+    return AssemblerTraverser<direction>::next_symbol();
+}
+
+} // namespace khmer

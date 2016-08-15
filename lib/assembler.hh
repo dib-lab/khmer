@@ -37,75 +37,21 @@ Contact: khmer-project@idyll.org
 #ifndef ASSEMBLER_HH
 #define ASSEMBLER_HH
 
-#include <queue>
 #include <functional>
 
 #include "khmer.hh"
-#include "khmer_exception.hh"
-#include "read_parsers.hh"
 #include "kmer_hash.hh"
-#include "hashtable.hh"
+
 #include "labelhash.hh"
+#include "traversal.hh"
 #include "kmer_filters.hh"
 
 
 namespace khmer
 {
 
-#define LEFT 0
-#define RIGHT 1
-
 class Hashtable;
 class LabelHash;
-
-typedef std::vector<std::string> StringVector;
-
-template<bool direction>
-class AssemblerTraverser: public Traverser
-{
-
-protected:
-
-    KmerFilterList filters;
-
-private:
-
-    Kmer get_neighbor(Kmer& node, const char symbol);
-
-public:
-
-    Kmer cursor;
-
-    explicit AssemblerTraverser(const Hashtable * ht,
-                             Kmer start_kmer,
-                             KmerFilterList filters);
-
-    char next_symbol();
-    bool set_cursor(Kmer& node);
-    void push_filter(KmerFilter filter);
-    KmerFilter pop_filter();
-    unsigned int cursor_degree() const;
-
-    std::string join_contigs(std::string& contig_a, std::string& contig_b) const;
-};
-
-
-template<bool direction>
-class NonLoopingAT: public AssemblerTraverser<direction>
-{
-protected:
-
-    const SeenSet * visited;
-
-public:
-
-    explicit NonLoopingAT(const Hashtable * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters,
-                          const SeenSet * visited);
-    char next_symbol();
-};
-
 
 /**
  * \class LinearAssembler
@@ -137,7 +83,7 @@ public:
     explicit LinearAssembler(const Hashtable * ht);
 
     std::string assemble(const Kmer seed_kmer,
-                         const Hashtable * stop_bf=0) const;
+                         const Hashtable * stop_bf = 0) const;
 
     std::string assemble_right(const Kmer seed_kmer,
                         const Hashtable * stop_bf = 0) const;
@@ -145,10 +91,17 @@ public:
     std::string assemble_left(const Kmer seed_kmer,
                         const Hashtable * stop_bf = 0) const;
 
-    std::string _assemble_directed(AssemblerTraverser<RIGHT>& cursor) const;
-
-    std::string _assemble_directed(AssemblerTraverser<LEFT>& cursor) const;
+    template <bool direction>
+    std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
 };
+
+// The explicit specializations need to be declared in the same translation unit
+// as their unspecialized declaration.
+template<>
+std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>& cursor) const;
+
+template<>
+std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor) const;
 
 
 class LabeledLinearAssembler

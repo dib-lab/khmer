@@ -49,6 +49,7 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
+
 class CountingHash;
 class LabelHash;
 

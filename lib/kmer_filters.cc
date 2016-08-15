@@ -34,32 +34,68 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef FILTER_HH
-#define FILTER_HH
-
-#include <functional>
 
 #include "khmer.hh"
-#include "kmer_hash.hh"
+#include "hashtable.hh"
 #include "labelhash.hh"
+#include "kmer_filters.hh"
 
-#define DEBUG_FILTERS 0
+namespace khmer {
 
-namespace khmer
+bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
 {
+    if (!filters.size()) {
+        return false;
+    }
 
-class Hashtable;
-class LabelHash;
+    for(auto filter : filters) {
+        if (filter(node)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
-bool apply_kmer_filters(Kmer& node, KmerFilterList& filters);
+KmerFilter get_label_filter(const Label label, const LabelHash * lh)
+{
+    KmerFilter filter = [=] (Kmer& node) {
+        LabelSet ls;
+        lh->get_tag_labels(node, ls);
+        #if DEBUG_FILTERS
+        if (ls.size() == 0) {
+            std::cout << "no labels to jump to!" << std::endl;
+        }
+        #endif
 
-KmerFilter get_label_filter(const Label label, const LabelHash * lh);
+        return !set_contains(ls, label);
 
-KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
+    };
+    return filter;
+}
 
-KmerFilter get_visited_filter(const SeenSet * visited);
 
+KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
+{
+    KmerFilter filter = [=] (Kmer& n) {
+        return stop_bf->get_count(n);
+    };
+    return filter;
+}
+
+
+KmerFilter get_visited_filter(const SeenSet * visited)
+{
+    KmerFilter filter = [=] (Kmer& node) {
+        #if DEBUG_FILTERS
+        if(set_contains(*visited, node)) {
+            std::cout << "loop!" << std::endl;
+        }
+        #endif
+        return set_contains(*visited, node);
+    };
+    return filter;
+}
 
 }
-#endif

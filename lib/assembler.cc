@@ -34,10 +34,11 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#include "hashtable.hh"
-#include "traversal.hh"
+
+//#include "khmer.hh"
+//#include "hashtable.hh"
+//#include "traversal.hh"
 #include "assembler.hh"
-#include "symbols.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -48,135 +49,6 @@ Contact: khmer-project@idyll.org
 using namespace std;
 
 namespace khmer {
-
-template<bool direction>
-AssemblerTraverser<direction>::AssemblerTraverser(const Hashtable * ht,
-                                 Kmer start_kmer,
-                                 KmerFilterList filters) :
-    Traverser(ht), filters(filters)
-{
-    cursor = start_kmer;
-}
-
-template<>
-Kmer AssemblerTraverser<LEFT>::get_neighbor(Kmer& node,
-                                            const char symbol) {
-    return get_left(node, symbol);
-}
-
-template<>
-Kmer AssemblerTraverser<RIGHT>::get_neighbor(Kmer& node,
-                                             const char symbol) {
-    return get_right(node, symbol);
-}
-
-template<>
-unsigned int AssemblerTraverser<LEFT>::cursor_degree()
-    const
-{
-    return degree_left(cursor);
-}
-
-template<>
-unsigned int AssemblerTraverser<RIGHT>::cursor_degree()
-    const
-{
-    return degree_right(cursor);
-}
-
-template <>
-std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
-                                                           std::string& contig_b)
-    const
-{
-    return contig_a + contig_b.substr(_ksize);
-}
-
-template <>
-std::string AssemblerTraverser<LEFT>::join_contigs(std::string& contig_a,
-                                                         std::string& contig_b)
-    const
-{
-    return contig_b + contig_a.substr(_ksize);
-}
-
-template<bool direction>
-char AssemblerTraverser<direction>::next_symbol()
-{
-    char * symbol_ptr = alphabets::DNA_SIMPLE;
-    char base;
-    short found = 0;
-    Kmer neighbor;
-    Kmer cursor_next;
-
-    while(*symbol_ptr != '\0') {
-        neighbor = get_neighbor(cursor, *symbol_ptr);
-
-        if (graph->get_count(neighbor) &&
-            !apply_kmer_filters(neighbor, filters)) {
-
-            found++;
-            if (found > 1) {
-                return '\0';
-            }
-            base = *symbol_ptr;
-            cursor_next = neighbor;
-        }
-        symbol_ptr++;
-    }
-
-    if (!found) {
-        return '\0';
-    } else {
-        cursor = cursor_next;
-        return base;
-    }
-}
-
-
-template<bool direction>
-bool AssemblerTraverser<direction>::set_cursor(Kmer& node)
-{
-    if(!apply_kmer_filters(node, filters)) {
-        cursor = node;
-        return true;
-    }
-    return false;
-}
-
-template<bool direction>
-void AssemblerTraverser<direction>::push_filter(KmerFilter filter)
-{
-    filters.push_back(filter);
-}
-
-template<bool direction>
-KmerFilter AssemblerTraverser<direction>::pop_filter()
-{
-    KmerFilter back = filters.back();
-    filters.pop_back();
-    return back;
-}
-
-template<bool direction>
-NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
-                                      Kmer start_kmer,
-                                      KmerFilterList filters,
-                                      const SeenSet * visited) :
-    AssemblerTraverser<direction>(ht, start_kmer, filters), visited(visited)
-{
-    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
-}
-
-template<bool direction>
-char NonLoopingAT<direction>::next_symbol()
-{
-    visited->insert(AssemblerTraverser<direction>::cursor);
-    #if DEBUG
-    std::cout << "next_symbol; visited " << visited->size() << std::endl;
-    #endif
-    return AssemblerTraverser<direction>::next_symbol();
-}
 
 /********************************
  * Simple Linear Assembly
@@ -220,7 +92,7 @@ std::string LinearAssembler::assemble_right(const Kmer seed_kmer,
     }
 
     AssemblerTraverser<RIGHT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed(cursor);
+    return _assemble_directed<RIGHT>(cursor);
 }
 
 
@@ -234,11 +106,11 @@ std::string LinearAssembler::assemble_left(const Kmer seed_kmer,
     }
 
     AssemblerTraverser<LEFT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed(cursor);
+    return _assemble_directed<LEFT>(cursor);
 }
 
-
-std::string LinearAssembler::_assemble_directed(AssemblerTraverser<LEFT>& cursor)
+template <>
+std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>& cursor)
     const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -262,8 +134,8 @@ std::string LinearAssembler::_assemble_directed(AssemblerTraverser<LEFT>& cursor
     return contig;
 }
 
-
-std::string LinearAssembler::_assemble_directed(AssemblerTraverser<RIGHT>& cursor)
+template<>
+std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor)
     const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -343,7 +215,7 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>& start_c
     const
 {
 
-    std::string root_contig = linear_asm->_assemble_directed(start_cursor);
+    std::string root_contig = linear_asm->_assemble_directed<direction>(start_cursor);
     Kmer end_kmer = start_cursor.cursor;
 
     if (start_cursor.cursor_degree() > 1) {               // hit a HDN
@@ -388,7 +260,7 @@ void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>& start_c
                 #endif
                 NonLoopingAT<direction> span_cursor(start_cursor);
                 span_cursor.push_filter(get_label_filter(label, lh));
-                std::string spanning_contig = linear_asm->_assemble_directed(span_cursor);
+                std::string spanning_contig = linear_asm->_assemble_directed<direction>(span_cursor);
 
                 if(spanning_contig.length() == _ksize) {
                    #if DEBUG
