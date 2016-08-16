@@ -280,7 +280,7 @@ template<bool direction>
 NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
                                       Kmer start_kmer,
                                       KmerFilterList filters,
-                                      const SeenSet * visited) :
+                                      SeenSet * visited) :
     AssemblerTraverser<direction>(ht, start_kmer, filters), visited(visited)
 {
     AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
@@ -290,9 +290,6 @@ template<bool direction>
 char NonLoopingAT<direction>::next_symbol()
 {
     visited->insert(this->cursor);
-    #if DEBUG
-    std::cout << "next_symbol; visited " << visited->size() << std::endl;
-    #endif
     return AssemblerTraverser<direction>::next_symbol();
 }
 
