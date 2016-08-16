@@ -232,6 +232,9 @@ LIBKHMER_OBJS= \
 	read_aligner.o \
 	read_parsers.o \
 	subset.o \
+	kmer_filters.o \
+	assembler.o \
+	symbols.o \
 	murmur3.o
 
 PRECOMILE_OBJS ?=
@@ -261,6 +264,9 @@ KHMER_HEADERS= \
 	read_aligner.hh \
 	read_parsers.hh \
 	subset.hh \
+	kmer_filters.hh \
+	assembler.hh \
+	symbols.hh
 
 # START OF RULES #
 
