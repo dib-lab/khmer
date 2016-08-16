@@ -39,6 +39,7 @@ from __future__ import absolute_import
 
 import khmer
 from khmer import ReadParser
+from khmer import reverse_complement as revcomp
 
 import screed
 
@@ -1091,10 +1092,6 @@ def test_traverse_linear_path_3_stopgraph():
     assert len(conns) == 0
 
 
-def _equals_rc(query, match):
-    return (query == match) or (screed.rc(query) == match)
-
-
 def test_assemble_linear_path_1():
     # assemble from beginning of contig, up until branch point
     contigfile = utils.get_test_data('simple-genome.fa')
@@ -1111,7 +1108,7 @@ def test_assemble_linear_path_1():
     path = nodegraph.assemble_linear_path(contig[0:K])
     len_path = len(path)
 
-    assert _equals_rc(path, contig[:len_path])
+    assert utils._equals_rc(path, contig[:len_path])
 
 
 def test_assemble_linear_path_1_rc():
@@ -1128,10 +1125,11 @@ def test_assemble_linear_path_1_rc():
     nodegraph.consume(contig)
     nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
 
-    path = nodegraph.assemble_linear_path(khmer.reverse_complement(contig[0:K]))
+    path = nodegraph.assemble_linear_path(revcomp(contig[0:K]))
     len_path = len(path)
 
-    assert _equals_rc(path, contig[:len_path])
+    assert utils._equals_rc(path, contig[:len_path])
+
 
 def test_assemble_linear_path_2():
     # assemble from branch point back to beginning of contig
@@ -1149,7 +1147,7 @@ def test_assemble_linear_path_2():
     path = nodegraph.assemble_linear_path(contig[100:100 + K])
     len_path = len(path)
 
-    assert _equals_rc(path, contig[:len_path])
+    assert utils._equals_rc(path, contig[:len_path])
 
 
 def test_assemble_linear_path_2_rc():
@@ -1165,10 +1163,10 @@ def test_assemble_linear_path_2_rc():
     nodegraph.consume(contig)
     nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
 
-    path = nodegraph.assemble_linear_path(khmer.reverse_complement(contig[100:100 + K]))
+    path = nodegraph.assemble_linear_path(revcomp(contig[100:100 + K]))
     len_path = len(path)
 
-    assert _equals_rc(path, contig[:len_path])
+    assert utils._equals_rc(path, contig[:len_path])
 
 
 def test_assemble_linear_path_3():
@@ -1185,7 +1183,7 @@ def test_assemble_linear_path_3():
 
     for start in range(0, len(contig), 150):
         path = nodegraph.assemble_linear_path(contig[start:start + K])
-        assert _equals_rc(path, contig), start
+        assert utils._equals_rc(path, contig), start
 
 
 def test_assemble_linear_path_4():
@@ -1208,9 +1206,9 @@ def test_assemble_linear_path_4():
 
     # this is actually bad behavior; we're ignoring a branch.
     # FIXME at some point.
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
     # should? be:
-    #    assert _equals_rc(path, contig[101:])
+    #    assert utils._equals_rc(path, contig[101:])
 
 
 def test_assemble_linear_path_5():
@@ -1233,9 +1231,9 @@ def test_assemble_linear_path_5():
 
     # this is actually bad behavior; we're ignoring a branch.
     # FIXME at some point.
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
     # should? be:
-    #    assert _equals_rc(path, contig[101:])
+    #    assert utils._equals_rc(path, contig[101:])
 
 
 def test_assemble_linear_path_6():
@@ -1256,7 +1254,7 @@ def test_assemble_linear_path_6():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig[101:])
+    assert utils._equals_rc(path, contig[101:])
 
 
 def test_assemble_linear_path_7():
@@ -1277,7 +1275,7 @@ def test_assemble_linear_path_7():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig[101:])
+    assert utils._equals_rc(path, contig[101:])
 
 
 def test_assemble_linear_path_8():
@@ -1300,7 +1298,7 @@ def test_assemble_linear_path_8():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
 
 
 def test_assemble_linear_path_9():
@@ -1323,7 +1321,7 @@ def test_assemble_linear_path_9():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
 
 
 def test_assemble_linear_path_10():
@@ -1347,7 +1345,7 @@ def test_assemble_linear_path_10():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, 'T' + contig[101:])
+    assert utils._equals_rc(path, 'T' + contig[101:])
 
 
 def test_assemble_labeled_paths():
@@ -1375,7 +1373,7 @@ def test_assemble_labeled_paths():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
 
 
 def test_assemble_labeled_paths_2():
@@ -1408,14 +1406,14 @@ def test_assemble_labeled_paths_2():
 
     found = False
     for path in paths:
-        if _equals_rc(path, contig):
+        if utils._equals_rc(path, contig):
             found = True
             break
     assert found
 
     found = False
     for path in paths:
-        if _equals_rc(path, branch):
+        if utils._equals_rc(path, branch):
             found = True
             break
     assert found
@@ -1455,21 +1453,21 @@ def test_assemble_labeled_paths_3():
 
     found = False
     for path in paths:
-        if _equals_rc(path, contig):
+        if utils._equals_rc(path, contig):
             found = True
             break
     assert found
 
     found = False
     for path in paths:
-        if _equals_rc(path, branch):
+        if utils._equals_rc(path, branch):
             found = True
             break
     assert found
 
     found = False
     for path in paths:
-        if _equals_rc(path, branch2):
+        if utils._equals_rc(path, branch2):
             found = True
             break
     assert found
@@ -1509,21 +1507,21 @@ def test_assemble_labeled_paths_4():
 
     found = False
     for path in paths:
-        if _equals_rc(path, contig):
+        if utils._equals_rc(path, contig):
             found = True
             break
     assert found
 
     found = False
     for path in paths:
-        if _equals_rc(path, branch):
+        if utils._equals_rc(path, branch):
             found = True
             break
     assert found
 
     found = False
     for path in paths:
-        if _equals_rc(path, branch2):
+        if utils._equals_rc(path, branch2):
             found = True
             break
     assert found
@@ -1554,4 +1552,4 @@ def test_assemble_labeled_paths_5():
 
     print('len path:', len_path)
 
-    assert _equals_rc(path, contig)
+    assert utils._equals_rc(path, contig)
