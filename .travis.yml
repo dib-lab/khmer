@@ -18,9 +18,18 @@ matrix:
             - cppcheck
             - enchant
 
+    - os: osx
+      language: generic
+      osx_image: xcode7.3
+      before_install:
+        - source ci_scripts/install.sh
+
 # command to install common dependencies
 install:
+  - python --version
+  - which python
   - gcc --version
+  - which gcc
   - make install-dependencies
 
 # command to run tests
