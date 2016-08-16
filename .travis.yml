@@ -1,0 +1,28 @@
+language: python
+
+notifications:
+  email: false
+
+
+matrix:
+  include:
+    - os: linux
+      python: "2.7"
+      # Tell travis we want debian trusty
+      sudo: required
+      dist: trusty
+      addons:
+        apt:
+          packages:
+            - astyle
+            - cppcheck
+            - enchant
+
+# command to install common dependencies
+install:
+  - gcc --version
+  - make install-dependencies
+
+# command to run tests
+script:
+  - make test
