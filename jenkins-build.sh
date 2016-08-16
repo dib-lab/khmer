@@ -74,7 +74,7 @@ else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
 	./setup.py install
 	./setup.py develop
-	make nosetests.xml
+	make pytests.xml
 fi
 
 if type cppcheck >/dev/null 2>&1
