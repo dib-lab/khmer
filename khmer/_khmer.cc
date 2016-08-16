@@ -1561,6 +1561,8 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
         stop_bf = nodegraph_o->hashbits;
     }
     LinearAssembler assembler(hashtable);
+    KmerFilterList lst;
+    AssemblerTraverser<RIGHT> test(hashtable, start_kmer, lst);
 
     std::string contig = assembler.assemble(start_kmer, stop_bf);
 
