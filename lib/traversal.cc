@@ -222,7 +222,7 @@ template<bool direction>
 char AssemblerTraverser<direction>::next_symbol()
 {
     char * symbol_ptr = alphabets::DNA_SIMPLE;
-    char base;
+    char base = *symbol_ptr; // kill -Wmaybe-uninitialized warning
     short found = 0;
     Kmer neighbor;
     Kmer cursor_next;
