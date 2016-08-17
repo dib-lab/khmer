@@ -39,7 +39,7 @@ install:
 # command to run tests
 script:
   - make test
-  # coverage needs a clean build, generate coverage for all ARCHs
+  # coverage needs a clean build, generate coverage on all ARCHs,
   # running it here means it will fail the build if it fails
   - make clean coverage-gcovr.xml coverage.xml
 
@@ -47,6 +47,7 @@ script:
 after_success:
   - make pylint
   - make pep8
+  - make cppcheck
   # do the docs build?
   - make doc
   # only upload the linux coverage report to codecov as it merges all reports
