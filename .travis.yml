@@ -11,6 +11,8 @@ matrix:
       # Tell travis we want debian trusty
       sudo: required
       dist: trusty
+      env:
+        - TESTATTR="'not huge and not known_failing'"
       addons:
         apt:
           packages:
@@ -21,6 +23,8 @@ matrix:
     - os: osx
       language: generic
       osx_image: xcode7.3
+      env:
+        - TESTATTR="'not linux and not known_failing and not huge'"
       before_install:
         - source ci_scripts/install.sh
 
