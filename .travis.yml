@@ -39,3 +39,14 @@ install:
 # command to run tests
 script:
   - make test
+
+# generate all the diagnostic reports
+after_success:
+  - make pylint
+  - make pep8
+  # do the docs build?
+  - make doc
+  # coverage needs a clean build
+  - make clean coverage-gcovr.xml coverage.xml
+  - pip install codecov
+  - codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml
