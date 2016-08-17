@@ -39,6 +39,9 @@ install:
 # command to run tests
 script:
   - make test
+  # coverage needs a clean build, generate coverage for all ARCHs
+  # running it here means it will fail the build if it fails
+  - make clean coverage-gcovr.xml coverage.xml
 
 # generate all the diagnostic reports
 after_success:
@@ -46,7 +49,7 @@ after_success:
   - make pep8
   # do the docs build?
   - make doc
-  # coverage needs a clean build
-  - make clean coverage-gcovr.xml coverage.xml
-  - pip install codecov
-  - codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml
+  # only upload the linux coverage report to codecov as it merges all reports
+  # from all builds into one
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codecov; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml; fi
