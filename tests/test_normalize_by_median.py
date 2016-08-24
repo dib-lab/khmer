@@ -37,7 +37,7 @@ from __future__ import print_function, absolute_import, unicode_literals
 import os
 import threading
 import io
-
+import shutil
 import screed
 import khmer
 
@@ -260,8 +260,10 @@ def test_normalize_by_median_report_fp():
     # this tests basic reporting of diginorm stats => report.out, including
     # a test of aggregate stats for two input files.
 
-    infile = utils.copy_test_data('test-abund-read-2.fa')
-    infile2 = utils.copy_test_data('test-abund-read-2.fa')
+    infile = utils.get_temp_filename('test.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile2 = utils.get_temp_filename('test2.fa')
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
