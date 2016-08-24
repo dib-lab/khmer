@@ -42,7 +42,6 @@ from __future__ import unicode_literals
 import sys
 import os
 import os.path
-import shutil
 from io import StringIO
 import traceback
 import glob
@@ -118,12 +117,9 @@ class _checkImportSucceeds(object):  # pylint: disable=too-few-public-methods
 
 
 def test_sweep_reads():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fa')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -164,12 +160,9 @@ def test_sweep_reads():
 
 
 def test_sweep_reads_fq():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fq')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fq'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -218,10 +211,9 @@ def test_sweep_reads_fq():
 
 def test_sweep_reads_2():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    inref = utils.get_temp_filename('ref.fa')
-    shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
+    infile = utils.copy_test_data('random-20-X2.fa')
+    inref = utils.copy_test_data('random-20-a.fa')
+
     wdir = os.path.dirname(inref)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
@@ -240,8 +232,7 @@ def test_sweep_reads_2():
 
 def test_sweep_reads_3():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     wdir = os.path.dirname(infile)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
@@ -288,8 +279,7 @@ def test_saturate_by_median():
 
 
 def test_count_kmers_1():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     ctfile = _make_counting(infile)
 
     script = scriptpath('count-kmers.py')
@@ -303,8 +293,7 @@ def test_count_kmers_1():
 
 
 def test_count_kmers_2_single():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
 
     script = scriptpath('count-kmers-single.py')
     args = ['-x', '1e7', '-k', '20', '-N', '2', infile]
@@ -317,11 +306,10 @@ def test_count_kmers_2_single():
 
 
 def test_multirename_fasta():
-    infile1 = utils.get_temp_filename('test-multi.fa')
+    # I'm not sure if this defeated the point of this test -Ryan
+    infile1 = utils.copy_test_data('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
-    infile2 = utils.get_temp_filename('out.fa')
-    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
-    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    infile2 = utils.copy_test_data('multi-output.fa')
     args = ['assembly', infile1]
     _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
     r = open(infile2).read()

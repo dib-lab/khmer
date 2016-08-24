@@ -35,7 +35,6 @@
 from __future__ import print_function, absolute_import, unicode_literals
 
 import os
-import shutil
 import threading
 import io
 
@@ -74,8 +73,7 @@ def test_normalize_by_median_loadgraph_with_args():
 
 
 def test_normalize_by_median_empty_file():
-    infile = utils.get_temp_filename('empty')
-    shutil.copyfile(utils.get_test_data('empty-file'), infile)
+    infile = utils.copy_test_data('empty-file')
     script = 'normalize-by-median.py'
     in_dir = os.path.dirname(infile)
 
@@ -90,10 +88,8 @@ def test_normalize_by_median_empty_file():
 def test_normalize_by_median():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', infile]
@@ -113,10 +109,8 @@ def test_normalize_by_median():
 def test_normalize_by_median_quiet():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', '--quiet', '-M', '2e6', infile]
@@ -137,10 +131,8 @@ def test_normalize_by_median_quiet():
 def test_normalize_by_median_unpaired_final_read():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('single-read.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', '-p', infile]
@@ -150,10 +142,8 @@ def test_normalize_by_median_unpaired_final_read():
 
 
 def test_normalize_by_median_sanity_check_0():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('single-read.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('single-read.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-U', '1024', '--max-mem', '60', infile]
@@ -163,10 +153,8 @@ def test_normalize_by_median_sanity_check_0():
 
 
 def test_normalize_by_median_sanity_check_1():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-filter-abund-Ns.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-U', '83', '--max-tablesize', '17', infile]
@@ -176,10 +164,8 @@ def test_normalize_by_median_sanity_check_1():
 
 
 def test_normalize_by_median_sanity_check_2():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-filter-abund-Ns.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-U', '83', infile]
@@ -190,11 +176,9 @@ def test_normalize_by_median_sanity_check_2():
 
 
 def test_normalize_by_median_sanity_check_3():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-filter-abund-Ns.fq')
     in_dir = os.path.dirname(infile)
     tablefile = utils.get_temp_filename('table', in_dir)
-
-    shutil.copyfile(utils.get_test_data('test-filter-abund-Ns.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-s', tablefile, '-U', '83', '--fp-rate', '0.7', infile]
@@ -226,11 +210,9 @@ def test_normalize_by_median_unforced_badfile():
 
 
 def test_normalize_by_median_contradictory_args():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-large.fa')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
-
-    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', '1', '-k', '17', '--force_single', '-p', '-R',
@@ -243,10 +225,8 @@ def test_normalize_by_median_contradictory_args():
 def test_normalize_by_median_stdout_3():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', infile, '--out', '-']
@@ -261,9 +241,8 @@ def test_normalize_by_median_stdout_3():
 def test_normalize_by_median_known_good():
     CUTOFF = '2'
 
-    infile = utils.get_temp_filename('test.fa.gz')
+    infile = utils.copy_test_data('100k-filtered.fa.gz')
     in_dir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('100k-filtered.fa.gz'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '20', '-x', '4e6', infile]
@@ -281,10 +260,8 @@ def test_normalize_by_median_report_fp():
     # this tests basic reporting of diginorm stats => report.out, including
     # a test of aggregate stats for two input files.
 
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    infile2 = utils.get_temp_filename('test2.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa')
 
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
@@ -307,8 +284,7 @@ def test_normalize_by_median_report_fp_hifreq():
     # this tests high-frequency reporting of diginorm stats for a single
     # file => report.out.
 
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
 
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
@@ -333,11 +309,9 @@ def test_normalize_by_median_report_fp_huge():
     # this tests reporting of diginorm stats => report.out for a large
     # file, with the default reporting interval of once every 100k.
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-large.fa')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
-
-    shutil.copyfile(utils.get_test_data('test-large.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', '1', '-k', '17', '-R', outfile, infile]
@@ -353,13 +327,11 @@ def test_normalize_by_median_report_fp_huge():
 def test_normalize_by_median_unpaired_and_paired():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-paired.fa')
     in_dir = os.path.dirname(infile)
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
-
-    unpairedfile = utils.get_temp_filename('test1.fa', tempdir=in_dir)
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), unpairedfile)
+    # Not sure if this will still work -Ryan
+    unpairedfile = utils.copy_test_data('random-20-a.fa')
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', '-u', unpairedfile, '-p', infile]
@@ -373,12 +345,11 @@ def test_normalize_by_median_unpaired_and_paired():
 
 def test_normalize_by_median_count_kmers_PE():
     CUTOFF = '1'
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('paired_one.base.dif.fa')
     in_dir = os.path.dirname(infile)
     # The test file has one pair of identical read except for the last base
     # The 2nd read should be discarded in the unpaired mode
     # but kept in the paired end mode adding only one more unique kmer
-    shutil.copyfile(utils.get_test_data('paired_one.base.dif.fa'), infile)
     script = 'normalize-by-median.py'
 
     args = ['-C', CUTOFF, '-k', '17', '--force_single', infile]
@@ -393,10 +364,8 @@ def test_normalize_by_median_count_kmers_PE():
 
 
 def test_normalize_by_median_double_file_name():
-    infile = utils.get_temp_filename('test-abund-read-2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = [utils.get_test_data('test-abund-read-2.fa'), infile]
@@ -419,13 +388,11 @@ def test_normalize_by_median_stdin_no_out():
 
 
 def test_normalize_by_median_overwrite():
-    outfile = utils.get_temp_filename('test.fa.keep')
-    shutil.copyfile(utils.get_test_data('test-abund-read.fa'), outfile)
+    outfile = utils.copy_test_data('test-abund-read.fa')
     in_dir = os.path.dirname(outfile)
 
     CUTOFF = '1'
-    infile = utils.get_temp_filename('test.fa', in_dir)
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-3.fa')
     script = 'normalize-by-median.py'
 
     args = ['-C', CUTOFF, '-k', '17', '-o', outfile, infile]
@@ -457,10 +424,8 @@ def test_normalize_by_median_version():
 def test_normalize_by_median_2():
     CUTOFF = '2'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', infile]
@@ -478,10 +443,8 @@ def test_normalize_by_median_2():
 def test_normalize_by_median_paired():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-paired.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
@@ -499,10 +462,8 @@ def test_normalize_by_median_paired():
 def test_normalize_by_median_paired_fq():
     CUTOFF = '20'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-paired.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
@@ -527,10 +488,8 @@ def test_normalize_by_median_paired_fq():
 def test_normalize_by_median_impaired():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-impaired.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
@@ -542,15 +501,10 @@ def test_normalize_by_median_impaired():
 def test_normalize_by_median_force():
     CUTOFF = '1'
 
-    corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
-    good_infile = utils.get_temp_filename('test-good.fq',
-                                          tempdir=os.path.dirname(
-                                              corrupt_infile))
+    corrupt_infile = utils.copy_test_data('test-error-reads.fq')
+    good_infile = utils.copy_test_data('test-fastq-reads.fq')
 
     in_dir = os.path.dirname(good_infile)
-
-    shutil.copyfile(utils.get_test_data('test-error-reads.fq'), corrupt_infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), good_infile)
 
     script = 'normalize-by-median.py'
     args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
@@ -562,11 +516,10 @@ def test_normalize_by_median_force():
 
 
 def test_normalize_by_median_no_bigcount():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     hashfile = utils.get_temp_filename('test-out.ct')
     in_dir = os.path.dirname(infile)
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     _make_counting(infile, K=8)
 
     script = 'normalize-by-median.py'
@@ -585,10 +538,8 @@ def test_normalize_by_median_no_bigcount():
 def test_normalize_by_median_empty():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-empty.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '-k', '17', infile]
@@ -601,10 +552,8 @@ def test_normalize_by_median_empty():
 def test_normalize_by_median_emptycountgraph():
     CUTOFF = '1'
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-empty.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-C', CUTOFF, '--loadgraph', infile, infile]
@@ -616,9 +565,8 @@ def test_normalize_by_median_emptycountgraph():
 def test_normalize_by_median_fpr():
     MAX_TABLESIZE_PARAM = 12
 
-    infile = utils.get_temp_filename('test-fpr.fq')
+    infile = utils.copy_test_data('test-fastq-reads.fq')
     in_dir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
 
     script = 'normalize-by-median.py'
     args = ['-f', '-k 17', '-x ' + str(MAX_TABLESIZE_PARAM), infile]
@@ -699,11 +647,8 @@ def test_diginorm_basic_functionality_1():
     CUTOFF = ['-C', '1']
     PAIRING = ['-p']
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('dn-test-all-paired-all-keep.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
-                    infile)
 
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
@@ -730,11 +675,8 @@ def test_diginorm_basic_functionality_2():
     CUTOFF = ['-C', '1']
     PAIRING = ['--force_single']
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('dn-test-all-paired-all-keep.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
-                    infile)
 
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
@@ -761,11 +703,8 @@ def test_diginorm_basic_functionality_3():
     CUTOFF = ['-C', '1']
     PAIRING = []
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('dn-test-none-paired.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('dn-test-none-paired.fa'),
-                    infile)
 
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]
@@ -790,11 +729,8 @@ def test_diginorm_basic_functionality_4():
 
     CUTOFF = ['-C', '1']
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('dn-test-some-paired-all-keep.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('dn-test-some-paired-all-keep.fa'),
-                    infile)
 
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + ['-k', '15', infile]
@@ -820,11 +756,8 @@ def test_diginorm_basic_functionality_5():
     CUTOFF = ['-C', '1']
     PAIRING = ['-p']
 
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('dn-test-all-paired-all-keep.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('dn-test-all-paired-all-keep.fa'),
-                    infile)
 
     script = 'normalize-by-median.py'
     args = list(CUTOFF) + list(PAIRING) + ['-k', '15', infile]

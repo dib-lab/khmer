@@ -232,4 +232,5 @@ def longify(listofints):
 def copy_test_data(testfile):
     infile = get_temp_filename(os.path.basename(testfile))
     shutil.copyfile(get_test_data(testfile), infile)
+
     return infile

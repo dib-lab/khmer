@@ -40,7 +40,6 @@ from __future__ import absolute_import, unicode_literals
 import gzip
 
 import os
-import shutil
 
 import khmer
 from . import khmer_tst_utils as utils
