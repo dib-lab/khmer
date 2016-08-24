@@ -1210,7 +1210,6 @@ def test_extract_partitions_no_output_groups():
 
 
 def test_extract_partitions_pid_0():
-    # This may have seriously broken because I don't understand this -Ryan
     partfile = utils.copy_test_data('random-20-a.fa.part')
 
     in_dir = os.path.dirname(partfile)

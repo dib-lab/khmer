@@ -306,7 +306,6 @@ def test_count_kmers_2_single():
 
 
 def test_multirename_fasta():
-    # I'm not sure if this defeated the point of this test -Ryan
     infile1 = utils.copy_test_data('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
     infile2 = utils.copy_test_data('multi-output.fa')

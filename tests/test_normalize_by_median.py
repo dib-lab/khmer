@@ -332,7 +332,6 @@ def test_normalize_by_median_unpaired_and_paired():
     infile = utils.copy_test_data('test-abund-read-paired.fa')
     in_dir = os.path.dirname(infile)
 
-    # Not sure if this will still work -Ryan
     unpairedfile = utils.copy_test_data('random-20-a.fa')
 
     script = 'normalize-by-median.py'
