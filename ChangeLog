@@ -1,3 +1,10 @@
+2016-08-26 Ryan Shean <rcs333@uw.edu>
+
+   * tests/{test_countergraph.py, test_filter_abund.py,
+   test_normalize_by_median.py, test_read_handling.py,
+   test_sandbox_scripts.py, test_scripts.py}: updated to use
+   copy_test_data function
+
 2016-07-18  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
