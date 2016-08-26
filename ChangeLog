@@ -1,3 +1,8 @@
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library.
+
 2016-07-18  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.

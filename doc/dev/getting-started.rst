@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 Getting started with khmer development
@@ -80,16 +80,16 @@ One-time Preparation
        On recent Debian and Ubuntu this can be done with::
 
            sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
-           g++ git astyle gcovr cppcheck
+           g++ git astyle gcovr cppcheck enchant
 
        For RHEL6::
 
-           sudo yum install -y python-devel python-pip git gcc gcc-c++ make
+           sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
            sudo pip install virtualenv
 
       For Arch Linux::
-      
-          sudo pacman -S python2 python2-pip python2-virtualenv gcc make
+
+          sudo pacman -S python2 python2-pip python2-virtualenv gcc make enchant
 
 #. Get a `GitHub <http://github.com>`__ account.
 
@@ -137,9 +137,9 @@ One-time Preparation
 
    `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
    install pip by execution from the command line::
-     
+
        sudo port install py27-pip
-     
+
    `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
    already installed
 
@@ -165,23 +165,23 @@ One-time Preparation
        source activate khmer
        cd khmer
        make install-dependencies
-       
+
 #. Cppcheck installation:
-   
+
    `Debian <https://www.debian.org/>`__ and
    `Ubuntu <http://www.ubuntu.com/>`__ Linux distro users can
    install cppcheck by executing from the command line::
-     
+
        sudo apt-get install cppcheck
 
    `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
    install cppcheck by executing from the command line::
-     
+
        sudo port install cppcheck
 
    `Homebrew <http://brew.sh/>`__ users on the OS X platform can
    install cppcheck by executing from the command line::
-     
+
        sudo brew install cppcheck
 
 
@@ -322,7 +322,7 @@ Claiming an issue and starting to develop
    message -- this is a short (typically 1-3 sentence) description of the
    changes you've made. Please make your commit message informative but
    concise -- these messages become part of the 'official' history of the
-   project. 
+   project.
 
    Once your changes have been committed, push them up to the remote branch::
 
@@ -371,7 +371,7 @@ Claiming an issue and starting to develop
 
      * add a descriptive title ("updated tests for XXX")
      * put the issue number in the comment ("fixes issue #532")
-   
+
    then click "Create pull request."
 
    (This creates a new issue where we can all discuss your proposed
@@ -388,12 +388,12 @@ Claiming an issue and starting to develop
 
       git push origin
 
-#. When you are ready to have the pull request reviewed, please mention 
+#. When you are ready to have the pull request reviewed, please mention
    @luizirber, @camillescott, @mr-c, or @ctb with a comment 'Ready for review!'
 
 #. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
-   'ping!' and an @ in the comments if you are looking for feedback 
+   'ping!' and an @ in the comments if you are looking for feedback
    -- this will alert us that you are still on the line -- but we will
    automatically get notified of your pull request and any new
    comments, so use sparingly.
