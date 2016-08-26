@@ -41,8 +41,8 @@ from __future__ import unicode_literals
 import json
 import sys
 import os
-import stat
 import shutil
+import stat
 import threading
 import gzip
 import io
@@ -387,13 +387,11 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
 
 
 def test_filter_stoptags():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
     stopfile = utils.get_temp_filename('stoptags', in_dir)
 
     # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
     # now, create a file with some stop tags in it --
     K = 18
     kh = khmer._Nodegraph(K, [1])
@@ -418,12 +416,11 @@ def test_filter_stoptags():
 
 
 def test_filter_stoptags_fq():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
     in_dir = os.path.dirname(infile)
     stopfile = utils.get_temp_filename('stoptags', in_dir)
 
     # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
 
     # now, create a file with some stop tags in it --
     K = 18
@@ -454,10 +451,9 @@ def test_filter_stoptags_fq():
 
 
 def test_count_median():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = infile + '.counts'
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     counting_ht = _make_counting(infile, K=8)
 
     script = 'count-median.py'
@@ -474,10 +470,9 @@ def test_count_median():
 
 
 def test_count_median_fq_csv():
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
     outfile = infile + '.counts'
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
     counting_ht = _make_counting(infile, K=8)
 
     script = 'count-median.py'
@@ -498,10 +493,9 @@ def test_count_median_fq_csv():
 
 
 def test_count_median_fq_csv_stdout():
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
     outfile = '-'
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
     counting_ht = _make_counting(infile, K=8)
 
     script = 'count-median.py'
@@ -1216,9 +1210,7 @@ def test_extract_partitions_no_output_groups():
 
 
 def test_extract_partitions_pid_0():
-    basefile = utils.get_test_data('random-20-a.fa.part')
-    partfile = utils.get_temp_filename('random-20-a.fa.part')
-    shutil.copyfile(basefile, partfile)
+    partfile = utils.copy_test_data('random-20-a.fa.part')
 
     in_dir = os.path.dirname(partfile)
     # ok, now run extract-partitions.
@@ -1240,9 +1232,7 @@ def test_extract_partitions_pid_0():
 
 
 def test_extract_partitions_multi_groups():
-    basefile = utils.get_test_data('random-20-a.fa.part')
-    partfile = utils.get_temp_filename('random-20-a.fa.part')
-    shutil.copyfile(basefile, partfile)
+    partfile = utils.copy_test_data('random-20-a.fa.part')
 
     in_dir = os.path.dirname(partfile)
 
@@ -1262,10 +1252,7 @@ def test_extract_partitions_multi_groups():
 
 
 def test_extract_partitions_no_groups():
-    empty_file = utils.get_temp_filename('empty-file')
-    basefile = utils.get_test_data('empty-file')
-
-    shutil.copyfile(basefile, empty_file)
+    empty_file = utils.copy_test_data('empty-file')
     in_dir = os.path.dirname(empty_file)
 
     # ok, now run extract-partitions.
@@ -1282,11 +1269,9 @@ def test_extract_partitions_no_groups():
 
 
 def test_abundance_dist():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     htfile = _make_counting(infile, K=17)
 
@@ -1304,11 +1289,9 @@ def test_abundance_dist():
 
 
 def test_abundance_dist_quiet():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     htfile = _make_counting(infile, K=17)
 
@@ -1328,10 +1311,8 @@ def test_abundance_dist_quiet():
 
 
 def test_abundance_dist_stdout():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     htfile = _make_counting(infile, K=17)
 
@@ -1344,11 +1325,9 @@ def test_abundance_dist_stdout():
 
 
 def test_abundance_dist_nobigcount():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     htfile = _make_counting(infile, K=17)
 
@@ -1365,11 +1344,9 @@ def test_abundance_dist_nobigcount():
 
 
 def test_abundance_dist_threaded():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--threads', '18',
@@ -1387,11 +1364,9 @@ def test_abundance_dist_threaded():
 
 
 def test_abundance_dist_single_csv():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile,
@@ -1408,11 +1383,9 @@ def test_abundance_dist_single_csv():
 
 
 def test_abundance_dist_single_nobigcount():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
@@ -1427,11 +1400,9 @@ def test_abundance_dist_single_nobigcount():
 
 
 def test_abundance_dist_single_nosquash():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
@@ -1446,11 +1417,9 @@ def test_abundance_dist_single_nosquash():
 
 
 def test_abundance_dist_single_quiet():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-q', '-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
@@ -1467,12 +1436,10 @@ def test_abundance_dist_single_quiet():
 
 
 def test_abundance_dist_single_savegraph():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = utils.get_temp_filename('test.dist')
     tabfile = utils.get_temp_filename('test-savegraph.ct')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'abundance-dist-single.py'
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--savegraph',
@@ -1567,8 +1534,7 @@ def test_make_initial_stoptags():
     # should keep test_data directory size down
     # or something like that
     # this assumes (obv.) load-graph.py works properly
-    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
-    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    bzinfile = utils.copy_test_data('test-reads.fq.bz2')
     in_dir = os.path.dirname(bzinfile)
 
     genscript = 'load-graph.py'
@@ -1599,8 +1565,7 @@ def test_make_initial_stoptags_load_stoptags():
     # should keep test_data directory size down
     # or something like that
     # this assumes (obv.) load-graph.py works properly
-    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
-    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    bzinfile = utils.copy_test_data('test-reads.fq.bz2')
     in_dir = os.path.dirname(bzinfile)
 
     genscript = 'load-graph.py'
@@ -1660,10 +1625,8 @@ def test_extract_paired_streaming():
 
 
 def test_sample_reads_randomly():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
@@ -1704,10 +1667,8 @@ def test_sample_reads_randomly():
 
 
 def test_sample_reads_randomly_force_single():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
@@ -1748,10 +1709,8 @@ def test_sample_reads_randomly_force_single():
 
 
 def test_sample_reads_randomly_force_single_outfile():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
@@ -1794,10 +1753,8 @@ def test_sample_reads_randomly_force_single_outfile():
 
 
 def test_sample_reads_randomly_fq():
-    infile = utils.get_temp_filename('test.fq.gz')
+    infile = utils.copy_test_data('test-reads.fq.gz')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
@@ -1848,11 +1805,8 @@ def test_sample_reads_randomly_stdin_no_out():
 def test_fastq_to_fasta():
 
     script = 'fastq-to-fasta.py'
-    clean_infile = utils.get_temp_filename('test-clean.fq')
-    n_infile = utils.get_temp_filename('test-n.fq')
-
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), clean_infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
+    clean_infile = utils.copy_test_data('test-fastq-reads.fq')
+    n_infile = utils.copy_test_data('test-fastq-n-reads.fq')
 
     clean_outfile = clean_infile + '.keep.fa'
     n_outfile = n_infile + '.keep.fa'
@@ -1907,11 +1861,10 @@ def test_fastq_to_fasta():
 def test_fastq_to_fasta_streaming_compressed_gzip():
 
     script = 'fastq-to-fasta.py'
-    infile = utils.get_temp_filename('test-clean.fq')
+    infile = utils.copy_test_data('test-reads.fq.gz')
     in_dir = os.path.dirname(infile)
     fifo = utils.get_temp_filename('fifo')
     copyfilepath = utils.get_temp_filename('copied.fa.gz', in_dir)
-    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
 
     # make a fifo to simulate streaming
     os.mkfifo(fifo)
@@ -1953,11 +1906,10 @@ def test_fastq_to_fasta_streaming_compressed_gzip():
 def test_fastq_to_fasta_streaming_compressed_bzip():
 
     script = 'fastq-to-fasta.py'
-    infile = utils.get_temp_filename('test-clean.fq')
+    infile = utils.copy_test_data('test-reads.fq.gz')
     in_dir = os.path.dirname(infile)
     fifo = utils.get_temp_filename('fifo')
     copyfilepath = utils.get_temp_filename('copied.fa.bz', in_dir)
-    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
 
     # make a fifo to simulate streaming
     os.mkfifo(fifo)
@@ -1999,9 +1951,7 @@ def test_fastq_to_fasta_streaming_compressed_bzip():
 def test_extract_long_sequences_fa():
 
     script = 'extract-long-sequences.py'
-    fa_infile = utils.get_temp_filename('test.fa')
-
-    shutil.copyfile(utils.get_test_data('paired-mixed.fa'), fa_infile)
+    fa_infile = utils.copy_test_data('paired-mixed.fa')
 
     fa_outfile = fa_infile + '.keep.fa'
 
@@ -2021,9 +1971,7 @@ def test_extract_long_sequences_fa():
 def test_extract_long_sequences_fq():
 
     script = 'extract-long-sequences.py'
-    fq_infile = utils.get_temp_filename('test.fq')
-
-    shutil.copyfile(utils.get_test_data('paired-mixed.fq'), fq_infile)
+    fq_infile = utils.copy_test_data('paired-mixed.fq')
 
     fq_outfile = fq_infile + '.keep.fq'
 
@@ -2041,10 +1989,8 @@ def test_extract_long_sequences_fq():
 
 
 def test_sample_reads_randomly_S():
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('test-fastq-reads.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
 
     script = 'sample-reads-randomly.py'
 
@@ -2166,9 +2112,8 @@ def _execute_load_graph_streaming(filename):
     '''
 
     scripts = utils.scriptpath()
-    infile = utils.get_temp_filename('temp')
+    infile = utils.copy_test_data(filename)
     in_dir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data(filename), infile)
 
     args = '-x 1e7 -N 2 -k 20 out -'
 
@@ -2347,10 +2292,8 @@ def test_readstats_empty():
 
 
 def test_trim_low_abund_1():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2364,10 +2307,8 @@ def test_trim_low_abund_1():
 
 
 def test_trim_low_abund_1_duplicate_filename_err():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
     (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
@@ -2393,6 +2334,7 @@ def test_trim_low_abund_2():
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2434,6 +2376,7 @@ def test_trim_low_abund_3_fq_retained():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
 
+
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
@@ -2454,10 +2397,8 @@ def test_trim_low_abund_3_fq_retained():
 
 
 def test_trim_low_abund_4_retain_low_abund():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2473,10 +2414,8 @@ def test_trim_low_abund_4_retain_low_abund():
 
 
 def test_trim_low_abund_5_trim_high_abund():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-3.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2494,10 +2433,8 @@ def test_trim_low_abund_5_trim_high_abund():
 
 
 def test_trim_low_abund_6_trim_high_abund_Z():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-3.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', '-Z', '25', infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2515,10 +2452,8 @@ def test_trim_low_abund_6_trim_high_abund_Z():
 
 
 def test_trim_low_abund_keep_paired():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-V", infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2531,11 +2466,8 @@ def test_trim_low_abund_keep_paired():
 
 
 def test_trim_low_abund_keep_paired_casava18():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired2.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
-                    infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-V", infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2548,10 +2480,8 @@ def test_trim_low_abund_keep_paired_casava18():
 
 
 def test_trim_low_abund_highfpr():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1", "-N", "1", "-V", infile]
     code, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
@@ -2562,10 +2492,8 @@ def test_trim_low_abund_highfpr():
 
 
 def test_trim_low_abund_trimtest():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "1",
             "-V", infile]
@@ -2590,12 +2518,10 @@ def test_trim_low_abund_trimtest():
 
 
 def test_trim_low_abund_trimtest_after_load():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired.fq')
     in_dir = os.path.dirname(infile)
 
     saved_table = utils.get_temp_filename('save.ct')
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
     utils.runscript('load-into-counting.py', args, in_dir)
@@ -2622,12 +2548,10 @@ def test_trim_low_abund_trimtest_after_load():
 
 
 def test_trim_low_abund_trimtest_savegraph():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.paired.fq')
     in_dir = os.path.dirname(infile)
 
     saved_table = utils.get_temp_filename('save.ct')
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2",
             "-Z", "2", "-C", "2", "-V", '--savegraph', saved_table, infile]
@@ -2655,10 +2579,8 @@ def test_trim_low_abund_trimtest_savegraph():
 
 
 def test_trim_low_abund_stdout():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2667,10 +2589,8 @@ def test_trim_low_abund_stdout():
 
 
 def test_trim_low_abund_diginorm_coverage_err():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-M", "1e7", infile, "--diginorm-coverage", "21"]
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
@@ -2683,10 +2603,8 @@ def test_trim_low_abund_diginorm_coverage_err():
 
 
 def test_trim_low_abund_diginorm_single_pass():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-M", "1e7", infile, "--diginorm", "--single-pass"]
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
@@ -2698,10 +2616,8 @@ def test_trim_low_abund_diginorm_single_pass():
 
 
 def test_trim_low_abund_varcov_err():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-M", "1e7", infile, "-Z", "21"]
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
@@ -2713,10 +2629,8 @@ def test_trim_low_abund_varcov_err():
 
 
 def test_trim_low_abund_single_pass():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     args = ["-M", "1e7", infile, "-V", '--single-pass']
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2725,10 +2639,8 @@ def test_trim_low_abund_single_pass():
 
 
 def test_trim_low_abund_quiet():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     args = ["-q", "-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2739,10 +2651,8 @@ def test_trim_low_abund_quiet():
 
 
 def test_trim_low_abund_reporting():
-    infile = utils.get_temp_filename('test.fa')
+    infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     args = ["-M", "1e7", infile, "-V", '-Z', '5', '-C', '1']
     status, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2755,10 +2665,8 @@ def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
     # to the input file when only paired data is given.
 
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('casava_18-pe.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('casava_18-pe.fq'), infile)
 
     _, out, err = utils.runscript('extract-paired-reads.py', [infile], in_dir)
 
@@ -2773,11 +2681,9 @@ def test_roundtrip_casava_format_2():
     # check that split-paired-reads -> interleave-reads produces a file
     # identical to input, when only paired reads are given.
 
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('casava_18-pe.fq')
     outfile = utils.get_temp_filename('test2.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('casava_18-pe.fq'), infile)
 
     _, out, err = utils.runscript('split-paired-reads.py', [infile], in_dir)
 
@@ -2808,12 +2714,9 @@ def test_roundtrip_commented_format():
     This should produce a file identical to the input when only paired
     reads are given.
     """
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.copy_test_data('old-style-format-w-comments.fq')
     outfile = utils.get_temp_filename('test2.fq')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('old-style-format-w-comments.fq'),
-                    infile)
 
     _, out, err = utils.runscript('split-paired-reads.py', [infile], in_dir)
 
@@ -2827,8 +2730,7 @@ def test_roundtrip_commented_format():
 
 
 def test_unique_kmers_defaults():
-    infile = utils.get_temp_filename('random-20-a.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
 
     args = ['-k', '20', '-e', '0.01', infile]
 
@@ -2842,8 +2744,7 @@ def test_unique_kmers_defaults():
 
 
 def test_unique_kmers_report_fp():
-    infile = utils.get_temp_filename('random-20-a.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     outfile = utils.get_temp_filename('report.unique')
 
     args = ['-k', '20', '-e', '0.01', '-R', outfile, infile]
@@ -2863,8 +2764,7 @@ def test_unique_kmers_report_fp():
 
 
 def test_unique_kmers_diagnostics():
-    infile = utils.get_temp_filename('random-20-a.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
 
     args = ['-k', '20', '-e', '0.01', '--diagnostics', infile]
 
@@ -2879,8 +2779,7 @@ def test_unique_kmers_diagnostics():
 def test_unique_kmers_multiple_inputs():
     infiles = []
     for fname in ('random-20-a.fa', 'paired-mixed.fa'):
-        infile = utils.get_temp_filename(fname)
-        shutil.copyfile(utils.get_test_data(fname), infile)
+        infile = utils.copy_test_data(fname)
         infiles.append(infile)
 
     args = ['-k', '20', '-e', '0.01']
