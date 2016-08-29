@@ -12,9 +12,12 @@ int main()
 {
     unsigned int ksize = 11;
 
-    // for exact counting, you need to create one table that is
-    // >= 4**k.  This will be that size in bytes, note, so you
-    // will need the appropriate amount of memory.
+    // For exact counting, you need to create one table that is >= 4**k. This
+    // will be that size in bytes, note, so you will need the appropriate amount
+    // of memory.
+
+    // If `ksize` is even, note that k-mers will collapse with their reverse
+    // complement. In that case, a table size of 4**(k-1) + k is required.
 
     std::vector<HashIntoType> tablesize;
     tablesize.push_back(pow(4, ksize));
