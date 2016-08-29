@@ -143,6 +143,80 @@ SeqAnParser::~SeqAnParser()
     delete _private;
 }
 
+
+struct SeqAnBamParser::Handle {
+    seqan::BamStream stream;
+    uint32_t seqan_spin_lock;
+};
+
+SeqAnBamParser::SeqAnBamParser( char const * filename ) : IParser( )
+{
+    _private = new SeqAnBamParser::Handle();
+    seqan::open(_private->stream, filename);
+    if (!seqan::isGood(_private->stream)) {
+        std::string message = "Could not open ";
+        message = message + filename + " for reading.";
+        throw InvalidStream(message);
+    } else if (seqan::atEnd(_private->stream)) {
+        std::string message = "File ";
+        message = message + filename + " does not contain any sequences!";
+        throw InvalidStream(message);
+    }
+    __asm__ __volatile__ ("" ::: "memory");
+    _private->seqan_spin_lock = 0;
+}
+
+bool SeqAnBamParser::is_complete()
+{
+    return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
+}
+
+void SeqAnBamParser::imprint_next_read(Read &the_read)
+{
+    the_read.reset();
+    int ret = -1;
+    const char *invalid_read_exc = NULL;
+    while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
+    bool atEnd = seqan::atEnd(_private->stream);
+    if (!atEnd) {
+        seqan::BamAlignmentRecord record;
+        readRecord(record, _private->stream);
+        the_read.name = seqan::toCString(record.qName);
+        the_read.sequence = seqan::toCString(record.seq);
+        the_read.quality = seqan::toCString(record.qual);
+
+        if (the_read.sequence.length() == 0) {
+            invalid_read_exc = "Sequence is empty";
+        } else if (_have_qualities && (the_read.sequence.length() != \
+                                       the_read.quality.length())) {
+            invalid_read_exc = "Sequence and quality lengths differ";
+        } else {
+            _num_reads++;
+        }
+    }
+    __asm__ __volatile__ ("" ::: "memory");
+    _private->seqan_spin_lock = 0;
+    // Throw any error in the read, even if we're at the end
+    if (invalid_read_exc != NULL) {
+        throw InvalidRead(invalid_read_exc);
+    }
+    // Throw NoMoreReadsAvailable if none of the above errors were raised, even
+    // if ret == 0
+    if (atEnd) {
+        throw NoMoreReadsAvailable();
+    }
+    // Catch-all error in readRecord that isn't one of the above
+    if (ret != 0) {
+        throw StreamReadError();
+    }
+}
+
+SeqAnBamParser::~SeqAnBamParser()
+{
+    seqan::close(_private->stream);
+    delete _private;
+}
+
 IParser * const
 IParser::
 get_parser(
