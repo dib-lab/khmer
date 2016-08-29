@@ -1,4 +1,11 @@
-2016-08-26 Ryan Shean <rcs333@uw.edu>
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
+   issues)
+   * Makefile: make the pep8 target less verbose by removing the --show-pep8
+   option
+
+2016-08-26  Ryan Shean  <rcs333@uw.edu>
 
    * tests/{test_countergraph.py, test_filter_abund.py,
    test_normalize_by_median.py, test_read_handling.py,

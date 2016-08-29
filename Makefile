@@ -172,7 +172,7 @@ cppcheck-long: FORCE
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
+	pep8 --exclude=_version.py  --show-source setup.py khmer/ \
 		scripts/ tests/ oxli/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
