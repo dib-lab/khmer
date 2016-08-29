@@ -1,3 +1,34 @@
+2016-08-29  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library, and dropped Arch linux install
+   instructions.
+
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
+   issues)
+   * Makefile: make the pep8 target less verbose by removing the --show-pep8
+   option
+
+2016-08-26  Ryan Shean  <rcs333@uw.edu>
+
+   * tests/{test_countergraph.py, test_filter_abund.py,
+   test_normalize_by_median.py, test_read_handling.py,
+   test_sandbox_scripts.py, test_scripts.py}: updated to use
+   copy_test_data function
+
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
+2016-07-03  Titus Brown  <titus@idyll.org>
+
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   graphs.
+   * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
+   * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
+
 2016-06-27  Titus Brown  <titus@idyll.org>
 
    * doc/requirements.txt: updated sphinx-autoprogram requirement for building
