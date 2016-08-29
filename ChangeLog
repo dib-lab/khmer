@@ -1,3 +1,9 @@
+2016-08-29  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library, and dropped Arch linux install
+   instructions.
+
 2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
 
    * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
