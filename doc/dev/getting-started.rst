@@ -87,10 +87,6 @@ One-time Preparation
            sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
            sudo pip install virtualenv
 
-      For Arch Linux::
-
-          sudo pacman -S python2 python2-pip python2-virtualenv gcc make enchant
-
 #. Get a `GitHub <http://github.com>`__ account.
 
    (We use GitHub to manage khmer contributions.)
