@@ -55,7 +55,10 @@ The following example demonstrates the basics of counting k-mers with khmer.
 
     >>> import khmer
     >>>
-    >>> # exact counting requires a single table with 4^k bytes
+    >>> ksize = 11
+    >>>
+    >>> # exact counting with and odd k requires a single table with 4^k bytes
+    >>> # even k will collapse k-mers with their reverse complement, and requires 4^(k-1) + k bytes
     >>> cg = khmer.Countgraph(ksize, 4**ksize, 1)
     >>>
     >>> # load all k-mers from the given string (returns the number of k-mers processed)
