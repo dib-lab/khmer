@@ -217,13 +217,17 @@ SeqAnBamParser::~SeqAnBamParser()
     delete _private;
 }
 
+IParser * const IParser::get_bam_parser(std::string const& ifile_name)
+{
+    return new SeqAnBamParser(ifile_name.c_str());
+}
+
 IParser * const
 IParser::
 get_parser(
     std:: string const	    &ifile_name
 )
 {
-
     return new SeqAnParser(ifile_name.c_str());
 }
 
