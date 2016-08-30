@@ -225,7 +225,7 @@ diff_pylint_report: pylint_report.txt
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	./setup.py develop
 	coverage run --branch --source=scripts,khmer,oxli \
-		--omit=khmer/_version.py -m pytest --junitxml=nosetests.xml \
+		--omit=khmer/_version.py -m pytest --junitxml=pytests.xml \
 		-m $(TESTATTR)
 
 coverage.xml: .coverage
@@ -252,7 +252,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml \
 		--html-report diff-cover.html
 
-nosetests.xml: FORCE
+pytests.xml: FORCE
 	py.test --junitxml=$@ -m ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code
