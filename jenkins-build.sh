@@ -52,10 +52,6 @@ virtualenv -p ${PYTHON_EXECUTABLE} .env
 pip install setuptools==3.4.1
 make install-dependencies
 
-# XXX temporary lines to debug coverage drop
-pip uninstall --yes gcovr
-pip install https://github.com/gcovr/gcovr/archive/master.zip
-
 if type ccache >/dev/null 2>&1
 then
         echo Enabling ccache
