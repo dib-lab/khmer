@@ -268,7 +268,7 @@ def get_parser():
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     parser.add_argument('-C', '--cutoff', help="when the median "
-                        "k-mer coverage level above is this numer the "
+                        "k-mer coverage level is above this number the "
                         "read is not kept.",
                         type=check_argument_range(0, 256, "cutoff"),
                         default=DEFAULT_DESIRED_COVERAGE)
