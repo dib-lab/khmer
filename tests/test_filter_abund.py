@@ -228,18 +228,33 @@ def test_filter_abund_4_retain_low_abund():
 
     counting_ht = _make_counting(infile, K=17)
 
-    for script, args in (('filter-abund.py',
-                          ['-V', counting_ht, infile]),
-                         ('filter-abund-single.py',
-                          ['-k', '17', '-V', infile])):
-        utils.runscript(script, args, in_dir)
+    script, args = ('filter-abund.py', ['-V', counting_ht, infile])
+    utils.runscript(script, args, in_dir)
 
-        outfile = infile + '.abundfilt'
-        assert os.path.exists(outfile), outfile
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
 
-        seqs = set([r.sequence for r in screed.open(outfile)])
-        assert len(seqs) == 2, seqs
-        assert 'GGTTGACGGGGCTCAGGG' in seqs
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_filter_abund_single_4_retain_low_abund():
+    # test that the -V option does not trim sequences that are low abundance
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    counting_ht = _make_counting(infile, K=17)
+
+    script, args = ('filter-abund-single.py', ['-k', '17', '-V', infile])
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
 def test_filter_abund_5_trim_high_abund():
