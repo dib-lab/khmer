@@ -178,7 +178,7 @@ def clean_up_reads(reads):
 
 
 def trim_record(read, trim_at):
-    "Utility function: create a new record, trimmed at given location."
+    """Utility function: create a new record, trimmed at given location."""
     new_read = Record()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
@@ -189,7 +189,7 @@ def trim_record(read, trim_at):
 
 
 def do_trim_read(graph, read, cleaned_read, CUTOFF):
-    "Utility function: trim a read on abundance."
+    """Utility function: trim a read on abundance."""
     K = graph.ksize()
 
     # trim the 'N'-cleaned read
@@ -211,7 +211,9 @@ def do_trim_read(graph, read, cleaned_read, CUTOFF):
 
 class Trimmer(object):
     """
-    Core trimming object; the two utility functions are 'pass1' and 'pass2',
+    Core trimming object.
+
+    The two utility functions are 'pass1' and 'pass2',
     which execute the first and second pass across the data, respectively.
     """
 
@@ -237,7 +239,9 @@ class Trimmer(object):
 
     def pass1(self, reader, saver):
         """
-        The first pass across the read data does the following:
+        The first pass across the read data.
+
+        It does the following:
 
         1. If do_normalize is set, discard all read pairs with coverage
         above DIGINORM_COVERAGE.

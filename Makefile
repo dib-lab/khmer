@@ -196,7 +196,7 @@ diff_pydocstyle_report: pydocstyle_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
-	astyle -A10 --max-code-length=80 $(CPPSOURCES)
+	astyle -A10 --max-code-length=80 $(filter-out setup.py,$(CPPSOURCES))
 
 ## autopep8    : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)

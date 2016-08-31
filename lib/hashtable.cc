@@ -986,7 +986,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 
 
 void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
-                                           SeenSet& hashes) const
+        SeenSet& hashes) const
 {
     KmerIterator kmers(s.c_str(), _ksize);
 
@@ -1011,7 +1011,7 @@ void Hashtable::get_kmer_counts(const std::string &s,
 
 void Hashtable::find_high_degree_nodes(const char * s,
                                        SeenSet& high_degree_nodes)
-    const
+const
 {
     Traverser traverser(this);
     KmerIterator kmers(s, _ksize);
@@ -1031,10 +1031,10 @@ void Hashtable::find_high_degree_nodes(const char * s,
 }
 
 unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
-                                             SeenSet &adjacencies,
-                                             SeenSet &visited, Hashtable &bf,
-                                             SeenSet &high_degree_nodes)
-    const
+        SeenSet &adjacencies,
+        SeenSet &visited, Hashtable &bf,
+        SeenSet &high_degree_nodes)
+const
 {
     unsigned int size = 0;
 
@@ -1052,7 +1052,7 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
     while (to_be_visited.size()) {
         Kmer kmer = to_be_visited.back();
         to_be_visited.pop_back();
-        
+
         visited.insert(kmer);
         size += 1;
 

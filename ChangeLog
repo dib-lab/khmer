@@ -1,3 +1,8 @@
+2016-08-31  Tim Head  <betatim@gmail.com>
+
+   * Fixed several source code style issues in python and cpp.
+   * Makefile: removed setup.py from the list of files passed to astyle
+
 2016-08-30  Tim Head  <betatim@gmail.com>
 
    * Fix coverage reporting on OSX and rename nosetests.xml to pytests.xml
