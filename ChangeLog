@@ -1,3 +1,7 @@
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * scripts/filter-abund-single.py: Add support for variable coverage trimming
+
 2016-08-31  Tim Head  <betatim@gmail.com>
 
    * Fixed several source code style issues in python and cpp.
