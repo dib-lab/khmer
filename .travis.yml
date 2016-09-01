@@ -41,11 +41,11 @@ script:
   - make test
   # coverage needs a clean build, generate coverage on all ARCHs,
   # running it here means it will fail the build if it fails
-  - make clean coverage-gcovr.xml coverage.xml
+  - PYTEST_ADDOPTS=-qqq make clean coverage-gcovr.xml coverage.xml
 
 # generate all the diagnostic reports
 after_success:
-  - make clean diff-cover
+  - PYTEST_ADDOPTS=-qqq make clean diff-cover
   - make format
   - make diff_pylint_report cppcheck doc
   - make cppcheck
