@@ -45,12 +45,16 @@ script:
 
 # generate all the diagnostic reports
 after_success:
-  - make pylint
-  - make pep8
+  - make clean diff-cover
+  - make format
+  - make diff_pylint_report cppcheck doc
   - make cppcheck
+  - make pydocstyle
   # do the docs build?
   - make doc
+  # XXX Do not upload results from travis yet. Currently jenkins is considered
+  # XXX the source of truth about coverage
   # only upload the linux coverage report to codecov as it merges all reports
   # from all builds into one
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codecov; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml; fi
+  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codecov; fi
+  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml; fi
