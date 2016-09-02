@@ -55,7 +55,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
@@ -86,7 +86,8 @@ def get_parser():
         "(in memory version).", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
 
-    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF, type=int,
+    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF,
+                        type=check_argument_range(0, 256, "cutoff"),
                         help="Trim at k-mers below this abundance.")
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         dest='variable_coverage', default=False,

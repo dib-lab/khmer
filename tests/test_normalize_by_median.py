@@ -521,19 +521,16 @@ def test_normalize_by_median_no_bigcount():
     hashfile = utils.get_temp_filename('test-out.ct')
     in_dir = os.path.dirname(infile)
 
-    _make_counting(infile, K=8)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
-    args = ['-C', '1000', '-k 8', '--savegraph', hashfile, infile]
+    # 256 is outside the range of valid values for C
+    args = ['-C', '256', '-k 8', '--savegraph', hashfile, infile]
 
-    (status, out, err) = utils.runscript(script, args, in_dir)
-    assert status == 0, (out, err)
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1, (out, err)
+    assert "ERROR: khmer only supports 0 <= cutoff < 256" in err
     print((out, err))
-
-    assert os.path.exists(hashfile), hashfile
-    kh = khmer.load_countgraph(hashfile)
-
-    assert kh.get('GGTTGACG') == 255
 
 
 def test_normalize_by_median_empty():
