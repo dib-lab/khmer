@@ -62,58 +62,43 @@ def teardown():
     utils.cleanup()
 
 
-def test_import_all():
-    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
-    if not os.path.exists(sandbox_path):
-        pytest.skip("sandbox scripts are only tested in a repository")
+sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
+if not os.path.exists(sandbox_path):
+    pytest.skip("sandbox scripts are only tested in a repository")
 
-    path = os.path.join(sandbox_path, "*.py")
-    scripts = glob.glob(path)
-    for s in scripts:
-        s = os.path.normpath(s)
-        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
+path = os.path.join(sandbox_path, "*.py")
+scripts = glob.glob(path)
+@pytest.mark.parametrize("filename", [os.path.normpath(s) for s in scripts])
+def test_import_succeeds(filename):
+    try:
+        mod = imp.load_source('__zzz', filename)
+    except:
+        print(traceback.format_exc())
+        raise AssertionError("%s cannot be imported" % (filename,))
 
+    oldargs = sys.argv
+    sys.argv = [filename]
 
-class _checkImportSucceeds(object):  # pylint: disable=too-few-public-methods
+    oldout, olderr = sys.stdout, sys.stderr
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
 
-    def __init__(self, tag, filename):
-        self.tag = tag
-        self.filename = filename
-        self.description = '%s: test import %s' % (self.tag,
-                                                   os.path.split(filename)[-1])
-
-    def __call__(self):
+    try:
         try:
-            mod = imp.load_source('__zzz', self.filename)
-        except:
-            print(traceback.format_exc())
-            raise AssertionError("%s cannot be imported" % (self.filename,))
-
-        #
-
-        oldargs = sys.argv
-        sys.argv = [self.filename]
-
-        oldout, olderr = sys.stdout, sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-
-        try:
-            try:
-                global_dict = {'__name__': '__main__'}
-                exec(  # pylint: disable=exec-used
-                    compile(open(self.filename).read(), self.filename, 'exec'),
-                    global_dict)
-            except (ImportError, SyntaxError) as err:
-                print("{0}".format(err))
-                raise AssertionError("%s cannot be exec'd" % (self.filename),
-                                     "{0}".format(traceback))
-            except:  # pylint: disable=bare-except
-                pass                        # other failures are expected :)
-        finally:
-            sys.argv = oldargs
-            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
-            sys.stdout, sys.stderr = oldout, olderr
+            global_dict = {'__name__': '__main__'}
+            exec(  # pylint: disable=exec-used
+                compile(open(filename).read(), filename, 'exec'),
+                global_dict)
+        except (ImportError, SyntaxError) as err:
+            print("{0}".format(err))
+            raise AssertionError("%s cannot be exec'd" % (filename),
+                                 "{0}".format(traceback))
+        except:  # pylint: disable=bare-except
+            pass                        # other failures are expected :)
+    finally:
+        sys.argv = oldargs
+        out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+        sys.stdout, sys.stderr = oldout, olderr
 
 
 def test_sweep_reads():
