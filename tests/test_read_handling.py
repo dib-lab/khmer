@@ -41,7 +41,6 @@ import json
 import sys
 import os
 import stat
-import shutil
 from io import StringIO
 import traceback
 import threading
@@ -363,8 +362,7 @@ def test_split_paired_reads_2_fq():
 
 def test_split_paired_reads_2_mixed_fq_require_pair():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
@@ -386,8 +384,7 @@ def test_split_paired_reads_2_stdin_no_out():
 
 def test_split_paired_reads_2_mixed_fq():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
@@ -400,8 +397,7 @@ def test_split_paired_reads_2_mixed_fq():
 
 def test_split_paired_reads_2_mixed_fq_orphans_to_file():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('out.fq')
 
@@ -429,8 +425,7 @@ def test_split_paired_reads_2_mixed_fq_orphans_to_file():
 
 def test_split_paired_reads_2_mixed_fq_gzfile():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('out.fq')
 
@@ -456,8 +451,7 @@ def test_split_paired_reads_2_mixed_fq_gzfile():
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-broken.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-broken.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'

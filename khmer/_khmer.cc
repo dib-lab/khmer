@@ -88,7 +88,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                            value, "utf-8", "strict"));
+                                             value, "utf-8", "strict"));
         if (strlen(s.c_str()) != ksize) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer length must equal the k-mer size");
@@ -122,8 +122,8 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
 // that checks this.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
-                                             HashIntoType& hashval,
-                                             WordLength ksize)
+        HashIntoType& hashval,
+        WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         if (PyLong_Check(value)) {
@@ -134,7 +134,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                            value, "utf-8", "strict"));
+                                             value, "utf-8", "strict"));
         if (strlen(s.c_str()) != ksize) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer length must equal the k-mer size");
@@ -361,6 +361,7 @@ _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
+    std::string exc_string;
 
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
@@ -380,9 +381,11 @@ _ReadParser_iternext( PyObject * self )
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            exc_string = exc.what();
+            file_exception = exc_string.c_str();
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            exc_string = exc.what();
+            value_exception = exc_string.c_str();
         }
     }
     Py_END_ALLOW_THREADS
@@ -423,6 +426,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     bool        stop_iteration  = false;
     const char *value_exception = NULL;
     const char *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
@@ -432,9 +436,11 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
-            file_exception = exc.what();
+            exc_string = exc.what();
+            file_exception = exc_string.c_str();
         } catch (khmer_value_exception &exc) {
-            value_exception = exc.what();
+            exc_string = exc.what();
+            value_exception = exc_string.c_str();
         }
     }
     Py_END_ALLOW_THREADS
@@ -861,7 +867,7 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
 {
     khmer_HashSet_Object * me = (khmer_HashSet_Object *) self;
     _HashSet_iterobj * iter_obj = (_HashSet_iterobj *)
-        _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
+                                  _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
     if (iter_obj != NULL) {
         Py_INCREF(me);
         iter_obj->parent = me;
@@ -886,7 +892,7 @@ static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
         return NULL;
     }
     khmer_HashSet_Object * no = create_HashSet_Object(new SeenSet,
-                                                      o->ksize);
+                                o->ksize);
     no->hashes->insert(o->hashes->begin(), o->hashes->end());
     no->hashes->insert(o2->hashes->begin(), o2->hashes->end());
 
@@ -894,7 +900,7 @@ static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
 }
 
 static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
-                                               khmer_HashSet_Object * o2)
+        khmer_HashSet_Object * o2)
 {
     if (o->ksize != o2->ksize) {
         PyErr_SetString(PyExc_ValueError,
@@ -980,7 +986,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
             return NULL;
         }
         me->hashes->insert(h);
-        
+
         Py_DECREF(item);
         item = PyIter_Next(iterator);
     }
@@ -1071,7 +1077,7 @@ static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k)
     khmer_HashSet_Object * self;
 
     self = (khmer_HashSet_Object *)
-        khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
+           khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
     if (self != NULL) {
         self->hashes = h;
         self->ksize = k;
@@ -1316,14 +1322,17 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     unsigned int        total_reads     = 0;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -1450,14 +1459,14 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     SeenSet * adj = new SeenSet;
     SeenSet * visited = new SeenSet;
     unsigned int size = hashtable->traverse_linear_path(start_kmer,
-                                                        *adj, *visited,
-                                                        *nodegraph_o->hashbits,
-                                                        *hdn_o->hashes);
+                        *adj, *visited,
+                        *nodegraph_o->hashbits,
+                        *hdn_o->hashes);
 
     khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
-                                                         hashtable->ksize());
+                                   hashtable->ksize());
     khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
-                                                           hashtable->ksize());
+                                       hashtable->ksize());
 
     PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
                                    (PyObject *) adj_o, (PyObject *) visited_o);
@@ -1674,7 +1683,7 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
     Py_END_ALLOW_THREADS
 
     PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
     return x;
 }
 
@@ -2049,14 +2058,17 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
     const char         *file_exception  = NULL;
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta_and_tag(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -2616,11 +2628,13 @@ hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
 
     const char         *file_exception  = NULL;
 
+    std::string exc_string ;
     Py_BEGIN_ALLOW_THREADS
     try {
         subset_p->load_partitionmap(filename);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -2763,7 +2777,7 @@ hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
     hashtable->divide_tags_into_subsets(subset_size, *divvy);
 
     PyObject * x = (PyObject *) create_HashSet_Object(divvy,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
     return x;
 }
 
@@ -2898,7 +2912,8 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me,
+                                     PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
     const char * sequence;
@@ -2911,7 +2926,7 @@ hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * ar
     hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
 
     PyObject * x = (PyObject *) create_HashSet_Object(hashes,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
 
     return x;
 }
@@ -3409,14 +3424,17 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
     HashIntoType       *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
 
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(rparser, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -3459,13 +3477,17 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
     HashIntoType       *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
+    std::string exc_string;
+
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = counting->abundance_distribution(filename, hashbits);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     Py_END_ALLOW_THREADS
 
@@ -4079,14 +4101,18 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
     const char         *file_exception  = NULL;
     unsigned long long  n_consumed      = 0;
     unsigned int        total_reads     = 0;
+    std::string exc_string;
+
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
                                               n_consumed);
     } catch (khmer_file_exception &exc) {
-        file_exception = exc.what();
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
     } catch (khmer_value_exception &exc) {
-        value_exception = exc.what();
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
     }
     //Py_END_ALLOW_THREADS
 
@@ -4265,7 +4291,7 @@ labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
     //Py_END_ALLOW_THREADS
 
     PyObject * x = (PyObject *) create_HashSet_Object(tagged_kmers,
-                                                   labelhash->graph->ksize());
+                   labelhash->graph->ksize());
     return x;
 }
 

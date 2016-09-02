@@ -1,6 +1,52 @@
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py: added check_argument_range to check an integer
+   command-line argument is within a given range.
+   * scripts/{normalize-by-median.py, filter-abund.py, filter-abund-single.py}
+   now use check_argument_range for the cutoff parameter.
+   * tests/test_normalize_by_median.py: modified
+   test_normalize_by_median_no_bigcount.
+
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * scripts/filter-abund-single.py: Add support for variable coverage trimming
+
+2016-08-31  Tim Head  <betatim@gmail.com>
+
+   * Fixed several source code style issues in python and cpp.
+   * Makefile: removed setup.py from the list of files passed to astyle
+
+2016-08-30  Tim Head  <betatim@gmail.com>
+
+   * Fix coverage reporting on OSX and rename nosetests.xml to pytests.xml
+
+2016-08-29  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library, and dropped Arch linux install
+   instructions.
+
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
+   issues)
+   * Makefile: make the pep8 target less verbose by removing the --show-pep8
+   option
+
+2016-08-26  Ryan Shean  <rcs333@uw.edu>
+
+   * tests/{test_countergraph.py, test_filter_abund.py,
+   test_normalize_by_median.py, test_read_handling.py,
+   test_sandbox_scripts.py, test_scripts.py}: updated to use
+   copy_test_data function
+
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
 2016-07-03  Titus Brown  <titus@idyll.org>
 
-   * lib{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
    graphs.
    * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
    * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
