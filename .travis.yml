@@ -1,5 +1,9 @@
 language: python
 
+# Tell travis we want Ubuntu 14.04
+sudo: required
+dist: trusty
+
 notifications:
   email: false
 
