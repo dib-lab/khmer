@@ -39,15 +39,15 @@ install:
 # command to run tests
 script:
   - make test
-  # coverage needs a clean build, generate coverage on all ARCHs,
-  # running it here means it will fail the build if it fails
-  - PYTEST_ADDOPTS=-qqq make clean coverage-gcovr.xml coverage.xml
 
 # generate all the diagnostic reports
 after_success:
-  - PYTEST_ADDOPTS=-qqq make clean diff-cover
+  - PYTEST_ADDOPTS=-qqq make coverage-gcovr.xml coverage.xml
+  # Fix suggested by http://diff-cover.readthedocs.io/en/latest/#troubleshooting
+  - git fetch origin master:refs/remotes/origin/master
+  - PYTEST_ADDOPTS=-qqq make diff-cover
   - make format
-  - make diff_pylint_report cppcheck doc
+  - make diff_pylint_report
   - make cppcheck
   - make pydocstyle
   # do the docs build?
