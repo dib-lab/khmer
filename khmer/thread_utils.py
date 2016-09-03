@@ -58,6 +58,7 @@ def verbose_loader(filename):
     for num, record in enumerate(screed_iter):
         if num % 100000 == 0:
             log_info('... filtering {num}', num=num)
+        record.sequence = record.sequence.upper()
         yield record
 
 verbose_fasta_iter = verbose_loader  # pylint: disable=invalid-name
