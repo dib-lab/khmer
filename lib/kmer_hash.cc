@@ -41,6 +41,8 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <string>
 
+#include <iostream>
+
 #include "MurmurHash3.h"
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -55,31 +57,39 @@ using namespace std;
 namespace khmer
 {
 
-HashIntoType _hash(const char * kmer, const WordLength k,
-                   HashIntoType& _h, HashIntoType& _r)
+// _hash_forward: return the hash from the forward direction only.
+
+HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
     if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
+    HashIntoType h = 0;
 
     h |= twobit_repr(kmer[0]);
-    r |= twobit_comp(kmer[k-1]);
 
-    for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
+    for (WordLength i = 1; i < k; i++) {
         h = h << 2;
-        r = r << 2;
-
         h |= twobit_repr(kmer[i]);
-        r |= twobit_comp(kmer[j]);
     }
 
-    _h = h;
-    _r = r;
+    return h;
+}
 
-    return uniqify_rc(h, r);
+HashIntoType _hash(const char * kmer, const WordLength k,
+                   HashIntoType& _h, HashIntoType& _r)
+{
+    std::string _revcomp(const std::string&);
+    std::string fwd(kmer);
+    fwd = fwd.substr(0, k);
+    std::string rc = _revcomp(fwd);
+
+    _h = _hash_forward(fwd.c_str(), k);
+    _r = _hash_forward(rc.c_str(), k);
+
+    return uniqify_rc(_h, _r);
 }
 
 // _hash: return the maximum of the forward and reverse hash.
@@ -90,18 +100,6 @@ HashIntoType _hash(const char * kmer, const WordLength k)
     HashIntoType r = 0;
 
     return khmer::_hash(kmer, k, h, r);
-}
-
-// _hash_forward: return the hash from the forward direction only.
-
-HashIntoType _hash_forward(const char * kmer, WordLength k)
-{
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-
-    khmer::_hash(kmer, k, h, r);
-    return h;			// return forward only
 }
 
 HashIntoType _hash(const std::string kmer, const WordLength k)
@@ -139,7 +137,7 @@ std::string _revcomp(const std::string& kmer)
     for (size_t i=0; i < ksize; ++i) {
         char complement;
 
-        switch(kmer[i]) {
+        switch(toupper(kmer[i])) {
         case 'A':
             complement = 'T';
             break;
