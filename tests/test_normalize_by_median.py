@@ -401,7 +401,7 @@ def test_normalize_by_median_overwrite():
     assert os.path.exists(outfile), outfile
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
-    assert 'GACAGCgtgCCGCA' in seqs[0], seqs
+    assert 'GACAGCgtgCCGCA'.upper() in seqs[0], seqs
 
 
 def test_normalize_by_median_version():
