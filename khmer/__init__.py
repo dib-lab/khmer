@@ -41,7 +41,6 @@ from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
-from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
@@ -270,25 +269,6 @@ class Countgraph(_Countgraph):
         countgraph = _Countgraph.__new__(cls, k, primes)
         countgraph.primes = primes
         return countgraph
-
-
-class GraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        nodegraph = Nodegraph(k, starting_size, n_tables)
-        graphlabels = _GraphLabels.__new__(cls, nodegraph)
-        graphlabels.graph = nodegraph
-        return graphlabels
-
-
-class CountingGraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _Countgraph(k, primes)
-        class_ = _GraphLabels.__new__(cls, countgraph)
-        class_.graph = countgraph
-        return class_
 
 
 class Nodegraph(_Nodegraph):

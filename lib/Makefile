@@ -227,11 +227,9 @@ LIBKHMER_OBJS= \
 	hashtable.o \
 	hllcounter.o \
 	kmer_hash.o \
-	labelhash.o \
 	traversal.o \
 	read_aligner.o \
 	read_parsers.o \
-	subset.o \
 	murmur3.o
 
 PRECOMILE_OBJS ?=
