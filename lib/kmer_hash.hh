@@ -295,11 +295,8 @@ protected:
     const char * _seq;
 
     HashIntoType _kmer_f, _kmer_r;
-    HashIntoType bitmask;
-    unsigned int _nbits_sub_1;
     unsigned int index;
     size_t length;
-    bool initialized;
 public:
     KmerIterator(const char * seq, unsigned char k);
 

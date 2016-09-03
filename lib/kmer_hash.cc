@@ -197,38 +197,21 @@ KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)
 {
-    bitmask = 0;
-    for (unsigned char i = 0; i < _ksize; i++) {
-        bitmask = (bitmask << 2) | 3;
-    }
-    _nbits_sub_1 = (_ksize*2 - 2);
-
     index = _ksize - 1;
     length = strlen(_seq);
     _kmer_f = 0;
     _kmer_r = 0;
-
-    initialized = false;
 }
 
 Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
 {
-    HashIntoType x;
-    x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
-    index = _ksize;
-
-    return Kmer(_kmer_f, _kmer_r, x);
+    return next(f, r);
 }
 
 Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
 {
     if (done()) {
         throw khmer_exception();
-    }
-
-    if (!initialized) {
-        initialized = true;
-        return first(f, r);
     }
 
     _hash(_seq + index - _ksize + 1, _ksize, _kmer_f, _kmer_r);
