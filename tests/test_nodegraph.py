@@ -60,15 +60,6 @@ def test_toobig():
         print(str(err))
 
 
-def test__get_set_tag_density():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    orig = nodegraph._get_tag_density()
-    assert orig != 2
-    nodegraph._set_tag_density(2)
-    assert nodegraph._get_tag_density() == 2
-
-
 def test_update_from():
     nodegraph = khmer.Nodegraph(5, 1000, 4)
     other_nodegraph = khmer.Nodegraph(5, 1000, 4)
@@ -287,48 +278,6 @@ def test_bloom_c_2():  # simple one
     assert other_nodegraph.n_unique_kmers() == 3
 
 
-def test_combine_pe():
-    inpfile = utils.get_test_data('combine_parts_1.fa')
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    nodegraph.consume_partitioned_fasta(inpfile)
-    assert nodegraph.count_partitions() == (2, 0)
-
-    first_seq = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
-    pid1 = nodegraph.get_partition_id(first_seq)
-
-    second_seq = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
-    pid2 = nodegraph.get_partition_id(second_seq)
-
-    assert pid1 == 2
-    assert pid2 == 80293
-
-    nodegraph.join_partitions(pid1, pid2)
-
-    pid1 = nodegraph.get_partition_id(first_seq)
-    pid2 = nodegraph.get_partition_id(second_seq)
-
-    assert pid1 == pid2
-    assert nodegraph.count_partitions() == (1, 0)
-
-
-def test_load_partitioned():
-    inpfile = utils.get_test_data('combine_parts_1.fa')
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    nodegraph.consume_partitioned_fasta(inpfile)
-    assert nodegraph.count_partitions() == (2, 0)
-
-    first_seq = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
-    assert nodegraph.get(first_seq)
-
-    second_seq = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
-    assert nodegraph.get(second_seq)
-
-    third_s = "CATGCAGAAGTTCCGCAACCATACCGTTCAGTTCCTGGTGGCTA"[-32:]
-    assert nodegraph.get(third_s)
-
-
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
@@ -413,72 +362,6 @@ def test_kmer_neighbors_wrong_ksize():
         pass
 
 
-def test_save_load_tagset():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    outfile = utils.get_temp_filename('tagset')
-
-    nodegraph.add_tag('A' * 32)
-    nodegraph.save_tagset(outfile)
-
-    nodegraph.add_tag('G' * 32)
-
-    nodegraph.load_tagset(outfile)              # implicitly => clear_tags=True
-    nodegraph.save_tagset(outfile)
-
-    # if tags have been cleared, then the new tagfile will be larger (34 bytes)
-    # else smaller (26 bytes).
-
-    fp = open(outfile, 'rb')
-    data = fp.read()
-    fp.close()
-    assert len(data) == 30, len(data)
-
-
-def test_save_load_tagset_noclear():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    outfile = utils.get_temp_filename('tagset')
-
-    nodegraph.add_tag('A' * 32)
-    nodegraph.save_tagset(outfile)
-
-    nodegraph.add_tag('G' * 32)
-
-    nodegraph.load_tagset(outfile, False)  # set clear_tags => False; zero tags
-    nodegraph.save_tagset(outfile)
-
-    # if tags have been cleared, then the new tagfile will be large (34 bytes);
-    # else small (26 bytes).
-
-    fp = open(outfile, 'rb')
-    data = fp.read()
-    fp.close()
-    assert len(data) == 38, len(data)
-
-
-def test_stop_traverse():
-    filename = utils.get_test_data('random-20-a.fa')
-
-    ksize = 20  # size of kmer
-    htable_size = 1e4  # size of hashtable
-    num_nodegraphs = 3  # number of hashtables
-
-    nodegraph = khmer.Nodegraph(ksize, htable_size, num_nodegraphs)
-
-    # without tagging/joining across consume, this breaks into two partition;
-    # with, it is one partition.
-    nodegraph.add_stop_tag('TTGCATACGTTGAGCCAGCG')
-
-    # DO NOT join reads across stoptags
-    nodegraph.consume_fasta_and_tag(filename)
-    subset = nodegraph.do_subset_partition(0, 0, True)
-    nodegraph.merge_subset(subset)
-
-    n, _ = nodegraph.count_partitions()
-    assert n == 2, n
-
-
 def test_get_ksize():
     kh = khmer._Nodegraph(22, [1])
     assert kh.ksize() == 22
@@ -490,59 +373,6 @@ def test_get_hashsizes():
     # supported any longer.
     expected = utils.longify([97, 89, 83, 79])
     assert kh.hashsizes() == expected, kh.hashsizes()
-
-
-def test_extract_unique_paths_0():
-    kh = khmer._Nodegraph(10, [5, 7, 11, 13])
-
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGATG']
-
-    kh.consume('ATGGAGAGACACAGATAGACAGGAGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    assert not x
-
-
-def test_extract_unique_paths_1():
-    kh = khmer._Nodegraph(10, [5, 7, 11, 13])
-
-    kh.consume('AGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print(x)
-    assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGAT']  # all but the last k-mer
-
-
-def test_extract_unique_paths_2():
-    kh = khmer._Nodegraph(10, [5, 7, 11, 13])
-
-    kh.consume('ATGGAGAGAC')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print(x)
-    assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGATG']  # all but the 1st k-mer
-
-
-def test_extract_unique_paths_3():
-    kh = khmer._Nodegraph(10, [5, 7, 11, 13])
-
-    kh.consume('ATGGAGAGAC')
-    kh.consume('AGTGGCGATG')
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print(x)
-    # all but the 1st/last k-mer
-    assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGAT']
-
-
-def test_extract_unique_paths_4():
-    kh = khmer.Nodegraph(10, 1e6, 4)
-
-    kh.consume('ATGGAGAGAC')
-    kh.consume('AGTGGCGATG')
-
-    kh.consume('ATAGACAGGA')
-
-    x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
-    print(x)
-    assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
 def test_get_raw_tables():
@@ -637,94 +467,6 @@ def test_load_truncated_should_fail():
         print(str(e))
 
 
-def test_save_load_tagset_notexist():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    outfile = utils.get_temp_filename('tagset')
-    try:
-        nodegraph.load_tagset(outfile)
-        assert 0, "this test should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_save_load_tagset_trunc():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    outfile = utils.get_temp_filename('tagset')
-
-    nodegraph.add_tag('A' * 32)
-    nodegraph.add_tag('G' * 32)
-    nodegraph.save_tagset(outfile)
-
-    # truncate tagset file...
-    fp = open(outfile, 'rb')
-    data = fp.read()
-    fp.close()
-
-    for i in range(len(data)):
-        fp = open(outfile, 'wb')
-        fp.write(data[:i])
-        fp.close()
-
-        # try loading it...
-        try:
-            nodegraph.load_tagset(outfile)
-            assert 0, "this test should fail"
-        except OSError as err:
-            print(str(err), i)
-
-    # try loading it...
-    try:
-        nodegraph.load_tagset(outfile)
-        assert 0, "this test should fail"
-    except OSError:
-        pass
-
-# to build the test files used below, add 'test' to this function
-# and then look in /tmp. You will need to tweak the version info in
-# khmer.hh in order to create "bad" versions, of course. -CTB
-
-
-def _build_testfiles():
-    # nodegraph file
-
-    inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer._Nodegraph(12, 2)
-    hi.consume_fasta(inpath)
-    hi.save('/tmp/goodversion-k12.htable')
-
-    # tagset file
-
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    nodegraph.add_tag('A' * 32)
-    nodegraph.add_tag('G' * 32)
-    nodegraph.save_tagset('/tmp/goodversion-k32.tagset')
-
-    # stoptags file
-
-    fakelump_fa = utils.get_test_data('fakelump.fa')
-
-    nodegraph = khmer.Nodegraph(32, 4, 4)
-    nodegraph.consume_fasta_and_tag(fakelump_fa)
-
-    subset = nodegraph.do_subset_partition(0, 0)
-    nodegraph.merge_subset(subset)
-
-    EXCURSION_DISTANCE = 40
-    EXCURSION_KMER_THRESHOLD = 82
-    EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.Countgraph(32, 4, 4)
-
-    nodegraph.repartition_largest_partition(None, counting,
-                                            EXCURSION_DISTANCE,
-                                            EXCURSION_KMER_THRESHOLD,
-                                            EXCURSION_KMER_COUNT_THRESHOLD)
-
-    nodegraph.save_stop_tags('/tmp/goodversion-k32.stoptags')
-
-
 def test_hashbits_file_version_check():
     nodegraph = khmer._Nodegraph(12, [1])
 
@@ -746,93 +488,6 @@ def test_nodegraph_file_type_check():
 
     try:
         nodegraph.load(savepath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_stoptags_file_version_check():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    inpath = utils.get_test_data('badversion-k32.stoptags')
-
-    try:
-        nodegraph.load_stop_tags(inpath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_stoptags_ksize_check():
-    nodegraph = khmer._Nodegraph(31, [1])
-
-    inpath = utils.get_test_data('goodversion-k32.stoptags')
-    try:
-        nodegraph.load_stop_tags(inpath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_stop_tags_filetype_check():
-    nodegraph = khmer._Nodegraph(31, [1])
-
-    inpath = utils.get_test_data('goodversion-k32.tagset')
-    try:
-        nodegraph.load_stop_tags(inpath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_tagset_file_version_check():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    inpath = utils.get_test_data('badversion-k32.tagset')
-
-    try:
-        nodegraph.load_tagset(inpath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_stop_tags_truncate_check():
-    nodegraph = khmer._Nodegraph(32, [1])
-
-    inpath = utils.get_test_data('goodversion-k32.tagset')
-    data = open(inpath, 'rb').read()
-
-    truncpath = utils.get_temp_filename('zzz')
-    for i in range(len(data)):
-        fp = open(truncpath, 'wb')
-        fp.write(data[:i])
-        fp.close()
-
-        try:
-            nodegraph.load_stop_tags(truncpath)
-            assert 0, "expect failure of previous command"
-        except OSError as e:
-            print(i, str(e))
-
-
-def test_tagset_ksize_check():
-    nodegraph = khmer._Nodegraph(31, [1])
-
-    inpath = utils.get_test_data('goodversion-k32.tagset')
-    try:
-        nodegraph.load_tagset(inpath)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-
-
-def test_tagset_filetype_check():
-    nodegraph = khmer._Nodegraph(31, [1])
-
-    inpath = utils.get_test_data('goodversion-k32.stoptags')
-    try:
-        nodegraph.load_tagset(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -869,18 +524,6 @@ def test_bad_primes():
             khmer._Nodegraph, 6, ["a", "b", "c"])
         assert 0, "this should fail"
     except TypeError as e:
-        print(str(e))
-
-
-def test_consume_fasta_and_tag_with_badreads_parser():
-    nodegraph = khmer.Nodegraph(6, 1e6, 2)
-    try:
-        readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_fasta_and_tag_with_reads_parser(readsparser)
-        assert 0, "this should fail"
-    except OSError as e:
-        print(str(e))
-    except ValueError as e:
         print(str(e))
 
 

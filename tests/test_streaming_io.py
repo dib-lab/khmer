@@ -347,24 +347,6 @@ def test_load_into_counting_1():
     khmer.load_countgraph(out1)
 
 
-def test_load_graph_1():
-    in1 = utils.get_test_data('test-abund-read-2.fa')
-    out1 = utils.get_temp_filename('out.ct')
-
-    cmd = """
-       cat {in1} |
-       {scripts}/load-graph.py -x 1e3 -N 2 -k 20 {out1} - \
-       2> /dev/null
-    """
-
-    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
-    print(cmd)
-
-    run_shell_cmd(cmd)
-    assert os.path.exists(out1)
-    khmer.load_nodegraph(out1)
-
-
 def test_filter_abund_1():
     in1 = utils.get_test_data('test-abund-read-2.fa')
     out1 = utils.get_temp_filename('out.abundfilt')

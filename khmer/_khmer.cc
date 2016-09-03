@@ -1822,6 +1822,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
     // graph/traversal functionality
     //
 
+   { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+   { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
     {
         "neighbors",
         (PyCFunction)hashtable_neighbors, METH_VARARGS,

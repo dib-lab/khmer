@@ -386,70 +386,6 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     return outfile
 
 
-def test_filter_stoptags():
-    infile = utils.copy_test_data('test-abund-read-2.fa')
-    in_dir = os.path.dirname(infile)
-    stopfile = utils.get_temp_filename('stoptags', in_dir)
-
-    # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
-    # now, create a file with some stop tags in it --
-    K = 18
-    kh = khmer._Nodegraph(K, [1])
-    kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
-    kh.save_stop_tags(stopfile)
-    del kh
-
-    # finally, run filter-stoptags.
-    script = 'filter-stoptags.py'
-    args = ['-k', str(K), stopfile, infile, infile]
-    utils.runscript(script, args, in_dir)
-
-    # verify that the basic output file exists
-    outfile = infile + '.stopfilt'
-    assert os.path.exists(outfile), outfile
-
-    # it should contain only one unique sequence, because we've trimmed
-    # off everything after the beginning of the only long sequence in there.
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
-
-
-def test_filter_stoptags_fq():
-    infile = utils.copy_test_data('test-abund-read-2.fq')
-    in_dir = os.path.dirname(infile)
-    stopfile = utils.get_temp_filename('stoptags', in_dir)
-
-    # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
-
-    # now, create a file with some stop tags in it --
-    K = 18
-    kh = khmer._Nodegraph(K, [1])
-    kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
-    kh.save_stop_tags(stopfile)
-    del kh
-
-    # finally, run filter-stoptags.
-    script = 'filter-stoptags.py'
-    args = ['-k', str(K), stopfile, infile, infile]
-    utils.runscript(script, args, in_dir)
-
-    # verify that the basic output file exists
-    outfile = infile + '.stopfilt'
-    assert os.path.exists(outfile), outfile
-
-    # it should contain only one unique sequence, because we've trimmed
-    # off everything after the beginning of the only long sequence in there.
-    seqs = set([r.sequence for r in screed.open(outfile)])
-    assert len(seqs) == 1, seqs
-    assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
-
-    # make sure that record names are carried through unparsed
-    names = [r.name for r in screed.open(outfile)]
-    names = set(names)
-    assert 'seq 1::BAR' in names
-
-
 def test_count_median():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     outfile = infile + '.counts'
@@ -1255,6 +1191,44 @@ def test_screed_streaming_gzipfa():
     assert os.path.exists(o)
     seqs = [r.sequence for r in screed.open(o)]
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+
+def _execute_load_graph_streaming(filename):
+    '''Helper function for the matrix of streaming tests using screed via
+    filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    uncompressed fastq, etc.
+    This is not directly executed but is run by the tests themselves
+    '''
+
+    scripts = utils.scriptpath()
+    infile = utils.copy_test_data(filename)
+    in_dir = os.path.dirname(infile)
+
+    args = '-x 1e7 -N 2 -k 20 out -'
+
+    cmd = 'cat {infile} | {scripts}/load-into-counting.py {args}'.format(
+        infile=infile, scripts=scripts, args=args)
+
+    (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
+
+    if status != 0:
+        print(out)
+        print(err)
+        assert status == 0, status
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = os.path.join(in_dir, 'out')
+    assert os.path.exists(ht_file), ht_file
+
+    ht = khmer.load_countgraph(ht_file)
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph.py worked :)
+    # @CTB broke test
+    #subset = ht.do_subset_partition(0, 0)
+    #x = ht.subset_count_partitions(subset)
+    #assert x == (1, 0), x
 
 
 def test_read_parser_streaming_ufa():
