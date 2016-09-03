@@ -51,7 +51,6 @@ Contact: khmer-project@idyll.org
 #include "hashbits.hh"
 #include "counting.hh"
 #include "read_aligner.hh"
-#include "labelhash.hh"
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
 
