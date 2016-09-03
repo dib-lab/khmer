@@ -123,16 +123,10 @@ std::string _revhash(HashIntoType hash, WordLength k)
 {
     std::string s = "";
 
-    unsigned int val = hash & 3;
-    s += revtwobit_repr(val);
-
+    s += "A";
     for (WordLength i = 1; i < k; i++) {
-        hash = hash >> 2;
-        val = hash & 3;
-        s += revtwobit_repr(val);
+        s += "A";
     }
-
-    reverse(s.begin(), s.end());
 
     return s;
 }
@@ -221,10 +215,6 @@ Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
 {
     HashIntoType x;
     x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
-
-    f = _kmer_f;
-    r = _kmer_r;
-
     index = _ksize;
 
     return Kmer(_kmer_f, _kmer_r, x);
@@ -241,29 +231,9 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
         return first(f, r);
     }
 
-    unsigned char ch = _seq[index];
+    _hash(_seq + index - _ksize + 1, _ksize, _kmer_f, _kmer_r);
     index++;
-    if (!(index <= length)) {
-        throw khmer_exception();
-    }
-
-    // left-shift the previous hash over
-    _kmer_f = _kmer_f << 2;
-
-    // 'or' in the current nt
-    _kmer_f |= twobit_repr(ch);
-
-    // mask off the 2 bits we shifted over.
-    _kmer_f &= bitmask;
-
-    // now handle reverse complement
-    _kmer_r = _kmer_r >> 2;
-    _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
-
-    f = _kmer_f;
-    r = _kmer_r;
 
     return build_kmer(_kmer_f, _kmer_r);
 }
-
 }
