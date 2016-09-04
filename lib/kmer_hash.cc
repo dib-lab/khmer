@@ -41,8 +41,6 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <string>
 
-#include <iostream>
-
 #include "MurmurHash3.h"
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -62,7 +60,7 @@ namespace khmer
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4)) {
+    if (!(k <= sizeof(HashIntoType)*4) || strlen(kmer) < k) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
@@ -185,31 +183,5 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
 
     khmer::_hash_murmur(kmer, h, r);
     return h;
-}
-
-KmerIterator::KmerIterator(const char * seq,
-                           unsigned char k) :
-    KmerFactory(k), _seq(seq)
-{
-    index = _ksize;
-    length = strlen(_seq);
-    _kmer_f = 0;
-    _kmer_r = 0;
-}
-
-Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
-{
-    return next(f, r);
-}
-
-Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
-{
-    if (done()) {
-        throw khmer_exception();
-    }
-
-    Kmer k = build_kmer(_seq + index - _ksize);
-    index++;
-    return k;
 }
 }

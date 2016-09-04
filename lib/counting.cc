@@ -245,7 +245,7 @@ const
 
     KmerIterator kmers(seq.c_str(), _ksize);
 
-    HashIntoType kmer = kmers.next();
+    HashIntoType kmer = kmers.first();
     if (kmers.done()) {
         return posns;
     }
