@@ -317,7 +317,7 @@ public:
             throw khmer_exception();
         }
 
-        char ch = _seq[index];
+        char ch = _seq[index - 1];
 
         // left-shift the previous hash over
         _kmer_f = _kmer_f << 2;
