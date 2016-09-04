@@ -64,14 +64,10 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0;
-
-    h |= twobit_repr(kmer[0]);
-
-    for (WordLength i = 1; i < k; i++) {
-        h = h << 2;
-        h |= twobit_repr(kmer[i]);
-    }
+    HashIntoType out[2];
+    uint32_t seed = 0;
+    MurmurHash3_x64_128((void *)kmer, k, seed, &out);
+    HashIntoType h = out[0];
 
     return h;
 }
