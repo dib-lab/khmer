@@ -52,19 +52,15 @@ Traverser::Traverser(const Hashtable * ht) :
 
 Kmer Traverser::get_left(Kmer& node, const char ch)
 {
-    HashIntoType kmer_f, kmer_r;
-    kmer_f = ((node.kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift);
-    kmer_r = (((node.kmer_r) << 2) & bitmask) | (twobit_comp(ch));
-    return build_kmer(kmer_f, kmer_r);
+    std::string left = std::string(1, ch) + node.kmer_s.substr(0, _ksize - 1);
+    return build_kmer(left.c_str());
 }
 
 
 Kmer Traverser::get_right(Kmer& node, const char ch)
 {
-    HashIntoType kmer_f, kmer_r;
-    kmer_f = (((node.kmer_f) << 2) & bitmask) | (twobit_repr(ch));
-    kmer_r = ((node.kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift);
-    return build_kmer(kmer_f, kmer_r);
+    std::string right = node.kmer_s.substr(1, _ksize - 1) + std::string(1, ch);
+    return build_kmer(right.c_str());
 }
 
 unsigned int Traverser::traverse_left(Kmer& node,

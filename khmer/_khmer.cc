@@ -114,17 +114,7 @@ extern "C" {
 static bool convert_PyObject_to_Kmer(PyObject * value,
                                      Kmer& kmer, WordLength ksize)
 {
-    if (PyInt_Check(value) || PyLong_Check(value)) {
-        HashIntoType h;
-        if (PyLong_Check(value)) {
-            h = PyLong_AsUnsignedLongLong(value);
-        } else {
-            h = PyInt_AsLong(value);
-        }
-
-        kmer.set_from_unique_hash(h, ksize);
-        return true;
-    } else if (PyUnicode_Check(value))  {
+    if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
                                              value, "utf-8", "strict"));
         if (strlen(s.c_str()) != ksize) {
@@ -146,7 +136,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
         return true;
     } else {
         PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
+                        "k-mers must be a string");
         return false;
     }
 }

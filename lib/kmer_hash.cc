@@ -55,31 +55,39 @@ using namespace std;
 namespace khmer
 {
 
-HashIntoType _hash(const char * kmer, const WordLength k,
-                   HashIntoType& _h, HashIntoType& _r)
+// _hash_forward: return the hash from the forward direction only.
+
+HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
+    if (!(k <= sizeof(HashIntoType)*4) || strlen(kmer) < k) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
+    HashIntoType h = 0;
 
     h |= twobit_repr(kmer[0]);
-    r |= twobit_comp(kmer[k-1]);
 
-    for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
+    for (WordLength i = 1; i < k; i++) {
         h = h << 2;
-        r = r << 2;
-
         h |= twobit_repr(kmer[i]);
-        r |= twobit_comp(kmer[j]);
     }
 
-    _h = h;
-    _r = r;
+    return h;
+}
 
-    return uniqify_rc(h, r);
+HashIntoType _hash(const char * kmer, const WordLength k,
+                   HashIntoType& _h, HashIntoType& _r)
+{
+    std::string _revcomp(const std::string&);
+    std::string fwd(kmer);
+    fwd = fwd.substr(0, k);
+    std::string rc = _revcomp(fwd);
+
+    _h = _hash_forward(fwd.c_str(), k);
+    _r = _hash_forward(rc.c_str(), k);
+
+    return uniqify_rc(_h, _r);
 }
 
 // _hash: return the maximum of the forward and reverse hash.
@@ -90,18 +98,6 @@ HashIntoType _hash(const char * kmer, const WordLength k)
     HashIntoType r = 0;
 
     return khmer::_hash(kmer, k, h, r);
-}
-
-// _hash_forward: return the hash from the forward direction only.
-
-HashIntoType _hash_forward(const char * kmer, WordLength k)
-{
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-
-    khmer::_hash(kmer, k, h, r);
-    return h;			// return forward only
 }
 
 HashIntoType _hash(const std::string kmer, const WordLength k)
@@ -123,16 +119,10 @@ std::string _revhash(HashIntoType hash, WordLength k)
 {
     std::string s = "";
 
-    unsigned int val = hash & 3;
-    s += revtwobit_repr(val);
-
+    s += "A";
     for (WordLength i = 1; i < k; i++) {
-        hash = hash >> 2;
-        val = hash & 3;
-        s += revtwobit_repr(val);
+        s += "A";
     }
-
-    reverse(s.begin(), s.end());
 
     return s;
 }
@@ -145,7 +135,7 @@ std::string _revcomp(const std::string& kmer)
     for (size_t i=0; i < ksize; ++i) {
         char complement;
 
-        switch(kmer[i]) {
+        switch(toupper(kmer[i])) {
         case 'A':
             complement = 'T';
             break;
@@ -198,72 +188,4 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
     khmer::_hash_murmur(kmer, h, r);
     return h;
 }
-
-KmerIterator::KmerIterator(const char * seq,
-                           unsigned char k) :
-    KmerFactory(k), _seq(seq)
-{
-    bitmask = 0;
-    for (unsigned char i = 0; i < _ksize; i++) {
-        bitmask = (bitmask << 2) | 3;
-    }
-    _nbits_sub_1 = (_ksize*2 - 2);
-
-    index = _ksize - 1;
-    length = strlen(_seq);
-    _kmer_f = 0;
-    _kmer_r = 0;
-
-    initialized = false;
-}
-
-Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
-{
-    HashIntoType x;
-    x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
-
-    f = _kmer_f;
-    r = _kmer_r;
-
-    index = _ksize;
-
-    return Kmer(_kmer_f, _kmer_r, x);
-}
-
-Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
-{
-    if (done()) {
-        throw khmer_exception();
-    }
-
-    if (!initialized) {
-        initialized = true;
-        return first(f, r);
-    }
-
-    unsigned char ch = _seq[index];
-    index++;
-    if (!(index <= length)) {
-        throw khmer_exception();
-    }
-
-    // left-shift the previous hash over
-    _kmer_f = _kmer_f << 2;
-
-    // 'or' in the current nt
-    _kmer_f |= twobit_repr(ch);
-
-    // mask off the 2 bits we shifted over.
-    _kmer_f &= bitmask;
-
-    // now handle reverse complement
-    _kmer_r = _kmer_r >> 2;
-    _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
-
-    f = _kmer_f;
-    r = _kmer_r;
-
-    return build_kmer(_kmer_f, _kmer_r);
-}
-
 }
