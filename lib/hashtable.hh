@@ -191,7 +191,6 @@ public:
                                     unsigned int max_count = MAX_KEEPER_SIZE)
     const;
 
-    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
     unsigned int kmer_degree(const char * kmer_s);
 
     // return all k-mer substrings, on the forward strand.

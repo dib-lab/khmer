@@ -62,7 +62,7 @@ namespace khmer
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
+    if (!(k <= sizeof(HashIntoType)*4)) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
@@ -195,7 +195,7 @@ KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)
 {
-    index = _ksize - 1;
+    index = _ksize;
     length = strlen(_seq);
     _kmer_f = 0;
     _kmer_r = 0;
@@ -212,9 +212,8 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
         throw khmer_exception();
     }
 
-    _hash(_seq + index - _ksize + 1, _ksize, _kmer_f, _kmer_r);
+    Kmer k = build_kmer(_seq + index - _ksize);
     index++;
-
-    return build_kmer(_kmer_f, _kmer_r);
+    return k;
 }
 }
