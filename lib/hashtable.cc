@@ -244,13 +244,6 @@ bool Hashtable::median_at_least(const std::string &s,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
-{
-    Traverser traverser(this);
-    Kmer node = build_kmer(kmer_f, kmer_r);
-    return traverser.degree(node);
-}
-
 unsigned int Hashtable::kmer_degree(const char * kmer_s)
 {
     Traverser traverser(this);

@@ -1477,7 +1477,7 @@ def test_trim_low_abund_6_trim_high_abund_Z():
     # untrimmed seq.
     badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
              'GATTTCCGGGCGG'
-    assert badseq in seqs       # should be there, untrimmed
+    assert badseq.upper() in seqs       # should be there, untrimmed
 
 
 def test_trim_low_abund_keep_paired():

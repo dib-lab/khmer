@@ -115,15 +115,8 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
                                      Kmer& kmer, WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
-        HashIntoType h;
-        if (PyLong_Check(value)) {
-            h = PyLong_AsUnsignedLongLong(value);
-        } else {
-            h = PyInt_AsLong(value);
-        }
-
-        kmer.set_from_unique_hash(h, ksize);
-        return true;
+        PyErr_SetString(PyExc_ValueError, "k-mers must be a string");
+        return false;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
                                              value, "utf-8", "strict"));
@@ -146,7 +139,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
         return true;
     } else {
         PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
+                        "k-mers must be a string");
         return false;
     }
 }
@@ -164,12 +157,8 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
-        if (PyLong_Check(value)) {
-            hashval = PyLong_AsUnsignedLongLong(value);
-        } else {
-            hashval = PyInt_AsLong(value);
-        }
-        return true;
+        PyErr_SetString(PyExc_ValueError, "k-mers must be a string");
+        return false;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
                                              value, "utf-8", "strict"));
@@ -191,8 +180,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         hashval = _hash(s, ksize);
         return true;
     } else {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
+        PyErr_SetString(PyExc_ValueError, "k-mers must be a string");
         return false;
     }
 }

@@ -134,58 +134,39 @@ class Kmer
 
 public:
 
-    /// The forward hash
-    HashIntoType kmer_f;
-    /// The reverse (complement) hash
-    HashIntoType kmer_r;
-    /// The uniqified hash
-    HashIntoType kmer_u;
-
-    /** @param[in]   f forward hash.
-     *  @param[in]   r reverse (complement) hash.
-     *  @param[in]   u uniqified hash.
-     */
-    Kmer(HashIntoType f, HashIntoType r, HashIntoType u)
-    {
-        kmer_f = f;
-        kmer_r = r;
-        kmer_u = u;
-    }
+    std::string kmer_s;
+    WordLength ksize;
 
     /** @param[in]   s     DNA k-mer
         @param[in]   ksize k-mer size
      */
-    Kmer(const std::string s, WordLength ksize)
+    Kmer(const std::string s, WordLength k)
     {
-        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+        kmer_s = s;
+        ksize = k;
     }
 
-    /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
-        kmer_f = kmer_r = kmer_u = 0;
-    }
-
-    void set_from_unique_hash(HashIntoType h, WordLength ksize)
-    {
-        std::string s = _revhash(h, ksize);
-        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+        kmer_s = "";
+        ksize = 0;
     }
 
     /// Allows complete backwards compatibility
     operator HashIntoType() const
     {
-        return kmer_u;
+        return _hash(kmer_s.c_str(), ksize);
     }
 
     bool operator< (const Kmer &other) const
     {
-        return kmer_u < other.kmer_u;
+        return _hash(kmer_s.c_str(), ksize) <
+            _hash(other.kmer_s.c_str(), other.ksize);
     }
 
     std::string get_string_rep(WordLength K) const
     {
-        return _revhash(kmer_u, K);
+        return kmer_s;
     }
 
 };
@@ -222,24 +203,9 @@ public:
     /** @param[in]  kmer_u Uniqified hash value.
      *  @return A complete Kmer object.
      */
-    Kmer build_kmer(HashIntoType kmer_u)
+    Kmer build_kmer(const char * kmer_s)
     {
-        HashIntoType kmer_f, kmer_r;
-        std:: string kmer_s = _revhash(kmer_u, _ksize);
-        _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
-    }
-
-    /** Call the uniqify function and build a complete Kmer.
-     *
-     *  @param[in]  kmer_f Forward hash value.
-     *  @param[in]  kmer_r Reverse complement hash value.
-     *  @return A complete Kmer object.
-     */
-    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
-    {
-        HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+        return Kmer(kmer_s, _ksize);
     }
 
     /** Hash the given sequence and call the uniqify function
@@ -250,22 +216,7 @@ public:
      */
     Kmer build_kmer(std::string kmer_s)
     {
-        HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
-    }
-
-    /** Hash the given sequence and call the uniqify function
-     *  on its results to build a complete Kmer.
-     *
-     *  @param[in]  kmer_c The character array representation of a k-mer.
-     *  @return A complete Kmer object hashed from the given char array.
-     */
-    Kmer build_kmer(const char * kmer_c)
-    {
-        HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+        return Kmer(kmer_s.c_str(), _ksize);
     }
 };
 
@@ -325,7 +276,7 @@ public:
     /// @return Whether or not the iterator has completed.
     bool done()
     {
-        return index >= length;
+        return index > length;
     }
 
     unsigned int get_start_pos() const
