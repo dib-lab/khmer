@@ -60,7 +60,7 @@ namespace khmer
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4)) {
+    if (!(k <= sizeof(HashIntoType)*4) || strlen(kmer) < k) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
