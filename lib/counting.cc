@@ -55,7 +55,7 @@ using namespace khmer:: read_parsers;
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType min_count = MAX_KCOUNT;
 
@@ -73,7 +73,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 
 BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
 
     BoundedCounterType max_count = 0;
 
@@ -121,7 +121,7 @@ CountingHash::abundance_distribution(
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KmerIterator kmers(seq.c_str(), _ksize);
+            StringToHashIterator kmers(seq.c_str(), _ksize);
 
             while(!kmers.done()) {
                 HashIntoType kmer = kmers.next();
@@ -172,7 +172,7 @@ const
         return 0;
     }
 
-    KmerIterator kmers(seq.c_str(), _ksize);
+    StringToHashIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -207,7 +207,7 @@ const
         return 0;
     }
 
-    KmerIterator kmers(seq.c_str(), _ksize);
+    StringToHashIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
 
@@ -243,7 +243,7 @@ const
         throw khmer_exception("invalid read");
     }
 
-    KmerIterator kmers(seq.c_str(), _ksize);
+    StringToHashIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer = kmers.first();
     if (kmers.done()) {

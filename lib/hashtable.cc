@@ -159,7 +159,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    KmerIterator kmers(sp, _ksize);
+    StringToHashIterator kmers(sp, _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -211,7 +211,7 @@ void Hashtable::get_median_count(const std::string &s,
 bool Hashtable::median_at_least(const std::string &s,
                                 unsigned int cutoff)
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
 
@@ -332,7 +332,7 @@ void Hashtable::get_kmers(const std::string &s,
 void Hashtable::get_kmer_hashes(const std::string &s,
                                 std::vector<HashIntoType> &kmers_vec) const
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -344,7 +344,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
         SeenSet& hashes) const
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -356,7 +356,7 @@ void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
-    KmerIterator kmers(s.c_str(), _ksize);
+    StringToHashIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -379,6 +379,7 @@ const
             std::cout << "... find_high_degree_nodes: " << n << "\n";
             std::cout << std::flush;
         }
+
         Kmer kmer = kmers.next();
         if ((traverser.degree(kmer)) > 2) {
             high_degree_nodes.insert(kmer);
