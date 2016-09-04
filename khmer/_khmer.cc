@@ -181,7 +181,8 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         hashval = _hash(s, ksize);
         return true;
     } else {
-        PyErr_SetString(PyExc_ValueError, "k-mers must be a string");
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mers must be either a hash or a string");
         return false;
     }
 }

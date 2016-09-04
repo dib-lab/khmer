@@ -70,14 +70,18 @@ def test_count_1():
     hi = khmer._Countgraph(12, PRIMES_1m)
 
     kmer = 'G' * 12
+    hashval = hi.hash('G' * 12)
 
     assert hi.get(kmer) == 0
+    assert hi.get(hashval) == 0
 
     hi.count(kmer)
     assert hi.get(kmer) == 1
+    assert hi.get(hashval) == 1
 
     hi.count(kmer)
     assert hi.get(kmer) == 2
+    assert hi.get(hashval) == 2
 
     kmer = 'G' * 11
     try:
