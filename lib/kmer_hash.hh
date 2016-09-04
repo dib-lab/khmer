@@ -113,6 +113,7 @@ HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
 
+
 /**
  * \class Kmer
  *
@@ -356,6 +357,94 @@ public:
         return index - 1;
     }
 }; // class KmerIterator
+
+
+class StringToHashIterator
+{
+protected:
+    const WordLength _ksize;
+    const char * _seq;
+
+    HashIntoType _kmer_f, _kmer_r;
+
+    unsigned int index;
+    size_t length;
+    bool initialized;
+    HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
+public:
+    StringToHashIterator(const char * seq, unsigned char k) :
+        _ksize(k), _seq(seq)
+    {
+        index = _ksize;
+        length = strlen(_seq);
+        _kmer_f = 0;
+        _kmer_r = 0;
+        initialized = false;
+
+        bitmask = 0;
+        for (unsigned char i = 0; i < _ksize; i++) {
+            bitmask = (bitmask << 2) | 3;
+        }
+        _nbits_sub_1 = (_ksize*2 - 2);
+    }
+
+    HashIntoType first()
+    {
+        initialized = true;
+
+        _hash(_seq + index - _ksize, _ksize, _kmer_f, _kmer_r);
+        index++;
+        return uniqify_rc(_kmer_f, _kmer_r);
+    }
+
+    HashIntoType next()
+    {
+        if (!initialized) {
+            return first();
+        }
+        if (done()) {
+            throw khmer_exception();
+        }
+
+        char ch = _seq[index - 1];
+
+        // left-shift the previous hash over
+        _kmer_f = _kmer_f << 2;
+
+        // 'or' in the current nt
+        _kmer_f |= twobit_repr(ch);
+
+        // mask off the 2 bits we shifted over.
+        _kmer_f &= bitmask;
+
+        // now handle reverse complement
+        _kmer_r = _kmer_r >> 2;
+        _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
+
+        index++;
+        return uniqify_rc(_kmer_f, _kmer_r);
+    }
+
+    /// @return Whether or not the iterator has completed.
+    bool done()
+    {
+        return index > length;
+    }
+
+    unsigned int get_start_pos() const
+    {
+        if (!initialized) {
+            throw khmer_exception();
+        }
+        return index - _ksize - 1;
+    }
+
+    unsigned int get_end_pos() const
+    {
+        return index - 1;
+    }
+}; // class StringToHashIterator
 
 }
 
