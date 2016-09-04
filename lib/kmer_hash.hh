@@ -248,29 +248,33 @@ protected:
     HashIntoType _kmer_f, _kmer_r;
     unsigned int index;
     size_t length;
+    bool initialized;
 public:
-    KmerIterator(const char * seq, unsigned char k);
-
-    /** @param[in]  f The forward hash value.
-     *  @param[in]  r The reverse complement hash value.
-     *  @return The first Kmer of the sequence.
-     */
-    Kmer first(HashIntoType& f, HashIntoType& r);
-
-    /** @param[in]  f The current forward hash value
-     *  @param[in]  r The current reverse complement hash value
-     *  @return The next Kmer in the sequence
-     */
-    Kmer next(HashIntoType& f, HashIntoType& r);
+    KmerIterator(const char * seq, unsigned char k) :
+        KmerFactory(k), _seq(seq)
+    {
+        index = _ksize;
+        length = strlen(_seq);
+        _kmer_f = 0;
+        _kmer_r = 0;
+        initialized = false;
+    }
 
     Kmer first()
     {
-        return first(_kmer_f, _kmer_r);
+        initialized = true;
+        return next();
     }
 
     Kmer next()
     {
-        return next(_kmer_f, _kmer_r);
+        if (done()) {
+            throw khmer_exception();
+        }
+
+        Kmer k = build_kmer(_seq + index - _ksize);
+        index++;
+        return k;
     }
 
     /// @return Whether or not the iterator has completed.
@@ -281,12 +285,15 @@ public:
 
     unsigned int get_start_pos() const
     {
-        return index - _ksize;
+        if (!initialized) {
+            throw khmer_exception();
+        }
+        return index - _ksize - 1;
     }
 
     unsigned int get_end_pos() const
     {
-        return index;
+        return index - 1;
     }
 }; // class KmerIterator
 
