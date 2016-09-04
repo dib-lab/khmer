@@ -136,6 +136,8 @@ public:
 
     std::string kmer_s;
     WordLength ksize;
+    HashIntoType kmer_u, kmer_f, kmer_r;
+    bool cached;
 
     /** @param[in]   s     DNA k-mer
         @param[in]   ksize k-mer size
@@ -144,24 +146,45 @@ public:
     {
         kmer_s = s;
         ksize = k;
+
+        kmer_u = _hash(s, k, kmer_f, kmer_r);
+        cached = true;
+    }
+
+    Kmer(const std::string s, WordLength k,
+         HashIntoType ku, HashIntoType kf, HashIntoType kr)
+    {
+        kmer_s = s;
+        ksize = k;
+        kmer_u = ku;
+        kmer_f = kf;
+        kmer_r = kr;
+        cached = true;
     }
 
     Kmer()
     {
         kmer_s = "";
         ksize = 0;
+        kmer_u = kmer_f = kmer_r = 0;
+        cached = false;
     }
 
     /// Allows complete backwards compatibility
     operator HashIntoType() const
     {
-        return _hash(kmer_s.c_str(), ksize);
+        if (cached) {
+            return kmer_u;
+        }
+        return _hash(kmer_s, ksize);
     }
 
-    bool operator< (const Kmer &other) const
+    bool operator< (Kmer &other)
     {
-        return _hash(kmer_s.c_str(), ksize) <
-            _hash(other.kmer_s.c_str(), other.ksize);
+        HashIntoType me = *this;
+        HashIntoType other_val = other;
+
+        return me < other_val;
     }
 
     std::string get_string_rep(WordLength K) const
@@ -218,6 +241,13 @@ public:
     {
         return Kmer(kmer_s.c_str(), _ksize);
     }
+    
+    Kmer build_kmer(std::string kmer_s,
+                    HashIntoType kmer_f, HashIntoType kmer_r)
+    {
+        return Kmer(kmer_s.c_str(), _ksize, uniqify_rc(kmer_f, kmer_r),
+                    kmer_f, kmer_r);
+    }
 };
 
 /**
@@ -249,6 +279,8 @@ protected:
     unsigned int index;
     size_t length;
     bool initialized;
+    HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
 public:
     KmerIterator(const char * seq, unsigned char k) :
         KmerFactory(k), _seq(seq)
@@ -258,21 +290,49 @@ public:
         _kmer_f = 0;
         _kmer_r = 0;
         initialized = false;
+
+        bitmask = 0;
+        for (unsigned char i = 0; i < _ksize; i++) {
+            bitmask = (bitmask << 2) | 3;
+        }
+        _nbits_sub_1 = (_ksize*2 - 2);
     }
 
     Kmer first()
     {
         initialized = true;
-        return next();
+
+        _hash(_seq + index - _ksize, _ksize, _kmer_f, _kmer_r);
+        Kmer k = build_kmer(_seq + index - _ksize, _kmer_f, _kmer_r);
+        index++;
+        return k;
     }
 
     Kmer next()
     {
+        if (!initialized) {
+            return first();
+        }
         if (done()) {
             throw khmer_exception();
         }
 
-        Kmer k = build_kmer(_seq + index - _ksize);
+        char ch = _seq[index];
+
+        // left-shift the previous hash over
+        _kmer_f = _kmer_f << 2;
+
+        // 'or' in the current nt
+        _kmer_f |= twobit_repr(ch);
+
+        // mask off the 2 bits we shifted over.
+        _kmer_f &= bitmask;
+
+        // now handle reverse complement
+        _kmer_r = _kmer_r >> 2;
+        _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
+
+        Kmer k = build_kmer(_seq + index - _ksize, _kmer_f, _kmer_r);
         index++;
         return k;
     }
