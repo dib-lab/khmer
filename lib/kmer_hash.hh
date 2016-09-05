@@ -57,18 +57,7 @@ Contact: khmer-project@idyll.org
 			     (ch) == 'G' || (ch) == 'T')
 #endif
 
-// bit representation of A/T/C/G.
-#ifdef KHMER_EXTRA_SANITY_CHECKS
-#   define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0LL : \
-			    (toupper(ch)) == 'T' ? 1LL : \
-			    (toupper(ch)) == 'C' ? 2LL : 3LL)
-#else
-// NOTE: Assumes data is already sanitized as it should be by parsers.
-//	     This assumption eliminates 4 function calls.
-#   define twobit_repr(ch) ((ch) == 'A' ? 0LL : \
-			    (ch) == 'T' ? 1LL : \
-			    (ch) == 'C' ? 2LL : 3LL)
-#endif
+khmer::HashIntoType twobit_repr(char ch);
 
 #define revtwobit_repr(n) ((n) == 0 ? 'A' : \
                            (n) == 1 ? 'T' : \

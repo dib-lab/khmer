@@ -48,6 +48,16 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 
+
+const unsigned long long
+twobit_values[256] = {['A'] = 0, ['T'] = 1, ['C'] = 2, ['G'] = 3,
+                      ['a'] = 0, ['t'] = 1, ['c'] = 2, ['g'] = 3};
+khmer::HashIntoType twobit_repr(char ch)
+{
+  return twobit_values[ch];
+}
+
+
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
