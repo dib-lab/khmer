@@ -49,12 +49,17 @@ Contact: khmer-project@idyll.org
 using namespace std;
 
 
-const unsigned long long
-twobit_values[256] = {['A'] = 0, ['T'] = 1, ['C'] = 2, ['G'] = 3,
-                      ['a'] = 0, ['t'] = 1, ['c'] = 2, ['g'] = 3};
-khmer::HashIntoType twobit_repr(char ch)
+const khmer::HashIntoType
+twobit_values[256] = {['A'] = 0+1, ['T'] = 1+1, ['C'] = 2+1, ['G'] = 3+1,
+                      ['a'] = 0+1, ['t'] = 1+1, ['c'] = 2+1, ['g'] = 3+1};
+khmer::HashIntoType twobit_repr(const char ch)
 {
-  return twobit_values[ch];
+  const khmer::HashIntoType v(twobit_values[ch]);
+  if (v > 0) {
+    return v - 1;
+  } else {
+    throw khmer::khmer_exception("Sequence contains invalid DNA symbol.");
+  }
 }
 
 
