@@ -61,6 +61,18 @@ khmer::HashIntoType twobit_repr(const char ch)
     throw khmer::khmer_exception("Sequence contains invalid DNA symbol.");
   }
 }
+const khmer::HashIntoType
+twobit_values_comp[256] = {['A'] = 1+1, ['T'] = 0+1, ['C'] = 3+1, ['G'] = 2+1,
+                           ['a'] = 1+1, ['t'] = 0+1, ['c'] = 3+1, ['g'] = 2+1};
+khmer::HashIntoType twobit_comp(const char ch)
+{
+  const khmer::HashIntoType v(twobit_values_comp[ch]);
+  if (v > 0) {
+    return v - 1;
+  } else {
+    throw khmer::khmer_exception("Sequence contains invalid DNA symbol.");
+  }
+}
 
 
 //
