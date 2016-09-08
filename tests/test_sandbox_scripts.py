@@ -68,6 +68,8 @@ if not os.path.exists(sandbox_path):
 
 path = os.path.join(sandbox_path, "*.py")
 scripts = glob.glob(path)
+
+
 @pytest.mark.parametrize("filename", [os.path.normpath(s) for s in scripts])
 def test_import_succeeds(filename):
     try:
