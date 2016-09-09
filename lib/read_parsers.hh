@@ -189,6 +189,20 @@ private:
 
 };
 
+class SeqAnBamParser : public IParser
+{
+public:
+    explicit SeqAnBamParser( const char * filename );
+    ~SeqAnBamParser( );
+
+    bool is_complete( );
+    void imprint_next_read(Read &the_read);
+
+private:
+    struct Handle;
+    Handle* _private;
+};
+
 inline PartitionID _parse_partition_id(std::string name)
 {
     PartitionID p = 0;
