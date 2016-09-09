@@ -1,3 +1,7 @@
+2016-09-09  Tim Head  <betatim@gmail.com>
+
+   * tests/test_filter_abund.py: remove for loops introduce to the test suit.
+
 2016-09-01  Tim Head  <betatim@gmail.com>
 
    * khmer/khmer_args.py: added check_argument_range to check an integer

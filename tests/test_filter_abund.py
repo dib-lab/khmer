@@ -277,7 +277,7 @@ def test_filter_abund_5_trim_high_abund():
     assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
 
 
-def test_filter_abund_single_5_trim_high_abund():
+def test_filter_abund_single_trim_high_abund():
     # test that the -V option *does* trim sequences that are high abundance
     infile = utils.copy_test_data('test-abund-read-3.fa')
     in_dir = os.path.dirname(infile)
