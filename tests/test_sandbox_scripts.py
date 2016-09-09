@@ -62,15 +62,16 @@ def teardown():
     utils.cleanup()
 
 
-sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
-if not os.path.exists(sandbox_path):
-    pytest.skip("sandbox scripts are only tested in a repository")
+def _sandbox_scripts():
+    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    if not os.path.exists(sandbox_path):
+        pytest.skip("sandbox scripts are only tested in a repository")
 
-path = os.path.join(sandbox_path, "*.py")
-scripts = glob.glob(path)
+    path = os.path.join(sandbox_path, "*.py")
+    return [os.path.normpath(s) for s in glob.glob(path)]
 
 
-@pytest.mark.parametrize("filename", [os.path.normpath(s) for s in scripts])
+@pytest.mark.parametrize("filename", _sandbox_scripts())
 def test_import_succeeds(filename):
     try:
         mod = imp.load_source('__zzz', filename)
