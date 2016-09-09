@@ -1,6 +1,6 @@
 2016-09-09  Tim Head  <betatim@gmail.com>
 
-   * tests/test_filter_abund.py: remove for loops introduce to the test suit.
+   * tests/test_filter_abund.py: remove for loops introduce to the test suite.
 
 2016-09-01  Tim Head  <betatim@gmail.com>
 
