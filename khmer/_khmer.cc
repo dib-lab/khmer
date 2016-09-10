@@ -40,9 +40,6 @@ Contact: khmer-project@idyll.org
 // A module for Python that exports khmer C++ library functions.
 //
 
-// Must be first.
-#include <Python.h>
-
 #include <iostream>
 
 #include "khmer.hh"
@@ -55,47 +52,11 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
 
+#include "_khmer.hh"
+#include "_minhash.hh"
+
 using namespace khmer;
 using namespace read_parsers;
-
-//
-// Python 2/3 compatibility: PyInt and PyLong
-//
-
-#if (PY_MAJOR_VERSION >= 3)
-#define PyInt_Check(arg) PyLong_Check(arg)
-#define PyInt_AsLong(arg) PyLong_AsLong(arg)
-#define PyInt_FromLong(arg) PyLong_FromLong(arg)
-#define Py_TPFLAGS_HAVE_ITER 0
-#endif
-
-//
-// Python 2/3 compatibility: PyBytes and PyString
-// https://docs.python.org/2/howto/cporting.html#str-unicode-unification
-//
-
-#include "bytesobject.h"
-
-//
-// Python 2/3 compatibility: Module initialization
-// http://python3porting.com/cextensions.html#module-initialization
-//
-
-#if PY_MAJOR_VERSION >= 3
-#define MOD_ERROR_VAL NULL
-#define MOD_SUCCESS_VAL(val) val
-#define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
-#define MOD_DEF(ob, name, doc, methods) \
-          static struct PyModuleDef moduledef = { \
-            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
-          ob = PyModule_Create(&moduledef);
-#else
-#define MOD_ERROR_VAL
-#define MOD_SUCCESS_VAL(val)
-#define MOD_INIT(name) void init##name(void)
-#define MOD_DEF(ob, name, doc, methods) \
-          ob = Py_InitModule3(name, methods, doc);
-#endif
 
 using namespace khmer;
 
@@ -760,7 +721,7 @@ static PyTypeObject khmer_PrePartitionInfo_Type = {
     0,                                    /* tp_setattro */
     0,                                    /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "Stores a k-kmer and a set of tagged seen k-mers.", /* tp_doc */
+    "Stores a k-mer and a set of tagged seen k-mers.", /* tp_doc */
 };
 
 
@@ -1413,27 +1374,6 @@ hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    PyObject * arg;
-
-    if (!PyArg_ParseTuple(args, "O", &arg)) {
-        return NULL;
-    }
-
-    HashIntoType hashval;
-    if (!convert_PyObject_to_HashIntoType(arg, hashval, hashtable->ksize())) {
-        return NULL;
-    }
-
-    unsigned int count = hashtable->get_count(hashval);
-    return PyLong_FromLong(count);
-}
-
-static
-PyObject *
 hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1503,8 +1443,8 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o;
-    khmer_HashSet_Object * hdn_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    khmer_HashSet_Object * hdn_o = NULL;
 
     if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
@@ -1532,6 +1472,58 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
                                    (PyObject *) adj_o, (PyObject *) visited_o);
     Py_DECREF(adj_o);
     Py_DECREF(visited_o);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * arg;
+
+    if (!PyArg_ParseTuple(args, "O", &arg)) {
+        return NULL;
+    }
+
+    HashIntoType hashval;
+    if (!convert_PyObject_to_HashIntoType(arg, hashval, hashtable->ksize())) {
+        return NULL;
+    }
+
+    unsigned int count = hashtable->get_count(hashval);
+    return PyLong_FromLong(count);
+}
+
+static
+PyObject *
+hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
+    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
 
     return ret;
 }
@@ -2163,6 +2155,93 @@ hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
     ppi_obj->PrePartitionInfo = ppi;
 
     return (PyObject*)ppi_obj;
+}
+
+static
+PyObject *
+hashtable_build_neighborhood_minhashes(khmer_KHashtable_Object * me,
+                                       PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * is_protein_o = NULL;
+    bool is_protein = false;
+    if (!PyArg_ParseTuple(args, "|O", &is_protein_o)) {
+        return NULL;
+    }
+
+    if (is_protein_o && PyObject_IsTrue(is_protein_o)) {
+      is_protein = true;
+    }
+
+    PyObject * module = PyImport_ImportModule("khmer._minhash");
+    if (module == NULL ){
+      return NULL;
+    }
+
+    PyObject * tname = PyObject_GetAttrString(module, "NeighborhoodMinHash");
+    if (tname == NULL ) {
+      Py_DECREF(module);
+      return NULL;
+    }
+    Py_DECREF(module);
+
+    PyObject * nbhd_mh_args = Py_BuildValue("bO",
+                                            (WordLength)hashtable->ksize(),
+                                            is_protein ? Py_True : Py_False);
+    PyObject * nbhd_mh_o = PyObject_Call(tname, nbhd_mh_args, NULL);
+    Py_DECREF(nbhd_mh_args);
+    Py_DECREF(tname);
+
+    if (nbhd_mh_o == NULL) {
+      return NULL;
+    }
+
+    NeighborhoodMinHash * nbhd_mh = extract_NeighborhoodMinHash(nbhd_mh_o);
+
+    Py_BEGIN_ALLOW_THREADS
+
+    hashtable->partition->build_neighborhood_minhashes(hashtable->all_tags,
+                                                       *nbhd_mh);
+    Py_END_ALLOW_THREADS
+
+    return nbhd_mh_o;
+}
+
+static
+PyObject *
+hashtable_build_neighborhood_minhash(khmer_KHashtable_Object * me, PyObject * args)
+{
+#if 0
+    Hashtable * hashtable = me->hashtable;
+
+    const char * kmer_s = NULL;
+    PyObject * mh_obj = NULL;;
+
+    if (!PyArg_ParseTuple(args, "sO", &kmer_s, &mh_obj)) {
+        return NULL;
+    }
+
+    if (strlen(kmer_s) != hashtable->ksize()) {
+        PyErr_SetString( PyExc_ValueError,
+                         "k-mer size must equal the k-mer size of the graph");
+        return NULL;
+    }
+
+    Kmer kmer = hashtable->build_kmer(kmer_s);
+    KmerMinHash * mh = extract_KmerMinHash(mh_obj);
+
+    Py_BEGIN_ALLOW_THREADS
+
+    SeenSet tagged_kmers;
+
+    hashtable->partition->build_neighborhood_minhash(kmer, tagged_kmers, *mh,
+                                                     hashtable->all_tags);
+
+    Py_END_ALLOW_THREADS
+#endif //0
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static
@@ -2975,7 +3054,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
     },
-
     {
         "find_high_degree_nodes",
         (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
@@ -2989,6 +3067,13 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "k-mer and avoiding high-degree nodes, finding (and returning) "
         "traversed k-mers and any encountered high-degree nodes.",
     },
+    {
+        "assemble_linear_path",
+        (PyCFunction)hashtable_assemble_linear_path, METH_VARARGS,
+        "Assemble a purely linear path starting with the given "
+        "k-mer, returning traversed k-mers and any encountered high-degree "
+        "nodes.",
+    },
 
     //
     // tagging / sparse graph functionality
@@ -2997,6 +3082,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
     { "consume_and_tag", (PyCFunction)hashtable_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
     { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
+    { "build_neighborhood_minhash", (PyCFunction)hashtable_build_neighborhood_minhash, METH_VARARGS, "Add neighboring kmers to a MinHash object" },    
+    { "build_neighborhood_minhashes", (PyCFunction)hashtable_build_neighborhood_minhashes, METH_VARARGS, "Build MinHash objects for all tags" },
     { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
     { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
@@ -4251,6 +4338,62 @@ labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 
 static
 PyObject *
+labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
+                                         PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    const char * long_str;
+    khmer_HashSet_Object * hdn_o = NULL;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "sO!K", &long_str,
+                          &khmer_HashSet_Type, &hdn_o, &label)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < labelhash->graph->ksize()) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    labelhash->label_across_high_degree_nodes(long_str, *hdn_o->hashes, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
+labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
+                                PyObject * args)
+{
+    LabelHash* labelhash = me->labelhash;
+
+    PyObject * val_o;
+
+    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer,
+                                  labelhash->graph->ksize())) {
+        return NULL;
+    }
+
+    std::vector<std::string> contigs = labelhash->assemble_labeled_path(start_kmer);
+
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+static
+PyObject *
 labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
@@ -4300,6 +4443,16 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
+    {
+        "label_across_high_degree_nodes",
+        (PyCFunction)labelhash_label_across_high_degree_nodes, METH_VARARGS,
+        "Connect graph across high degree nodes using labels.",
+    },
+    {
+        "assemble_labeled_path",
+        (PyCFunction)labelhash_assemble_labeled_path, METH_VARARGS,
+        "Assemble all paths, using labels to negotiate tricky bits."
+    },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };

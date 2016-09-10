@@ -199,6 +199,13 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
     return h;
 }
 
+int _hash_murmur32(const std::string& kmer) {
+    int out[2];
+    uint32_t seed = 0;
+    MurmurHash3_x86_32((void *)kmer.c_str(), kmer.size(), seed, &out);
+    return out[0];
+}
+
 KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)

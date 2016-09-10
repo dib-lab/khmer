@@ -41,7 +41,7 @@ try:
     import matplotlib
     matplotlib.use('Agg')
     from pylab import *
-except ImportError:
+except (ImportError, RuntimeError):
     pass
 
 def main():

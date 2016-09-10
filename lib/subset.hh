@@ -44,6 +44,7 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "traversal.hh"
+#include "kmer_min_hash.hh"
 
 namespace khmer
 {
@@ -111,6 +112,13 @@ public:
                        bool break_on_stop_tags=false,
                        bool stop_big_traversals=false);
 
+    void build_neighborhood_minhash(Kmer start_kmer,
+                                    SeenSet& tagged_kmers,
+                                    HashIntoType& the_hash,
+                                    const SeenSet& all_tags,
+                                    bool break_on_stop_tags=false,
+                                    bool stop_big_traversals=false);
+
     unsigned int sweep_for_tags(const std::string& seq,
                                 SeenSet& tagged_kmers,
                                 const SeenSet& all_tags,
@@ -171,6 +179,8 @@ public:
                       PartitionPtrMap& diskp_to_pp);
 
     void report_on_partitions();
+
+    void build_neighborhood_minhashes(const SeenSet&, NeighborhoodMinHash&);
 };
 }
 

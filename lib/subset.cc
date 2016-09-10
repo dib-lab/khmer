@@ -308,6 +308,107 @@ void SubsetPartition::find_all_tags(
     }
 }
 
+// build_neighborhood_minhash: traverses out to all tagged k-mers
+//    connected to kmer_f/kmer_r in the graph, adding them to a minhash
+//    in the process.
+
+void SubsetPartition::build_neighborhood_minhash(
+    Kmer start_kmer,
+    SeenSet&		tagged_kmers,
+    HashIntoType& the_hash,
+    const SeenSet&	all_tags,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals)
+{
+
+    bool first = true;
+    KmerQueue node_q;
+    std::queue<unsigned int> breadth_q;
+
+    unsigned int cur_breadth = 0;
+    const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
+
+    unsigned int total = 0;
+    unsigned int nfound = 0;
+
+    Traverser traverser(_ht);
+    KmerSet keeper;		// keep track of traversed kmers
+
+    auto filter = [&] (Kmer& n) -> bool {
+        return !set_contains(keeper, n);
+    };
+
+    node_q.push(start_kmer);
+    breadth_q.push(0);
+
+    while(!node_q.empty()) {
+
+        if (stop_big_traversals && keeper.size() > BIG_TRAVERSALS_ARE) {
+            tagged_kmers.clear();
+            break;
+        }
+
+        Kmer node = node_q.front();
+        node_q.pop();
+
+        unsigned int breadth = breadth_q.front();
+        breadth_q.pop();
+
+        if (set_contains(keeper, node)) {
+            continue;
+        }
+
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
+            continue;
+        }
+
+        // keep track of seen kmers
+        keeper.insert(node);
+
+        HashIntoType f = _hash_murmur(_revhash(node.kmer_f, _ht->ksize()));
+        HashIntoType r = _hash_murmur(_revhash(node.kmer_r, _ht->ksize()));
+
+        if (f < the_hash) { the_hash = f; }
+        if (r < the_hash) { the_hash = r; }
+        total++;
+
+        // Is this a kmer-to-tag, and have we put this tag in a partition
+        // already? Search no further in this direction.  (This is where we
+        // connect partitions.)
+        if (!first && set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
+            continue;
+        }
+
+        if (!(breadth >= cur_breadth)) { // keep track of watermark, for
+            // debugging
+            throw khmer_exception("Desynchonization between traversal "
+                                  "and breadth tracking. Did you forget "
+                                  "to pop the node or breadth queue?");
+        }
+        if (breadth > cur_breadth) {
+            cur_breadth = breadth;
+        }
+
+        if (breadth >= max_breadth) {
+            continue;    // truncate search @CTB exit?
+        }
+
+        nfound = traverser.traverse_right(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
+
+        nfound = traverser.traverse_left(node, node_q, filter);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
+
+
+        first = false;
+    }
+}
+
 // Perform a breadth-first search starting from the k-mers in the given
 // sequence.
 
@@ -1429,4 +1530,36 @@ void SubsetPartition::report_on_partitions()
         }
         std::cout << "--\n";
     }
+}
+
+// build_neighborhood_minhashes
+
+void SubsetPartition::build_neighborhood_minhashes(const SeenSet& all_tags,
+                                                  NeighborhoodMinHash& nbhd_mh)
+{
+  // we want to build two things:
+  // first, a mapping from tag to minhash, just for records.
+  // second, a mapping from tag to other tags, so that we can merge
+  //    minhashes based on that.
+
+  SeenSet::const_iterator si;
+  unsigned int n = 0;
+  for (si = all_tags.begin(); si != all_tags.end(); ++si) {
+    n += 1;
+    if (n % 10000 == 0) {
+      std::cout << n << " ... " << all_tags.size() << "\n";
+      std::cout << std::flush;
+    }
+    std::string start = _revhash(*si, _ht->ksize());
+    Kmer start_kmer(start, _ht->ksize());
+
+    HashIntoType the_hash = _hash_murmur(start);
+
+    build_neighborhood_minhash(start_kmer, nbhd_mh.tag_connections[*si],
+                               the_hash, all_tags);
+    // here, tagged_kmers will be tags encountered while traversing,
+    // and hash will now be the bottom neighborhood hash.
+
+    nbhd_mh.tag_to_hash[*si] = the_hash;
+  }
 }

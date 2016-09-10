@@ -164,6 +164,14 @@ EXTENSION_MOD_DICT = \
     }
 
 EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
+MINHASH_MOD = Extension("khmer._minhash",  # pylint: disable=W0142
+                        sources=["khmer/_minhash.cc", "lib/kmer_hash.cc",
+                                 "third-party/smhasher/MurmurHash3.cc"],
+                        language="c++",
+                        depends=["lib/kmer_min_hash.hh",
+                                 "lib/khmer.hh"],
+                        extra_compile_args=EXTRA_COMPILE_ARGS)
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -234,7 +242,7 @@ SETUP_METADATA = \
         #        "oxli = oxli:main"
         #    ]
         # },
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": [EXTENSION_MOD, MINHASH_MOD],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
