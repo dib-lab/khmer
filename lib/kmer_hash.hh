@@ -38,6 +38,8 @@ Contact: khmer-project@idyll.org
 #ifndef KMER_HASH_HH
 #define KMER_HASH_HH
 
+#include <array>
+#include <iostream>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,6 +114,71 @@ HashIntoType _hash_murmur(const std::string& kmer);
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
+
+
+class HashType
+{
+	std::array<unsigned char, 8> bytes { {0, 0, 0, 0, 0, 0, 0, 0 } };
+public:
+	HashType() : bytes{{0, 0, 0, 0, 0, 0, 0, 0 }} {};
+	HashType(std::array<unsigned char, 8> const& bytes_) : bytes(bytes_) {};
+
+	unsigned long long int as_ull() {
+		unsigned long long int x(0);
+		for (int i = 0; i < 8; i++) {
+			x += pow(256, 8 - i - 1) * bytes[i];
+		}
+		return x;
+	}
+
+	HashType operator>>(int shift) {
+		HashType shifted;
+		int next_(0);
+		for (int s = 0; s < shift; s++) {
+			int carry(0);
+			for (int i = 0; i < 8; i++){
+				next_ = (bytes[i] & 1) ? 0x80 : 0;
+				shifted.bytes[i] = carry | (bytes[i] >> 1);
+				carry = next_;
+			}
+		}
+		return shifted;
+	}
+
+	HashType operator<<(int shift) {
+		HashType shifted;
+		int next_(0);
+		for (int s = 0; s < shift; s++) {
+			int carry(0);
+			for (int i = 8 - 1; i >= 0; i--){
+				next_ = (bytes[i] & 128) ? 1 : 0;
+				shifted.bytes[i] = carry | ((bytes[i] << 1) & 255);
+				carry = next_;
+			}
+		}
+		return shifted;
+	}
+
+	HashType operator<<=(int rhs){
+		*this = *this << rhs;
+		return *this;
+	}
+
+	HashType operator>>=(int rhs){
+		*this = *this >> rhs;
+		return *this;
+	}
+
+	HashType operator|(int rhs) {
+		bytes[7] |= rhs;
+		return *this;
+	}
+
+	HashType operator|=(int rhs){
+		*this = *this | rhs;
+		return *this;
+	}
+};
 
 /**
  * \class Kmer

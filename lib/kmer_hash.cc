@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
@@ -64,9 +65,14 @@ HashIntoType _hash(const char * kmer, const WordLength k,
     }
 
     HashIntoType h = 0, r = 0;
+    HashType hh;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
+
+    hh |= twobit_repr(kmer[0]);
+    HashIntoType xx(hh.as_ull());
+    std::cout << "h: " << h << " hh: " << xx <<std::endl;
 
     for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
         h = h << 2;
