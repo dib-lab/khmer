@@ -132,13 +132,13 @@ public:
 	}
 
 	HashType operator>>(int shift) {
-		HashType shifted;
+		HashType shifted(bytes);
 		int next_(0);
 		for (int s = 0; s < shift; s++) {
 			int carry(0);
 			for (int i = 0; i < 8; i++){
-				next_ = (bytes[i] & 1) ? 0x80 : 0;
-				shifted.bytes[i] = carry | (bytes[i] >> 1);
+				next_ = (shifted.bytes[i] & 1) ? 0x80 : 0;
+				shifted.bytes[i] = carry | (shifted.bytes[i] >> 1);
 				carry = next_;
 			}
 		}
@@ -146,13 +146,13 @@ public:
 	}
 
 	HashType operator<<(int shift) {
-		HashType shifted;
+		HashType shifted(bytes);
 		int next_(0);
 		for (int s = 0; s < shift; s++) {
 			int carry(0);
 			for (int i = 8 - 1; i >= 0; i--){
-				next_ = (bytes[i] & 128) ? 1 : 0;
-				shifted.bytes[i] = carry | ((bytes[i] << 1) & 255);
+				next_ = (shifted.bytes[i] & 128) ? 1 : 0;
+				shifted.bytes[i] = carry | ((shifted.bytes[i] << 1) & 255);
 				carry = next_;
 			}
 		}

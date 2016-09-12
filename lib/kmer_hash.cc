@@ -64,15 +64,10 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
-    HashType hh;
+    HashType h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
-
-    hh |= twobit_repr(kmer[0]);
-    HashIntoType xx(hh.as_ull());
-    std::cout << "h: " << h << " hh: " << xx <<std::endl;
 
     for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
         h = h << 2;
@@ -82,10 +77,10 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         r |= twobit_comp(kmer[j]);
     }
 
-    _h = h;
-    _r = r;
+    _h = h.as_ull();
+    _r = r.as_ull();
 
-    return uniqify_rc(h, r);
+    return uniqify_rc(h.as_ull(), r.as_ull());
 }
 
 // _hash: return the maximum of the forward and reverse hash.
