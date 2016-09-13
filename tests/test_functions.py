@@ -56,6 +56,9 @@ def test_forward_hash():
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
 
+    h = 13607885392109549066
+    assert khmer.forward_hash('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG', 32) == h
+
 
 def test_get_file_writer_fail():
     somefile = utils.get_temp_filename("potato")

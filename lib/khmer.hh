@@ -99,13 +99,14 @@ private:\
 
 namespace khmer
 {
-class HashType;
+class BigHashType;
 // largest number we can count up to, exactly. (8 bytes)
 typedef unsigned long long int ExactCounterType;
 
 // largest number we're going to hash into. (8 bytes/64 bits/32 nt)
 typedef unsigned long long int HashIntoType;
-const unsigned char KSIZE_MAX = sizeof(HashIntoType)*4;
+//typedef BigHashType HashIntoType;
+const unsigned char KSIZE_MAX = 32;//sizeof(HashIntoType)*4;
 
 // largest size 'k' value for k-mer calculations.  (1 byte/255)
 typedef unsigned char WordLength;

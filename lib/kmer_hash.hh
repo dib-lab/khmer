@@ -45,6 +45,7 @@ Contact: khmer-project@idyll.org
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <tuple>
 
 #include "khmer.hh"
 
@@ -116,23 +117,23 @@ HashIntoType _hash_murmur(const std::string& kmer,
 HashIntoType _hash_murmur_forward(const std::string& kmer);
 
 
-class HashType
+class BigHashType
 {
-	std::array<unsigned char, 8> bytes { {0, 0, 0, 0, 0, 0, 0, 0 } };
 public:
-	HashType() : bytes{{0, 0, 0, 0, 0, 0, 0, 0 }} {};
-	HashType(std::array<unsigned char, 8> const& bytes_) : bytes(bytes_) {};
+	std::array<uint8_t, 8> bytes { {0, 0, 0, 0, 0, 0, 0, 0 } };
+	BigHashType() : bytes{{0, 0, 0, 0, 0, 0, 0, 0 }} {};
+	BigHashType(const std::array<uint8_t, 8>& bytes_) : bytes(bytes_) {};
 
-	unsigned long long int as_ull() {
-		unsigned long long int x(0);
+	uint64_t as_ull() {
+		uint64_t x(0);
 		for (int i = 0; i < 8; i++) {
-			x += pow(256, 8 - i - 1) * bytes[i];
+			x+= ((uint64_t)bytes[i])<<((8-i-1)*8);
 		}
 		return x;
 	}
 
-	HashType operator>>(int shift) {
-		HashType shifted(bytes);
+	BigHashType operator>>(int shift) {
+		BigHashType shifted(bytes);
 		int next_(0);
 		for (int s = 0; s < shift; s++) {
 			int carry(0);
@@ -145,8 +146,8 @@ public:
 		return shifted;
 	}
 
-	HashType operator<<(int shift) {
-		HashType shifted(bytes);
+	BigHashType operator<<(int shift) {
+		BigHashType shifted(bytes);
 		int next_(0);
 		for (int s = 0; s < shift; s++) {
 			int carry(0);
@@ -159,24 +160,33 @@ public:
 		return shifted;
 	}
 
-	HashType operator<<=(int rhs){
+	BigHashType operator<<=(int rhs){
 		*this = *this << rhs;
 		return *this;
 	}
 
-	HashType operator>>=(int rhs){
+	BigHashType operator>>=(int rhs){
 		*this = *this >> rhs;
 		return *this;
 	}
 
-	HashType operator|(int rhs) {
+	BigHashType operator|(uint8_t rhs) {
+		BigHashType n(bytes);
+		n.bytes[7] |= rhs;
+		return n;
+	}
+
+	BigHashType operator|=(uint8_t rhs){
 		bytes[7] |= rhs;
 		return *this;
 	}
 
-	HashType operator|=(int rhs){
-		*this = *this | rhs;
-		return *this;
+	uint8_t operator&(uint8_t rhs) {
+		return bytes[7] & rhs;
+	}
+
+	friend bool operator<(const BigHashType& lhs, const BigHashType& rhs) {
+		return std::tie(lhs.bytes) < std::tie(rhs.bytes);
 	}
 };
 
@@ -230,7 +240,7 @@ public:
     /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
-        kmer_f = kmer_r = kmer_u = 0;
+        //kmer_f = kmer_r = kmer_u = 0;
     }
 
     void set_from_unique_hash(HashIntoType h, WordLength ksize)

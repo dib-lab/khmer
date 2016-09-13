@@ -64,7 +64,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashType h, r;
+    BigHashType h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
@@ -80,7 +80,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
     _h = h.as_ull();
     _r = r.as_ull();
 
-    return uniqify_rc(h.as_ull(), r.as_ull());
+    return uniqify_rc(h, r).as_ull();
 }
 
 // _hash: return the maximum of the forward and reverse hash.
