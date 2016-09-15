@@ -50,7 +50,6 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 class CountingHash;
-class LabelHash;
 
 class Hashbits : public khmer::Hashtable
 {
@@ -217,7 +216,6 @@ public:
 }
 
 #include "counting.hh"
-#include "labelhash.hh"
 #endif // HASHBITS_HH
 
 // vim: set sts=2 sw=2:
