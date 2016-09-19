@@ -83,10 +83,10 @@ class CountingHash : public khmer::Hashtable
 protected:
     bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
     uint32_t _bigcount_spin_lock;
-    std::vector<HashIntoType> _tablesizes;
+    std::vector<uint64_t> _tablesizes;
     size_t _n_tables;
-    HashIntoType _n_unique_kmers;
-    HashIntoType _occupied_bins;
+    uint64_t _n_unique_kmers;
+    uint64_t _occupied_bins;
 
     Byte ** _counts;
 
@@ -103,7 +103,7 @@ protected:
 public:
     KmerCountMap _bigcounts;
 
-    CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
+    CountingHash( WordLength ksize, uint64_t single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
         _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
@@ -112,7 +112,7 @@ public:
         _allocate_counters();
     }
 
-    CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
+    CountingHash( WordLength ksize, std::vector<uint64_t>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
         _n_unique_kmers(0), _occupied_bins(0)
@@ -159,12 +159,12 @@ public:
         return !x;
     }
 
-    std::vector<HashIntoType> get_tablesizes() const
+    std::vector<uint64_t> get_tablesizes() const
     {
         return _tablesizes;
     }
 
-    virtual const HashIntoType n_unique_kmers() const
+    virtual const uint64_t n_unique_kmers() const
     {
         return _n_unique_kmers;
     }
@@ -187,7 +187,7 @@ public:
     }
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied() const
+    virtual const uint64_t n_occupied() const
     {
         return _occupied_bins;
     }
@@ -204,7 +204,7 @@ public:
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
-            const HashIntoType bin = khash % _tablesizes[i];
+            const uint64_t bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
             if (!is_new_kmer) {
                 if (current_count == 0) {
@@ -288,9 +288,9 @@ public:
 
     BoundedCounterType get_max_count(const std::string &s);
 
-    HashIntoType * abundance_distribution(read_parsers::IParser * parser,
+    uint64_t * abundance_distribution(read_parsers::IParser * parser,
                                           Hashbits * tracking);
-    HashIntoType * abundance_distribution(std::string filename,
+    uint64_t * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 
     unsigned long trim_on_abundance(std::string seq,

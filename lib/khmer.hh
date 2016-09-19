@@ -99,13 +99,13 @@ private:\
 
 namespace khmer
 {
-class BigHashType;
+template <typename T=uint8_t, std::size_t N=8> class BigHashType;
 // largest number we can count up to, exactly. (8 bytes)
 typedef unsigned long long int ExactCounterType;
 
 // largest number we're going to hash into. (8 bytes/64 bits/32 nt)
-typedef unsigned long long int HashIntoType;
-//typedef BigHashType HashIntoType;
+//typedef unsigned long long int HashIntoType;
+typedef BigHashType<> HashIntoType;
 const unsigned char KSIZE_MAX = 32;//sizeof(HashIntoType)*4;
 
 // largest size 'k' value for k-mer calculations.  (1 byte/255)

@@ -64,7 +64,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    BigHashType h, r;
+    BigHashType<> h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
@@ -77,18 +77,18 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         r |= twobit_comp(kmer[j]);
     }
 
-    _h = h.as_ull();
-    _r = r.as_ull();
+    _h = h;
+    _r = r;
 
-    return uniqify_rc(h, r).as_ull();
+    return uniqify_rc(h, r);
 }
 
 // _hash: return the maximum of the forward and reverse hash.
 
 HashIntoType _hash(const char * kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash(kmer, k, h, r);
 }
@@ -97,8 +97,8 @@ HashIntoType _hash(const char * kmer, const WordLength k)
 
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
 
     khmer::_hash(kmer, k, h, r);
@@ -170,8 +170,8 @@ std::string _revcomp(const std::string& kmer)
 
 HashIntoType _hash_murmur(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash_murmur(kmer, h, r);
 }
@@ -193,8 +193,8 @@ HashIntoType _hash_murmur(const std::string& kmer,
 
 HashIntoType _hash_murmur_forward(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     khmer::_hash_murmur(kmer, h, r);
     return h;
@@ -204,7 +204,6 @@ KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)
 {
-    bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {
         bitmask = (bitmask << 2) | 3;
     }
@@ -212,8 +211,6 @@ KmerIterator::KmerIterator(const char * seq,
 
     index = _ksize - 1;
     length = strlen(_seq);
-    _kmer_f = 0;
-    _kmer_r = 0;
 
     initialized = false;
 }
