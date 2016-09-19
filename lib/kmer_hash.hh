@@ -122,7 +122,7 @@ class BigHashType
 {
 public:
 	std::array<T, N> bytes;
-	BigHashType() {};
+	BigHashType() : bytes{{0}} {};
 	BigHashType(const std::array<T, N>& bytes_) : bytes(bytes_) {};
 
 	uint64_t as_ull() {
