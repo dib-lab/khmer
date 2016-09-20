@@ -56,7 +56,6 @@ Contact: khmer-project@idyll.org
 #include "hllcounter.hh"
 
 using namespace khmer;
-using namespace read_parsers;
 
 //
 // Python 2/3 compatibility: PyInt and PyLong
@@ -98,6 +97,7 @@ using namespace read_parsers;
 #endif
 
 using namespace khmer;
+using namespace read_parsers;
 
 //
 // Function necessary for Python loading:
@@ -331,8 +331,7 @@ static PyTypeObject khmer_Read_Type = {
 
 typedef struct {
     PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
+    read_parsers::ReadParser<FastxParser>* parser;
 } khmer_ReadParser_Object;
 
 
@@ -349,7 +348,7 @@ static
 void
 _ReadParser_dealloc(khmer_ReadParser_Object * obj)
 {
-    Py_DECREF(obj->parser);
+    delete obj->parser;
     obj->parser = NULL;
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
@@ -384,8 +383,8 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     // Wrap the low-level parser object.
     try {
-        myself->parser =
-            IParser:: get_parser( ifile_name );
+        FastxParser fp(ifile_name);
+        myself->parser = new ReadParser<FastxParser>(fp);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -398,8 +397,8 @@ static
 PyObject *
 _ReadParser_iternext( PyObject * self )
 {
-    khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
-    IParser *       parser  = myself->parser;
+    khmer_ReadParser_Object * myself = (khmer_ReadParser_Object *)self;
+    ReadParser<FastxParser>* parser = myself->parser;
     std::string exc_string;
 
     bool        stop_iteration  = false;
@@ -458,7 +457,7 @@ PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
+    ReadParser<FastxParser>* parser = parent->parser;
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
@@ -568,7 +567,7 @@ static
 PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
-    int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+    int  pair_mode  = ReadParser<FastxParser>::PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
         return NULL;
@@ -669,7 +668,7 @@ void _init_ReadParser_Type_constants()
     // Place pair mode constants into class dictionary.
     int result;
 
-    PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
+    PyObject * value = PyLong_FromLong( ReadParser<FastxParser>::PAIR_MODE_ALLOW_UNPAIRED );
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -682,7 +681,7 @@ void _init_ReadParser_Type_constants()
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    value = PyLong_FromLong( ReadParser<FastxParser>::PAIR_MODE_IGNORE_UNPAIRED );
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -695,7 +694,7 @@ void _init_ReadParser_Type_constants()
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong( ReadParser<FastxParser>::PAIR_MODE_ERROR_ON_UNPAIRED );
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -717,7 +716,7 @@ void _init_ReadParser_Type_constants()
 
 
 static
-read_parsers:: IParser *
+read_parsers::ReadParser<FastxParser>*
 _PyObject_to_khmer_ReadParser( PyObject * py_object )
 {
     // TODO: Add type-checking.
@@ -1353,7 +1352,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser =
+    read_parsers::ReadParser<FastxParser> * rparser =
         _PyObject_to_khmer_ReadParser( rparser_obj );
 
     // call the C++ function, and trap signals => Python
@@ -2059,7 +2058,7 @@ hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser = rparser_obj-> parser;
+    read_parsers::ReadParser<FastxParser> * rparser = rparser_obj-> parser;
 
     // call the C++ function, and trap signals => Python
     const char         *value_exception = NULL;
@@ -3332,7 +3331,7 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         return NULL;
     }
 
-    read_parsers::IParser *rparser      = rparser_obj->parser;
+    read_parsers::ReadParser<FastxParser> *rparser      = rparser_obj->parser;
     Hashbits           *hashbits        = tracking_obj->hashbits;
     HashIntoType       *dist            = NULL;
     const char         *value_exception = NULL;
