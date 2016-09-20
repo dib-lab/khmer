@@ -33,7 +33,7 @@ for ctlfile in args.controls:
     controls.append(countgraph)
     print('Control countgraph loaded', file=sys.stderr)
 
-print('Iterating over case reads', args.case_fastq, '...', sys.stderr)
+print('Iterating over case reads', args.case_fastq, '...', file=sys.stderr)
 for n, record in enumerate(screed.open(args.case_fastq)):
     if n+1 % 1e6 == 0:
         print('    processed', n+1, 'reads...', file=sys.stderr)
@@ -47,4 +47,4 @@ for n, record in enumerate(screed.open(args.case_fastq)):
             continue
 
         ctl_abund_str = '\t'.join([str(a) for a in control_abunds])
-        print(kmer, case_abund, ctl_abund_str)
+        print(kmer, case_abund, ctl_abund_str, sep='\t')
