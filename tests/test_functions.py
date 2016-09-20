@@ -389,14 +389,6 @@ class Test_BrokenPairedReader(object):
         assert m == 3
         assert n == 3, n
 
-    def testMinLength_with_paired(self):
-        x, n, m = self.gather(min_length=4, require_paired=True)
-
-        expected = [('seq1/1', 'seq1/2')]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
     def testForceSingle(self):
         x, n, m = self.gather(force_single=True)
 
@@ -418,3 +410,44 @@ class Test_BrokenPairedReader(object):
         assert x == expected, x
         assert m == 3, m
         assert n == 2, n
+
+
+class Test_BrokenPairedReader_OnPairs(object):
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq3/1', sequence='A' * 3),
+              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+
+    def gather(self, **kw):
+        itr = broken_paired_reader(self.stream, **kw)
+
+        x = []
+        m = 0
+        num = 0
+        for num, is_pair, read1, read2 in itr:
+            if is_pair:
+                x.append((read1.name, read2.name))
+            else:
+                x.append((read1.name, None))
+            m += 1
+
+        return x, num, m
+
+    def testMinLength_with_paired(self):
+        x, n, m = self.gather(min_length=4, require_paired=True)
+
+        expected = [('seq1/1', 'seq1/2')]
+        assert x == expected, x
+        assert m == 1
+        assert n == 0, n
+
+    def testForceSingle(self):
+        x, n, m = self.gather(force_single=True)
+
+        expected = [('seq1/1', None),
+                    ('seq1/2', None),
+                    ('seq3/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x
+        assert m == 4
+        assert n == 3, n
