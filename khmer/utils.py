@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -137,6 +137,14 @@ class UnpairedReadsError(ValueError):
     """ValueError with refs to the read pair in question."""
 
     def __init__(self, msg, r1, r2):
+        r1_name = "<no read>"
+        r2_name = "<no read>"
+        if r1:
+            r1_name = r1.name
+        if r2:
+            r2_name = r2.name
+
+        msg = msg + '\n"{0}"\n"{1}"'.format(r1_name, r2_name)
         ValueError.__init__(self, msg)
         self.read1 = r1
         self.read2 = r2
@@ -176,24 +184,30 @@ def broken_paired_reader(screed_iter, min_length=None,
 
     # handle the majority of the stream.
     for record in screed_iter:
-        # ignore short reads
-        if min_length and len(record.sequence) < min_length:
-            record = None
-            continue
 
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
-                yield num, True, prev_record, record  # it's a pair!
-                num += 2
-                record = None
+                if min_length and (len(prev_record.sequence) < min_length or
+                                   len(record.sequence) < min_length):
+                    if require_paired:
+                        record = None
+                else:
+                    yield num, True, prev_record, record  # it's a pair!
+                    num += 2
+                    record = None
             else:                                   # orphan.
                 if require_paired:
                     err = UnpairedReadsError(
                         "Unpaired reads when require_paired is set!",
                         prev_record, record)
                     raise err
-                yield num, False, prev_record, None
-                num += 1
+
+                # ignore short reads
+                if min_length and len(prev_record.sequence) < min_length:
+                    pass
+                else:
+                    yield num, False, prev_record, None
+                    num += 1
 
         prev_record = record
         record = None
@@ -203,7 +217,10 @@ def broken_paired_reader(screed_iter, min_length=None,
         if require_paired:
             raise UnpairedReadsError("Unpaired reads when require_paired "
                                      "is set!", prev_record, None)
-        yield num, False, prev_record, None
+        if min_length and len(prev_record.sequence) < min_length:
+            pass
+        else:
+            yield num, False, prev_record, None
 
 
 def write_record(record, fileobj):
