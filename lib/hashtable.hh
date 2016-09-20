@@ -86,7 +86,6 @@ namespace khmer
 {
 
 class Hashtable: public
-    KmerFactory  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
@@ -121,14 +120,6 @@ protected:
         delete partition;
     }
 
-    void _init_bitstuff()
-    {
-        bitmask = 0;
-        for (unsigned int i = 0; i < _ksize; i++) {
-            bitmask = (bitmask << 2) | 3;
-        }
-        _nbits_sub_1 = (_ksize*2 - 2);
-    }
 
     void _clear_all_partitions()
     {

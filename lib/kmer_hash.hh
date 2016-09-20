@@ -44,7 +44,10 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <string>
 
+
+#include "MurmurHash3.h"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 
 // test validity
 #ifdef KHMER_EXTRA_SANITY_CHECKS
@@ -96,22 +99,38 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-// two-way hash functions.
-HashIntoType _hash(const char * kmer, const WordLength k);
-HashIntoType _hash(const char * kmer, const WordLength k,
-                   HashIntoType& h, HashIntoType& r);
-HashIntoType _hash(const std::string kmer, const WordLength k);
-HashIntoType _hash(const std::string kmer, const WordLength k,
-                   HashIntoType& h, HashIntoType& r);
-HashIntoType _hash_forward(const char * kmer, WordLength k);
 
-std::string _revhash(HashIntoType hash, WordLength k);
 
-// two-way hash functions, MurmurHash3.
-HashIntoType _hash_murmur(const std::string& kmer);
-HashIntoType _hash_murmur(const std::string& kmer,
-                          HashIntoType& h, HashIntoType& r);
-HashIntoType _hash_murmur_forward(const std::string& kmer);
+std::string _revcomp(const std::string& kmer)
+{
+    std::string out = kmer;
+    size_t ksize = out.size();
+
+    for (size_t i=0; i < ksize; ++i) {
+        char complement;
+
+        switch(kmer[i]) {
+        case 'A':
+            complement = 'T';
+            break;
+        case 'C':
+            complement = 'G';
+            break;
+        case 'G':
+            complement = 'C';
+            break;
+        case 'T':
+            complement = 'A';
+            break;
+        default:
+            throw khmer::khmer_exception("Invalid base in read");
+            break;
+        }
+        out[ksize - i - 1] = complement;
+    }
+    return out;
+}
+
 
 /**
  * \class Kmer
@@ -152,24 +171,17 @@ public:
         kmer_u = u;
     }
 
-    /** @param[in]   s     DNA k-mer
-        @param[in]   ksize k-mer size
-     */
-    Kmer(const std::string s, WordLength ksize)
+    Kmer(HashIntoType f, HashIntoType r)
     {
-        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+        kmer_u = uniqify_rc(f, r);
+        kmer_f = f;
+        kmer_r = r;
     }
 
     /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
         kmer_f = kmer_r = kmer_u = 0;
-    }
-
-    void set_from_unique_hash(HashIntoType h, WordLength ksize)
-    {
-        std::string s = _revhash(h, ksize);
-        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
     }
 
     /// Allows complete backwards compatibility
@@ -183,91 +195,80 @@ public:
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K) const
-    {
-        return _revhash(kmer_u, K);
-    }
-
 };
 
-/**
- * \class KmerFactory
- *
- * \brief Build complete Kmer objects.
- *
- * The KmerFactory is a simple construct to emit complete
- * Kmer objects. The design decision leading to this class
- * stems from the issue of overloading the Kmer constructor
- * while also giving it a K size: you get ambiguous signatures
- * between the (kmer_u, K) and (kmer_f, kmer_r) cases. This
- * implementation also allows a logical architecture wherein
- * KmerIterator and Hashtable inherit directly from KmerFactory,
- * extending the latter's purpose of "create k-mers" to
- * "emit k-mers from a sequence" and "create and store k-mers".
- *
- * \author Camille Scott
- *
- * Contact: camille.scott.w@gmail.com
- *
- */
-class KmerFactory
+
+class BitrepFunctor
 {
-protected:
-    WordLength _ksize;
 
 public:
 
-    explicit KmerFactory(WordLength K): _ksize(K) {}
+    WordLength K;
 
-    /** @param[in]  kmer_u Uniqified hash value.
-     *  @return A complete Kmer object.
-     */
-    Kmer build_kmer(HashIntoType kmer_u)
-    {
-        HashIntoType kmer_f, kmer_r;
-        std:: string kmer_s = _revhash(kmer_u, _ksize);
-        _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+    explicit BitrepFunctor(WordLength K): K(K) {
+        
     }
 
-    /** Call the uniqify function and build a complete Kmer.
-     *
-     *  @param[in]  kmer_f Forward hash value.
-     *  @param[in]  kmer_r Reverse complement hash value.
-     *  @return A complete Kmer object.
-     */
-    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
-    {
-        HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+    Kmer operator()(const char * sequence) const {
+        // sizeof(HashIntoType) * 8 bits / 2 bits/base
+        if (!(K <= sizeof(HashIntoType)*4) || !(strlen(sequence) >= K)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+
+        HashIntoType h = 0, r = 0;
+
+        h |= twobit_repr(sequence[0]);
+        r |= twobit_comp(sequence[K-1]);
+
+        for (WordLength i = 1, j = K - 2; i < K; i++, j--) {
+            h = h << 2;
+            r = r << 2;
+
+            h |= twobit_repr(sequence[i]);
+            r |= twobit_comp(sequence[j]);
+        }
+
+        return Kmer(h, r, uniqify_rc(h, r));
     }
 
-    /** Hash the given sequence and call the uniqify function
-     *  on its results to build a complete Kmer.
-     *
-     *  @param[in]  kmer_s String representation of a k-mer.
-     *  @return A complete Kmer object hashed from the given string.
-     */
-    Kmer build_kmer(std::string kmer_s)
-    {
-        HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+    std::string operator()(Kmer& kmer) const {
+        std::string s = "";
+        HashIntoType hash = (HashIntoType) kmer;
+
+        unsigned int val = hash & 3;
+        s += revtwobit_repr(val);
+
+        for (WordLength i = 1; i < K; i++) {
+            hash = hash >> 2;
+            val = hash & 3;
+            s += revtwobit_repr(val);
+        }
+
+        reverse(s.begin(), s.end());
+
+        return s;
     }
 
-    /** Hash the given sequence and call the uniqify function
-     *  on its results to build a complete Kmer.
-     *
-     *  @param[in]  kmer_c The character array representation of a k-mer.
-     *  @return A complete Kmer object hashed from the given char array.
-     */
-    Kmer build_kmer(const char * kmer_c)
-    {
-        HashIntoType kmer_f, kmer_r, kmer_u;
-        kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
-        return Kmer(kmer_f, kmer_r, kmer_u);
+};
+
+
+class MurmurFunctor
+{
+public:
+    Kmer operator()(const std::string& sequence) {
+        HashIntoType out[2];
+        uint32_t seed = 0;
+        MurmurHash3_x64_128((void *)sequence.c_str(), sequence.size(), seed, &out);
+        HashIntoType h = out[0];
+
+        std::string rev = khmer::_revcomp(sequence);
+        MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
+        HashIntoType r = out[0];
+
+        return Kmer(h, r, h ^ r);
     }
 };
+
 
 /**
  * \class KmerIterator
@@ -300,30 +301,14 @@ protected:
     unsigned int index;
     size_t length;
     bool initialized;
+    BitrepFunctor _hash;
+    
 public:
     KmerIterator(const char * seq, unsigned char k);
 
-    /** @param[in]  f The forward hash value.
-     *  @param[in]  r The reverse complement hash value.
-     *  @return The first Kmer of the sequence.
-     */
-    Kmer first(HashIntoType& f, HashIntoType& r);
+    Kmer first();
 
-    /** @param[in]  f The current forward hash value
-     *  @param[in]  r The current reverse complement hash value
-     *  @return The next Kmer in the sequence
-     */
-    Kmer next(HashIntoType& f, HashIntoType& r);
-
-    Kmer first()
-    {
-        return first(_kmer_f, _kmer_r);
-    }
-
-    Kmer next()
-    {
-        return next(_kmer_f, _kmer_r);
-    }
+    Kmer next();
 
     /// @return Whether or not the iterator has completed.
     bool done()
