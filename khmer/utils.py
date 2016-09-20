@@ -144,7 +144,7 @@ class UnpairedReadsError(ValueError):
         if r2:
             r2_name = r2.name
 
-        msg = msg + '\n"%s"\n"%s"' % (r1_name, r2_name)
+        msg = msg + '\n"{0}"\n"{1}"'.format(r1_name, r2_name)
         ValueError.__init__(self, msg)
         self.read1 = r1
         self.read2 = r2
