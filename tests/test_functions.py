@@ -389,6 +389,14 @@ class Test_BrokenPairedReader(object):
         assert m == 3
         assert n == 3, n
 
+    def testMinLength_with_paired(self):
+        x, n, m = self.gather(min_length=4, require_paired=True)
+
+        expected = [('seq1/1', 'seq1/2')]
+        assert x == expected, x
+        assert m == 3
+        assert n == 3, n
+
     def testForceSingle(self):
         x, n, m = self.gather(force_single=True)
 
