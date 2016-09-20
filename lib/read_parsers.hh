@@ -38,6 +38,10 @@ Contact: khmer-project@idyll.org
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+
 #include <regex.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -114,16 +118,17 @@ public:
 };
 typedef std::pair<Read, Read> ReadPair;
 
-template <typename ParseFunctor>
+template<typename ParseFunctor>
 class ReadParser
 {
 protected:
-    ParseFunctor parser;
+    ParseFunctor _parser;
     size_t _num_reads;
     bool _have_qualities;
     regex_t _re_read_2_nosub;
     regex_t _re_read_1;
     regex_t _re_read_2;
+    void _init();
 
 #if (0)
     void  _imprint_next_read_pair_in_allow_mode(ReadPair& pair);
@@ -144,9 +149,8 @@ public:
     };
 
     // Constructors / destructors
-    explicit ReadParser(ParseFunctor parser);
+    explicit ReadParser(ParseFunctor pf);
     explicit ReadParser(ReadParser& other);
-    ReadParser& operator=(const ReadParser& other);
     virtual ~ReadParser();
 
     // Class methods
@@ -175,19 +179,19 @@ public:
 class FastxParser
 {
 private:
-    std::string filename;
-    seqan::SequenceStream stream;
-    uint32_t seqan_spin_lock;
+    std::string _filename;
+    seqan::SequenceStream _stream;
+    uint32_t _spin_lock;
+    void _init();
 
 public:
     FastxParser();
     FastxParser(std::string& infile);
     FastxParser(FastxParser& other);
-    FastxParser& operator=(const FastxParser& other);
 
     void operator()(Read &read);
     bool is_complete();
-}
+};
 
 inline PartitionID _parse_partition_id(std::string name)
 {
