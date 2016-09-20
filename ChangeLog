@@ -1,3 +1,11 @@
+2016-09-09  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/read_parsers.{cc,hh}: rename SeqAnParser to FastxParser.
+
+2016-09-09  Tim Head  <betatim@gmail.com>
+
+   * tests/test_filter_abund.py: remove for loops introduce to the test suite.
+
 2016-09-01  Tim Head  <betatim@gmail.com>
 
    * khmer/khmer_args.py: added check_argument_range to check an integer
