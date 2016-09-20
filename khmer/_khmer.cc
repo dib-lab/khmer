@@ -5090,19 +5090,24 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 
 static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
-    HashIntoType val;
+    PyObject * val;
+    HashIntoType hash;
     WordLength ksize;
 
-    if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
+    if (!PyArg_ParseTuple(args, "Ob", &val, &ksize)) {
         return NULL;
     }
+    _PyLong_AsByteArray((PyLongObject *)val,
+                        hash.bytes.data(),
+                        hash.bytes.size(), 0, 0);
+    std::cout << hash.as_ull() << std::endl;
 
     if (ksize > KSIZE_MAX) {
         PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
-    return PyUnicode_FromString(_revhash(val, ksize).c_str());
+    return PyUnicode_FromString(_revhash(hash, ksize).c_str());
 }
 
 static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
