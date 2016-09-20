@@ -123,8 +123,6 @@ class ReadParser
 {
 protected:
     ParseFunctor _parser;
-    size_t _num_reads;
-    bool _have_qualities;
     regex_t _re_read_2_nosub;
     regex_t _re_read_1;
     regex_t _re_read_2;
@@ -182,12 +180,15 @@ private:
     std::string _filename;
     seqan::SequenceStream _stream;
     uint32_t _spin_lock;
+    size_t _num_reads;
+    bool _have_qualities;
     void _init();
 
 public:
     FastxParser();
     FastxParser(std::string& infile);
     FastxParser(FastxParser& other);
+    ~FastxParser();
 
     void operator()(Read &read);
     bool is_complete();

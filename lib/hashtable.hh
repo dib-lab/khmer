@@ -61,14 +61,14 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class CountingHash;
-class Hashtable;
+    class CountingHash;
+    class Hashtable;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename ParseFunctor> class ReadParser;
+    }
+}
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -185,8 +185,9 @@ public:
     );
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
+    template<typename ReadFunctor>
     void consume_fasta(
-        read_parsers:: IParser *	    parser,
+        read_parsers::ReadParser<ReadFunctor>* parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
@@ -269,8 +270,9 @@ public:
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
-        read_parsers:: IParser *	    parser,
+        read_parsers::ReadParser<ParseFunctor> * parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
