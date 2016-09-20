@@ -120,20 +120,22 @@ def _runscript(scriptname, sandbox=False):
             scriptname, namespace)
         return 0
     except pkg_resources.ResolutionError:
-        if sandbox:
-            path = os.path.join(os.path.dirname(__file__), "../sandbox")
-        else:
-            path = scriptpath()
+        pass
 
-        scriptfile = os.path.join(path, scriptname)
+    if sandbox:
+        path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    else:
+        path = scriptpath()
+
+    scriptfile = os.path.join(path, scriptname)
+    if os.path.isfile(scriptfile):
         if os.path.isfile(scriptfile):
-            if os.path.isfile(scriptfile):
-                exec(  # pylint: disable=exec-used
-                    compile(open(scriptfile).read(), scriptfile, 'exec'),
-                    namespace)
-                return 0
-        elif sandbox:
-            pytest.skip("sandbox tests are only run in a repository.")
+            exec(# pylint: disable=exec-used
+                 compile(open(scriptfile).read(), scriptfile, 'exec'),
+                 namespace)
+            return 0
+    elif sandbox:
+        pytest.skip("sandbox tests are only run in a repository.")
 
     return -1
 
