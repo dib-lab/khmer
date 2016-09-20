@@ -38,12 +38,12 @@ for n, record in enumerate(screed.open(args.case_fastq)):
     if n+1 % 1e6 == 0:
         print('    processed', n+1, 'reads...', file=sys.stderr)
     for kmer in case.get_kmers(record.sequence):
-        case_abund = case.get_count(kmer)
+        case_abund = case.get(kmer)
         if case_abund < args.case_lower_threshold:
             continue
-        control_abunds = [c.get_count(kmer) for c in controls]
+        control_abunds = [c.get(kmer) for c in controls]
         ctl_thresh_pass = [a > args.control_threshold for a in control_abunds]
-        if False in ctl_thresh_pass:
+        if True in ctl_thresh_pass:
             continue
 
         ctl_abund_str = '\t'.join([str(a) for a in control_abunds])
