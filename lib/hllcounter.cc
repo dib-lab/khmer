@@ -429,7 +429,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (stream_records) {
-                    read.write_to(std::cout);
+                    read.write_fastx(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \

@@ -52,8 +52,6 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-
-
 namespace read_parsers
 {
 
@@ -85,109 +83,111 @@ struct InvalidReadPair : public  khmer_value_exception {
         khmer_value_exception("Invalid read pair detected.") {}
 };
 
-struct Read {
-    std:: string    name;
-    std:: string    annotations;
-    std:: string    sequence;
-    std:: string    quality;
-    // TODO? Add description field.
+class Read
+{
+public:
+    std::string name;
+    std::string annotations;
+    std::string sequence;
+    std::string quality;
 
-    inline void reset ( )
+    inline void reset()
     {
-        name.clear( );
-        annotations.clear( );
-        sequence.clear( );
-        quality.clear( );
+        name.clear();
+        annotations.clear();
+        sequence.clear();
+        quality.clear();
     }
 
-    void write_to(std::ostream&);
+    inline void write_fastx(std::ostream& output)
+    {
+        if (quality.length() != 0) {
+            output << "@" << name << '\n'
+                   << sequence << '\n'
+                   << "+" << '\n'
+                   << quality << '\n';
+        } else {
+            output << ">" << name << '\n'
+                   << sequence << '\n';
+        }
+    }
 };
+typedef std::pair<Read, Read> ReadPair;
 
-typedef std:: pair< Read, Read >	ReadPair;
+template <typename ParseFunctor>
+class ReadParser
+{
+protected:
+    ParseFunctor parser;
+    size_t _num_reads;
+    bool _have_qualities;
+    regex_t _re_read_2_nosub;
+    regex_t _re_read_1;
+    regex_t _re_read_2;
 
-struct IParser {
+#if (0)
+    void  _imprint_next_read_pair_in_allow_mode(ReadPair& pair);
+#endif
+    void  _imprint_next_read_pair_in_ignore_mode(ReadPair& pair);
+    void  _imprint_next_read_pair_in_error_mode(ReadPair& pair);
+    bool  _is_valid_read_pair(
+        ReadPair& pair,
+        regmatch_t &match_1,
+        regmatch_t &match_2
+    );
 
+public:
     enum {
         PAIR_MODE_ALLOW_UNPAIRED = 0,
         PAIR_MODE_IGNORE_UNPAIRED,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
-    static IParser * const  get_parser(
-        std:: string const 	&ifile_name
-    );
+    // Constructors / destructors
+    explicit ReadParser(ParseFunctor parser);
+    explicit ReadParser(ReadParser& other);
+    ReadParser& operator=(const ReadParser& other);
+    virtual ~ReadParser();
 
-    IParser( );
-    virtual ~IParser( );
-
-    virtual bool		is_complete( ) = 0;
-
-    // Note: 'get_next_read' exists for legacy reasons.
-    //	     In the long term, it should be eliminated in favor of direct use of
-    //	     'imprint_next_read'. A potentially costly copy-by-value happens
-    //	     upon return.
-    // TODO: Eliminate all calls to 'get_next_read'.
-    // Or switch to C++11 w/ move constructors
-    inline Read		get_next_read( )
-    {
-        Read the_read;
-        imprint_next_read( the_read );
-        return the_read;
-    }
-    virtual void	imprint_next_read( Read &the_read ) = 0;
-
-    virtual void	imprint_next_read_pair(
-        ReadPair &the_read_pair,
+    // Class methods
+    void imprint_next_read(Read &read);
+    void imprint_next_read_pair(
+        ReadPair &pair,
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
+    size_t get_num_reads();
+    virtual bool is_complete();
 
-    size_t		    get_num_reads()
+    // Note: 'get_next_read' exists for legacy reasons.
+    //       In the long term, it should be eliminated in favor of direct use of
+    //       'imprint_next_read'. A potentially costly copy-by-value happens
+    //       upon return.
+    // TODO: Eliminate all calls to 'get_next_read'.
+    // Or switch to C++11 w/ move constructors
+    inline Read get_next_read()
     {
-        return _num_reads;
+        Read read;
+        imprint_next_read(read);
+        return read;
     }
+}; // struct ReadParser
 
-protected:
-
-    size_t		_num_reads;
-    bool        _have_qualities;
-    regex_t		_re_read_2_nosub;
-    regex_t		_re_read_1;
-    regex_t		_re_read_2;
-
-#if (0)
-    void		_imprint_next_read_pair_in_allow_mode(
-        ReadPair &the_read_pair
-    );
-#endif
-
-    void		_imprint_next_read_pair_in_ignore_mode(
-        ReadPair &the_read_pair
-    );
-    void		_imprint_next_read_pair_in_error_mode(
-        ReadPair &the_read_pair
-    );
-    bool		_is_valid_read_pair(
-        ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
-    );
-
-}; // struct IParser
-
-class FastxParser : public IParser
+class FastxParser
 {
+private:
+    std::string filename;
+    seqan::SequenceStream stream;
+    uint32_t seqan_spin_lock;
 
 public:
-    explicit FastxParser( const char * filename );
-    ~FastxParser( );
+    FastxParser();
+    FastxParser(std::string& infile);
+    FastxParser(FastxParser& other);
+    FastxParser& operator=(const FastxParser& other);
 
-    bool is_complete( );
-    void imprint_next_read(Read &the_read);
-
-private:
-    struct Handle;
-
-    Handle* _private;
-
-};
+    void operator()(Read &read);
+    bool is_complete();
+}
 
 inline PartitionID _parse_partition_id(std::string name)
 {
@@ -204,21 +204,16 @@ inline PartitionID _parse_partition_id(std::string name)
     if (*s == '\t') {
         p = (PartitionID) atoi(s + 1);
     } else {
-        std::cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
+        std::cerr << "consume_partitioned_fasta barfed on read "
+                  << name << "\n";
         throw khmer_exception();
     }
 
     return p;
 }
 
-
-
 } // namespace read_parsers
-
 
 } // namespace khmer
 
-
 #endif // READ_PARSERS_HH
-
-// vim: set ft=cpp sts=4 sw=4 tw=80:

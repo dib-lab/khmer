@@ -50,21 +50,6 @@ namespace khmer
 namespace read_parsers
 {
 
-void
-Read::write_to(std::ostream& output)
-{
-    if (quality.length() != 0) {
-        output << "@" << name << std::endl
-               << sequence << std::endl
-               << "+" << std::endl
-               << quality << std::endl;
-    } else {
-        output << ">" << name << std::endl
-               << sequence << std::endl;
-    }
-}
-
-
 struct FastxParser::Handle {
     seqan::SequenceStream stream;
     uint32_t seqan_spin_lock;
