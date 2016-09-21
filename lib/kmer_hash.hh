@@ -117,22 +117,23 @@ HashIntoType _hash_murmur(const std::string& kmer,
 HashIntoType _hash_murmur_forward(const std::string& kmer);
 
 
-template <typename T, std::size_t N>
+//template <typename T, std::size_t N>
 class BigHashType
 {
 public:
-	std::array<T, N> bytes;
-	BigHashType() : bytes{{0}} {};
-	BigHashType(const std::array<T, N>& bytes_) : bytes(bytes_) {};
-	BigHashType(const uint64_t value) {
-		for (int i = 0; i < 8; i++) {
+	std::size_t N;
+	std::array<uint8_t, 8> bytes;
+	BigHashType() : N(8), bytes{{0}} {};
+	BigHashType(const std::array<uint8_t, 8>& bytes_) : N(8), bytes(bytes_) {};
+	BigHashType(const uint64_t value) : N(8) {
+		for (std::size_t i = 0; i < 8; i++) {
 			bytes[8 - 1 - i] = (value >> (i * 8));
 		}
 	}
 
-	uint64_t as_ull() {
+	uint64_t as_ull() const {
 		uint64_t x(0);
-		for (int i = 0; i < 8; i++) {
+		for (std::size_t i = 0; i < N; i++) {
 			x+= ((uint64_t)bytes[i])<<((8-i-1)*8);
 		}
 		return x;
@@ -191,14 +192,20 @@ public:
 		return tmp;
 	}
 
-	BigHashType operator|(T rhs) {
-		BigHashType<T, N> n(bytes);
-		n.bytes[N - 1] |= rhs;
+	BigHashType operator|(uint64_t rhs) {
+		BigHashType n(bytes);
+		BigHashType rhs_(rhs);
+		for (unsigned int i = 0; i < N; i++) {
+			n.bytes[i] = bytes[i] | rhs_.bytes[i];
+		}
 		return n;
 	}
 
-	BigHashType& operator|=(T rhs){
-		bytes[N - 1] |= rhs;
+	BigHashType& operator|=(uint64_t rhs) {
+		BigHashType rhs_(rhs);
+		for (unsigned int i = 0; i < N; i++) {
+			bytes[i] |= rhs_.bytes[i];
+		}
 		return *this;
 	}
 
@@ -217,7 +224,7 @@ public:
 		return tmp;
 	}
 
-	T operator&(T rhs) {
+	uint8_t operator&(uint8_t rhs) {
 		return bytes[N - 1] & rhs;
 	}
 

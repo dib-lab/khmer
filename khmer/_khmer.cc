@@ -1269,8 +1269,12 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
+    PyObject * val_o;
     HashIntoType val;
-    if (!PyArg_ParseTuple(args, "K", &val)) {
+    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(val_o, val, 0)) {
         return NULL;
     }
 
@@ -4228,9 +4232,13 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
+    PyObject * tag_o;
     HashIntoType tag;
 
-    if (!PyArg_ParseTuple(args, "K", &tag)) {
+    if (!PyArg_ParseTuple(args, "O", &tag_o)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(tag_o, tag, 0)) {
         return NULL;
     }
 

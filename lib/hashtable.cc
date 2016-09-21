@@ -163,7 +163,6 @@ unsigned int Hashtable::consume_string(const std::string &s)
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
-
         count(kmer);
         n_consumed++;
     }
@@ -1080,4 +1079,3 @@ const
 }
 
 // vim: set sts=2 sw=2:
-
