@@ -548,3 +548,18 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
     delete[] buf;
 }
+
+template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxReader>(
+    std:: string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data
+);
+template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data
+);

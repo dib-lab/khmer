@@ -56,6 +56,7 @@ namespace khmer
     namespace read_parsers
     {
         template<typename ParseFunctor> class ReadParser;
+        class FastxReader;
     }
 }
 

@@ -51,7 +51,7 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
@@ -784,4 +784,11 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     gzclose(outfile);
 }
 
-/* vim: set ft=cpp ts=8 sts=4 sw=4 et tw=79 */
+template HashIntoType * CountingHash::abundance_distribution<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    Hashbits * tracking
+);
+template HashIntoType * CountingHash::abundance_distribution<read_parsers::FastxReader>(
+    std::string filename,
+    Hashbits * tracking
+);

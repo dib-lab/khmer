@@ -111,14 +111,9 @@ void Hashtable::consume_fasta(
     unsigned long long &n_consumed
 )
 {
-    ReadParser<ParseFunctor> * parser = ReadParser<ParseFunctor>::get_parser( filename );
-
-    consume_fasta(
-        parser,
-        total_reads, n_consumed
-    );
-
-    delete parser;
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
+    consume_fasta(&parser, total_reads, n_consumed);
 }
 
 template<typename ParseFunctor>
@@ -1072,4 +1067,13 @@ const
     return size;
 }
 
-// vim: set sts=2 sw=2:
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
