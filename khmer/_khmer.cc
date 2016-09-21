@@ -1671,7 +1671,9 @@ hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
 
     PyObject * posns_list = PyList_New(posns.size());
     for (size_t i = 0; i < posns.size(); i++) {
-        PyObject * tup = Py_BuildValue("IK", posns[i], tags[i]);
+        PyObject * tag = _PyLong_FromByteArray(tags[i].bytes.data(),
+                                               tags[i].bytes.size(), 0, 0);
+        PyObject * tup = Py_BuildValue("IO", posns[i], tag);
         PyList_SET_ITEM(posns_list, i, tup);
     }
 
