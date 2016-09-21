@@ -178,6 +178,7 @@ public:
     // Note: Yes, the name 'consume_fasta' is a bit misleading,
     //	     but the FASTA format is effectively a subset of the FASTQ format
     //	     and the FASTA portion is what we care about in this case.
+    template<typename ParseFunctor>
     void consume_fasta(
         std::string const   &filename,
         unsigned int	    &total_reads,
@@ -261,6 +262,7 @@ public:
 
     // Count every k-mer in a FASTA or FASTQ file.
     // Tag certain ones on the connectivity graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -280,7 +282,6 @@ public:
     void consume_sequence_and_tag(const std::string& seq,
                                   unsigned long long& n_consumed,
                                   SeenSet * new_tags = 0);
-
 
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,

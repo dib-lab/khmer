@@ -1327,7 +1327,7 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        hashtable->consume_fasta(filename, total_reads, n_consumed);
+        hashtable->consume_fasta<FastxParser>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -1712,7 +1712,7 @@ hashtable_consume_fasta_and_tag(khmer_KHashtable_Object * me, PyObject * args)
     unsigned int total_reads;
 
     try {
-        hashtable->consume_fasta_and_tag(filename, total_reads, n_consumed);
+        hashtable->consume_fasta_and_tag<FastxParser>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
