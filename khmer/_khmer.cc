@@ -1506,7 +1506,8 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
         HashIntoType h = node_q.front();
         node_q.pop();
         // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", h));
+        PyList_SET_ITEM(x, i, _PyLong_FromByteArray(h.bytes.data(),
+                                                    h.bytes.size(), 0, 0));
     }
 
     return x;
