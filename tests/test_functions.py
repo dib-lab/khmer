@@ -102,6 +102,26 @@ def test_reverse_hash():
     assert s == "GGGG"
 
 
+def test_reverse_hash_longs():
+    # test explicitly with long integers, only needed for python2
+    # the builtin `long` exists in the global scope
+    global long
+    if sys.version_info > (3,):
+        long = int
+
+    s = khmer.reverse_hash(long(0), 4)
+    assert s == "AAAA"
+
+    s = khmer.reverse_hash(long(85), 4)
+    assert s == "TTTT"
+
+    s = khmer.reverse_hash(long(170), 4)
+    assert s == "CCCC"
+
+    s = khmer.reverse_hash(long(255), 4)
+    assert s == "GGGG"
+
+
 def test_reverse_hash_raises():
     with pytest.raises(ValueError) as excinfo:
         s = khmer.reverse_hash('2345', 4)
