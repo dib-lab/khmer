@@ -118,12 +118,14 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
     if (PyInt_Check(value) || PyLong_Check(value)) {
         HashIntoType h;
         if (PyLong_Check(value)) {
-            //h = PyLong_AsUnsignedLongLong(value);
             _PyLong_AsByteArray((PyLongObject *)value,
-                                (unsigned char *)&h.bytes,
+                                h.bytes.data(),
                                 h.bytes.size(), 0, 0);
         } else {
-            //h = PyInt_AsLong(value);
+            PyObject * long_val = PyLong_FromLong(PyInt_AsLong(value));
+            _PyLong_AsByteArray((PyLongObject *)long_val,
+                                h.bytes.data(),
+                                h.bytes.size(), 0, 0);
         }
 
         kmer.set_from_unique_hash(h, ksize);
@@ -5097,10 +5099,19 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "Ob", &val, &ksize)) {
         return NULL;
     }
-    _PyLong_AsByteArray((PyLongObject *)val,
-                        hash.bytes.data(),
-                        hash.bytes.size(), 0, 0);
-    std::cout << hash.as_ull() << std::endl;
+    if (PyLong_Check(val)) {
+        _PyLong_AsByteArray((PyLongObject *)val,
+                            hash.bytes.data(),
+                            hash.bytes.size(), 0, 0);
+    } else if (PyInt_Check(val)) {
+        PyObject * long_val = PyLong_FromLong(PyInt_AsLong(val));
+        _PyLong_AsByteArray((PyLongObject *)long_val, hash.bytes.data(),
+                            hash.bytes.size(), 0, 0);
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "Hash value must be an integer.");
+        return NULL;
+    }
 
     if (ksize > KSIZE_MAX) {
         PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);

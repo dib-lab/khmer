@@ -40,6 +40,7 @@ import khmer
 import os
 import sys
 import collections
+import pytest
 from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
@@ -99,6 +100,13 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_hash_raises():
+    with pytest.raises(ValueError) as excinfo:
+        s = khmer.reverse_hash('2345', 4)
+
+    assert 'must be an integer' in str(excinfo.value)
 
 
 def test_hash_murmur3():
