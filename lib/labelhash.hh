@@ -51,13 +51,13 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class Hashtable;
+    class Hashtable;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename ParseFunctor> class ReadParser;
+    }
+}
 
 namespace khmer
 {
@@ -145,7 +145,7 @@ public:
         return all_labels.size();
     }
 
-
+    template<typename ParseFunctor>
     void consume_fasta_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -153,13 +153,15 @@ public:
         CallbackFn	  callback	  = NULL,
         void *		  callback_data	  = NULL);
 
+    template<typename ParseFunctor>
     void consume_fasta_and_tag_with_labels(
-        read_parsers:: IParser *	    parser,
+        read_parsers::ReadParser<ParseFunctor> * parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
         CallbackFn	    callback	    = NULL,
         void *		    callback_data   = NULL);
 
+    template<typename ParseFunctor>
     void consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
             unsigned int &total_reads,
             unsigned long long &n_consumed,

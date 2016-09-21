@@ -4017,7 +4017,7 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
 
     //Py_BEGIN_ALLOW_THREADS
     try {
-        hb->consume_fasta_and_tag_with_labels(filename, total_reads,
+        hb->consume_fasta_and_tag_with_labels<FastxParser>(filename, total_reads,
                                               n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
@@ -4059,7 +4059,7 @@ labelhash_consume_partitioned_fasta_and_tag_with_labels(
     unsigned int        total_reads = 0;
 
     try {
-        labelhash->consume_partitioned_fasta_and_tag_with_labels(filename,
+        labelhash->consume_partitioned_fasta_and_tag_with_labels<FastxParser>(filename,
                 total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
