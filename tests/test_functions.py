@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -337,6 +337,22 @@ def test_check_is_left():
         '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
 
 
+def gather(stream, **kw):
+    itr = broken_paired_reader(stream, **kw)
+
+    x = []
+    m = 0
+    num = 0
+    for num, is_pair, read1, read2 in itr:
+        if is_pair:
+            x.append((read1.name, read2.name))
+        else:
+            x.append((read1.name, None))
+        m += 1
+
+    return x, num, m
+
+
 class Test_BrokenPairedReader(object):
     stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
               FakeFastaRead(name='seq1/2', sequence='A' * 4),
@@ -344,23 +360,8 @@ class Test_BrokenPairedReader(object):
               FakeFastaRead(name='seq3/1', sequence='A' * 3),
               FakeFastaRead(name='seq3/2', sequence='A' * 5)]
 
-    def gather(self, **kw):
-        itr = broken_paired_reader(self.stream, **kw)
-
-        x = []
-        m = 0
-        num = 0
-        for num, is_pair, read1, read2 in itr:
-            if is_pair:
-                x.append((read1.name, read2.name))
-            else:
-                x.append((read1.name, None))
-            m += 1
-
-        return x, num, m
-
     def testDefault(self):
-        x, n, m = self.gather(min_length=1)
+        x, n, m = gather(self.stream, min_length=1)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -370,7 +371,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testMinLength(self):
-        x, n, m = self.gather(min_length=3)
+        x, n, m = gather(self.stream, min_length=3)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -380,7 +381,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testMinLength_2(self):
-        x, n, m = self.gather(min_length=4)
+        x, n, m = gather(self.stream, min_length=4)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -390,7 +391,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testForceSingle(self):
-        x, n, m = self.gather(force_single=True)
+        x, n, m = gather(self.stream, force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq1/2', None),
@@ -402,7 +403,7 @@ class Test_BrokenPairedReader(object):
         assert n == 4, n
 
     def testForceSingleAndMinLength(self):
-        x, n, m = self.gather(min_length=5, force_single=True)
+        x, n, m = gather(self.stream, min_length=5, force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq2/1', None),
@@ -410,3 +411,59 @@ class Test_BrokenPairedReader(object):
         assert x == expected, x
         assert m == 3, m
         assert n == 2, n
+
+
+def test_BrokenPairedReader_OnPairs():
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq3/1', sequence='A' * 3),
+              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_2():
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq3/1', sequence='A' * 5),   # switched
+              FakeFastaRead(name='seq3/2', sequence='A' * 3)]   # wrt previous
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_3():
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq3/1', sequence='A' * 3),   # both short
+              FakeFastaRead(name='seq3/2', sequence='A' * 3)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_4():
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 3),  # too short
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq3/1', sequence='A' * 4),
+              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq3/1', 'seq3/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n

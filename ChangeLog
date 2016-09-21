@@ -1,3 +1,11 @@
+2016-09-20  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: fixed bug in broken_paired_reader when short reads
+   are discarded and require_paired is set; improved read pair error reporting.
+   * tests/test_functions.py: added tests for broken_paired_reader fix.
+   * tests/khmer_tst_utils.py: de-nested exceptions for better error reporting
+   from tests.
+
 2016-09-09  Daniel Standage  <daniel.standage@gmail.com>
 
    * lib/read_parsers.{cc,hh}: rename SeqAnParser to FastxParser.
