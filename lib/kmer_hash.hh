@@ -124,6 +124,11 @@ public:
 	std::array<T, N> bytes;
 	BigHashType() : bytes{{0}} {};
 	BigHashType(const std::array<T, N>& bytes_) : bytes(bytes_) {};
+	BigHashType(const uint64_t value) {
+		for (int i = 0; i < 8; i++) {
+			bytes[8 - 1 - i] = (value >> (i * 8));
+		}
+	}
 
 	uint64_t as_ull() {
 		uint64_t x(0);
@@ -131,6 +136,13 @@ public:
 			x+= ((uint64_t)bytes[i])<<((8-i-1)*8);
 		}
 		return x;
+	}
+
+	BigHashType& operator=(const uint64_t value) {
+		for (int i = 0; i < 8; i++) {
+			bytes[8 - 1 - i] = (value >> (i * 8));
+		}
+		return *this;
 	}
 
 	BigHashType operator>>(int shift) {
@@ -161,12 +173,12 @@ public:
 		return shifted;
 	}
 
-	BigHashType operator<<=(int rhs){
+	BigHashType& operator<<=(int rhs){
 		*this = *this << rhs;
 		return *this;
 	}
 
-	BigHashType operator>>=(int rhs){
+	BigHashType& operator>>=(int rhs){
 		*this = *this >> rhs;
 		return *this;
 	}
@@ -185,12 +197,12 @@ public:
 		return n;
 	}
 
-	BigHashType operator|=(T rhs){
+	BigHashType& operator|=(T rhs){
 		bytes[N - 1] |= rhs;
 		return *this;
 	}
 
-	BigHashType operator&=(const BigHashType& rhs) {
+	BigHashType& operator&=(const BigHashType& rhs) {
 		for (unsigned int i = 0; i < N; i++) {
 			bytes[i] &= rhs.bytes[i];
 		}
