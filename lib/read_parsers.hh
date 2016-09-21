@@ -174,7 +174,7 @@ public:
     }
 }; // struct ReadParser
 
-class FastxParser
+class FastxReader
 {
 private:
     std::string _filename;
@@ -185,13 +185,14 @@ private:
     void _init();
 
 public:
-    FastxParser();
-    FastxParser(std::string& infile);
-    FastxParser(FastxParser& other);
-    ~FastxParser();
+    FastxReader();
+    FastxReader(std::string& infile);
+    FastxReader(FastxReader& other);
+    ~FastxReader();
 
     void operator()(Read &read);
     bool is_complete();
+    size_t get_num_reads();
 };
 
 inline PartitionID _parse_partition_id(std::string name)

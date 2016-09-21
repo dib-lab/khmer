@@ -112,7 +112,7 @@ void SubsetPartition::count_partitions(
     n_partitions = partitions.size();
 }
 
-
+template<typename ParseFunctor>
 size_t SubsetPartition::output_partitioned_file(
     const std::string	&infilename,
     const std::string	&outputfile,
@@ -120,7 +120,8 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    IParser* parser = IParser::get_parser(infilename);
+    ParseFunctor reader(infilename);
+    ReadParser<ParseFunctor> parser(reader);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
@@ -141,9 +142,9 @@ size_t SubsetPartition::output_partitioned_file(
     // and output them.
     //
 
-    while(!parser->is_complete()) {
+    while(!parser.is_complete()) {
         try {
-            read = parser->get_next_read();
+            read = parser.get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
@@ -208,9 +209,6 @@ size_t SubsetPartition::output_partitioned_file(
             }
         }
     }
-
-    delete parser;
-    parser = NULL;
 
     return partitions.size() + n_singletons;
 }

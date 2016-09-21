@@ -127,7 +127,7 @@ void ReadParser<ParseFunctor>::imprint_next_read_pair(ReadPair &pair, uint8_t mo
 template<typename ParseFunctor>
 size_t ReadParser<ParseFunctor>::get_num_reads()
 {
-    return _parser._num_reads;
+    return _parser.get_num_reads();
 }
 
 template<typename ParseFunctor>
@@ -227,7 +227,7 @@ bool ReadParser<ParseFunctor>::_is_valid_read_pair(
 }
 
 
-void FastxParser::_init()
+void FastxReader::_init()
 {
     seqan::open(_stream, _filename.c_str());
     if (!seqan::isGood(_stream)) {
@@ -242,13 +242,13 @@ void FastxParser::_init()
     __asm__ __volatile__ ("" ::: "memory");
 }
 
-FastxParser::FastxParser()
+FastxReader::FastxReader()
         : _filename("-"), _spin_lock(0), _num_reads(0), _have_qualities(false)
 {
     _init();
 }
 
-FastxParser::FastxParser(std::string& infile)
+FastxReader::FastxReader(std::string& infile)
         : _filename(infile),
           _spin_lock(0),
           _num_reads(0),
@@ -257,17 +257,22 @@ FastxParser::FastxParser(std::string& infile)
     _init();
 }
 
-FastxParser::~FastxParser()
+FastxReader::~FastxReader()
 {
     seqan::close(_stream);
 }
 
-bool FastxParser::is_complete()
+bool FastxReader::is_complete()
 {
     return !seqan::isGood(_stream) || seqan::atEnd(_stream);
 }
 
-void FastxParser::operator()(Read& read)
+size_t FastxReader::get_num_reads()
+{
+    return _num_reads;
+}
+
+void FastxReader::operator()(Read& read)
 {
     read.reset();
     int ret = -1;
@@ -310,6 +315,9 @@ void FastxParser::operator()(Read& read)
         throw StreamReadError();
     }
 }
+
+// All template instantiations used in the codebase must be declared here.
+template class ReadParser<FastxReader>;
 
 } // namespace read_parsers
 

@@ -64,11 +64,13 @@ public:
 
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
+    template<typename ParseFunctor>
     void consume_fasta(std::string const &,
                        bool,
                        unsigned int &,
                        unsigned long long &);
-    void consume_fasta(read_parsers::IParser *,
+    template<typename ParseFunctor>
+    void consume_fasta(read_parsers::ReadParser<ParseFunctor> *,
                        bool,
                        unsigned int &,
                        unsigned long long &);

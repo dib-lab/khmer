@@ -510,6 +510,7 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
 
+template<typename ParseFunctor>
 void Hashtable::consume_partitioned_fasta(const std::string &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed)
@@ -517,8 +518,8 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
     total_reads = 0;
     n_consumed = 0;
 
-    FastxParser fp((std::string&)filename);
-    ReadParser<FastxParser> parser(fp);
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
     Read read;
 
     string seq = "";

@@ -145,6 +145,7 @@ public:
     void count_partitions(size_t& n_partitions,
                           size_t& n_unassigned);
 
+    template<typename ParseFunctor>
     size_t output_partitioned_file(const std::string &infilename,
                                    const std::string &outputfilename,
                                    bool output_unassigned=false,

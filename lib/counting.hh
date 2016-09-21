@@ -291,6 +291,7 @@ public:
     template<typename ParseFunctor>
     HashIntoType * abundance_distribution(read_parsers::ReadParser<ParseFunctor> * parser,
                                           Hashbits * tracking);
+    template<typename ParseFunctor>
     HashIntoType * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 

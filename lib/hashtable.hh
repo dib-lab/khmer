@@ -283,6 +283,7 @@ public:
                                   unsigned long long& n_consumed,
                                   SeenSet * new_tags = 0);
 
+    template<typename ParseFunctor>
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);

@@ -89,9 +89,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
     return max_count;
 }
 
-HashIntoType *
-CountingHash::abundance_distribution(
-    read_parsers::IParser * parser,
+template<typename ParseFunctor>
+HashIntoType * CountingHash::abundance_distribution(
+    read_parsers::ReadParser<ParseFunctor> * parser,
     Hashbits *          tracking)
 {
     HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
@@ -141,15 +141,14 @@ CountingHash::abundance_distribution(
     return dist;
 }
 
-
+template<typename ParseFunctor>
 HashIntoType * CountingHash::abundance_distribution(
     std::string filename,
     Hashbits *  tracking)
 {
-    IParser* parser = IParser::get_parser(filename.c_str());
-
-    HashIntoType * distribution = abundance_distribution(parser, tracking);
-    delete parser;
+    ParseFunctor reader(filename);
+    ReadParser<ParseFunctor> parser(reader);
+    HashIntoType * distribution = abundance_distribution(&parser, tracking);
     return distribution;
 }
 
