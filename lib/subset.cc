@@ -112,7 +112,6 @@ void SubsetPartition::count_partitions(
     n_partitions = partitions.size();
 }
 
-
 size_t SubsetPartition::output_partitioned_file(
     const std::string	&infilename,
     const std::string	&outputfile,
@@ -120,7 +119,8 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    IParser* parser = IParser::get_parser(infilename);
+    FastxReader reader((std::string&)infilename);
+    ReadParser<FastxReader> parser(reader);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
@@ -141,9 +141,9 @@ size_t SubsetPartition::output_partitioned_file(
     // and output them.
     //
 
-    while(!parser->is_complete()) {
+    while(!parser.is_complete()) {
         try {
-            read = parser->get_next_read();
+            read = parser.get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
@@ -200,17 +200,12 @@ size_t SubsetPartition::output_partitioned_file(
                     callback("output_partitions", callback_data,
                              total_reads, reads_kept);
                 } catch (...) {
-                    delete parser;
-                    parser = NULL;
                     outfile.close();
                     throw;
                 }
             }
         }
     }
-
-    delete parser;
-    parser = NULL;
 
     return partitions.size() + n_singletons;
 }

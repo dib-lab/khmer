@@ -52,13 +52,14 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class Hashbits;
+    class Hashbits;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename ParseFunctor> class ReadParser;
+        class FastxReader;
+    }
+}
 
 namespace khmer
 {
@@ -288,8 +289,10 @@ public:
 
     BoundedCounterType get_max_count(const std::string &s);
 
-    HashIntoType * abundance_distribution(read_parsers::IParser * parser,
+    template<typename ParseFunctor>
+    HashIntoType * abundance_distribution(read_parsers::ReadParser<ParseFunctor> * parser,
                                           Hashbits * tracking);
+    template<typename ParseFunctor>
     HashIntoType * abundance_distribution(std::string filename,
                                           Hashbits * tracking);
 

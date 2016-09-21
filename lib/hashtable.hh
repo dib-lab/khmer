@@ -61,14 +61,15 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class CountingHash;
-class Hashtable;
+    class CountingHash;
+    class Hashtable;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename ParseFunctor> class ReadParser;
+        class FastxReader;
+    }
+}
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -178,6 +179,7 @@ public:
     // Note: Yes, the name 'consume_fasta' is a bit misleading,
     //	     but the FASTA format is effectively a subset of the FASTQ format
     //	     and the FASTA portion is what we care about in this case.
+    template<typename ParseFunctor>
     void consume_fasta(
         std::string const   &filename,
         unsigned int	    &total_reads,
@@ -185,8 +187,9 @@ public:
     );
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
+    template<typename ReadFunctor>
     void consume_fasta(
-        read_parsers:: IParser *	    parser,
+        read_parsers::ReadParser<ReadFunctor>* parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
@@ -260,6 +263,7 @@ public:
 
     // Count every k-mer in a FASTA or FASTQ file.
     // Tag certain ones on the connectivity graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -269,8 +273,9 @@ public:
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
-        read_parsers:: IParser *	    parser,
+        read_parsers::ReadParser<ParseFunctor> * parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
@@ -279,7 +284,7 @@ public:
                                   unsigned long long& n_consumed,
                                   SeenSet * new_tags = 0);
 
-
+    template<typename ParseFunctor>
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
@@ -344,7 +349,8 @@ public:
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
 };
-}
+
+} // namespace khmer
 
 
 

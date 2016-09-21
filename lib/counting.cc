@@ -51,7 +51,10 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
+
+namespace khmer
+{
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
@@ -89,9 +92,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
     return max_count;
 }
 
-HashIntoType *
-CountingHash::abundance_distribution(
-    read_parsers::IParser * parser,
+template<typename ParseFunctor>
+HashIntoType * CountingHash::abundance_distribution(
+    read_parsers::ReadParser<ParseFunctor> * parser,
     Hashbits *          tracking)
 {
     HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
@@ -141,15 +144,14 @@ CountingHash::abundance_distribution(
     return dist;
 }
 
-
+template<typename ParseFunctor>
 HashIntoType * CountingHash::abundance_distribution(
     std::string filename,
     Hashbits *  tracking)
 {
-    IParser* parser = IParser::get_parser(filename.c_str());
-
-    HashIntoType * distribution = abundance_distribution(parser, tracking);
-    delete parser;
+    ParseFunctor reader(filename);
+    ReadParser<ParseFunctor> parser(reader);
+    HashIntoType * distribution = abundance_distribution<ParseFunctor>(&parser, tracking);
     return distribution;
 }
 
@@ -785,4 +787,13 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     gzclose(outfile);
 }
 
-/* vim: set ft=cpp ts=8 sts=4 sw=4 et tw=79 */
+template HashIntoType * CountingHash::abundance_distribution<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    Hashbits * tracking
+);
+template HashIntoType * CountingHash::abundance_distribution<read_parsers::FastxReader>(
+    std::string filename,
+    Hashbits * tracking
+);
+
+}

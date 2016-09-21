@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2014-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -46,15 +46,6 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
-
-
-namespace khmer
-{
 
 class HLLCounter
 {
@@ -68,7 +59,7 @@ public:
                        bool,
                        unsigned int &,
                        unsigned long long &);
-    void consume_fasta(read_parsers::IParser *,
+    void consume_fasta(read_parsers::ReadParser<read_parsers::FastxReader> *,
                        bool,
                        unsigned int &,
                        unsigned long long &);

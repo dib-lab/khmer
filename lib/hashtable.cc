@@ -52,7 +52,10 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
+
+namespace khmer
+{
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -104,28 +107,21 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 //
 
 // TODO? Inline in header.
-void
-Hashtable::
-consume_fasta(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed
+template<typename ParseFunctor>
+void Hashtable::consume_fasta(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
-    consume_fasta(
-        parser,
-        total_reads, n_consumed
-    );
-
-    delete parser;
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
+    consume_fasta(&parser, total_reads, n_consumed);
 }
 
-void
-Hashtable::
-consume_fasta(
-    read_parsers:: IParser *  parser,
+template<typename ParseFunctor>
+void Hashtable::consume_fasta(
+    read_parsers::ReadParser<ParseFunctor> * parser,
     unsigned int		    &total_reads, unsigned long long  &n_consumed
 )
 {
@@ -441,28 +437,23 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 //
 
 // TODO? Inline in header.
-void
-Hashtable::
-consume_fasta_and_tag(
+template<typename ParseFunctor>
+void Hashtable::consume_fasta_and_tag(
     std:: string const  &filename,
     unsigned int	      &total_reads, unsigned long long	&n_consumed
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
+    ParseFunctor pf(filename);
+    ReadParser<ParseFunctor> parser(pf);
     consume_fasta_and_tag(
         parser,
         total_reads, n_consumed
     );
-
-    delete parser;
 }
 
-void
-Hashtable::
-consume_fasta_and_tag(
-    read_parsers:: IParser *  parser,
+template<typename ParseFunctor>
+void Hashtable::consume_fasta_and_tag(
+    read_parsers::ReadParser<ParseFunctor> * parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed
 )
 {
@@ -517,6 +508,7 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
 
+template<typename ParseFunctor>
 void Hashtable::consume_partitioned_fasta(const std::string &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed)
@@ -524,7 +516,8 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
     total_reads = 0;
     n_consumed = 0;
 
-    IParser* parser = IParser::get_parser(filename.c_str());
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
     Read read;
 
     string seq = "";
@@ -537,9 +530,9 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
     // iterate through the FASTA file & consume the reads.
     //
 
-    while(!parser->is_complete())  {
+    while(!parser.is_complete())  {
         try {
-            read = parser->get_next_read();
+            read = parser.get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
@@ -563,8 +556,6 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
         // reset the sequence info, increment read number
         total_reads++;
     }
-
-    delete parser;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1079,5 +1070,15 @@ const
     return size;
 }
 
-// vim: set sts=2 sw=2:
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
 
+} // namespace khmer

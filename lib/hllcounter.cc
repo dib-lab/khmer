@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2014-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -381,15 +381,13 @@ void HLLCounter::consume_fasta(
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
-
-    consume_fasta(parser, stream_records, total_reads, n_consumed);
-
-    delete parser;
+    read_parsers::FastxReader reader((std::string&)filename);
+    read_parsers::ReadParser<read_parsers::FastxReader> parser(reader);
+    consume_fasta(&parser, stream_records, total_reads, n_consumed);
 }
 
 void HLLCounter::consume_fasta(
-    read_parsers::IParser *parser,
+    read_parsers::ReadParser<read_parsers::FastxReader> *parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
@@ -429,7 +427,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (stream_records) {
-                    read.write_to(std::cout);
+                    read.write_fastx(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
