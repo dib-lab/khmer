@@ -52,7 +52,10 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
+
+namespace khmer
+{
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -1077,3 +1080,5 @@ template void Hashtable::consume_fasta<read_parsers::FastxReader>(
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+
+} // namespace khmer

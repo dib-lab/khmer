@@ -191,7 +191,8 @@ public:
     void load_labels_and_tags(std::string);
 
 };
-}
+
+} // namespace khmer
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));

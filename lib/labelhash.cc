@@ -55,7 +55,10 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
+
+namespace khmer
+{
 
 /*
  * @camillescott
@@ -563,3 +566,5 @@ template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxRe
     CallbackFn callback,
     void * callback_data
 );
+
+}

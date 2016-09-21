@@ -349,7 +349,8 @@ public:
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
 };
-}
+
+} // namespace khmer
 
 
 

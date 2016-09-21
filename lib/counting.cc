@@ -53,6 +53,9 @@ using namespace std;
 using namespace khmer;
 using namespace khmer::read_parsers;
 
+namespace khmer
+{
+
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KmerIterator kmers(s.c_str(), _ksize);
@@ -792,3 +795,5 @@ template HashIntoType * CountingHash::abundance_distribution<read_parsers::Fastx
     std::string filename,
     Hashbits * tracking
 );
+
+}
