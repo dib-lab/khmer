@@ -618,7 +618,7 @@ static PyTypeObject khmer_ReadParser_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
-    "_khmer.ReadParser",                        /* tp_name */
+    "_khmer.ReadParser",                       /* tp_name */
     sizeof(khmer_ReadParser_Object),           /* tp_basicsize */
     0,                                         /* tp_itemsize */
     (destructor)_ReadParser_dealloc,           /* tp_dealloc */
@@ -2293,7 +2293,7 @@ hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
 
     try {
         SubsetPartition * subset_p = hashtable->partition;
-        n_partitions = subset_p->output_partitioned_file<FastxReader>(filename,
+        n_partitions = subset_p->output_partitioned_file(filename,
                        output,
                        output_unassigned);
     } catch (khmer_file_exception &e) {
@@ -3340,7 +3340,7 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        dist = counting->abundance_distribution(rparser, hashbits);
+        dist = counting->abundance_distribution<FastxReader>(rparser, hashbits);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -4772,7 +4772,7 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta<FastxReader>(filename, stream_records, total_reads,
+        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
                                       n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());

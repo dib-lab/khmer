@@ -112,7 +112,6 @@ void SubsetPartition::count_partitions(
     n_partitions = partitions.size();
 }
 
-template<typename ParseFunctor>
 size_t SubsetPartition::output_partitioned_file(
     const std::string	&infilename,
     const std::string	&outputfile,
@@ -120,8 +119,8 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    ParseFunctor reader(infilename);
-    ReadParser<ParseFunctor> parser(reader);
+    FastxReader reader((std::string&)infilename);
+    ReadParser<FastxReader> parser(reader);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
@@ -201,8 +200,6 @@ size_t SubsetPartition::output_partitioned_file(
                     callback("output_partitions", callback_data,
                              total_reads, reads_kept);
                 } catch (...) {
-                    delete parser;
-                    parser = NULL;
                     outfile.close();
                     throw;
                 }

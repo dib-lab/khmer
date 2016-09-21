@@ -46,15 +46,11 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
+
 namespace read_parsers
 {
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
-
-
-namespace khmer
-{
+    template<typename ParseFunctor> class ReadParser;
+}
 
 class HLLCounter
 {
@@ -64,13 +60,11 @@ public:
 
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
-    template<typename ParseFunctor>
     void consume_fasta(std::string const &,
                        bool,
                        unsigned int &,
                        unsigned long long &);
-    template<typename ParseFunctor>
-    void consume_fasta(read_parsers::ReadParser<ParseFunctor> *,
+    void consume_fasta(read_parsers::ReadParser<read_parsers::FastxReader> *,
                        bool,
                        unsigned int &,
                        unsigned long long &);

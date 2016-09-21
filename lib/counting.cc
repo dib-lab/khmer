@@ -148,7 +148,7 @@ HashIntoType * CountingHash::abundance_distribution(
 {
     ParseFunctor reader(filename);
     ReadParser<ParseFunctor> parser(reader);
-    HashIntoType * distribution = abundance_distribution(&parser, tracking);
+    HashIntoType * distribution = abundance_distribution<ParseFunctor>(&parser, tracking);
     return distribution;
 }
 

@@ -375,21 +375,19 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     return n_consumed;
 }
 
-template<typename ParseFunctor>
 void HLLCounter::consume_fasta(
     std::string const &filename,
     bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    ParseFunctor reader(filename);
-    read_parsers::ReadParser<ParseFunctor> parser(reader);
+    read_parsers::FastxReader reader((std::string&)filename);
+    read_parsers::ReadParser<read_parsers::FastxReader> parser(reader);
     consume_fasta(&parser, stream_records, total_reads, n_consumed);
 }
 
-template<typename ParseFunctor>
 void HLLCounter::consume_fasta(
-    read_parsers::ReadParser<ParseFunctor> *parser,
+    read_parsers::ReadParser<read_parsers::FastxReader> *parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
