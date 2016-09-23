@@ -104,8 +104,8 @@ def test_reverse_hash():
 
 def test_reverse_hash_longs():
     # test explicitly with long integers, only needed for python2
-    # the builtin `long` exists in the global scope
-    global long
+    # the builtin `long` exists in the global scope only
+    global long # pylint: disable=global-variable-undefined
     if sys.version_info > (3,):
         long = int
 
@@ -124,7 +124,7 @@ def test_reverse_hash_longs():
 
 def test_reverse_hash_raises():
     with pytest.raises(TypeError) as excinfo:
-        s = khmer.reverse_hash('2345', 4)
+        khmer.reverse_hash('2345', 4)
 
     assert 'must be int' in str(excinfo.value)
 
