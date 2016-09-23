@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -41,6 +41,7 @@ import khmer
 import os
 import sys
 import collections
+import pytest
 from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
@@ -56,6 +57,9 @@ def test_forward_hash():
     assert khmer.forward_hash('TTTT', 4) == 0
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
+
+    h = 13607885392109549066
+    assert khmer.forward_hash('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG', 32) == h
 
 
 def test_get_file_writer_fail():
@@ -97,6 +101,33 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_hash_longs():
+    # test explicitly with long integers, only needed for python2
+    # the builtin `long` exists in the global scope only
+    global long # pylint: disable=global-variable-undefined
+    if sys.version_info > (3,):
+        long = int
+
+    s = khmer.reverse_hash(long(0), 4)
+    assert s == "AAAA"
+
+    s = khmer.reverse_hash(long(85), 4)
+    assert s == "TTTT"
+
+    s = khmer.reverse_hash(long(170), 4)
+    assert s == "CCCC"
+
+    s = khmer.reverse_hash(long(255), 4)
+    assert s == "GGGG"
+
+
+def test_reverse_hash_raises():
+    with pytest.raises(TypeError) as excinfo:
+        khmer.reverse_hash('2345', 4)
+
+    assert 'int' in str(excinfo.value)
 
 
 def test_hash_murmur3():
@@ -334,6 +365,22 @@ def test_check_is_left():
         '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
 
 
+def gather(stream, **kw):
+    itr = broken_paired_reader(stream, **kw)
+
+    x = []
+    m = 0
+    num = 0
+    for num, is_pair, read1, read2 in itr:
+        if is_pair:
+            x.append((read1.name, read2.name))
+        else:
+            x.append((read1.name, None))
+        m += 1
+
+    return x, num, m
+
+
 class Test_BrokenPairedReader(object):
     stream = [screed.Record(name='seq1/1', sequence='A' * 5),
               screed.Record(name='seq1/2', sequence='A' * 4),
@@ -341,23 +388,8 @@ class Test_BrokenPairedReader(object):
               screed.Record(name='seq3/1', sequence='A' * 3),
               screed.Record(name='seq3/2', sequence='A' * 5)]
 
-    def gather(self, **kw):
-        itr = broken_paired_reader(self.stream, **kw)
-
-        x = []
-        m = 0
-        num = 0
-        for num, is_pair, read1, read2 in itr:
-            if is_pair:
-                x.append((read1.name, read2.name))
-            else:
-                x.append((read1.name, None))
-            m += 1
-
-        return x, num, m
-
     def testDefault(self):
-        x, n, m = self.gather(min_length=1)
+        x, n, m = gather(self.stream, min_length=1)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -367,7 +399,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testMinLength(self):
-        x, n, m = self.gather(min_length=3)
+        x, n, m = gather(self.stream, min_length=3)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -377,7 +409,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testMinLength_2(self):
-        x, n, m = self.gather(min_length=4)
+        x, n, m = gather(self.stream, min_length=4)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
@@ -387,7 +419,7 @@ class Test_BrokenPairedReader(object):
         assert n == 3, n
 
     def testForceSingle(self):
-        x, n, m = self.gather(force_single=True)
+        x, n, m = gather(self.stream, force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq1/2', None),
@@ -399,7 +431,7 @@ class Test_BrokenPairedReader(object):
         assert n == 4, n
 
     def testForceSingleAndMinLength(self):
-        x, n, m = self.gather(min_length=5, force_single=True)
+        x, n, m = gather(self.stream, min_length=5, force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq2/1', None),
@@ -407,3 +439,59 @@ class Test_BrokenPairedReader(object):
         assert x == expected, x
         assert m == 3, m
         assert n == 2, n
+
+
+def test_BrokenPairedReader_OnPairs():
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_2():
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 5),   # switched
+              screed.Record(name='seq3/2', sequence='A' * 3)]   # wrt previous
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_3():
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),   # both short
+              screed.Record(name='seq3/2', sequence='A' * 3)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq1/1', 'seq1/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
+
+
+def test_BrokenPairedReader_OnPairs_4():
+    stream = [screed.Record(name='seq1/1', sequence='A' * 3),  # too short
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 4),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
+
+    x, n, m = gather(stream, min_length=4, require_paired=True)
+
+    expected = [('seq3/1', 'seq3/2')]
+    assert x == expected, x
+    assert m == 1
+    assert n == 0, n
