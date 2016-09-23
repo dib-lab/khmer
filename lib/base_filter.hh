@@ -3,32 +3,22 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 #include <fstream>
 #include <iostream>
-#include <list>
 #include <map>
-#include <queue>
-#include <queue>
-#include <set>
 #include <string>
 #include <vector>
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
-#include "kmer_hash.hh"
-#include "read_parsers.hh"
-#include "traversal.hh"
 
 namespace khmer
 {
 
-template <typename HashFunctorType, typename HashType>
+template <typename HashType = HashIntoType>
 class BaseFilter
 {
 protected:
-
-    HashFunctorType _hash;
 
     uint64_t _n_unique;
     uint64_t _occupied_bins;
@@ -37,16 +27,14 @@ protected:
     size_t _n_tables;
     Byte ** _counts;
 
-    explicit BaseFilter(std::vector<uint64_t>& tablesizes,
-                        HashFunctorType hash_function)
-        : hash_function(hash_function), _tablesizes(tablesizes),
+    explicit BaseFilter(std::vector<uint64_t>& tablesizes)
+        : _tablesizes(tablesizes),
           _n_unique_kmers(0), _occupied_bins(0)
     {
     }
 
-    explicit BaseFilter(uint64_t single_tablesize,
-                        HashFunctorType hash_function)
-        : hash_function(hash_function), _n_unique_kmers(0), _occupied_bins(0)
+    explicit BaseFilter(uint64_t single_tablesize)
+        : _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
     }
@@ -59,10 +47,6 @@ protected:
     virtual void _allocate_counters() = 0;
 
 public:
-
-    HashFunctorType get_hash_function() {
-        return _hash;
-    }
 
     // Accessors for protected/private table info members
     std::vector<uint64_t> get_tablesizes() const
@@ -93,20 +77,17 @@ public:
         return _n_unique;
     }
 
-    virtual BoundedCounterType test_and_set_bits(const char * str) = 0;
-    virtual BoudnedCounterType test_and_set_bits(HashType elem) = 0;
 
-    virtual void count(const char * str) = 0;
+    virtual BoundedCounterType test_and_set_bits(HashType elem) = 0;
+
     virtual void count(HashType elem) = 0;
 
-    // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * str) const = 0;
     virtual const BoundedCounterType get_count(HashType elem) const = 0;
 };
 
 
-template <typename HashFunctorType, typename HashType>
-class BloomFilter: public khmer::BaseFilter<HashFunctorType, HashType>
+template <typename HashType>
+class BloomFilter: public khmer::BaseFilter<HashType>
 {
 protected:
 
@@ -126,9 +107,8 @@ protected:
     }
 
 public:
-    BloomFilter(std::vector<HashType>& tablesizes,
-                HashFunctorType hash_function)
-        : khmer::BaseFilter<HashFunctorType, HashType>(tablesizes, hash_function)
+    BloomFilter(std::vector<uint64_t>& tablesizes)
+        : khmer::BaseFilter<HashType>(tablesizes)
     {
         _allocate_counters();
     }
@@ -146,14 +126,6 @@ public:
             _n_tables = 0;
         }
 
-    }
-
-    inline
-    virtual
-    BoundedCounterType
-    test_and_set_bits(const char * str)
-    {
-        return test_and_set_bits(_hash(str));
     }
 
     // Get and set the hashbits for the given kmer hash.
@@ -191,21 +163,11 @@ public:
         return 0; // kmer already seen
     } // test_and_set_bits
 
-    virtual void count(const char * str)
-    {
-        count(_hash(str));
-    }
-
     virtual void count(HashType elem)
     {
         test_and_set_bits(elem);
     }
 
-    // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * str) const
-    {
-        return get_count(_hash(str));
-    }
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashType elem) const
@@ -222,7 +184,7 @@ public:
         return 1;
     }
 
-    void update_from(const BloomFilter<HashFunctorType, HashType> &other) {
+    void update_from(const BloomFilter<HashType> &other) {
         if (_tablesizes != other._tablesizes) {
             throw khmer_exception("both BloomFilters must have same table sizes");
         }
@@ -257,8 +219,8 @@ public:
 };
 
 
-template <typename HashFunctorType, typename HashType>
-class CountingFilter: public khmer::BaseFilter<HashFunctorType, HashType>
+template <typename HashType>
+class CountingFilter: public khmer::BaseFilter<HashType>
 {
 
 protected:
@@ -284,9 +246,8 @@ public:
 
     std::map<HashType, BoundedCounterType> _bigcounts;
 
-    CountingHash( uint64_t single_tablesize,
-                  HashFunctorType hash_function) :
-        khmer::BaseFilter<HashFunctorType, HashType>(single_tablesize, hash_function), 
+    CountingHash( uint64_t single_tablesize) :
+        khmer::BaseFilter<HashType>(single_tablesize), 
         _use_bigcount(false),
         _bigcount_spin_lock(false),
         _max_count( MAX_KCOUNT ),
@@ -295,9 +256,8 @@ public:
         _allocate_counters();
     }
 
-    CountingHash(std::vector<uint64_t>& tablesizes,
-                 HashFunctorType hash_function) :
-        khmer::BaseFilter<HashFunctorType, HashType>(tablesizes, hash_function),
+    CountingHash(std::vector<uint64_t>& tablesizes):
+        khmer::BaseFilter<HashType>(tablesizes),
         _use_bigcount(false),
         _bigcount_spin_lock(false),
         _max_count( MAX_KCOUNT ),
@@ -323,23 +283,11 @@ public:
         }
     }
 
-    virtual BoundedCounterType test_and_set_bits(const char * str)
-    {
-        BoundedCounterType x = get_count(str); // @CTB just hash it, yo.
-        count(str);
-        return !x;
-    }
-
     virtual BoundedCounterType test_and_set_bits(HashType elem)
     {
         BoundedCounterType x = get_count(elem);
         count(elem);
         return !x;
-    }
-
-    virtual void count(const char * str)
-    {
-        count(_hash(str));
     }
 
     virtual void count(HashType elem)
@@ -401,12 +349,6 @@ public:
         count(elem);
     }
 
-    // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * str) const
-    {
-        return get_count(_hash(str));
-    }
-
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashType elem) const
     {
@@ -419,7 +361,7 @@ public:
             }
         }
         if (min_count == max_count && _use_bigcount) {
-            KmerCountMap::const_iterator it = _bigcounts.find(elem);
+            std::map<HashType, BoundedCounterType>::const_iterator it = _bigcounts.find(elem);
             if (it != _bigcounts.end()) {
                 min_count = it->second;
             }
