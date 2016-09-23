@@ -148,30 +148,31 @@ std::string _revcomp(const std::string& kmer)
  * Contact: camille.scott.w@gmail.com
  *
  */
+template <typename HashType>
 class Kmer
 {
 
 public:
 
     /// The forward hash
-    HashIntoType kmer_f;
+    HashType kmer_f;
     /// The reverse (complement) hash
-    HashIntoType kmer_r;
+    HashType kmer_r;
     /// The uniqified hash
-    HashIntoType kmer_u;
+    HashType kmer_u;
 
     /** @param[in]   f forward hash.
      *  @param[in]   r reverse (complement) hash.
      *  @param[in]   u uniqified hash.
      */
-    Kmer(HashIntoType f, HashIntoType r, HashIntoType u)
+    Kmer(HashType f, HashType r, HashType u)
     {
         kmer_f = f;
         kmer_r = r;
         kmer_u = u;
     }
 
-    Kmer(HashIntoType f, HashIntoType r)
+    Kmer(HashType f, HashType r)
     {
         kmer_u = uniqify_rc(f, r);
         kmer_f = f;
@@ -185,7 +186,7 @@ public:
     }
 
     /// Allows complete backwards compatibility
-    operator HashIntoType() const
+    operator HashType() const
     {
         return kmer_u;
     }
@@ -198,18 +199,26 @@ public:
 };
 
 
-class BitrepFunctor
+class BitRepFunctor
 {
 
 public:
 
     WordLength K;
+    HashIntoType bitmask;
+    unsigned int rc_left_shift;
+    unsigned int _nbits_sub_1;
 
-    explicit BitrepFunctor(WordLength K): K(K) {
-        
+    explicit BitRepFunctor(WordLength K): 
+        K(K), bitmask(0) {
+
+        for (unsigned char i = 0; i < K; i++) {
+            bitmask = (bitmask << 2) | 3;
+        }
+        rc_left_shift = K * 2 - 2;
     }
 
-    Kmer operator()(const char * sequence) const {
+    Kmer<HashIntoType> operator()(const char * sequence) const {
         // sizeof(HashIntoType) * 8 bits / 2 bits/base
         if (!(K <= sizeof(HashIntoType)*4) || !(strlen(sequence) >= K)) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
@@ -228,10 +237,10 @@ public:
             r |= twobit_comp(sequence[j]);
         }
 
-        return Kmer(h, r, uniqify_rc(h, r));
+        return Kmer<HashIntoType>(h, r, uniqify_rc(h, r));
     }
 
-    std::string operator()(Kmer& kmer) const {
+    std::string inverse(Kmer<HashIntoType>& kmer) const {
         std::string s = "";
         HashIntoType hash = (HashIntoType) kmer;
 
@@ -247,6 +256,22 @@ public:
         reverse(s.begin(), s.end());
 
         return s;
+    }
+
+    Kmer<HashIntoType> operator()(Kmer<HashIntoType>& kmer, const char * seq) {
+        HashIntoType kmer_f, kmer_r;
+        kmer_f = (((kmer.kmer_f) << 2) & bitmask) | (twobit_repr(seq[K-1]));
+        kmer_r = ((kmer.kmer_r) >> 2) | (twobit_comp(seq[K-1]) << rc_left_shift);
+
+        return Kmer<HashIntoType>(kmer_f, kmer_r);
+    }
+
+    Kmer<HashIntoType> operator()(const char * seq, Kmer<HashIntoType>& kmer) {
+        HashIntoType kmer_f, kmer_r;
+        kmer_f = ((kmer.kmer_f) >> 2 | twobit_repr(seq[0]) << rc_left_shift);
+        kmer_r = (((kmer.kmer_r) << 2) & bitmask) | (twobit_comp(seq[0]));
+        
+        return Kmer<HashIntoType>(kmer_f, kmer_r);
     }
 
 };
@@ -290,25 +315,61 @@ public:
  * Contact: camille.scott.w@gmail.com
  *
  */
-class KmerIterator: public KmerFactory
+template <class HashFunctorType>
+class KmerIterator
 {
+
 protected:
     const char * _seq;
+    WordLength _ksize;
 
-    HashIntoType _kmer_f, _kmer_r;
-    HashIntoType bitmask;
-    unsigned int _nbits_sub_1;
+    Kmer cur_kmer;
     unsigned int index;
     size_t length;
     bool initialized;
-    BitrepFunctor _hash;
+    HashFunctorType  _hash;
     
 public:
-    KmerIterator(const char * seq, unsigned char k);
+    KmerIterator(const char * seq,
+                 unsigned char ksize,
+                 HashFunctorType hash_function)
+                _seq(seq), _ksize(ksize), bitmask(0),
+                _hash(hash_function)
 
-    Kmer first();
+    {
+        index = _ksize - 1;
+        length = strlen(_seq);
+        initialized = false;
+    }
 
-    Kmer next();
+    Kmer first()
+    {
+        index = 1;
+        cur_kmer = _hash(_seq);
+
+        return cur_kmer;
+    }
+
+    Kmer next()
+    {
+        if (done()) {
+            throw khmer_exception();
+        }
+
+        if (!initialized) {
+            initialized = true;
+            return first();
+        }
+
+        const unsigned char * ch = _seq + index;
+        index++;
+        if (!(index <= length)) {
+            throw khmer_exception();
+        }
+
+        cur_kmer = _hash(cur_kmer, ch);
+        return cur_kmer;   
+    }
 
     /// @return Whether or not the iterator has completed.
     bool done()
