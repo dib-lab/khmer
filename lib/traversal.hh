@@ -54,7 +54,6 @@ class Hashtable;
 
 class Traverser: public KmerFactory
 {
-    friend class Hashtable;
 
 protected:
 
