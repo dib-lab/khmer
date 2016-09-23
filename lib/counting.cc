@@ -89,13 +89,13 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
     return max_count;
 }
 
-HashIntoType *
+uint64_t *
 CountingHash::abundance_distribution(
     read_parsers::IParser * parser,
     Hashbits *          tracking)
 {
-    HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
-    HashIntoType i;
+    uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
+    uint64_t i;
 
     for (i = 0; i <= MAX_BIGCOUNT; i++) {
         dist[i] = 0;
@@ -142,13 +142,13 @@ CountingHash::abundance_distribution(
 }
 
 
-HashIntoType * CountingHash::abundance_distribution(
+uint64_t * CountingHash::abundance_distribution(
     std::string filename,
     Hashbits *  tracking)
 {
     IParser* parser = IParser::get_parser(filename.c_str());
 
-    HashIntoType * distribution = abundance_distribution(parser, tracking);
+    uint64_t * distribution = abundance_distribution(parser, tracking);
     delete parser;
     return distribution;
 }
@@ -403,11 +403,11 @@ CountingHashFileReader::CountingHashFileReader(
         }
 
         for (unsigned int i = 0; i < ht._n_tables; i++) {
-            HashIntoType tablesize;
+            uint64_t tablesize;
 
             infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
-            tablesize = (HashIntoType) save_tablesize;
+            tablesize = save_tablesize;
             ht._tablesizes.push_back(tablesize);
 
             ht._counts[i] = new Byte[tablesize];
@@ -419,7 +419,7 @@ CountingHashFileReader::CountingHashFileReader(
             }
         }
 
-        HashIntoType n_counts = 0;
+        uint64_t n_counts = 0;
         infile.read((char *) &n_counts, sizeof(n_counts));
 
         if (n_counts) {
