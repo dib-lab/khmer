@@ -127,21 +127,23 @@ public:
 	BigHashType(const std::array<uint8_t, 8>& bytes_) : N(8), bytes(bytes_) {};
 	BigHashType(const uint64_t value) : N(8) {
 		for (std::size_t i = 0; i < 8; i++) {
-			bytes[8 - 1 - i] = (value >> (i * 8));
+			bytes[N - 1 - i] = (value >> (i * 8));
 		}
 	}
 
 	uint64_t as_ull() const {
 		uint64_t x(0);
-		for (std::size_t i = 0; i < N; i++) {
-			x+= ((uint64_t)bytes[i])<<((8-i-1)*8);
+		int offset(N-8);
+		for (std::size_t i = offset; i < N; i++) {
+			x+= ((uint64_t)bytes[i])<<((N-i-1)*8);
 		}
 		return x;
 	}
 
 	BigHashType& operator=(const uint64_t value) {
-		for (int i = 0; i < 8; i++) {
-			bytes[8 - 1 - i] = (value >> (i * 8));
+		unsigned int offset(N-8);
+		for (unsigned int i = 0; i < N - offset; i++) {
+			bytes[N - 1 - i] = (value >> (i * 8));
 		}
 		return *this;
 	}
@@ -195,6 +197,7 @@ public:
 	BigHashType operator|(uint64_t rhs) {
 		BigHashType n(bytes);
 		BigHashType rhs_(rhs);
+
 		for (unsigned int i = 0; i < N; i++) {
 			n.bytes[i] = bytes[i] | rhs_.bytes[i];
 		}
@@ -202,10 +205,21 @@ public:
 	}
 
 	BigHashType& operator|=(uint64_t rhs) {
+		// The RHS only has the last 8 bytes set
+		unsigned int offset(N - 8);
 		BigHashType rhs_(rhs);
-		for (unsigned int i = 0; i < N; i++) {
+		//std::copy(bytes.begin(), bytes.end(),
+		//					std::ostream_iterator<uint64_t>(std::cout, " "));
+		//std::cout << std::endl;
+		//std::copy(rhs_.bytes.begin(), rhs_.bytes.end(),
+		//					std::ostream_iterator<uint64_t>(std::cout, " "));
+		//std::cout << std::endl;
+		for (unsigned int i = offset; i < N; i++) {
 			bytes[i] |= rhs_.bytes[i];
 		}
+		//std::copy(bytes.begin(), bytes.end(),
+		//					std::ostream_iterator<uint64_t>(std::cout, " "));
+		//std::cout << std::endl;
 		return *this;
 	}
 
