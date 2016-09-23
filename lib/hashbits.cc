@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -163,12 +163,12 @@ void Hashbits::load(std::string infilename)
 
         _counts = new Byte*[_n_tables];
         for (unsigned int i = 0; i < _n_tables; i++) {
-            HashIntoType tablesize;
+            uint64_t tablesize;
             unsigned long long tablebytes;
 
             infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
-            tablesize = (HashIntoType) save_tablesize;
+            tablesize = save_tablesize;
             _tablesizes.push_back(tablesize);
 
             tablebytes = tablesize / 8 + 1;
@@ -204,10 +204,10 @@ void Hashbits::update_from(const Hashbits &other)
     for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
         Byte * me = _counts[table_num];
         Byte * ot = other._counts[table_num];
-        HashIntoType tablesize = _tablesizes[table_num];
-        HashIntoType tablebytes = tablesize / 8 + 1;
+        uint64_t tablesize = _tablesizes[table_num];
+        uint64_t tablebytes = tablesize / 8 + 1;
 
-        for (HashIntoType index = 0; index < tablebytes; index++) {
+        for (uint64_t index = 0; index < tablebytes; index++) {
             // Bloom filters can be unioned with bitwise OR.
             // First, get the new value
             tmp = me[index] | ot[index];

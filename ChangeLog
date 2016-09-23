@@ -1,3 +1,10 @@
+2016-09-23  Tim Head  <betatim@gmail.com>
+
+   * khmer/_khmer.cc, lib/counting.{cc,hh}, lib/hashbits.{cc,hh},
+     lib/hashtable.hh, lib/hllcounter.{cc,hh}, lib/kmer_hash.cc,
+     tests/khmer_tst_utils.py, tests/test_functions.py: move away from using
+     HashIntoType as synonym to uint64.
+
 2016-09-21  Tim Head  <betatim@gmail.com>
 
    * .travis.yml: add python 3.5 to the build matrix and allow fast finishing

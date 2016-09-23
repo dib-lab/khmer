@@ -178,7 +178,7 @@ HashIntoType _hash_murmur(const std::string& kmer)
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r)
 {
-    HashIntoType out[2];
+    uint64_t out[2];
     uint32_t seed = 0;
     MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
     h = out[0];

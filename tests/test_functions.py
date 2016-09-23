@@ -40,6 +40,7 @@ import khmer
 import os
 import sys
 import collections
+import pytest
 from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
@@ -55,6 +56,9 @@ def test_forward_hash():
     assert khmer.forward_hash('TTTT', 4) == 0
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
+
+    h = 13607885392109549066
+    assert khmer.forward_hash('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG', 32) == h
 
 
 def test_get_file_writer_fail():
@@ -96,6 +100,33 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_hash_longs():
+    # test explicitly with long integers, only needed for python2
+    # the builtin `long` exists in the global scope only
+    global long # pylint: disable=global-variable-undefined
+    if sys.version_info > (3,):
+        long = int
+
+    s = khmer.reverse_hash(long(0), 4)
+    assert s == "AAAA"
+
+    s = khmer.reverse_hash(long(85), 4)
+    assert s == "TTTT"
+
+    s = khmer.reverse_hash(long(170), 4)
+    assert s == "CCCC"
+
+    s = khmer.reverse_hash(long(255), 4)
+    assert s == "GGGG"
+
+
+def test_reverse_hash_raises():
+    with pytest.raises(TypeError) as excinfo:
+        khmer.reverse_hash('2345', 4)
+
+    assert 'int' in str(excinfo.value)
 
 
 def test_hash_murmur3():

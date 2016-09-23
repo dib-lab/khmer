@@ -131,8 +131,8 @@ def _runscript(scriptname, sandbox=False):
     if os.path.isfile(scriptfile):
         if os.path.isfile(scriptfile):
             exec(  # pylint: disable=exec-used
-                 compile(open(scriptfile).read(), scriptfile, 'exec'),
-                 namespace)
+                compile(open(scriptfile).read(), scriptfile, 'exec'),
+                namespace)
             return 0
     elif sandbox:
         pytest.skip("sandbox tests are only run in a repository.")
