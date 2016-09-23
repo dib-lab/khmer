@@ -43,7 +43,7 @@ using namespace std;
 Traverser::Traverser(const Hashtable * ht) :
     KmerFactory(ht->ksize()), graph(ht)
 {
-    bitmask = 0;
+    bitmask;
     for (unsigned int i = 0; i < _ksize; i++) {
         bitmask = (bitmask << 2) | 3;
     }

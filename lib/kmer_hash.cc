@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
@@ -63,7 +64,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
+    BigHashType h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
@@ -86,8 +87,8 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 
 HashIntoType _hash(const char * kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash(kmer, k, h, r);
 }
@@ -96,8 +97,8 @@ HashIntoType _hash(const char * kmer, const WordLength k)
 
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
 
     khmer::_hash(kmer, k, h, r);
@@ -169,8 +170,8 @@ std::string _revcomp(const std::string& kmer)
 
 HashIntoType _hash_murmur(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash_murmur(kmer, h, r);
 }
@@ -178,7 +179,7 @@ HashIntoType _hash_murmur(const std::string& kmer)
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r)
 {
-    HashIntoType out[2];
+    uint64_t out[2];
     uint32_t seed = 0;
     MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
     h = out[0];
@@ -192,8 +193,8 @@ HashIntoType _hash_murmur(const std::string& kmer,
 
 HashIntoType _hash_murmur_forward(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     khmer::_hash_murmur(kmer, h, r);
     return h;
@@ -203,7 +204,6 @@ KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)
 {
-    bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {
         bitmask = (bitmask << 2) | 3;
     }
@@ -211,8 +211,6 @@ KmerIterator::KmerIterator(const char * seq,
 
     index = _ksize - 1;
     length = strlen(_seq);
-    _kmer_f = 0;
-    _kmer_r = 0;
 
     initialized = false;
 }
