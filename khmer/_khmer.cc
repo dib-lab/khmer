@@ -956,9 +956,9 @@ static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 {
     HashIntoType v;
     if (convert_PyObject_to_HashIntoType(val, v, 0)) {
-      if (set_contains(*o->hashes, v)) {
-          return 1;
-      }
+        if (set_contains(*o->hashes, v)) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -3582,7 +3582,7 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
             } else if (PyInt_Check(size_o)) {
                 sizes.push_back(PyInt_AsLong(size_o));
             } else if (PyFloat_Check(size_o)) {
-              // XXX really? should be Float_AS_INT?
+                // XXX really? should be Float_AS_INT?
                 sizes.push_back(PyFloat_AS_DOUBLE(size_o));
             } else {
                 Py_DECREF(self);

@@ -289,9 +289,9 @@ public:
     BoundedCounterType get_max_count(const std::string &s);
 
     uint64_t * abundance_distribution(read_parsers::IParser * parser,
-                                          Hashbits * tracking);
+                                      Hashbits * tracking);
     uint64_t * abundance_distribution(std::string filename,
-                                          Hashbits * tracking);
+                                      Hashbits * tracking);
 
     unsigned long trim_on_abundance(std::string seq,
                                     BoundedCounterType min_abund) const;
