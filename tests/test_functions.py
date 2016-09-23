@@ -126,7 +126,7 @@ def test_reverse_hash_raises():
     with pytest.raises(TypeError) as excinfo:
         khmer.reverse_hash('2345', 4)
 
-    assert 'must be int' in str(excinfo.value)
+    assert 'int' in str(excinfo.value)
 
 
 def test_hash_murmur3():

@@ -3582,7 +3582,6 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
             } else if (PyInt_Check(size_o)) {
                 sizes.push_back(PyInt_AsLong(size_o));
             } else if (PyFloat_Check(size_o)) {
-                // XXX really? should be Float_AS_INT?
                 sizes.push_back(PyFloat_AS_DOUBLE(size_o));
             } else {
                 Py_DECREF(self);
