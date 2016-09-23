@@ -332,7 +332,7 @@ double HLLCounter::_Ep()
     return E;
 }
 
-HashIntoType HLLCounter::estimate_cardinality()
+uint64_t HLLCounter::estimate_cardinality()
 {
     long V = count(this->M.begin(), this->M.end(), 0);
 
@@ -348,7 +348,7 @@ HashIntoType HLLCounter::estimate_cardinality()
 void HLLCounter::add(const std::string &value)
 {
     HashIntoType x = khmer::_hash_murmur(value);
-    HashIntoType j = x & (this->m - 1);
+    uint64_t j = x & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 

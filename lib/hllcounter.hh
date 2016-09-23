@@ -75,7 +75,7 @@ public:
     unsigned int check_and_process_read(std::string &,
                                         bool &);
     bool check_and_normalize_read(std::string &) const;
-    HashIntoType estimate_cardinality();
+    uint64_t estimate_cardinality();
     void merge(HLLCounter &);
     virtual ~HLLCounter() {}
 

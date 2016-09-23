@@ -428,7 +428,7 @@ CountingHashFileReader::CountingHashFileReader(
             HashIntoType kmer;
             BoundedCounterType count;
 
-            for (HashIntoType n = 0; n < n_counts; n++) {
+            for (uint64_t n = 0; n < n_counts; n++) {
                 infile.read((char *) &kmer, sizeof(kmer));
                 infile.read((char *) &count, sizeof(count));
                 ht._bigcounts[kmer] = count;
@@ -530,7 +530,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     ht._counts = new Byte*[ht._n_tables];
     for (unsigned int i = 0; i < ht._n_tables; i++) {
-        HashIntoType tablesize;
+        uint64_t tablesize;
 
         read_b = gzread(infile, (char *) &save_tablesize,
                         sizeof(save_tablesize));
@@ -548,12 +548,12 @@ CountingHashGzFileReader::CountingHashGzFileReader(
             throw khmer_file_exception(err);
         }
 
-        tablesize = (HashIntoType) save_tablesize;
+        tablesize = save_tablesize;
         ht._tablesizes.push_back(tablesize);
 
         ht._counts[i] = new Byte[tablesize];
 
-        HashIntoType loaded = 0;
+        uint64_t loaded = 0;
         while (loaded != tablesize) {
             unsigned long long  to_read_ll = tablesize - loaded;
             unsigned int        to_read_int;
@@ -581,7 +581,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         }
     }
 
-    HashIntoType n_counts = 0;
+    uint64_t n_counts = 0;
     read_b = gzread(infile, (char *) &n_counts, sizeof(n_counts));
     if (read_b <= 0) {
         std::string gzerr = gzerror(infile, &read_b);
@@ -601,7 +601,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         HashIntoType kmer;
         BoundedCounterType count;
 
-        for (HashIntoType n = 0; n < n_counts; n++) {
+        for (uint64_t n = 0; n < n_counts; n++) {
             int read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
             int read_c = gzread(infile, (char *) &count, sizeof(count));
 
@@ -664,7 +664,7 @@ CountingHashFileWriter::CountingHashFileWriter(
         outfile.write((const char *) ht._counts[i], save_tablesize);
     }
 
-    HashIntoType n_counts = ht._bigcounts.size();
+    uint64_t n_counts = ht._bigcounts.size();
     outfile.write((const char *) &n_counts, sizeof(n_counts));
 
     if (n_counts) {
@@ -765,7 +765,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         }
     }
 
-    HashIntoType n_counts = ht._bigcounts.size();
+    uint64_t n_counts = ht._bigcounts.size();
     gzwrite(outfile, (const char *) &n_counts, sizeof(n_counts));
 
     if (n_counts) {
