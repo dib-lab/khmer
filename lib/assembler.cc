@@ -35,9 +35,6 @@ LICENSE (END)
 Contact: khmer-project@idyll.org
 */
 
-//#include "khmer.hh"
-//#include "hashtable.hh"
-//#include "traversal.hh"
 #include "assembler.hh"
 
 #include <algorithm>

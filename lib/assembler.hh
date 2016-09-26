@@ -104,6 +104,22 @@ template<>
 std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor) const;
 
 
+/**
+ * \class LabeledLinearAssembler
+ *
+ * \brief Assemble linear paths using labels to span high degree nodes.
+ *
+ * Shares a common API (namely, the assemble and templated _assemble_directed functions) with
+ * LinearAssembler, though does not inherit. High degree nodes (nodes with degree > 2) are spanned
+ * using labeling formation: if there is a matching label on two sides of the HDN, we can keep
+ * traverse across. Internally, this is performed by pushing a new filter to search for the label on to
+ * the Traverser's filter stack and popping it on the other side.
+ *
+ * \author Camille Scott
+ *
+ * Contact: camille.scott.w@gmail.com
+ *
+ */
 class LabeledLinearAssembler
 {
     friend class Hashtable;

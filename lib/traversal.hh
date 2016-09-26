@@ -48,14 +48,12 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-/*
 #ifndef LEFT
 #define LEFT 0
 #endif
 #ifndef RIGHT
 #define RIGHT 1
 #endif
-*/
 
 class Hashtable;
 class LabelHash;
