@@ -128,7 +128,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                            value, "utf-8", "strict"));
+                                             value, "utf-8", "strict"));
         if (strlen(s.c_str()) != ksize) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer length must equal the k-mer size");
@@ -162,8 +162,8 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
 // that checks this.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
-                                             HashIntoType& hashval,
-                                             WordLength ksize)
+        HashIntoType& hashval,
+        WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         if (PyLong_Check(value)) {
@@ -174,7 +174,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                            value, "utf-8", "strict"));
+                                             value, "utf-8", "strict"));
         if (strlen(s.c_str()) != ksize) {
             PyErr_SetString(PyExc_ValueError,
                             "k-mer length must equal the k-mer size");
@@ -907,7 +907,7 @@ static PyObject * khmer_HashSet_iter(PyObject * self)
 {
     khmer_HashSet_Object * me = (khmer_HashSet_Object *) self;
     _HashSet_iterobj * iter_obj = (_HashSet_iterobj *)
-        _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
+                                  _HashSet_iter_Type.tp_alloc(&_HashSet_iter_Type, 0);
     if (iter_obj != NULL) {
         Py_INCREF(me);
         iter_obj->parent = me;
@@ -932,7 +932,7 @@ static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
         return NULL;
     }
     khmer_HashSet_Object * no = create_HashSet_Object(new SeenSet,
-                                                      o->ksize);
+                                o->ksize);
     no->hashes->insert(o->hashes->begin(), o->hashes->end());
     no->hashes->insert(o2->hashes->begin(), o2->hashes->end());
 
@@ -940,7 +940,7 @@ static PyObject * khmer_HashSet_concat(khmer_HashSet_Object * o,
 }
 
 static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
-                                               khmer_HashSet_Object * o2)
+        khmer_HashSet_Object * o2)
 {
     if (o->ksize != o2->ksize) {
         PyErr_SetString(PyExc_ValueError,
@@ -955,14 +955,8 @@ static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
 
 static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 {
-    if (PyInt_Check(val) || PyLong_Check(val)) {
-        HashIntoType v;
-        if (PyLong_Check(val)) {
-            v = PyLong_AsUnsignedLongLong(val);
-        } else {
-            v = PyInt_AsLong(val);
-        }
-
+    HashIntoType v;
+    if (convert_PyObject_to_HashIntoType(val, v, 0)) {
         if (set_contains(*o->hashes, v)) {
             return 1;
         }
@@ -1016,11 +1010,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
     PyObject * item = PyIter_Next(iterator);
     while(item) {
         HashIntoType h;
-        if (PyLong_Check(item)) {
-            h = PyLong_AsUnsignedLongLong(item);
-        } else if (PyInt_Check(item)) {                // assume PyInt
-            h = PyInt_AsLong(item);
-        } else {
+        if (!convert_PyObject_to_HashIntoType(item, h, 0)) {
             PyErr_SetString(PyExc_ValueError, "unknown item type for update");
             Py_DECREF(item);
             return NULL;
@@ -1117,7 +1107,7 @@ static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k)
     khmer_HashSet_Object * self;
 
     self = (khmer_HashSet_Object *)
-        khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
+           khmer_HashSet_Type.tp_alloc(&khmer_HashSet_Type, 0);
     if (self != NULL) {
         self->hashes = h;
         self->ksize = k;
@@ -1276,7 +1266,7 @@ hashtable_n_occupied(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    HashIntoType n = hashtable->n_occupied();
+    uint64_t n = hashtable->n_occupied();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -1287,7 +1277,7 @@ hashtable_n_unique_kmers(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    HashIntoType n = hashtable->n_unique_kmers();
+    uint64_t n = hashtable->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -1520,14 +1510,14 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     SeenSet * adj = new SeenSet;
     SeenSet * visited = new SeenSet;
     unsigned int size = hashtable->traverse_linear_path(start_kmer,
-                                                        *adj, *visited,
-                                                        *nodegraph_o->hashbits,
-                                                        *hdn_o->hashes);
+                        *adj, *visited,
+                        *nodegraph_o->hashbits,
+                        *hdn_o->hashes);
 
     khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
-                                                         hashtable->ksize());
+                                   hashtable->ksize());
     khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
-                                                           hashtable->ksize());
+                                       hashtable->ksize());
 
     PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
                                    (PyObject *) adj_o, (PyObject *) visited_o);
@@ -1626,7 +1616,7 @@ hashtable_get_hashsizes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    std::vector<HashIntoType> ts = hashtable->get_tablesizes();
+    std::vector<uint64_t> ts = hashtable->get_tablesizes();
 
     PyObject * x = PyList_New(ts.size());
     for (size_t i = 0; i < ts.size(); i++) {
@@ -1726,7 +1716,7 @@ hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
     Py_END_ALLOW_THREADS
 
     PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
     return x;
 }
 
@@ -2733,7 +2723,7 @@ hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
     hashtable->divide_tags_into_subsets(subset_size, *divvy);
 
     PyObject * x = (PyObject *) create_HashSet_Object(divvy,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
     return x;
 }
 
@@ -2868,7 +2858,8 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me,
+                                     PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
     const char * sequence;
@@ -2881,7 +2872,7 @@ hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me, PyObject * ar
     hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
 
     PyObject * x = (PyObject *) create_HashSet_Object(hashes,
-                                                      hashtable->ksize());
+                   hashtable->ksize());
 
     return x;
 }
@@ -3256,7 +3247,7 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
     CountingHash * counting = self->counting;
 
     khmer::Byte ** table_ptrs = counting->get_raw_tables();
-    std::vector<HashIntoType> sizes = counting->get_tablesizes();
+    std::vector<uint64_t> sizes = counting->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
@@ -3375,7 +3366,7 @@ count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
 
     read_parsers::IParser *rparser      = rparser_obj->parser;
     Hashbits           *hashbits        = tracking_obj->hashbits;
-    HashIntoType       *dist            = NULL;
+    uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
     std::string exc_string;
@@ -3428,7 +3419,7 @@ count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
     }
 
     Hashbits           *hashbits        = tracking_obj->hashbits;
-    HashIntoType       *dist            = NULL;
+    uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
     std::string exc_string;
@@ -3619,7 +3610,7 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
             return NULL;
         }
 
-        std::vector<HashIntoType> sizes;
+        std::vector<uint64_t> sizes;
         Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
         if (sizes_list_o_length == -1) {
             Py_DECREF(self);
@@ -3629,11 +3620,11 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
         for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
             if (PyLong_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
             } else if (PyInt_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+                sizes.push_back(PyInt_AsLong(size_o));
             } else if (PyFloat_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
             } else {
                 Py_DECREF(self);
                 PyErr_SetString(PyExc_TypeError,
@@ -3685,7 +3676,7 @@ hashbits_get_raw_tables(khmer_KHashbits_Object * self, PyObject * args)
     Hashbits * counting = self->hashbits;
 
     khmer::Byte ** table_ptrs = counting->get_raw_tables();
-    std::vector<HashIntoType> sizes = counting->get_tablesizes();
+    std::vector<uint64_t> sizes = counting->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
@@ -3738,16 +3729,16 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
             return NULL;
         }
 
-        std::vector<HashIntoType> sizes;
+        std::vector<uint64_t> sizes;
         Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
         for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
             if (PyLong_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
             } else if (PyInt_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+                sizes.push_back(PyInt_AsLong(size_o));
             } else if (PyFloat_Check(size_o)) {
-                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
             } else {
                 Py_DECREF(self);
                 PyErr_SetString(PyExc_TypeError,
@@ -4245,7 +4236,7 @@ labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
     //Py_END_ALLOW_THREADS
 
     PyObject * x = (PyObject *) create_HashSet_Object(tagged_kmers,
-                                                   labelhash->graph->ksize());
+                   labelhash->graph->ksize());
     return x;
 }
 

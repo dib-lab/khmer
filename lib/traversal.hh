@@ -89,6 +89,7 @@ public:
     unsigned int traverse(Kmer& node,
                           KmerQueue &node_q,
                           KmerFilter filter=0) const {
+
         unsigned int found;
         found = traverse_left(node, node_q, filter);
         found += traverse_right(node, node_q, filter);

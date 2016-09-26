@@ -258,6 +258,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
 
+        if sys.platform == 'darwin' and 'gcov' in self.libraries:
+            self.libraries.remove('gcov')
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '

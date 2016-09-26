@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -56,10 +56,10 @@ class LabelHash;
 class Hashbits : public khmer::Hashtable
 {
 protected:
-    std::vector<HashIntoType> _tablesizes;
+    std::vector<uint64_t> _tablesizes;
     size_t _n_tables;
-    HashIntoType _occupied_bins;
-    HashIntoType _n_unique_kmers;
+    uint64_t _occupied_bins;
+    uint64_t _n_unique_kmers;
     Byte ** _counts;
 
     virtual void _allocate_counters()
@@ -69,8 +69,8 @@ protected:
         _counts = new Byte*[_n_tables];
 
         for (size_t i = 0; i < _n_tables; i++) {
-            HashIntoType tablesize = _tablesizes[i];
-            HashIntoType tablebytes = tablesize / 8 + 1;
+            uint64_t tablesize = _tablesizes[i];
+            uint64_t tablebytes = tablesize / 8 + 1;
 
             _counts[i] = new Byte[tablebytes];
             memset(_counts[i], 0, tablebytes);
@@ -78,7 +78,7 @@ protected:
     }
 
 public:
-    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
+    Hashbits(WordLength ksize, std::vector<uint64_t>& tablesizes)
         : khmer::Hashtable(ksize),
           _tablesizes(tablesizes)
     {
@@ -104,7 +104,7 @@ public:
     }
 
     // Accessors for protected/private table info members
-    std::vector<HashIntoType> get_tablesizes() const
+    std::vector<uint64_t> get_tablesizes() const
     {
         return _tablesizes;
     }
@@ -118,12 +118,12 @@ public:
     virtual void load(std::string);
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied() const
+    virtual const uint64_t n_occupied() const
     {
         return _occupied_bins;
     }
 
-    virtual const HashIntoType n_unique_kmers() const
+    virtual const uint64_t n_unique_kmers() const
     {
         return _n_unique_kmers;
     }
@@ -151,12 +151,12 @@ public:
         bool is_new_kmer = false;
 
         for (size_t i = 0; i < _n_tables; i++) {
-            HashIntoType bin = khash % _tablesizes[i];
-            HashIntoType byte = bin / 8;
+            uint64_t bin = khash % _tablesizes[i];
+            uint64_t byte = bin / 8;
             unsigned char bit = (unsigned char)(1 << (bin % 8));
 
             unsigned char bits_orig = __sync_fetch_and_or( *(_counts + i) +
-                                                           byte, bit );
+                                      byte, bit );
             if (!(bits_orig & bit)) {
                 if (i == 0) {
                     __sync_add_and_fetch( &_occupied_bins, 1 );
@@ -195,8 +195,8 @@ public:
     virtual const BoundedCounterType get_count(HashIntoType khash) const
     {
         for (size_t i = 0; i < _n_tables; i++) {
-            HashIntoType bin = khash % _tablesizes[i];
-            HashIntoType byte = bin / 8;
+            uint64_t bin = khash % _tablesizes[i];
+            uint64_t byte = bin / 8;
             unsigned char bit = bin % 8;
 
             if (!(_counts[i][byte] & (1 << bit))) {

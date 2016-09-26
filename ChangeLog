@@ -16,6 +16,75 @@
    * lib/{symbols.hh, symbols.cc}: Global DNA alphabets.
    * tests/test_nodegraph.py: Additional tests for the assembler API.
 
+2016-09-23  Tim Head  <betatim@gmail.com>
+
+   * khmer/_khmer.cc, lib/counting.{cc,hh}, lib/hashbits.{cc,hh},
+     lib/hashtable.hh, lib/hllcounter.{cc,hh}, lib/kmer_hash.cc,
+     tests/khmer_tst_utils.py, tests/test_functions.py: move away from using
+     HashIntoType as synonym to uint64.
+
+2016-09-21  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: add python 3.5 to the build matrix and allow fast finishing
+
+2016-09-20  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: fixed bug in broken_paired_reader when short reads
+   are discarded and require_paired is set; improved read pair error reporting.
+   * tests/test_functions.py: added tests for broken_paired_reader fix.
+   * tests/khmer_tst_utils.py: de-nested exceptions for better error reporting
+   from tests.
+
+2016-09-09  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/read_parsers.{cc,hh}: rename SeqAnParser to FastxParser.
+
+2016-09-09  Tim Head  <betatim@gmail.com>
+
+   * tests/test_filter_abund.py: remove for loops introduce to the test suite.
+
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py: added check_argument_range to check an integer
+   command-line argument is within a given range.
+   * scripts/{normalize-by-median.py, filter-abund.py, filter-abund-single.py}
+   now use check_argument_range for the cutoff parameter.
+   * tests/test_normalize_by_median.py: modified
+   test_normalize_by_median_no_bigcount.
+
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * scripts/filter-abund-single.py: Add support for variable coverage trimming
+
+2016-08-31  Tim Head  <betatim@gmail.com>
+
+   * Fixed several source code style issues in python and cpp.
+   * Makefile: removed setup.py from the list of files passed to astyle
+
+2016-08-30  Tim Head  <betatim@gmail.com>
+
+   * Fix coverage reporting on OSX and rename nosetests.xml to pytests.xml
+
+2016-08-29  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library, and dropped Arch linux install
+   instructions.
+
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
+   issues)
+   * Makefile: make the pep8 target less verbose by removing the --show-pep8
+   option
+
+2016-08-26  Ryan Shean  <rcs333@uw.edu>
+
+   * tests/{test_countergraph.py, test_filter_abund.py,
+   test_normalize_by_median.py, test_read_handling.py,
+   test_sandbox_scripts.py, test_scripts.py}: updated to use
+   copy_test_data function
+
 2016-07-18  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.

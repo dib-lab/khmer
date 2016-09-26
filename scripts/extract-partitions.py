@@ -123,12 +123,11 @@ def PartitionedReader(filename_list, quiet=False, single=False):
 
 def PartitionedReadIterator(filename_list, quiet=False, single=False):
     """
-    Generator to do boilerplate output of statistics
+    Generator to do boilerplate output of statistics.
 
     Uses a list of input files and verbosity
     Returns reads and partition IDs
     """
-
     for filename in filename_list:
         for index, read, pid in read_partition_file(filename):
             if not quiet:
@@ -160,7 +159,7 @@ class PartitionExtractor(object):
 
     def process_unassigned(self, outfp=None):
         """
-        Process unassigned reads
+        Process unassigned reads.
 
         Can optionally output said reads if outfp is given
         Also develops counts of partition IDs--necessary for further processing
@@ -175,7 +174,7 @@ class PartitionExtractor(object):
                         write_record(read, outfp)
 
     def output_histogram(self, dist_filename):
-        """OUtputs histogram of partition counts to the given filename"""
+        """Output histogram of partition counts to the given filename."""
         # develop histogram of partition sizes
         dist = {}
         for _, size in list(self.count.items()):
@@ -193,7 +192,7 @@ class PartitionExtractor(object):
         distfp.close()
 
     def develop_groups(self):
-        """Processing method that divides up the partitions into groups"""
+        """Processing method that divides up the partitions into groups."""
         if 0 in self.count:            # eliminate unpartitioned sequences
             del self.count[0]
 
@@ -224,7 +223,7 @@ class PartitionExtractor(object):
 
     class ReadGroupGenerator(object):
         """
-        Generator that yields partitioned reads and their group
+        Generator that yields partitioned reads and their group.
 
         Takes PartitionExtractor and PartitionedReadIterator objects
         """
