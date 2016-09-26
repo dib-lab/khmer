@@ -337,7 +337,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
 }
 
 void LabelHash::get_tag_labels(const HashIntoType tag,
-                                   LabelSet& labels) const
+                               LabelSet& labels) const
 {
     if (set_contains(graph->all_tags, tag)) {
         _get_tag_labels(tag, tag_labels, labels);
@@ -345,7 +345,7 @@ void LabelHash::get_tag_labels(const HashIntoType tag,
 }
 
 void LabelHash::get_tags_from_label(const Label label,
-                                      TagSet& tags) const
+                                    TagSet& tags) const
 {
     if(set_contains(all_labels, label)) {
         _get_tags_from_label(label, label_tag, tags);
@@ -569,17 +569,21 @@ void LabelHash::load_labels_and_tags(std::string filename)
 // tag & label k-mers on either side of an HDN.
 
 void LabelHash::label_across_high_degree_nodes(const char * s,
-                                               SeenSet& high_degree_nodes,
-                                               const Label label)
+        SeenSet& high_degree_nodes,
+        const Label label)
 {
     KmerIterator kmers(s, graph->_ksize);
 
     unsigned long n = 0;
 
     Kmer prev_kmer = kmers.next();
-    if (kmers.done()) { return; }
+    if (kmers.done()) {
+        return;
+    }
     Kmer kmer = kmers.next();
-    if (kmers.done()) { return; }
+    if (kmers.done()) {
+        return;
+    }
     Kmer next_kmer = kmers.next();
 
     // ignore any situation where HDN is at beginning or end of sequence

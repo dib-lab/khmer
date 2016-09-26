@@ -171,9 +171,9 @@ public:
             SeenSet * new_tags = 0);
 
     void get_tag_labels(const HashIntoType tag,
-                            LabelSet& labels) const;
+                        LabelSet& labels) const;
     void get_tags_from_label(const Label label,
-                               TagSet& tags) const;
+                             TagSet& tags) const;
 
     void link_tag_and_label(const HashIntoType kmer, const Label label);
 

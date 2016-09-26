@@ -34,17 +34,18 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef SYMBOLS_HH 
+#ifndef SYMBOLS_HH
 #define SYMBOLS_HH
 
-namespace khmer { 
+namespace khmer
+{
 namespace alphabets
 {
 
-    extern char DNA_SIMPLE [];
-    extern char DNAN_SIMPLE [];
-    extern char IUPAC_NUCL [];
-    extern char IUPAC_AA [];
+extern char DNA_SIMPLE [];
+extern char DNAN_SIMPLE [];
+extern char IUPAC_NUCL [];
+extern char IUPAC_AA [];
 
 }
 }

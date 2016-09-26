@@ -35,14 +35,15 @@ LICENSE (END)
 Contact: khmer-project@idyll.org
 */
 
-namespace khmer { 
+namespace khmer
+{
 namespace alphabets
 {
 
-    char DNA_SIMPLE [] = "ACGT";
-    char DNAN_SIMPLE [] = "ACGTN";
-    char IUPAC_NUCL [] = "ACGTURYSWKMBDHVN.-";
-    char IUPAC_AA [] = "ACDEFGHIKLMNPQRSTVWY";
+char DNA_SIMPLE [] = "ACGT";
+char DNAN_SIMPLE [] = "ACGTN";
+char IUPAC_NUCL [] = "ACGTURYSWKMBDHVN.-";
+char IUPAC_AA [] = "ACDEFGHIKLMNPQRSTVWY";
 
 }
 }

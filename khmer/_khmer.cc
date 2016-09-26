@@ -4283,7 +4283,7 @@ labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 static
 PyObject *
 labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
-                                         PyObject * args)
+        PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
@@ -5268,11 +5268,12 @@ static PyMethodDef KhmerMethods[] = {
         "Calculate the hash value of a k-mer using MurmurHash3 "
         "(no reverse complement)",
     },
-    { "reverse_complement",
-       reverse_complement,
-       METH_VARARGS,
-       "Calculate the reverse-complement of the DNA sequence "
-       "with alphabet ACGT",
+    {
+        "reverse_complement",
+        reverse_complement,
+        METH_VARARGS,
+        "Calculate the reverse-complement of the DNA sequence "
+        "with alphabet ACGT",
     },
     {
         "get_version_cpp", get_version_cpp,
