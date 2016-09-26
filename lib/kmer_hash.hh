@@ -118,9 +118,7 @@ HashIntoType _hash_murmur(const std::string& kmer,
 HashIntoType _hash_murmur_forward(const std::string& kmer);
 
 
-//template <typename T, std::size_t N>
-class BigHashType
-{
+class BigHashType {
 public:
   std::array<uint8_t, 10> bytes{{0}};
   constexpr static std::size_t N{10};
@@ -139,122 +137,120 @@ public:
 
   uint64_t as_ull() const {
     uint64_t x(0);
-    int offset(N-8);
+    int offset(N - 8);
     for (std::size_t i = offset; i < N; i++) {
-      x+= ((uint64_t)bytes[i])<<((N-i-1)*8);
+      x += ((uint64_t)bytes[i]) << ((N - i - 1) * 8);
     }
     return x;
   }
 
-  BigHashType& operator=(const uint64_t value) {
-    unsigned int offset(N-8);
+  BigHashType &operator=(const uint64_t value) {
+    unsigned int offset(N - 8);
     for (unsigned int i = 0; i < N - offset; i++) {
       bytes[N - 1 - i] = (value >> (i * 8));
     }
     return *this;
   }
 
-	BigHashType operator>>(int shift) {
-		BigHashType shifted{*this};
-		int next_(0);
-		for (int s = 0; s < shift; s++) {
-			int carry(0);
-			for (unsigned int i = 0; i < N; i++){
-				next_ = (shifted.bytes[i] & 1) ? 0x80 : 0;
-				shifted.bytes[i] = carry | (shifted.bytes[i] >> 1);
-				carry = next_;
-			}
-		}
-		return shifted;
-	}
+  BigHashType operator>>(int shift) {
+    BigHashType shifted{*this};
+    int next_(0);
+    for (int s = 0; s < shift; s++) {
+      int carry(0);
+      for (unsigned int i = 0; i < N; i++) {
+        next_ = (shifted.bytes[i] & 1) ? 0x80 : 0;
+        shifted.bytes[i] = carry | (shifted.bytes[i] >> 1);
+        carry = next_;
+      }
+    }
+    return shifted;
+  }
 
-	BigHashType operator<<(int shift) {
-		BigHashType shifted{*this};
-		int next_(0);
-		for (int s = 0; s < shift; s++) {
-			int carry(0);
-			for (int i = N - 1; i >= 0; i--){
-				next_ = (shifted.bytes[i] & 128) ? 1 : 0;
-				shifted.bytes[i] = carry | ((shifted.bytes[i] << 1) & 255);
-				carry = next_;
-			}
-		}
-		return shifted;
-	}
+  BigHashType operator<<(int shift) {
+    BigHashType shifted{*this};
+    int next_(0);
+    for (int s = 0; s < shift; s++) {
+      int carry(0);
+      for (int i = N - 1; i >= 0; i--) {
+        next_ = (shifted.bytes[i] & 128) ? 1 : 0;
+        shifted.bytes[i] = carry | ((shifted.bytes[i] << 1) & 255);
+        carry = next_;
+      }
+    }
+    return shifted;
+  }
 
-	BigHashType& operator<<=(int rhs){
-		*this = *this << rhs;
-		return *this;
-	}
+  BigHashType &operator<<=(int rhs) {
+    *this = *this << rhs;
+    return *this;
+  }
 
-	BigHashType& operator>>=(int rhs){
-		*this = *this >> rhs;
-		return *this;
-	}
+  BigHashType &operator>>=(int rhs) {
+    *this = *this >> rhs;
+    return *this;
+  }
 
-	BigHashType operator^(const BigHashType& rhs){
-		BigHashType tmp;
-		for (unsigned int i = 0; i < N; i++) {
-			tmp.bytes[i] = bytes[i] ^ rhs.bytes[i];
-		}
-		return tmp;
-	}
+  BigHashType operator^(const BigHashType &rhs) {
+    BigHashType tmp;
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] ^ rhs.bytes[i];
+    }
+    return tmp;
+  }
 
-	BigHashType operator|(const uint64_t rhs) {
-		BigHashType tmp;
-		const BigHashType rhs_{rhs};
+  BigHashType operator|(const uint64_t rhs) {
+    BigHashType tmp;
+    const BigHashType rhs_{rhs};
 
-		for (unsigned int i = 0; i < N; i++) {
-			tmp.bytes[i] = bytes[i] | rhs_.bytes[i];
-		}
-		return tmp;
-	}
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] | rhs_.bytes[i];
+    }
+    return tmp;
+  }
 
-	BigHashType& operator|=(const uint64_t rhs) {
-		// The RHS only has the last 8 bytes set
-		const unsigned int offset(N - 8);
-		const BigHashType rhs_{rhs};
-		for (unsigned int i = offset; i < N; i++) {
-			bytes[i] |= rhs_.bytes[i];
-		}
-		return *this;
-	}
+  BigHashType &operator|=(const uint64_t rhs) {
+    // The RHS only has the last 8 bytes set
+    const unsigned int offset(N - 8);
+    const BigHashType rhs_{rhs};
+    for (unsigned int i = offset; i < N; i++) {
+      bytes[i] |= rhs_.bytes[i];
+    }
+    return *this;
+  }
 
-	BigHashType& operator&=(const BigHashType& rhs) {
-		for (unsigned int i = 0; i < N; i++) {
-			bytes[i] &= rhs.bytes[i];
-		}
-		return *this;
-	}
+  BigHashType &operator&=(const BigHashType &rhs) {
+    for (unsigned int i = 0; i < N; i++) {
+      bytes[i] &= rhs.bytes[i];
+    }
+    return *this;
+  }
 
-	BigHashType operator&(const BigHashType& rhs) {
-		BigHashType tmp;
-		for (unsigned int i = 0; i < N; i++) {
-			tmp.bytes[i] = bytes[i] & rhs.bytes[i];
-		}
-		return tmp;
-	}
+  BigHashType operator&(const BigHashType &rhs) {
+    BigHashType tmp;
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] & rhs.bytes[i];
+    }
+    return tmp;
+  }
 
-	uint8_t operator&(const uint8_t rhs) {
-		return bytes[N - 1] & rhs;
-	}
+  uint8_t operator&(const uint8_t rhs) { return bytes[N - 1] & rhs; }
 
-	uint64_t operator%(const uint64_t mod) {
-		uint64_t ull(as_ull());
-		return ull % mod;
-	}
+  uint64_t operator%(const uint64_t mod) {
+    uint64_t ull(as_ull());
+    return ull % mod;
+  }
 
-	friend bool operator<(const BigHashType& lhs, const BigHashType& rhs) {
-		return std::tie(lhs.bytes) < std::tie(rhs.bytes);
-	}
+  friend bool operator<(const BigHashType &lhs, const BigHashType &rhs) {
+    return std::tie(lhs.bytes) < std::tie(rhs.bytes);
+  }
 
-	friend bool operator==(const BigHashType& lhs, const BigHashType& rhs){
-		return lhs.bytes == rhs.bytes;
-	}
+  friend bool operator==(const BigHashType &lhs, const BigHashType &rhs) {
+    return lhs.bytes == rhs.bytes;
+  }
 
-	friend bool operator!=(const BigHashType& lhs, const BigHashType& rhs){
-		return lhs.bytes != rhs.bytes;
-	}
+  friend bool operator!=(const BigHashType &lhs, const BigHashType &rhs) {
+    return lhs.bytes != rhs.bytes;
+  }
 };
 
 /**
