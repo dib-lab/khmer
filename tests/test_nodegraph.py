@@ -432,7 +432,7 @@ def test_save_load_tagset():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 30, len(data)
+    assert len(data) == 32, len(data)
 
 
 def test_save_load_tagset_noclear():
@@ -454,7 +454,7 @@ def test_save_load_tagset_noclear():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 38, len(data)
+    assert len(data) == 42, len(data)
 
 
 def test_stop_traverse():

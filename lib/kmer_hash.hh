@@ -122,37 +122,37 @@ HashIntoType _hash_murmur_forward(const std::string& kmer);
 class BigHashType
 {
 public:
-	std::array<uint8_t, 8> bytes{{0}};
-	constexpr static std::size_t N{8};
+  std::array<uint8_t, 10> bytes{{0}};
+  constexpr static std::size_t N{10};
 
-	BigHashType() = default;
-	BigHashType(const BigHashType &) = default;
-	BigHashType &operator=(const BigHashType &) = default;
-	BigHashType(BigHashType &&) = default;
-	BigHashType &operator=(BigHashType &&) = default;
+  BigHashType() = default;
+  BigHashType(const BigHashType &) = default;
+  BigHashType &operator=(const BigHashType &) = default;
+  BigHashType(BigHashType &&) = default;
+  BigHashType &operator=(BigHashType &&) = default;
 
-	BigHashType(const uint64_t value) {
-		for (std::size_t i = 0; i < 8; i++) {
-			bytes[N - 1 - i] = (value >> (i * 8));
-		}
-	}
+  BigHashType(const uint64_t value) {
+    for (std::size_t i = 0; i < 8; i++) {
+      bytes[N - 1 - i] = (value >> (i * 8));
+    }
+  }
 
-	uint64_t as_ull() const {
-		uint64_t x(0);
-		int offset(N-8);
-		for (std::size_t i = offset; i < N; i++) {
-			x+= ((uint64_t)bytes[i])<<((N-i-1)*8);
-		}
-		return x;
-	}
+  uint64_t as_ull() const {
+    uint64_t x(0);
+    int offset(N-8);
+    for (std::size_t i = offset; i < N; i++) {
+      x+= ((uint64_t)bytes[i])<<((N-i-1)*8);
+    }
+    return x;
+  }
 
-	BigHashType& operator=(const uint64_t value) {
-		unsigned int offset(N-8);
-		for (unsigned int i = 0; i < N - offset; i++) {
-			bytes[N - 1 - i] = (value >> (i * 8));
-		}
-		return *this;
-	}
+  BigHashType& operator=(const uint64_t value) {
+    unsigned int offset(N-8);
+    for (unsigned int i = 0; i < N - offset; i++) {
+      bytes[N - 1 - i] = (value >> (i * 8));
+    }
+    return *this;
+  }
 
 	BigHashType operator>>(int shift) {
 		BigHashType shifted{*this};
