@@ -64,7 +64,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    BigHashType h, r;
+    HashIntoType h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);

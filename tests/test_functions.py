@@ -89,6 +89,18 @@ def test_forward_hash_no_rc():
     assert h == 255, h
 
 
+def test_forward_hash_no_rc_33mer():
+    # check that k-mers with k=33 are dealt with correctly
+    # a 33-mer is magic as it is the first to go beyond 64bit
+    kmer32 = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG'
+    h32 = khmer.forward_hash_no_rc(kmer32, 32)
+
+    for twobit, base in ((0, 'A'), (1, 'T'), (2, 'C'), (3, 'G')):
+        h33 = (h32 << 2) | twobit
+        h = khmer.forward_hash_no_rc(kmer32 + base, 33)
+        assert h == h33, base
+
+
 def test_reverse_hash():
     s = khmer.reverse_hash(0, 4)
     assert s == "AAAA"
@@ -101,6 +113,18 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_hash_33mer():
+    # check that k-mers with k=33 are dealt with correctly
+    # a 33-mer is magic as it is the first to go beyond 64bit
+    kmer32 = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG'
+    h32 = khmer.forward_hash_no_rc(kmer32, 32)
+
+    for twobit, base in ((0, 'A'), (1, 'T'), (2, 'C'), (3, 'G')):
+        h33 = (h32 << 2) | twobit
+        kmer33 = khmer.reverse_hash(h33, 33)
+        assert kmer32 + base == kmer33, base
 
 
 def test_reverse_hash_longs():
