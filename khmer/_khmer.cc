@@ -113,7 +113,8 @@ extern "C" {
 static bool convert_HashIntoType_to_PyObject(const HashIntoType &hashval,
         PyObject **value)
 {
-    *value = PyLong_FromUnsignedLongLong(hashval);
+    *value = _PyLong_FromByteArray(hashval.bytes.data(), hashval.bytes.size(),
+                                   0, 0);
     return true;
 }
 
@@ -123,11 +124,18 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
         HashIntoType &hashval)
 {
     if (PyLong_Check(value)) {
-        //(PyLongObject *)
-        hashval = PyLong_AsUnsignedLongLong(value);
+        _PyLong_AsByteArray((PyLongObject *)value,
+                            hashval.bytes.data(),
+                            hashval.bytes.size(), 0, 0);
         return true;
     } else if (PyInt_Check(value)) {
-        hashval = PyInt_AsLong(value);
+        // XXX the need to distinguish int and long goes away once python2
+        // XXX support ends
+        PyObject * long_val = PyLong_FromLong(PyInt_AsLong(value));
+        _PyLong_AsByteArray((PyLongObject *)long_val,
+                            hashval.bytes.data(),
+                            hashval.bytes.size(), 0, 0);
+
         return true;
     } else {
         PyErr_SetString(PyExc_ValueError, "could not convert to hash");
@@ -3518,7 +3526,7 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
 {
     CountingHash * counting = me->counting;
 
-    HashIntoType start_kmer = 0, end_kmer = 0;
+    HashIntoType start_kmer, end_kmer;
     PyObject * break_on_stop_tags_o = NULL;
     PyObject * stop_big_traversals_o = NULL;
     BoundedCounterType min_count, max_count;

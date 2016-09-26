@@ -234,7 +234,7 @@ private:
 
     HashIntoType comp_bitmask(WordLength k)
     {
-        HashIntoType ret = 0;
+        HashIntoType ret;
         for (size_t i = 0; i < k; i++) {
             ret = (ret << 2) | 3;
         }
