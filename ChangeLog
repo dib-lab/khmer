@@ -16,6 +16,10 @@
    * lib/{symbols.hh, symbols.cc}: Global DNA alphabets.
    * tests/test_nodegraph.py: Additional tests for the assembler API.
 
+2016-09-26  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/khmer_args.py: Update HLL citation to point to preprint.
+
 2016-09-23  Tim Head  <betatim@gmail.com>
 
    * khmer/_khmer.cc, lib/counting.{cc,hh}, lib/hashbits.{cc,hh},
