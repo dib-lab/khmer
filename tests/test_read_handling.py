@@ -777,3 +777,16 @@ def test_extract_paired_reads_5_stdin_error():
     status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
     assert "output filenames must be provided." in err
+
+
+def test_read_bundler():
+    infile = utils.get_test_data('unclean-reads.fastq')
+    records = [r for r in screed.open(infile)]
+    bundle = khmer.utils.ReadBundle(*records)
+
+    assert bundle.num_reads == 2
+    assert bundle.agg_length == 200
+    assert bundle.cleaned_reads[0] == ('GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGAC'
+        'AGCAGCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGG')
+    assert bundle.cleaned_reads[1] == ('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGAC'
+        'AGCAGCCGCAGCTGTCGTCAGGGGAAAACCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGG')
