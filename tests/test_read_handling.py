@@ -784,9 +784,25 @@ def test_read_bundler():
     records = [r for r in screed.open(infile)]
     bundle = khmer.utils.ReadBundle(*records)
 
+    raw_reads = (
+        'GGTTGACGGGGNNNAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+            'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGANNNCCG'
+            'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
+    cleaned_reads = (
+        'GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+            'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGAAAACCG'
+            'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
     assert bundle.num_reads == 2
     assert bundle.agg_length == 200
-    assert bundle.cleaned_reads[0] == ('GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGAC'
-        'AGCAGCCGCAGCTGTCGTCAGGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGG')
-    assert bundle.cleaned_reads[1] == ('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGAC'
-        'AGCAGCCGCAGCTGTCGTCAGGGGAAAACCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGG')
+    assert bundle.cleaned_reads[0] == cleaned_reads[0]
+    assert bundle.cleaned_reads[1] == cleaned_reads[1]
+
+    for (rd, cln), raw, tstcln in zip(bundle.both(), raw_reads, cleaned_reads):
+        assert rd.sequence == raw
+        assert cln == tstcln
