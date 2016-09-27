@@ -52,9 +52,12 @@ class Hashtable;
 class LabelHash;
 
 
-bool apply_kmer_filters(Kmer& node, KmerFilterList& filters);
+bool apply_kmer_filters(const Kmer& node, const KmerFilterList& filters);
 
 KmerFilter get_label_filter(const Label label, const LabelHash * lh);
+
+KmerFilter get_label_intersect_filter(const LabelSet * src_labels, 
+                                      const LabelHash * lh);
 
 KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
 
