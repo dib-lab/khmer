@@ -1,3 +1,8 @@
+2016-09-26 Ali Aliyari <aaliyari@ucdavis.edu>
+
+   * khmer/khmer_args.py: prevent -N from being set to more than 20 (override by -f)
+   * tests/test_script_arguments.py added test functions for the above change
+
 2016-09-26  Luiz Irber  <khmer@luizirber.org>
 
    * khmer/khmer_args.py: Update HLL citation to point to preprint.
