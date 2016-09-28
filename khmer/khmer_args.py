@@ -427,12 +427,11 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     args = _check_fp_rate(args, fp_rate)
     
     if hasattr(args, 'force'):
-        if not args.force:
-            if args.n_tables > 20:
+        if args.n_tables > 20:
+            if not args.force:
                 print_error("\n** ERROR: khmer only supports number of tables <= 20.\n")
                 sys.exit(1)
-        else:
-            if args.n_tables > 20:
+            else:
                 log_warn("\n*** Warning: Maximum recommended number of tables is 20, discarded by force nonetheless!\n")
 
     if ksize is None:
@@ -450,13 +449,13 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     args = _check_fp_rate(args, fp_rate)
     
     if hasattr(args, 'force'):
-        if not args.force:
-            if args.n_tables > 20:
+        if args.n_tables > 20:
+            if not args.force:
                 print_error("\n** ERROR: khmer only supports number of tables <= 20.\n")
                 sys.exit(1)
-        else:
-            if args.n_tables > 20:
-                log_warn("\n*** Warning: Maximum recommended number of tables is 20, discarded by force nonetheless!\n")
+            else:
+                if args.n_tables > 20:
+                    log_warn("\n*** Warning: Maximum recommended number of tables is 20, discarded by force nonetheless!\n")
 
     if ksize is None:
         ksize = args.ksize

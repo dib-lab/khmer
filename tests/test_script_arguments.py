@@ -150,7 +150,8 @@ FakeArgparseObject = collections.namedtuple('FakeArgs',
                                             ['ksize', 'n_tables',
                                              'max_tablesize',
                                              'max_memory_usage',
-                                             'unique_kmers', 'force'])
+                                             'unique_kmers',
+                                             'force'])
 
 
 def test_create_countgraph_1():
