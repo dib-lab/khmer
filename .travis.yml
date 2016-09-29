@@ -76,7 +76,7 @@ after_success:
   - make doc
   # XXX Do not upload results from travis yet. Currently jenkins is considered
   # XXX the source of truth about coverage
-  # only upload the linux coverage report to codecov as it merges all reports
-  # from all builds into one
-  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install codecov; fi
-  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml; fi
+  # only upload one coverage report to codecov as it merges all reports
+  # from all builds into one.
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip install codecov; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then codecov -X pycov search gcov -f coverage.xml coverage-gcovr.xml; fi
