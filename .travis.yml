@@ -58,6 +58,9 @@ install:
 # command to run tests
 script:
   - make test
+  # copy of `make autopep8`, explicitly placed here as `autopep8` does not
+  # return a non-zero exit status when there are violations
+  - pep8 --ignore E309 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 # generate all the diagnostic reports
 after_success:
