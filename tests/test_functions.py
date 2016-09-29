@@ -105,7 +105,7 @@ def test_reverse_hash():
 def test_reverse_hash_longs():
     # test explicitly with long integers, only needed for python2
     # the builtin `long` exists in the global scope only
-    global long # pylint: disable=global-variable-undefined
+    global long  # pylint: disable=global-variable-undefined
     if sys.version_info > (3,):
         long = int
 
