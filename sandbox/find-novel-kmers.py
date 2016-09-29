@@ -37,7 +37,8 @@ print('Iterating over case reads', args.case_fastq, '...', file=sys.stderr)
 for n, record in enumerate(screed.open(args.case_fastq)):
     if n+1 % 1e6 == 0:
         print('    processed', n+1, 'reads...', file=sys.stderr)
-    for kmer in case.get_kmers(record.sequence):
+    novel_kmers = dict()
+    for i, kmer in enumerate(case.get_kmers(record.sequence)):
         case_abund = case.get(kmer)
         if case_abund < args.case_lower_threshold:
             continue
@@ -46,5 +47,10 @@ for n, record in enumerate(screed.open(args.case_fastq)):
         if True in ctl_thresh_pass:
             continue
 
-        ctl_abund_str = '\t'.join([str(a) for a in control_abunds])
-        print(kmer, case_abund, ctl_abund_str, sep='\t')
+        novel_kmers[i] = [kmer, case_abund] + control_abunds
+    if len(novel_kmers) > 0:
+        print('@', record.name, '\n', record.sequence, '\n+\n', record.quality, sep='')
+        for i in sorted(novel_kmers):
+            kmer, case_abund, ctl1, ctl2 = novel_kmers[i]
+            abundstr = ' '.join([str(abund) for abund in [case_abund, ctl1, ctl2]])
+            print(' ' * i, kmer, ' ' * 10, abundstr, '#', sep='')

@@ -11,6 +11,7 @@ def match(record, seq):
     return refrseq == records.seq
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--seqid', metavar='SEQ', help='dump reads not mapped to SEQ')
 parser.add_argument('fasta')
 parser.add_argument('bam')
 args = parser.parse_args()
@@ -22,6 +23,11 @@ bam = pysam.AlignmentFile(args.bam, 'rb')
 for i, record in enumerate(bam):
     if (i+1) % 10000 == 0:
         print('...processed', i, 'records', file=sys.stderr)
+
+    if args.seqid:
+        if record.reference_id < 0 or bam.get_reference_name(record.reference_id) != args.seqid:
+            continue
+
     if record.is_secondary or record.is_supplementary:
         continue
 
