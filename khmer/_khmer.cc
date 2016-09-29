@@ -111,15 +111,16 @@ extern "C" {
 
 // Convert a hash to a python long object.
 static bool convert_HashIntoType_to_PyObject(const HashIntoType &hashval,
-                                             PyObject **value) {
-      *value = PyLong_FromUnsignedLongLong(hashval);
-      return true;
+        PyObject **value)
+{
+    *value = PyLong_FromUnsignedLongLong(hashval);
+    return true;
 }
 
 
 // Convert a python long to a hash
 static bool convert_PyLong_to_HashIntoType(PyObject * value,
-   HashIntoType &hashval)
+        HashIntoType &hashval)
 {
     if (PyLong_Check(value)) {
         //(PyLongObject *)
@@ -144,7 +145,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
     if (PyInt_Check(value) || PyLong_Check(value)) {
         HashIntoType h;
         if (!convert_PyLong_to_HashIntoType(value, h)) {
-          return false;
+            return false;
         }
         kmer.set_from_unique_hash(h, ksize);
         return true;
@@ -5121,7 +5122,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
     }
     if (PyLong_Check(val) || PyInt_Check(val)) {
         if (!convert_PyLong_to_HashIntoType(val, hash)) {
-          return NULL;
+            return NULL;
         }
     } else {
         PyErr_SetString(PyExc_TypeError,
