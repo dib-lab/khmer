@@ -109,6 +109,32 @@ extern "C" {
 
 /***********************************************************************/
 
+// Convert a hash to a python long object.
+static bool convert_HashIntoType_to_PyObject(const HashIntoType &hashval,
+                                             PyObject **value) {
+      *value = PyLong_FromUnsignedLongLong(hashval);
+      return true;
+}
+
+
+// Convert a python long to a hash
+static bool convert_PyLong_to_HashIntoType(PyObject * value,
+   HashIntoType &hashval)
+{
+    if (PyLong_Check(value)) {
+        //(PyLongObject *)
+        hashval = PyLong_AsUnsignedLongLong(value);
+        return true;
+    } else if (PyInt_Check(value)) {
+        hashval = PyInt_AsLong(value);
+        return true;
+    } else {
+        PyErr_SetString(PyExc_ValueError, "could not convert to hash");
+        return false;
+    }
+}
+
+
 // Take a Python object and (try to) convert it to a khmer::Kmer.
 // Note: will set error condition and return false if cannot do.
 
@@ -117,12 +143,9 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         HashIntoType h;
-        if (PyLong_Check(value)) {
-            h = PyLong_AsUnsignedLongLong(value);
-        } else {
-            h = PyInt_AsLong(value);
+        if (!convert_PyLong_to_HashIntoType(value, h)) {
+          return false;
         }
-
         kmer.set_from_unique_hash(h, ksize);
         return true;
     } else if (PyUnicode_Check(value))  {
@@ -152,7 +175,8 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
     }
 }
 
-// Take a Python object and (try to) convert it to a HashIntoType..
+
+// Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
 // Further note: the main difference between this and
 // convert_PyObject_to_Kmer is that this will not pass HashIntoType
@@ -165,12 +189,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         WordLength ksize)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
-        if (PyLong_Check(value)) {
-            hashval = PyLong_AsUnsignedLongLong(value);
-        } else {
-            hashval = PyInt_AsLong(value);
-        }
-        return true;
+        return convert_PyLong_to_HashIntoType(value, hashval);
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
                                              value, "utf-8", "strict"));
@@ -852,7 +871,8 @@ static PyObject * _HashSet_iternext(PyObject * self)
     _HashSet_iterobj * iter_obj = (_HashSet_iterobj *) self;
     SeenSet * hashes = iter_obj->parent->hashes;
     if (*iter_obj->it != hashes->end()) {
-        PyObject * ret = PyLong_FromUnsignedLongLong(**iter_obj->it);
+        PyObject * ret = nullptr;
+        convert_HashIntoType_to_PyObject((**iter_obj->it), &ret);
         (*(iter_obj->it))++;
         return ret;
     }
@@ -966,8 +986,12 @@ static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 static PyObject *
 hashset_add(khmer_HashSet_Object * me, PyObject * args)
 {
+    PyObject * hash_obj;
     HashIntoType h;
-    if (!PyArg_ParseTuple(args, "K", &h)) {
+    if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
     me->hashes->insert(h);
@@ -979,8 +1003,12 @@ hashset_add(khmer_HashSet_Object * me, PyObject * args)
 static PyObject *
 hashset_remove(khmer_HashSet_Object * me, PyObject * args)
 {
+    PyObject * hash_obj;
     HashIntoType h;
-    if (!PyArg_ParseTuple(args, "K", &h)) {
+    if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
     SeenSet::iterator it = me->hashes->find(h);
@@ -1232,8 +1260,9 @@ hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     try {
-        PyObject * hash;
-        hash = PyLong_FromUnsignedLongLong(_hash(kmer, hashtable->ksize()));
+        PyObject * hash = nullptr;
+        const HashIntoType h(_hash(kmer, hashtable->ksize()));
+        convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
@@ -1247,8 +1276,12 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
+    PyObject * val_o;
     HashIntoType val;
-    if (!PyArg_ParseTuple(args, "K", &val)) {
+    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(val_o, val, 0)) {
         return NULL;
     }
 
@@ -1476,11 +1509,12 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     unsigned int i;
+    PyObject * value = nullptr;
     for (i = 0; node_q.size() > 0; i++) {
-        HashIntoType h = node_q.front();
+        const HashIntoType h = node_q.front();
         node_q.pop();
-        // type K for python unsigned long long
-        PyList_SET_ITEM(x, i, Py_BuildValue("K", h));
+        convert_HashIntoType_to_PyObject(h, &value);
+        PyList_SET_ITEM(x, i, value);
     }
 
     return x;
@@ -1642,9 +1676,11 @@ hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
         pos++;
     }
 
+    PyObject * tag = nullptr;
     PyObject * posns_list = PyList_New(posns.size());
     for (size_t i = 0; i < posns.size(); i++) {
-        PyObject * tup = Py_BuildValue("IK", posns[i], tags[i]);
+        convert_HashIntoType_to_PyObject(tags[i], &tag);
+        PyObject * tup = Py_BuildValue("IO", posns[i], tag);
         PyList_SET_ITEM(posns_list, i, tup);
     }
 
@@ -1951,13 +1987,21 @@ hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    HashIntoType start_kmer = 0, end_kmer = 0;
+    PyObject * start_kmer_obj;
+    PyObject * end_kmer_obj;
+    HashIntoType start_kmer, end_kmer;
     PyObject * break_on_stop_tags_o = NULL;
     PyObject * stop_big_traversals_o = NULL;
 
-    if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
+    if (!PyArg_ParseTuple(args, "|OOOO", &start_kmer_obj, &end_kmer_obj,
                           &break_on_stop_tags_o,
                           &stop_big_traversals_o)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer, 0)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer, 0)) {
         return NULL;
     }
 
@@ -2813,7 +2857,8 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 
     PyObject * x = PyList_New(hashes.size());
     for (unsigned int i = 0; i < hashes.size(); i++) {
-        PyObject * obj = PyLong_FromUnsignedLongLong(hashes[i]);
+        PyObject * obj = nullptr;
+        convert_HashIntoType_to_PyObject(hashes[i], &obj);
         PyList_SET_ITEM(x, i, obj);
     }
 
@@ -4204,9 +4249,13 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
 
+    PyObject * tag_o;
     HashIntoType tag;
 
-    if (!PyArg_ParseTuple(args, "K", &tag)) {
+    if (!PyArg_ParseTuple(args, "O", &tag_o)) {
+        return NULL;
+    }
+    if (!convert_PyObject_to_HashIntoType(tag_o, tag, 0)) {
         return NULL;
     }
 
@@ -5024,8 +5073,9 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
     }
 
     try {
-        PyObject * hash;
-        hash = PyLong_FromUnsignedLongLong(_hash(kmer, ksize));
+        PyObject * hash = nullptr;
+        const HashIntoType h(_hash(kmer, ksize));
+        convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
@@ -5054,15 +5104,28 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(_hash_forward(kmer, ksize));
+    PyObject * hash = nullptr;
+    const HashIntoType h(_hash_forward(kmer, ksize));
+    convert_HashIntoType_to_PyObject(h, &hash);
+    return hash;
 }
 
 static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
-    HashIntoType val;
+    PyObject * val;
+    HashIntoType hash;
     WordLength ksize;
 
-    if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
+    if (!PyArg_ParseTuple(args, "Ob", &val, &ksize)) {
+        return NULL;
+    }
+    if (PyLong_Check(val) || PyInt_Check(val)) {
+        if (!convert_PyLong_to_HashIntoType(val, hash)) {
+          return NULL;
+        }
+    } else {
+        PyErr_SetString(PyExc_TypeError,
+                        "Hash value must be an integer.");
         return NULL;
     }
 
@@ -5071,7 +5134,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyUnicode_FromString(_revhash(val, ksize).c_str());
+    return PyUnicode_FromString(_revhash(hash, ksize).c_str());
 }
 
 static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
@@ -5082,7 +5145,10 @@ static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(_hash_murmur(kmer));
+    PyObject * hash = nullptr;
+    const HashIntoType h(_hash_murmur(kmer));
+    convert_HashIntoType_to_PyObject(h, &hash);
+    return hash;
 }
 
 static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
@@ -5093,7 +5159,10 @@ static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyLong_FromUnsignedLongLong(_hash_murmur_forward(kmer));
+    PyObject * hash = nullptr;
+    const HashIntoType h(_hash_murmur_forward(kmer));
+    convert_HashIntoType_to_PyObject(h, &hash);
+    return hash;
 }
 
 //
