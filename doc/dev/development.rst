@@ -196,8 +196,9 @@ On the C++ side, there are an abundance of ``consume`` functions for loading
 Fasta/Fastq sequences. On the Python side, read handling is sometimes delegated
 to the C++ library, and sometimes handled in Python using screed.
 
-In an attempt to normalize read handling in Python, the `ReadBundle` class has
+In an attempt to normalize read handling in Python, the ``ReadBundle`` class has
 been taken out of ``trim-low-abund.py`` and placed in ``khmer/utils.py`` to be
 accessible to all other modules and scripts. Further development should focus on
-moving all existing Python read cleaning/QC/handling to `ReadBundle`, as well as
-replacing *ad hoc* read handling code throughout the codebase with `ReadBundle`.
+moving all existing Python read cleaning/QC/handling to ``ReadBundle``, as well
+as replacing *ad hoc* read handling code throughout the codebase with
+``ReadBundle``.
