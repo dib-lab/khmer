@@ -35,8 +35,8 @@ for ctlfile in args.controls:
 
 print('Iterating over case reads', args.case_fastq, '...', file=sys.stderr)
 for n, record in enumerate(screed.open(args.case_fastq)):
-    if n+1 % 1e6 == 0:
-        print('    processed', n+1, 'reads...', file=sys.stderr)
+    if n > 0 and n % 1e6 == 0:
+        print('    processed', n, 'reads...', file=sys.stderr)
     novel_kmers = dict()
     for i, kmer in enumerate(case.get_kmers(record.sequence)):
         case_abund = case.get(kmer)
@@ -54,3 +54,4 @@ for n, record in enumerate(screed.open(args.case_fastq)):
             kmer, case_abund, ctl1, ctl2 = novel_kmers[i]
             abundstr = ' '.join([str(abund) for abund in [case_abund, ctl1, ctl2]])
             print(' ' * i, kmer, ' ' * 10, abundstr, '#', sep='')
+            sys.stdout.flush()
