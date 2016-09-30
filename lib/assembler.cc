@@ -40,7 +40,7 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG 0
+#define DEBUG 1
 #define DEBUG_AT 0
 
 using namespace std;
@@ -157,7 +157,7 @@ const
  * Labeled Assembly
  ********************************/
 
-LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * lh) :
+NaiveLabeledAssembler::NaiveLabeledAssembler(const LabelHash * lh) :
     graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
 {
     linear_asm = new LinearAssembler(graph);
@@ -166,7 +166,7 @@ LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * lh) :
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
-StringVector LabeledLinearAssembler::assemble(const Kmer seed_kmer,
+StringVector NaiveLabeledAssembler::assemble(const Kmer seed_kmer,
         const Hashtable * stop_bf)
 const
 {
@@ -210,7 +210,87 @@ const
 }
 
 template <bool direction>
-void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>&
+void NaiveLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
+        start_cursor,
+        StringVector& paths)
+const
+{
+
+    std::string root_contig = linear_asm->_assemble_directed<direction>
+                              (start_cursor);
+    Kmer end_kmer = start_cursor.cursor;
+
+    if (start_cursor.cursor_degree() > 1) {               // hit a HDN
+#if DEBUG
+        std::cout << "Contig thus far: " << root_contig << std::endl;
+        std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
+#endif // DEBUG
+
+        LabelSet labels;
+        lh->get_tag_labels(end_kmer, labels);
+
+
+        if(labels.size() == 0) {
+            // if no labels are found there's nothing to be done, return
+#if DEBUG
+            std::cout << "no labels" << std::endl;
+#endif
+            paths.push_back(root_contig);
+            return;
+        } else {
+#if DEBUG
+            std::cout << "num labels: " << labels.size() << std::endl;
+#endif
+            /* Copy the current cursor at end_cursor for the spanning function.
+             * We'll now assemble, following the given label, as far as we can.
+             * We add an extra filter to the list: now, if we find no labels, we
+             * continue assembling; if we find labels and ours is included, we
+             * continue; and if we find labels and ours is not included, we stop.
+             * This cursor should also have the filters for visited k-mers and
+             * the stop bloom filter already.
+             */
+
+            // Get neighbors using NodeGatherer.neighbors instead?
+            NonLoopingAT<direction> span_cursor(start_cursor);
+            span_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+            std::string spanning_contig = linear_asm->_assemble_directed<direction>
+                                          (span_cursor);
+
+            if(spanning_contig.length() == _ksize) {
+                // only found the HDN, ie, we found nothing
+#if DEBUG
+                std::cout << "zero length spanning contig" << spanning_contig << std::endl;
+#endif
+                paths.push_back(root_contig);
+                return;
+            }
+
+            // Remove the label filter
+            span_cursor.pop_filter();
+
+            // Recurse and gather paths
+            StringVector continue_contigs;
+            _assemble_directed<direction>(span_cursor, continue_contigs);
+
+            if (continue_contigs.size() == 0) {
+                paths.push_back(span_cursor.join_contigs(root_contig,
+                                spanning_contig));
+            } else {
+                for (auto continue_contig : continue_contigs) {
+                    std::string full_contig = span_cursor.join_contigs(root_contig,
+                                              spanning_contig);
+                    paths.push_back(span_cursor.join_contigs(full_contig, continue_contig));
+                }
+            }
+        }
+    } else {
+        paths.push_back(root_contig);
+    }
+}
+
+
+template <bool direction>
+void LabelIntersectAssembler::_assemble_directed(NonLoopingAT<direction>&
         start_cursor,
         StringVector& paths)
 const
@@ -296,5 +376,7 @@ const
         paths.push_back(root_contig);
     }
 }
+
+
 
 }
