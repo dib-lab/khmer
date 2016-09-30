@@ -265,7 +265,7 @@ class ReadBundle(object):
         return len(self.cleaned_reads)
 
     @property
-    def agg_length(self):
+    def total_length(self):
         return sum([len(r) for r in self.cleaned_reads])
 
 

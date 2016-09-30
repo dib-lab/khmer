@@ -240,7 +240,7 @@ class Trimmer(object):
 
             # clean up the sequences for examination.
             self.n_reads += bundle.num_reads
-            self.n_bp += bundle.agg_length
+            self.n_bp += bundle.total_length
 
             min_coverage = min(bundle.coverages(graph))
 
@@ -284,7 +284,7 @@ class Trimmer(object):
 
             # clean up the sequences for examination.
             self.n_reads += bundle.num_reads
-            self.n_bp += bundle.agg_length
+            self.n_bp += bundle.total_length
 
             for (read, cleaned_read), coverage in zip(bundle.both(),
                                                       bundle.coverages(graph)):
