@@ -811,6 +811,7 @@ def test_read_bundler():
     records = [r for r in screed.open(infile)]
     bundle = khmer.utils.ReadBundle(*records)
     assert bundle.num_reads == 1
+    assert bundle.reads[0].sequence == bundle.cleaned_reads[0]
 
     infile = utils.get_test_data('empty-file')
     records = [r for r in screed.open(infile)]
