@@ -61,8 +61,6 @@ script:
   # copy of `make autopep8`, explicitly placed here as `autopep8` does not
   # return a non-zero exit status when there are violations
   - pep8 --ignore E309 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make astyle; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" && $(git status -s) ]] then exit 1; fi 
 
 # generate all the diagnostic reports
 after_success:
