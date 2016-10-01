@@ -1112,12 +1112,19 @@ std::string Hashtable::_assemble_right(const char * start_kmer,
     std::string kmer = start_kmer;
     std::string contig = kmer;
 
+    // This loop extends the starting k-mer to the right as long as it can
+    // do so unambiguously (or not at all).  This involves checking each
+    // possible nucleotide suffix for presence; extension is continued until
+    // either more than one such k-mer is present ('found2' is true), or no
+    // such k-mer is present ('found' is false).
+
     while (1) {
         const char * base = &bases[0];
         bool found = false;
         char found_base;
         bool found2 = false;
 
+        // check all four suffixes for presence.
         while(*base != 0) {
             std::string try_kmer = kmer.substr(1) + (char) *base;
 
@@ -1133,13 +1140,16 @@ std::string Hashtable::_assemble_right(const char * start_kmer,
             }
             base++;
         }
+
+        // exit condition: no suffix k-mer, or more than one.
         if (!found or found2) {
             break;
-        } else {
-            contig += found_base;
-            kmer = kmer.substr(1) + found_base;
-            found = true;
         }
+
+        // extend assembly!
+        contig += found_base;
+        kmer = kmer.substr(1) + found_base;
+        found = true;
     }
     return contig;
 }
