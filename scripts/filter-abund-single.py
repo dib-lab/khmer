@@ -48,9 +48,11 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import os
 import sys
-import khmer
 import threading
 import textwrap
+import khmer
+import screed
+from khmer.utils import broken_paired_reader, write_record
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_graphsize,
@@ -61,8 +63,6 @@ from khmer.kfile import (check_input_files, check_space,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
-import screed
-from khmer.utils import broken_paired_reader, write_record
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2

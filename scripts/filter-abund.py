@@ -45,21 +45,21 @@ Output sequences will be placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+import sys
 import os
-import khmer
 import textwrap
 import argparse
-import sys
+import khmer
+import screed
+from khmer import __version__
+from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
                               sanitize_help, _VersionStdErrAction,
                               check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
-from khmer import __version__
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
-import screed
-from khmer.utils import broken_paired_reader, write_record
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
