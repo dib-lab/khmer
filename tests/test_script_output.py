@@ -58,7 +58,7 @@ def test_normalize_by_median_k21_C20_M1e7():
                                                infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '63a8124e36f866976ab19f1779c59636', hash
+    assert hash == '5fed8ed10896639ad7fb607f93a4473d', hash
 
 
 def test_normalize_by_median_k21_C15_M1e7():
@@ -69,7 +69,7 @@ def test_normalize_by_median_k21_C15_M1e7():
                                                infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == 'c5359f28ea15d8ca067d87a0c9157b09', hash
+    assert hash == 'fd38b9e17a736694c20e66a3d8411eaa', hash
 
 
 def test_trim_low_abund_k21_C0_M1e7_diginorm():
@@ -83,7 +83,7 @@ def test_trim_low_abund_k21_C0_M1e7_diginorm():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '63a8124e36f866976ab19f1779c59636', hash
+    assert hash == '5fed8ed10896639ad7fb607f93a4473d', hash
 
 
 def test_trim_low_abund_k21_C0_M1e7_diginorm_dn15():
@@ -97,7 +97,7 @@ def test_trim_low_abund_k21_C0_M1e7_diginorm_dn15():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == 'c5359f28ea15d8ca067d87a0c9157b09', hash
+    assert hash == 'fd38b9e17a736694c20e66a3d8411eaa', hash
 
 
 def test_trim_low_abund_k21_C2_M1e7_diginorm_dn15():
@@ -111,7 +111,7 @@ def test_trim_low_abund_k21_C2_M1e7_diginorm_dn15():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '9964b660d003856984e188c62e6f4551', hash
+    assert hash == 'e57be1402a9fd84d8481d8ef5a695596', hash
 
 
 def test_trim_low_abund_k21_M1e7_C2():
@@ -122,7 +122,7 @@ def test_trim_low_abund_k21_M1e7_C2():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '0177bcb95a5b0f99f223b39d76b7dba2', hash
+    assert hash == '21ad2f64ceeb1e153f1e513486df9434', hash
 
 
 def test_trim_low_abund_k21_M1e7_C3():
@@ -133,7 +133,7 @@ def test_trim_low_abund_k21_M1e7_C3():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == 'a6eba345ace7263a69c77a97854e1df0', hash
+    assert hash == '3da84a42d8538e24240e78cd0eadf168', hash
 
 
 def test_trim_low_abund_k21_M1e7_C4():
@@ -144,7 +144,7 @@ def test_trim_low_abund_k21_M1e7_C4():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '65596253b87ed8d5aeb14dc8cf5a7406', hash
+    assert hash == '578f124937b5a639985cc0a808139653', hash
 
 
 def test_trim_low_abund_k21_M1e7_C4_variable():
@@ -156,7 +156,7 @@ def test_trim_low_abund_k21_M1e7_C4_variable():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == 'd0a3c3727fc7842f449fddef5b6c8532', hash
+    assert hash == '154d2a25599b3dcd2cf9cd2375999e56', hash
 
 
 def test_trim_low_abund_k21_M1e7_C4_variable_Z25():
@@ -168,7 +168,7 @@ def test_trim_low_abund_k21_M1e7_C4_variable_Z25():
                                           infile])
 
     hash = utils._calc_md5(open(outfile, 'rb'))
-    assert hash == '82807b46fa5ee6b035b82a163cb980d6', hash
+    assert hash == 'eb8bc6ed6246fb819100b9e7dde6fad2', hash
 
 
 def test_trim_low_abund_k21_M1e7_C4_variable_Z15():
@@ -181,4 +181,4 @@ def test_trim_low_abund_k21_M1e7_C4_variable_Z15():
 
     with open(outfile, 'rb') as output:
         hashval = utils._calc_md5(output)
-    assert hashval == 'bc7c38423411b642668775dd8048e11a', hash
+    assert hashval == 'b948ae4f2114be27279de37b46376f6d', hash
