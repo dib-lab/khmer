@@ -114,6 +114,26 @@ def get_parser():
     return parser
 
 
+def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
+    name = record.name
+    seq = record.sequence
+    seqN = seq.replace('N', 'A')
+
+    if variable_coverage:  # only trim when sequence has high enough C
+        med, _, _ = countgraph.get_median_count(seqN)
+        if med < normalize_to:
+            return name, seq
+
+    _, trim_at = countgraph.trim_on_abundance(seqN, cutoff)
+
+    if trim_at >= countgraph.ksize():
+        # be sure to not to change the 'N's in the trimmed sequence -
+        # so, return 'seq' and not 'seqN'.
+        return name, seq[:trim_at]
+
+    return None, None
+
+
 def main():
     args = sanitize_help(get_parser()).parse_args()
     if not args.quiet:
@@ -153,27 +173,9 @@ def main():
     fp_rate = khmer.calc_expected_collisions(graph, args.force)
     log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    # now, trim.
-
-    # the filtering function.
     def process_fn(record):
-        name = record.name
-        seq = record.sequence
-        seqN = seq.replace('N', 'A')
-
-        if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = graph.get_median_count(seqN)
-            if med < args.normalize_to:
-                return name, seq
-
-        _, trim_at = graph.trim_on_abundance(seqN, args.cutoff)
-
-        if trim_at >= args.ksize:
-            # be sure to not to change the 'N's in the trimmed sequence -
-            # so, return 'seq' and not 'seqN'.
-            return name, seq[:trim_at]
-
-        return None, None
+        return trim_record(graph, record, args.variable_coverage,
+                           args.cutoff, args.normalize_to)
 
     # the filtering loop
     log_info('filtering {datafile}', datafile=args.datafile)

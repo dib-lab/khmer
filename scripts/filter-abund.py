@@ -112,6 +112,7 @@ def get_parser():
     add_output_compression_type(parser)
     return parser
 
+
 def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
     name = record.name
     seq = record.sequence
@@ -130,6 +131,7 @@ def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
         return name, seq[:trim_at]
 
     return None, None
+
 
 def main():
     args = sanitize_help(get_parser()).parse_args()
