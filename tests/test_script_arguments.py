@@ -244,7 +244,7 @@ def test_create_countgraph_5():
     try:
         khmer_args.create_countgraph(args, ksize=None)
         message = "Warning: Maximum recommended number of tables is 20, " + \
-                  " discarded by force nonetheless!"
+                  "discarded by force nonetheless!"
         assert message in capture.getvalue()
     except SystemExit as e:
         print(str(e))
