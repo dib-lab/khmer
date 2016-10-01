@@ -1528,8 +1528,8 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o;
-    khmer_HashSet_Object * hdn_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    khmer_HashSet_Object * hdn_o = NULL;
 
     if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
@@ -1557,6 +1557,37 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
                                    (PyObject *) adj_o, (PyObject *) visited_o);
     Py_DECREF(adj_o);
     Py_DECREF(visited_o);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
+    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
 
     return ret;
 }
@@ -3025,6 +3056,13 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "k-mer and avoiding high-degree nodes, finding (and returning) "
         "traversed k-mers and any encountered high-degree nodes.",
     },
+    {
+        "assemble_linear_path",
+        (PyCFunction)hashtable_assemble_linear_path, METH_VARARGS,
+        "Assemble a purely linear path starting with the given "
+        "k-mer, returning traversed k-mers and any encountered high-degree "
+        "nodes.",
+    },
 
     //
     // tagging / sparse graph functionality
@@ -4291,6 +4329,62 @@ labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 
 static
 PyObject *
+labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
+                                         PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    const char * long_str;
+    khmer_HashSet_Object * hdn_o = NULL;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "sO!K", &long_str,
+                          &khmer_HashSet_Type, &hdn_o, &label)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < labelhash->graph->ksize()) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    labelhash->label_across_high_degree_nodes(long_str, *hdn_o->hashes, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
+labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
+                                PyObject * args)
+{
+    LabelHash* labelhash = me->labelhash;
+
+    PyObject * val_o;
+
+    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer,
+                                  labelhash->graph->ksize())) {
+        return NULL;
+    }
+
+    std::vector<std::string> contigs = labelhash->assemble_labeled_path(start_kmer);
+
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+static
+PyObject *
 labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     const char * filename = NULL;
@@ -4340,6 +4434,16 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
+    {
+        "label_across_high_degree_nodes",
+        (PyCFunction)labelhash_label_across_high_degree_nodes, METH_VARARGS,
+        "Connect graph across high degree nodes using labels.",
+    },
+    {
+        "assemble_labeled_path",
+        (PyCFunction)labelhash_assemble_labeled_path, METH_VARARGS,
+        "Assemble all paths, using labels to negotiate tricky bits."
+    },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };

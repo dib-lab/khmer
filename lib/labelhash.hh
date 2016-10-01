@@ -97,7 +97,7 @@ protected:
 
     unsigned int _get_tag_labels(const HashIntoType tag,
                                  const TagLabelMap cmap,
-                                 LabelSet& found_labels)
+                                 LabelSet& found_labels) const
     {
         unsigned int num_labels = 0;
         std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
@@ -171,7 +171,7 @@ public:
             Label current_label,
             SeenSet * new_tags = 0);
 
-    LabelSet get_tag_labels(const HashIntoType tag);
+    LabelSet get_tag_labels(const HashIntoType tag) const;
 
     void link_tag_and_label(const HashIntoType kmer, const Label label);
 
@@ -187,6 +187,13 @@ public:
     void save_labels_and_tags(std::string);
     void load_labels_and_tags(std::string);
 
+    void label_across_high_degree_nodes(const char * sequence,
+                                        SeenSet& high_degree_nodes,
+                                        const Label label);
+    std::vector<std::string> assemble_labeled_path(const Kmer seed_kmer) const;
+    void _assemble_labeled_right(const char * start_kmer, std::vector<std::string>&) const;
+    std::string _assemble_linear_labels(const std::string kmer,
+                                        const Label label) const;
 };
 }
 
