@@ -50,7 +50,6 @@ import khmer
 import textwrap
 import argparse
 import sys
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
                               sanitize_help, _VersionStdErrAction,
                               check_argument_range)
@@ -59,6 +58,8 @@ from khmer.kfile import (check_input_files, check_space,
 from khmer import __version__
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+import screed
+from khmer.utils import broken_paired_reader, write_record
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -174,9 +175,26 @@ def main():
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads,
-                                        verbose=not args.quiet)
-        tsp.start(verbose_loader(infile), outfp)
+        screed_iter = screed.open(infile)
+        paired_iter = broken_paired_reader(screed_iter, min_length=ksize,
+                                           force_single=True)
+
+        for n, is_pair, read1, read2 in paired_iter:
+            assert not is_pair
+            assert read2 is None
+
+            name, seq = trim_record(countgraph, read1, args.variable_coverage,
+                                    args.cutoff, args.normalize_to)
+            if name:
+                if hasattr(read1, 'quality'):
+                    qual = read1.quality
+                    qual = qual[:len(seq)]
+                    record = screed.Record(name=name, sequence=seq,
+                                           quality=qual)
+                else:
+                    record = screed.Record(name=name, sequence=seq)
+
+                write_record(record, outfp)
 
         log_info('output in {outfile}', outfile=outfile)
 
