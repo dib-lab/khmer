@@ -37,7 +37,8 @@ from __future__ import print_function, unicode_literals
 import screed
 
 
-def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
+def trim_record(countgraph, record, cutoff, variable_coverage=False,
+                normalize_to=None):
     name = record.name
     seq = record.sequence
     seqN = seq.replace('N', 'A')
@@ -45,13 +46,17 @@ def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
     if variable_coverage:  # only trim when sequence has high enough C
         med, _, _ = countgraph.get_median_count(seqN)
         if med < normalize_to:
-            return record                 # return unmodified
+            return record, False                 # return unmodified
 
     _, trim_at = countgraph.trim_on_abundance(seqN, cutoff)
 
     # too short? eliminate read
     if trim_at < countgraph.ksize():
-        return None
+        return None, True
+
+    # would we trim? if not, return unmodified.
+    if trim_at == len(seq):
+        return record, False
 
     # construct new record
     trim_seq = seq[:trim_at]
@@ -62,4 +67,4 @@ def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
     else:
         trim_rec = screed.Record(name=name, sequence=trim_seq)
 
-    return trim_rec
+    return trim_rec, True

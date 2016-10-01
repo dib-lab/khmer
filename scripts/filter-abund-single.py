@@ -172,9 +172,11 @@ def main():
         assert not is_pair
         assert read2 is None
 
-        trimmed_record = trim_record(graph, read1, args.variable_coverage,
-                                     args.cutoff, args.normalize_to)
+        trimmed_record, _ = trim_record(graph, read1, args.cutoff,
+                                        args.variable_coverage,
+                                        args.normalize_to)
         if trimmed_record:
+            print((trimmed_record,))
             write_record(trimmed_record, outfp)
 
     log_info('output in {outfile}', outfile=outfile)

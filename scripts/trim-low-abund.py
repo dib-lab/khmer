@@ -66,6 +66,7 @@ from khmer.kfile import (check_space, check_space_for_graph,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+import khmer.trimming
 
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
@@ -152,38 +153,6 @@ def get_parser():
     return parser
 
 
-def trim_record(read, trim_at):
-    """Utility function: create a new record, trimmed at given location."""
-    new_read = Record()
-    new_read.name = read.name
-    new_read.sequence = read.sequence[:trim_at]
-    if hasattr(read, 'quality'):
-        new_read.quality = read.quality[:trim_at]
-
-    return new_read
-
-
-def do_trim_read(graph, read, cleaned_read, CUTOFF):
-    """Utility function: trim a read on abundance."""
-    K = graph.ksize()
-
-    # trim the 'N'-cleaned read
-    _, trim_at = graph.trim_on_abundance(cleaned_read, CUTOFF)
-
-    # too short after trimming? eliminate read.
-    if trim_at < K:
-        return None, False
-
-    # will trim? do so.
-    did_trim = False
-    if trim_at != len(cleaned_read):
-        did_trim = True
-        read = trim_record(read, trim_at)
-
-    # return for processing
-    return read, did_trim
-
-
 class Trimmer(object):
     """
     Core trimming object.
@@ -251,8 +220,8 @@ class Trimmer(object):
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
                 for read, cleaned_read in bundle.both():
-                    record, did_trim = do_trim_read(graph, read,
-                                                    cleaned_read, CUTOFF)
+                    record, did_trim = khmer.trimming.trim_record(graph, read,
+                                                                  CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
@@ -286,11 +255,12 @@ class Trimmer(object):
             self.n_reads += bundle.num_reads
             self.n_bp += bundle.total_length
 
+            # @CTB look into this code.
             for (read, cleaned_read), coverage in zip(bundle.both(),
                                                       bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
-                    record, did_trim = do_trim_read(graph, read, cleaned_read,
-                                                    CUTOFF)
+                    record, did_trim = khmer.trimming.trim_record(graph, read,
+                                                                  CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
