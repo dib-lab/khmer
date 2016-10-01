@@ -7,6 +7,15 @@
    * tests/test_functions.py: updated tests to use screed.Record instead of
    namedtuple classes.
 
+2016-10-01  Titus Brown  <titus@idyll.org>
+
+   * lib/hashtable.{cc,hh}: added assemble_linear_path function & helpers.
+   * khmer/_khmer.cc: CPython API for assemble_linear_path.
+   * tests/test_nodegraph.py: tests for new assemble_linear_path behavior.
+   * khmer/khmer_args.py, tests/test_script_arguments.py: fix some lingering
+   PEP 8 errors.
+   * lib/kmer_hash.hh: added string -> string _revcomp function.
+
 2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
