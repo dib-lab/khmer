@@ -253,7 +253,7 @@ def write_record_pair(read1, read2, fileobj):
 class ReadBundle(object):
     def __init__(self, *raw_records):
         self.reads = [i for i in raw_records if i]
-        self.cleaned_seqs = [r.sequence.replace('N', 'A') for r in self.reads]
+        self.cleaned_seqs = [r.cleaned_seq for r in self.reads]
 
     def coverages(self, graph):
         return [graph.get_median_count(r)[0] for r in self.cleaned_seqs]
