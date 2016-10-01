@@ -2794,22 +2794,18 @@ def test_unique_kmers_multiple_inputs():
     assert 'Total estimated number of unique 20-mers: 4170' in err
 
 
-def check_version_and_basic_citation(scriptname):
-    version = re.compile("^khmer .*$", re.MULTILINE)
-    status, out, err = utils.runscript(scriptname, ["--version"])
-    assert status == 0, status
-    print(out)
-    print(err)
-    # assert "publication" in err, err
-    assert version.search(err) is not None, err
-
-
-def test_version():
-    for entry in os.listdir(utils.scriptpath()):
-        if entry.endswith(".py"):
-            with open(os.path.join(utils.scriptpath(), entry)) as script:
-                line = script.readline()
-                line = script.readline()
-                if 'khmer' in line:  # simple check of copyright line.
-                    yield check_version_and_basic_citation, entry
-                    # emit test for each script
+@pytest.mark.parametrize("scriptname",
+                         [entry for entry in os.listdir(utils.scriptpath())
+                          if entry.endswith('.py')])
+def test_version_and_basic_citation(scriptname):
+    with open(os.path.join(utils.scriptpath(), scriptname)) as script:
+        line = script.readline()
+        line = script.readline()
+        if 'khmer' in line:
+            version = re.compile("^khmer .*$", re.MULTILINE)
+            status, out, err = utils.runscript(scriptname, ["--version"])
+            assert status == 0, status
+            print(out)
+            print(err)
+            # assert "publication" in err, err
+            assert version.search(err) is not None, err

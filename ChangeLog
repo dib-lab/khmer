@@ -1,3 +1,60 @@
+2016-10-01  Titus Brown  <titus@idyll.org>
+
+   * khmer/trimming.py,scripts/{filter-abund-single.py,filter-abund.py,
+   trim-low-abund.py}: extracted similar trimming code and refactored.
+   * khmer/utils.py,tests/test_read_handling.py: change ReadBundle.trimmed_reads
+   to trimmed_seqs; fix associated tests.
+   * tests/test_functions.py: updated tests to use screed.Record instead of
+   namedtuple classes.
+
+2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
+   ReadBundle class to utils
+   * tests/test_read_handling.py, tests/test-data/unclean-reads.fastq: tests
+   related to ReadBundle
+
+2016-09-29  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py, tests/test_functions.py,
+   tests/test_script_arguments.py: fix up formatting
+
+2016-09-26 Ali Aliyari <aaliyari@ucdavis.edu>
+
+   * khmer/khmer_args.py: prevent -N from being set to more than 20 (override by -f)
+   * tests/test_script_arguments.py added test functions for the above change
+
+2016-09-26  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/khmer_args.py: Update HLL citation to point to preprint.
+
+2016-09-23  Tim Head  <betatim@gmail.com>
+
+   * khmer/_khmer.cc, lib/counting.{cc,hh}, lib/hashbits.{cc,hh},
+     lib/hashtable.hh, lib/hllcounter.{cc,hh}, lib/kmer_hash.cc,
+     tests/khmer_tst_utils.py, tests/test_functions.py: move away from using
+     HashIntoType as synonym to uint64.
+
+2016-09-21  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: add python 3.5 to the build matrix and allow fast finishing
+
+2016-09-20  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: fixed bug in broken_paired_reader when short reads
+   are discarded and require_paired is set; improved read pair error reporting.
+   * tests/test_functions.py: added tests for broken_paired_reader fix.
+   * tests/khmer_tst_utils.py: de-nested exceptions for better error reporting
+   from tests.
+
+2016-09-09  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/read_parsers.{cc,hh}: rename SeqAnParser to FastxParser.
+
+2016-09-09  Tim Head  <betatim@gmail.com>
+
+   * tests/test_filter_abund.py: remove for loops introduce to the test suite.
+
 2016-09-01  Tim Head  <betatim@gmail.com>
 
    * khmer/khmer_args.py: added check_argument_range to check an integer

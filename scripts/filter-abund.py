@@ -45,20 +45,22 @@ Output sequences will be placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+import sys
 import os
-import khmer
 import textwrap
 import argparse
-import sys
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+import khmer
+import screed
+from khmer import __version__
+from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
                               sanitize_help, _VersionStdErrAction,
                               check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
-from khmer import __version__
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+from khmer.trimming import (trim_record)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -138,26 +140,6 @@ def main():
 
     log_info("K: {ksize}", ksize=ksize)
 
-    # the filtering function.
-    def process_fn(record):
-        name = record.name
-        seq = record.sequence
-        seqN = seq.replace('N', 'A')
-
-        if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = countgraph.get_median_count(seqN)
-            if med < args.normalize_to:
-                return name, seq
-
-        _, trim_at = countgraph.trim_on_abundance(seqN, args.cutoff)
-
-        if trim_at >= ksize:
-            # be sure to not to change the 'N's in the trimmed sequence -
-            # so, return 'seq' and not 'seqN'.
-            return name, seq[:trim_at]
-
-        return None, None
-
     if args.single_output_file:
         outfile = args.single_output_file.name
         outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
@@ -170,9 +152,19 @@ def main():
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads,
-                                        verbose=not args.quiet)
-        tsp.start(verbose_loader(infile), outfp)
+        screed_iter = screed.open(infile)
+        paired_iter = broken_paired_reader(screed_iter, min_length=ksize,
+                                           force_single=True)
+
+        for n, is_pair, read1, read2 in paired_iter:
+            assert not is_pair
+            assert read2 is None
+
+            trimmed_record, _ = trim_record(countgraph, read1, args.cutoff,
+                                            args.variable_coverage,
+                                            args.normalize_to)
+            if trimmed_record:
+                write_record(trimmed_record, outfp)
 
         log_info('output in {outfile}', outfile=outfile)
 

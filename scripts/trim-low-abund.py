@@ -59,12 +59,14 @@ from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
-from khmer.utils import write_record, write_record_pair, broken_paired_reader
+from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
+                         ReadBundle)
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+from khmer.trimming import trim_record
 
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
@@ -151,64 +153,6 @@ def get_parser():
     return parser
 
 
-class ReadBundle(object):
-    def __init__(self, *raw_records):
-        self.reads = [i for i in raw_records if i]
-        self.cleaned_reads, self.n_reads, self.n_bp = \
-            clean_up_reads(self.reads)
-
-    def coverages(self, graph):
-        return [graph.get_median_count(r)[0] for r in self.cleaned_reads]
-
-    def both(self):
-        return zip(self.reads, self.cleaned_reads)
-
-
-def clean_up_reads(reads):
-    n_reads = 0
-    n_bp = 0
-    cleaned_reads = []
-    for read in reads:
-        r = read.sequence.replace('N', 'A')
-        cleaned_reads.append(r)
-        n_reads += 1
-        n_bp += len(r)
-
-    return cleaned_reads, n_reads, n_bp
-
-
-def trim_record(read, trim_at):
-    """Utility function: create a new record, trimmed at given location."""
-    new_read = Record()
-    new_read.name = read.name
-    new_read.sequence = read.sequence[:trim_at]
-    if hasattr(read, 'quality'):
-        new_read.quality = read.quality[:trim_at]
-
-    return new_read
-
-
-def do_trim_read(graph, read, cleaned_read, CUTOFF):
-    """Utility function: trim a read on abundance."""
-    K = graph.ksize()
-
-    # trim the 'N'-cleaned read
-    _, trim_at = graph.trim_on_abundance(cleaned_read, CUTOFF)
-
-    # too short after trimming? eliminate read.
-    if trim_at < K:
-        return None, False
-
-    # will trim? do so.
-    did_trim = False
-    if trim_at != len(cleaned_read):
-        did_trim = True
-        read = trim_record(read, trim_at)
-
-    # return for processing
-    return read, did_trim
-
-
 class Trimmer(object):
     """
     Core trimming object.
@@ -264,8 +208,8 @@ class Trimmer(object):
             bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
-            self.n_reads += bundle.n_reads
-            self.n_bp += bundle.n_bp
+            self.n_reads += bundle.num_reads
+            self.n_bp += bundle.total_length
 
             min_coverage = min(bundle.coverages(graph))
 
@@ -275,17 +219,16 @@ class Trimmer(object):
 
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
-                for read, cleaned_read in bundle.both():
-                    record, did_trim = do_trim_read(graph, read,
-                                                    cleaned_read, CUTOFF)
+                for read, cleaned_seq in bundle.both():
+                    record, did_trim = trim_record(graph, read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
                         yield record
             # no, too low coverage to trim; consume & set aside for 2nd pass.
             else:
-                for read, cleaned_read in bundle.both():
-                    graph.consume(cleaned_read)
+                for read, cleaned_seq in bundle.both():
+                    graph.consume(cleaned_seq)
                     write_record(read, saver)
                     self.n_saved += 1
 
@@ -308,14 +251,12 @@ class Trimmer(object):
             bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
-            self.n_reads += bundle.n_reads
-            self.n_bp += bundle.n_bp
+            self.n_reads += bundle.num_reads
+            self.n_bp += bundle.total_length
 
-            for (read, cleaned_read), coverage in zip(bundle.both(),
-                                                      bundle.coverages(graph)):
+            for read, coverage in zip(bundle.reads, bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
-                    record, did_trim = do_trim_read(graph, read, cleaned_read,
-                                                    CUTOFF)
+                    record, did_trim = trim_record(graph, read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
