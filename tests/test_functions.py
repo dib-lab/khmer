@@ -36,6 +36,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+import screed
 import khmer
 import os
 import sys
@@ -277,55 +278,51 @@ def test_check_file_status_kfile_force():
     assert "does not exist" in capture.getvalue(), capture.getvalue()
 
 
-FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
-FakeFastaRead = collections.namedtuple('Read', ['name', 'sequence'])
-
-
 def test_check_is_pair_1():
-    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq2', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq2', quality='###', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
 
 def test_check_is_pair_2():
-    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq/1', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq/2', quality='###', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
 
 def test_check_is_pair_3_fq():
-    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq 1::', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq 2::', quality='###', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
 
 def test_check_is_pair_3_broken_fq_1():
-    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq 2::', quality='###', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
 
 def test_check_is_pair_3_broken_fq_2():
-    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq 1::', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq', quality='###', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
 
 def test_check_is_pair_3_fa():
-    read1 = FakeFastaRead(name='seq 1::', sequence='AAA')
-    read2 = FakeFastaRead(name='seq 2::', sequence='AAA')
+    read1 = screed.Record(name='seq 1::', sequence='AAA')
+    read2 = screed.Record(name='seq 2::', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
 
 def test_check_is_pair_4():
-    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
+    read1 = screed.Record(name='seq/1', quality='###', sequence='AAA')
+    read2 = screed.Record(name='seq/2', sequence='AAA')
 
     try:
         check_is_pair(read1, read2)
@@ -335,8 +332,8 @@ def test_check_is_pair_4():
 
 
 def test_check_is_pair_4b():
-    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
+    read1 = screed.Record(name='seq/1', sequence='AAA')
+    read2 = screed.Record(name='seq/2', quality='###', sequence='AAA')
 
     try:
         check_is_pair(read1, read2)
@@ -346,22 +343,22 @@ def test_check_is_pair_4b():
 
 
 def test_check_is_pair_5():
-    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
+    read1 = screed.Record(name='seq/1', sequence='AAA')
+    read2 = screed.Record(name='seq/2', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
 
 def test_check_is_pair_6():
-    read1 = FakeFastaRead(name='seq1', sequence='AAA')
-    read2 = FakeFastaRead(name='seq2', sequence='AAA')
+    read1 = screed.Record(name='seq1', sequence='AAA')
+    read2 = screed.Record(name='seq2', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
 
 def test_check_is_pair_7():
-    read1 = FakeFastaRead(name='seq/2', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/1', sequence='AAA')
+    read1 = screed.Record(name='seq/2', sequence='AAA')
+    read2 = screed.Record(name='seq/1', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
@@ -406,11 +403,11 @@ def gather(stream, **kw):
 
 
 class Test_BrokenPairedReader(object):
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq2/1', sequence='A' * 5),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq2/1', sequence='A' * 5),
+              screed.Record(name='seq3/1', sequence='A' * 3),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
 
     def testDefault(self):
         x, n, m = gather(self.stream, min_length=1)
@@ -466,10 +463,10 @@ class Test_BrokenPairedReader(object):
 
 
 def test_BrokenPairedReader_OnPairs():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -480,10 +477,10 @@ def test_BrokenPairedReader_OnPairs():
 
 
 def test_BrokenPairedReader_OnPairs_2():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 5),   # switched
-              FakeFastaRead(name='seq3/2', sequence='A' * 3)]   # wrt previous
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 5),   # switched
+              screed.Record(name='seq3/2', sequence='A' * 3)]   # wrt previous
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -494,10 +491,10 @@ def test_BrokenPairedReader_OnPairs_2():
 
 
 def test_BrokenPairedReader_OnPairs_3():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),   # both short
-              FakeFastaRead(name='seq3/2', sequence='A' * 3)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),   # both short
+              screed.Record(name='seq3/2', sequence='A' * 3)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -508,10 +505,10 @@ def test_BrokenPairedReader_OnPairs_3():
 
 
 def test_BrokenPairedReader_OnPairs_4():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 3),  # too short
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 4),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 3),  # too short
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 4),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
