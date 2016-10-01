@@ -1,4 +1,4 @@
-2016-10-01  Titus Brown  <t@Titus-MacBook-Air-3.local>
+2016-10-01  Titus Brown  <titus@idyll.org>
 
   * lib/hashtable.{cc,hh}: added assemble_linear_path function & helpers.
    * khmer/_khmer.cc: CPython API for assemble_linear_path.
