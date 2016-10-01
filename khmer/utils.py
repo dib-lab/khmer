@@ -184,7 +184,7 @@ def broken_paired_reader(screed_iter, min_length=None,
 
     # handle the majority of the stream.
     for record in screed_iter:
-        record.sequence = record.sequence.upper()
+        record.cleaned_seq = record.sequence.upper().replace('N', 'A')
 
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:

@@ -319,7 +319,7 @@ def test_filter_abund_6_trim_high_abund_Z():
         # untrimmed seq.
         badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTG' \
                  'TCGTCAGGGGATTTCCGGGCGG'
-        assert badseq.upper() in seqs       # should be there, untrimmed
+        assert badseq in seqs       # should be there, untrimmed
 
 
 def test_filter_abund_7_retain_Ns():
