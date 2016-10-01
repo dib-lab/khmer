@@ -1528,8 +1528,8 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o;
-    khmer_HashSet_Object * hdn_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    khmer_HashSet_Object * hdn_o = NULL;
 
     if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
@@ -1557,6 +1557,37 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
                                    (PyObject *) adj_o, (PyObject *) visited_o);
     Py_DECREF(adj_o);
     Py_DECREF(visited_o);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
+    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
 
     return ret;
 }
@@ -3024,6 +3055,13 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Traverse the path through the graph starting with the given "
         "k-mer and avoiding high-degree nodes, finding (and returning) "
         "traversed k-mers and any encountered high-degree nodes.",
+    },
+    {
+        "assemble_linear_path",
+        (PyCFunction)hashtable_assemble_linear_path, METH_VARARGS,
+        "Assemble a purely linear path starting with the given "
+        "k-mer, returning traversed k-mers and any encountered high-degree "
+        "nodes.",
     },
 
     //
