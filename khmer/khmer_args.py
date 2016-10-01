@@ -430,7 +430,8 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
         if args.n_tables > 20:
             if not args.force:
                 print_error(
-                    "\n** ERROR: khmer only supports number of tables <= 20.\n")
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
                 sys.exit(1)
             else:
                 log_warn("\n*** Warning: Maximum recommended number of "
@@ -454,7 +455,8 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         if args.n_tables > 20:
             if not args.force:
                 print_error(
-                    "\n** ERROR: khmer only supports number of tables <= 20.\n")
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
                 sys.exit(1)
             else:
                 if args.n_tables > 20:
