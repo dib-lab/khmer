@@ -66,7 +66,7 @@ from khmer.kfile import (check_space, check_space_for_graph,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
-import khmer.trimming
+from khmer.trimming import trim_record
 
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
@@ -219,17 +219,16 @@ class Trimmer(object):
 
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
-                for read, cleaned_read in bundle.both():
-                    record, did_trim = khmer.trimming.trim_record(graph, read,
-                                                                  CUTOFF)
+                for read, cleaned_seq in bundle.both():
+                    record, did_trim = trim_record(graph, read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
                         yield record
             # no, too low coverage to trim; consume & set aside for 2nd pass.
             else:
-                for read, cleaned_read in bundle.both():
-                    graph.consume(cleaned_read)
+                for read, cleaned_seq in bundle.both():
+                    graph.consume(cleaned_seq)
                     write_record(read, saver)
                     self.n_saved += 1
 
@@ -255,12 +254,9 @@ class Trimmer(object):
             self.n_reads += bundle.num_reads
             self.n_bp += bundle.total_length
 
-            # @CTB look into this code.
-            for (read, cleaned_read), coverage in zip(bundle.both(),
-                                                      bundle.coverages(graph)):
+            for read, coverage in zip(bundle.reads, bundle.coverages(graph)):
                 if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
-                    record, did_trim = khmer.trimming.trim_record(graph, read,
-                                                                  CUTOFF)
+                    record, did_trim = trim_record(graph, read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:

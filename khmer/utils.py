@@ -252,21 +252,21 @@ def write_record_pair(read1, read2, fileobj):
 class ReadBundle(object):
     def __init__(self, *raw_records):
         self.reads = [i for i in raw_records if i]
-        self.cleaned_reads = [r.sequence.replace('N', 'A') for r in self.reads]
+        self.cleaned_seqs = [r.sequence.replace('N', 'A') for r in self.reads]
 
     def coverages(self, graph):
-        return [graph.get_median_count(r)[0] for r in self.cleaned_reads]
+        return [graph.get_median_count(r)[0] for r in self.cleaned_seqs]
 
     def both(self):
-        return zip(self.reads, self.cleaned_reads)
+        return zip(self.reads, self.cleaned_seqs)
 
     @property
     def num_reads(self):
-        return len(self.cleaned_reads)
+        return len(self.cleaned_seqs)
 
     @property
     def total_length(self):
-        return sum([len(r) for r in self.cleaned_reads])
+        return sum([len(r) for r in self.cleaned_seqs])
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
