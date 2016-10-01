@@ -29,7 +29,7 @@ khmer-cov.tgz
 cppcheck-result.xml
 MANIFEST
 TAGS
-nosetests.xml
+pytests.xml
 pep8.out
 pylint.out
 .coverage

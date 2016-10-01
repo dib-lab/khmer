@@ -55,7 +55,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
@@ -63,7 +63,7 @@ from khmer.kfile import (check_input_files, check_space,
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
 
-
+DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
 
@@ -86,8 +86,17 @@ def get_parser():
         "(in memory version).", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
 
-    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF, type=int,
+    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF,
+                        type=check_argument_range(0, 256, "cutoff"),
                         help="Trim at k-mers below this abundance.")
+    parser.add_argument('--variable-coverage', '-V', action='store_true',
+                        dest='variable_coverage', default=False,
+                        help='Only trim low-abundance k-mers from sequences '
+                        'that have high coverage.')
+    parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
+                        help='Base the variable-coverage cutoff on this median'
+                        ' k-mer abundance.',
+                        default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('--savegraph', metavar="filename", default='',
                         help="If present, the name of the file to save the "
                         "k-mer countgraph to")
@@ -151,6 +160,11 @@ def main():
         name = record.name
         seq = record.sequence
         seqN = seq.replace('N', 'A')
+
+        if args.variable_coverage:  # only trim when sequence has high enough C
+            med, _, _ = graph.get_median_count(seqN)
+            if med < args.normalize_to:
+                return name, seq
 
         _, trim_at = graph.trim_on_abundance(seqN, args.cutoff)
 

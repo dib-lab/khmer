@@ -83,6 +83,9 @@ release makers, following this checklist by MRC.
 
 #. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
 
+#. Run through the `API examples <../user/api-examples.html>`__ to verify they
+   are still valid.
+
 #. Submit a build to Coverity Scan if it hasn't been done
    recently. You can get the token from
    https://gitlab.msu.edu/ged-lab/ged-internal-docs/wikis/coverity-scan
