@@ -442,10 +442,10 @@ class Test_BrokenPairedReader(object):
 
 
 def test_BrokenPairedReader_OnPairs():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -456,10 +456,10 @@ def test_BrokenPairedReader_OnPairs():
 
 
 def test_BrokenPairedReader_OnPairs_2():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 5),   # switched
-              FakeFastaRead(name='seq3/2', sequence='A' * 3)]   # wrt previous
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 5),   # switched
+              screed.Record(name='seq3/2', sequence='A' * 3)]   # wrt previous
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -470,10 +470,10 @@ def test_BrokenPairedReader_OnPairs_2():
 
 
 def test_BrokenPairedReader_OnPairs_3():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),   # both short
-              FakeFastaRead(name='seq3/2', sequence='A' * 3)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 3),   # both short
+              screed.Record(name='seq3/2', sequence='A' * 3)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
@@ -484,10 +484,10 @@ def test_BrokenPairedReader_OnPairs_3():
 
 
 def test_BrokenPairedReader_OnPairs_4():
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 3),  # too short
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq3/1', sequence='A' * 4),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
+    stream = [screed.Record(name='seq1/1', sequence='A' * 3),  # too short
+              screed.Record(name='seq1/2', sequence='A' * 4),
+              screed.Record(name='seq3/1', sequence='A' * 4),
+              screed.Record(name='seq3/2', sequence='A' * 5)]
 
     x, n, m = gather(stream, min_length=4, require_paired=True)
 
