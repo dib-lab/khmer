@@ -1,3 +1,12 @@
+2016-10-01  Titus Brown  <titus@idyll.org>
+
+   * khmer/trimming.py,scripts/{filter-abund-single.py,filter-abund.py,
+   trim-low-abund.py}: extracted similar trimming code and refactored.
+   * khmer/utils.py,tests/test_read_handling.py: change ReadBundle.trimmed_reads
+   to trimmed_seqs; fix associated tests.
+   * tests/test_functions.py: updated tests to use screed.Record instead of
+   namedtuple classes.
+
 2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
 
    * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
