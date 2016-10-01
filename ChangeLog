@@ -1,7 +1,7 @@
-2016-09-26  Camille Scott  <camille.scott.w@gmail.com>
+2016-10-01  Camille Scott  <camille.scott.w@gmail.com>
 
    * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose reverse_complement to Python.
-   * lib/{traversal.cc, traversal.hh}: Add two new Traverser classes, 
+   * lib/{traversal.cc, traversal.hh}: Add two new Traverser classes,
    AssemblerTraverser and NonloopingAT, to do the traversal portions of
    assembly.
    * lib/{assembler.cc, assembler.hh}, khmer/_khmer.cc: New code files containing the
@@ -15,6 +15,23 @@
    * lib/kmer_hash.hh: Helper functions for the Kmer class.
    * lib/{symbols.hh, symbols.cc}: Global DNA alphabets.
    * tests/test_nodegraph.py: Additional tests for the assembler API.
+
+2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
+   ReadBundle class to utils
+   * tests/test_read_handling.py, tests/test-data/unclean-reads.fastq: tests
+   related to ReadBundle
+
+2016-09-29  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py, tests/test_functions.py,
+   tests/test_script_arguments.py: fix up formatting
+
+2016-09-26 Ali Aliyari <aaliyari@ucdavis.edu>
+
+   * khmer/khmer_args.py: prevent -N from being set to more than 20 (override by -f)
+   * tests/test_script_arguments.py added test functions for the above change
 
 2016-09-26  Luiz Irber  <khmer@luizirber.org>
 

@@ -59,7 +59,8 @@ from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
-from khmer.utils import write_record, write_record_pair, broken_paired_reader
+from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
+                         ReadBundle)
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
@@ -151,32 +152,6 @@ def get_parser():
     return parser
 
 
-class ReadBundle(object):
-    def __init__(self, *raw_records):
-        self.reads = [i for i in raw_records if i]
-        self.cleaned_reads, self.n_reads, self.n_bp = \
-            clean_up_reads(self.reads)
-
-    def coverages(self, graph):
-        return [graph.get_median_count(r)[0] for r in self.cleaned_reads]
-
-    def both(self):
-        return zip(self.reads, self.cleaned_reads)
-
-
-def clean_up_reads(reads):
-    n_reads = 0
-    n_bp = 0
-    cleaned_reads = []
-    for read in reads:
-        r = read.sequence.replace('N', 'A')
-        cleaned_reads.append(r)
-        n_reads += 1
-        n_bp += len(r)
-
-    return cleaned_reads, n_reads, n_bp
-
-
 def trim_record(read, trim_at):
     """Utility function: create a new record, trimmed at given location."""
     new_read = Record()
@@ -264,8 +239,8 @@ class Trimmer(object):
             bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
-            self.n_reads += bundle.n_reads
-            self.n_bp += bundle.n_bp
+            self.n_reads += bundle.num_reads
+            self.n_bp += bundle.total_length
 
             min_coverage = min(bundle.coverages(graph))
 
@@ -308,8 +283,8 @@ class Trimmer(object):
             bundle = ReadBundle(read1, read2)
 
             # clean up the sequences for examination.
-            self.n_reads += bundle.n_reads
-            self.n_bp += bundle.n_bp
+            self.n_reads += bundle.num_reads
+            self.n_bp += bundle.total_length
 
             for (read, cleaned_read), coverage in zip(bundle.both(),
                                                       bundle.coverages(graph)):
