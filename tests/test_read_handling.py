@@ -791,7 +791,7 @@ def test_read_bundler():
         'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
     )
 
-    cleaned_reads = (
+    cleaned_seqs = (
         'GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
         'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
         'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGAAAACCG'
@@ -800,10 +800,10 @@ def test_read_bundler():
 
     assert bundle.num_reads == 2
     assert bundle.total_length == 200
-    assert bundle.cleaned_reads[0] == cleaned_reads[0]
-    assert bundle.cleaned_reads[1] == cleaned_reads[1]
+    assert bundle.cleaned_seqs[0] == cleaned_seqs[0]
+    assert bundle.cleaned_seqs[1] == cleaned_seqs[1]
 
-    for (rd, cln), raw, tstcln in zip(bundle.both(), raw_reads, cleaned_reads):
+    for (rd, cln), raw, tstcln in zip(bundle.both(), raw_reads, cleaned_seqs):
         assert rd.sequence == raw
         assert cln == tstcln
 
@@ -813,7 +813,7 @@ def test_read_bundler_single_read():
     records = [r for r in screed.open(infile)]
     bundle = khmer.utils.ReadBundle(*records)
     assert bundle.num_reads == 1
-    assert bundle.reads[0].sequence == bundle.cleaned_reads[0]
+    assert bundle.reads[0].sequence == bundle.cleaned_seqs[0]
 
 
 def test_read_bundler_empty_file():
