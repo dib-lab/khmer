@@ -207,17 +207,17 @@ def test_create_countgraph_3():
 
 def test_create_countgraph_4():
     # tests too-big n_tables WITHOUT force
-    
+
     ksize = khmer_args.DEFAULT_K
-    n_tables = 21 # some number larger than 20
+    n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
-    
+
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0, 0)
-    
+
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
-    
+
     try:
         khmer_args.create_countgraph(args, ksize=None)
         assert 0, "should not reach this"
@@ -230,17 +230,17 @@ def test_create_countgraph_4():
 
 def test_create_countgraph_5():
     # tests too-big n_tables WITH force
-    
+
     ksize = khmer_args.DEFAULT_K
-    n_tables = 21 # some number larger than 20
+    n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
-    
+
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0, 1)
-    
+
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
-    
+
     try:
         khmer_args.create_countgraph(args, ksize=None)
         message = "Warning: Maximum recommended number of tables is 20, discarded by force nonetheless!"
@@ -316,16 +316,16 @@ def test_create_nodegraph_3():
 
 def test_create_nodegraph_4():
     # tests too-big number of tables WITHOUT force
-    
+
     ksize = khmer_args.DEFAULT_K
-    n_tables = 21 # some number larger than 20
+    n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
-    
+
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0, 0)
-    
+
     sys.stderr = capture = StringIO()
-    
+
     try:
         khmer_args.create_nodegraph(args, ksize=None)
         assert 0, "should not reach this"
@@ -336,16 +336,16 @@ def test_create_nodegraph_4():
 
 def test_create_nodegraph_5():
     # tests too-big number of tables WITH force
-    
+
     ksize = khmer_args.DEFAULT_K
-    n_tables = 21 # some number larger than 20
+    n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
-    
+
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0, 1)
-    
+
     sys.stderr = capture = StringIO()
-    
+
     try:
         khmer_args.create_nodegraph(args, ksize=None)
         message = "Warning: Maximum recommended number of tables is 20, discarded by force nonetheless!"

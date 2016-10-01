@@ -777,3 +777,52 @@ def test_extract_paired_reads_5_stdin_error():
     status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
     assert "output filenames must be provided." in err
+
+
+def test_read_bundler():
+    infile = utils.get_test_data('unclean-reads.fastq')
+    records = [r for r in screed.open(infile)]
+    bundle = khmer.utils.ReadBundle(*records)
+
+    raw_reads = (
+        'GGTTGACGGGGNNNAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGANNNCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
+    cleaned_reads = (
+        'GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGAAAACCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
+    assert bundle.num_reads == 2
+    assert bundle.total_length == 200
+    assert bundle.cleaned_reads[0] == cleaned_reads[0]
+    assert bundle.cleaned_reads[1] == cleaned_reads[1]
+
+    for (rd, cln), raw, tstcln in zip(bundle.both(), raw_reads, cleaned_reads):
+        assert rd.sequence == raw
+        assert cln == tstcln
+
+
+def test_read_bundler_single_read():
+    infile = utils.get_test_data('single-read.fq')
+    records = [r for r in screed.open(infile)]
+    bundle = khmer.utils.ReadBundle(*records)
+    assert bundle.num_reads == 1
+    assert bundle.reads[0].sequence == bundle.cleaned_reads[0]
+
+
+def test_read_bundler_empty_file():
+    infile = utils.get_test_data('empty-file')
+    records = [r for r in screed.open(infile)]
+    bundle = khmer.utils.ReadBundle(*records)
+    assert bundle.num_reads == 0
+
+
+def test_read_bundler_empty_list():
+    bundle = khmer.utils.ReadBundle(*[])
+    assert bundle.num_reads == 0

@@ -1,3 +1,15 @@
+2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
+   ReadBundle class to utils
+   * tests/test_read_handling.py, tests/test-data/unclean-reads.fastq: tests
+   related to ReadBundle
+
+2016-09-29  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py, tests/test_functions.py,
+   tests/test_script_arguments.py: fix up formatting
+
 2016-09-26 Ali Aliyari <aaliyari@ucdavis.edu>
 
    * khmer/khmer_args.py: prevent -N from being set to more than 20 (override by -f)
