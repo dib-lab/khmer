@@ -172,18 +172,10 @@ def main():
         assert not is_pair
         assert read2 is None
 
-        name, seq = trim_record(graph, read1, args.variable_coverage,
-                                args.cutoff, args.normalize_to)
-        if name:
-            if hasattr(read1, 'quality'):
-                qual = read1.quality
-                qual = qual[:len(seq)]
-                record = screed.Record(name=name, sequence=seq,
-                                       quality=qual)
-            else:
-                record = screed.Record(name=name, sequence=seq)
-
-            write_record(record, outfp)
+        trimmed_record = trim_record(graph, read1, args.variable_coverage,
+                                     args.cutoff, args.normalize_to)
+        if trimmed_record:
+            write_record(trimmed_record, outfp)
 
     log_info('output in {outfile}', outfile=outfile)
 

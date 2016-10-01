@@ -34,6 +34,8 @@
 # Contact: khmer-project@idyll.org
 """Common methods for trimming short reads on k-mer abundance."""
 from __future__ import print_function, unicode_literals
+import screed
+
 
 def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
     name = record.name
@@ -43,13 +45,21 @@ def trim_record(countgraph, record, variable_coverage, cutoff, normalize_to):
     if variable_coverage:  # only trim when sequence has high enough C
         med, _, _ = countgraph.get_median_count(seqN)
         if med < normalize_to:
-            return name, seq
+            return record                 # return unmodified
 
     _, trim_at = countgraph.trim_on_abundance(seqN, cutoff)
 
-    if trim_at >= countgraph.ksize():
-        # be sure to not to change the 'N's in the trimmed sequence -
-        # so, return 'seq' and not 'seqN'.
-        return name, seq[:trim_at]
+    # too short? eliminate read
+    if trim_at < countgraph.ksize():
+        return None
 
-    return None, None
+    # construct new record
+    trim_seq = seq[:trim_at]
+    if hasattr(record, 'quality'):
+        trim_qual = record.quality[:trim_at]
+        trim_rec = screed.Record(name=name, sequence=trim_seq,
+                                 quality=trim_qual)
+    else:
+        trim_rec = screed.Record(name=name, sequence=trim_seq)
+
+    return trim_rec
