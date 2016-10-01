@@ -1310,3 +1310,25 @@ def test_assemble_linear_path_10():
     print('len path:', len_path)
 
     assert _equals_rc(path, 'T' + contig[101:])
+
+
+def test_assemble_linear_path_single_node():
+    # assemble single node.
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+    print('contig len', len(contig))
+
+    K = 21
+
+    nodegraph = khmer.Nodegraph(K, 1e5, 4)
+
+    nodegraph.consume(contig)
+    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor after
+    nodegraph.count('T' + contig[100:120])  # ...and before.
+
+    path = nodegraph.assemble_linear_path(contig[100:121])
+    len_path = len(path)
+
+    print('len path:', len_path)
+
+    assert _equals_rc(path, contig[100:121])
