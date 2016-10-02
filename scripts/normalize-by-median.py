@@ -178,13 +178,13 @@ class Normalizer(object):
             batch.append(read1)
 
         for record in batch:
-            seq = record.sequence.replace('N', 'A')
+            seq = record.sequence.upper().replace('N', 'A')
             if not self.countgraph.median_at_least(seq, desired_coverage):
                 passed_filter = True
 
         if passed_filter:
             for record in batch:
-                seq = record.sequence.replace('N', 'A')
+                seq = record.sequence.upper().replace('N', 'A')
                 self.countgraph.consume(seq)
                 yield record
 
