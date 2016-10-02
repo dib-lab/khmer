@@ -40,7 +40,7 @@ from __future__ import print_function, unicode_literals
 import threading
 import sys
 import screed
-from khmer.utils import write_record, check_is_pair
+from khmer.utils import (write_record, check_is_pair, clean_input_reads)
 from khmer.khmer_logger import log_info
 # stdlib queue module was renamed on Python 3
 try:
@@ -54,7 +54,7 @@ DEFAULT_GROUPSIZE = 100
 
 def verbose_loader(filename):
     """Screed iterator that additionally prints progress info to stderr."""
-    screed_iter = screed.open(filename)
+    screed_iter = clean_input_reads(screed.open(filename))
     for num, record in enumerate(screed_iter):
         if num % 100000 == 0:
             log_info('... filtering {num}', num=num)

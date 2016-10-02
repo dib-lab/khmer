@@ -183,9 +183,7 @@ def broken_paired_reader(screed_iter, min_length=None,
         raise ValueError("force_single and require_paired cannot both be set!")
 
     # handle the majority of the stream.
-    for record in screed_iter:
-        record.cleaned_seq = record.sequence.upper().replace('N', 'A')
-
+    for record in clean_input_reads(screed_iter):
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
                 if min_length and (len(prev_record.sequence) < min_length or
@@ -250,28 +248,30 @@ def write_record_pair(read1, read2, fileobj):
     write_record(read2, fileobj)
 
 
+def clean_input_reads(screed_iter):
+    for record in screed_iter:
+        record.cleaned_seq = record.sequence.upper().replace('N', 'A')
+        yield record
+
+
 class ReadBundle(object):
     def __init__(self, *raw_records):
         self.reads = [i for i in raw_records if i]
-        self.cleaned_seqs = [r.cleaned_seq for r in self.reads]
 
     def coverages(self, graph):
-        return [graph.get_median_count(r)[0] for r in self.cleaned_seqs]
+        return [graph.get_median_count(r.cleaned_seq)[0] for r in self.reads]
 
     def coverages_at_least(self, graph, coverage):
-        return all(graph.median_at_least(r, coverage) \
-                   for r in self.cleaned_seqs)
-
-    def both(self):
-        return zip(self.reads, self.cleaned_seqs)
+        return all(graph.median_at_least(r.cleaned_seq, coverage) \
+                   for r in self.reads)
 
     @property
     def num_reads(self):
-        return len(self.cleaned_seqs)
+        return len(self.reads)
 
     @property
     def total_length(self):
-        return sum([len(r) for r in self.cleaned_seqs])
+        return sum([len(r.sequence) for r in self.reads])
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

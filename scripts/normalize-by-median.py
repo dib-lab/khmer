@@ -173,8 +173,8 @@ class Normalizer(object):
 
         # if any in batch have coverage below desired coverage, consume & yield.
         if not batch.coverages_at_least(self.countgraph, desired_coverage):
-           for (record, cleaned_seq) in batch.both():
-                self.countgraph.consume(cleaned_seq)
+           for record in batch.reads:
+                self.countgraph.consume(record.cleaned_seq)
                 yield record
 
 
