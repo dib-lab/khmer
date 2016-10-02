@@ -495,3 +495,24 @@ def test_BrokenPairedReader_OnPairs_4():
     assert x == expected, x
     assert m == 1
     assert n == 0, n
+
+
+def test_BrokenPairedReader_lowercase():
+    stream = [screed.Record(name='seq1/1', sequence='acgtn'),
+              screed.Record(name='seq1/2', sequence='AcGtN'),
+              screed.Record(name='seq1/2', sequence='aCgTn')]
+
+    results = []
+    for num, is_pair, read1, read2 in broken_paired_reader(stream):
+        results.append((read1, read2))
+
+    a, b = results[0]
+    assert a.sequence == 'acgtn'
+    assert a.cleaned_seq == 'ACGTA'
+    assert b.sequence == 'AcGtN'
+    assert b.cleaned_seq == 'ACGTA'
+    
+    c, d = results[1]
+    assert c.sequence == 'aCgTn'
+    assert c.cleaned_seq == 'ACGTA'
+    assert d == None
