@@ -254,14 +254,18 @@ class Trimmer(object):
             self.n_reads += bundle.num_reads
             self.n_bp += bundle.total_length
 
-            for read, coverage in zip(bundle.reads, bundle.coverages(graph)):
-                if coverage >= TRIM_AT_COVERAGE or self.do_trim_low_abund:
-                    record, did_trim = trim_record(graph, read, CUTOFF)
+            if self.do_trim_low_abund or \
+               bundle.coverages_at_least(graph, TRIM_AT_COVERAGE):
+
+                for read in bundle.reads:
+                    trimmed_record, did_trim = trim_record(graph, read, CUTOFF)
+
                     if did_trim:
                         self.trimmed_reads += 1
-                    if record:
-                        yield record
-                else:
+                    if trimmed_record:
+                        yield trimmed_record
+            else:
+                for read in bundle.reads:
                     self.n_skipped += 1
                     self.bp_skipped += 1
                     yield read

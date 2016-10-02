@@ -258,6 +258,10 @@ class ReadBundle(object):
     def coverages(self, graph):
         return [graph.get_median_count(r)[0] for r in self.cleaned_seqs]
 
+    def coverages_at_least(self, graph, coverage):
+        return all(graph.median_at_least(r, coverage) \
+                   for r in self.cleaned_seqs)
+
     def both(self):
         return zip(self.reads, self.cleaned_seqs)
 

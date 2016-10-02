@@ -61,7 +61,7 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
-from khmer.utils import write_record, broken_paired_reader
+from khmer.utils import (write_record, broken_paired_reader, ReadBundle)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
@@ -168,24 +168,13 @@ class Normalizer(object):
         * if any read's median k-mer count is below desired coverage, keep all;
         * consume and yield kept reads.
         """
+        batch = ReadBundle(read0, read1)
         desired_coverage = self.desired_coverage
 
-        passed_filter = False
-
-        batch = []
-        batch.append(read0)
-        if read1 is not None:
-            batch.append(read1)
-
-        for record in batch:
-            seq = record.cleaned_seq
-            if not self.countgraph.median_at_least(seq, desired_coverage):
-                passed_filter = True
-
-        if passed_filter:
-            for record in batch:
-                seq = record.cleaned_seq
-                self.countgraph.consume(seq)
+        # if any in batch have coverage below desired coverage, consume & yield.
+        if not batch.coverages_at_least(self.countgraph, desired_coverage):
+           for (record, cleaned_seq) in batch.both():
+                self.countgraph.consume(cleaned_seq)
                 yield record
 
 
