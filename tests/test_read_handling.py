@@ -802,9 +802,9 @@ def test_read_bundler():
     assert bundle.num_reads == 2
     assert bundle.total_length == 200
 
-    for read, raw_seq, cleaned_seq in zip(bundle.reads, raw_seqs, cleaned_seqs):
+    for read, raw_seq, clean_seq in zip(bundle.reads, raw_seqs, cleaned_seqs):
         assert read.sequence == raw_seq
-        assert read.cleaned_seq == cleaned_seq
+        assert read.cleaned_seq == clean_seq
 
 
 def test_read_bundler_single_read():

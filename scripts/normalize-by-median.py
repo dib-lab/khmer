@@ -171,9 +171,9 @@ class Normalizer(object):
         batch = ReadBundle(read0, read1)
         desired_coverage = self.desired_coverage
 
-        # if any in batch have coverage below desired coverage, consume & yield.
+        # if any in batch have coverage below desired coverage, consume &yield
         if not batch.coverages_at_least(self.countgraph, desired_coverage):
-           for record in batch.reads:
+            for record in batch.reads:
                 self.countgraph.consume(record.cleaned_seq)
                 yield record
 

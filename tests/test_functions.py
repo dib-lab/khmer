@@ -515,4 +515,4 @@ def test_BrokenPairedReader_lowercase():
     c, d = results[1]
     assert c.sequence == 'aCgTn'
     assert c.cleaned_seq == 'ACGTA'
-    assert d == None
+    assert d is None
