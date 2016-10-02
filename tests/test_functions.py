@@ -511,7 +511,7 @@ def test_BrokenPairedReader_lowercase():
     assert a.cleaned_seq == 'ACGTA'
     assert b.sequence == 'AcGtN'
     assert b.cleaned_seq == 'ACGTA'
-    
+
     c, d = results[1]
     assert c.sequence == 'aCgTn'
     assert c.cleaned_seq == 'ACGTA'
