@@ -1,3 +1,7 @@
+2016-10-03  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: adjust setup for exclusive use of travis (jenkins is retiring)
+
 2016-10-02  Titus Brown  <titus@idyll.org>
 
    * khmer/{utils.py,thread_utils.py,trimming.py}: introduce new function,
