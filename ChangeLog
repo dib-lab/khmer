@@ -1,3 +1,19 @@
+2016-10-02  Titus Brown  <titus@idyll.org>
+
+   * khmer/{utils.py,thread_utils.py,trimming.py}: introduce new function,
+   clean_input_reads, that does consistent read cleaning; update ReadBundle
+   and trimming to make use of new cleaned_seq attribute.
+   * scripts/{normalize-by-median.py,trim-low-abund.py}: refactor to use
+   cleaned_seq attribute properly; this fixed a bug in normalize-by-median.py
+   that led to ignoring lowercase 'actgn'.
+   * doc/dev/development.rst: update developer documentation for new
+   cleaned_seq attribute and ReadBundle behavior.
+   * tests/test_script_output.py: update md5 signatures for output to reflect
+   corrected behavior.
+   * tests/test_functions.py: add test for broken_paired_iter uppercase
+   behavior.
+   * tests/test_read_handling.py: update tests for ReadBundle.
+
 2016-10-01  Titus Brown  <titus@idyll.org>
 
    * khmer/trimming.py,scripts/{filter-abund-single.py,filter-abund.py,

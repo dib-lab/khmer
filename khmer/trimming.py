@@ -40,11 +40,10 @@ def trim_record(countgraph, record, cutoff, variable_coverage=False,
                 normalize_to=None):
     name = record.name
     seq = record.sequence
-    seqN = seq.replace('N', 'A')
+    seqN = record.cleaned_seq
 
     if variable_coverage:  # only trim when sequence has high enough C
-        med, _, _ = countgraph.get_median_count(seqN)
-        if med < normalize_to:
+        if not countgraph.median_at_least(seqN, normalize_to):
             return record, False                 # return unmodified
 
     _, trim_at = countgraph.trim_on_abundance(seqN, cutoff)

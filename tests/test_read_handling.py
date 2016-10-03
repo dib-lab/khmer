@@ -53,6 +53,7 @@ from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
+from khmer.utils import clean_input_reads
 
 
 def test_interleave_read_stdout():
@@ -781,10 +782,10 @@ def test_extract_paired_reads_5_stdin_error():
 
 def test_read_bundler():
     infile = utils.get_test_data('unclean-reads.fastq')
-    records = [r for r in screed.open(infile)]
+    records = [r for r in clean_input_reads(screed.open(infile))]
     bundle = khmer.utils.ReadBundle(*records)
 
-    raw_reads = (
+    raw_seqs = (
         'GGTTGACGGGGNNNAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
         'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
         'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGANNNCCG'
@@ -800,25 +801,23 @@ def test_read_bundler():
 
     assert bundle.num_reads == 2
     assert bundle.total_length == 200
-    assert bundle.cleaned_seqs[0] == cleaned_seqs[0]
-    assert bundle.cleaned_seqs[1] == cleaned_seqs[1]
 
-    for (rd, cln), raw, tstcln in zip(bundle.both(), raw_reads, cleaned_seqs):
-        assert rd.sequence == raw
-        assert cln == tstcln
+    for read, raw_seq, clean_seq in zip(bundle.reads, raw_seqs, cleaned_seqs):
+        assert read.sequence == raw_seq
+        assert read.cleaned_seq == clean_seq
 
 
 def test_read_bundler_single_read():
     infile = utils.get_test_data('single-read.fq')
-    records = [r for r in screed.open(infile)]
+    records = [r for r in clean_input_reads(screed.open(infile))]
     bundle = khmer.utils.ReadBundle(*records)
     assert bundle.num_reads == 1
-    assert bundle.reads[0].sequence == bundle.cleaned_seqs[0]
+    assert bundle.reads[0].sequence == bundle.reads[0].cleaned_seq
 
 
 def test_read_bundler_empty_file():
     infile = utils.get_test_data('empty-file')
-    records = [r for r in screed.open(infile)]
+    records = [r for r in clean_input_reads(screed.open(infile))]
     bundle = khmer.utils.ReadBundle(*records)
     assert bundle.num_reads == 0
 
