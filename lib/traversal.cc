@@ -171,18 +171,6 @@ NodeCursor<direction>::NodeCursor(const Hashtable * ht,
 }
 
 
-template<bool direction>
-bool NodeCursor<direction>::set_cursor(Kmer& node)
-{
-    if(!apply_kmer_filters(node, this->filters)) {
-        cursor = node;
-        return true;
-    }
-    return false;
-}
-
-
-
 /******************************************
  * Traverser
  ******************************************/

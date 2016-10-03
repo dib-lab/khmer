@@ -114,7 +114,9 @@ public:
                         Kmer start_kmer,
                         KmerFilter filter);
 
-    bool set_cursor(Kmer& node);
+    unsigned int neighbors(KmerQueue& node_q) const {
+        return NodeGatherer<direction>::neighbors(cursor, node_q);
+    }
 
     KmerFilter pop_filter()
     {
@@ -173,7 +175,9 @@ public:
     char next_symbol();
     unsigned int cursor_degree() const;
 
-    std::string join_contigs(std::string& contig_a, std::string& contig_b) const;
+    std::string join_contigs(std::string& contig_a, 
+                             std::string& contig_b,
+                             WordLength offset = 0) const;
 };
 
 
