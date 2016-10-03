@@ -199,8 +199,8 @@ to the C++ library, and sometimes handled in Python using screed.
 In an attempt to normalize read handling in Python, the functions in
 ``khmer/utils.py`` should be used whenever possible.  Here,
 ``broken_paired_reader`` in ``khmer/utils.py`` should be used to do all
-paired-end sequence handling, and individual sequence loading should
-be passed through ``khmer.utils.clean_input_reads(iter)``; this is a
+paired-end sequence handling, and sequence loading should
+go through ``khmer.utils.clean_input_reads(iter)``; this is a
 generator that wraps the iterator produced by ``screed.open``, and it
 adds a ``cleaned_seq`` attribute to screed ``Record`` objects.  This
 attribute should be used for any k-mer or graph operations, while
@@ -209,7 +209,7 @@ the normal ``sequence`` attribute is what should be written out.
 records.  All of these functions are aware of FASTA and FASTQ records,
 too.
 
-For applying operations to colletions of reads, the ``ReadBundle`` class is
+For applying operations to collections of reads, the ``ReadBundle`` class is
 available.  This is used to wrap a collection of reads for examination and
 processing in situations where (for example) something should be done to
 either both reads in a pair, or neither.
