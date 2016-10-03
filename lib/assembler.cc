@@ -160,7 +160,7 @@ const
  * Labeled Assembly
  ********************************/
 
-NaiveLabeledAssembler::NaiveLabeledAssembler(const LabelHash * lh) :
+SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash * lh) :
     graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
 {
     linear_asm = new LinearAssembler(graph);
@@ -169,7 +169,7 @@ NaiveLabeledAssembler::NaiveLabeledAssembler(const LabelHash * lh) :
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
-StringVector NaiveLabeledAssembler::assemble(const Kmer seed_kmer,
+StringVector SimpleLabeledAssembler::assemble(const Kmer seed_kmer,
         const Hashtable * stop_bf)
 const
 {
@@ -213,7 +213,7 @@ const
 }
 
 template <bool direction>
-void NaiveLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
+void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
         start_cursor,
         StringVector& paths)
 const
@@ -221,29 +221,25 @@ const
 
     std::string root_contig = linear_asm->_assemble_directed<direction>
                               (start_cursor);
-    Kmer end_kmer = start_cursor.cursor;
+    //Kmer end_kmer = start_cursor.cursor;
 
     if (start_cursor.cursor_degree() > 1) {               // hit a HDN
 #if DEBUG
         std::cout << "Contig thus far: " << root_contig << std::endl;
-        std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
+        std::cout << "HDN: " << start_cursor.cursor.repr(_ksize) << "\n";
 #endif // DEBUG
 
         LabelSet labels;
-        lh->get_tag_labels(end_kmer, labels);
+        lh->get_tag_labels(start_cursor.cursor, labels);
 
 
         if(labels.size() == 0) {
             // if no labels are found there's nothing to be done, return
-#if DEBUG
-            std::cout << "no labels" << std::endl;
-#endif
+
             paths.push_back(root_contig);
             return;
         } else {
-#if DEBUG
-            std::cout << "num labels: " << labels.size() << std::endl;
-#endif
+
             /* Copy the current cursor at end_cursor for the spanning function.
              * We'll now assemble, following the given label, as far as we can.
              * We add an extra filter to the list: now, if we find no labels, we
@@ -253,133 +249,34 @@ const
              * the stop bloom filter already.
              */
 
-            // Get neighbors using NodeGatherer.neighbors instead?
-            NonLoopingAT<direction> span_cursor(start_cursor);
-            span_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
-            std::string spanning_contig = linear_asm->_assemble_directed<direction>
-                                          (span_cursor);
-
-            if(spanning_contig.length() == _ksize) {
-                // only found the HDN, ie, we found nothing
-#if DEBUG
-                std::cout << "zero length spanning contig" << spanning_contig << std::endl;
-#endif
+            start_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+            KmerQueue branch_starts;
+            if (start_cursor.neighbors(branch_starts) == 0) {
                 paths.push_back(root_contig);
                 return;
             }
 
-            // Remove the label filter
-            span_cursor.pop_filter();
+            start_cursor.pop_filter();
+            
+            StringVector branch_contigs;
+            while(!branch_starts.empty()) { // TODO: change from queue
+                NonLoopingAT<direction> branch_cursor(start_cursor);
+                branch_cursor.cursor = branch_starts.front();
+                branch_starts.pop();
 
-            // Recurse and gather paths
-            StringVector continue_contigs;
-            _assemble_directed<direction>(span_cursor, continue_contigs);
+                _assemble_directed<direction>(branch_cursor, branch_contigs);
+            }
 
-            if (continue_contigs.size() == 0) {
-                paths.push_back(span_cursor.join_contigs(root_contig,
-                                spanning_contig));
-            } else {
-                for (auto continue_contig : continue_contigs) {
-                    std::string full_contig = span_cursor.join_contigs(root_contig,
-                                              spanning_contig);
-                    paths.push_back(span_cursor.join_contigs(full_contig, continue_contig));
-                }
+            for (auto branch_contig : branch_contigs) {
+                std::string full_contig = start_cursor.join_contigs(root_contig,
+                                                                   branch_contig,
+                                                                   1);
+                paths.push_back(full_contig);
             }
         }
     } else {
         paths.push_back(root_contig);
     }
 }
-
-
-template <bool direction>
-void LabelIntersectAssembler::_assemble_directed(NonLoopingAT<direction>&
-        start_cursor,
-        StringVector& paths)
-const
-{
-
-    std::string root_contig = linear_asm->_assemble_directed<direction>
-                              (start_cursor);
-    Kmer end_kmer = start_cursor.cursor;
-
-    if (start_cursor.cursor_degree() > 1) {               // hit a HDN
-#if DEBUG
-        std::cout << "Contig thus far: " << root_contig << std::endl;
-        std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
-#endif // DEBUG
-
-        LabelSet labels;
-        lh->get_tag_labels(end_kmer, labels);
-
-        /* For each label, we try to find spanning paths. We create
-         * a new cursor starting at the end k-mer, with the existing node
-         * filters; then we give that to the label spanning function.
-         *
-         * NOTE: This implies that there may be some non-deterministic
-         * behavior: the ordering of the labels could vary, and decides
-         * the recursion termination.
-         */
-        if(labels.size() == 0) {
-            // if no labels are found there's nothing to be done, return
-#if DEBUG
-            std::cout << "no labels" << std::endl;
-#endif
-            paths.push_back(root_contig);
-            return;
-        } else {
-#if DEBUG
-            std::cout << "num labels: " << labels.size() << std::endl;
-#endif
-            for (Label label : labels) {
-                /* Copy the current cursor at end_cursor for the spanning function.
-                 * We'll now assemble, following the given label, as far as we can.
-                 * We add an extra filter to the list: now, if we find no labels, we
-                 * continue assembling; if we find labels and ours is included, we
-                 * continue; and if we find labels and ours is not included, we stop.
-                 * This cursor should also have the filters for visited k-mers and
-                 * the stop bloom filter already.
-                 */
-#if DEBUG
-                std::cout << "label: " << label << std::endl;
-#endif
-                NonLoopingAT<direction> span_cursor(start_cursor);
-                span_cursor.push_filter(get_label_filter(label, lh));
-                std::string spanning_contig = linear_asm->_assemble_directed<direction>
-                                              (span_cursor);
-
-                if(spanning_contig.length() == _ksize) {
-#if DEBUG
-                    std::cout << "zero length spanning contig" << spanning_contig << std::endl;
-#endif
-                    paths.push_back(root_contig);
-                    continue;
-                }
-
-                // Remove the label filter
-                span_cursor.pop_filter();
-
-                // Recurse and gather paths
-                StringVector continue_contigs;
-                _assemble_directed<direction>(span_cursor, continue_contigs);
-
-                if (continue_contigs.size() == 0) {
-                    paths.push_back(span_cursor.join_contigs(root_contig,
-                                    spanning_contig));
-                } else {
-                    for (auto continue_contig : continue_contigs) {
-                        std::string full_contig = span_cursor.join_contigs(root_contig,
-                                                  spanning_contig);
-                        paths.push_back(span_cursor.join_contigs(full_contig, continue_contig));
-                    }
-                }
-            } //end for
-        }
-    } else {
-        paths.push_back(root_contig);
-    }
-}
-
-
 
 }
