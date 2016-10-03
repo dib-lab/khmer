@@ -37,7 +37,7 @@ Contact: khmer-project@idyll.org
 #include "khmer.hh"
 #include "hashtable.hh"
 #include "traversal.hh"
-#include "symbols.hh"
+#include "alphabets.hh"
 #include "kmer_hash.hh"
 
 #define DEBUG 1
@@ -109,10 +109,9 @@ unsigned int NodeGatherer<direction>::neighbors(const Kmer& node,
 const
 {
     unsigned int found = 0;
-    char * base = alphabets::DNA_SIMPLE;
 
-    while(*base != '\0') {
-        Kmer neighbor = get_neighbor(node, *base);
+    for (auto base : alphabets::DNA_SIMPLE) {
+        Kmer neighbor = get_neighbor(node, base);
         if (graph->get_count(neighbor) && !(apply_kmer_filters(neighbor, filters))) {
             node_q.push(neighbor);
             ++found;
@@ -129,10 +128,9 @@ unsigned int NodeGatherer<direction>::degree(const Kmer& node)
 const
 {
     unsigned int degree = 0;
-    char * base = alphabets::DNA_SIMPLE;
 
-    while(*base != '\0') {
-        if (graph->get_count(get_neighbor(node, *base))) {
+    for (auto base : alphabets::DNA_SIMPLE) {
+        if (graph->get_count(get_neighbor(node, base))) {
             ++degree;
         }
         ++base;
@@ -271,31 +269,30 @@ const
 
 template <>
 std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
-        std::string& contig_b)
+        std::string& contig_b, WordLength offset)
 const
 {
-    return contig_a + contig_b.substr(_ksize);
+    return contig_a + contig_b.substr(_ksize - offset);
 }
 
 template <>
 std::string AssemblerTraverser<LEFT>::join_contigs(std::string& contig_a,
-        std::string& contig_b)
+        std::string& contig_b, WordLength offset)
 const
 {
-    return contig_b + contig_a.substr(_ksize);
+    return contig_b + contig_a.substr(_ksize - offset);
 }
 
 template<bool direction>
 char AssemblerTraverser<direction>::next_symbol()
 {
-    char * symbol_ptr = alphabets::DNA_SIMPLE;
-    char base = *symbol_ptr; // kill -Wmaybe-uninitialized warning
     short found = 0;
+    char found_base = '\0';
     Kmer neighbor;
     Kmer cursor_next;
 
-    while(*symbol_ptr != '\0') {
-        neighbor = this->get_neighbor(this->cursor, *symbol_ptr);
+    for (auto base : alphabets::DNA_SIMPLE) {
+        neighbor = NodeCursor<direction>::get_neighbor(this->cursor, base);
 
         if (this->graph->get_count(neighbor) &&
                 !apply_kmer_filters(neighbor, this->filters)) {
@@ -304,17 +301,16 @@ char AssemblerTraverser<direction>::next_symbol()
             if (found > 1) {
                 return '\0';
             }
-            base = *symbol_ptr;
+            found_base = base;
             cursor_next = neighbor;
         }
-        symbol_ptr++;
     }
 
     if (!found) {
         return '\0';
     } else {
         this->cursor = cursor_next;
-        return base;
+        return found_base;
     }
 }
 

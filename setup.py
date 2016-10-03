@@ -129,13 +129,13 @@ BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "symbols"])
+    "kmer_filters", "traversal", "assembler", "alphabets"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal", "kmer_filters", "assembler", "symbols"])
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -148,6 +148,8 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+else:
+    EXTRA_COMPILE_ARGS.append('-fdiagnostics-color=auto')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
