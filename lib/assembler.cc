@@ -139,6 +139,9 @@ std::string LinearAssembler::_assemble_directed<RIGHT>
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
+    if (!cursor.cursor.is_forward()) {
+        contig = _revcomp(contig);
+    }
     char next_base;
 
 #if DEBUG
