@@ -40,7 +40,7 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG 0
+#define DEBUG 1
 #define DEBUG_AT 0
 
 using namespace std;
@@ -139,6 +139,9 @@ std::string LinearAssembler::_assemble_directed<RIGHT>
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
+    if (!cursor.cursor.is_forward()) {
+        contig = _revcomp(contig);
+    }
     char next_base;
 
 #if DEBUG
@@ -157,7 +160,7 @@ const
  * Labeled Assembly
  ********************************/
 
-LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * lh) :
+SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash * lh) :
     graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
 {
     linear_asm = new LinearAssembler(graph);
@@ -166,7 +169,7 @@ LabeledLinearAssembler::LabeledLinearAssembler(const LabelHash * lh) :
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
-StringVector LabeledLinearAssembler::assemble(const Kmer seed_kmer,
+StringVector SimpleLabeledAssembler::assemble(const Kmer seed_kmer,
         const Hashtable * stop_bf)
 const
 {
@@ -210,7 +213,7 @@ const
 }
 
 template <bool direction>
-void LabeledLinearAssembler::_assemble_directed(NonLoopingAT<direction>&
+void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
         start_cursor,
         StringVector& paths)
 const
@@ -218,79 +221,58 @@ const
 
     std::string root_contig = linear_asm->_assemble_directed<direction>
                               (start_cursor);
-    Kmer end_kmer = start_cursor.cursor;
+    //Kmer end_kmer = start_cursor.cursor;
 
     if (start_cursor.cursor_degree() > 1) {               // hit a HDN
 #if DEBUG
         std::cout << "Contig thus far: " << root_contig << std::endl;
-        std::cout << "HDN: " << end_kmer.repr(_ksize) << "\n";
+        std::cout << "HDN: " << start_cursor.cursor.repr(_ksize) << "\n";
 #endif // DEBUG
 
         LabelSet labels;
-        lh->get_tag_labels(end_kmer, labels);
+        lh->get_tag_labels(start_cursor.cursor, labels);
 
-        /* For each label, we try to find spanning paths. We create
-         * a new cursor starting at the end k-mer, with the existing node
-         * filters; then we give that to the label spanning function.
-         *
-         * NOTE: This implies that there may be some non-deterministic
-         * behavior: the ordering of the labels could vary, and decides
-         * the recursion termination.
-         */
+
         if(labels.size() == 0) {
             // if no labels are found there's nothing to be done, return
-#if DEBUG
-            std::cout << "no labels" << std::endl;
-#endif
+
             paths.push_back(root_contig);
             return;
         } else {
-#if DEBUG
-            std::cout << "num labels: " << labels.size() << std::endl;
-#endif
-            for (Label label : labels) {
-                /* Copy the current cursor at end_cursor for the spanning function.
-                 * We'll now assemble, following the given label, as far as we can.
-                 * We add an extra filter to the list: now, if we find no labels, we
-                 * continue assembling; if we find labels and ours is included, we
-                 * continue; and if we find labels and ours is not included, we stop.
-                 * This cursor should also have the filters for visited k-mers and
-                 * the stop bloom filter already.
-                 */
-#if DEBUG
-                std::cout << "label: " << label << std::endl;
-#endif
-                NonLoopingAT<direction> span_cursor(start_cursor);
-                span_cursor.push_filter(get_label_filter(label, lh));
-                std::string spanning_contig = linear_asm->_assemble_directed<direction>
-                                              (span_cursor);
 
-                if(spanning_contig.length() == _ksize) {
-#if DEBUG
-                    std::cout << "zero length spanning contig" << spanning_contig << std::endl;
-#endif
-                    paths.push_back(root_contig);
-                    continue;
-                }
+            /* Copy the current cursor at end_cursor for the spanning function.
+             * We'll now assemble, following the given label, as far as we can.
+             * We add an extra filter to the list: now, if we find no labels, we
+             * continue assembling; if we find labels and ours is included, we
+             * continue; and if we find labels and ours is not included, we stop.
+             * This cursor should also have the filters for visited k-mers and
+             * the stop bloom filter already.
+             */
 
-                // Remove the label filter
-                span_cursor.pop_filter();
+            start_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+            KmerQueue branch_starts;
+            if (start_cursor.neighbors(branch_starts) == 0) {
+                paths.push_back(root_contig);
+                return;
+            }
 
-                // Recurse and gather paths
-                StringVector continue_contigs;
-                _assemble_directed<direction>(span_cursor, continue_contigs);
+            start_cursor.pop_filter();
+            
+            StringVector branch_contigs;
+            while(!branch_starts.empty()) { // TODO: change from queue
+                NonLoopingAT<direction> branch_cursor(start_cursor);
+                branch_cursor.cursor = branch_starts.front();
+                branch_starts.pop();
 
-                if (continue_contigs.size() == 0) {
-                    paths.push_back(span_cursor.join_contigs(root_contig,
-                                    spanning_contig));
-                } else {
-                    for (auto continue_contig : continue_contigs) {
-                        std::string full_contig = span_cursor.join_contigs(root_contig,
-                                                  spanning_contig);
-                        paths.push_back(span_cursor.join_contigs(full_contig, continue_contig));
-                    }
-                }
-            } //end for
+                _assemble_directed<direction>(branch_cursor, branch_contigs);
+            }
+
+            for (auto branch_contig : branch_contigs) {
+                std::string full_contig = start_cursor.join_contigs(root_contig,
+                                                                   branch_contig,
+                                                                   1);
+                paths.push_back(full_contig);
+            }
         }
     } else {
         paths.push_back(root_contig);

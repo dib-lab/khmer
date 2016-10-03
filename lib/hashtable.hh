@@ -89,7 +89,6 @@ class Hashtable: public
 {
     friend class SubsetPartition;
     friend class LabelHash;
-    friend class Traverser;
 
 protected:
     unsigned int _tag_density;

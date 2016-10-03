@@ -42,10 +42,10 @@ namespace khmer
 namespace alphabets
 {
 
-extern char DNA_SIMPLE [];
-extern char DNAN_SIMPLE [];
-extern char IUPAC_NUCL [];
-extern char IUPAC_AA [];
+extern std::string DNA_SIMPLE;
+extern std::string DNAN_SIMPLE;
+extern std::string IUPAC_NUCL;
+extern std::string IUPAC_AA;
 
 }
 }

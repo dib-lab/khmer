@@ -58,76 +58,126 @@ namespace khmer
 class Hashtable;
 class LabelHash;
 
-class Traverser: public KmerFactory
+
+template<bool direction>
+class NodeGatherer: public KmerFactory
 {
     friend class Hashtable;
 
 protected:
 
+    KmerFilterList filters;
     HashIntoType bitmask;
     unsigned int rc_left_shift;
+    const Hashtable * graph;
 
 public:
 
-    const Hashtable * graph;
+    explicit NodeGatherer(const Hashtable * ht,
+                       KmerFilterList filters);
+    
+    explicit NodeGatherer(const Hashtable * ht);
+    
+    explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
 
-    explicit Traverser(const Hashtable * ht);
-
-    Kmer get_left(const Kmer& node, const char ch) const;
-    Kmer get_right(const Kmer& node, const char ch) const;
-
-    unsigned int traverse_left(Kmer& node,
-                               KmerQueue &node_q,
-                               KmerFilter filter=0,
-                               unsigned short max_neighbors=4) const;
-    unsigned int traverse_right(Kmer& node,
-                                KmerQueue &node_q,
-                                KmerFilter filter=0,
-                                unsigned short max_neighbors=4) const;
-    unsigned int traverse(Kmer& node,
-                          KmerQueue &node_q,
-                          KmerFilter filter=0) const
+    void push_filter(KmerFilter filter)
     {
+        filters.push_back(filter);
+    }
 
-        unsigned int found;
-        found = traverse_left(node, node_q, filter);
-        found += traverse_right(node, node_q, filter);
-        return found;
-    };
+    Kmer get_neighbor(const Kmer& node, const char ch) const;
 
-    unsigned int degree_left(const Kmer& node) const;
-    unsigned int degree_right(const Kmer& node) const;
+    unsigned int neighbors(const Kmer& node,
+                           KmerQueue &node_q) const;
+
     unsigned int degree(const Kmer& node) const;
 };
 
 
-template<bool direction>
-class AssemblerTraverser: public Traverser
+template <bool direction>
+class NodeCursor: public NodeGatherer<direction>
 {
-
-protected:
-
-    KmerFilterList filters;
-
-private:
-
-    Kmer get_neighbor(Kmer& node, const char symbol);
 
 public:
 
     Kmer cursor;
+    using NodeGatherer<direction>::push_filter;
 
-    explicit AssemblerTraverser(const Hashtable * ht,
-                                Kmer start_kmer,
-                                KmerFilterList filters);
+    explicit NodeCursor(const Hashtable * ht,
+                        Kmer start_kmer,
+                        KmerFilterList filters);
+    
+    explicit NodeCursor(const Hashtable * ht,
+                        Kmer start_kmer);
+
+    explicit NodeCursor(const Hashtable * ht, 
+                        Kmer start_kmer,
+                        KmerFilter filter);
+
+    unsigned int neighbors(KmerQueue& node_q) const {
+        return NodeGatherer<direction>::neighbors(cursor, node_q);
+    }
+
+    KmerFilter pop_filter()
+    {
+        KmerFilter back = this->filters.back();
+        this->filters.pop_back();
+        return back;
+    }
+
+};
+
+
+class Traverser: public KmerFactory
+{
+
+protected:
+    
+    const Hashtable * graph;
+    NodeGatherer<LEFT> left_gatherer;
+    NodeGatherer<RIGHT> right_gatherer;
+
+public:
+
+    explicit Traverser(const Hashtable * ht,
+                       KmerFilterList filters);
+
+    explicit Traverser(const Hashtable * ht) : Traverser(ht, KmerFilterList()) {}
+
+    explicit Traverser(const Hashtable * ht, 
+                       KmerFilter filter);
+
+    void push_filter(KmerFilter filter);
+
+    unsigned int traverse(const Kmer& node,
+                          KmerQueue& node_q) const;
+
+    unsigned int traverse_left(const Kmer& node,
+                               KmerQueue& node_q) const;
+
+    unsigned int traverse_right(const Kmer& node,
+                                KmerQueue& node_q) const;
+
+    unsigned int degree(const Kmer& node) const;
+    unsigned int degree_left(const Kmer& node) const;
+    unsigned int degree_right(const Kmer& node) const;
+
+};
+
+
+template <bool direction>
+class AssemblerTraverser: public NodeCursor<direction>
+{
+
+public:
+    using NodeCursor<direction>::NodeCursor;
 
     char next_symbol();
-    bool set_cursor(Kmer& node);
-    void push_filter(KmerFilter filter);
-    KmerFilter pop_filter();
     unsigned int cursor_degree() const;
 
-    std::string join_contigs(std::string& contig_a, std::string& contig_b) const;
+    std::string join_contigs(std::string& contig_a, 
+                             std::string& contig_b,
+                             WordLength offset = 0) const;
 };
 
 

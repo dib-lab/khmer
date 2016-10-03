@@ -4376,7 +4376,7 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
         return NULL;
     }
 
-    LabeledLinearAssembler assembler(labelhash);
+    SimpleLabeledAssembler assembler(labelhash);
     std::vector<std::string> contigs = assembler.assemble(start_kmer);
 
     PyObject * ret = PyList_New(contigs.size());

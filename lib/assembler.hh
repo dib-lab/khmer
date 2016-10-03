@@ -98,16 +98,14 @@ public:
 // The explicit specializations need to be declared in the same translation unit
 // as their unspecialized declaration.
 template<>
-std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>&
-        cursor) const;
+std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT> &cursor) const;
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>
-(AssemblerTraverser<RIGHT>& cursor) const;
+std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT> &cursor) const;
 
 
 /**
- * \class LabeledLinearAssembler
+ * \class SimpleLabeledAssembler
  *
  * \brief Assemble linear paths using labels to span high degree nodes.
  *
@@ -122,7 +120,7 @@ std::string LinearAssembler::_assemble_directed<RIGHT>
  * Contact: camille.scott.w@gmail.com
  *
  */
-class LabeledLinearAssembler
+class SimpleLabeledAssembler
 {
     friend class Hashtable;
     const LinearAssembler * linear_asm;
@@ -132,7 +130,7 @@ class LabeledLinearAssembler
 
 public:
 
-    explicit LabeledLinearAssembler(const LabelHash * lh);
+    explicit SimpleLabeledAssembler(const LabelHash * lh);
 
     StringVector assemble(const Kmer seed_kmer,
                           const Hashtable * stop_bf=0) const;

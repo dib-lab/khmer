@@ -34,6 +34,7 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
+#include <algorithm>
 
 #include "khmer.hh"
 #include "hashtable.hh"
@@ -43,7 +44,7 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
+bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
 {
     if (!filters.size()) {
         return false;
@@ -61,11 +62,12 @@ bool apply_kmer_filters(Kmer& node, std::list<KmerFilter>& filters)
 
 KmerFilter get_label_filter(const Label label, const LabelHash * lh)
 {
-    KmerFilter filter = [=] (Kmer& node) {
+    KmerFilter filter = [=] (const Kmer& node) {
         LabelSet ls;
         lh->get_tag_labels(node, ls);
 #if DEBUG_FILTERS
         if (ls.size() == 0) {
+            // this should never happen
             std::cout << "no labels to jump to!" << std::endl;
         }
 #endif
@@ -73,13 +75,52 @@ KmerFilter get_label_filter(const Label label, const LabelHash * lh)
         return !set_contains(ls, label);
 
     };
+
     return filter;
 }
 
 
+KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
+                                             const LabelHash * lh,
+                                             const unsigned int min_cov)
+{
+    auto src_begin = src_labels.begin();
+    auto src_end = src_labels.end();
+    unsigned int src_size = src_labels.size();
+
+    KmerFilter filter = [=] (const Kmer& node) {
+        LabelSet dst_labels;
+        lh->get_tag_labels(node, dst_labels);
+        
+        LabelSet intersect;
+        std::set_intersection(src_begin, src_end,
+                                dst_labels.begin(), dst_labels.end(),
+                                std::inserter(intersect, intersect.begin()));
+        
+        if ((intersect.size() == 1)
+             && (dst_labels.size() == 1)
+             && (src_size >= min_cov)) {
+#if DEBUG_FILTERS
+            std::cout << "TIP: " << intersect.size() << ", " <<
+               dst_labels.size() << ", " << src_size << std::endl;
+#endif 
+            // putative error / tip
+            return true;
+        } else if (intersect.size() > 0) {
+            // there's at least one spanning read
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    return filter;
+}
+                                      
+
 KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
 {
-    KmerFilter filter = [=] (Kmer& n) {
+    KmerFilter filter = [=] (const Kmer& n) {
         return stop_bf->get_count(n);
     };
     return filter;
@@ -88,7 +129,7 @@ KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
 
 KmerFilter get_visited_filter(const SeenSet * visited)
 {
-    KmerFilter filter = [=] (Kmer& node) {
+    KmerFilter filter = [=] (const Kmer& node) {
 #if DEBUG_FILTERS
         if(set_contains(*visited, node)) {
             std::cout << "loop!" << std::endl;

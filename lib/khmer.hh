@@ -163,7 +163,7 @@ typedef std::set<Kmer> KmerSet;
 
 // A function which takes a Kmer and returns true if it
 // is to be filtered / ignored
-typedef std::function<bool (Kmer&)> KmerFilter;
+typedef std::function<bool (const Kmer&)> KmerFilter;
 typedef std::list<KmerFilter> KmerFilterList;
 typedef std::vector<std::string> StringVector;
 }

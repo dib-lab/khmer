@@ -236,12 +236,11 @@ void SubsetPartition::find_all_tags(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
-
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
     };
+    Traverser traverser(_ht, filter);
 
     node_q.push(start_kmer);
     breadth_q.push(0);
@@ -293,12 +292,12 @@ void SubsetPartition::find_all_tags(
             continue;    // truncate search @CTB exit?
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -320,7 +319,6 @@ unsigned int SubsetPartition::sweep_for_tags(
     bool		stop_big_traversals)
 {
 
-    Traverser traverser(_ht);
     KmerSet traversed_nodes;
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
@@ -329,9 +327,10 @@ unsigned int SubsetPartition::sweep_for_tags(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(traversed_nodes, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(traversed_nodes, n);
     };
+    Traverser traverser(_ht, filter);
 
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
@@ -388,12 +387,12 @@ unsigned int SubsetPartition::sweep_for_tags(
             return total;
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -425,12 +424,12 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
-
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
     };
+
+    Traverser traverser(_ht, filter);
 
     node_q.push(start_kmer);
     breadth_q.push(0);
@@ -491,12 +490,12 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             continue;    // truncate search @CTB exit?
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
