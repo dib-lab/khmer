@@ -1127,7 +1127,7 @@ def test_assemble_linear_path_2():
     nodegraph.consume(contig)
     nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
 
-    path = nodegraph.assemble_linear_path(contig[100:100+K])
+    path = nodegraph.assemble_linear_path(contig[100:100 + K])
     len_path = len(path)
 
     assert _equals_rc(path, contig[:len_path])
