@@ -130,8 +130,7 @@ def _runscript(scriptname, sandbox=False):
     scriptfile = os.path.join(path, scriptname)
     if os.path.isfile(scriptfile):
         if os.path.isfile(scriptfile):
-            exec(  # pylint: disable=exec-used
-                 compile(open(scriptfile).read(), scriptfile, 'exec'),
+            exec(compile(open(scriptfile).read(), scriptfile, 'exec'),
                  namespace)
             return 0
     elif sandbox:
