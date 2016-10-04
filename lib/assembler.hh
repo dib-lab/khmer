@@ -113,7 +113,9 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
  * LinearAssembler, though does not inherit. High degree nodes (nodes with degree > 2) are spanned
  * using labeling formation: if there is a matching label on two sides of the HDN, we can keep
  * traverse across. Internally, this is performed by pushing a new filter to search for the label on to
- * the Traverser's filter stack and popping it on the other side.
+ * the Traverser's filter stack and popping it on the other side of the HDN. This implementation also
+ * does a simple check to guess whether a branch is an error: if the HDN has label coverage great than 5, and
+ * the branch has only a single label spanning, it is guessed to be a tip and ignored.
  *
  * \author Camille Scott
  *

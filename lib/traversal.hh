@@ -58,7 +58,14 @@ namespace khmer
 class Hashtable;
 class LabelHash;
 
-
+/**
+ * @brief Gather neighbors from a given node.
+ *
+ * The most basic traversal utility. Stores a list of KmerFilter functions, and given
+ * a Kmer, finds all its neighbors that pass the filter function.s
+ *
+ * @tparam direction The direction in the graph to gather nodes from.
+ */
 template<bool direction>
 class NodeGatherer: public KmerFactory
 {
@@ -80,26 +87,74 @@ public:
     
     explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
 
+    /**
+     * @brief Push a new filter on to the filter stack.
+     */
     void push_filter(KmerFilter filter)
     {
         filters.push_back(filter);
     }
 
+    /**
+     * @brief Pop a filter off the stack.
+     *
+     * @return The filter.
+     */
+    KmerFilter pop_filter()
+    {
+        KmerFilter back = this->filters.back();
+        this->filters.pop_back();
+        return back;
+    }
+
+    /**
+     * @brief Build the Kmer for the potential neighbor node of the given Kmer.
+     *
+     * When templated for RIGHT, will return the Kmer built from the length K-1 suffix of the
+     * input Kmer with the new base appended; when LEFT, the length K-1 prefix of the input Kmer
+     * with the new base prepended.
+     *
+     * @param node The starting node.
+     * @param ch The new base to build from.
+     *
+     * @return The new Kmer.
+     */
     Kmer get_neighbor(const Kmer& node, const char ch) const;
 
+    /**
+     * @brief Get all neighbors which are present in the graph and pass the filters.
+     *
+     * @param node The Kmer to start at.
+     * @param node_q To collect the results.
+     *
+     * @return Number of neighbors found.
+     */
     unsigned int neighbors(const Kmer& node,
                            KmerQueue &node_q) const;
 
+    /**
+     * @brief Get the degree of the given Kmer in the templated direction.
+     *
+     * @param node The Kmer to check.
+     *
+     * @return The degree.
+     */
     unsigned int degree(const Kmer& node) const;
 };
 
 
+/**
+ * @brief A stateful NodeGatherer. Stores its current position.
+ *
+ * @tparam direction The direction to gather nodes from.
+ */
 template <bool direction>
 class NodeCursor: public NodeGatherer<direction>
 {
 
 public:
 
+    // The current position.
     Kmer cursor;
     using NodeGatherer<direction>::push_filter;
 
@@ -114,20 +169,29 @@ public:
                         Kmer start_kmer,
                         KmerFilter filter);
 
+    /**
+     * @brief Get the neighbors for the current position.
+
+     *
+     * @param node_q To collection the results.
+     *
+     * @return Number of neighbors found.
+     */
     unsigned int neighbors(KmerQueue& node_q) const {
         return NodeGatherer<direction>::neighbors(cursor, node_q);
     }
 
-    KmerFilter pop_filter()
-    {
-        KmerFilter back = this->filters.back();
-        this->filters.pop_back();
-        return back;
-    }
+    /**
+     * @return Degree of the current cursor position and direction.
+     */
+    unsigned int cursor_degree() const;
 
 };
 
 
+/**
+ * @brief Wraps a LEFT and RIGHT NodeGatherer.
+ */
 class Traverser: public KmerFactory
 {
 
@@ -165,6 +229,11 @@ public:
 };
 
 
+/**
+ * @brief A NodeCursor specialized for assembling contigs.
+ *
+ * @tparam direction The direction to assemble.
+ */
 template <bool direction>
 class AssemblerTraverser: public NodeCursor<direction>
 {
@@ -172,15 +241,42 @@ class AssemblerTraverser: public NodeCursor<direction>
 public:
     using NodeCursor<direction>::NodeCursor;
 
+    /**
+     * @brief Get the next symbol.
+     *
+     * Finds the next symbol which passes the filters, so long as there is only
+     * one branch. Does not return a new symbol if there are multiple potential neighbors.
+     *
+     * @return A member of alphabets::DNA_SIMPLE if a neighbor is found; '\0' otherwise.
+     */
     char next_symbol();
-    unsigned int cursor_degree() const;
 
+    /**
+     * @brief Utility function to join two overlapping contigs with proper directionality.
+     *
+     *  By default, assumes the two contigs overlap by length K. This can be reduced via the
+     *  offset parameter.
+     *
+     * @param contig_a
+     * @param contig_b
+     * @param offset Number of bases to subtract from K when joining.
+     *
+     * @return The joined contig.
+     */
     std::string join_contigs(std::string& contig_a, 
                              std::string& contig_b,
                              WordLength offset = 0) const;
 };
 
 
+/**
+ * @brief An AssemblerTraverser which does not traverse to Kmers it has already encountered.
+ *
+ * Simply adds a new filter to check if the Kmer has been seen, and adds the Kmer to the set
+ * of seen Kmers after calling ::next_symbol.
+ *
+ * @tparam direction The direction to assemble.
+ */
 template<bool direction>
 class NonLoopingAT: public AssemblerTraverser<direction>
 {

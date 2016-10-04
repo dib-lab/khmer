@@ -84,6 +84,8 @@ template<>
 Kmer NodeGatherer<LEFT>::get_neighbor(const Kmer& node, const char ch)
 const
 {
+    // optimized bit-foo to check for LEFT neighbors in both forward and
+    // reverse-complemented directions
     HashIntoType kmer_f, kmer_r;
     kmer_f = ((node.kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift);
     kmer_r = (((node.kmer_r) << 2) & bitmask) | (twobit_comp(ch));
@@ -96,6 +98,8 @@ Kmer NodeGatherer<RIGHT>::get_neighbor(const Kmer& node,
                                        const char ch)
 const
 {
+    // optimized bit-foo to check for LEFT neighbors in both forward and
+    // reverse-complemented directions
     HashIntoType kmer_f, kmer_r;
     kmer_f = (((node.kmer_f) << 2) & bitmask) | (twobit_repr(ch));
     kmer_r = ((node.kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift);
@@ -111,7 +115,9 @@ const
     unsigned int found = 0;
 
     for (auto base : alphabets::DNA_SIMPLE) {
+        // Get the putative neighboring Kmer
         Kmer neighbor = get_neighbor(node, base);
+        // Now check if it's in the graph and passes the filters
         if (graph->get_count(neighbor) && !(apply_kmer_filters(neighbor, filters))) {
             node_q.push(neighbor);
             ++found;
@@ -169,6 +175,15 @@ NodeCursor<direction>::NodeCursor(const Hashtable * ht,
 {
     push_filter(filter);
 }
+
+
+template<bool direction>
+unsigned int NodeCursor<direction>::cursor_degree()
+const
+{
+    return this->degree(this->cursor);
+}
+
 
 
 /******************************************
@@ -247,14 +262,6 @@ unsigned int Traverser::degree_right(const Kmer& node) const
  * AssemblerTraverser
  ******************************************/
 
-template<bool direction>
-unsigned int AssemblerTraverser<direction>::cursor_degree()
-const
-{
-    return this->degree(this->cursor);
-}
-
-
 template <>
 std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
         std::string& contig_b, WordLength offset)
@@ -280,12 +287,15 @@ char AssemblerTraverser<direction>::next_symbol()
     Kmer cursor_next;
 
     for (auto base : alphabets::DNA_SIMPLE) {
+        // Get the putative neighbor for this base at the cursor position
         neighbor = NodeCursor<direction>::get_neighbor(this->cursor, base);
 
+        // Now check that the putative neighbor is in the graph and passes the filters
         if (this->graph->get_count(neighbor) &&
                 !apply_kmer_filters(neighbor, this->filters)) {
 
             found++;
+            // This naive traverser stops on high degree nodes
             if (found > 1) {
                 return '\0';
             }
