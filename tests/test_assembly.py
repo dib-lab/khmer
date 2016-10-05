@@ -54,8 +54,18 @@ from . import khmer_tst_utils as utils
 def teardown():
     utils.cleanup()
 
-def setup_module(module):
-    module.K = 21
+K = 21
+
+class Kmer(str):
+
+    def __init__(self, value, pos=0):
+        self.pos = pos
+
+    def __new__(cls, value, pos=0):
+        if not len(value) == K:
+            raise ValueError('bad k-mer length')
+        return str.__new__(cls, value)
+
 
 def mutate_base(base):
     if base in 'AT':
@@ -78,6 +88,34 @@ def mutate_position(sequence, pos):
     sequence = list(sequence)
     sequence[pos] = mutate_base(sequence[pos])
     return ''.join(sequence)
+
+
+def get_random_sequence(length, exclude=None):
+    '''Generate a random (non-looping) nucleotide sequence.
+
+    Args:
+        exlcude (str): If not None, add the k-mers from this sequence to the seen set.
+    
+    Returns:
+        str: A random non-looping sequence.
+    '''
+    seen = set()
+    if exclude is not None:
+        print('Adding', exclude, 'to seen set')
+        for pos in range(0, len(exclude)-K+1):
+            seen.add(exclude[pos:pos+K])
+
+    seq = [random.choice('ACGT') for _ in range(K)] # do first K bases
+    seen.add(''.join(seq))
+    while(len(seq) < length):
+        next_base = random.choice('ACGT')
+        next_kmer = ''.join(seq[-K+1:] + [next_base])
+        assert len(next_kmer) == K
+        if (next_kmer) not in seen:
+            seq.append(next_base)
+        else:
+            continue
+    return ''.join(seq)  
 
 
 def reads_from_sequence(sequence, L=100, N=100):
@@ -113,273 +151,350 @@ def test_reads_from_sequence():
         assert mutate_sequence(read) not in contig
 
 
-class TestNonBranching:
-    '''
-    Sets up a simple linear path graph structure.
+@pytest.fixture(params=['simple-genome.fa'])
+def known_sequence(request):
+    fn = utils.get_test_data(request.param)
+    return list(screed.open(fn))[0].sequence
+
+
+@pytest.fixture(params=list(range(500, 1500, 100)))
+def random_sequence(request):
+
+    return get_random_sequence(request.param) 
+
+
+@pytest.fixture(params=[khmer.Nodegraph, khmer.Countgraph])
+def graph(request):
+    return request.param(K, 1e6, 4)
+
+
+
+'''
+# GRAPH STRUCTURE FIXTURES
+
+These fixtures emit various graph structures with their corresponding
+sequences and important nodes. They take a random sequence fixture and
+a graph fixture, then consume sequence and generate k-mers accordingly.
+
+We're using a bespoke but simple language to describe graph structures in the
+docstrings of these tests. It is as follows:
+
+    o: Node
+    [x:y]: Node at position in sequence
+    [x:y]+S: Node at position in sequence with extra base (where S in ACGT)
+    (Name), ([x:y] Name): Named node, named node at position
+    → : Edge
+    ~~: Tandem → o→  repeats
+
+'''
+
+@pytest.fixture
+def linear_structure(graph, random_sequence):
+    '''Sets up a simple linear path graph structure.
 
     contig
-    [0]--o--o--o~~o--o--o--[-1]
+    [0]→ o→ o~~o→ o→ [-1]
     '''
 
-    def setup_class(self):
-        contigfile = utils.get_test_data('simple-genome.fa')
-        self.contig = list(screed.open(contigfile))[0].sequence
+    graph.consume(random_sequence)
 
-    def test_all_start_positions(self):
+    return graph, random_sequence
+
+
+@pytest.fixture(params=[K*2, K*3, -K*3, -K*2])
+def right_tip_structure(request, graph, random_sequence):
+    '''
+    Sets up a graph structure like so:
+                                        ([S+1:S+K]+B tip)
+    contig                             ↗
+    [0]→ o→ o~~o→ (L)→ ([S:S+K] HDN)→ (R)→ o→ o→ o~~o→ [-1]
+
+    Where S is the start position of the high degreen node (HDN).
+    That is, it has a single branch at the Sth K-mer.
+    '''
+    
+    S = request.param
+    if S < 0:
+        S = len(random_sequence) + S
+    # the HDN
+    HDN = Kmer(random_sequence[S:S+K], pos=S)
+    # the branch kmer
+    tip = Kmer(mutate_position(random_sequence[S+1:S+1+K], -1),
+               pos=S+1)
+    # left of the HDN
+    L = Kmer(random_sequence[S-1:S-1+K], pos=S-1)
+    # right of the HDN
+    R = Kmer(random_sequence[S+1:S+1+K], pos=S+1)
+
+
+    graph.consume(random_sequence)
+    graph.count(tip)
+
+    return graph, random_sequence, L, HDN, R, tip
+
+
+@pytest.fixture(params=[K*2, K*3, -K*3, -K*2])
+def right_fork_structure(request, graph, random_sequence):
+    '''
+    Sets up a graph structure like so:
+                                        ([:S+1]+B*25 branch)
+    contig                             ↗
+    [0]→ o→ o~~o→ (L)→ ([S:S+K] HDN)→ (R)→ o→ o→ o~~o→ [-1]
+
+    Where S is the start position of the high degreen node (HDN).
+    The branch is fixed at length 25, and will not form a loop
+    with the main contig.
+    '''
+    
+    S = request.param
+    if S < 0:
+        S = len(random_sequence) + S
+    # the HDN
+    HDN = Kmer(random_sequence[S:S+K], pos=S)
+    # the branch sequence, mutated at position S+1
+    branch = mutate_position(random_sequence[:S+2], -1)
+    branch += get_random_sequence(25, exclude=random_sequence)
+    # left of the HDN
+    L = Kmer(random_sequence[S-1:S-1+K], pos=S-1)
+    # right of the HDN
+    R = Kmer(random_sequence[S+1:S+1+K], pos=S+1)
+
+
+    graph.consume(random_sequence)
+    graph.consume(branch)
+
+    return graph, random_sequence, L, HDN, R, branch
+
+
+@pytest.fixture(params=[K*2, K*3, -K*3, -K*2])
+def left_tip_structure(request, graph, random_sequence):
+    '''
+    Sets up a graph structure like so:
+
+    (B+[S:S+K-1] tip)
+                     ↘
+    [0]→ o~~o→ (L)→ ([S:S+K] HDN)→ (R)→ o→ o~~o→ [-1]
+
+    Where S is the start position of the HDN
+    That is, it has a single branch at the 100th K-mer.
+    '''
+    S = request.param
+    if S < 0:
+        S = len(random_sequence) + S
+    tip = Kmer(mutate_position(random_sequence[S-1:S-1+K], 0),
+               pos=S-1+K)
+    HDN = Kmer(random_sequence[S:S+K], pos=S)
+    L = Kmer(random_sequence[S-1:S-1+K], pos=S-1)
+    R = Kmer(random_sequence[S+1:S+1+K], pos=S+1)
+
+    graph.consume(random_sequence)
+    graph.count(tip)
+
+    return graph, random_sequence, L, HDN, R, tip
+
+
+class TestNonBranching:
+
+    def test_all_start_positions(self, linear_structure):
         # assemble entire contig, starting from wherever
-        print('contig len', len(self.contig))
+        nodegraph, contig = linear_structure
 
-        nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-        nodegraph.consume(self.contig)
-
-        for start in range(0, len(self.contig), 150):
-            path = nodegraph.assemble_linear_path(self.contig[start:start + K])
-            assert utils._equals_rc(path, self.contig), start
+        for start in range(0, len(contig), 150):
+            path = nodegraph.assemble_linear_path(contig[start:start + K])
+            assert utils._equals_rc(path, contig), start
 
 
 class TestLinearAssembler_RightBranching:
-    '''
-    Sets up a graph structure like so:
-                                 [101:101+K-1]+G(tip)
-    contig                     ↗
-    [0]→ o→ o→ o→ L→ [100:100+K]→ R→ o→ o→ o~~o→ [-1]
+ 
+    def test_branch_point(self, right_tip_structure):
+        graph, contig, L, HDN, R, tip = right_tip_structure
 
-    That is, it has a single branch at the 100th K-mer.
-    '''
+        assert graph.kmer_degree(HDN) == 3
 
-    def setup_class(self):
-        contigfile = utils.get_test_data('simple-genome.fa')
-
-        self.contig = list(screed.open(contigfile))[0].sequence
-        self.tip = self.contig[101:101+K-1] + 'G'
-        self.HDN = self.contig[100:100+K]
-
-        self.nodegraph = khmer.Nodegraph(K, 1e5, 4)
-        self.nodegraph.consume(self.contig)
-        self.nodegraph.count(self.tip)
-
-    def test_branch_point(self):
-        assert self.nodegraph.kmer_degree(self.HDN) == 3
-
-    def test_beginning_to_branch(self):
+    def test_beginning_to_branch(self, right_tip_structure):
         # assemble from beginning of contig, up until branch point
+        graph, contig, L, HDN, R, tip = right_tip_structure
 
-        path = self.nodegraph.assemble_linear_path(self.contig[0:K])
-        len_path = len(path)
+        path = graph.assemble_linear_path(contig[0:K])
 
-        assert len_path == 100+K
-        assert utils._equals_rc(path, self.contig[:len_path])
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
 
-    def test_beginning_to_branch_revcomp(self):
+    def test_beginning_to_branch_revcomp(self, right_tip_structure):
         # assemble from beginning of contig, up until branch point
         # starting from rev comp
-        path = self.nodegraph.assemble_linear_path(revcomp(self.contig[0:K]))
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        path = graph.assemble_linear_path(revcomp(contig[0:K]))
 
-        assert utils._equals_rc(path, self.contig[:len_path])
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
 
-    def test_left_of_branch_to_beginning(self):
+    def test_left_of_branch_to_beginning(self, right_tip_structure):
         # start from HDN (left of branch)
-        path = self.nodegraph.assemble_linear_path(self.HDN)
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        path = graph.assemble_linear_path(L)
 
-        assert len_path == 100+K
-        assert utils._equals_rc(path, self.contig[:len_path])
+        assert len(path) == HDN.pos+K
+        assert utils._equals_rc(path, contig[:len(path)])
 
-    def test_left_of_branch_to_beginning_revcomp(self):
+    def test_left_of_branch_to_beginning_revcomp(self, right_tip_structure):
         # start from revcomp of HDN (left of branch)
-        path = self.nodegraph.assemble_linear_path(self.HDN)
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        path = graph.assemble_linear_path(revcomp(L))
 
-        assert len_path == 100+K
-        assert utils._equals_rc(path, self.contig[:len_path])
+        assert len(path) == HDN.pos+K
+        assert utils._equals_rc(path, contig[:len(path)])
 
-    def test_right_of_branch_outwards_to_ends(self):
+    def test_right_of_branch_outwards_to_ends(self, right_tip_structure):
         # assemble from right of branch point (at R)
         # Should get the *entire* original contig, as the assembler
         # will move left relative to the branch, and not consider it
         # as a high degree node
-        path = self.nodegraph.assemble_linear_path(self.contig[101:101 + K])
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        path = graph.assemble_linear_path(R)
 
-        assert len_path == len(self.contig)
-        assert utils._equals_rc(path, self.contig)
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
 
-    def test_end_to_beginning(self):
+    def test_end_to_beginning(self, right_tip_structure):
         # should have exact same behavior as right_of_branch_outwards
-        path = self.nodegraph.assemble_linear_path(self.contig[-K:])
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        path = graph.assemble_linear_path(contig[-K:])
 
-        assert len_path == len(self.contig)
-        assert utils._equals_rc(path, self.contig)
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
 
 
 class TestLinearAssembler_LeftBranching:
-    '''
-    Sets up a graph structure like so:
+ 
 
-    T+[101:101+K-1](tip)
-                       ↘
-    [0]→ o→ o→ o→ L→ [101:101+K]→ R→ o→ o→ o~~o→ [-1]
+    def test_branch_point(self, left_tip_structure):
+        graph, contig, L, HDN, R, tip = left_tip_structure
 
-    That is, it has a single branch at the 100th K-mer.
-    '''
+        assert graph.kmer_degree(HDN) == 3
 
-    def setup_class(self):
-        contigfile = utils.get_test_data('simple-genome.fa')
-
-        self.contig = list(screed.open(contigfile))[0].sequence
-        self.tip = 'T' + self.contig[101:101+K-1]
-        self.HDN = self.contig[101:101+K]
-        self.L = self.contig[100:100+K]
-        self.R = self.contig[102:102+K]
-
-        self.nodegraph = khmer.Nodegraph(K, 1e5, 4)
-        self.nodegraph.consume(self.contig)
-        self.nodegraph.count(self.tip)
-
-    def test_branch_point(self):
-        assert self.nodegraph.kmer_degree(self.HDN) == 3
-
-    def test_end_to_branch(self):
+    def test_end_to_branch(self, left_tip_structure):
         # assemble from end until branch point
         # should include HDN
-        path = self.nodegraph.assemble_linear_path(self.contig[-K:])
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = left_tip_structure
 
-        assert len_path == 899
-        assert utils._equals_rc(path, self.contig[101:])
+        path = graph.assemble_linear_path(contig[-K:])
 
-    def test_branch_to_end(self):
+        assert len(path) == len(contig) - HDN.pos
+        assert utils._equals_rc(path, contig[HDN.pos:])
+
+    def test_branch_to_end(self, left_tip_structure):
         # assemble from branch point until end
-        path = self.nodegraph.assemble_linear_path(self.HDN)
-        len_path = len(path)
+        graph, contig, L, HDN, R, tip = left_tip_structure
 
-        assert len_path == 899
-        assert utils._equals_rc(path, self.contig[101:])
+        path = graph.assemble_linear_path(HDN)
 
-    def test_branch_outwards_to_ends_with_stopbf(self):
+        assert len(path) == len(contig) - HDN.pos
+        assert utils._equals_rc(path, contig[HDN.pos:])
+
+    def test_branch_outwards_to_ends_with_stopbf(self, left_tip_structure):
         # block the tip with the stop_bf. should return a full length contig.
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
-        stop_bf.count(self.tip) 
+        stop_bf.count(tip) 
 
-        path = self.nodegraph.assemble_linear_path(self.HDN, stop_bf)
-        len_path = len(path)
+        path = graph.assemble_linear_path(HDN, stop_bf)
 
-        assert len_path == 1000
-        assert utils._equals_rc(path, self.contig)
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
 
-    def test_branch_outwards_to_ends_with_stopbf_revcomp(self):
+    def test_branch_outwards_to_ends_with_stopbf_revcomp(self, left_tip_structure):
          # block the tip with the stop_bf. should return a full length contig.
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
-        stop_bf.count(self.tip) 
+        stop_bf.count(tip) 
 
-        path = self.nodegraph.assemble_linear_path(revcomp(self.HDN), stop_bf)
-        len_path = len(path)
+        path = graph.assemble_linear_path(revcomp(HDN), stop_bf)
 
-        assert len_path == 1000
-        assert utils._equals_rc(path, self.contig)
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
 
 
-    def test_end_thru_tip_with_stopbf(self):
+    def test_end_thru_tip_with_stopbf(self, left_tip_structure):
         # assemble up to branch point, and include introduced branch b/c
         # of stop bf
- 
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
-        stop_bf.count(self.L)          # ...and block original path
+        stop_bf.count(L)          # ...and block original path
+        path = graph.assemble_linear_path(contig[-K:], stop_bf)
 
-        path = self.nodegraph.assemble_linear_path(self.contig[-K:], stop_bf)
-        len_path = len(path)
+        assert len(path) == len(contig) - HDN.pos + 1
 
-        assert len_path == 900
-        assert utils._equals_rc(path, 'T' + self.contig[101:])
+        # should be the tip k-kmer, plus the last base of the HDN thru
+        # the end of the contig
+        assert utils._equals_rc(path, tip + contig[HDN.pos+K-1:])
 
 
-    def test_single_node_flanked_by_hdns(self):
+    def test_single_node_flanked_by_hdns(self, left_tip_structure):
         # assemble single node flanked by high-degree nodes
         # we'll copy the main nodegraph before mutating it
-        nodegraph = khmer.Nodegraph(K, 1e5, 4)
-        nodegraph.update(self.nodegraph)
+        graph, contig, L, HDN, R, tip = left_tip_structure
 
-        # add a neighbor after the current tip
-        nodegraph.count(self.contig[102:102+K-1] + 'G')
+        graph.consume(mutate_position(contig, HDN.pos + K))
 
-        path = nodegraph.assemble_linear_path(self.HDN)
+        path = graph.assemble_linear_path(HDN)
 
         assert len(path) == K
-        assert utils._equals_rc(path, self.HDN)
+        assert utils._equals_rc(path, HDN)
 
 
-def test_assemble_labeled_paths():
-    # assemble entire contig, ignoring branch point b/c of labels
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
+class TestLabeledAssembler:
 
-    K = 21
+    def test_beginning_to_end_across_tip(self, right_tip_structure):
+        # assemble entire contig, ignoring branch point b/c of labels
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        lh = khmer._GraphLabels(graph)
 
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    lh = khmer._GraphLabels(nodegraph)
+        hdn = graph.find_high_degree_nodes(contig)
+        # L, HDN, and R will be labeled with 1
+        lh.label_across_high_degree_nodes(contig, hdn, 1)
 
-    nodegraph.consume(contig)
-    nodegraph.count(contig[100:120] + 'T')  # will add another neighbor
+        path = lh.assemble_labeled_path(contig[:K])
+        assert len(path) == 1, "there should only be one path"
+        path = path[0]  # @CTB
 
-    print(contig[100:125])
-
-    hdn = nodegraph.find_high_degree_nodes(contig)
-    lh.label_across_high_degree_nodes(contig, hdn, 1)
-
-    path = lh.assemble_labeled_path(contig[:K])
-    path = path[0]  # @CTB
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert utils._equals_rc(path, contig)
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
 
 
-def test_assemble_labeled_paths_2():
-    # assemble entire contig + branch point b/c of labels
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
+    def test_assemble_original_and_branch_contigs(self, right_fork_structure):
+        # assemble entire contig + branch point b/c of labels
+        graph, contig, L, HDN, R, branch = right_fork_structure
+        lh = khmer._GraphLabels(graph)
 
-    K = 21
+        hdn = graph.find_high_degree_nodes(contig)
+        hdn += graph.find_high_degree_nodes(branch)
+        print(list(hdn))
+        lh.label_across_high_degree_nodes(contig, hdn, 1)
+        lh.label_across_high_degree_nodes(branch, hdn, 2)
+        print(lh.get_tag_labels(list(hdn)[0]))
 
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    lh = khmer._GraphLabels(nodegraph)
+        paths = lh.assemble_labeled_path(contig[:K])
+        print('Path lengths', [len(x) for x in paths])
 
-    nodegraph.consume(contig)
-    branch = contig[:120] + 'TGATGGACAG'
-    nodegraph.consume(branch)  # will add a branch
+        assert len(paths) == 2
 
-    hdn = nodegraph.find_high_degree_nodes(contig)
-    hdn += nodegraph.find_high_degree_nodes(branch)
-    print(list(hdn))
-    lh.label_across_high_degree_nodes(contig, hdn, 1)
-    lh.label_across_high_degree_nodes(branch, hdn, 2)
-    print(lh.get_tag_labels(list(hdn)[0]))
+        found = False
+        for path in paths:
+            if utils._equals_rc(path, contig):
+                found = True
+                break
+        assert found
 
-    paths = lh.assemble_labeled_path(contig[:K])
-    print([len(x) for x in paths])
-    len_path = len(paths)
-
-    print('len path:', len_path)
-
-    found = False
-    for path in paths:
-        if utils._equals_rc(path, contig):
-            found = True
-            break
-    assert found
-
-    found = False
-    for path in paths:
-        if utils._equals_rc(path, branch):
-            found = True
-            break
-    assert found
+        found = False
+        for path in paths:
+            if utils._equals_rc(path, branch):
+                found = True
+                break
+        assert found
 
 
 def test_assemble_labeled_paths_3():
