@@ -43,7 +43,6 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "labelhash.hh"
 
-#define DEBUG_FILTERS 1
 
 namespace khmer
 {

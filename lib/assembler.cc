@@ -40,9 +40,6 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG 1
-#define DEBUG_AT 0
-
 using namespace std;
 
 namespace khmer

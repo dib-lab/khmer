@@ -40,8 +40,6 @@ Contact: khmer-project@idyll.org
 #include "alphabets.hh"
 #include "kmer_hash.hh"
 
-#define DEBUG 1
-
 using namespace std;
 
 namespace khmer
