@@ -1586,8 +1586,6 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
         stop_bf = nodegraph_o->hashbits;
     }
     LinearAssembler assembler(hashtable);
-    KmerFilterList lst;
-    AssemblerTraverser<RIGHT> test(hashtable, start_kmer, lst);
 
     std::string contig = assembler.assemble(start_kmer, stop_bf);
 
@@ -4365,19 +4363,25 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     LabelHash* labelhash = me->labelhash;
 
     PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
 
-    if (!PyArg_ParseTuple(args, "O", &val_o)) {
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer,
-                                  labelhash->graph->ksize())) {
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph->ksize())) {
         return NULL;
     }
 
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
     SimpleLabeledAssembler assembler(labelhash);
-    std::vector<std::string> contigs = assembler.assemble(start_kmer);
+    std::vector<std::string> contigs = assembler.assemble(start_kmer, stop_bf);
 
     PyObject * ret = PyList_New(contigs.size());
     for (unsigned int i = 0; i < contigs.size(); i++) {
