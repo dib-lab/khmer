@@ -162,14 +162,14 @@ def test_mutate_position():
     assert mutate_position('GGGG', 2) in ['GGAG', 'GGTG']
 
 
-def test_reads_from_sequence():
+def test_reads():
     contigfile = utils.get_test_data('simple-genome.fa')
     contig = list(screed.open(contigfile))[0].sequence
 
-    for read in reads_from_sequence(contig):
+    for read in reads(contig):
         assert read in contig
 
-    for read in reads_from_sequence(contig):
+    for read in reads(contig):
         assert mutate_sequence(read) not in contig
 
 
