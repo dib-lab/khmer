@@ -1,4 +1,4 @@
-2016-10-01  Camille Scott  <camille.scott.w@gmail.com>
+2016-10-06  Camille Scott  <camille.scott.w@gmail.com>
 
    * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose
    reverse_complement to Python.
@@ -14,8 +14,28 @@
    * lib/{kmer_filters.hh, kmer_filters.cc}: Helper filter-functions for the
    AssemblerTraversers.
    * lib/kmer_hash.hh: Helper functions for the Kmer class.
-   * lib/{symbols.hh, symbols.cc}: Global DNA alphabets.
-   * tests/test_nodegraph.py: Additional tests for the assembler API.
+   * lib/{alphabets.hh, alphabets.cc}: Global DNA alphabets.
+   * tests/test_assembly.py: Tests for the assembler API.
+
+2016-10-03  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: adjust setup for exclusive use of travis (jenkins is retiring)
+
+2016-10-02  Titus Brown  <titus@idyll.org>
+
+   * khmer/{utils.py,thread_utils.py,trimming.py}: introduce new function,
+   clean_input_reads, that does consistent read cleaning; update ReadBundle
+   and trimming to make use of new cleaned_seq attribute.
+   * scripts/{normalize-by-median.py,trim-low-abund.py}: refactor to use
+   cleaned_seq attribute properly; this fixed a bug in normalize-by-median.py
+   that led to ignoring lowercase 'actgn'.
+   * doc/dev/development.rst: update developer documentation for new
+   cleaned_seq attribute and ReadBundle behavior.
+   * tests/test_script_output.py: update md5 signatures for output to reflect
+   corrected behavior.
+   * tests/test_functions.py: add test for broken_paired_iter uppercase
+   behavior.
+   * tests/test_read_handling.py: update tests for ReadBundle.
 
 2016-10-01  Titus Brown  <titus@idyll.org>
 

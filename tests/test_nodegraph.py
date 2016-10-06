@@ -1091,3 +1091,4 @@ def test_traverse_linear_path_3_stopgraph():
     assert size == 0
     assert len(visited) == 0
     assert len(conns) == 0
+
