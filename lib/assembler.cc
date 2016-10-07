@@ -57,9 +57,6 @@ LinearAssembler::LinearAssembler(const Hashtable * ht) :
 
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
-//
-// No guarantees on direction, of course - this may return the reverse
-// complement of the input sequence.
 std::string LinearAssembler::assemble(const Kmer seed_kmer,
                                       const Hashtable * stop_bf)
 const
@@ -115,24 +112,28 @@ const
     }
 
 #if DEBUG
-    std::cout << "## assemble_left\nStart Contig: " << contig << std::endl;
+    std::cout << "## assemble_linear_left[start] at " << contig << std::endl;
 #endif
 
     reverse(contig.begin(), contig.end());
     char next_base;
+    unsigned int found = 0;
 
     while ((next_base = cursor.next_symbol()) != '\0') {
         contig += next_base;
+        found++;
     }
 
     reverse(contig.begin(), contig.end());
+#if DEBUG
+    std::cout << "## assemble_linear_left[end] found " << found << std::endl;
+#endif
 
     return contig;
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>
-(AssemblerTraverser<RIGHT>& cursor)
+std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -140,15 +141,19 @@ const
         contig = _revcomp(contig);
     }
     char next_base;
+    unsigned int found = 0;
 
 #if DEBUG
-    std::cout << "## assemble_right\nContig: " << contig << std::endl;
+    std::cout << "## assemble_linear_right[start] at " << contig << std::endl;
 #endif
 
     while ((next_base = cursor.next_symbol()) != '\0') {
         contig += next_base;
+        found++;
     }
-
+#if DEBUG
+    std::cout << "## assemble_linear_right[end] found " << found << std::endl;
+#endif
     return contig;
 }
 
@@ -215,15 +220,122 @@ void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
         StringVector& paths)
 const
 {
+#if DEBUG
+    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " << 
+        start_cursor.cursor.repr(_ksize) << std::endl;
+#endif
 
+    // prime the traversal with the first linear segment
+    std::string root_contig = linear_asm->_assemble_directed<direction>(start_cursor);
+#if DEBUG
+    std::cout << "Primed: " << root_contig << std::endl;
+    std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
+#endif 
+    StringVector segments;
+    std::vector< NonLoopingAT<direction> > cursors;
+
+    segments.push_back(root_contig);
+    cursors.push_back(start_cursor);
+
+    while(segments.size() != 0) {
+        
+        std::string segment = segments.back();
+        NonLoopingAT<direction> cursor = cursors.back();
+#if DEBUG
+        std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
+        std::cout << "Segment: " << segment << std::endl;
+        std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
+#endif 
+        segments.pop_back();
+        cursors.pop_back();
+
+        // check if the cursor has hit a HDN or reached a dead end
+        if (cursor.cursor_degree() > 1) { 
+
+            LabelSet labels;
+            lh->get_tag_labels(cursor.cursor, labels);
+
+            if(labels.size() == 0) {
+                // if no labels are found we can do nothing; gather this contig
+#if DEBUG
+                std::cout << "no-label dead-end" << std::endl;
+#endif
+                paths.push_back(segment);
+                continue;
+            } else {
+                // if there are labels, try to hop the HDN.
+                // first, get a label filter
+                cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+                KmerQueue branch_starts;
+                // now get neighbors that pass the filter
+                cursor.neighbors(branch_starts);
+                // remove the filter
+                cursor.pop_filter();
+
+                // no neighbors found; done with this path
+                if (branch_starts.empty()) {
+#if DEBUG
+                    std::cout << "no-neighbors dead-end" << std::endl;
+#endif
+                    paths.push_back(segment);
+                    continue;
+                }
+                
+                // found some neighbors; extend them
+                while(!branch_starts.empty()) {
+                    // spin off a cursor for the new branch
+                    NonLoopingAT<direction> branch_cursor(cursor);
+                    branch_cursor.cursor = branch_starts.front();
+                    branch_starts.pop();
+
+#if DEBUG
+                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(_ksize) << std::endl;
+#endif
+
+                    // assemble linearly as far as possible
+                    std::string branch = linear_asm->_assemble_directed<direction>(branch_cursor);
+                    // create a new segment with the branch
+                    std::string new_segment = branch_cursor.join_contigs(segment, branch, 1);
+#if DEBUG
+                    std::cout << "Push segment: " << new_segment << std::endl;
+                    std::cout << "Push cursor: " << branch_cursor.cursor.repr(_ksize) << std::endl;
+#endif
+                    segments.push_back(new_segment);
+                    cursors.push_back(branch_cursor);
+                }
+            }
+        } else {
+            // this segment is a dead-end; keep the contig
+#if DEBUG
+            std::cout << "degree-1 dead-end" << std::endl;
+#endif
+            paths.push_back(segment);
+            continue;
+        }
+    }
+}
+
+
+
+/*
+template <bool direction>
+void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
+        start_cursor,
+        StringVector& paths)
+const
+{
+#if DEBUG
+    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " << 
+        start_cursor.cursor.repr(_ksize) << std::endl;
+#endif
     std::string root_contig = linear_asm->_assemble_directed<direction>
                               (start_cursor);
-    //Kmer end_kmer = start_cursor.cursor;
 
     if (start_cursor.cursor_degree() > 1) {               // hit a HDN
 #if DEBUG
-        std::cout << "Contig thus far: " << root_contig << std::endl;
+        std::cout << "Root contig: " << root_contig << std::endl;
         std::cout << "HDN: " << start_cursor.cursor.repr(_ksize) << "\n";
+        std::cout << start_cursor.cursor_degree() << std::endl;
 #endif // DEBUG
 
         LabelSet labels;
@@ -236,24 +348,23 @@ const
             paths.push_back(root_contig);
             return;
         } else {
+#if DEBUG
+            std::cout << "Found " << labels.size() << " labels" << std::endl;
+#endif
 
-            /* Copy the current cursor at end_cursor for the spanning function.
-             * We'll now assemble, following the given label, as far as we can.
-             * We add an extra filter to the list: now, if we find no labels, we
-             * continue assembling; if we find labels and ours is included, we
-             * continue; and if we find labels and ours is not included, we stop.
-             * This cursor should also have the filters for visited k-mers and
-             * the stop bloom filter already.
-             */
+
 
             start_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
             KmerQueue branch_starts;
-            if (start_cursor.neighbors(branch_starts) == 0) {
+            start_cursor.neighbors(branch_starts);
+            start_cursor.pop_filter();
+#if DEBUG
+                std::cout << branch_starts.size() << " neighbors found" << std::endl;
+#endif
+            if (branch_starts.size() == 0) {
                 paths.push_back(root_contig);
                 return;
             }
-
-            start_cursor.pop_filter();
             
             StringVector branch_contigs;
             while(!branch_starts.empty()) { // TODO: change from queue
@@ -275,5 +386,7 @@ const
         paths.push_back(root_contig);
     }
 }
+
+*/
 
 }
