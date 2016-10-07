@@ -505,6 +505,20 @@ def snp_bubble_structure(request, linear_structure):
     return graph, wildtype_sequence, snp_sequence, HDN_L, HDN_R
 
 
+@pytest.fixture(params=[2,3,4,5,6,7,8])
+def tandem_repeat_structure(request, linear_structure):
+
+    graph, sequence = linear_structure
+
+    tandem_repeats = sequence * request.param
+    graph.consume(tandem_repeats)
+
+    if hdn_counts(tandem_repeats, graph):
+        request.applymarker(pytest.mark.xfail)
+
+    return graph, sequence, tandem_repeats
+
+
 class TestNonBranching:
 
     def test_all_start_positions(self, linear_structure):
@@ -797,3 +811,14 @@ class TestLabeledAssembler:
         assert len(paths) == 1
 
         assert any(utils._equals_rc(path, wildtype) for path in paths)
+
+    @pytest.mark.skip(reason='destroys your computer and then the world')
+    def test_assemble_tandem_repeats(self, tandem_repeat_structure):
+        # assemble one copy of a tandem repeat
+        graph, repeat, tandem_repeats = tandem_repeat_structure
+
+        lh = khmer._GraphLabels(graph)
+        
+        paths = lh.assemble_labeled_path(repeat[:K])
+        assert len(paths) == 1
+        assert len(paths[0]) == len(repeat)
