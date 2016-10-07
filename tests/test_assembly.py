@@ -784,12 +784,12 @@ class TestLabeledAssembler:
         paths = lh.assemble_labeled_path(wildtype[:K])
         assert len(paths) == 2
 
-        assert any(utils._equals_rc(path, wildtype) for path in paths)
-        assert any(utils._equals_rc(path, mutant) for path in paths)
-        assert all(path[:HDN_L.pos+K][-K:] == HDN_L for path in paths)
-        assert all(path[HDN_R.pos:][:K] == HDN_R for path in paths)
-        assert paths[0][:HDN_L.pos+K] == paths[1][:HDN_L.pos+K]
-        assert paths[0][HDN_R.pos:] == paths[1][HDN_R.pos:]
+        assert any(utils._contains_rc(wildtype, path) for path in paths)
+        assert any(utils._contains_rc(mutant, path) for path in paths)
+        #assert all(path[:HDN_L.pos+K][-K:] == HDN_L for path in paths)
+        #assert all(path[HDN_R.pos:][:K] == HDN_R for path in paths)
+        #assert paths[0][:HDN_L.pos+K] == paths[1][:HDN_L.pos+K]
+        #assert paths[0][HDN_R.pos:] == paths[1][HDN_R.pos:]
 
     def test_assemble_snp_bubble_stopbf(self, snp_bubble_structure):
         # assemble one side of bubble, blocked with stop_bf,
@@ -812,7 +812,7 @@ class TestLabeledAssembler:
 
         assert any(utils._equals_rc(path, wildtype) for path in paths)
 
-    @pytest.mark.skip(reason='destroys your computer and then the world')
+    #@pytest.mark.skip(reason='destroys your computer and then the world')
     def test_assemble_tandem_repeats(self, tandem_repeat_structure):
         # assemble one copy of a tandem repeat
         graph, repeat, tandem_repeats = tandem_repeat_structure
@@ -821,4 +821,6 @@ class TestLabeledAssembler:
         
         paths = lh.assemble_labeled_path(repeat[:K])
         assert len(paths) == 1
-        assert len(paths[0]) == len(repeat)
+        # There are K-1 k-mers spanning the junction between
+        # the beginning and end of the repeat
+        assert len(paths[0]) == len(repeat) + K - 1

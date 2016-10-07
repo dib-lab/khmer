@@ -86,7 +86,7 @@ public:
     explicit NodeGatherer(const Hashtable * ht);
     
     explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
-
+    
     /**
      * @brief Push a new filter on to the filter stack.
      */
@@ -105,6 +105,11 @@ public:
         KmerFilter back = this->filters.back();
         this->filters.pop_back();
         return back;
+    }
+
+    unsigned int n_filters()
+    {
+        return filters.size();
     }
 
     /**
@@ -249,7 +254,7 @@ public:
      *
      * @return A member of alphabets::DNA_SIMPLE if a neighbor is found; '\0' otherwise.
      */
-    char next_symbol();
+    virtual char next_symbol();
 
     /**
      * @brief Utility function to join two overlapping contigs with proper directionality.
@@ -290,7 +295,7 @@ public:
                           Kmer start_kmer,
                           KmerFilterList filters,
                           SeenSet * visited);
-    char next_symbol();
+    virtual char next_symbol();
 };
 
 }

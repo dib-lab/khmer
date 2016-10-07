@@ -41,7 +41,6 @@ Contact: khmer-project@idyll.org
 #include "labelhash.hh"
 #include "kmer_filters.hh"
 
-#define DEBUG_FILTERS 1
 
 namespace khmer
 {
@@ -136,6 +135,10 @@ KmerFilter get_visited_filter(const SeenSet * visited)
        " containing " << visited->size() << " nodes" << std::endl;
 #endif
     KmerFilter filter = [=] (const Kmer& node) {
+#if DEBUG_FILTERS
+        std::cout << "Check visited filter (" << visited->size() 
+            << " elems)" << std::endl;
+#endif
         return set_contains(*visited, node);
     };
     return filter;

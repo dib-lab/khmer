@@ -327,6 +327,9 @@ NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
 template<bool direction>
 char NonLoopingAT<direction>::next_symbol()
 {
+#if DEBUG_TRAVERSAL
+    std::cout << "Insert cursor to visited filter" << std::endl;
+#endif
     visited->insert(this->cursor);
     return AssemblerTraverser<direction>::next_symbol();
 }
