@@ -100,6 +100,27 @@ def test_forward_hash_no_rc_33mer():
         h = khmer.forward_hash_no_rc(kmer32 + base, 33)
         assert h == h33, base
 
+        kmer33 = kmer32 + base
+        for twobit, base in ((0, 'A'), (1, 'T'), (2, 'C'), (3, 'G')):
+            h34 = (h33 << 2) | twobit
+            h = khmer.forward_hash_no_rc(kmer33 + base, 34)
+            assert kmer33 + base == khmer.reverse_hash(h, 34)
+            assert h == h34, base
+
+            kmer34 = kmer33 + base
+            for twobit, base in ((0, 'A'), (1, 'T'), (2, 'C'), (3, 'G')):
+                h35 = (h34 << 2) | twobit
+                h = khmer.forward_hash_no_rc(kmer34 + base, 35)
+                assert kmer34 + base == khmer.reverse_hash(h, 35)
+                assert h == h35, base
+
+                kmer35 = kmer34 + base
+                for twobit, base in ((0, 'A'), (1, 'T'), (2, 'C'), (3, 'G')):
+                    h36 = (h35 << 2) | twobit
+                    h = khmer.forward_hash_no_rc(kmer35 + base, 36)
+                    assert kmer35 + base == khmer.reverse_hash(h, 36)
+                    assert h == h36, base
+
 
 def test_reverse_hash():
     s = khmer.reverse_hash(0, 4)

@@ -120,8 +120,8 @@ HashIntoType _hash_murmur_forward(const std::string& kmer);
 
 class BigHashType {
 public:
-  std::array<uint8_t, 10> bytes{};
-  constexpr static std::size_t N{10};
+  std::array<uint8_t, 16> bytes{};
+  constexpr static std::size_t N{16};
 
   BigHashType() = default;
   BigHashType(const BigHashType &) = default;
