@@ -100,7 +100,7 @@ Contact: khmer-project@idyll.org
 
 namespace std {
 template <size_t N>
-struct std::less<bitset<N>> : std::binary_function<bitset<N>, bitset<N>, bool> {
+struct less<bitset<N>> : std::binary_function<bitset<N>, bitset<N>, bool> {
   bool operator()(const std::bitset<N> &L, const std::bitset<N> &R) const {
     for (int i = N - 1; i >= 0; i--) {
       if (L[i] ^ R[i])
@@ -141,26 +141,6 @@ HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
 
-
-#if 0
-template<std::size_t N>
-bool operator<(const std::bitset<N>& x, const std::bitset<N>& y)
-{
-    for (int i = N-1; i >= 0; i--) {
-        if (x[i] ^ y[i]) return y[i];
-    }
-    return false;
-}
-
-template<std::size_t N>
-inline bool operator> (const std::bitset<N>& lhs, const std::bitset<N>& rhs){ return rhs < lhs; }
-
-template<std::size_t N>
-inline bool operator<=(const std::bitset<N>& lhs, const std::bitset<N>& rhs){ return !(lhs > rhs); }
-
-template<std::size_t N>
-inline bool operator>=(const std::bitset<N>& lhs, const std::bitset<N>& rhs){ return !(lhs < rhs); }
-#endif
 
 template<std::size_t N>
 uint64_t operator%(const std::bitset<N>& x, const uint64_t y)
